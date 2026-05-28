@@ -1,20 +1,25 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Z3-based state update invariant verifier (Stage 1a).
+"""Z3-based state update invariant verifier + Marabou bridge skeleton.
 
-llcore の核独自軸: **進化ループ内 SMT online gate** (事前調査で先行未発見).
-StateUpdateGene の clip 範囲下で「state norm 有界」が構造的に保たれることを
-Z3 で satisfiability 検査し、進化中の gene を online で gate する基盤。
+llcore の核独自軸:
+- Stage 1a: 進化ループ内 SMT online gate (PoC 1a 完了)
+- Stage 3a: Marabou Incremental NN Verification の **異構造拡張** refinement
+  relation sound 拡張 + ChangeOp-MCC curriculum (PoC 3a)
 
-API:
+API (Stage 1a):
 - :func:`verify_state_norm_invariant` — clip 範囲下の有界性を Z3 で検証
 - :func:`verify_gene_safe` — 単一 gene が安全 (invariant 違反なし) か検査
-- :class:`InvariantResult` — 検査結果 (ok / counterexample / z3 unavailable 等)
+- :class:`InvariantResult` — 検査結果
+
+API (Stage 3a):
+- :mod:`llcore.verifier.changeop` — ChangeOp / ChangeOpSequence 型と合成
+- :mod:`llcore.verifier.refinement` — sound 拡張 R(NN,NN',c) と Marabou bridge
+- :mod:`llcore.verifier.curriculum` — MCC 風 ChangeOp 淘汰
 
 honest 留保:
-- tanh は Z3 で直接表現できないため、``|tanh(z)| <= min(|z|, 1)`` の上界で近似。
-  これは保守的 (sound: 上界で OK なら実値も OK) だが完全ではない。
-- Stage 1a は state_norm 有界 (Lyapunov-style 数値安定性) のみ。Lipschitz は Stage 1b、
-  spectral radius は Stage 1c で別 PoC。
+- tanh は Z3 で直接表現できないため、``|tanh(z)| <= 1`` の上界で近似 (sound).
+- Marabou native 統合は Stage 5+。Stage 3a は **mock + Z3 で sound 性を再現** し
+  refinement 拡張の機構実証に集中。
 """
 
 from .invariants import (
@@ -23,10 +28,74 @@ from .invariants import (
     verify_gene_safe,
     verify_state_norm_invariant,
 )
+from .changeop import (
+    ChangeOp,
+    ChangeOpSequence,
+    apply_changeop,
+    apply_sequence,
+    decay_shift,
+    gate_shift,
+    kernel_swap_mock,
+    mix_shift,
+    sequence_from_iter,
+)
+from .refinement import (
+    E_BASE,
+    K_INHERIT,
+    KERNEL_SWAP_EXTRA,
+    MarabouBridgeStatus,
+    RefinementResult,
+    SequenceCheckResult,
+    epsilon_for,
+    get_bridge_status,
+    is_marabou_available,
+    verify_composition,
+    verify_refinement_single,
+    verify_sequence_tolerance,
+)
+from .curriculum import (
+    CurriculumGeneration,
+    CurriculumState,
+    evolve_one_generation,
+    initial_population,
+    is_saturated,
+    run_curriculum,
+)
 
 __all__ = [
+    # Stage 1a
     "InvariantResult",
     "is_z3_available",
     "verify_gene_safe",
     "verify_state_norm_invariant",
+    # Stage 3a changeop
+    "ChangeOp",
+    "ChangeOpSequence",
+    "apply_changeop",
+    "apply_sequence",
+    "decay_shift",
+    "mix_shift",
+    "gate_shift",
+    "kernel_swap_mock",
+    "sequence_from_iter",
+    # Stage 3a refinement
+    "E_BASE",
+    "K_INHERIT",
+    "KERNEL_SWAP_EXTRA",
+    "MarabouBridgeStatus",
+    "RefinementResult",
+    "SequenceCheckResult",
+    "epsilon_for",
+    "get_bridge_status",
+    "is_marabou_available",
+    "verify_composition",
+    "verify_refinement_single",
+    "verify_sequence_tolerance",
+    # Stage 3a curriculum
+    "CurriculumGeneration",
+    "CurriculumState",
+    "evolve_one_generation",
+    "initial_population",
+    "is_saturated",
+    "run_curriculum",
 ]
