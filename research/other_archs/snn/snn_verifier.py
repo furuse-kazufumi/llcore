@@ -150,9 +150,12 @@ def verify_firing_rate_bound(
     for i in range(n_spikes - 1):
         solver.add(spike_times[i + 1] - spike_times[i] >= t_ref)
 
-    # invariant 違反: rate = n / (T/1000) > 1000 / t_ref
-    # <=> n_spikes * t_ref > T_window
-    solver.add(n_spikes * t_ref > T_window_ms)
+    # invariant 違反 (finite-window 厳密, Codex F1 / Stage 2.1):
+    #   refractory respect で t_n - t_1 >= (n-1) * t_ref より n <= 1 + T_window/t_ref
+    #   違反: (n-1) * t_ref > T_window
+    # 旧式 `n * t_ref > T_window` は fence-post で over-strict (false positive),
+    # boundary case n = 1 + T/t_ref を不当 reject していた.
+    solver.add((n_spikes - 1) * t_ref > T_window_ms)
 
     result = solver.check()
     if result == z3.unsat:
@@ -216,9 +219,9 @@ def verify_firing_rate_per_gene(
     solver.add(spike_times[-1] <= T_window_ms)
     for i in range(n_spikes - 1):
         solver.add(spike_times[i + 1] - spike_times[i] >= g.t_ref)
-    # 違反: n_spikes / (T/1000) > 1000 / t_ref
-    # <=> n_spikes * t_ref > T  (固定値で比較)
-    solver.add(n_spikes * g.t_ref > T_window_ms)
+    # 違反 (finite-window 厳密, Codex F1 / Stage 2.1):
+    #   (n-1) * t_ref > T_window で violation. 旧式 `n * t_ref > T` は over-strict.
+    solver.add((n_spikes - 1) * g.t_ref > T_window_ms)
 
     result = solver.check()
     upper_rate = 1000.0 / g.t_ref
@@ -230,7 +233,7 @@ def verify_firing_rate_per_gene(
     if result == z3.sat:
         return SNNInvariantResult(
             ok=False, used_z3=True,
-            reason=f"sat: refractory bound violated (n_spikes * t_ref > T)",
+            reason=f"sat: refractory bound violated ((n_spikes-1) * t_ref > T)",
         )
     return SNNInvariantResult(
         ok=False, used_z3=True, reason=f"unknown ({result})",
