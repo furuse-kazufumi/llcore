@@ -22,6 +22,8 @@ honest 留保:
   が、初期は素朴 tournament で十分 (state update 数式は genome 次元 3 と小さい)
 """
 
+from .adaptive_floor import AdaptiveFloorGate
+from .lineage_reservoir import LineageReservoir
 from .minimal_ga import (
     EvolutionResult,
     FitnessFunc,
@@ -34,16 +36,21 @@ from .minimal_ga import (
     tournament_select,
     uniform_mutate,
 )
+from .modes_meter import ModesMeter, pairwise_l2_diversity
 
 __all__ = [
+    "AdaptiveFloorGate",
     "EvolutionResult",
     "FitnessFunc",
     "Individual",
+    "LineageReservoir",
+    "ModesMeter",
     "Population",
     "crossover_uniform",
     "evaluate_population",
     "evolve",
     "initialize_random_population",
+    "pairwise_l2_diversity",
     "tournament_select",
     "uniform_mutate",
 ]
