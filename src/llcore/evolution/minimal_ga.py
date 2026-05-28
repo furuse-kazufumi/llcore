@@ -1,0 +1,262 @@
+# SPDX-License-Identifier: Apache-2.0
+"""llcore 自前 minimal GA — tournament + uniform mutation の素朴 GA.
+
+設計判断 (ユーザー指示 2026-05-29):
+- llive lldarwin_v2 / Genome3D / persona_evolution への依存なし
+- state_update gene 3 次元に特化、素朴 tournament で十分
+- 拡張は v0.2+ で (ε-lexicase / novelty 等は自前実装で追従、llive 参考のみ)
+
+最小 API:
+- :class:`Individual` — gene + fitness の tuple
+- :class:`Population` — frozen container
+- :func:`tournament_select` — k 個 random sample → max fitness
+- :func:`uniform_mutate` — 各 gene parameter に gaussian noise
+- :func:`crossover_uniform` — 2 親の gene を独立に親 0/1 から選ぶ
+- :func:`evolve` — 進化 main loop (CPU 完結, deterministic with seed)
+
+破綻防止:
+- 全滅回避: tournament k <= pop_size で構造的保証
+- 数値安定: gene.clipped() で範囲外を抑える
+- 単調非減少 best: elitism (top-1 必ず次世代に残す)
+- 決定論性: rng を毎呼出で渡す
+"""
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Callable
+
+import numpy as np
+
+from llcore.state_update import StateUpdateGene
+
+
+@dataclass(frozen=True)
+class Individual:
+    """gene + fitness の immutable tuple."""
+
+    gene: StateUpdateGene
+    fitness: float
+
+
+@dataclass(frozen=True)
+class Population:
+    """immutable individual list (順序保持)."""
+
+    individuals: tuple[Individual, ...]
+
+    @property
+    def size(self) -> int:
+        return len(self.individuals)
+
+    @property
+    def best(self) -> Individual:
+        return max(self.individuals, key=lambda ind: ind.fitness)
+
+    @property
+    def fitness_array(self) -> np.ndarray:
+        return np.array([ind.fitness for ind in self.individuals], dtype=np.float64)
+
+    @property
+    def gene_matrix(self) -> np.ndarray:
+        """shape (N, 3): (decay, mix, gate_str) per row."""
+        return np.array([ind.gene.as_array() for ind in self.individuals])
+
+
+# ---------------------------------------------------------------------------
+# selection
+# ---------------------------------------------------------------------------
+
+
+def tournament_select(
+    pop: Population, k: int, rng: np.random.Generator
+) -> Individual:
+    """k 個体を random sampling し最大 fitness を返す.
+
+    k=1 で random 選択、k=size で best (greedy)。標準は k=3。
+    """
+    if k < 1 or k > pop.size:
+        raise ValueError(f"k={k} must be in [1, {pop.size}]")
+    indices = rng.choice(pop.size, size=k, replace=False)
+    candidates = [pop.individuals[i] for i in indices]
+    return max(candidates, key=lambda ind: ind.fitness)
+
+
+# ---------------------------------------------------------------------------
+# mutation / crossover
+# ---------------------------------------------------------------------------
+
+
+def uniform_mutate(
+    gene: StateUpdateGene, sigma: float, rng: np.random.Generator
+) -> StateUpdateGene:
+    """各 gene parameter に独立 gaussian noise (σ=sigma).
+
+    clip 範囲 (decay [0,1], mix [-1,1], gate_str [-2,2]) を gene.clipped() で守る。
+    """
+    noise = rng.normal(0.0, sigma, size=3)
+    arr = gene.as_array() + noise
+    return StateUpdateGene.from_array(arr).clipped()
+
+
+def crossover_uniform(
+    parent_a: StateUpdateGene,
+    parent_b: StateUpdateGene,
+    rng: np.random.Generator,
+) -> StateUpdateGene:
+    """各 parameter を 50/50 で a/b から独立に選ぶ (uniform crossover)."""
+    arr_a = parent_a.as_array()
+    arr_b = parent_b.as_array()
+    mask = rng.integers(0, 2, size=3).astype(bool)
+    child_arr = np.where(mask, arr_a, arr_b)
+    return StateUpdateGene.from_array(child_arr).clipped()
+
+
+# ---------------------------------------------------------------------------
+# evolution loop
+# ---------------------------------------------------------------------------
+
+
+FitnessFunc = Callable[[StateUpdateGene, np.random.Generator], float]
+
+
+def evaluate_population(
+    genes: list[StateUpdateGene],
+    fitness_func: FitnessFunc,
+    rng: np.random.Generator,
+) -> Population:
+    """全個体の fitness 計算 → Population を返す."""
+    individuals: list[Individual] = []
+    for gene in genes:
+        f = fitness_func(gene, rng)
+        individuals.append(Individual(gene=gene, fitness=float(f)))
+    return Population(individuals=tuple(individuals))
+
+
+def initialize_random_population(
+    pop_size: int, rng: np.random.Generator
+) -> list[StateUpdateGene]:
+    """random gene 集団を生成 (clip 範囲内 uniform)."""
+    return [
+        StateUpdateGene(
+            decay=float(rng.uniform(0.0, 1.0)),
+            mix=float(rng.uniform(-1.0, 1.0)),
+            gate_str=float(rng.uniform(-2.0, 2.0)),
+        )
+        for _ in range(pop_size)
+    ]
+
+
+@dataclass(frozen=True)
+class EvolutionResult:
+    """進化結果のスナップショット.
+
+    Attributes
+    ----------
+    generations : tuple[Population, ...]
+        世代ごとの Population (世代 0 から最終世代まで).
+    best_fitness_curve : tuple[float, ...]
+        各世代の best fitness (進化進捗の主指標).
+    diversity_curve : tuple[float, ...]
+        各世代の gene_matrix 分散 (gene 多様性指標).
+    """
+
+    generations: tuple[Population, ...]
+    best_fitness_curve: tuple[float, ...]
+    diversity_curve: tuple[float, ...]
+
+    @property
+    def final_best(self) -> Individual:
+        return self.generations[-1].best
+
+
+def evolve(
+    fitness_func: FitnessFunc,
+    *,
+    pop_size: int = 10,
+    n_generations: int = 10,
+    tournament_k: int = 3,
+    mutation_sigma: float = 0.15,
+    crossover_rate: float = 0.5,
+    elitism: int = 1,
+    rng: np.random.Generator | None = None,
+    initial_pop: list[StateUpdateGene] | None = None,
+) -> EvolutionResult:
+    """進化 main loop.
+
+    Parameters
+    ----------
+    fitness_func : Callable[[gene, rng], float]
+        個体評価関数。rng は再現性のため受け渡し。
+    pop_size : int
+        集団サイズ。
+    n_generations : int
+        世代数。
+    tournament_k : int
+        tournament 選択 size (1=random, pop_size=greedy)。
+    mutation_sigma : float
+        gaussian noise sigma。
+    crossover_rate : float
+        crossover を実行する確率 (それ以外は mutation のみ)。
+    elitism : int
+        各世代で上位 N を必ず次世代に残す。
+    rng : np.random.Generator
+        seed 固定の再現性のため必須 (None なら default_rng())。
+    initial_pop : list[StateUpdateGene] | None
+        初期集団。None なら random 生成。
+
+    Returns
+    -------
+    EvolutionResult
+        全世代のスナップショット + best_fitness_curve + diversity_curve。
+    """
+    if rng is None:
+        rng = np.random.default_rng()
+    if elitism > pop_size:
+        raise ValueError(f"elitism={elitism} must be <= pop_size={pop_size}")
+    if tournament_k > pop_size:
+        raise ValueError(f"tournament_k={tournament_k} must be <= pop_size={pop_size}")
+
+    # 初期集団
+    if initial_pop is None:
+        initial_pop = initialize_random_population(pop_size, rng)
+    elif len(initial_pop) != pop_size:
+        raise ValueError(f"initial_pop size {len(initial_pop)} != pop_size {pop_size}")
+
+    pop = evaluate_population(initial_pop, fitness_func, rng)
+    generations: list[Population] = [pop]
+    best_curve: list[float] = [pop.best.fitness]
+    diversity_curve: list[float] = [float(pop.gene_matrix.var())]
+
+    for _gen in range(n_generations):
+        # elitism: 上位 N を子に「fitness ごと」持ち越し (再評価しない)
+        #
+        # fitness は確率的 (fitness_func 内 task.generate が rng 使用) なので、
+        # elite を再評価すると fitness が変動して best 単調性が崩れる。
+        # → elite は前世代の Individual (gene + fitness) をそのまま次世代に。
+        sorted_inds = sorted(pop.individuals, key=lambda ind: -ind.fitness)
+        elites: list[Individual] = list(sorted_inds[:elitism])
+
+        # 残り (pop_size - elitism) を tournament + mutation/crossover で生成し新評価
+        new_genes: list[StateUpdateGene] = []
+        while len(new_genes) < pop_size - elitism:
+            parent_a = tournament_select(pop, tournament_k, rng)
+            if rng.random() < crossover_rate:
+                parent_b = tournament_select(pop, tournament_k, rng)
+                child = crossover_uniform(parent_a.gene, parent_b.gene, rng)
+            else:
+                child = parent_a.gene
+            child = uniform_mutate(child, mutation_sigma, rng)
+            new_genes.append(child)
+
+        new_pop = evaluate_population(new_genes, fitness_func, rng)
+        # elite (旧 fitness 維持) + 新個体 (新評価) を結合
+        pop = Population(individuals=tuple(elites) + new_pop.individuals)
+        generations.append(pop)
+        best_curve.append(pop.best.fitness)
+        diversity_curve.append(float(pop.gene_matrix.var()))
+
+    return EvolutionResult(
+        generations=tuple(generations),
+        best_fitness_curve=tuple(best_curve),
+        diversity_curve=tuple(diversity_curve),
+    )
