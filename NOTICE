@@ -1,0 +1,81 @@
+llive
+Copyright 2026 Kazufumi Furuse
+
+This product includes software developed by Kazufumi Furuse
+(https://github.com/furuse-kazufumi).
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+implied. See the License for the specific language governing permissions
+and limitations under the License.
+
+Commercial licenses are also available; see LICENSE-COMMERCIAL.
+
+================================================================
+Trademarks
+================================================================
+
+"FullSense" (umbrella brand and spec name), "llmesh", "llive", and "llove"
+are trademarks of Kazufumi Furuse. See TRADEMARK.md for the brand hierarchy
+and trademark usage guidelines.
+
+llive is part of the FullSense family of products:
+
+    FullSense (umbrella) — brand + technical specification
+      ├─ llmesh — secure LLM hub / on-prem MCP server
+      ├─ llive  — self-evolving modular memory LLM framework (this project)
+      └─ llove  — TUI dashboard / HITL workbench
+
+================================================================
+Third-party software
+================================================================
+
+llive depends on several third-party Python packages. Each is governed by
+its own license, which can be reviewed via:
+
+    pip-licenses --format=markdown
+
+Major direct dependencies and their primary licenses (as of 2026-05-16):
+
+  * jsonschema       — MIT
+  * pydantic         — MIT
+  * pyyaml           — MIT
+  * numpy            — BSD-3-Clause
+  * duckdb           — MIT
+  * structlog        — Apache-2.0 / MIT (dual)
+  * typer            — MIT
+  * kuzu             — MIT
+  * apscheduler      — MIT
+  * safetensors      — Apache-2.0
+  * cryptography     — Apache-2.0 / BSD (dual)
+
+Optional dependencies for the `[torch]`, `[mcp]`, `[vlm]`, and `[coding]`
+extras have their own licenses; review them with `pip-licenses` after
+installing the relevant extras.
+
+================================================================
+Datasets and corpora
+================================================================
+
+llive ships **no** dataset or corpus in this repository. The
+`scripts/import_rad.py` utility allows local users to copy the Raptor RAD
+corpus (sibling project) into `data/rad/`. Each corpus directory contains
+content licensed under its own terms — most are CC0, CC-BY, MIT, or
+public-domain. **Users are responsible for verifying the license of each
+individual corpus** before redistribution. The data files in `data/rad/`
+are excluded from the PyPI distribution and the Git repository.
+
+================================================================
+Attribution
+================================================================
+
+Portions of the design, naming, and architecture were developed in
+collaboration with Claude (Anthropic's language model) under user
+direction. Code authorship and copyright remain with the human author.

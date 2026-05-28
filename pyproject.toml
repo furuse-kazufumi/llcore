@@ -1,0 +1,67 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "llmesh-llcore"
+version = "0.1.0a0"
+description = "Verified Neural Architecture Evolution on CPU — core algorithm evolution (state-update kernels, learning rules, factor-driven adaptive computation) under Z3-gated selection pressure"
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE", "LICENSE-COMMERCIAL", "NOTICE"]
+requires-python = ">=3.11,<3.14"
+authors = [{ name = "Kazufumi Furuse", email = "kazufumi@furuse.work" }]
+keywords = [
+  "neural-architecture-evolution",
+  "verified-ml",
+  "state-space-model",
+  "evolutionary-computation",
+  "smt-solver",
+  "z3",
+  "predictive-coding",
+  "learning-rules",
+]
+classifiers = [
+  "Development Status :: 1 - Planning",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Operating System :: OS Independent",
+]
+dependencies = [
+  "numpy>=1.26",
+]
+
+[project.optional-dependencies]
+z3 = ["z3-solver>=4.13"]
+llive = ["llmesh-llive>=0.6"]
+# rad は stdlib のみで動くため optional-dep 不要 (RAD コーパスを path-based 参照)
+# LLCORE_RAD_DIR env で RAD 根ディレクトリを指定 (default D:/docs/)
+dev = [
+  "pytest>=8",
+  "pytest-cov>=4.1",
+  "hypothesis>=6.100",
+  "ruff>=0.5",
+  "mypy>=1.10",
+]
+
+[project.urls]
+Homepage = "https://github.com/furuse-kazufumi/llcore"
+Repository = "https://github.com/furuse-kazufumi/llcore"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/llcore"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = ["-ra", "--strict-markers"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
