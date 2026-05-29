@@ -161,16 +161,19 @@ class VerifierBackend(Protocol[GeneT]):
 
 **backend 一覧 (移植時の対応表)**:
 
-| backend | 元 research 関数 | invariant | per-gene 真正性 |
+| backend | 元 research 関数 | invariant | per-gene 真正性 (Codex 検証済) |
 |---|---|---|---|
-| `RWKVStateNormBackend` (本流) | `verify_gene_safe` (invariants.py) | `\|state\| <= bound` (box) | **真** (`z3.RealVal(g.decay)` で gene を制約に投入) |
-| `SNNLifBackend` | `verify_membrane_bounded_per_gene` + `verify_firing_rate_per_gene` | 膜電位 bounded + firing rate | 要監査 (§4 参照) |
-| `IzhikevichBackend` | `verify_v_bounded_per_gene` + `verify_firing_rate_per_gene` | v² 1-step Euler + dt packing | **box 流用** (Codex F1: gene.clipped() で box → 真の per-gene でない) |
+| `RWKVStateNormBackend` (本流) | `verify_gene_safe` (invariants.py) | `\|state\| <= bound` | **真** (`z3.RealVal(g.decay)` 等で gene を制約に投入) |
+| `SNNLifBackend` | `verify_membrane_bounded_per_gene` + `verify_firing_rate_per_gene` | 膜電位 bounded + firing rate | **真 (限定付き)** — `tau_m_const`/`v_th_const`/`v_reset_const` を Z3 制約に具体投入。ただし **I_max 入力契約 + 1-step Euler + t_ref 未関与** の限定 |
+| `IzhikevichBackend` | `verify_v_bounded_per_gene` + `verify_firing_rate_per_gene` | v² 1-step Euler + dt packing | **box 流用** (Codex 既出 F1: gene.clipped() で box → 真の per-gene でない) |
 
 > **per-gene verifier の罠 (ARCH_LANDSCAPE §5.3 #3)**: backend を「per-gene」と名乗る前に、
-> gene parameter が **Z3 symbolic constraint に実際に入っているか**を監査する。`gene.clipped()`
-> で box 範囲に流用するだけのものは「assumed-contract 下の box proof」であり per-gene ではない。
-> 移植時に backend docstring で **どちらか明示**する (Izhikevich F1 の再発防止)。
+> gene parameter が **Z3 symbolic constraint に実際に入っているか**を監査する。
+> **Codex review で実コード確認済 (L1 訂正)**: SNN-LIF `verify_membrane_bounded_per_gene` は
+> `gene.clipped()` 後に **具体値を Z3 制約に埋込んでおり真の per-gene** (RWKV と同質)。当初表の
+> 「要監査」は過度に保守的だった → 「**true per-gene under assumed-input 1-step contract**」が正確。
+> 一方 Izhikevich は box 流用のまま (降格表示維持)。`gene.clipped()` で box 範囲に流用するだけの
+> ものは per-gene ではない、という罠の判定基準は変わらず — backend docstring で **どちらか明示**する。
 
 ---
 
