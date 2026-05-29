@@ -60,6 +60,10 @@ def smooth_eval(gene: np.ndarray, rng: np.random.Generator) -> float:
 
 
 def _run(name: str, eval_fn) -> bool:
+    """全 3 baseline (RR-hillclimb / panmictic-GA / random) に対して MAP-Elites の優位を判定.
+
+    返り値 = 3 baseline 全てに有意勝利か (exp4 の '③成立' 定義と同一基準で境界対照する)。
+    """
     bounds = (np.zeros(D), np.ones(D))
     res = run_methods_over_seeds(
         eval_fn, behavior_mean,
@@ -69,10 +73,13 @@ def _run(name: str, eval_fn) -> bool:
     print(f"\n--- 条件 {name} ---")
     for k, v in res.items():
         print(f"  {k:14s}: mean={v.mean():.4f} (reach>0.8: {float(np.mean(v>0.8)):.2f})")
-    cme_rr = compare(res["map_elites"], res["rr_hillclimb"], "me", "rr")
-    print(f"  MAP-Elites vs RR-hillclimb: diff={cme_rr.diff:+.4f} p={cme_rr.wilcoxon_p:.4g} "
-          f"δ={cme_rr.cliff_delta:+.2f} → {'③成立側' if cme_rr.passes else '有意差なし'}")
-    return cme_rr.passes
+    passes = {}
+    for base in ("rr_hillclimb", "panmictic_ga", "random"):
+        c = compare(res["map_elites"], res[base], "me", base)
+        passes[base] = c.passes
+        print(f"  MAP-Elites vs {base:13s}: diff={c.diff:+.4f} p={c.wilcoxon_p:.4g} "
+              f"δ={c.cliff_delta:+.2f} → {'③成立側' if c.passes else '有意差なし'}")
+    return all(passes.values())
 
 
 def main() -> int:
