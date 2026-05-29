@@ -52,9 +52,13 @@ from .honest_eval import (
 __all__ = [
     "AdaptiveFloorGate",
     "EvolutionResult",
+    "FalsificationResult",
     "FitnessFunc",
     "FitnessFuncG",
     "GeneT",
+    "equal_budget",
+    "evolution_vs_random",
+    "honest_reevaluate",
     "Individual",
     "LineageReservoir",
     "ModesMeter",
