@@ -14,7 +14,8 @@
    random / panmictic-GA / random-restart hill-climbing の 3 baseline 全てに圧勝** (p=1.9e-6, Cliff δ=+1.00,
    全 20 seed 勝利)。MAP-Elites のみ大域最適に到達 (95%)、他は全て局所最適で停滞 (0%)。= **③ が立つ**。
 2. この優位は **MAP-Elites が万能だからではなく landscape が欺瞞的だから**。dip を外した滑らかな
-   corridor では優位が**消える** (p=0.29) — 境界実験で確認。
+   corridor では **MAP-Elites は RR-hillclimb (p=0.29) にも panmictic-GA (むしろやや劣位) にも優位を失い、
+   pure random にのみ勝つ** — 境界実験 exp5 (全 3 baseline) で確認。
 3. → **③ の将来性は「実 task / 実 LLM fitness が欺瞞的 corridor 構造を持つか」に帰着する** empirical question。
 
 ## 1. ③ 立証の falsifiable 基準 (設計ノート C1-C4) と達成
