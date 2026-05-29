@@ -207,6 +207,22 @@ def uniform_mutate_g(gene, codec: GeneCodec, sigma, rng):
 > **破綻防止**: 既存 67+ 進化系 test が `StateUpdateGene` 前提なので、
 > 「codec デフォルト = RWKV」で**シグネチャ後方互換**を保証する。新 test で LIF codec path を追加。
 
+> **Codex review 反映 (M3) — 後方互換は evolve だけでは不十分**: `minimal_ga` の RWKV 固定は
+> `evolve` に留まらず、以下のシンボルに広がっている。後方互換の十分条件は「これら全てを
+> **RWKV wrapper として温存**し、一般化版を別名で additive 追加する」こと。`evolve(..., codec=RWKV)`
+> 1 点に根拠を寄せない。
+>
+> | 温存対象シンボル | 一般化版 (additive) |
+> |---|---|
+> | `Individual.gene: StateUpdateGene` | `Individual[GeneT]` (Generic 化、デフォルト束縛で旧 import 維持) |
+> | `FitnessFunc = Callable[[StateUpdateGene, rng], float]` | `FitnessFunc[GeneT]` (TypeVar) |
+> | `evaluate_population(genes, ...)` | codec 不要 (gene 型に依存しない) — 変更なしで OK |
+> | `initialize_random_population(pop_size, rng)` | `initialize_random_population_g(pop_size, codec, rng)` |
+> | `uniform_mutate` / `crossover_uniform` (size=3 固定) | `*_g(gene, codec, ...)` (§3.1) |
+> | `Population.gene_matrix` ((N,3) 固定) | codec.to_array stack で任意 dim、旧 property は RWKV stack 維持 |
+>
+> 旧シンボルは「RWKV codec を内部固定した薄い wrapper」に書き換える (シグネチャ・戻り値不変)。
+
 ---
 
 ## 4. SNN-LIF 取り込み path (最初の plugin、step-by-step)
