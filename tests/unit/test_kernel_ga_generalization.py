@@ -327,6 +327,37 @@ def test_evolve_with_dependent_constraint_codec_maintains_constraint() -> None:
             assert ind.gene.lo < ind.gene.hi
 
 
+def test_dep_codec_clip_equality_branch_direct() -> None:
+    """clip の equality 分岐 (lo>=hi で 0.05 分離) を直接踏む (Codex 提案 teeth 強化).
+
+    乱数経由でなく lo==hi / lo>hi の固定入力で repair 分岐を確実に exercise する。
+    """
+    codec = _DepCodec()
+    # lo == hi 中央 → hi+0.05 で分離
+    g_mid = codec.clip(_DepGene(0.5, 0.5))
+    assert g_mid.lo < g_mid.hi
+    # lo == hi 上端 (>0.95) → hi+0.05 が [0,1] 超えるので lo-0.05 分岐
+    g_top = codec.clip(_DepGene(1.0, 1.0))
+    assert g_top.lo < g_top.hi and 0.0 <= g_top.lo and g_top.hi <= 1.0
+    # lo > hi (逆転) → sort で repair
+    g_rev = codec.clip(_DepGene(0.9, 0.1))
+    assert g_rev.lo < g_rev.hi
+
+
+def test_crossover_uniform_g_clips_out_of_bounds() -> None:
+    """crossover_g も bounds 外親から作った子を codec.clip で範囲内に収める
+    (workflow Low: mutate のみだった clip 発動 unit を crossover にも拡張)."""
+    codec = RWKVCodec()
+    a = StateUpdateGene(decay=5.0, mix=5.0, gate_str=5.0)     # 範囲外
+    b = StateUpdateGene(decay=-5.0, mix=-5.0, gate_str=-5.0)  # 範囲外
+    for seed in range(20):
+        c = crossover_uniform_g(a, b, codec, np.random.default_rng(seed))
+        arr = c.as_array()
+        assert 0.0 <= arr[0] <= 1.0
+        assert -1.0 <= arr[1] <= 1.0
+        assert -2.0 <= arr[2] <= 2.0
+
+
 # ---------------------------------------------------------------------------
 # byte-identity の config sweep (lens=test網羅 Medium): crossover_rate / elitism / initial_pop
 # ---------------------------------------------------------------------------
