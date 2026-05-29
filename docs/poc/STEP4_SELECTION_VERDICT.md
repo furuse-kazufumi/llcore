@@ -66,7 +66,7 @@ behavior descriptor で動く)。手順 2 で fitness 多峰性が出ないと�
 | 2 | 高次元(D=20) 欺瞞 corner=behavior極値 | 全手法停滞 (MAP-E も corner 不到達) | behavior=高次元平均だと corner 到達に全 dim 整列必要+valley に勾配なく illumination も届かない |
 | 3 | 可動behavior(gene0,1)×高次元alignment | **RR-hillclimb 圧勝** (90%到達), MAP-E 停滞 | behavior が直接設定可能だと **restart が競合**。MAP-E は cell 離散化で niche 内深層最適化できず |
 | **4** | **deceptive corridor (behavior=mean, dip)** | **MAP-E のみ大域到達, 3 baseline 全敗** | **③ が立つ正準状態を発見** (genotypic corridor + dip) |
-| 5 | exp4 ± dip (境界対照) | dip あり=MAP-E勝 / dip なし=優位消失 | **③優位は欺瞞 regime 限定** (MAP-E 万能でない) |
+| 5 | exp4 ± dip (境界対照, 3 baseline) | dip あり=MAP-E が 3 baseline 全勝 / dip なし=優位消失 | **③優位は欺瞞 regime 限定** (MAP-E 万能でない) |
 
 ## 4. honest 留保 (overclaim しない)
 
