@@ -354,15 +354,15 @@ def evolve(
         elites: list[Individual] = list(sorted_inds[:elitism])
 
         # 残り (pop_size - elitism) を tournament + mutation/crossover で生成し新評価
-        new_genes: list[StateUpdateGene] = []
+        new_genes: list = []
         while len(new_genes) < pop_size - elitism:
             parent_a = tournament_select(pop, tournament_k, rng)
             if rng.random() < crossover_rate:
                 parent_b = tournament_select(pop, tournament_k, rng)
-                child = crossover_uniform(parent_a.gene, parent_b.gene, rng)
+                child = _cx(parent_a.gene, parent_b.gene, rng)
             else:
                 child = parent_a.gene
-            child = uniform_mutate(child, mutation_sigma, rng)
+            child = _mut(child, rng)
             new_genes.append(child)
 
         new_pop = evaluate_population(new_genes, fitness_func, rng)
@@ -370,7 +370,7 @@ def evolve(
         pop = Population(individuals=tuple(elites) + new_pop.individuals)
         generations.append(pop)
         best_curve.append(pop.best.fitness)
-        diversity_curve.append(float(pop.gene_matrix.var()))
+        diversity_curve.append(_div(pop))
 
     return EvolutionResult(
         generations=tuple(generations),
