@@ -99,7 +99,29 @@ behavior descriptor で動く)。手順 2 で fitness 多峰性が出ないと�
    (現状 research 隔離)。behavior descriptor の設計 (lineage 特性等) が鍵。
 3. **deceptive corridor を実 task で実現**: multi-delay recall 等で genotypic corridor + dip を作れるか。
 
+## 7. 手順 6 結果 — 実 substrate proxy は欺瞞的でない (2026-05-30, research/step6_real_proxy/)
+
+§6 の次アクション 1 (実 substrate の欺瞞性測定) を実施。CPU 完結の実 proxy =
+**ESN (固定 reservoir + ridge readout) × 実テキスト (llcore Python source 124K chars) の
+next-char 予測**。gene = reservoir 力学パラメータ。= llcore thesis (dynamics gene 進化) の最近接 CPU 近似。
+
+- **exp6 (landscape map)**: gene 空間 (spectral_radius×leak) の grid は **滑らかな broad ridge**
+  (leak 単調増・rho 弱依存、max acc 0.293/range 0.083)。検出 "局所最適" は全て global 近傍 0.265-0.281 の
+  **ノイズ水準凹凸**で、exp4 のような深い valley なし。
+- **exp7 (決定的: 実 MAP-Elites vs baseline)**: heuristic を信用せず実測比較。
+  - (A) 3-param ESN: MAP-Elites は 3 baseline 全てに**有意差なし** (vs RR diff=−0.0016 p=0.078)。③不成立。
+  - (B) per-neuron leak (高次元 40-dim, dynamics gene 化): MAP-Elites は RR/panmictic に**負け**、
+    pure random にのみ勝つ (exp5 の smooth 条件と同型)。③不成立。
+
+**結論 (honest)**: **実テキスト proxy の landscape は滑らか/単峰で、exp4 の欺瞞 corridor は自然出現しない。**
+→ この proxy では ③/MAP-Elites の追加価値は限定的 (hill-climbing/coverage で十分)。**③ のための GPU
+投資の根拠は本 proxy 証拠では弱い**。
+**留保**: これは reservoir+ridge proxy (固定力学+学習 readout) であり backprop 学習の full LLM とは別。
+full LLM の損失 landscape が欺瞞的でない保証ではない (proxy の限界)。だが「dynamics gene 進化」の
+最近接 CPU 近似が滑らかだった事実は、③ 路線への投資を慎重にすべき強い示唆。
+
 ## 関連
+- `YOUGO_平易版.md` (用語集・図入り・非専門家向け)
 - `STEP4_DESIGN_space_expansion_niching.md` (設計 + C1-C4 基準 + 案 A scout)
 - `EVOLUTION_SOUNDNESS_AUDIT_2026-05-30.md` (手順 1-2)
 - `research/step4_selection/` (selection_lab.py + exp1-5)
