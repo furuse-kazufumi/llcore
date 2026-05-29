@@ -22,6 +22,13 @@ honest 留保:
 - proxy task mechanism feasibility のみ、実 LLM scale ではない。
 """
 
+from .ridge_readout import (
+    RidgeEvalOnce,
+    RidgeReadout,
+    fit_ridge_readout,
+    make_ridge_eval_once,
+    ridge_fitness,
+)
 from .tasks import (
     AdditionTask,
     CopyTask,
@@ -37,9 +44,14 @@ __all__ = [
     "AdditionTask",
     "CopyTask",
     "FixedReadout",
+    "RidgeEvalOnce",
+    "RidgeReadout",
     "SyntheticTask",
     "calibrate_baseline",
     "calibrate_baseline_robust",
     "evaluate_gene",
+    "fit_ridge_readout",
     "make_fixed_readout",
+    "make_ridge_eval_once",
+    "ridge_fitness",
 ]
