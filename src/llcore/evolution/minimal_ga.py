@@ -259,6 +259,7 @@ def evolve(
     elitism: int = 1,
     rng: np.random.Generator | None = None,
     initial_pop: list[StateUpdateGene] | None = None,
+    codec: "GeneCodec | None" = None,
 ) -> EvolutionResult:
     """進化 main loop.
 
