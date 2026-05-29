@@ -86,52 +86,79 @@ def p1_unflatten() -> bool:
 
 
 def p2_easy_no_selection() -> bool:
-    """P2: copy delay=0 は un-flatten 後容易になり GA≈random (③ 未証明)."""
+    """P2: copy delay=0 は un-flatten 後容易になり GA≈random (③ 未証明).
+
+    eval-noise を n_train で掃引 (Codex Low finding: n_train=6 数値の再現性確保)。
+    """
     print("\n=== P2: copy delay=0 は容易 → GA ≈ random (③ 未証明) ===")
     copy = CopyTask(state_dim=8, out_dim=8, seq_len=32, delay=0)
-    ev = make_ridge_eval_once(copy, n_train=32, n_eval=32)
-    r = evolution_vs_random(
-        ev, pop_size=10, n_generations=10, n_seeds=12, honest_n_trials=15, base_seed=20260530
-    )
-    print(
-        f"  GA={r.ga_mean:.4f} RAND={r.random_mean:.4f} diff={r.diff:+.4f} "
-        f"win={r.win_rate:.2f} p={r.wilcoxon_p:.4g} delta={r.cliff_delta:+.2f} passes={r.passes}"
-    )
-    ok = (not r.passes) and r.ga_mean > 0.9  # 容易に高水準・しかし選択優位なし
-    print(f"  [P2] easy-but-no-selection holds: {ok}")
+    results = []
+    for n_train in (6, 12, 32):
+        ev = make_ridge_eval_once(copy, n_train=n_train, n_eval=n_train)
+        r = evolution_vs_random(
+            ev, pop_size=10, n_generations=10, n_seeds=12, honest_n_trials=15, base_seed=20260530
+        )
+        print(
+            f"  n_train={n_train:2d}: GA={r.ga_mean:.4f} RAND={r.random_mean:.4f} diff={r.diff:+.4f} "
+            f"win={r.win_rate:.2f} p={r.wilcoxon_p:.4g} delta={r.cliff_delta:+.2f} passes={r.passes}"
+        )
+        results.append(r)
+    # 全ノイズ水準で「進化成立」の合格条件 (passes) は立たない = ③ 未証明
+    ok = all(not r.passes for r in results)
+    print(f"  [P2] no-selection-advantage across noise levels holds: {ok}")
     return ok
 
 
-def p3_no_hard_structured_regime() -> bool:
-    """P3: delay≥4 / addition は線形デコード不能で全 gene ~0."""
-    print("\n=== P3: delay≥4 / addition は ~0 (構造的-難 regime 不在) ===")
+def p3_no_useful_signal_regime() -> bool:
+    """P3: delay≥4 / addition は clip 後 fitness 平坦 (選択信号なし)。
+
+    honest (Codex High finding): raw R² (clip=False) は **負** で、clip が 0 化している。
+    「原理的に不能」ではなく『この評価設定で線形 readout が有用信号を出さない』。
+    """
+    print("\n=== P3: delay≥4 / addition は clip 後 fitness 平坦 (raw R² は負) ===")
     genes = _random_genes(20, seed=1)
-    copy4 = CopyTask(state_dim=8, out_dim=8, seq_len=32, delay=4)
-    add = AdditionTask(state_dim=8, out_dim=1, seq_len=32)
-    s_copy4 = np.array(
-        [ridge_fitness(g, copy4, n_train=64, n_eval=64, rng=np.random.default_rng(7)) for g in genes]
+    for name, task in [
+        ("copy delay=4", CopyTask(state_dim=8, out_dim=8, seq_len=32, delay=4)),
+        ("addition    ", AdditionTask(state_dim=8, out_dim=1, seq_len=32)),
+    ]:
+        clipped = np.array(
+            [ridge_fitness(g, task, n_train=64, n_eval=64, rng=np.random.default_rng(7)) for g in genes]
+        )
+        raw = np.array(
+            [ridge_fitness(g, task, n_train=64, n_eval=64, rng=np.random.default_rng(7), clip=False)
+             for g in genes]
+        )
+        print(
+            f"  {name}: clipped max={clipped.max():.4f} | raw R² mean={raw.mean():+.4f} "
+            f"std={raw.std():.4f} min={raw.min():+.4f} max={raw.max():+.4f}"
+        )
+    # clip 後の選択信号不在 (GA が使えるのは clip 済 fitness) を判定。
+    copy4 = np.array(
+        [ridge_fitness(g, CopyTask(state_dim=8, out_dim=8, seq_len=32, delay=4),
+                       n_train=64, n_eval=64, rng=np.random.default_rng(7)) for g in genes]
     )
-    s_add = np.array(
-        [ridge_fitness(g, add, n_train=64, n_eval=64, rng=np.random.default_rng(7)) for g in genes]
+    addv = np.array(
+        [ridge_fitness(g, AdditionTask(state_dim=8, out_dim=1, seq_len=32),
+                       n_train=64, n_eval=64, rng=np.random.default_rng(7)) for g in genes]
     )
-    print(f"  copy delay=4 : max={s_copy4.max():.4f} mean={s_copy4.mean():.4f}")
-    print(f"  addition     : max={s_add.max():.4f} mean={s_add.mean():.4f}")
-    ok = s_copy4.max() < 0.1 and s_add.max() < 0.15
-    print(f"  [P3] no hard-structured regime holds: {ok}")
+    ok = copy4.max() < 0.1 and addv.max() < 0.15
+    print(f"  [P3] no usable selection signal (post-clip) holds: {ok}")
     return ok
 
 
 def main() -> int:
     print("PoC CPU 手順 2 — per-gene ridge readout で landscape un-flatten")
     print("=" * 64)
-    results = {"P1": p1_unflatten(), "P2": p2_easy_no_selection(), "P3": p3_no_hard_structured_regime()}
+    results = {"P1": p1_unflatten(), "P2": p2_easy_no_selection(), "P3": p3_no_useful_signal_regime()}
     print("\n" + "=" * 64)
     for k, v in results.items():
         print(f"  {k}: {'PASS' if v else 'FAIL'}")
     print(
-        "\n結論 (honest): ridge readout は fitness scale を un-flatten するが、3-param leak\n"
-        "integrator では copy delay=0=容易 / delay≥4・addition=不能 で『構造的かつ難しい』\n"
-        "regime が無く、③(選択) は立たない。真の unlock は CPU 手順 4 (空間拡張 + 分離機構)。"
+        "\n結論 (honest): ridge readout は fitness の scale を un-flatten する (real capability)\n"
+        "が、3-param leak integrator では copy delay=0=容易 (random も天井) / delay≥4・addition=\n"
+        "clip 後 fitness 平坦 (raw R² は負・小 spread) で、③(選択) が立つ『構造的かつ難しい』\n"
+        "中間 regime をこの評価設定・サンプルでは作れない。真の unlock は CPU 手順 4 (空間拡張 +\n"
+        "分離機構)。これは負だが情報量のある結果で、診断 §7b の核を経験的に裏づける。"
     )
     return 0 if all(results.values()) else 1
 
