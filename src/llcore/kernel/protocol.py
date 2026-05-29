@@ -136,6 +136,12 @@ class Kernel(Protocol[GeneT]):
         設計 doc M2: 既存 ``ChangeOp`` 型をそのまま受ける ((op_type, delta) には
         潰さない)。``ChangeOpSequence`` / ``refinement.py`` 接続の再利用性を保つため。
         kernel ごとに op_type の意味が違う。
+
+        **S3 延期事項 (Codex review S1 Medium)**: 現 ``ChangeOp.__post_init__`` は RWKV 4 種
+        (``decay/mix/gate/kernel_swap_mock``) 以外の op_type を拒否するため、非 RWKV kernel
+        (SNN の ``tau_shift`` 等) はまだ ``ChangeOp`` を構築できない。op_type 検証を kernel 別
+        (``change_op_types`` 参照) に拡張するのは SNN-LIF 移植 (S3, 設計 doc §4.1) で行う。
+        S1 時点では RWKV 準拠例として動作する。
         """
         ...
 
