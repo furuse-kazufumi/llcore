@@ -244,7 +244,7 @@ def uniform_mutate_g(gene, codec: GeneCodec, sigma, rng):
 |---|---|---|
 | S1 | `src/llcore/kernel/protocol.py` 追加 (§2 の 3 Protocol)。**RWKV を最初の準拠例**として `RWKVKernel` + `RWKVStateNormBackend` を実装し、既存 `verify_gene_safe`/`run_sequence` を委譲 wrapper で包む | (D) src 既存挙動不変 = 既存関数はそのまま、plugin は薄い委譲。145 本流 test 回帰なし |
 | S2 | `minimal_ga` 一般化 (§3)。codec デフォルト=RWKV で後方互換。新 test で **任意 dim GA** を検証 | (B) 既存 67 進化 test PASS + 新規 |
-| S3 | `src/llcore/kernel/snn_lif.py` 追加。research `LIFGene` + simulator を昇格、`SNNLifKernel` 実装。research 側は `from llcore.kernel.snn_lif import LIFGene` の re-export に置換 (sys.path hack 撤廃 = C5) | (A) plugin 化実証。research test を import 経路だけ差し替えて PASS 維持 |
+| S3 | `src/llcore/kernel/snn_lif.py` 追加。research `LIFGene` + simulator を昇格、`SNNLifKernel` 実装。research 側は `from llcore.kernel.snn_lif import LIFGene` の re-export に置換 (sys.path hack 撤廃 = C5)。**`SNNLifCodec.clip` は `V_reset<V_th` dependency-repair を実装必須** (§2.1)、post-init/post-mutate 制約充足を test で assert | (A) plugin 化実証。research test を import 経路だけ差し替えて PASS 維持。依存制約 repair は S2 の `_DepCodec` test pattern を踏襲 |
 | S4 | `SNNLifBackend` 実装 + **per-gene 真正性監査** (§2.3 罠)。`verify_membrane_bounded_per_gene` が gene を Z3 symbolic に入れているか確認、box 流用なら docstring で明示降格 | (C) Codex pair-review: per-gene claim の真正性を必ず検証させる |
 | S5 | SNN-LIF を `evolve` で実走 (LIF codec + SNNLifBackend gate)。10×10 toy 進化が回り、verifier reject が選択圧になることを smoke | (B)(C) 全 test + Codex review、verdict 更新 |
 
