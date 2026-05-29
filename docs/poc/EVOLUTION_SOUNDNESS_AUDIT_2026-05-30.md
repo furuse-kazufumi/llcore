@@ -78,6 +78,52 @@ best-delta=0」(選択の実在) を回帰テストで保持。
   上振れさせる)。「選択機構の実在」(定数 fitness→改善 0) は頑健に再現。
 - 全実験は CPU・toy synthetic task・3-param gene 空間 (天井~0.2) での測定。実 LLM 損失とは別。
 
+## 7b. confound 切り分け診断の結果 (2026-05-30, [GA健全性 切り分け診断])
+
+§3 の confound (「GA 機構が弱い」vs「proxy fitness が平坦+ノイズ過大」) を 3 条件で実測切り分け。
+
+**結論: ③失敗の主因は landscape の平坦さ。GA 機構の弱さでもノイズでもない。**
+
+| 検証 | 結果 |
+|---|---|
+| clean 構造的 landscape での GA | **圧勝** (単峰 GA−RAND=+0.122, p<1e-4, Cliff δ=+0.97, 30/0/0 / 多峰 +0.162, δ=+0.77 / 構造ゼロ対照 +0.0009 p=0.629)。**機構は健全、rework 不要** |
+| 本番 CopyTask でのノイズ掃引 | SNR を 0.38→**3.51 まで上げても GA=random** (全水準 p>0.05)。律速は SNR でなく **上位20遺伝子の真の spread=0.0007** の平坦プラトー |
+| 固定 readout → 最適化(共進化) | copy d=8 で landscape に構造出現 → GA 勝つ (p=0.0005, δ=+0.62)。**固定 random readout が平坦化の最大要因**。ただし addition は最適化しても null (線形デコード不可) |
+
+**最重要 honest 発見**: 構造的 landscape で「GA が勝つ」時も、**tournament_k=1 (選択差なし) でも勝つ**
+(+0.078, p=0.0001) → 勝因は ③(tournament 選択) でなく **elitism+変異の近傍 hill-climbing**。
+3-param 低次元では近傍探索が支配 operator。**「GA が勝つ」≠「③(差し survival 経由の選択)が立証」**。
+③ そのものは合成構造 landscape でも未分離・未立証。
+
+**報告 best +0.29 水増し = artifact 確定**: noise σ↑で report_gap が 0→+0.808 と拡大 (eval-noise×elitism 凍結)。
+
+### GPU 投資判定: **conditional (今は保留)** — §0 の "GPU 必要" を修正
+
+「機構健全 → GPU で③が立つ」は論理が一段飛んでいる:
+1. ノイズ抑制 (=GPU で n_trials↑) では③は立たない (律速は landscape の平坦さ、SNR3.5 でも本番 GA=random)
+2. 構造 landscape で勝った operator は③でなく hill-climbing
+3. 実 LLM fitness が「SNR≥2 の構造 + 良遺伝子間 spread」を持つかは**未証明** (これが GPU の必要十分条件)
+
+→ **GPU(RTX 4090 24GB) 投資は CPU 手順 (下記) で「効くと分かる」まで保留。** 永遠に不要でなく、買う前に検証する順序。
+
+### ③を立てる概念 (ユーザー言語化 2026-05-30)
+
+集団内 **分離(speciation / Quality-Diversity / niching)** を入れ、集団を多峰に分化させて ③(差し survival)に
+「選ぶべき差」を作る (大量プロセス起動でなく 1 集団内 N 個体の niching)。llcore 既存の LineageReservoir/
+ModesMeter/persona を「飾り」から load-bearing に昇格 + evolve 配線。**ただし分離先に構造が要る** ので
+readout 修正 + 空間拡張とセット。
+
+### CPU 手順 (GPU 前、優先順)
+
+1. **[着手] honest 再評価 + falsification test を CI ゲート化** (`src/llcore/evolution/honest_eval.py`):
+   fresh-seed 再評価を主指標化、elitism 凍結持越し artifact を測定から排除。clean landscape で GA 勝利を
+   regression 固定、定数 fitness で改善 0 を回帰保持。**これが全後続手順の信頼できる物差し**。
+2. fixed readout → per-gene least-squares(ridge, held-out) 置換を本番 fitness に配線 (landscape un-flatten)
+3. ③を hill-climbing から分離測定 (本番 readout で tournament_k sweep + elitism=0)
+4. 探索空間を 3-param から拡張 (multi-layer/複数 update gene) + 分離機構 (QD/niching) を load-bearing 化
+5. AdditionTask 追試 (線形可解性で③成立が分岐する仮説の確証 = GPU 投資の task 選別基準)
+6. 小型 LLM(CPU 推論可) で実 proxy の landscape 構造を事前 sanity check (GPU 投資の最終判断材料)
+
 ## 7. 関連
 - [[project_llcore_init_2026_05_29]] / [[feedback_benchmark_honest_disclosure]] / [[feedback_codex_pair_review_for_llcore]]
 - `docs/poc/STAGE_3_VERDICT.md` (project 自身の honest 降格、本監査と整合)
