@@ -149,28 +149,43 @@ def test_ridge_unflattens_vs_fixed_readout_copy_delay0() -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_ridge_fitness_delayed_copy_is_unsolvable() -> None:
-    """delay≥4 の copy は leak integrator + 線形 readout で復元不能 → 全 gene ~0.
+def test_ridge_fitness_delayed_copy_no_selection_signal() -> None:
+    """delay≥4 の copy: clip 後 fitness は全 gene 0 (GA に選択信号なし).
 
-    honest 発見: delay=0 は容易すぎ・delay≥4 は不能で、3-param gene 空間には
-    『構造的だが難しい』中間 regime が存在しない (③ が立つ landscape を作れない)。
+    honest 注 (Codex High finding 2026-05-30): clip=False の raw R² は **負** (mean 予測
+    以下) であり「raw=0 の信号皆無」とは別物。'原理的に不能' でなく『この評価設定では
+    線形 readout が有用信号を出さず、clip 後 fitness が平坦 = 選択に使えない』が正確。
     """
     copy = CopyTask(state_dim=6, out_dim=6, seq_len=16, delay=4)
     genes = _random_genes(16, seed=1)
-    scores = np.array(
+    clipped = np.array(
         [ridge_fitness(g, copy, n_train=48, n_eval=48, rng=np.random.default_rng(7)) for g in genes]
     )
-    assert scores.max() < 0.1, f"delay=4 copy が解けてしまった: max={scores.max():.3f}"
+    raw = np.array(
+        [ridge_fitness(g, copy, n_train=48, n_eval=48, rng=np.random.default_rng(7), clip=False)
+         for g in genes]
+    )
+    assert clipped.max() == 0.0, f"clip 後 fitness が非ゼロ: max={clipped.max():.3f}"
+    assert raw.max() < 0.05, f"raw R² に有用信号 (clip 検閲の可能性): max={raw.max():.3f}"
 
 
-def test_ridge_fitness_addition_is_null() -> None:
-    """addition (||sum x||) は線形 readout で原理的にデコード困難 → ~0 (診断再現)."""
+def test_ridge_fitness_addition_no_selection_signal() -> None:
+    """addition (||sum x||): clip 後 fitness は全 gene ~0 (診断再現, 線形デコード弱).
+
+    honest 注: raw R² は負 (mean 予測以下) で、clip により 0 化。'原理的に不能' でなく
+    この評価設定での観測 (state は tanh 非線形の出力なので数学的不能の証明ではない)。
+    """
     add = AdditionTask(state_dim=6, out_dim=1, seq_len=16)
     genes = _random_genes(16, seed=2)
-    scores = np.array(
+    clipped = np.array(
         [ridge_fitness(g, add, n_train=48, n_eval=48, rng=np.random.default_rng(7)) for g in genes]
     )
-    assert scores.max() < 0.15, f"addition が線形デコードできてしまった: max={scores.max():.3f}"
+    raw = np.array(
+        [ridge_fitness(g, add, n_train=48, n_eval=48, rng=np.random.default_rng(7), clip=False)
+         for g in genes]
+    )
+    assert clipped.max() < 0.15, f"addition が線形デコードできてしまった: max={clipped.max():.3f}"
+    assert raw.max() < 0.1, f"raw R² に有用信号: max={raw.max():.3f}"
 
 
 # ---------------------------------------------------------------------------
