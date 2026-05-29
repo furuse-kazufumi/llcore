@@ -3,35 +3,42 @@
 > 自動生成: `libexec/raptor-auto-summary` (Stop hook)
 > 次回 ccr 起動時に CLAUDE.md SESSION START で自動的に読み取られる。
 
-- **最終更新**: 2026-05-30 06:59:09
+- **最終更新**: 2026-05-30 07:22:26
 - **プロジェクト**: `D:/projects/llcore`
 - **ブランチ**: `main`
 
 ## 直近の git log
 
 ```
+a5b6acf feat(step4): ③が立つ状態を発見 — deceptive corridor + MAP-Elites (Goal達成) + Codex review反映
+74dd737 auto: STEP4_SELECTION_VERDICT.md 編集前 (2026-05-30 07:20)
+c3c0852 auto: STEP4_SELECTION_VERDICT.md 編集前 (2026-05-30 07:20)
+e2bd01b auto: STEP4_SELECTION_VERDICT.md 編集前 (2026-05-30 07:19)
+ceee3f9 auto: STEP4_SELECTION_VERDICT.md 編集前 (2026-05-30 07:19)
+dd517bf auto: exp5_boundary_control.py 編集前 (2026-05-30 07:18)
+3b7ce60 auto: selection_lab.py 編集前 (2026-05-30 07:18)
 cbdc1ac docs(step4): (C1)多峰性 scout — 素朴な案Aは fitness 多峰性を満たさない (重要 honest)
 2f0d139 docs(step4): 空間拡張+分離機構 設計ノート + 案A greenlight scout
 f11bc49 auto: STEP4_DESIGN_space_expansion_niching.md 編集前 (2026-05-30 02:56)
-c578f6f feat(ridge-readout): per-gene ridge readout で landscape un-flatten (CPU 手順2) + Codex review 反映
-0e89abc auto: EVOLUTION_SOUNDNESS_AUDIT_2026-05-30.md 編集前 (2026-05-30 02:43)
-db9c808 auto: ridge_readout.py 編集前 (2026-05-30 02:42)
-6b6bfd7 auto: poc_ridge_readout_unflatten.py 編集前 (2026-05-30 02:42)
-e488e9d auto: test_ridge_readout.py 編集前 (2026-05-30 02:41)
-a7d038b auto: ridge_readout.py 編集前 (2026-05-30 02:41)
-45b0200 auto: EVOLUTION_SOUNDNESS_AUDIT_2026-05-30.md 編集前 (2026-05-30 02:37)
 ```
 
 ## 現在の git status
 
 ```
-M docs/SESSION_SUMMARY.md
+(clean)
 ```
 
 ## 直近 2 時間に変更されたファイル
 
 ```
-(直近 2h の変更なし)
+07:20 docs/poc/STEP4_SELECTION_VERDICT.md
+07:18 research/step4_selection/exp5_boundary_control.py
+07:18 research/step4_selection/selection_lab.py
+07:11 research/step4_selection/exp4_genotypic_corridor.py
+07:09 research/step4_selection/exp3_niche_alignment.py
+07:06 research/step4_selection/exp2_highdim_deceptive.py
+07:05 research/step4_selection/exp1_deceptive_validation.py
+06:59 docs/SESSION_SUMMARY.md
 ```
 
 ---
