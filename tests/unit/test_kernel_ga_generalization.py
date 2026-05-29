@@ -440,7 +440,7 @@ def test_toy_codec_diversity_numeric_correctness() -> None:
     codec = _ToyCodec()
     genes = [_ToyGene(0.1, 0.2, 0.3, 0.4), _ToyGene(0.5, 0.6, 0.7, 0.8)]
     result = evolve(
-        _toy_fitness, pop_size=2, n_generations=0,
+        _toy_fitness, pop_size=2, n_generations=0, tournament_k=2,
         initial_pop=list(genes), rng=np.random.default_rng(0), codec=codec,
     )
     expected = float(np.array([[0.1, 0.2, 0.3, 0.4], [0.5, 0.6, 0.7, 0.8]]).var())
