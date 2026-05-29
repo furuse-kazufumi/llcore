@@ -303,5 +303,5 @@ ARCHITECTURE_LANDSCAPE §6.1 の 4 条件を 0.2.0a0 移行で**どう守るか*
 
 ---
 
-**doc 完成日**: 2026-05-29
-**次の更新トリガ**: Codex review 反映 / S1 着手 / SNN-LIF 移植開始
+**doc 完成日**: 2026-05-29 (Codex pair-review 5 Findings 反映済)
+**次の更新トリガ**: S1 着手 (`src/llcore/kernel/protocol.py`) / SNN-LIF 移植開始
