@@ -295,10 +295,18 @@ ARCHITECTURE_LANDSCAPE §6.1 の 4 条件を 0.2.0a0 移行で**どう守るか*
    (Medium 3 / Low 2 + 補足 1)。全件実コード検証の上 doc に反映済 (§2.2 M1 Trajectory + M2 ChangeOp 型 /
    §2.3 補足 result 正規化 adapter / §2.3 表 L1 per-gene 真正性訂正 / §3.2 §5 M3 シンボル温存)。
    **設計の overclaim 残りなし、Protocol 境界は adapter 前提で締まった**。
-2. S1 着手判断 (ユーザー承認後): `src/llcore/kernel/protocol.py` (`GeneCodec` / `Kernel` / `Trajectory` /
-   `VerifierBackend`) + RWKV 準拠例 (`RWKVKernel` / `RWKVStateNormBackend`)
-3. 並行候補: ARCH_LANDSCAPE §9 の C (真の per-gene verifier, Izhikevich F1 直接対応) は
-   本 plugin 設計の S4 と論点が重なるため、S4 で一緒に解消する設計
+2. ~~S1~~ **完了 (commit 9bb2228)**: `src/llcore/kernel/` (3 Protocol + Trajectory + RWKV 準拠例)。本流 145→163 PASS。
+3. ~~S2~~ **完了 + re-PoC 強化 (2026-05-29)**: `minimal_ga.py` を `GeneCodec` で gene 型非依存化
+   (codec=None 旧パス byte-identical、codec 指定で `*_g` 汎用パス)。`FitnessFuncG` additive 追加
+   (FitnessFunc は後方互換で具象据え置き)。**Codex (High0/Med0/Low2) + 4-lens workflow** 検証 →
+   構造的欠陥ゼロ。TRUE findings (全 coverage/doc gap) を re-PoC で解消: **依存制約 toy codec で
+   clip 核心契約を実証** (`_DepGene` lo<hi + box-only teeth) / config sweep byte-identity
+   (crossover_rate/elitism/initial_pop) / RNG state 直接比較 / diversity 数値 / validation 分岐 /
+   Protocol 準拠。本流 163→188 PASS。
+4. **次=S3**: `src/llcore/kernel/snn_lif.py` (LIFGene 昇格 + `SNNLifCodec.clip` の V_reset<V_th
+   dependency-repair 必須 §2.1 + §4 表) + ChangeOp op_type kernel 別検証拡張 + `SNNLifBackend`
+   per-gene 真正性 (§2.3: 真の per-gene と Codex 確認済、I_max 1-step contract 限定明示)。
+5. 並行候補: ARCH_LANDSCAPE §9 の C (真の per-gene verifier, Izhikevich F1 直接対応) は S4 と論点重複。
 
 ---
 
