@@ -23,11 +23,14 @@ train/eval を分離するため readout の暗記 (leakage) は構造的に排�
 honest 留保:
 - これは依然 "**probe-based fitness**" であり gene の純粋 fitness ではない。ただし readout が
   各 gene に適応する点で fixed readout より「gene の真の表現力」に近い。
-- AdditionTask は ``||sum x||`` の非線形量で、線形 readout では原理的にデコード困難
-  (診断: 最適化しても null)。本 fitness が addition で平坦に留まるのは **想定挙動** で、
-  task 選別 (CPU 手順 5) の判断材料になる。
-- R² は held-out で負になりうる (mean 予測より悪い) ため [0, 1] に clip する。clip 下限は
-  「mean 予測と同等以下 = 情報なし」を 0 に潰す honest な床。
+- AdditionTask は ``||sum x||`` の非線形量で、この評価設定では線形 readout の held-out
+  R² が負 (mean 予測以下) に留まる (診断: 最適化しても null)。state は tanh 非線形の出力なので
+  これは「数学的にデコード不能」の証明ではなく **この設定・このサンプルでの観測**。本 fitness が
+  addition で平坦なのは task 選別 (CPU 手順 5) の判断材料になる。
+- R² は held-out で負になりうる (mean 予測より悪い) ため ``clip=True`` (既定) で [0, 1] に clip。
+  clip 下限は「mean 予測と同等以下 = 選択に使えない」を 0 に潰す honest な床。**ただし clip 後の
+  0.0 は raw R²<0 を潰した値で「raw=0 の信号皆無」とは識別不能** (Codex pair-review High finding
+  2026-05-30)。信号の有無を診断するときは ``clip=False`` で raw R² の符号・spread を見ること。
 
 semver: 新規 module 追加のみ。既存シンボル不変 ([[feedback_implementation_status_record]])。
 """
