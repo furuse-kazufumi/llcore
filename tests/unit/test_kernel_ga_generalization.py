@@ -268,9 +268,14 @@ class _DepCodec:
 
     def clip(self, gene: _DepGene) -> _DepGene:
         arr = np.clip(self.to_array(gene), 0.0, 1.0)
-        lo, hi = float(arr[0]), float(arr[1])
-        if lo >= hi:  # 依存制約 repair (box clip では不可能な部分)
-            lo = max(0.0, hi - 0.05)
+        # 依存制約 repair (box clip では不可能な部分): sort で lo<=hi を保証し、
+        # 一致時は [0,1] 内で 0.05 分離 (端でも破綻しない堅牢版)。
+        lo, hi = sorted((float(arr[0]), float(arr[1])))
+        if lo >= hi:
+            if hi <= 0.95:
+                hi = hi + 0.05
+            else:
+                lo = lo - 0.05
         return _DepGene(lo, hi)
 
 
