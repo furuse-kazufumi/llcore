@@ -27,14 +27,18 @@ from .lineage_reservoir import LineageReservoir
 from .minimal_ga import (
     EvolutionResult,
     FitnessFunc,
+    GeneT,
     Individual,
     Population,
     crossover_uniform,
+    crossover_uniform_g,
     evaluate_population,
     evolve,
     initialize_random_population,
+    initialize_random_population_g,
     tournament_select,
     uniform_mutate,
+    uniform_mutate_g,
 )
 from .modes_meter import ModesMeter, pairwise_l2_diversity
 
@@ -42,15 +46,19 @@ __all__ = [
     "AdaptiveFloorGate",
     "EvolutionResult",
     "FitnessFunc",
+    "GeneT",
     "Individual",
     "LineageReservoir",
     "ModesMeter",
     "Population",
     "crossover_uniform",
+    "crossover_uniform_g",
     "evaluate_population",
     "evolve",
     "initialize_random_population",
+    "initialize_random_population_g",
     "pairwise_l2_diversity",
     "tournament_select",
     "uniform_mutate",
+    "uniform_mutate_g",
 ]
