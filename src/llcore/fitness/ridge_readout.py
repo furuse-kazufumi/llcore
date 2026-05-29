@@ -163,21 +163,34 @@ def ridge_fitness(
     n_eval: int = 64,
     ridge_lambda: float = 1e-2,
     rng: np.random.Generator,
+    clip: bool = True,
 ) -> float:
-    """gene の per-gene ridge readout fitness (held-out R², [0, 1] clip).
+    """gene の per-gene ridge readout fitness (held-out R²).
 
     手順:
     1. ``n_train`` 本で readout を fit (train set)。
     2. ``n_eval`` 本の **held-out** で予測し R² = 1 - MSE / target分散 を計算。
-    3. [0, 1] に clip (mean 予測以下 = 情報なしを 0 に潰す)。
+    3. ``clip=True`` (既定、進化の選択圧として使う場合) なら [0, 1] に clip。
 
     train/eval を別 sequence で引くため readout の暗記 (leakage) は起こらない。
     決定論性は呼出側で ``rng`` の seed を固定して管理する。
 
+    Parameters
+    ----------
+    clip : bool
+        ``True`` (既定) → fitness として [0, 1] に clip (GA の選択圧用)。
+        ``False`` → **raw R²** をそのまま返す (負値あり)。
+
+        honest 注 (Codex pair-review 2026-05-30 High finding): clip 後の 0.0 は
+        「mean 予測以下 (raw R²<0)」を潰した値であり、「raw R²=0 = 信号皆無」とは
+        識別できない。「線形 readout が有用信号を出すか」を診断する用途では
+        ``clip=False`` で raw R² を見て、負値か・spread があるかを確認すること。
+
     Returns
     -------
     float
-        held-out R² ∈ [0, 1]。gene の state が target を線形デコード可能なほど高い。
+        ``clip=True`` なら [0, 1]、``clip=False`` なら raw R² (負値含む)。
+        gene の state が target を線形デコード可能なほど高い。
     """
     if n_train < 1 or n_eval < 1:
         raise ValueError(f"n_train/n_eval must be >= 1, got {n_train}/{n_eval}")
@@ -192,7 +205,7 @@ def ridge_fitness(
     # held-out target の分散 (= mean 予測の MSE) を正規化分母に使う = R²。
     var = float(np.mean((y_ev - y_ev.mean(axis=0)) ** 2))
     r2 = 1.0 - mse / max(var, 1e-12)
-    return float(np.clip(r2, 0.0, 1.0))
+    return float(np.clip(r2, 0.0, 1.0)) if clip else float(r2)
 
 
 def make_ridge_eval_once(
