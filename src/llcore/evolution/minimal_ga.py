@@ -196,6 +196,10 @@ def initialize_random_population_g(
 
 
 FitnessFunc = Callable[[StateUpdateGene, np.random.Generator], float]
+# S2 honest 注記 (Codex/semver review): 設計 doc §3.2 M3 は FitnessFunc 自体の TypeVar 化を
+# 提案したが、既存 import の型エラー回避 (後方互換厳守) のため FitnessFunc は **具象のまま据え置き**、
+# 一般 gene 型用に FitnessFuncG を additive 追加する。実行時は両者とも duck typing で gene 型非依存。
+FitnessFuncG = Callable[[GeneT, np.random.Generator], float]
 
 
 def evaluate_population(
