@@ -88,29 +88,49 @@ class GeneCodec(Protocol[GeneT]):
 
 ### 2.2 `Kernel` — 1 アーキの「中身」(simulate + ChangeOp)
 
+> **Codex review 反映 (M1)**: 現 SNN simulator は `simulate_lif(gene, I_input, T, dt, V_init)
+> -> tuple[np.ndarray, list[float]]` (V 列 + spike 時刻列) で、RWKV `run_sequence(inputs, gene,
+> initial_state) -> np.ndarray` と **入口・戻り値・時間長の渡し方が別物**。`np.ndarray` 1 本では
+> 吸収できないため、戻り値を `Trajectory` 型に統一し、kernel ごとの adapter で正規化する。
+
 ```python
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class Trajectory:
+    """kernel 横断の simulate 戻り値. 意味論差を field で明示 (M1)."""
+    primary: np.ndarray            # RWKV=state 列 (L+1, dim), SNN=膜電位 V 列 (T,)
+    events: tuple[float, ...] = () # SNN=spike 時刻列. RWKV は空 tuple
+    kind: str = "state"            # "state" | "spike_voltage" — 上流が意味論分岐に使う
+
 @runtime_checkable
 class Kernel(Protocol[GeneT]):
     """1 アーキの forward dynamics + 構造変更 op を束ねる plugin."""
 
-    name: str                       # "rwkv" / "snn_lif" / "izhikevich"
+    name: str                          # "rwkv" / "snn_lif" / "izhikevich"
     codec: GeneCodec[GeneT]
-    change_op_types: tuple[str, ...]  # kernel 固有の ChangeOp 種別 (C4 一般化)
+    change_op_types: tuple[str, ...]   # kernel 固有の ChangeOp 種別 (C4 一般化)
 
-    def run_sequence(
-        self, inputs: np.ndarray, gene: GeneT,
-        initial_state: np.ndarray | None = None,
-    ) -> np.ndarray:
-        """L step trajectory を返す (RWKV=state 列, SNN=spike/V 列)."""
+    def simulate(self, inputs: np.ndarray, gene: GeneT, **kw) -> Trajectory:
+        """L step trajectory を Trajectory で返す. RWKV は run_sequence を、
+        SNN は simulate_lif を adapter で包んで正規化する (M1)."""
 
-    def apply_change_op(self, gene: GeneT, op_type: str, delta: float) -> GeneT:
-        """ChangeOp を適用した新 gene (C4: kernel ごとに op 意味が違う)."""
+    def apply_change_op(self, gene: GeneT, op: "ChangeOp") -> GeneT:
+        """ChangeOp を適用した新 gene を返す (M2: 既存 ChangeOp 型をそのまま受ける).
+        kernel ごとに op_type の意味が違う (RWKV: decay/mix/gate_shift,
+        SNN: tau/vth/tref_shift) が、ChangeOpSequence / refinement.py との
+        再利用性を保つため (op_type, delta) には潰さない."""
 ```
 
 > **honest 留保 (ARCH_LANDSCAPE §5.3 #2 直結)**: Kernel Protocol は「same **design pattern**」を
-> 契約化するもので、「same **verifier stack**」ではない。各 kernel の `run_sequence` の戻り値の
-> 意味 (RWKV=連続 state、SNN=spike 列) は型レベルで `np.ndarray` だが**意味論は別物**。
-> 上流 (fitness/verifier) は kernel name で意味論を分岐する必要がある (汎用化しすぎない)。
+> 契約化するもので、「same **verifier stack**」ではない。`Trajectory.kind` で意味論差を
+> **型レベルに明示**し (M1 対応)、上流 (fitness/verifier) は `kind` で分岐する。汎用化しすぎない。
+>
+> **Codex review 反映 (M2)**: `apply_change_op` は当初 `(op_type, delta)` 引数を提案したが、実コードの
+> 中心は `ChangeOp` / `ChangeOpSequence` + `apply_changeop(gene, op: ChangeOp)` であり、`(op_type,
+> delta)` に潰すと `ChangeOpSequence` ベースの合成性 (`compose`) と `refinement.py` 接続の再利用性が
+> 下がる。**`ChangeOp` 型を受ける**形に修正済。kernel 別 op_type は `change_op_types` で宣言し、
+> `ChangeOp.__post_init__` の `OP_TYPES` 検証を kernel 別に拡張する (§4.1)。
 
 ### 2.3 `VerifierBackend` — Z3 invariant gate の plugin
 
