@@ -3,23 +3,23 @@
 > 自動生成: `libexec/raptor-auto-summary` (Stop hook)
 > 次回 ccr 起動時に CLAUDE.md SESSION START で自動的に読み取られる。
 
-- **最終更新**: 2026-05-30 02:05:29
+- **最終更新**: 2026-05-30 06:59:09
 - **プロジェクト**: `D:/projects/llcore`
 - **ブランチ**: `main`
 
 ## 直近の git log
 
 ```
-5ee1c13 feat(honest-eval): 公正な評価+反証ハーネス (CPU 手順1) + 監査に診断結果追記
-f1c0655 auto: __init__.py 編集前 (2026-05-30 01:49)
-e0cca5f auto: __init__.py 編集前 (2026-05-30 01:49)
-36aff8f auto: EVOLUTION_SOUNDNESS_AUDIT_2026-05-30.md 編集前 (2026-05-30 01:44)
-f9f1798 docs(audit): 進化機構 健全性監査 — 機構 PoC は成立、進化(累積改善)は未成立
-cc0c3c0 feat(kernel-s2): minimal_ga を GeneCodec で gene 型非依存化 + re-PoC 強化
-d9ae806 auto: test_kernel_ga_generalization.py 編集前 (2026-05-29 22:40)
-0bc6b06 auto: kernel_plugin_0_2_0a0.md 編集前 (2026-05-29 22:39)
-2c876ef auto: kernel_plugin_0_2_0a0.md 編集前 (2026-05-29 22:31)
-2390fbf auto: kernel_plugin_0_2_0a0.md 編集前 (2026-05-29 22:31)
+cbdc1ac docs(step4): (C1)多峰性 scout — 素朴な案Aは fitness 多峰性を満たさない (重要 honest)
+2f0d139 docs(step4): 空間拡張+分離機構 設計ノート + 案A greenlight scout
+f11bc49 auto: STEP4_DESIGN_space_expansion_niching.md 編集前 (2026-05-30 02:56)
+c578f6f feat(ridge-readout): per-gene ridge readout で landscape un-flatten (CPU 手順2) + Codex review 反映
+0e89abc auto: EVOLUTION_SOUNDNESS_AUDIT_2026-05-30.md 編集前 (2026-05-30 02:43)
+db9c808 auto: ridge_readout.py 編集前 (2026-05-30 02:42)
+6b6bfd7 auto: poc_ridge_readout_unflatten.py 編集前 (2026-05-30 02:42)
+e488e9d auto: test_ridge_readout.py 編集前 (2026-05-30 02:41)
+a7d038b auto: ridge_readout.py 編集前 (2026-05-30 02:41)
+45b0200 auto: EVOLUTION_SOUNDNESS_AUDIT_2026-05-30.md 編集前 (2026-05-30 02:37)
 ```
 
 ## 現在の git status
@@ -31,12 +31,7 @@ M docs/SESSION_SUMMARY.md
 ## 直近 2 時間に変更されたファイル
 
 ```
-01:51 docs/SESSION_SUMMARY.md
-01:50 .pytest_cache/v/cache/nodeids
-01:49 src/llcore/evolution/__init__.py
-01:49 tests/unit/test_honest_eval_falsification.py
-01:48 src/llcore/evolution/honest_eval.py
-01:44 docs/poc/EVOLUTION_SOUNDNESS_AUDIT_2026-05-30.md
+(直近 2h の変更なし)
 ```
 
 ---
