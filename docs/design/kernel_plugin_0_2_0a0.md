@@ -259,7 +259,7 @@ ARCHITECTURE_LANDSCAPE §6.1 の 4 条件を 0.2.0a0 移行で**どう守るか*
 | **(A) kernel plugin 化可** | 本 doc の 3 Protocol が plugin 境界。RWKV が最初の準拠例 (dogfooding)、SNN-LIF が 2 例目で「2 アーキで成立」を実証 |
 | **(B) 既存 test 回帰なし** | 全 step で `pytest`。codec デフォルト=RWKV でシグネチャ後方互換。research test は import 経路差替のみ |
 | **(C) Codex pair-review 通過** | 各 step commit 前。特に **per-gene 真正性** (S4) と **「same design pattern」境界** (Kernel Protocol が verifier stack を共有すると overclaim していないか) を突かせる |
-| **(D) semver 互換** | 0.1.0a0 の公開シンボル (`StateUpdateGene`, `evolve`, `verify_gene_safe`) は **削除も挙動変更もしない**。plugin は全て additive。`0.1.0a0 → 0.2.0a0` は minor (alpha) bump で破壊的変更なし |
+| **(D) semver 互換** | 0.1.0a0 の公開シンボル (`StateUpdateGene`, `evolve`, `verify_gene_safe`, **および §3.2 M3 表の全シンボル**) は **削除も挙動変更もしない**。旧シンボルは RWKV codec 固定 wrapper として温存、一般化版は別名で additive 追加。`0.1.0a0 → 0.2.0a0` は alpha bump で破壊的変更なし |
 
 > **semver の honest 注記**: 0.x alpha なので厳密な semver 保証義務はないが、
 > **「単純→複雑は進化型で困難」(ユーザー哲学)** に従い、最初から拡張余地を残す設計にする。
