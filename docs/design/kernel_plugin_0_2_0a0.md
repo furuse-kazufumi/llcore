@@ -134,9 +134,14 @@ class Kernel(Protocol[GeneT]):
 
 ### 2.3 `VerifierBackend` — Z3 invariant gate の plugin
 
-戻り値型 `InvariantResult` は既存 (`verifier/invariants.py`) を再利用。これが
-plugin 間の **共通 currency** になる (research verifier は複数 `verify_*` 関数を持つが、
-backend が標準 `verify_gene_safe` に集約する)。
+戻り値型 `InvariantResult` は既存 (`verifier/invariants.py`) を **共通 currency** にする。
+
+> **Codex review 反映 (補足 Finding)**: research verifier は型・引数が別物 — SNN は独自
+> `SNNInvariantResult` を返し、関数引数も `safety_margin` / `I_max` / `n_spikes` / `T_window_ms` 等
+> kernel 固有。よって backend は単なる re-export でなく、**`SNNInvariantResult → InvariantResult`
+> へ正規化する adapter 層**を持つ。`InvariantResult` / `SNNInvariantResult` は field がほぼ同型
+> (`ok` / `used_z3` / `reason` / `counterexample`) なので、adapter は機械的変換で済む。
+> backend が複数 `verify_*` (膜電位 + firing rate) を呼ぶ場合は **AND 集約** (全 ok で admit)。
 
 ```python
 from llcore.verifier import InvariantResult  # 既存型を再利用
