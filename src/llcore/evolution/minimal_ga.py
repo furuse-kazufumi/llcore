@@ -23,26 +23,43 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Callable
+from typing import TYPE_CHECKING, Callable, Generic, TypeVar
 
 import numpy as np
 
 from llcore.state_update import StateUpdateGene
 
+if TYPE_CHECKING:
+    # 型注釈のみ (実行時 import なし = import cycle 完全回避)。
+    # GeneCodec は llcore.kernel.protocol で定義 (S1)。
+    from llcore.kernel.protocol import GeneCodec
+
+# S2: gene 型を一般化する TypeVar。RWKV では StateUpdateGene に束縛される。
+GeneT = TypeVar("GeneT")
+
 
 @dataclass(frozen=True)
-class Individual:
-    """gene + fitness の immutable tuple."""
+class Individual(Generic[GeneT]):
+    """gene + fitness の immutable tuple.
 
-    gene: StateUpdateGene
+    S2 (0.2.0a0): ``gene`` を ``Generic[GeneT]`` 化。``Individual(gene=StateUpdateGene(...),
+    fitness=...)`` の既存呼び出しは型・実行とも不変 (後方互換)。
+    """
+
+    gene: GeneT
     fitness: float
 
 
 @dataclass(frozen=True)
-class Population:
-    """immutable individual list (順序保持)."""
+class Population(Generic[GeneT]):
+    """immutable individual list (順序保持).
 
-    individuals: tuple[Individual, ...]
+    S2: ``Generic[GeneT]`` 化。:attr:`gene_matrix` は ``gene.as_array()`` の duck typing
+    に依存する (RWKV / LIF は両方 ``as_array`` を持つ)。``as_array`` を持たない gene 型では
+    :func:`evolve` 側が codec 経由で diversity を計算するため、gene_matrix は呼ばれない。
+    """
+
+    individuals: tuple[Individual[GeneT], ...]
 
     @property
     def size(self) -> int:
