@@ -85,6 +85,16 @@ class GeneCodec(Protocol[GeneT]):
 > `clip` を codec が持つのが重要: LIF は `V_reset < V_th` の post-clip 補正、Izhikevich は
 > `c < V_PEAK` の補正という **box clip では表せない依存制約**があるため、単純 bounds clip では
 > 不足。`clipped()` メソッドの委譲で吸収する。
+>
+> **重要 (S2 verify で判明、init の独立 box draw との相互作用)**: `initialize_random_population_g`
+> は各 param を `codec.lower`/`codec.upper` の box から **独立に** draw する (byte-identity のため
+> 意図的)。よって依存制約を持つ gene 型では、init 直後に `V_reset >= V_th` のような制約破りが
+> 生成されうる (S2 検証 lens で box-only clip だと 200 個中 56 個が violation と実測)。**framework は
+> 制約 repair を `codec.clip` に全面委譲しており、framework 側に検証はない**。したがって依存制約
+> gene の codec.clip は **box clip でなく dependency-repair を必須**とする (mutate/crossover 後も
+> 同様に clip を通る)。S2 では依存制約 toy codec (`_DepGene`, lo<hi) でこの核心契約を test 実証済
+> (box-only codec が violation を出す teeth test 付き)。S3 の `SNNLifCodec.clip` は `V_reset<V_th`
+> repair を実装必須 + S3 test で post-init/post-mutate の制約充足を assert すること。
 
 ### 2.2 `Kernel` — 1 アーキの「中身」(simulate + ChangeOp)
 
