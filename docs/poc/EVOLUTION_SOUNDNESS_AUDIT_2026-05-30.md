@@ -124,6 +124,30 @@ readout 修正 + 空間拡張とセット。
 5. AdditionTask 追試 (線形可解性で③成立が分岐する仮説の確証 = GPU 投資の task 選別基準)
 6. 小型 LLM(CPU 推論可) で実 proxy の landscape 構造を事前 sanity check (GPU 投資の最終判断材料)
 
+### CPU 手順 2 の結果 (2026-05-30, per-gene ridge readout)
+
+手順 2 (fixed readout → per-gene least-squares(ridge, held-out) 置換) を本番 fitness に
+配線し実証した (`src/llcore/fitness/ridge_readout.py` + `scripts/poc_ridge_readout_unflatten.py` +
+`tests/unit/test_ridge_readout.py` 8 件)。各 gene について train sequence で線形 readout を
+ridge で fit → **held-out** で R² を測る (reservoir computing 標準評価、leakage 構造的に排除)。
+
+| 命題 | 測定 | 判定 |
+|---|---|---|
+| **P1 un-flatten** | copy d=8 delay=0 で ridge は spread を広げ最良 gene を押し上げる: fixed std=0.230/max=0.632 → ridge std=0.373/max=**0.996** (spread 1.62×) | **成立** |
+| **P2 容易だが選択なし** | un-flatten 後 copy delay=0 は『容易な単峰』化。GA=0.998 vs 同予算 random=0.997, diff=+0.0007, p=0.47 → **GA≈random** (eval-noise を n_train=6 まで上げても diff=+0.05, p=0.18 で非有意) | ③ **未証明** |
+| **P3 構造的-難 regime 不在** | copy delay≥4 / addition は線形 readout で原理的にデコード不能 → 全 gene **max=0.000** | **成立** |
+
+**最重要 honest 発見**: per-gene ridge readout は fitness の **scale** を un-flatten する (real な capability)
+が、3-param leak integrator 上では copy delay=0=**容易すぎ** (random も天井に届く) / delay≥4・addition=
+**不能** で、③(差し survival 経由の選択)が立つ『構造的かつ難しい』中間 regime が存在しない。
+診断 §7b の「copy d=8 で GA 勝つ (p=0.0005)」は readout を **共進化** (gene×readout 結合 landscape) させた
+別機構の結果であり、**per-gene 独立 ridge fit (手順 2 が指定する手法) では再現しない**。
+
+→ **readout 修正だけでは ③ は立たない。真の unlock は CPU 手順 4 (探索空間を 3-param から拡張 +
+分離機構 QD/niching の load-bearing 化)**。手順 2 は「物差しの un-flatten は効くが、それは
+landscape 平坦さの一因に過ぎず、gene 空間の低次元・縮退が残る律速」であることを経験的に確定した
+negative-but-informative result。手順 3 (③を hill-climbing から分離) は手順 4 の空間拡張後に意味を持つ。
+
 ## 7. 関連
 - [[project_llcore_init_2026_05_29]] / [[feedback_benchmark_honest_disclosure]] / [[feedback_codex_pair_review_for_llcore]]
 - `docs/poc/STAGE_3_VERDICT.md` (project 自身の honest 降格、本監査と整合)
