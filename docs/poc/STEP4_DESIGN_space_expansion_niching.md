@@ -65,11 +65,39 @@ research scout で実測 (d=6, seq=20, 30-40 random gene):
 | copy delay=6 | +0.957 | **−0.354** | **大半の gene が失敗・良 gene のみ成功** = 構造的-難の理想形 |
 | two-horizon (x[t-2]+x[t-5]) | +0.998 | +0.504 (std 0.367) | 難易度に幅 (20/40 が R²>0.5) |
 
-→ **空間拡張 (delay line) は手順 2 で欠けていた『構造的かつ難しい』regime を実際に作る**。特に
-delay=6 / two-horizon は「大半 fail・少数 success」で勾配があり、hill-climbing が詰まりうる
-(C2) + niching が効きうる (C3) の検証 task として有望。**案 A を本実装に進める根拠が揃った**
-(ただし多峰性 (C1) の厳密確認 = 分離した複数 basin の存在は、本実装の最初の gate で要検証)。
-scout コードは未コミット (inline 実験)、本実装時に `research/` へ整理予定。
+→ **空間拡張 (delay line) は手順 2 で欠けていた『構造的かつ難しい』regime (=解ける + 勾配) を作る**。
+delay=6 / two-horizon は「大半 fail・少数 success」で勾配あり。
+
+### (C1) 多峰性 gate の scout 結果 (2026-05-30) — **重要: 案 A は (C1) を満たさない**
+
+設計ノートが指定した (C1) fail-fast gate を実行: random-restart hill-climb (12 start) を two_horizon /
+copy_delay6 で走らせ、収束 optima が **分離 basin** か **連結 manifold** かを「2 optima の中点が谷に
+なるか」で判定。
+
+| task | R²>0.6 到達 | 収束 fit | optima 間 leak 距離 (mean) | **中点が谷のペア (分離 basin 証拠)** |
+|---|---|---|---|---|
+| two_horizon | 12/12 | 1.000 | 0.76 | **0/66** |
+| copy_delay6 | 11/12 | 1.000 | 0.74 | **0/55** |
+
+→ **(C1) FAIL**: optima は leak 空間に散らばる (距離 0.74) が中点に谷が無い = 高 fitness 領域は
+**連結した冗長解 manifold** (分離した複数 peak ではない)。**per-gene ridge readout の柔軟性が、多数の
+leak ベクトルを同じ task 解に compensate する**ため、fitness 上は単一の連結最適集合になる。
+hill-climbing がどこからでも到達でき、niching が維持すべき「分離した峰」が無い。
+
+**→ honest 含意 (案 A の素朴版は ③ に不十分)**: 空間拡張だけでは fitness 多峰性は出ない。原因は
+solvability ではなく **per-gene 最適 readout が解 manifold を連結にすること**。③ を立てるには次のいずれか:
+- **(i) 競合目的 task**: 同時に最大化できない複数目的 (例: 短延延 vs 長延延の recall を限られた tap で
+  両立不可) → gene が排他的 niche に特化せざるを得ず、真に分離した峰が出る。
+- **(ii) readout を connected manifold にしない**: per-gene 最適 ridge をやめ、**共進化 readout** (gene と
+  共有・進化) にする (診断 §7b の p=0.0005 GA-win 機構と一致)。compensate 自由度を奪い峰を分離。
+- **(iii) 行動記述子ベース QD (MAP-Elites)**: niche を fitness peak でなく **behavior descriptor** で定義
+  (例: gene の delay 特性 profile)。MAP-Elites は fitness 多峰性を要求せず、行動多様性で動く。連結
+  manifold 上でも behavioral に分散した archive を維持でき、③ の代替的成立路線になりうる。
+
+**→ 修正推奨**: 案 A (delay-line で解ける化) は前提として有効だが、その上に **(i) 競合目的 task** か
+**(iii) MAP-Elites (behavioral niching)** を載せるのが ③ 立証の本線。(ii) 共進化 readout は診断の
+GA-win を再現する最短路だが「読出の進化 = gene の進化」の交絡に注意 (honest 分離が必要)。
+**この3択は user steering 案件** (研究方向の選択)。scout コードは未コミット inline、本実装時に research/ 整理。
 
 ## 4. 分離機構 (既存資産の load-bearing 化)
 
