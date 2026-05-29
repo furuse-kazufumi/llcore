@@ -33,12 +33,17 @@ from llcore.verifier import ChangeOp, InvariantResult
 GeneT = TypeVar("GeneT")
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class Trajectory:
     """kernel 横断の simulate 戻り値.
 
     意味論差を field で明示する (設計 doc M1: RWKV ``run_sequence`` と SNN
     ``simulate_lif`` は戻り値が別物。``np.ndarray`` 1 本では吸収できないため正規化).
+
+    ``eq=False`` (Codex review S1 Low 反映): 自動生成 ``__eq__`` は ``primary``
+    (np.ndarray) を ``==`` 比較し ambiguous truth value で落ちるため、identity 比較に
+    する。Trajectory 同士の中身比較が必要なら ``np.array_equal(a.primary, b.primary)``
+    を明示的に使う。
 
     Attributes
     ----------
