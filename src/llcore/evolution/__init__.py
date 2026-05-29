@@ -27,6 +27,7 @@ from .lineage_reservoir import LineageReservoir
 from .minimal_ga import (
     EvolutionResult,
     FitnessFunc,
+    FitnessFuncG,
     GeneT,
     Individual,
     Population,
