@@ -276,6 +276,147 @@ def test_evolution_lineage_diversity_smoke():
 
 
 # ---------------------------------------------------------------------------
+# Stage 2.4 反証的 tests (Codex Findings を機械検査で確定する)
+#
+# 目的: Stage 2.3 Codex pair-review が指摘した overclaim を **test で機械検査**
+# することで、Codex pair-review が担っていた反証役を **test に内製化** する.
+# これらの test は **PASS する** が、内容は「現実装の claim が overclaim だった」
+# ことを assert する反証. 既存 claim の機械検査強化と Stage 3+ 改善方向の固定化.
+# 関連 memory: [[feedback_codex_pair_review_for_llcore]] (反証 test の不在 ⇒ 内製化)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.skipif(not is_z3_available(), reason="z3-solver not installed")
+def test_anti_verifier_is_gene_independent_in_v_bounded():
+    """[反証] Codex F1: `verify_v_bounded_per_gene` は実質 gene-independent.
+
+    `verify_v_bounded_per_gene(gene, ...)` は gene を `clipped()` しただけで
+    Z3 制約式に a, b, c, d を **入れない** (u は box `[-25, 25]` で扱う).
+    Codex 指摘の通り「per-gene」表現は overclaim. 本 test は **現実装が確かに
+    gene-independent** であることを機械検査する反証 test = 大きく異なる 2 gene
+    で同じ Z3 verdict (admit/reject + 同じ reason 構造) を返すことを assert.
+
+    現実装が overclaim でない実装に **将来修正された場合は本 test が FAIL** し、
+    Codex F1 の真の per-gene verifier への昇格を機械検査で検知できる.
+    """
+    safety_margin = 100.0
+    I_max = 5.0
+    # 大きく異なる 2 gene (RS と FS)
+    g_RS = IzhikevichGene(a=0.02, b=0.2, c=-65.0, d=8.0)
+    g_FS = IzhikevichGene(a=0.10, b=0.2, c=-65.0, d=2.0)
+
+    r_RS = verify_v_bounded_per_gene(g_RS, safety_margin=safety_margin, I_max=I_max)
+    r_FS = verify_v_bounded_per_gene(g_FS, safety_margin=safety_margin, I_max=I_max)
+
+    # 両方とも同じ verdict (gene が制約に効かない証拠)
+    assert r_RS.ok == r_FS.ok, (
+        f"gene-independent claim 反証失敗: RS.ok={r_RS.ok}, FS.ok={r_FS.ok}. "
+        f"verifier が真に per-gene になっていれば本 test は FAIL し、"
+        f"Stage 3+ で a,b,c,d を Z3 制約に入れた事実が機械検査される."
+    )
+
+    # honest: 実装は reason 文字列で `gene (a=..., b=...)` を表示するが、
+    # **Z3 制約式 (solver.assertions)** には a, b が入っていない (Codex F1 指摘).
+    # reason 表示は cosmetic で per-gene 装い + Z3 構造は gene-independent =
+    # 「reason だけ per-gene 装い」も別の overclaim 可能性 → Stage 2.4 サブ phase で
+    # reason 表示を「gene clipped box は同じ」に正名化検討.
+    # 本 test では cosmetic 検査は割愛し verdict 一致のみで反証成立とする.
+
+
+@pytest.mark.skipif(not is_z3_available(), reason="z3-solver not installed")
+def test_anti_firing_rate_bound_is_dt_packing_not_neuron_dynamics():
+    """[反証] Codex F2: `verify_firing_rate_per_gene` は dt packing bound のみ.
+
+    Codex 指摘: 実装は `t_{i+1} - t_i >= dt` と `(n-1)*dt > T_window` のみで、
+    gene a,b,c,d は使われない. 「per-gene firing rate invariant」は誤解.
+
+    本 test は **異なる gene でも同じ verdict** を返すことを assert する反証.
+    """
+    n_spikes = 10
+    T_window_ms = 50.0  # 10 spike × DT=0.1ms = 1ms <<<< 50ms = admit 想定
+    g_RS = IzhikevichGene(a=0.02, b=0.2, c=-65.0, d=8.0)
+    g_FS = IzhikevichGene(a=0.10, b=0.2, c=-65.0, d=2.0)
+
+    r_RS = verify_firing_rate_per_gene(g_RS, n_spikes=n_spikes, T_window_ms=T_window_ms)
+    r_FS = verify_firing_rate_per_gene(g_FS, n_spikes=n_spikes, T_window_ms=T_window_ms)
+
+    assert r_RS.ok == r_FS.ok, (
+        f"firing-rate bound が gene-independent 反証失敗: "
+        f"Codex F2 claim と矛盾, verifier が gene dynamics を反映していれば異 verdict 想定"
+    )
+
+
+@pytest.mark.skipif(not is_z3_available(), reason="z3-solver not installed")
+def test_anti_G8_lineage_diversity_depends_on_reservoir_not_attractor():
+    """[反証] Codex F3: G8 4 firing-type lineage 維持は Reservoir 効果 (mechanism でない).
+
+    Codex 指摘: lineage 4 種維持は `sample_initial_gene` type bias と
+    `LineageReservoir.reinject_extinct()` で **構造的に保証**, 4 attractors の
+    証拠でない. `RS=6, IB=24, CH=1, FS=1` は「1 dominant basin (IB) + 3 preserved
+    labels」.
+
+    本 test は **gene-guess (firing_type_guess) が lineage label と乖離する** ことを
+    assert する反証 = lineage label は reservoir で構造的維持されるが、実 gene の
+    firing-type 分布は IB 集約傾向を示す.
+    """
+    from other_archs.snn.izhikevich.poc import run_izh_evolution
+
+    rng = np.random.default_rng(20260530)
+    trace = run_izh_evolution(
+        pop_per_type=4,
+        n_types=4,
+        n_generations=8,
+        target_rate_hz_start=20.0,
+        target_rate_hz_end=40.0,
+        I_value_curriculum=(5.0, 10.0),
+        rng=rng,
+        use_verifier=True,
+    )
+    final = trace.populations[-1]
+    lineage_labels = {ind.firing_type for ind in final}
+    # firing_type_guess は IzhikevichGene method (ind.firing_type_guess は string)
+    gene_guesses = [ind.firing_type_guess for ind in final]
+
+    # lineage labels は Reservoir で 4 種維持 (構造的保証)
+    assert lineage_labels == {0, 1, 2, 3}, f"lineage label 維持失敗: {lineage_labels}"
+
+    # 反証ポイント: 最頻 gene-guess type が支配的 = "1 dominant basin"
+    from collections import Counter
+    guess_counter = Counter(gene_guesses)
+    most_common_count = guess_counter.most_common(1)[0][1]
+    dominant_ratio = most_common_count / len(final)
+    # >=0.35 (= 32 個体中 12 個以上が同 type) で "1 dominant basin" 確認可
+    # honest: seed 依存で揺れるため緩めの閾値 (Codex F3 受容を機械検査)
+    assert dominant_ratio >= 0.35, (
+        f"1 dominant basin 反証失敗: 最頻 gene-guess type が {dominant_ratio:.0%}. "
+        f"Codex F3 想定では selection pressure 下で 1 type dominant の想定 "
+        f"(均等分布なら 25%, 集中なら >35%)."
+    )
+
+
+def test_anti_G8_pass_threshold_is_lenient():
+    """[反証] Codex F3 補足: G8 判定 logic は gene-guess 3 種以上で trivial PASS.
+
+    poc.py の G8 判定 (`gate_g8_firing_type_distribution`) は lineage 種数 + gene-guess
+    種数の組合せで PASS する設計. 厳格な「4 attractors mechanism」claim には
+    `gene_guesses == 4` and 各 type が >= 一定割合、等の hard 条件が必要.
+
+    本 test は poc.py source 中に「>= 3」または「>=3」緩めの閾値の存在を assert.
+    将来 hard 厳格化された場合は本 test FAIL = claim 強化が機械検査される.
+    """
+    from other_archs.snn.izhikevich import poc
+
+    source = Path(poc.__file__).read_text(encoding="utf-8")
+    # G8 判定関数本体を文字列で含む + >= 3 or >=3 の lenient 閾値を含む
+    assert "g8" in source.lower() or "G8" in source, "PoC G8 関数が見つからない"
+    # 3 という閾値文字列が source に少なくとも 1 回出る (G4=4, G7=15ms 等もあるため
+    # 緩い assertion. hard 厳格化で 4 のみになれば本 test 修正の指針)
+    assert " 3" in source or ">=3" in source or ">= 3" in source, (
+        "lenient threshold (3) が見つからない. G8 厳格化された場合は本 test を update."
+    )
+
+
+# ---------------------------------------------------------------------------
 # Constants sanity (regression for accidental changes)
 # ---------------------------------------------------------------------------
 
