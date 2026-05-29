@@ -53,6 +53,24 @@ commit 5ee1c13) / 手順 2 (per-gene ridge readout un-flatten, commit c578f6f) �
 不能) = 構造的-難 regime 不在」を示した。multi-tap は delayed copy を **解ける化** し、かつ delay ごとに
 異なる tap 構成が最適 → 自然に多峰。(C1)-(C4) を最短で検証できる。案 B/C は A で ③ が立った後の一般化。
 
+### 案 A scout 結果 (2026-05-30, 強い greenlight 証拠)
+
+leaky delay-line prototype (K=8 tap shift register, gene=leak vector, state flatten→ridge readout) を
+research scout で実測 (d=6, seq=20, 30-40 random gene):
+
+| task | random gene max R² | mean R² | 解釈 |
+|---|---|---|---|
+| copy delay=0 | +1.000 | +1.000 | 容易 (3-param と同様) |
+| copy delay=4 | +1.000 | **+0.416** | **解ける + 勾配あり** (3-param では一様に負/0 = 不能だった) |
+| copy delay=6 | +0.957 | **−0.354** | **大半の gene が失敗・良 gene のみ成功** = 構造的-難の理想形 |
+| two-horizon (x[t-2]+x[t-5]) | +0.998 | +0.504 (std 0.367) | 難易度に幅 (20/40 が R²>0.5) |
+
+→ **空間拡張 (delay line) は手順 2 で欠けていた『構造的かつ難しい』regime を実際に作る**。特に
+delay=6 / two-horizon は「大半 fail・少数 success」で勾配があり、hill-climbing が詰まりうる
+(C2) + niching が効きうる (C3) の検証 task として有望。**案 A を本実装に進める根拠が揃った**
+(ただし多峰性 (C1) の厳密確認 = 分離した複数 basin の存在は、本実装の最初の gate で要検証)。
+scout コードは未コミット (inline 実験)、本実装時に `research/` へ整理予定。
+
 ## 4. 分離機構 (既存資産の load-bearing 化)
 
 multimodal landscape を作ったら、以下を evolve に**実配線**する (現状は未配線 or 飾り):
