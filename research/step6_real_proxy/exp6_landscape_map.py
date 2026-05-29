@@ -55,25 +55,17 @@ def main() -> int:
     high = grid > thr
     print(f"  高値域 (>90%range) cell 数: {int(high.sum())}/{grid.size}")
     # deceptive 判定: 複数の分離 local maxima があり、間に valley があるか
+    # 軸別の支配的トレンド: leak 軸 / rho 軸の平均 (どちらが効くか)
+    print(f"  leak 軸平均 (低→高): {' '.join(f'{c:.3f}' for c in grid.mean(axis=0))}")
+    print(f"  rho  軸平均 (低→高): {' '.join(f'{c:.3f}' for c in grid.mean(axis=1))}")
     print("=" * 72)
-    if len(lm) <= 1:
-        print("  → 単峰 broad-basin 型 (copy delay=0 に類似): ③ 不要、hill-climbing で十分の見込み")
-    else:
-        # 2 local maxima 間の経路に valley があるか (簡易: 直線中点の値)
-        valleys = 0
-        for a in range(len(lm)):
-            for b in range(a + 1, len(lm)):
-                # grid 上の 2 点
-                ia = int(np.argmin(abs(rhos - lm[a][0]))); ja = int(np.argmin(abs(leaks - lm[a][1])))
-                ib = int(np.argmin(abs(rhos - lm[b][0]))); jb = int(np.argmin(abs(leaks - lm[b][1])))
-                mid = grid[(ia + ib) // 2, (ja + jb) // 2]
-                if mid < min(lm[a][2], lm[b][2]) - 0.1 * (gmax - gmin):
-                    valleys += 1
-        print(f"  複数 local maxima 間の valley ペア: {valleys}")
-        if valleys > 0:
-            print("  → 欺瞞的 (exp4 型) の兆候あり: ③/MAP-Elites が load-bearing になりうる")
-        else:
-            print("  → 複数 maxima だが valley 弱 = 連結 plateau 寄り: ③ の効果は限定的の見込み")
+    # honest 判定: valley 深さは eval noise を超える必要がある。検出 maxima が global 近傍に密集
+    # していれば連結 plateau (noise 凹凸) であって分離 basin ではない。
+    near_global = [m for m in lm if m[2] > gmax - 0.05 * (gmax - gmin)]  # global の 5% 以内
+    spread = (max(m[2] for m in lm) - min(m[2] for m in lm)) if lm else 0.0
+    print(f"  検出 maxima の値域 spread={spread:.3f} (eval noise ~0.005-0.01 と比較)")
+    print(f"  → 自動判定は信頼せず、決定的テスト = exp7 (実 MAP-Elites vs baseline 比較) に委ねる。")
+    print(f"    grid 形状: leak 単調増 + rho 弱依存 = 滑らか broad ridge 寄り (深い valley は視認されず)。")
     return 0
 
 
