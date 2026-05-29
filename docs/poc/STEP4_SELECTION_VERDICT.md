@@ -21,13 +21,25 @@
 
 | 基準 | 内容 | 達成 (exp4) |
 |---|---|---|
-| C2 | hill-climbing が局所最適に詰まる | ✓ RR-hillclimb / random 大域到達率 **0%** (局所 0.60 で停滞) |
-| C3 | niching が baseline を有意に上回る | ✓ MAP-Elites 大域到達 **95%**, vs 3 baseline 全て p=1.9e-6, δ=+1.00 |
-| C4 | 勝因が探索量でなく diversity 維持 | ✓ **強 baseline = random-restart hill-climbing** (coverage 機構) にも δ=+1.00 で勝利 |
-| (境界) | ③優位は欺瞞 regime 限定 | ✓ smooth landscape では優位消失 (exp5) |
+| C2 | hill-climbing が局所最適に詰まる | ✓ RR-hillclimb / random / panmictic-GA 大域到達率 **0%** (局所 0.60 で停滞) |
+| C3 | niching が baseline を有意に上回る | ✓ MAP-Elites 大域到達 **95%**, vs 3 baseline 全て p=1.9e-6, δ=+1.00, 勝率 100% |
+| C4 | 勝因が探索量でなく diversity 維持 | ✓ random-restart hill-climbing (restart=coverage 機構) にも δ=+1.00 / **init_batch ablation** で確証 (下記) |
+| (境界) | ③優位は欺瞞 regime 限定 | ✓ smooth landscape では 3 baseline 全てに対し優位消失 (exp5) |
+
+**robustness**: 3 種の base_seed (20260530 / 777 / 31337, 計 60 seed) 全てで MAP-E reach≧0.95,
+RR=0.60, p=1.9e-6, δ=+1.00 — seed 非依存。
+
+**C4 の確証 (init_batch ablation, Codex Medium 指摘対応)**: 「MAP-Elites の初期 random batch
+(default 600 点) の coverage が勝因では?」を切り分けた。init_batch を **30 に削減しても MAP-Elites は
+100% 大域到達** (mean 0.998)。かつ **pure random は 6000 点でも 0% 到達**。→ 勝因は初期 coverage でも
+探索量でもなく **archive の stepping-stone ratchet (diversity 維持)** と確定。
 
 C1 (fitness 多峰性) は MAP-Elites の前提として**要求しない** (behavioral niching は fitness peak でなく
 behavior descriptor で動く)。手順 2 で fitness 多峰性が出ないと判明したが、(iii) はそれを回避する路線。
+
+**到達判定の注 (Codex Low 指摘)**: 「大域到達」は honest 再評価 fitness `>0.8` を大域峰 proxy とした
+判定 (basin membership を直接記録したものではない)。この landscape では局所 0.60 / 大域 1.00 が明確に
+分離するため妥当な proxy。
 
 ## 2. ③ が立つ landscape の構造 (発見した条件)
 
