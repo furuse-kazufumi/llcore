@@ -89,7 +89,7 @@ class GeneCodec(Protocol[GeneT]):
 > **重要 (S2 verify で判明、init の独立 box draw との相互作用)**: `initialize_random_population_g`
 > は各 param を `codec.lower`/`codec.upper` の box から **独立に** draw する (byte-identity のため
 > 意図的)。よって依存制約を持つ gene 型では、init 直後に `V_reset >= V_th` のような制約破りが
-> 生成されうる (S2 検証 lens で box-only clip だと 200 個中 56 個が violation と実測)。**framework は
+> 生成されうる (S2 検証で box-only clip だと 200 個中 **97 個** が violation と実測、seed 7; repair 版は 0)。**framework は
 > 制約 repair を `codec.clip` に全面委譲しており、framework 側に検証はない**。したがって依存制約
 > gene の codec.clip は **box clip でなく dependency-repair を必須**とする (mutate/crossover 後も
 > 同様に clip を通る)。S2 では依存制約 toy codec (`_DepGene`, lo<hi) でこの核心契約を test 実証済
