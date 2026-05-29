@@ -24,6 +24,20 @@ from pathlib import Path
 
 import numpy as np
 
+
+def _ensure_utf8_stdout() -> None:
+    """Windows cp932 console で em-dash/日本語を出すため stdout を UTF-8 化."""
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure is not None:
+            try:
+                reconfigure(encoding="utf-8")
+            except (ValueError, OSError):  # pragma: no cover
+                pass
+
+
+_ensure_utf8_stdout()
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from llcore.evolution.honest_eval import evolution_vs_random  # noqa: E402
