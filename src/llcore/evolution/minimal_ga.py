@@ -129,6 +129,68 @@ def crossover_uniform(
 
 
 # ---------------------------------------------------------------------------
+# S2: gene 型非依存の汎用 operator (GeneCodec 経由)
+#
+# RWKV codec に対しては上記 RWKV 専用版と **RNG ストリームまで byte-identical**:
+# - mutate:  rng.normal(0, sigma, size=dim) は dim=3 で同一 draw
+# - crossover: rng.integers(0, 2, size=dim) は dim=3 で同一 draw
+# - init:    各 param を per-element scalar rng.uniform(lo, hi) で順に draw (旧版と同順)
+# RWKV in-range gene では codec.clip が identity なので fitness も byte-identical。
+# (test_kernel_ga_generalization で evolve(codec=RWKVCodec()) == evolve(codec=None) を証明)
+# ---------------------------------------------------------------------------
+
+
+def uniform_mutate_g(
+    gene: GeneT, codec: "GeneCodec[GeneT]", sigma: float, rng: np.random.Generator
+) -> GeneT:
+    """gene 型非依存の uniform mutation (codec 経由).
+
+    各 param に独立 gaussian noise (σ=sigma) → codec.clip で範囲制約を反映。
+    """
+    noise = rng.normal(0.0, sigma, size=codec.dim)
+    arr = codec.to_array(gene) + noise
+    return codec.clip(codec.from_array(arr))
+
+
+def crossover_uniform_g(
+    parent_a: GeneT,
+    parent_b: GeneT,
+    codec: "GeneCodec[GeneT]",
+    rng: np.random.Generator,
+) -> GeneT:
+    """gene 型非依存の uniform crossover (codec 経由).
+
+    各 param を 50/50 で a/b から独立に選ぶ。
+    """
+    arr_a = codec.to_array(parent_a)
+    arr_b = codec.to_array(parent_b)
+    mask = rng.integers(0, 2, size=codec.dim).astype(bool)
+    child_arr = np.where(mask, arr_a, arr_b)
+    return codec.clip(codec.from_array(child_arr))
+
+
+def initialize_random_population_g(
+    pop_size: int, codec: "GeneCodec[GeneT]", rng: np.random.Generator
+) -> list[GeneT]:
+    """gene 型非依存の random 集団生成 (codec.lower/upper box 内 uniform).
+
+    各 param を per-element scalar ``rng.uniform(lo, hi)`` で **順に** draw する
+    (RWKV 専用 :func:`initialize_random_population` の draw 順と一致させ byte-identity を保つ)。
+    codec.clip で依存制約 (LIF の V_reset<V_th 等) を反映。
+    """
+    lower = codec.lower
+    upper = codec.upper
+    genes: list[GeneT] = []
+    for _ in range(pop_size):
+        arr = np.array(
+            [float(rng.uniform(lo, hi)) for lo, hi in zip(lower, upper)],
+            dtype=np.float64,
+        )
+        genes.append(codec.clip(codec.from_array(arr)))
+    return genes
+
+
+# ---------------------------------------------------------------------------
 # evolution loop
 # ---------------------------------------------------------------------------
 
