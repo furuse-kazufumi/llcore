@@ -281,8 +281,12 @@ ARCHITECTURE_LANDSCAPE §6.1 の 4 条件を 0.2.0a0 移行で**どう守るか*
 
 ## 7. 次のアクション (本 doc 後)
 
-1. **本 doc を Codex review** (設計の overclaim / Protocol 境界の妥当性 / semver 主張の検証)
-2. S1 着手判断 (ユーザー承認後): `src/llcore/kernel/protocol.py` + RWKV 準拠例
+1. ~~本 doc を Codex review~~ **完了 (2026-05-29)**: Codex (gpt-5.4) read-only review → 5 Findings
+   (Medium 3 / Low 2 + 補足 1)。全件実コード検証の上 doc に反映済 (§2.2 M1 Trajectory + M2 ChangeOp 型 /
+   §2.3 補足 result 正規化 adapter / §2.3 表 L1 per-gene 真正性訂正 / §3.2 §5 M3 シンボル温存)。
+   **設計の overclaim 残りなし、Protocol 境界は adapter 前提で締まった**。
+2. S1 着手判断 (ユーザー承認後): `src/llcore/kernel/protocol.py` (`GeneCodec` / `Kernel` / `Trajectory` /
+   `VerifierBackend`) + RWKV 準拠例 (`RWKVKernel` / `RWKVStateNormBackend`)
 3. 並行候補: ARCH_LANDSCAPE §9 の C (真の per-gene verifier, Izhikevich F1 直接対応) は
    本 plugin 設計の S4 と論点が重なるため、S4 で一緒に解消する設計
 
