@@ -248,6 +248,7 @@ def verify_firing_rate_per_gene(
 def verify_membrane_bounded(
     *,
     safety_margin: float = 1.0,
+    I_max: float | None = None,
     timeout_ms: int = 2000,
 ) -> SNNInvariantResult:
     """forward Euler 1 step 後の V_next が安全範囲に収まるか.
@@ -257,8 +258,20 @@ def verify_membrane_bounded(
 
     解析対象は「不応期外、まだ spike していない時点」の V_next.
     V ∈ [V_reset_min, V_th_max] = [-80, -40] mV (clip 範囲広め),
-    I ∈ [-I_MAX, +I_MAX] = [-2, 2],
+    I ∈ [-I_max, +I_max],
     tau_m ∈ [TAU_M_MIN, TAU_M_MAX] = [5, 30].
+
+    Parameters
+    ----------
+    safety_margin : float
+        invariant 上下界の余裕 (mV).
+    I_max : float | None, default None
+        **Stage 2.2a (Codex F3 対応)**: 入力 amplitude 上界の **assumed-input contract**.
+        None なら module 既定 `I_MAX_ABS` を使用 (後方互換). 引数で contract を狭めれば
+        bound 厳しくなり sound 強化、広げれば bound 緩和 (overshoot 可能性).
+        旧実装は `I_MAX_ABS=2.5` 固定で scenario-specific (Codex Q3 / Finding #3 指摘).
+    timeout_ms : int
+        Z3 timeout (ms).
 
     invariant:
         V_next <= V_th + safety_margin  (overshoot 上界)
@@ -277,6 +290,12 @@ def verify_membrane_bounded(
             ok=True, used_z3=False, reason="z3 unavailable, skip",
         )
 
+    # I_max parameter 化 (Stage 2.2a): 既定値は後方互換のため I_MAX_ABS
+    if I_max is None:
+        I_max = I_MAX_ABS
+    if I_max <= 0:
+        raise ValueError(f"I_max must be positive, got {I_max}")
+
     solver = z3.Solver()
     solver.set("timeout", timeout_ms)
     tau_m = z3.Real("tau_m")
@@ -288,7 +307,8 @@ def verify_membrane_bounded(
     # V の許容範囲: V_RESET_MIN から V_TH_MAX まで (spike 直前まで)
     # 下界は V_RESET_MIN を許す (不応期明けの開始点)
     solver.add(V >= V_RESET_MIN, V <= V_TH_MAX)
-    solver.add(I >= -I_MAX_ABS, I <= I_MAX_ABS)
+    # Stage 2.2a: I_max は assumed-input contract (引数で contract 設定可)
+    solver.add(I >= -I_max, I <= I_max)
 
     # forward Euler 更新 (R_MEM=1.0 固定)
     # V_next * tau_m = V * tau_m + DT * (V_REST - V + R_MEM * I)
@@ -306,7 +326,7 @@ def verify_membrane_bounded(
             ok=True, used_z3=True,
             reason=(
                 f"unsat: V_next ∈ [{lower}, {upper}] mV for "
-                f"V ∈ [{V_RESET_MIN},{V_TH_MAX}], I ∈ [-{I_MAX_ABS},{I_MAX_ABS}], "
+                f"V ∈ [{V_RESET_MIN},{V_TH_MAX}], I ∈ [-{I_max},{I_max}] (contract), "
                 f"tau_m ∈ [{TAU_M_MIN},{TAU_M_MAX}]"
             ),
         )
@@ -343,11 +363,29 @@ def verify_membrane_bounded_per_gene(
     gene: LIFGene,
     *,
     safety_margin: float = 1.0,
+    I_max: float | None = None,
     timeout_ms: int = 1000,
 ) -> SNNInvariantResult:
-    """単一 gene の tau_m に対し膜電位 bound が成立するか (online gate)."""
+    """単一 gene の tau_m に対し膜電位 bound が成立するか (online gate).
+
+    Parameters
+    ----------
+    gene : LIFGene
+    safety_margin : float
+        bound 余裕 mV.
+    I_max : float | None
+        Stage 2.2a: 入力 amplitude 上界の assumed-input contract.
+        None なら既定 `I_MAX_ABS`.
+    timeout_ms : int
+        Z3 timeout.
+    """
     if not _HAS_Z3:
         return SNNInvariantResult(ok=True, used_z3=False, reason="z3 unavailable, skip")
+
+    if I_max is None:
+        I_max = I_MAX_ABS
+    if I_max <= 0:
+        raise ValueError(f"I_max must be positive, got {I_max}")
 
     g = gene.clipped()
     solver = z3.Solver()
@@ -362,7 +400,8 @@ def verify_membrane_bounded_per_gene(
     v_reset_const = g.V_reset
 
     solver.add(V >= v_reset_const, V <= v_th_const)  # spike 手前
-    solver.add(I >= -I_MAX_ABS, I <= I_MAX_ABS)
+    # Stage 2.2a: I_max は assumed-input contract (引数化)
+    solver.add(I >= -I_max, I <= I_max)
     # tau_m_const > 0 確定なので両辺 tau_m_const 掛けなくて OK
     solver.add(V_next == V + (DT / tau_m_const) * (V_REST - V + R_MEM * I))
 

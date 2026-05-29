@@ -213,17 +213,61 @@ class TestSNNVerifier:
         assert r.ok is True, f"per-gene boundary n=21 should admit: {r.reason}"
 
     def test_membrane_bounded_safe_margin(self):
-        """safety_margin=5 で unsat 証明."""
+        """safety_margin=5 で unsat 証明 (default I_max, 後方互換)."""
         r = verify_membrane_bounded(safety_margin=5.0, timeout_ms=3000)
         assert r.ok is True
         assert r.used_z3 is True
 
     def test_membrane_bounded_per_gene(self):
-        """per-gene 膜電位 bound 検査."""
+        """per-gene 膜電位 bound 検査 (default I_max, 後方互換)."""
         g = LIFGene(10.0, -50.0, -70.0, 2.0)
         r = verify_membrane_bounded_per_gene(g, safety_margin=5.0, timeout_ms=1000)
         assert r.ok is True
         assert r.used_z3 is True
+
+    def test_membrane_bounded_tight_I_max_admit(self):
+        """[Stage 2.2a Codex F3] tight contract I_max=1.0 で admit (sound 強化).
+
+        V_next = V + (DT/τ_m) * (V_REST - V + R*I), DT=0.1, τ_m∈[5,30], R=10
+        I_max=1.0, V=V_TH=-40 で V_next 上界 = -40 + (0.1/5)*(-25+10*1) = -40.3
+        ≤ V_TH+safety_margin=-40+5=-35 で admit 期待.
+        """
+        r = verify_membrane_bounded(safety_margin=5.0, I_max=1.0, timeout_ms=3000)
+        assert r.ok is True, f"tight I_max=1.0 should admit: {r.reason}"
+        assert "I ∈ [-1.0,1.0]" in r.reason, f"reason should reflect I_max: {r.reason}"
+
+    def test_membrane_bounded_loose_I_max_rejects(self):
+        """[Stage 2.2a Codex F3] loose contract I_max=10.0 + safety_margin=0 で reject.
+
+        I_max=10.0 で V=V_TH=-40 から V_next 計算:
+        V_next = -40 + (0.1/τ_m_min)*(V_REST - V + R*I) = -40 + 0.02*(-25 + 100) = -38.5
+        safety_margin=0 で V_TH 越え (V_next > -40) を Z3 が探索 → overshoot 検出.
+        """
+        r = verify_membrane_bounded(safety_margin=0.0, I_max=10.0, timeout_ms=3000)
+        assert r.ok is False, f"loose I_max=10 with margin=0 should reject: {r.reason}"
+        assert r.counterexample is not None
+
+    def test_membrane_bounded_I_max_invalid_raises(self):
+        """[Stage 2.2a] I_max <= 0 は ValueError (sound contract 保証)."""
+        with pytest.raises(ValueError, match="I_max must be positive"):
+            verify_membrane_bounded(safety_margin=5.0, I_max=0.0)
+        with pytest.raises(ValueError, match="I_max must be positive"):
+            verify_membrane_bounded(safety_margin=5.0, I_max=-1.0)
+
+    def test_membrane_bounded_per_gene_tight_I_max(self):
+        """[Stage 2.2a] per-gene 版で I_max=1.0 admit."""
+        g = LIFGene(10.0, -50.0, -70.0, 2.0)
+        r = verify_membrane_bounded_per_gene(
+            g, safety_margin=5.0, I_max=1.0, timeout_ms=1000
+        )
+        assert r.ok is True, f"per-gene tight I_max should admit: {r.reason}"
+        assert r.used_z3 is True
+
+    def test_membrane_bounded_per_gene_I_max_invalid_raises(self):
+        """[Stage 2.2a] per-gene 版でも I_max <= 0 は ValueError."""
+        g = LIFGene(10.0, -50.0, -70.0, 2.0)
+        with pytest.raises(ValueError, match="I_max must be positive"):
+            verify_membrane_bounded_per_gene(g, safety_margin=5.0, I_max=0.0)
 
     def test_shielded_rl_hint_admit(self):
         """t_ref=5 ms, R_safe=200 で admit (境界, unsat)."""
