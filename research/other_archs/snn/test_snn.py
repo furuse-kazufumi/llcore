@@ -42,6 +42,7 @@ from other_archs.snn.snn_verifier import (  # noqa: E402
     verify_firing_rate_bound,
     verify_firing_rate_per_gene,
     verify_membrane_bounded,
+    verify_membrane_bounded_2step,
     verify_membrane_bounded_per_gene,
     verify_shielded_rl_hint,
 )
@@ -268,6 +269,49 @@ class TestSNNVerifier:
         g = LIFGene(10.0, -50.0, -70.0, 2.0)
         with pytest.raises(ValueError, match="I_max must be positive"):
             verify_membrane_bounded_per_gene(g, safety_margin=5.0, I_max=0.0)
+
+    # ----- Stage 2.2b: 2-step + |ΔI| contract -----
+
+    def test_membrane_bounded_2step_tight_contract_admit(self):
+        """[Stage 2.2b] I_max=1.0, dI_max=0.5 tight contract で 2-step admit.
+
+        2-step Euler chain で V_1, V_2 が両方 safe range 内.
+        |I_1 - I_0| <= 0.5 で input dynamics 制約.
+        """
+        r = verify_membrane_bounded_2step(
+            safety_margin=5.0, I_max=1.0, dI_max=0.5, timeout_ms=3000
+        )
+        assert r.ok is True, f"tight 2-step contract should admit: {r.reason}"
+        assert r.used_z3 is True
+        assert "|ΔI|<=0.5" in r.reason
+
+    def test_membrane_bounded_2step_loose_dI_rejects(self):
+        """[Stage 2.2b] dI_max 緩めると 2-step CE 検出 (input dynamics 制約効果実証).
+
+        I_max=10 (overshoot 可能) + safety_margin=0 で 1-step と同様 reject.
+        2-step では |ΔI|=20 (= 2*I_max) ≧ contract 不要、Z3 が overshoot CE 検出.
+        """
+        r = verify_membrane_bounded_2step(
+            safety_margin=0.0, I_max=10.0, dI_max=20.0, timeout_ms=3000
+        )
+        assert r.ok is False, f"loose 2-step contract should reject: {r.reason}"
+        assert r.counterexample is not None
+        assert "V0" in r.counterexample and "V1" in r.counterexample and "V2" in r.counterexample
+
+    def test_membrane_bounded_2step_default_dI_eq_2_I_max(self):
+        """[Stage 2.2b] dI_max=None で default = 2*I_max (制約なし相当)."""
+        r = verify_membrane_bounded_2step(
+            safety_margin=5.0, I_max=1.0, dI_max=None, timeout_ms=3000
+        )
+        assert r.ok is True
+        assert "|ΔI|<=2.0" in r.reason
+
+    def test_membrane_bounded_2step_invalid_dI_max_raises(self):
+        """[Stage 2.2b] dI_max <= 0 で ValueError."""
+        with pytest.raises(ValueError, match="dI_max must be positive"):
+            verify_membrane_bounded_2step(safety_margin=5.0, I_max=1.0, dI_max=0.0)
+        with pytest.raises(ValueError, match="dI_max must be positive"):
+            verify_membrane_bounded_2step(safety_margin=5.0, I_max=1.0, dI_max=-0.1)
 
     def test_shielded_rl_hint_admit(self):
         """t_ref=5 ms, R_safe=200 で admit (境界, unsat)."""

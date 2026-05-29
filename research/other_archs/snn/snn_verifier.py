@@ -440,6 +440,147 @@ def verify_membrane_bounded_per_gene(
 
 
 # ---------------------------------------------------------------------------
+# (2b) 2-step 膜電位 bounded invariant + |ΔI| input contract (Stage 2.2b)
+# ---------------------------------------------------------------------------
+
+
+def verify_membrane_bounded_2step(
+    *,
+    safety_margin: float = 1.0,
+    I_max: float | None = None,
+    dI_max: float | None = None,
+    timeout_ms: int = 3000,
+) -> SNNInvariantResult:
+    """**Stage 2.2b**: 2 step forward Euler chain で V_1, V_2 が安全範囲に収まるか
+    を **|ΔI| <= dI_max** input contract 下で Z3 検査.
+
+    Codex F3 follow-up: 1-step bound は scenario-specific assumption (I_max 固定).
+    本関数は **input dynamics の contract** (隣接 step 差 |I_1 - I_0| <= dI_max)
+    まで含めることで robust 化.
+
+    Forward Euler chain (R_MEM=R_MEM 固定):
+        V_1 * tau_m = V_0 * tau_m + DT * (V_REST - V_0 + R_MEM * I_0)
+        V_2 * tau_m = V_1 * tau_m + DT * (V_REST - V_1 + R_MEM * I_1)
+
+    contract:
+        V_0 ∈ [V_RESET_MIN, V_TH_MAX]
+        I_0, I_1 ∈ [-I_max, +I_max]
+        |I_1 - I_0| <= dI_max  ← **本 Stage 2.2b の追加 contract**
+        tau_m ∈ [TAU_M_MIN, TAU_M_MAX]
+
+    invariant (2-step 全部):
+        V_1 ∈ [V_RESET_MIN - margin, V_TH_MAX + margin]
+        V_2 ∈ [V_RESET_MIN - margin, V_TH_MAX + margin]
+
+    Z3 で「V_1 OR V_2 が範囲外」を sat 探索. unsat なら 2-step bound 成立.
+
+    Parameters
+    ----------
+    safety_margin : float
+        bound 余裕 mV.
+    I_max : float | None
+        各 step の input amplitude 上界 (None → I_MAX_ABS).
+    dI_max : float | None
+        **|ΔI| <= dI_max** input dynamics contract. None → 2*I_max (制約なし相当).
+        値を狭めれば input dynamics 制限 → bound 強化.
+    timeout_ms : int
+        Z3 timeout.
+
+    Returns
+    -------
+    SNNInvariantResult
+        ok=True なら 2-step bound 証明.
+
+    honest 留保:
+    - 2-step のみ (n-step への一般化は別 PoC).
+    - V_2 の bound は V_1 bound 下で derive されるため、`|ΔI|<=dI_max` contract が
+      V_1 ∈ safe → V_2 ∈ safe の保証に貢献するかは Z3 探索結果に依存
+      (機構実証は本 PoC, formal proof は Stage 3+).
+    """
+    if not _HAS_Z3:
+        return SNNInvariantResult(
+            ok=True, used_z3=False, reason="z3 unavailable, skip",
+        )
+
+    if I_max is None:
+        I_max = I_MAX_ABS
+    if I_max <= 0:
+        raise ValueError(f"I_max must be positive, got {I_max}")
+    # dI_max=None なら 2*I_max (= |I_1-I_0| max possible) で contract 無効
+    if dI_max is None:
+        dI_max = 2.0 * I_max
+    if dI_max <= 0:
+        raise ValueError(f"dI_max must be positive, got {dI_max}")
+
+    solver = z3.Solver()
+    solver.set("timeout", timeout_ms)
+    tau_m = z3.Real("tau_m")
+    V0 = z3.Real("V0")
+    V1 = z3.Real("V1")
+    V2 = z3.Real("V2")
+    I0 = z3.Real("I0")
+    I1 = z3.Real("I1")
+
+    solver.add(tau_m >= TAU_M_MIN, tau_m <= TAU_M_MAX)
+    solver.add(V0 >= V_RESET_MIN, V0 <= V_TH_MAX)
+    solver.add(I0 >= -I_max, I0 <= I_max)
+    solver.add(I1 >= -I_max, I1 <= I_max)
+    # |ΔI| contract: -dI_max <= I_1 - I_0 <= dI_max
+    solver.add(I1 - I0 >= -dI_max, I1 - I0 <= dI_max)
+
+    # Step 1: V_0 → V_1
+    solver.add(V1 * tau_m == V0 * tau_m + DT * (V_REST - V0 + R_MEM * I0))
+    # Step 2: V_1 → V_2
+    solver.add(V2 * tau_m == V1 * tau_m + DT * (V_REST - V1 + R_MEM * I1))
+
+    upper = V_TH_MAX + safety_margin
+    lower = V_RESET_MIN - safety_margin
+    # 違反: V_1 or V_2 が範囲外
+    solver.add(z3.Or(V1 > upper, V1 < lower, V2 > upper, V2 < lower))
+
+    result = solver.check()
+    if result == z3.unsat:
+        return SNNInvariantResult(
+            ok=True, used_z3=True,
+            reason=(
+                f"unsat (2-step): V_1, V_2 ∈ [{lower}, {upper}] mV "
+                f"for V_0 ∈ [{V_RESET_MIN},{V_TH_MAX}], "
+                f"I ∈ [-{I_max},{I_max}], |ΔI|<={dI_max}, "
+                f"tau_m ∈ [{TAU_M_MIN},{TAU_M_MAX}]"
+            ),
+        )
+    if result == z3.sat:
+        m = solver.model()
+
+        def _to_f(name):
+            try:
+                return float(m[name].as_decimal(6).rstrip("?"))
+            except Exception:
+                return float(m[name].as_fraction())
+
+        ce = {
+            "tau_m": _to_f(tau_m),
+            "V0": _to_f(V0),
+            "V1": _to_f(V1),
+            "V2": _to_f(V2),
+            "I0": _to_f(I0),
+            "I1": _to_f(I1),
+        }
+        return SNNInvariantResult(
+            ok=False, used_z3=True,
+            reason=(
+                f"sat (2-step CE): tau_m={ce['tau_m']:.3f}, "
+                f"V0={ce['V0']:.3f}, V1={ce['V1']:.3f}, V2={ce['V2']:.3f}, "
+                f"I0={ce['I0']:.3f}, I1={ce['I1']:.3f}, ΔI={ce['I1']-ce['I0']:.3f}"
+            ),
+            counterexample=ce,
+        )
+    return SNNInvariantResult(
+        ok=False, used_z3=True, reason=f"unknown / timeout ({result})",
+    )
+
+
+# ---------------------------------------------------------------------------
 # (3) Shielded RL hint sketch
 # ---------------------------------------------------------------------------
 
@@ -531,5 +672,6 @@ __all__ = [
     "verify_firing_rate_per_gene",
     "verify_membrane_bounded",
     "verify_membrane_bounded_per_gene",
+    "verify_membrane_bounded_2step",
     "verify_shielded_rl_hint",
 ]

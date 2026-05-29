@@ -23,6 +23,7 @@ from .snn_gene import LIFGene, simulate_lif
 from .snn_verifier import (
     verify_firing_rate_bound,
     verify_membrane_bounded,
+    verify_membrane_bounded_2step,
     verify_shielded_rl_hint,
 )
 
@@ -31,5 +32,6 @@ __all__ = [
     "simulate_lif",
     "verify_firing_rate_bound",
     "verify_membrane_bounded",
+    "verify_membrane_bounded_2step",
     "verify_shielded_rl_hint",
 ]
