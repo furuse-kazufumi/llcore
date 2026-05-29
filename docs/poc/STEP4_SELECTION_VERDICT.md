@@ -78,6 +78,11 @@ behavior descriptor で動く)。手順 2 で fitness 多峰性が出ないと�
   機構)」。これは広義の niching/③ (分離が選択を可能にする) だが、「差し survival 率の差」を単独で
   分離したわけではない。MAP-Elites は niching と selection の複合。
 - 全実験 CPU・toy・noise σ=0.008 の低ノイズ。実 LLM fitness のノイズ/次元とは別。
+- baseline の RR-hillclimb は **固定 sigma・固定 restart_patience・非悪化受理のみの素朴 (1+1)-ES**
+  (step-size 適応 / multi-try / restart 間予算最適配分なし)。「妥当な restart baseline」であって
+  tuned state-of-the-art optimizer ではない (Codex Medium 指摘)。ただし欺瞞 corridor は構造的に
+  downhill 跨ぎを要するため、step-size 適応程度では突破できない (restart しても fresh random は
+  必ず b≈0.5 の罠に戻る) — baseline の弱さでなく landscape の構造が分離要因。
 
 ## 5. ③ の将来性についての回答 (ユーザー問い)
 
