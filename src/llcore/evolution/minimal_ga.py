@@ -283,6 +283,16 @@ def evolve(
         seed 固定の再現性のため必須 (None なら default_rng())。
     initial_pop : list[StateUpdateGene] | None
         初期集団。None なら random 生成。
+    codec : GeneCodec | None
+        S2 (0.2.0a0): gene 型非依存化のための codec。
+
+        - ``None`` (既定) → **RWKV 専用旧パス** (``initialize_random_population`` /
+          ``uniform_mutate`` / ``crossover_uniform`` をそのまま使用、挙動 byte-identical)。
+        - codec 指定 → 汎用 ``*_g`` operator を codec 経由で使用 (任意 gene 型に対応)。
+          diversity も codec.to_array で計算 (gene が ``as_array`` を持たなくてよい)。
+
+        RWKV では ``evolve(codec=RWKVCodec())`` と ``evolve(codec=None)`` は byte-identical
+        (operator が RNG ストリームまで一致する設計)。
 
     Returns
     -------
@@ -296,16 +306,43 @@ def evolve(
     if tournament_k > pop_size:
         raise ValueError(f"tournament_k={tournament_k} must be <= pop_size={pop_size}")
 
+    # S2: operator 選択 (codec=None は旧 RWKV パスを完全保存 = byte-identical)。
+    if codec is None:
+        def _init(n: int, r: np.random.Generator):
+            return initialize_random_population(n, r)
+
+        def _mut(g, r: np.random.Generator):
+            return uniform_mutate(g, mutation_sigma, r)
+
+        def _cx(a, b, r: np.random.Generator):
+            return crossover_uniform(a, b, r)
+
+        def _div(p: Population) -> float:
+            return float(p.gene_matrix.var())
+    else:
+        def _init(n: int, r: np.random.Generator):
+            return initialize_random_population_g(n, codec, r)
+
+        def _mut(g, r: np.random.Generator):
+            return uniform_mutate_g(g, codec, mutation_sigma, r)
+
+        def _cx(a, b, r: np.random.Generator):
+            return crossover_uniform_g(a, b, codec, r)
+
+        def _div(p: Population) -> float:
+            mat = np.array([codec.to_array(ind.gene) for ind in p.individuals])
+            return float(mat.var())
+
     # 初期集団
     if initial_pop is None:
-        initial_pop = initialize_random_population(pop_size, rng)
+        initial_pop = _init(pop_size, rng)
     elif len(initial_pop) != pop_size:
         raise ValueError(f"initial_pop size {len(initial_pop)} != pop_size {pop_size}")
 
     pop = evaluate_population(initial_pop, fitness_func, rng)
     generations: list[Population] = [pop]
     best_curve: list[float] = [pop.best.fitness]
-    diversity_curve: list[float] = [float(pop.gene_matrix.var())]
+    diversity_curve: list[float] = [_div(pop)]
 
     for _gen in range(n_generations):
         # elitism: 上位 N を子に「fitness ごと」持ち越し (再評価しない)
