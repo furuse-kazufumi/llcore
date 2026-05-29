@@ -47,6 +47,7 @@ __all__ = [
     "AdaptiveFloorGate",
     "EvolutionResult",
     "FitnessFunc",
+    "FitnessFuncG",
     "GeneT",
     "Individual",
     "LineageReservoir",
