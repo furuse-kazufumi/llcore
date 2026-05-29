@@ -153,7 +153,7 @@ def random_restart_hillclimb(
             stall += 1
         if cur_f > best_f:
             best_g, best_f = cur_g.copy(), cur_f
-        if stall >= restart_patience:  # 局所最適から脱出 = 探索量で多峰攻略
+        if stall >= restart_patience and evals < n_evals:  # 局所脱出 (予算内のみ, 同一予算厳守)
             cur_g = bounds[0] + (bounds[1] - bounds[0]) * rng.random(dim)
             cur_f = eval_once(cur_g, rng)
             evals += 1
