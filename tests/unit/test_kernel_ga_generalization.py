@@ -27,7 +27,7 @@ from llcore.evolution import (
     uniform_mutate,
     uniform_mutate_g,
 )
-from llcore.kernel import RWKVCodec
+from llcore.kernel import GeneCodec, RWKVCodec
 from llcore.state_update import StateUpdateGene
 
 
