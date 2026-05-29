@@ -42,6 +42,12 @@ from .minimal_ga import (
     uniform_mutate_g,
 )
 from .modes_meter import ModesMeter, pairwise_l2_diversity
+from .honest_eval import (
+    FalsificationResult,
+    equal_budget,
+    evolution_vs_random,
+    honest_reevaluate,
+)
 
 __all__ = [
     "AdaptiveFloorGate",
