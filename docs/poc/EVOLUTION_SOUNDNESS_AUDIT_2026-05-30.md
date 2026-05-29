@@ -1,0 +1,84 @@
+# llcore 進化機構 健全性監査 (Evolution Soundness Audit)
+
+**実施**: 2026-05-29〜30 / **手法**: 5-lens 経験的調査 (コード読込 + 反証実験を py-3.11 実走) + synthesis 独立再現
+**目的**: 「PoC が個別に動く」と「進化 (変異×選択×遺伝が累積改善・開放端性を生む) が成立する」を峻別し、
+後者を falsifiable に検証する。
+**位置づけ**: [[feedback_benchmark_honest_disclosure]] (異常に良い結果は内訳を疑う) の実演事例。
+
+---
+
+## 0. 結論
+
+**llcore は「自己進化型アーキ探索の機構 PoC」としては成立。しかし「進化が成立している」とは
+(強い意味で) 言えない。** 機構 (selection/variation/heredity/Z3 健全性/open-end 各部品) は real かつ
+単体で動くが、システムとして累積改善・開放端性を生むことは未実証 (一部は falsify 済)。
+
+## 1. 進化 4 要件 (Darwin/Mayr) の物差しで holds / 空転
+
+| 要件 | 判定 | 実測根拠 |
+|---|---|---|
+| ① 変異 (variation) | **成立** | frozen gene 3.9% のみ / zero-attractor 脱出済 / NaN・Inf 0。表現型が動く |
+| ② 遺伝 (heredity) | **成立** | 子→親 behavioral 距離 = 無関係ペアの 0.18× (σ=0.15)、σ で単調連続 (相関 0.87) |
+| ③ 生存・繁殖の差 (differential survival) | **機構はあるが空転** | 定数 fitness で改善 = 完全に 0.0000 (選択は配線済)。**だが** honest 再評価で GA は同予算 random search を**有意に上回らない** (GA−RAND=−0.011、5/10 勝、Wilcoxon p=0.77) |
+| ④ 過剰繁殖 (over-reproduction) | **③依存で空転** | tournament で繁殖差の構造はあるが、③が弱い (proxy fitness の eval-noise 過大、clean SNR≈0.89、landscape 天井 ~0.2) ため選択信号がノイズに埋もれる |
+| (llcore 固有) 検証ゲート (verifier = 生存可能領域) | **no-op** | 主張 invariant \|state\|≤1 で reject 率 0/2000 = 構造的トートロジー。かつ `minimal_ga.evolve` に**未配線**。reject は PoC が選択圧捏造のため恣意的に state_bound=0.4 に下げた時のみ |
+
+## 2. 最重要 honest 発見
+
+1. **報告 best 曲線は elitism artifact**: `minimal_ga.py` の elitism が前世代の noisy fitness を
+   **再評価せず凍結持越し** → 報告 best 0.473 が fresh-seed honest 再評価で **0.183 に崩落
+   (+0.29 の水増し剥落、独立再現)**。「best 単調上昇 = 進化成立」は不成立。honest 信号は集団 mean。
+2. **開放端性 (open-endedness) は drift 以下**: 後半 novelty が機構あり FULL=9.0 / PLAIN=9.3 に対し
+   **無選択 random-walk=21**。「持続的新規性を生む」どころか drift より新規領域が少ない。
+   adaptive_floor は last-50 世代で変化 0、curriculum は gen10 で飽和 (is_saturated=True)。
+   A_new 指標は無選択 jitter でも 100% 達成 = drift と弁別不能な artifact。
+3. **唯一の確かな効果 = 系統固定 (premature convergence) の防止**: reservoir OFF で最終 persona
+   生存 = 1.0 (5 seed 全)、ON で 7.4。ただし reservoir docstring 自身が「能動進化でなく凍結 elite の
+   生命維持」と disclose 済 (再投入の 98-100% が凍結 elite)。
+4. **cross-arch ChangeOp (#5) は mock**: `kernel_swap_mock` は gate_str 符号反転のみで同型・同更新関数。
+5. **G3/G4/G6/G7 等の PoC ゲートは elitism bookkeeping を測っており「進化成立」の証拠にならない**
+   (G4 単調性は elitism の定義的 artifact: elitism=1 で 6/6 mono、elitism=0 で 0/6)。
+
+> プロジェクト自身の `STAGE_3_VERDICT` は既に正直に降格済 (Marabou⊂llcore 完全撤回 / 上限なし claim
+> 限定) で本監査と整合。**claim と実装のズレを隠してはいない** — ただし上記ゲートの disclosure は不足。
+
+## 3. confound (交絡) — まだ切り分いていない核心
+
+現 ③失敗 (p=0.77) は **「GA 自体が弱い」と「proxy fitness の landscape が平坦+ノイズ過大」の交絡**。
+これを切り分けないと GPU 投資 (実 LLM fitness) の妥当性が確定しない:
+- **clean で構造のある fitness なら GA が random search を有意に上回る** → 機構は健全、欠けているのは
+  本物の選択信号のみ → 実 LLM fitness (GPU) で ③が立つ見込み。**GPU 投資が正当化される。**
+- **構造のある fitness でも GA が random と互角** → GA/探索空間 (3-param) 自体に rework が必要。
+
+## 4. gap to real evolution (③を立てる道筋、優先順)
+
+1. **eval-noise 抑制 + elitism 凍結持越しの廃止**: 各世代 best を fresh-seed honest 再評価、n_trials を
+   上げ「遺伝子間の真の差 > 評価ノイズ」を確保 (現状は逆転)。**[CPU 可]**
+2. **falsification test を CI ゲート化**: 「honest 再評価 best が同予算 random search を多 seed (≥15) で
+   Wilcoxon p<0.05 + Cliff's delta 非無視で上回る」を進化成立の合格条件に。定数 fitness で改善 0 も回帰保持。**[CPU 可]**
+3. **confound 切り分け診断**: 非平坦・低ノイズの構造的 fitness (readout 共進化 or 表現力ある合成タスク) で
+   GA vs random を測り、機構が健全か landscape 問題かを確定。**[CPU 可、GPU 投資前の必須]**
+4. **③を本物に**: fixed-readout probe → 実 LLM/重み損失・downstream 性能に接続。**[GPU 必要: RTX 4090 24GB]**
+5. 検証ゲートが効く非自明 invariant を定義し evolve に配線。**[CPU 可]**
+6. cross-arch ChangeOp の実装 (mock 符号反転 → 実 kernel 置換)。
+7. 開放端性の長 run 実証 (飽和解消 + random-walk control を下回らない sustained novelty)。
+
+## 5. falsification test (進化成立の合格条件、CI 化対象)
+
+各世代 best gene を進化 rng と独立な fresh seed で n_trials≥30 の honest 再評価にかけた曲線を**主指標**とし、
+**「honest 再評価 best が同一 eval budget の random search を ≥15 seed で Wilcoxon p<0.05 かつ
+Cliff's delta 非無視で上回る」**を真の進化成立条件として CI ゲート化する。これを満たすまで、報告される
+単調 best 改善は elitism+noise の artifact とみなし「進化成立」と認めない。併せて「定数 fitness で
+best-delta=0」(選択の実在) を回帰テストで保持。
+
+## 6. 監査の honest 留保
+
+- synthesis 独立再現で **lens 1 の「random fitness 集団 mean は 0.5 固着」は再現せず** seed 依存に
+  大 drift (+0.24〜−0.17)。lens 1 の決定的分離は報告より弱い (短 run では genetic drift が control を
+  上振れさせる)。「選択機構の実在」(定数 fitness→改善 0) は頑健に再現。
+- 全実験は CPU・toy synthetic task・3-param gene 空間 (天井~0.2) での測定。実 LLM 損失とは別。
+
+## 7. 関連
+- [[project_llcore_init_2026_05_29]] / [[feedback_benchmark_honest_disclosure]] / [[feedback_codex_pair_review_for_llcore]]
+- `docs/poc/STAGE_3_VERDICT.md` (project 自身の honest 降格、本監査と整合)
+- `docs/design/kernel_plugin_0_2_0a0.md` (S1/S2 完了、S3 は ③確立後)
