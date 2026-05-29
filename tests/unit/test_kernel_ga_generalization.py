@@ -221,3 +221,233 @@ def test_population_generic_backward_compat() -> None:
     assert pop.size == 2
     assert pop.best.fitness == 0.7
     assert pop.gene_matrix.shape == (2, 3)  # RWKV gene は as_array を持つ
+
+
+# ===========================================================================
+# PoC 強化 (workflow 4-lens + Codex review の TRUE findings 対応, re-PoC)
+# ===========================================================================
+
+
+# ---------------------------------------------------------------------------
+# 核心契約: codec.clip が box では表せない依存制約を吸収する (S2 設計の中核命題)
+# 設計 doc §2.1: 「LIF は V_reset<V_th、Izhikevich は c<V_PEAK という box clip では
+# 表せない依存制約があるため、単純 bounds clip では不足。clipped() の委譲で吸収」。
+# init_g は各 param を box から独立 draw するため、依存制約 gene では clip が repair
+# しないと制約破りが残る (lens=正当性 Medium / lens=test網羅 Medium)。
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class _DepGene:
+    """依存制約 lo < hi を持つ 2-dim gene (box では表せない制約)."""
+
+    lo: float
+    hi: float
+
+
+class _DepCodec:
+    """_DepGene 用 codec — clip が **依存制約 lo<hi を repair** する (正しい実装)."""
+
+    @property
+    def dim(self) -> int:
+        return 2
+
+    @property
+    def lower(self) -> np.ndarray:
+        return np.zeros(2)
+
+    @property
+    def upper(self) -> np.ndarray:
+        return np.ones(2)
+
+    def to_array(self, gene: _DepGene) -> np.ndarray:
+        return np.array([gene.lo, gene.hi], dtype=np.float64)
+
+    def from_array(self, arr: np.ndarray) -> _DepGene:
+        return _DepGene(float(arr[0]), float(arr[1]))
+
+    def clip(self, gene: _DepGene) -> _DepGene:
+        arr = np.clip(self.to_array(gene), 0.0, 1.0)
+        lo, hi = float(arr[0]), float(arr[1])
+        if lo >= hi:  # 依存制約 repair (box clip では不可能な部分)
+            lo = max(0.0, hi - 0.05)
+        return _DepGene(lo, hi)
+
+
+class _DepCodecBoxOnly(_DepCodec):
+    """teeth 用: clip が box のみで依存制約を repair しない (誤った実装)."""
+
+    def clip(self, gene: _DepGene) -> _DepGene:
+        arr = np.clip(self.to_array(gene), 0.0, 1.0)
+        return _DepGene(float(arr[0]), float(arr[1]))
+
+
+def _dep_fitness(gene: _DepGene, rng: np.random.Generator) -> float:
+    return float(gene.hi - gene.lo)  # 制約満たす個体ほど高 (lo<hi)
+
+
+def test_clip_repairs_dependent_constraint_after_init() -> None:
+    """init_g 後、依存制約 lo<hi が codec.clip で全個体満たされる (核心契約)."""
+    codec = _DepCodec()
+    genes = initialize_random_population_g(200, codec, np.random.default_rng(7))
+    assert all(g.lo < g.hi for g in genes), "依存制約 repair に失敗した gene がある"
+
+
+def test_box_only_clip_leaves_violations_teeth() -> None:
+    """teeth: box-only clip だと init 後に依存制約破りが残る (= 核心契約 test が空でない証明)."""
+    codec = _DepCodecBoxOnly()
+    genes = initialize_random_population_g(200, codec, np.random.default_rng(7))
+    violations = sum(1 for g in genes if g.lo >= g.hi)
+    assert violations > 0, "box-only clip で violation が出ないなら test に teeth がない"
+
+
+def test_clip_repairs_dependent_constraint_after_mutate() -> None:
+    """mutate_g 後も依存制約が codec.clip で維持される."""
+    codec = _DepCodec()
+    g = _DepGene(0.2, 0.8)
+    for seed in range(50):
+        m = uniform_mutate_g(g, codec, 1.0, np.random.default_rng(seed))
+        assert m.lo < m.hi
+
+
+def test_evolve_with_dependent_constraint_codec_maintains_constraint() -> None:
+    """evolve 全体 (init+mutate+crossover) を通して依存制約が維持される."""
+    codec = _DepCodec()
+    result = evolve(
+        _dep_fitness, pop_size=12, n_generations=15,
+        rng=np.random.default_rng(2026), codec=codec,
+    )
+    for gen in result.generations:
+        for ind in gen.individuals:
+            assert ind.gene.lo < ind.gene.hi
+
+
+# ---------------------------------------------------------------------------
+# byte-identity の config sweep (lens=test網羅 Medium): crossover_rate / elitism / initial_pop
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "crossover_rate,elitism",
+    [(0.0, 1), (1.0, 1), (0.5, 3), (0.0, 3), (1.0, 2)],
+)
+def test_evolve_codec_equals_legacy_across_configs(
+    crossover_rate: float, elitism: int
+) -> None:
+    """多様な config で codec=RWKVCodec() ≡ codec=None (byte-identity が config 非依存)."""
+    kw = dict(
+        pop_size=10, n_generations=12,
+        crossover_rate=crossover_rate, elitism=elitism, mutation_sigma=0.25,
+    )
+    r_l = evolve(_rwkv_fitness, rng=np.random.default_rng(42), codec=None, **kw)
+    r_c = evolve(_rwkv_fitness, rng=np.random.default_rng(42), codec=RWKVCodec(), **kw)
+    assert r_l.best_fitness_curve == r_c.best_fitness_curve
+    assert r_l.diversity_curve == r_c.diversity_curve
+    for gen_l, gen_c in zip(r_l.generations, r_c.generations):
+        assert [i.gene for i in gen_l.individuals] == [i.gene for i in gen_c.individuals]
+
+
+def test_evolve_initial_pop_with_codec_equals_legacy() -> None:
+    """initial_pop 明示 + codec でも legacy と byte-identical (init bypass path)."""
+    init = [
+        StateUpdateGene(decay=0.1 * i, mix=0.05 * i - 0.2, gate_str=0.1 * i - 0.3)
+        for i in range(6)
+    ]
+    kw = dict(pop_size=6, n_generations=8, mutation_sigma=0.2)
+    r_l = evolve(_rwkv_fitness, rng=np.random.default_rng(9), codec=None,
+                 initial_pop=list(init), **kw)
+    r_c = evolve(_rwkv_fitness, rng=np.random.default_rng(9), codec=RWKVCodec(),
+                 initial_pop=list(init), **kw)
+    assert r_l.best_fitness_curve == r_c.best_fitness_curve
+    assert r_l.final_best.gene == r_c.final_best.gene
+
+
+# ---------------------------------------------------------------------------
+# fail-closed 検証分岐 (lens=test網羅 Low): codec path でも ValueError gate が効く
+# ---------------------------------------------------------------------------
+
+
+def test_evolve_validation_errors_with_codec() -> None:
+    codec = RWKVCodec()
+    with pytest.raises(ValueError):
+        evolve(_rwkv_fitness, pop_size=5, elitism=6, codec=codec)
+    with pytest.raises(ValueError):
+        evolve(_rwkv_fitness, pop_size=5, tournament_k=6, codec=codec)
+    with pytest.raises(ValueError):
+        evolve(
+            _rwkv_fitness, pop_size=5,
+            initial_pop=[StateUpdateGene(0.1, 0.1, 0.1)] * 3,  # size != pop_size
+            codec=codec,
+        )
+
+
+# ---------------------------------------------------------------------------
+# RNG ストリーム直接比較 (Codex Low / lens=test網羅 Low): 消費後の state まで一致
+# ---------------------------------------------------------------------------
+
+
+def test_operator_rng_state_identical_to_legacy() -> None:
+    """*_g operator が legacy と同一本数・同一順で RNG を消費 (bit_generator state 一致)."""
+    codec = RWKVCodec()
+    g = StateUpdateGene(decay=0.4, mix=0.1, gate_str=-0.3)
+    # mutate
+    r1, r2 = np.random.default_rng(5), np.random.default_rng(5)
+    uniform_mutate(g, 0.3, r1)
+    uniform_mutate_g(g, codec, 0.3, r2)
+    assert r1.bit_generator.state == r2.bit_generator.state
+    # crossover
+    a, b = StateUpdateGene(0.1, -0.5, 1.0), StateUpdateGene(0.9, 0.5, -1.0)
+    r3, r4 = np.random.default_rng(13), np.random.default_rng(13)
+    crossover_uniform(a, b, r3)
+    crossover_uniform_g(a, b, codec, r4)
+    assert r3.bit_generator.state == r4.bit_generator.state
+    # init
+    r5, r6 = np.random.default_rng(21), np.random.default_rng(21)
+    initialize_random_population(8, r5)
+    initialize_random_population_g(8, codec, r6)
+    assert r5.bit_generator.state == r6.bit_generator.state
+
+
+# ---------------------------------------------------------------------------
+# clip 発動 (lens=test網羅 Medium): bounds 外 mutation が境界に切り詰められる
+# ---------------------------------------------------------------------------
+
+
+def test_uniform_mutate_g_clips_out_of_bounds() -> None:
+    """大 sigma で bounds 超過しても codec.clip で範囲内に収まる (clip 発動の直接確認)."""
+    codec = RWKVCodec()
+    g = StateUpdateGene(decay=0.99, mix=0.99, gate_str=1.99)
+    for seed in range(30):
+        m = uniform_mutate_g(g, codec, 5.0, np.random.default_rng(seed))
+        a = m.as_array()
+        assert 0.0 <= a[0] <= 1.0
+        assert -1.0 <= a[1] <= 1.0
+        assert -2.0 <= a[2] <= 2.0
+
+
+# ---------------------------------------------------------------------------
+# diversity 数値正しさ (lens=test網羅 Low): codec.to_array stack の pooled var
+# ---------------------------------------------------------------------------
+
+
+def test_toy_codec_diversity_numeric_correctness() -> None:
+    """diversity_curve[0] が codec.to_array stack の pooled variance と数値一致."""
+    codec = _ToyCodec()
+    genes = [_ToyGene(0.1, 0.2, 0.3, 0.4), _ToyGene(0.5, 0.6, 0.7, 0.8)]
+    result = evolve(
+        _toy_fitness, pop_size=2, n_generations=0,
+        initial_pop=list(genes), rng=np.random.default_rng(0), codec=codec,
+    )
+    expected = float(np.array([[0.1, 0.2, 0.3, 0.4], [0.5, 0.6, 0.7, 0.8]]).var())
+    assert abs(result.diversity_curve[0] - expected) < 1e-12
+
+
+# ---------------------------------------------------------------------------
+# 任意 codec の Protocol 準拠 (lens=test網羅 Low): isinstance structural
+# ---------------------------------------------------------------------------
+
+
+def test_custom_codecs_satisfy_gene_codec_protocol() -> None:
+    assert isinstance(_ToyCodec(), GeneCodec)
+    assert isinstance(_DepCodec(), GeneCodec)
+    assert isinstance(_DepCodecBoxOnly(), GeneCodec)
