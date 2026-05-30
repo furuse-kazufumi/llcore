@@ -141,6 +141,40 @@ def test_gate_is_multiplicative():
     assert np.allclose(feat, 0.0)
 
 
+@pytest.mark.parametrize("use_gate,use_quad", [(True, True), (True, False),
+                                               (False, True), (False, False)])
+def test_features_batch_matches_single(use_gate, use_quad):
+    """features_batch が features を row-wise に積んだものと数値一致する (高速路の回帰保証)."""
+    res = HybridMaxReservoir(layer_taps=(6, 5), in_dim=2,
+                             use_gate=use_gate, use_quadratic=use_quad)
+    rng = np.random.default_rng(11)
+    gene = res.random_gene(rng)
+    batch = rng.standard_normal((7, 18, 2))
+    fb = res.features_batch(gene, batch)
+    assert fb.shape == (7, res.feature_dim)
+    assert np.all(np.isfinite(fb))
+    for i in range(7):
+        assert np.allclose(fb[i], res.features(gene, batch[i]), atol=1e-12)
+
+
+def test_eval_on_dataset_matches_eval_once():
+    """eval_on_dataset (batch高速路) が make_eval_once の eval_once と一致する.
+
+    同一 task / 同一 rng seed で train/eval を引けば、batch 路と逐次路は同じ held-out R²。
+    """
+    res = HybridMaxReservoir(layer_taps=(8, 8), in_dim=1)
+    task = DelayedParityTask(seq_len=20, window=5, in_dim=1)
+    gene = res.random_gene(np.random.default_rng(0))
+
+    # 逐次路
+    eval_once = make_eval_once(res, task, n_train=24, n_eval=24, ridge_lambda=1e-2)
+    r2_seq = eval_once(gene, np.random.default_rng(123))
+    # batch 路 (同一 seed でデータ生成 → 同一 train/eval 系列)
+    ds = make_batched_dataset(task, 24, 24, np.random.default_rng(123))
+    r2_batch = eval_on_dataset(res, gene, ds, ridge_lambda=1e-2)
+    assert abs(r2_seq - r2_batch) < 1e-9
+
+
 def test_gate_quadratic_actually_expand():
     """gate / quadratic を有効化すると特徴次元が確実に増える (機構が寄与している)."""
     taps = (8, 8)
