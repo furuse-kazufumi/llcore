@@ -179,6 +179,8 @@ def evolution_vs_random(
     honest_n_trials: int = 30,
     base_seed: int = 0,
     alpha: float = 0.05,
+    min_seeds: int = 15,
+    min_effect: float = 0.147,
 ) -> FalsificationResult:
     """進化 vs 同予算 random search を ``n_seeds`` で公正比較し合格判定を返す.
 
@@ -186,6 +188,16 @@ def evolution_vs_random(
     1. evolve() を回し (進化用 rng)、final_best.gene を **fresh seed** で honest 再評価。
     2. 同じ評価予算 (= :func:`equal_budget`) の random search を回し、best を **別 fresh seed** で再評価。
     3. paired (ga, rand) を蓄積。
+
+    Parameters
+    ----------
+    min_seeds : int
+        ``passes`` が要求する最小 seed 数 (監査 §5 の「≥15 seed」)。``n_seeds`` がこれ未満なら
+        ``passes=False`` (少 seed では「進化成立」と認めない)。関数自体は ``n_seeds`` で実行する
+        (少 seed の quick check も可)。
+    min_effect : float
+        ``passes`` が要求する ``abs(paired_sign_delta)`` の下限 (「効果量が非無視」)。既定 0.147 は
+        Cliff's delta の small-effect 境界を実務上の cutoff として流用 (paired_sign_delta に適用)。
 
     Returns
     -------
@@ -195,7 +207,11 @@ def evolution_vs_random(
 
     Notes
     -----
-    eval_once は ``(gene, rng) -> float`` の **1 回の確率的評価**。決定論的 fitness なら rng は無視。
+    - eval_once は ``(gene, rng) -> float`` の **1 回の確率的評価**。決定論的 fitness なら rng は無視。
+    - **確率的 fitness では監査 §5 の基準が ``honest_n_trials >= 30`` を要求** (再評価のノイズ平均化)。
+      決定論的 fitness では 1 で可 (平均しても同値)。
+    - ``passes`` は監査 §5 の完全基準: ``diff>0 ∧ 片側 p<alpha ∧ n_seeds>=min_seeds
+      ∧ |paired_sign_delta|>=min_effect``。
     """
     budget = equal_budget(pop_size, n_generations, elitism)
     ga_scores: list[float] = []
