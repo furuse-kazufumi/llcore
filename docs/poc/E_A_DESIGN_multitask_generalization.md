@@ -48,14 +48,21 @@ Step C 実測より、**単一 leaky reservoir + ridge で解ける**タスク�
 
 調査済の差し替え点 = `selection_lab.py:100` の親選択。
 
-| 群 | niching (behavior archive) | parent selection | 殺すもの |
-|---|---|---|---|
-| **MAP-E (full)** | あり (behavior grid + ratchet) | archive elite から選択 | — |
-| **MAP-E_randselect (③殺し)** | あり (grid 維持) | **bounds から uniform random** (archive 無視) | ③ 選択圧のみ (①変異・grid 構造は温存) |
-| **panmictic-GA** | なし (単一集団) | tournament 選択 | ②分離 (niching) |
-| **random search** | なし | なし | ①②③ 全部 (床/規模対照) |
+ユーザー spec (Step C verdict): 「③ablation = MAP-E vs MAP-E_randselect = **②③殺し①変異のみ**」。
+= fitness による生存選択 (③) と niche elite 維持 (②) を殺し、行動ビニング上の **変異 (①) だけ**残す。
 
-③ の load-bearing 判定 = **MAP-E > MAP-E_randselect** (niching 構造は同じ、selection 圧だけの差)。
+| 群 | behavior grid | parent | placement (生存) | 残すもの |
+|---|---|---|---|---|
+| **MAP-E (full)** | あり | archive elite から選択 | **fitness ゲート** (f>cell 既存で置換=ratchet) | ①②③ |
+| **MAP-E_randselect (②③殺し)** | あり (grid 維持) | **bounds から random** | **無条件配置** (fitness 無視、最後の child を保持) | ① 変異のみ |
+| **panmictic-GA** | なし (単一集団) | tournament 選択 | elitism + tournament | ①③ (③選択あり、②niching なし) |
+| **random search** | なし | なし | best のみ保持 | 床/規模対照 |
+
+判定の切り分け (因子分解):
+- **MAP-E > MAP-E_randselect** → **②③ (niching + 選択) が ① 変異だけより寄与**。
+- **MAP-E > panmictic-GA** → **② (niching) が ③ 選択だけ (panmictic) より上乗せ**。
+- **MAP-E > random** → 全体が無探索に勝つ。
+③ の load-bearing は MAP-E が **MAP-E_randselect と panmictic-GA の両方**に strict gate で勝つことで主張。
 
 ## fitness と主指標
 
