@@ -131,7 +131,7 @@ AURORA-XCon=Coiffard 2025) し、gem-critic で premise まで監査した結果
   **欺瞞的 (deceptive) 領域では many-objective レキシケース選択 (lexicase) 選択が MAP-Elites (行動空間を網羅する品質多様性探索) を上回り、QD は illumination(非欺瞞)領域でのみ優位**。
   Step C は「欺瞞 地形 (landscape) を QD で攻める」設定なので、**「QD/MAP-Elites が記憶 landscape の正しい道具」という枠組み前提自体が未検証 交絡 (confound)**。
   → C3 が MAP-E>random でも「QD 固有の③か、一般の多目的選択(lexicase)でも足りるか」を切り分けるまで「③(QD)が答え」と断定不可。
-  逆に C3 が MAP-E≈random でも「③が無力」でなく「QD が wrong-tool で lexicase なら立つ」可能性が残る。**安価な lexicase baseline で前提を検定すべき**。
+  逆に C3 が MAP-E≈random でも「③が無力」でなく「QD が wrong-tool で lexicase なら立つ」可能性が残る。**安価な lexicase 基準 (baseline) で前提を検定すべき**。
 
 ### 6b. C3 の confound 一覧 (これまでの対話 + workflow を統合; verdict の解釈に必須)
 1. **descriptor 衝突** (前出): 2D 粗 BD が異質解を同セルに潰す → ③の多様性維持を削ぐ。
