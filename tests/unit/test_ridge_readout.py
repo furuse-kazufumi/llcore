@@ -208,4 +208,4 @@ def test_make_ridge_eval_once_integrates_with_harness() -> None:
     assert r.n_seeds == 6
     assert 0.0 <= r.ga_mean <= 1.0 and 0.0 <= r.random_mean <= 1.0
     assert abs(r.diff - (r.ga_mean - r.random_mean)) < 1e-12
-    assert -1.0 <= r.cliff_delta <= 1.0
+    assert -1.0 <= r.paired_sign_delta <= 1.0
