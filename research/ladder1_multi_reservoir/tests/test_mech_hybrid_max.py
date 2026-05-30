@@ -26,7 +26,9 @@ from mech_hybrid_max import (  # noqa: E402
     HybridMaxReservoir,
     _quadratic_dim,
     _quadratic_expand,
+    eval_on_dataset,
     gene_bounds,
+    make_batched_dataset,
     make_eval_once,
 )
 from memory_tasks import DelayedParityTask  # noqa: E402
