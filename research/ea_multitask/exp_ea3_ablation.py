@@ -54,7 +54,7 @@ TRAIN_D = (15, 30)        # 学習 regime (遅延長 D = seq_len)
 TEST_D = (45, 60)         # hold-out regime (より長い遅延への extrapolation = 時定数外挿)
 N_SEEDS = 15              # strict gate 要件
 N_EVALS = 400
-HONEST_N = 16
+HONEST_N = 30             # 確率的 fitness の honest 基準 (honest_eval §5: n_trials>=30)。旧 16 は不足
 SIGMA = 0.12
 GRID = (6, 6)
 
