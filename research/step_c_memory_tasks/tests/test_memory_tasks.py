@@ -33,6 +33,7 @@ def test_flipflop_holds_last_set():
         elif inputs[t, 1] > 0:
             state = -1.0
     assert float(np.atleast_1d(target)[0]) == state
+    assert float(np.atleast_1d(target)[0]) in {-1.0, 1.0}
 
 
 def test_delayed_recall_returns_initial_cue():
