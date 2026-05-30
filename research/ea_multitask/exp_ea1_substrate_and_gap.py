@@ -33,10 +33,10 @@ for _stream in (sys.stdout, sys.stderr):
 _HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(_HERE))
 sys.path.insert(0, str(_HERE.parents[1] / "step_c_memory_tasks"))
-
-import numpy as np  # noqa: E402
+sys.path.insert(0, str(_HERE.parents[1] / "src"))
 
 from ea_lab import map_elites_full  # noqa: E402
+from llcore.evolution.honest_eval import honest_reevaluate  # noqa: E402
 from memory_tasks import FlipFlopTask  # noqa: E402
 from reservoir import (  # noqa: E402
     LeakyDelayLineReservoir,
@@ -44,10 +44,7 @@ from reservoir import (  # noqa: E402
     make_behavior,
     make_eval_once,
 )
-from task_mixture import TaskMixture, split_regimes
-
-sys.path.insert(0, str(_HERE.parents[1] / "src"))
-from llcore.evolution.honest_eval import honest_reevaluate  # noqa: E402
+from task_mixture import TaskMixture, split_regimes  # noqa: E402
 
 N_TAPS = 8
 IN_DIM = 2  # FlipFlop
