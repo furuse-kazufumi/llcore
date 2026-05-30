@@ -185,6 +185,14 @@ def make_behavior(res: LeakyDelayLineReservoir):
     - 実効記憶長: leak が小さいほど長い。1/leak の平均を tanh で [0,1] に圧縮。
     - leak の分散: 時定数の多様性。均一=0、多様=大。
 
+    NOTE (Codex pair-review BLOCKER 2026-05-30): この descriptor は leak のみを使い
+    ``w_in`` を捨てている。実際のダイナミクスは leak + w_in の両方に依存するため、
+    MAP-Elites の niche 軸として使うと異なる記憶戦略が同セルに衝突しやすい。
+    また leak の 1次・2次モーメントだけでは時定数分布の形状を弁別できない。
+    仕様 (プラン Task 2) には「behavior descriptor = (平均実効記憶長, leak の分散)」と
+    明記されているため現 task スコープでは仕様通りに実装し、niche 軸の改良は
+    後続タスク (MAP-Elites 統合フェーズ) で行う。
+
     Returns
     -------
     behavior : Callable[[np.ndarray], np.ndarray]
