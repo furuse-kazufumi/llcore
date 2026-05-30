@@ -3,13 +3,16 @@
 > 自動生成: `libexec/raptor-auto-summary` (Stop hook)
 > 次回 ccr 起動時に CLAUDE.md SESSION START で自動的に読み取られる。
 
-- **最終更新**: 2026-05-30 13:27:40
+- **最終更新**: 2026-05-30 13:48:59
 - **プロジェクト**: `D:/projects/llcore`
 - **ブランチ**: `main`
 
 ## 直近の git log
 
 ```
+93b1464 docs(step-c): 探索の航行枠 — 比喩↔machinery↔反証予言の生きたメモ
+b11439e fix(step-c): C2 を測定可能に — reach-rate(複数閾値)+per-seed配列保存
+22a6765 auto: exp_c2c3_compare.py 編集前 (2026-05-30 13:36)
 6ddfe68 feat(step-c): exp_c2c3 (C2/C3) + exp_c4 ablation (C4)
 c5594b3 auto: exp_c4_ablation.py 編集前 (2026-05-30 13:12)
 3722fc5 auto: exp_c4_ablation.py 編集前 (2026-05-30 13:12)
@@ -17,24 +20,24 @@ c5594b3 auto: exp_c4_ablation.py 編集前 (2026-05-30 13:12)
 a9a7ee8 feat(step-c): C1 多峰性診断 (収束点間の谷検出)
 ac0a5fc feat(step-c): 強化版 honest 基準の strict_compare (片側/効果量/seed ゲート)
 dbc2314 fix(step-c): reservoir eval_once コメント明確化 + test 名修正 + in_dim=2 path test
-7e16c73 auto: test_reservoir.py 編集前 (2026-05-30 12:24)
-599d42d auto: test_reservoir.py 編集前 (2026-05-30 12:24)
-d8e1843 auto: test_reservoir.py 編集前 (2026-05-30 12:24)
 ```
 
 ## 現在の git status
 
 ```
 M docs/SESSION_SUMMARY.md
+ M research/step_c_memory_tasks/exp_c2c3c4_run.log
 ```
 
 ## 直近 2 時間に変更されたファイル
 
 ```
-13:24 docs/SESSION_SUMMARY.md
+13:48 docs/poc/STEP_C_NAVIGATION_FRAME.md
+13:44 docs/SESSION_SUMMARY.md
+13:37 research/step_c_memory_tasks/exp_c2c3c4_run.log
+13:36 research/step_c_memory_tasks/exp_c2c3_compare.py
+13:28 docs/poc/STEP_C_VERDICT_SCAFFOLD.md
 13:12 research/step_c_memory_tasks/exp_c4_ablation.py
-13:10 research/step_c_memory_tasks/exp_c2c3c4_run.log
-12:59 research/step_c_memory_tasks/exp_c2c3_compare.py
 12:54 research/step_c_memory_tasks/exp_c1_landscape.py
 12:53 .pytest_cache/v/cache/nodeids
 12:30 .pytest_cache/v/cache/lastfailed
@@ -44,8 +47,6 @@ M docs/SESSION_SUMMARY.md
 12:26 research/step_c_memory_tasks/tests/test_strict_compare.py
 12:24 research/step_c_memory_tasks/tests/test_reservoir.py
 12:24 research/step_c_memory_tasks/reservoir.py
-12:04 research/step_c_memory_tasks/tests/test_memory_tasks.py
-12:04 research/step_c_memory_tasks/memory_tasks.py
 ```
 
 ---
