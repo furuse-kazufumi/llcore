@@ -21,6 +21,11 @@ def test_delayed_parity_shapes_and_label():
     assert float(np.atleast_1d(target)[0]) == expected
 
 
+def test_delayed_parity_rejects_window_larger_than_seq_len():
+    with pytest.raises(ValueError):
+        DelayedParityTask(seq_len=3, window=5)
+
+
 def test_flipflop_holds_last_set():
     task = FlipFlopTask(seq_len=30, in_dim=2)
     rng = np.random.default_rng(1)
