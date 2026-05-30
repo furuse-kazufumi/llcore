@@ -239,11 +239,13 @@ def main() -> None:
     for label, taps, use_gate, use_quad in mech_configs:
         res = HybridMaxReservoir(layer_taps=taps, in_dim=task.in_dim,
                                  use_gate=use_gate, use_quadratic=use_quad)
-        eval_once = mech_eval_once(res, task, n_train=N_TRAIN, n_eval=N_EVAL,
-                                   ridge_lambda=RIDGE_LAMBDA)
         t0 = time.time()
         vals = np.array([
-            random_search_ceiling(eval_once, res.random_gene, N_RANDOM, s) for s in seeds
+            random_search_ceiling(
+                lambda g, r=res, s=s: eval_on_dataset(r, g, datasets[s],
+                                                      ridge_lambda=RIDGE_LAMBDA),
+                res.random_gene, N_RANDOM, s)
+            for s in seeds
         ])
         dt = time.time() - t0
         cfg_max = float(vals.max())
