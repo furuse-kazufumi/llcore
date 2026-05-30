@@ -111,7 +111,7 @@
      窓幅は「答えが利用可能な時刻範囲」に限定し標準タスク定義を逸脱しない (地形捏造禁止 §7 と同精神)。
    - CPU med (eval_once コストは窓幅にほぼ不変、readout 評価が窓分増えるのみ)。
 4. **補助の太陽**: next-input 予測の self-supervised 補助目的を足し、平坦な湖に勾配が出るか。CPU med。
-5. **attractor 基質 vs leaky**: 同タスクで Hopfield/gated 基質の valley_fraction が落ちるか (川が干上がらない予言)。CPU med、要設計。
+5. **attractor 基質 vs リーキー (leaky、漏れ率を持つリザバー)**: 同タスクで Hopfield/gated 基質の 谷率 (valley_fraction) が落ちるか (川が干上がらない予言)。CPU med、要設計。
 
 ## 5. honest 留保
 
