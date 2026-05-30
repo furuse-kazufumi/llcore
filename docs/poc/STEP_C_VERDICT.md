@@ -1,8 +1,9 @@
 # Step C Verdict — 記憶タスクで欺瞞 corridor が自然発生し ③(適者生存・選択) が load-bearing になるか
 
-> **状態**: 確定 (two-way 決着)。C1 = 実測済 / C2-C3 = `exp_c2c3_compare` 実測済 / C4 = MAP-E 非勝利のため moot。
-> **結論**: **③ は実記憶タスク (この基質) で load-bearing でない** = CPU 撤退の精密化 (両方向決着・honest)。
+> **状態**: ③を有効検定できる欺瞞回廊が本基質で現れなかった (clean な③検定は未達 = N/A)。C1 = 実測済 / C2-C3 = `exp_c2c3_compare` 実測済 / C4 = MAP-E 非勝利のため moot。**両タスクとも C3 が confounded (parity=基質の床で clean テスト非該当 / flip_flop=C2 不成立で欺瞞無し)** ため、③有無を有効分離した C3 検定は 0 件。得られたのは Yes/No の two-way 決着ではなく N/A (本基質では測定不能)。
+> **結論**: **③ が load-bearing かどうかを本基質では分離できなかった** = CPU 撤退の精密化 (撤退ではなく『本基質では非診断』の決着・honest)。本基質で③不要を確定したものではない。
 > base_seed=20260530, n_seeds=15, strict gate = diff>0 ∧ 片側 Wilcoxon p<0.05 ∧ n≥15 ∧ |paired_sign_delta|≥0.147。
+> **検出力 (power) 留保**: n=15。negative verdict が成立するには (a) 十分な検出力 か (b) 床/天井で比較が moot になる明示 が要る。本件は (b) 側 (両タスクとも床/天井で C3 が非診断) で成立させるものであり、検出力に基づく③不在の積極的主張ではない。後述 flip_flop MAP-E vs random (δ=+0.33, p=0.15) は **non-significant かつ underpowered = inconclusive (保留)** であって null の受容ではない。
 
 ---
 
