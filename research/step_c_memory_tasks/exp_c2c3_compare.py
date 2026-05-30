@@ -111,6 +111,9 @@ def main() -> None:
                   f"δ={r.paired_sign_delta:+.2f} passes={r.passes}")
         results[name]["c3_all_pass"] = all_pass
         print(f"  => C3 ({name}): {'成立 (③ load-bearing)' if all_pass else '不成立'}")
+        # 各タスク完了ごとに保存 (途中クラッシュでも部分結果を残す = 約24分/タスクの再計算回避)
+        OUT_JSON.write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"  (中間保存: {OUT_JSON.name})")
 
     OUT_JSON.write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"\n結果を保存: {OUT_JSON}")
