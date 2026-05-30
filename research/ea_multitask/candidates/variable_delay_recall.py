@@ -54,7 +54,7 @@ class VariableDelayRecallTask:
     """
 
     seq_len: int = 30
-    distractor_amp: float = 0.5
+    distractor_amp: float = 0.2
     in_dim: int = 2
     out_dim: int = 1
     cue_amp: float = 1.0
@@ -96,7 +96,7 @@ class VariableDelayRecallTask:
 def make_regimes(
     delays: tuple[int, ...] = (15, 30, 45, 60),
     *,
-    distractor_amp: float = 0.5,
+    distractor_amp: float = 0.2,
     in_dim: int = 2,
     cue_amp: float = 1.0,
 ) -> list[VariableDelayRecallTask]:

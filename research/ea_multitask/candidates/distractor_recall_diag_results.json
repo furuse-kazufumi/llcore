@@ -1,0 +1,112 @@
+{
+  "experiment": "distractor_recall diagnostic (C-gen1 ceiling + C-gen2 gap + niche)",
+  "config": {
+    "n_taps": 8,
+    "in_dim": 1,
+    "seq_len": 30,
+    "amps": [
+      0.2,
+      0.5,
+      0.8,
+      1.1
+    ],
+    "test_amps": [
+      0.8,
+      1.1
+    ],
+    "n_random": 120,
+    "n_seeds": 5,
+    "n_evals": 200,
+    "honest_n": 12,
+    "grid": [
+      6,
+      6
+    ]
+  },
+  "per_regime_ceiling": [
+    {
+      "regime": "a=0.2",
+      "amp": 0.2,
+      "noisy_max_mean": 0.9940414335603617,
+      "noisy_max_max": 0.994511470148269,
+      "honest_mean": 0.9824422370114275,
+      "honest_max": 0.9905058181653134,
+      "solvable": true,
+      "difficulty_class": "saturated"
+    },
+    {
+      "regime": "a=0.5",
+      "amp": 0.5,
+      "noisy_max_mean": 0.8579466881875206,
+      "noisy_max_max": 0.8893911368564124,
+      "honest_mean": 0.7867681128630598,
+      "honest_max": 0.8077816595290769,
+      "solvable": true,
+      "difficulty_class": "medium"
+    },
+    {
+      "regime": "a=0.8",
+      "amp": 0.8,
+      "noisy_max_mean": 0.5344260311292226,
+      "noisy_max_max": 0.6286500659042631,
+      "honest_mean": 0.3284894955874805,
+      "honest_max": 0.3518678097882588,
+      "solvable": false,
+      "difficulty_class": "floor"
+    },
+    {
+      "regime": "a=1.1",
+      "amp": 1.1,
+      "noisy_max_mean": 0.3746137713776757,
+      "noisy_max_max": 0.4842424838431161,
+      "honest_mean": 0.0999399694305064,
+      "honest_max": 0.13173624384110863,
+      "solvable": false,
+      "difficulty_class": "floor"
+    }
+  ],
+  "generalization": {
+    "split": "train a=(0.2, 0.5) / test a=(0.8, 1.1), seq_len=30",
+    "train_mean": 0.7646773730889773,
+    "test_mean": 0.08489998851008895,
+    "gap": 0.6797773845788884,
+    "difficulty_class": "floor",
+    "train_per_seed": [
+      0.8235784813881503,
+      0.7499952921871448,
+      0.7186155936636712,
+      0.7286744570840497,
+      0.8025230411218706
+    ],
+    "test_per_seed": [
+      0.06022628450326053,
+      0.11525305465419496,
+      0.09472316629261923,
+      0.0718015343020121,
+      0.08249590279835792
+    ]
+  },
+  "niche_signal": {
+    "per_regime_mean_behavior": {
+      "a=0.2": {
+        "eff_mem_norm": 0.07593011407452699,
+        "leak_std": 0.28077086973334525
+      },
+      "a=0.5": {
+        "eff_mem_norm": 0.14865914096018154,
+        "leak_std": 0.31669821939664555
+      },
+      "a=0.8": {
+        "eff_mem_norm": 0.1353781338864359,
+        "leak_std": 0.3565522394889536
+      },
+      "a=1.1": {
+        "eff_mem_norm": 0.14703870596642593,
+        "leak_std": 0.3503931548359293
+      }
+    },
+    "eff_mem_spread": 0.029785682541947193,
+    "leak_std_spread": 0.030251527806779324,
+    "leak_spread_across_regimes": 0.04245399650367443
+  }
+}

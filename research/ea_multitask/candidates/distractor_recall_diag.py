@@ -206,8 +206,7 @@ def main() -> None:
                    "honest_n": HONEST_N, "grid": list(GRID)},
         "per_regime_ceiling": per_regime,
         "generalization": {
-            "split": f"train a{{{TRAIN_a}}} / test a{{{TEST_AMPS}}}, seq_len={SEQ_LEN}".replace(
-                "TRAIN_a", str(tuple(a for a in AMPS if a not in TEST_AMPS))),
+            "split": f"train a={train_amps} / test a={TEST_AMPS}, seq_len={SEQ_LEN}",
             "train_mean": train_mean, "test_mean": test_mean,
             "gap": gap, "difficulty_class": overall_difficulty,
             "train_per_seed": train_arr.tolist(), "test_per_seed": test_arr.tolist(),

@@ -3,13 +3,16 @@
 > 自動生成: `libexec/raptor-auto-summary` (Stop hook)
 > 次回 ccr 起動時に CLAUDE.md SESSION START で自動的に読み取られる。
 
-- **最終更新**: 2026-05-30 20:52:55
+- **最終更新**: 2026-05-31 06:48:22
 - **プロジェクト**: `D:/projects/llcore`
 - **ブランチ**: `main`
 
 ## 直近の git log
 
 ```
+a6c6e14 auto: distractor_recall_diag.py 編集前 (2026-05-31 06:37)
+85f027a auto: distractor_recall_diag.py 編集前 (2026-05-31 06:37)
+f0467cc research(ea): exp_ea1 診断 = FlipFlop 分布は too-easy/汎化ギャップ無し (honest negative)
 d120792 auto: exp_ea1_substrate_and_gap.py 編集前 (2026-05-30 20:50)
 79e3a29 auto: exp_ea1_substrate_and_gap.py 編集前 (2026-05-30 20:50)
 9ad8c82 research(ea): E-A ハーネス ea_lab — ③ablation + train/test 汎化 runner (Codex 修正済)
@@ -17,34 +20,42 @@ d120792 auto: exp_ea1_substrate_and_gap.py 編集前 (2026-05-30 20:50)
 fbccd75 auto: E_A_DESIGN_multitask_generalization.md 編集前 (2026-05-30 20:47)
 f18a8fd auto: ea_lab.py 編集前 (2026-05-30 20:46)
 ba406a6 auto: ea_lab.py 編集前 (2026-05-30 20:46)
-91fb26c auto: ea_lab.py 編集前 (2026-05-30 20:46)
-d594ca5 research(ea): E-A フェーズ kickoff — 多タスク分布設計 + TaskMixture
-757a5dd research(ladder1): VERDICT を Codex pair-review で修正 + evolved_search 結果JSON
 ```
 
 ## 現在の git status
 
 ```
-M research/ea_multitask/exp_ea1_substrate_and_gap.py
-?? research/ea_multitask/exp_ea3_ablation.py
+M docs/SESSION_SUMMARY.md
+ M research/ea_multitask/candidates/distractor_recall_diag.py
+?? research/ea_multitask/candidates/_sweep_amp.py
+?? research/ea_multitask/candidates/_verify_distractor_recall.py
+?? research/ea_multitask/candidates/_verify_xor2_contract.py
+?? research/ea_multitask/candidates/_verify_xor2_probe.py
+?? research/ea_multitask/candidates/distractor_recall_diag_results.json
+?? research/ea_multitask/candidates/freq_tracking_diag.py
+?? research/ea_multitask/candidates/temporal_xor2_delay_results.json
+?? research/ea_multitask/candidates/variable_delay_recall_diag.py
+?? research/ea_multitask/candidates/variable_delay_recall_diag_results.json
 ```
 
 ## 直近 2 時間に変更されたファイル
 
 ```
-20:51 research/ea_multitask/exp_ea3_ablation.py
-20:50 research/ea_multitask/exp_ea1_substrate_and_gap.py
-20:47 .pytest_cache/v/cache/nodeids
-20:47 research/ea_multitask/tests/test_ea_lab.py
-20:47 docs/poc/E_A_DESIGN_multitask_generalization.md
-20:46 research/ea_multitask/ea_lab.py
-20:40 research/ea_multitask/tests/test_task_mixture.py
-20:38 research/ea_multitask/task_mixture.py
-20:37 research/ladder1_multi_reservoir/exp_mech_evolved_search_results.json
-20:32 docs/poc/LADDER1_VERDICT.md
-20:29 research/ladder1_multi_reservoir/exp_quad_positive_control_results.json
-20:29 research/ladder1_multi_reservoir/exp_quad_positive_control.py
-19:54 docs/SESSION_SUMMARY.md
+06:48 research/ea_multitask/candidates/_verify_xor2_contract.py
+06:48 research/ea_multitask/candidates/_verify_distractor_recall.py
+06:46 research/ea_multitask/candidates/_verify_xor2_probe.py
+06:43 research/ea_multitask/candidates/distractor_recall_diag_results.json
+06:42 research/ea_multitask/candidates/_sweep_amp.py
+06:42 research/ea_multitask/candidates/variable_delay_recall_diag_results.json
+06:40 research/ea_multitask/candidates/temporal_xor2_delay_results.json
+06:37 research/ea_multitask/candidates/variable_delay_recall_diag.py
+06:37 docs/SESSION_SUMMARY.md
+06:37 research/ea_multitask/candidates/freq_tracking_diag.py
+06:37 research/ea_multitask/candidates/distractor_recall_diag.py
+06:36 research/ea_multitask/candidates/temporal_xor2_delay_diag.py
+06:36 research/ea_multitask/candidates/variable_delay_recall.py
+06:36 research/ea_multitask/candidates/freq_tracking.py
+06:36 research/ea_multitask/candidates/distractor_recall.py
 ```
 
 ---

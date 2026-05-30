@@ -1,0 +1,123 @@
+{
+  "experiment": "temporal_xor2_delay diagnostic (C-gen1 ceiling + C-gen2 gap + niche)",
+  "config": {
+    "n_taps": 8,
+    "in_dim": 1,
+    "n_random": 120,
+    "n_seeds": 5,
+    "n_evals": 200,
+    "honest_n": 12,
+    "delays": [
+      10,
+      20,
+      30,
+      40
+    ],
+    "test_idx": [
+      2,
+      3
+    ],
+    "sigma": 0.12,
+    "grid": [
+      6,
+      6
+    ]
+  },
+  "per_regime_ceiling": [
+    {
+      "regime": "D10",
+      "delay": 10,
+      "mean_r2": 0.0036068723171886084,
+      "max_r2": 0.008527626841460531,
+      "raw_max_r2": 0.0771567082882737,
+      "raw_mean_r2": 0.061392832092136126,
+      "solvable": false,
+      "best_gene_eff_mem_norm": 0.1295880516042105,
+      "best_gene_leak_std": 0.35518199782244475,
+      "best_gene_leak_mean": 0.5560167283209987
+    },
+    {
+      "regime": "D20",
+      "delay": 20,
+      "mean_r2": 0.00461898345820364,
+      "max_r2": 0.010898921164690786,
+      "raw_max_r2": 0.1272753083677557,
+      "raw_mean_r2": 0.07967537783099463,
+      "solvable": false,
+      "best_gene_eff_mem_norm": 0.3214691871530002,
+      "best_gene_leak_std": 0.2889941911258923,
+      "best_gene_leak_mean": 0.2670229091697284
+    },
+    {
+      "regime": "D30",
+      "delay": 30,
+      "mean_r2": 0.0008089195896267942,
+      "max_r2": 0.0014387789516413136,
+      "raw_max_r2": 0.16413647233539486,
+      "raw_mean_r2": 0.1014694640363177,
+      "solvable": false,
+      "best_gene_eff_mem_norm": 0.16185064309105868,
+      "best_gene_leak_std": 0.3857072242337812,
+      "best_gene_leak_mean": 0.6401702712691983
+    },
+    {
+      "regime": "D40",
+      "delay": 40,
+      "mean_r2": 0.0018115115239628222,
+      "max_r2": 0.0033865045688027027,
+      "raw_max_r2": 0.10396159953172379,
+      "raw_mean_r2": 0.06687595226329883,
+      "solvable": false,
+      "best_gene_eff_mem_norm": 0.062465939143943716,
+      "best_gene_leak_std": 0.27462907010142784,
+      "best_gene_leak_mean": 0.5468400814859751
+    }
+  ],
+  "niche_signal": {
+    "eff_mem_norm_per_regime": [
+      0.1295880516042105,
+      0.3214691871530002,
+      0.16185064309105868,
+      0.062465939143943716
+    ],
+    "leak_mean_per_regime": [
+      0.5560167283209987,
+      0.2670229091697284,
+      0.6401702712691983,
+      0.5468400814859751
+    ],
+    "leak_std_per_regime": [
+      0.35518199782244475,
+      0.2889941911258923,
+      0.3857072242337812,
+      0.27462907010142784
+    ],
+    "niche_eff_mem_spread": 0.09513237633569455,
+    "niche_leak_mean_spread": 0.14074147070855925,
+    "leak_spread_across_regimes": 0.14102594421809017,
+    "niche_present": true
+  },
+  "generalization": {
+    "split": "train D={10,20} / test(hold-out) D={30,40}",
+    "train_mean": 0.004360748841036781,
+    "test_mean": 0.003866519529105058,
+    "gap": 0.0004942293119317232,
+    "train_per_seed": [
+      0.0035355042328567656,
+      0.005826904549293012,
+      0.0,
+      0.0017353531882881486,
+      0.010705982234745975
+    ],
+    "test_per_seed": [
+      0.004974610583825673,
+      0.0013847385861131638,
+      0.0,
+      0.012508358282391496,
+      0.0004648901931949556
+    ]
+  },
+  "all_ceiling_mean": 0.002711571722245466,
+  "difficulty_class": "floor",
+  "viable_for_third_factor": false
+}

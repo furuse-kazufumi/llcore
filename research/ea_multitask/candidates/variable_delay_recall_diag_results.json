@@ -1,0 +1,107 @@
+{
+  "experiment": "variable_delay_recall: per-regime ceiling + extrapolation gap + niche",
+  "config": {
+    "n_taps": 8,
+    "in_dim": 2,
+    "n_random": 120,
+    "n_seeds": 5,
+    "n_evals": 200,
+    "honest_n": 12,
+    "sigma": 0.12,
+    "grid": [
+      6,
+      6
+    ],
+    "delays": [
+      15,
+      30,
+      45,
+      60
+    ],
+    "distractor_amp": 0.2,
+    "test_idx": [
+      2,
+      3
+    ]
+  },
+  "per_regime_ceiling": [
+    {
+      "regime": "D15",
+      "delay": 15,
+      "max_r2": 0.970583001998683,
+      "mean_r2": 0.9307539459937203,
+      "selected_mean_r2": 0.9613517469697956,
+      "solvable": true,
+      "best_leak_median": 0.5827446434363104,
+      "best_eff_mem": 0.07518242357581133
+    },
+    {
+      "regime": "D30",
+      "delay": 30,
+      "max_r2": 0.9171018537035011,
+      "mean_r2": 0.8774725054898237,
+      "selected_mean_r2": 0.8973673333917462,
+      "solvable": true,
+      "best_leak_median": 0.40566125425165545,
+      "best_eff_mem": 0.10334281518915063
+    },
+    {
+      "regime": "D45",
+      "delay": 45,
+      "max_r2": 0.8398067678865531,
+      "mean_r2": 0.7300367728229623,
+      "selected_mean_r2": 0.7994414827289977,
+      "solvable": true,
+      "best_leak_median": 0.20848026208669607,
+      "best_eff_mem": 0.18001000790807356
+    },
+    {
+      "regime": "D60",
+      "delay": 60,
+      "max_r2": 0.8300306599342556,
+      "mean_r2": 0.6212460549040334,
+      "selected_mean_r2": 0.7245941518597925,
+      "solvable": true,
+      "best_leak_median": 0.37410841657856053,
+      "best_eff_mem": 0.16229044934470432
+    }
+  ],
+  "niche_signal": {
+    "regime_leak_median": [
+      0.5827446434363104,
+      0.40566125425165545,
+      0.20848026208669607,
+      0.37410841657856053
+    ],
+    "regime_eff_mem": [
+      0.07518242357581133,
+      0.10334281518915063,
+      0.18001000790807356,
+      0.16229044934470432
+    ],
+    "leak_spread_across_regimes": 0.13282272956518382,
+    "eff_mem_spread_across_regimes": 0.042600104910174845
+  },
+  "generalization": {
+    "split": "train D[15, 30] / test(hold-out) D[45, 60]",
+    "train_mean": 0.8680128636208941,
+    "test_mean": 0.6222684226841743,
+    "gap": 0.24574444093671988,
+    "train_per_seed": [
+      0.8880295096081129,
+      0.8048796259475228,
+      0.8663702149203375,
+      0.8664666209296691,
+      0.9143183466988288
+    ],
+    "test_per_seed": [
+      0.7202885168539757,
+      0.6885427783698937,
+      0.5337660262989399,
+      0.4780970830017896,
+      0.6906477088962726
+    ]
+  },
+  "difficulty_class": "medium",
+  "viable_for_third_factor": true
+}
