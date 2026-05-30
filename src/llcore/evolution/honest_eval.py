@@ -105,12 +105,24 @@ def equal_budget(pop_size: int, n_generations: int, elitism: int) -> int:
     """evolve() の fitness 呼出回数 = 初期集団 + 各世代の新個体数.
 
     random search の標本数をこれに合わせると「同じ評価予算」での公正比較になる。
+    入力は ``evolve()`` と同じ契約 (0 <= elitism <= pop_size) を要求する。
     """
+    if pop_size < 1:
+        raise ValueError(f"pop_size must be >= 1, got {pop_size}")
+    if n_generations < 0:
+        raise ValueError(f"n_generations must be >= 0, got {n_generations}")
+    if not (0 <= elitism <= pop_size):
+        raise ValueError(f"elitism must be in [0, pop_size={pop_size}], got {elitism}")
     return pop_size + n_generations * (pop_size - elitism)
 
 
-def _cliff_delta(deltas: np.ndarray) -> float:
-    """paired 差分 (ga - rand) から Cliff's delta = (#正 - #負) / n."""
+def _paired_sign_delta(deltas: np.ndarray) -> float:
+    """paired 差分 (ga - rand) の符号バランス効果量 ``(#正 - #負) / n``.
+
+    **教科書的 Cliff's delta ではない** (あれは 2 標本の全 i,j ペア比較)。本統計は
+    paired 設計 (同 seed の ga/rand) に合わせ seed ごとの差の符号バランスを測る。
+    値域 [-1,1]、+1 で全 seed 進化勝ち、-1 で全 seed 負け、0 で拮抗。
+    """
     n = len(deltas)
     if n == 0:
         return 0.0
@@ -119,8 +131,11 @@ def _cliff_delta(deltas: np.ndarray) -> float:
     return (pos - neg) / n
 
 
-def _sign_test_p(deltas: np.ndarray) -> float:
-    """scipy 不在時の代替: 両側符号検定 (タイ除外, p=0.5 の二項検定)."""
+def _sign_test_p_greater(deltas: np.ndarray) -> float:
+    """scipy 不在時の代替: **片側** 符号検定 (H1: 正の差が多い = 進化 > random).
+
+    タイ (差=0) は除外し、Binom(n, 0.5) で ``P(X >= wins)`` を返す。
+    """
     from math import comb
 
     wins = int(np.sum(deltas > 0))
@@ -128,23 +143,26 @@ def _sign_test_p(deltas: np.ndarray) -> float:
     n = wins + losses
     if n == 0:
         return 1.0
-    k = min(wins, losses)
-    tail = sum(comb(n, i) for i in range(0, k + 1)) * (0.5 ** n)
-    return float(min(1.0, 2.0 * tail))
+    p = sum(comb(n, i) for i in range(wins, n + 1)) * (0.5 ** n)
+    return float(min(1.0, p))
 
 
 def _paired_p(ga: np.ndarray, rand: np.ndarray) -> float:
-    """paired 比較の p 値 (scipy Wilcoxon、不在/全タイ時は符号検定 fallback)."""
+    """**片側** paired 比較の p 値 (H1: ga > rand).
+
+    scipy Wilcoxon を ``alternative="greater"`` で使い、不在/全タイ時は片側符号検定で代替する。
+    仮説は「進化が random を上回る」の一方向なので両側でなく片側 (両側だと p が 2 倍で過剰に厳しい)。
+    """
     deltas = ga - rand
     if np.allclose(deltas, 0.0):
         return 1.0
     if _HAS_SCIPY:
         try:
             # zero_method='wilcox' はタイをドロップ。全要素同一だと例外 → fallback。
-            return float(_scipy_wilcoxon(ga, rand).pvalue)
+            return float(_scipy_wilcoxon(ga, rand, alternative="greater").pvalue)
         except Exception:  # pragma: no cover
-            return _sign_test_p(deltas)
-    return _sign_test_p(deltas)
+            return _sign_test_p_greater(deltas)
+    return _sign_test_p_greater(deltas)
 
 
 def evolution_vs_random(
