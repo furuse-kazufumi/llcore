@@ -260,10 +260,15 @@ def evolution_vs_random(
     rand = np.array(rand_scores, dtype=np.float64)
     deltas = ga - rand
     diff = float(np.mean(deltas))
-    win_rate = float(np.mean(ga >= rand))
+    win_rate = float(np.mean(ga > rand))
     p = _paired_p(ga, rand)
-    delta = _cliff_delta(deltas)
-    passes = bool(diff > 0.0 and p < alpha)
+    delta = _paired_sign_delta(deltas)
+    passes = bool(
+        diff > 0.0
+        and p < alpha
+        and n_seeds >= min_seeds
+        and abs(delta) >= min_effect
+    )
 
     return FalsificationResult(
         ga_mean=float(np.mean(ga)),
@@ -271,7 +276,7 @@ def evolution_vs_random(
         diff=diff,
         win_rate=win_rate,
         wilcoxon_p=p,
-        cliff_delta=delta,
+        paired_sign_delta=delta,
         n_seeds=n_seeds,
         passes=passes,
     )
