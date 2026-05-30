@@ -139,8 +139,7 @@ def es_search_ceiling(res: HybridMaxReservoir, score_gene, lo, hi, seed_idx: int
     span = hi - lo
 
     def evaluate(gene: np.ndarray) -> float:
-        eval_rng = np.random.default_rng(EVAL_BASE + seed_idx)  # 全個体同一 train/eval
-        return eval_once(np.clip(gene, lo, hi), eval_rng)
+        return score_gene(np.clip(gene, lo, hi))  # 全個体同一 train/eval (score_gene が束縛)
 
     # --- 初期親集団 ---
     parents = [lo + span * gene_rng.random(res.gene_dim) for _ in range(ES_MU)]
