@@ -76,6 +76,50 @@ def test_full_beats_randselect_on_structured_landscape() -> None:
     assert np.median(full) >= np.median(rand)
 
 
+def test_randselect_has_no_fitness_gate_even_in_init_batch() -> None:
+    """回帰 (Codex F-High): randselect は init batch でも fitness ゲートを持たない.
+
+    単一 cell (grid=(1,1)) かつ higher-gene=higher-fitness の決定論 landscape で、
+    全 eval を init_batch に含めて実行。elite は cell に **max** を残すが、random は
+    fitness ゲート無しで **最後に置いた gene** を残すため、elite.best >= random.best
+    が常に成立し、両者は一般に一致しない (= ③ が randselect から完全に除去されている)。"""
+    dim = 1
+    bounds = (np.full(dim, 0.0), np.full(dim, 1.0))
+    bbounds = (np.full(2, 0.0), np.full(2, 1.0))
+
+    def behave(g):  # 全 gene を 1 cell に写像
+        return np.array([0.0, 0.0])
+
+    def ev(g, rng):  # ノイズ無し: fitness = gene 値 (単調)
+        return float(g[0])
+
+    kw = dict(dim=dim, bounds=bounds, behavior_bounds=bbounds, grid_shape=(1, 1),
+              n_evals=12, init_batch=12, sigma=0.3)
+    elite = _map_elites_core_elite(ev, behave, **kw)
+    rand = _map_elites_core_rand(ev, behave, **kw)
+    # elite は max を保持 → random (最後の gene 保持) 以上
+    assert elite.best_fitness >= rand.best_fitness
+    # 一般に一致しない (max != last) ことを高確率で確認: 複数 seed で少なくとも 1 回は厳密に上回る
+    strictly = [
+        _map_elites_core_elite(ev, behave, **kw, _seed=s).best_fitness
+        > _map_elites_core_rand(ev, behave, **kw, _seed=s).best_fitness
+        for s in range(5)
+    ]
+    assert any(strictly)
+
+
+def _map_elites_core_elite(ev, behave, *, _seed=0, **kw):
+    from ea_lab import _map_elites_core
+    return _map_elites_core(ev, behave, **kw, rng=np.random.default_rng(_seed),
+                            selection_mode="elite")
+
+
+def _map_elites_core_rand(ev, behave, *, _seed=0, **kw):
+    from ea_lab import _map_elites_core
+    return _map_elites_core(ev, behave, **kw, rng=np.random.default_rng(_seed),
+                            selection_mode="random")
+
+
 def test_invalid_selection_mode_raises() -> None:
     from ea_lab import _map_elites_core
     with pytest.raises(ValueError, match="selection_mode"):
