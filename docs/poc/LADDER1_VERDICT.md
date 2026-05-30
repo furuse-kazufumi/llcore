@@ -52,11 +52,16 @@ window=5) を解けない = **基質の床** (Minsky-Papert、全 method held-ou
 readout で解くのは原理的に困難。**
 
 - 「二次特徴で XOR が線形分離可能」は **2-bit XOR (degree-2) にのみ成立する古典結果**。
-  quadratic_readout が **window=2 で R²=1.0、window=5 で −0.02** を出したのが決定的証拠
-  (実装は健全 = positive control 合格、5-bit は degree 不足で原理的に不能)。
-- 探索を random→進化に強化しても床は動かない (evolved_search)。3L-random の見かけ天井
-  0.135 は **honest_eval の発想 (fresh-seed 再評価) で崩れる水増し** = elitism 凍結持越し +
-  同一 eval-seed の幸運 draw。真の天井は 0.018 で baseline 以下。
+  理想 per-bit positive control (`exp_quad_positive_control.py`、完全記憶を仮定し reservoir
+  ダイナミクスを切り離した上限テスト、raw held-out R²) が **window=2→+1.0000、window=3/4/5→
+  −0.064/−0.052/−0.086** を出したのが決定的証拠。target は `bits[:window]` の積 = degree-window
+  単項式なので、degree-2 readout は degree-2 (window=2) のみ表現でき degree≥3 は **完全記憶でも
+  原理的に不能**。reservoir 上の見かけ 0.055 は探索分散の小正値で解ではない。
+- 探索を random→進化に強化しても床は動かない (evolved_search)。**3L-evolved の fresh-seed
+  honest 再評価天井は 0.018** で baseline (1L-8 random max 0.045) 以下 = 進化は床を外さない。
+  (注: 3L-random の見かけ天井 0.135 は random search が単一 eval-seed 上で 300 本中 max を取る
+  **selection-on-noise (lucky-draw)** による水増しで、進化の elitism 凍結持越し artifact とは
+  別物 — random search に世代も elite 持越しも無い。honest 再評価は ES 経路のみに実装。)
 - 幅・乗法結合・全部入りも床を外さない。共通原因 = **random/進化で引いた reservoir 最終状態が
   過去ビットの分離した線形表現を保持しない** (tanh 飽和混合) + **parity の高次数**。
 
