@@ -98,12 +98,34 @@ Step C verdict §6(g): 「結合 reservoir + lexicase + 軌跡 fitness を全部
 解ける土俵を前提とするため、**③ の load-bearing 判定は parity 経路を捨て E-A (多タスク汎化)
 経路に移すのが筋**。無限後退は「parity に固執しない」ことで止める。
 
+## Codex pair-review (2026-05-30, gpt-5.4 read-only) — 4 findings 実コード検証後に反映
+
+[[feedback_codex_pair_review_for_llcore]] / [[feedback_external_ai_verify]] に従い、commit 前に
+Codex で verdict + 5 機構を read-only review。4 findings を **実コードで一件ずつ検証**して反映:
+
+- **F1 (High) 採用** — 「3L-random 0.135 = elitism 凍結持越し」は誤帰属。`mech_evolved_search.evolve_search`
+  の honest 再評価 (fresh-seed) は **ES 経路のみ**実装、`random_search_ceiling` は単一 eval-seed の
+  max で elite 持越し無し。→ 3L-random の水増しを **selection-on-noise (lucky-draw)** に訂正、
+  0.018 は 3L-evolved honest 値と明記 (random の honest 値ではない)。
+- **F2 (High) 採用** — verdict の「window=2 で R²=1.0」positive control に裏付け成果物が無かった
+  (`exp_mech_quadratic_readout.py` は window=5 固定、raw R² も clip 後のみ保存)。→ **理想 per-bit
+  positive control `exp_quad_positive_control.py` を新規実装**し raw held-out R² で再現可能化
+  (window=2→+1.0000 / 3→−0.064 / 4→−0.052 / 5→−0.086)。hybrid_max の raw 負値主張も
+  positive control 由来に紐付け直し。
+- **F3 (Medium) 採用** — 「degree-5 を CPU reservoir+ridge で解くのは原理的に困難/不能」は証拠より
+  一段強い。→ degree-2 readout の不能のみ positive control で原理的確定とし、reservoir+線形側は
+  「本設定で極めて頑健な床 / degree-5 仮説と強く整合」に緩和。
+- **F4 (Low) 採用** — 「E-A 最有力」は比較実証ではなく優先順位づけ → その旨明記。
+- **補足 (Codex 確認)**: held-out 厳守・データリーク防止は実装上担保 (`make_eval_once` 系は
+  train/eval 別 draw、random search は seed 内同一 eval データ)。深さ結論 (2L/3L strict PASS) は妥当。
+
 ## 規律・成果物
 
-- 全機構 held-out 厳守・リークなし・pytest pass・honest 内訳 (positive control / ablation /
-  confound 調査 / 水増し排除) を各 honest_notes に保持。
+- 全機構 held-out 厳守・リークなし・pytest pass (66 tests)・honest 内訳 (positive control /
+  ablation / confound 調査 / 水増し排除) を各 honest_notes に保持。
 - ワークフロー: 5 agent / 264 tool uses / genuinely_lifted=0。
-- 実装: `research/ladder1_multi_reservoir/` (multi_reservoir.py + mech_*.py 5種 + tests + exp_*)。
+- 実装: `research/ladder1_multi_reservoir/` (multi_reservoir.py + mech_*.py 5種 + tests + exp_*
+  + **exp_quad_positive_control.py** [Codex F2 対応] + exp_mech_evolved_search_results.json)。
 - 関連: [[project_llcore_init_2026_05_29]] / [[feedback_codex_pair_review_for_llcore]] /
-  [[feedback_benchmark_honest_disclosure]] (水増し排除) / Step C verdict。
-- push 未 (ローカル保持)。Codex pair-review 後に commit。
+  [[feedback_benchmark_honest_disclosure]] (水増し排除) / [[feedback_external_ai_verify]] / Step C verdict。
+- push 未 (ローカル保持)。
