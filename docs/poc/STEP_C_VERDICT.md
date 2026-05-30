@@ -136,7 +136,7 @@ positive bias (③実在に寄せたい誘惑) を排し、C3 不成立を素直
 
 3. **(c) reservoir+ridge proxy ≠ full LLM / CPU→GPU 分解 (機構 vs 前提)**: 基質は固定 reservoir 力学の gene 化 + per-gene ridge readout で、backprop full LLM とは別物 (navigation frame §6e)。本 verdict は **機構 (a)** = 「欺瞞構造+航行可能な流れを持つ landscape で③が立つか」を CPU で検証したものであり、**前提 (b)** = 「実 GPU/LLM 訓練 landscape が実際に欺瞞構造を持つか」は CPU では立証できない (GPU でしか試せない経験的問)。撤退は機構層の結果であって前提を否定するものではない。
 
-4. **(d) 5 confound (navigation frame §6b)**: ① descriptor 衝突 (粗 2D BD が異質解を同セルに潰す) / ② lake-island (最適解が behavior でも孤立=航行不能地形) / ③ 基質ボトルネック (本件 parity に直撃) / ④ BD アライメント (現 BD が基質パラメタ寄りで課題難度勾配に未アライン疑い) / ⑤ wrong-tool (QD 自体が欺瞞領域で次善 = Boldi/Ding/Spector 2023 lexicase「Objectives Are All You Need」arXiv:2311.02283)。C3✗ をこれらと分離するまで「③が答え/無力」を断定不可。
+4. **(d) 5 confound (navigation frame §6b) — 特に wrong-tool は結論本文へ昇格**: ① descriptor 衝突 (粗 2D BD が異質解を同セルに潰す) / ② lake-island (最適解が behavior でも孤立=航行不能地形) / ③ 基質ボトルネック (本件 parity に直撃) / ④ BD アライメント (現 BD が基質パラメタ寄りで課題難度勾配に未アライン疑い) / ⑤ **wrong-tool (未排除 — 結論を左右)**: C3 は MAP-E (QD) vs baseline のみで、Boldi/Ding/Spector 2023 (「Objectives Are All You Need」arXiv:2311.02283) によれば欺瞞では lexicase>QD=wrong-tool。よって **QD≈baseline は「③無力」でなく「QD が次善」を意味しうる**。本 verdict は QD=③ を暗黙等置せず、**lexicase baseline が未検定**である以上「③ load-bearing でない」とは断定できない (§5 decision tree の hill-climbing 分離不能の読みもこの交絡を被る)。C3✗ をこれらと分離するまで「③が答え/無力」を断定不可。
 
 5. **(e) ③ ablation は MAP-E vs random/RR/GA であり、より clean な MAP-E_randselect は未実施**: 本 verdict の③分離は MAP-E vs {random / RR-hillclimb / panmictic-GA} だが、navigation frame §7e が指す **MAP-E vs MAP-E_randselect** (archive-elite 選択を fresh random gene 引きに置換=②③を殺し①変異のみ残す) の方が③の最も clean な分離。後続実験の標準 ablation に採用予定 (本件では未走)。
 
