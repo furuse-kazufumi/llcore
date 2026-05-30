@@ -131,6 +131,11 @@ def _paired_sign_delta(deltas: np.ndarray) -> float:
     return (pos - neg) / n
 
 
+# 後方互換 alias (旧名)。research/step4 selection_lab が import 済のため温存。
+# 新コードは _paired_sign_delta を使うこと (本統計は教科書的 Cliff's delta ではない)。
+_cliff_delta = _paired_sign_delta
+
+
 def _sign_test_p_greater(deltas: np.ndarray) -> float:
     """scipy 不在時の代替: **片側** 符号検定 (H1: 正の差が多い = 進化 > random).
 
