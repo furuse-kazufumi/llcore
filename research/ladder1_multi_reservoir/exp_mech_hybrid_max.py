@@ -46,9 +46,19 @@ _HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(_HERE))  # mech_hybrid_max
 sys.path.insert(0, str(_HERE.parent / "step_c_memory_tasks"))  # memory_tasks, reservoir
 
-from mech_hybrid_max import HybridMaxReservoir, make_eval_once as mech_eval_once
-from reservoir import LeakyDelayLineReservoir, make_eval_once as single_eval_once
+from mech_hybrid_max import (
+    HybridMaxReservoir,
+    eval_on_dataset,
+    gene_bounds as mech_bounds,
+    make_batched_dataset,
+)
+from mech_hybrid_max import _sigmoid as _hm_sigmoid
+from reservoir import LeakyDelayLineReservoir
 from memory_tasks import DelayedParityTask
+
+# src/llcore への相対パス (baseline の batched ridge 評価で fit_ridge_readout を流用)。
+sys.path.insert(0, str(_HERE.parent.parent / "src"))
+from llcore.fitness.ridge_readout import fit_ridge_readout  # noqa: E402
 
 # ---- 測定設定 (固定 seed で再現可能) ----
 N_RANDOM = 300       # random search 1 seed あたりの gene 本数 (到達天井の推定)
