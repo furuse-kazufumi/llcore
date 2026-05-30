@@ -28,6 +28,13 @@ from pathlib import Path
 
 import numpy as np
 
+# Windows cp932 console でも R²/絵文字を出せるよう stdout/stderr を UTF-8 に reconfigure
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8")  # type: ignore[union-attr]
+    except (AttributeError, ValueError):
+        pass
+
 # src/llcore (ridge readout) と step_c (task) を read-only 流用
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "step_c_memory_tasks"))
