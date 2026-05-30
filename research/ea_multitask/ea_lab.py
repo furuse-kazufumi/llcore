@@ -118,6 +118,18 @@ def _map_elites_core(
 
     archive: dict[tuple[int, ...], tuple[np.ndarray, float]] = {}
     evals = 0
+    # global best-of-budget (Codex F2 対応): best_gene を「最終 archive 占有者の max」でなく
+    # 「予算内で評価した全個体の max-fitness」にする。randselect は無条件上書きで強個体を忘れる
+    # ため、archive-max だと評価予算が同じ random (全 n_evals から best) に対し不当に不利になり
+    # C-gen3 の gap を水増ししていた。elite mode では fitness ゲート placement により global best が
+    # 自分の cell から退避しないので archive-max ≡ global best (full MAP-E は数値不変)。
+    gbest_gene: np.ndarray | None = None
+    gbest_f = -np.inf
+
+    def _track(g: np.ndarray, f: float) -> None:
+        nonlocal gbest_gene, gbest_f
+        if f > gbest_f:
+            gbest_f, gbest_gene = f, g
 
     # 初期 random batch。placement も selection_mode に従う (Codex F-High 対応:
     # 初期ループで fitness ゲートを残すと randselect に ③ が混入し「②③だけの差」が崩れる)。
@@ -125,6 +137,7 @@ def _map_elites_core(
         g = bounds[0] + (bounds[1] - bounds[0]) * rng.random(dim)
         f = eval_once(g, rng)
         evals += 1
+        _track(g, f)
         c = cell_of(behavior(g))
         if selection_mode == "elite":
             if c not in archive or f > archive[c][1]:  # ③ fitness ゲート
@@ -141,6 +154,7 @@ def _map_elites_core(
         child = _clip(parent_gene + rng.normal(0, sigma, size=dim), bounds)
         f = eval_once(child, rng)
         evals += 1
+        _track(child, f)
         c = cell_of(behavior(child))
         if selection_mode == "elite":
             if c not in archive or f > archive[c][1]:  # ③: fitness ゲート (ratchet)
@@ -148,9 +162,9 @@ def _map_elites_core(
         else:  # 'random': ③ 殺し — fitness 無視で無条件上書き
             archive[c] = (child, f)
 
-    best_cell = max(archive, key=lambda k: archive[k][1])
-    bg, bf = archive[best_cell]
-    return MapElitesResult(best_fitness=bf, best_gene=bg, n_filled_cells=len(archive), n_evals=evals)
+    assert gbest_gene is not None  # n_evals>=1 で必ず 1 個体は評価される
+    return MapElitesResult(best_fitness=gbest_f, best_gene=gbest_gene,
+                           n_filled_cells=len(archive), n_evals=evals)
 
 
 @dataclass
