@@ -175,7 +175,7 @@ AURORA-XCon=Coiffard 2025) し、gem-critic で premise まで監査した結果
 - つまり ③ が空転して見えたのは、**④ (過剰繁殖→希少→密度依存選択) が構造的に不在**で選択圧が内生的に生まれていないから、とも読める。
 
 ### 7b. 捕食者・食料 の machinery 写像
-- **食料/資源 = 密度依存選択 (density-dependent selection) / carrying capacity**。有限食料が pop を律速 → 過剰繁殖が希少に出会う → 選択が内生化。logistic 成長 / Lotka-Volterra。
+- **食料/資源 = 密度依存選択 (density-dependent selection) / 環境収容力 (carrying capacity)**。有限食料が pop を律速 → 過剰繁殖が希少に出会う → 選択が内生化。logistic 成長 / Lotka-Volterra。
 - **捕食者 = 共進化/赤の女王 (Van Valen 1973) の移動する選択標的**。動的選択圧 = 環境複雑性テーゼ「新ニッチを生み続ける環境」(wkackrdhl が裏取り中)。
 - 合わせて = **内生的・動的選択圧を自己生成する生態系** → ④③ が空転をやめる。古典 ALife: Tierra (Ray 1991) / Avida (Adami&Ofria) / PolyWorld (Yaeger 1994)。
 
