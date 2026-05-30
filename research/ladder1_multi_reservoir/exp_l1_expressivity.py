@@ -36,7 +36,7 @@ except Exception:
 
 _HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(_HERE))  # multi_reservoir
-sys.path.insert(0, str(_HERE.parents[1] / "step_c_memory_tasks"))  # memory_tasks, strict_compare
+sys.path.insert(0, str(_HERE.parent / "step_c_memory_tasks"))  # memory_tasks, strict_compare
 
 from multi_reservoir import DeepReservoir, make_eval_once
 from memory_tasks import DelayedParityTask
