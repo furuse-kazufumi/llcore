@@ -49,7 +49,9 @@ window=5) を解けない = **基質の床** (Minsky-Papert、全 method held-ou
 ## 最重要発見 (梯子段1 の核心)
 
 **5-bit parity = degree-5 単項式 (b₁·b₂·b₃·b₄·b₅)。これを CPU reservoir + 線形/2次 ridge
-readout で解くのは原理的に困難。**
+readout で解くのは、本設定 (最終状態 readout・本探索予算・held-out R² 評価系) で極めて頑健な
+床を示し、degree-5 仮説と強く整合する。** (degree-2 readout の不能は positive control で原理的に
+確定。reservoir+線形 readout 側はパラダイム全体の不可能性証明ではなく「本設定で頑健な床」。)
 
 - 「二次特徴で XOR が線形分離可能」は **2-bit XOR (degree-2) にのみ成立する古典結果**。
   理想 per-bit positive control (`exp_quad_positive_control.py`、完全記憶を仮定し reservoir
