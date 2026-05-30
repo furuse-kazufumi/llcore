@@ -221,7 +221,7 @@ def run_ea_methods_over_seeds(
 
         # --- panmictic GA (①③, ②なし) ---
         r = panmictic_ga(
-            eval_train, dim=dim, bounds=bounds, n_evals=n_evals, pop_size=20,
+            eval_train, dim=dim, bounds=bounds, n_evals=n_evals, pop_size=_PANMICTIC_POP,
             tournament_k=3, sigma=sigma, elitism=1, rng=np.random.default_rng(base_seed + s + 2))
         te, tr = _honest_both(r.best_gene, s + 30_000_000)
         test_scores["panmictic_ga"].append(te); train_scores["panmictic_ga"].append(tr)
