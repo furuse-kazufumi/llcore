@@ -190,7 +190,7 @@ AURORA-XCon=Coiffard 2025) し、gem-critic で premise まで監査した結果
 ### 7d. 統合 (③ landscape 航行 と ④ 生態系 の関係)
 - §1-6 (③/navigation) は「**与えられた landscape をどう航行するか**」、§7 (④/ecology) は「**そもそも選択圧をどう内生させるか**」。
 - 監査の「③④空転」= landscape が平坦(③側の問題) **かつ** 過剰繁殖×資源希少が不在(④側の問題) の二重欠如。
-- environment-complexity workflow (wkackrdhl, 反証ガード付き) が Red Queen/niche construction/POET を裏取り中 → **完了時に「CPU toy ecology で ④ を非空転化する最小実験」を design 出力**へ統合する。
+- environment-complexity workflow (wkackrdhl, 反証ガード付き) が 赤の女王 (Red Queen)/ニッチ構築 (niche construction)/POET を裏取り中 → **完了時に「CPU toy ecology で ④ を非空転化する最小実験」を design 出力**へ統合する。
   反証可能形 (unfalsifiable 回避): 「有限資源+変動 pop を入れると、固定予算 baseline より ③ の load-bearing 度(MAP-E−random の δ)が有意に上がる」を strict gate で検定。上がらなければ「④ 生態系も Step C 課題では不要」と negative 決着。
 
 ## 8. 海 vs landscape パラダイム (ユーザー 2026-05-30: 「生命誕生に倣うなら landscape より海から始めた方が良かった」)
