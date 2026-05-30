@@ -406,8 +406,64 @@ def make_eval_once(
     return eval_once
 
 
+def make_batched_dataset(task: object, n_train: int, n_eval: int,
+                         rng: np.random.Generator):
+    """train/eval の入力・target を **別 draw** でバッチ生成する (held-out 分離維持).
+
+    全 gene を同一データで採点する公平比較のために、データ生成を 1 度だけ行い再利用する
+    ための前計算。eval は train の続きから draw されるため train とは独立 (leakage なし)。
+
+    Returns
+    -------
+    (x_tr, y_tr, x_ev, y_ev) : tuple[np.ndarray, ...]
+        x_*: shape (n, T, in_dim)、y_*: shape (n, out_dim)。
+    """
+    def _draw(n: int):
+        xs: list[np.ndarray] = []
+        ys: list[np.ndarray] = []
+        for _ in range(n):
+            inputs, target = task.generate(rng)
+            xs.append(np.asarray(inputs, dtype=np.float64))
+            ys.append(np.atleast_1d(np.asarray(target, dtype=np.float64)))
+        return np.stack(xs), np.stack(ys)
+
+    x_tr, y_tr = _draw(n_train)
+    x_ev, y_ev = _draw(n_eval)  # train の続き → held-out
+    return x_tr, y_tr, x_ev, y_ev
+
+
+def eval_on_dataset(res: HybridMaxReservoir, gene: np.ndarray, dataset,
+                    *, ridge_lambda: float = 1e-2) -> float:
+    """前計算済みデータセット上で held-out R² を採点する (features_batch 使用の高速路).
+
+    ``make_eval_once`` の eval_once と数値的に等価だが、データは外部で 1 度だけ生成し
+    全 gene で共有する (公平比較 + Python ループ消去で高速化)。
+
+    Parameters
+    ----------
+    dataset : tuple
+        ``make_batched_dataset`` が返す (x_tr, y_tr, x_ev, y_ev)。
+
+    Returns
+    -------
+    float
+        clip([0,1]) の held-out R²。
+    """
+    x_tr, y_tr, x_ev, y_ev = dataset
+    s_tr = res.features_batch(gene, x_tr)
+    readout = fit_ridge_readout(s_tr, y_tr, ridge_lambda=ridge_lambda)
+    s_ev = res.features_batch(gene, x_ev)
+    pred = np.atleast_2d(readout(s_ev))
+    mse = float(np.mean((pred - y_ev) ** 2))
+    var = float(np.mean((y_ev - y_ev.mean(axis=0)) ** 2))
+    r2 = 1.0 - mse / max(var, 1e-12)
+    return float(np.clip(r2, 0.0, 1.0))
+
+
 __all__ = [
     "HybridMaxReservoir",
     "gene_bounds",
     "make_eval_once",
+    "make_batched_dataset",
+    "eval_on_dataset",
 ]
