@@ -110,8 +110,9 @@ def main() -> None:
 
     out = {
         "experiment": "exp_ea3 third-factor ablation (multitask hold-out generalization)",
-        "config": {"n_taps": N_TAPS, "seq_len": SEQ_LEN, "train_pp": list(TRAIN_PP),
-                   "test_pp": list(TEST_PP), "n_seeds": N_SEEDS, "n_evals": N_EVALS,
+        "config": {"task": "variable_delay_recall", "n_taps": N_TAPS, "in_dim": IN_DIM,
+                   "distractor_amp": DISTRACTOR_AMP, "train_D": list(TRAIN_D),
+                   "test_D": list(TEST_D), "n_seeds": N_SEEDS, "n_evals": N_EVALS,
                    "honest_n": HONEST_N, "grid": list(GRID)},
         "scores": {m: {"test_mean": float(sc.test.mean()), "test_std": float(sc.test.std()),
                        "train_mean": float(sc.train.mean()),
