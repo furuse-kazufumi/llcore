@@ -58,15 +58,20 @@ class FalsificationResult:
     diff : float
         ``ga_mean - random_mean`` (正で進化優位)。
     win_rate : float
-        進化 >= random だった seed の割合。
+        進化 > random だった seed の割合 (厳密勝率、タイは勝ちに数えない)。
     wilcoxon_p : float
-        paired Wilcoxon signed-rank の p 値 (scipy 不在時は符号検定で代替)。
-    cliff_delta : float
-        Cliff's delta (効果量, [-1,1])。
+        **片側** paired Wilcoxon signed-rank (H1: 進化 > random) の p 値
+        (scipy 不在時は片側符号検定で代替)。
+    paired_sign_delta : float
+        paired 符号バランス効果量 ``(#正 - #負) / n_seeds`` ([-1,1])。
+        **教科書的 Cliff's delta (全 i,j ペア比較) ではない**。paired 設計に合わせた
+        符号ベース効果量で pairing 情報を保持する (旧名 ``cliff_delta`` から改名)。
     n_seeds : int
         比較に使った seed 数。
     passes : bool
-        進化成立の合格判定: ``diff > 0`` かつ ``wilcoxon_p < alpha``。
+        進化成立の合格判定 = 監査 §5 の完全な基準:
+        ``diff > 0`` かつ 片側 ``wilcoxon_p < alpha`` かつ ``n_seeds >= min_seeds``
+        かつ ``abs(paired_sign_delta) >= min_effect`` (効果量が非無視)。
     """
 
     ga_mean: float
@@ -74,7 +79,7 @@ class FalsificationResult:
     diff: float
     win_rate: float
     wilcoxon_p: float
-    cliff_delta: float
+    paired_sign_delta: float
     n_seeds: int
     passes: bool
 
