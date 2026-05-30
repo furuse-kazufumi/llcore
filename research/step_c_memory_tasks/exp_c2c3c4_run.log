@@ -1,1 +1,31 @@
 === exp_c2c3 (utf8-fixed + 中間保存) start ===
+
+[delayed_parity] mean honest R²: MAP-E=0.0031 random=0.0039 RR=0.0038 GA=0.0033
+  C2 到達率 (R²>=τ の seed 割合):
+    τ=0.5: MAP-E=0.00 random=0.00 RR=0.00 GA=0.00
+    τ=0.7: MAP-E=0.00 random=0.00 RR=0.00 GA=0.00
+    τ=0.8: MAP-E=0.00 random=0.00 RR=0.00 GA=0.00
+    τ=0.9: MAP-E=0.00 random=0.00 RR=0.00 GA=0.00
+  C3 strict gate (MAP-E vs baseline):
+    MAP-E vs random: diff=-0.0008 p=0.8486 δ=-0.20 passes=False
+    MAP-E vs rr_hillclimb: diff=-0.0007 p=0.8349 δ=-0.20 passes=False
+    MAP-E vs panmictic_ga: diff=-0.0002 p=0.511 δ=+0.07 passes=False
+  => C3 (delayed_parity): 不成立
+  (中間保存: exp_c2c3_results.json)
+
+[flip_flop] mean honest R²: MAP-E=0.9487 random=0.9446 RR=0.9451 GA=0.9527
+  C2 到達率 (R²>=τ の seed 割合):
+    τ=0.5: MAP-E=1.00 random=1.00 RR=1.00 GA=1.00
+    τ=0.7: MAP-E=1.00 random=1.00 RR=1.00 GA=1.00
+    τ=0.8: MAP-E=1.00 random=1.00 RR=1.00 GA=1.00
+    τ=0.9: MAP-E=1.00 random=1.00 RR=1.00 GA=1.00
+  C3 strict gate (MAP-E vs baseline):
+    MAP-E vs random: diff=+0.0041 p=0.1514 δ=+0.33 passes=False
+    MAP-E vs rr_hillclimb: diff=+0.0036 p=0.2622 δ=+0.07 passes=False
+    MAP-E vs panmictic_ga: diff=-0.0041 p=0.9681 δ=-0.20 passes=False
+  => C3 (flip_flop): 不成立
+  (中間保存: exp_c2c3_results.json)
+
+結果を保存: D:\projects\llcore\research\step_c_memory_tasks\exp_c2c3_results.json
+=== exp_c2c3 done (exit=0) ===
+=== exp_c4 start ===
