@@ -3,13 +3,15 @@
 > 自動生成: `libexec/raptor-auto-summary` (Stop hook)
 > 次回 ccr 起動時に CLAUDE.md SESSION START で自動的に読み取られる。
 
-- **最終更新**: 2026-05-30 13:57:17
+- **最終更新**: 2026-05-30 14:07:16
 - **プロジェクト**: `D:/projects/llcore`
 - **ブランチ**: `main`
 
 ## 直近の git log
 
 ```
+263fef1 docs(step-c): ④過剰繁殖と生態系 — ④空転診断 + 捕食者/食料の machinery 写像 + CPU→GPU 分解
+32da911 auto: STEP_C_NAVIGATION_FRAME.md 編集前 (2026-05-30 14:04)
 0c8ca3e docs(step-c): story-method workflow 接地 + premise 監査 + CPU→GPU transfer 分解
 63563cc auto: STEP_C_NAVIGATION_FRAME.md 編集前 (2026-05-30 13:56)
 96061e3 auto: STEP_C_NAVIGATION_FRAME.md 編集前 (2026-05-30 13:55)
@@ -18,21 +20,19 @@
 93b1464 docs(step-c): 探索の航行枠 — 比喩↔machinery↔反証予言の生きたメモ
 b11439e fix(step-c): C2 を測定可能に — reach-rate(複数閾値)+per-seed配列保存
 22a6765 auto: exp_c2c3_compare.py 編集前 (2026-05-30 13:36)
-6ddfe68 feat(step-c): exp_c2c3 (C2/C3) + exp_c4 ablation (C4)
-c5594b3 auto: exp_c4_ablation.py 編集前 (2026-05-30 13:12)
 ```
 
 ## 現在の git status
 
 ```
-(clean)
+M docs/SESSION_SUMMARY.md
 ```
 
 ## 直近 2 時間に変更されたファイル
 
 ```
-13:56 docs/poc/STEP_C_NAVIGATION_FRAME.md
-13:50 docs/SESSION_SUMMARY.md
+14:05 docs/SESSION_SUMMARY.md
+14:04 docs/poc/STEP_C_NAVIGATION_FRAME.md
 13:37 research/step_c_memory_tasks/exp_c2c3c4_run.log
 13:36 research/step_c_memory_tasks/exp_c2c3_compare.py
 13:28 docs/poc/STEP_C_VERDICT_SCAFFOLD.md
