@@ -56,3 +56,37 @@
 - 文献 (Sussillo&Barak / Howard&Kahana 等) は記憶ダイナミクスの定説だが、**我々の reservoir+ridge proxy は
   backprop full RNN/LLM とは別物**。予言の転用は proxy の限界内に留める。
 - 本 doc は**生きたメモ** (対話で拡張中)。確定 verdict は C1-C4 実数 + adversarial verify を経てから。
+
+## 6. story-method workflow 接地 (w2tb55l9v, 7 agents) — premise 監査 + 確定 future-work
+
+記憶術 → QD の対応を文献接地 (Mouret&Clune 2015 / Lehman&Stanley 2011 / Maguire 2003 / Hopfield 1982 /
+Bengio 1994,2009 / Sel4Sel=Frans,Soros,Witkowski 2021 arXiv:2106.09153 / CMA-ME=Fontaine 2020 GECCO /
+AURORA-XCon=Coiffard 2025) し、gem-critic で premise まで監査した結果。
+
+### 6a. ★premise レベルの honest 反証 (verdict 冒頭に必須)
+- **Boldi/Ding/Spector 2023「Objectives Are All You Need」(arXiv:2311.02283, コーパス内確認済)**:
+  **deceptive 領域では many-objective lexicase 選択が MAP-Elites を上回り、QD は illumination(非欺瞞)領域でのみ優位**。
+  Step C は「欺瞞 landscape を QD で攻める」設定なので、**「QD/MAP-Elites が記憶 landscape の正しい道具」という枠組み前提自体が未検証 confound**。
+  → C3 が MAP-E>random でも「QD 固有の③か、一般の多目的選択(lexicase)でも足りるか」を切り分けるまで「③(QD)が答え」と断定不可。
+  逆に C3 が MAP-E≈random でも「③が無力」でなく「QD が wrong-tool で lexicase なら立つ」可能性が残る。**安価な lexicase baseline で前提を検定すべき**。
+
+### 6b. C3 の confound 一覧 (これまでの対話 + workflow を統合; verdict の解釈に必須)
+1. **descriptor 衝突** (前出): 2D 粗 BD が異質解を同セルに潰す → ③の多様性維持を削ぐ。
+2. **lake-island**: 最適解が behavior でも孤立 (流れ無し) → C3≈random は「③無力」でなく「航行不能地形」。
+3. **★基質ボトルネック** (新, P1): leaky reservoir は連想束縛4要件 (選択的保持/固定点束縛/内容アドレス性/変数束縛) を欠き、③以前に fitness 天井を作りうる → C3 失敗が「③」でなく「基質」のせいの可能性。
+4. **★BD アライメント** (新, P3): 現 BD(平均実効記憶長/leak std)が基質パラメタ寄りで課題難度勾配に未アライン疑い → unaligned BD 上では③が踏み石を正しく選べない (Pugh/Soros/Stanley 2016 = 性能の支配因子)。
+5. **★wrong-tool** (新, 6a): QD 自体が欺瞞領域で次善 (Boldi 2023)。
+
+### 6c. 確定 future-work 実験 (verdict 後、critic 修正適用済の検証順)
+> 全て CPU low・既存 step_c 部品の最小拡張・strict gate(n≥15, 片側Wilcoxon p<0.05, |δ|≥0.147)・two-way 反証。
+> **順序が重要**: unaligned BD 上では③検証が無効化されるため P3 を先に。
+1. **P3 [BD アライメント]** (③の前提チェック・最優先): 課題構造 BD(依存距離×系列位置) / AURORA風 PCA-BD vs 現 BD。弁別性指標(隣接セル間 behavior距離÷セル内分散>1)+collision率を測定。`make_behavior` 差替のみ。
+2. **P1 [基質 ablation]**: leaky(S0) → scalar forget gate(S1, 真に1パラメタ追加で最安, まず S0 vs S1) → 必要なら 1-step modern-Hopfield(S2, Ramsauer 2020)。③設定固定で基質だけ振り「③の利得が基質非依存に残るか/基質を強くすると逓減するか」を分離。
+3. **P4 [選択スケジュール] + lexicase baseline**: λ(t)=1→0 (novelty→fitness, 手書きスケジュールであり Sel4Sel の学習選択の再現ではない=overclaim 除去) vs 純fitness/純novelty。**L4=lexicase 選択を baseline に追加** (6a の前提検定: parity を依存距離別 sub-objective に分解)。
+4. **P2 [カリキュラム]**: 多様遅延ニッチ+③ vs 単調 continuation(Elman 1993/Bengio 2009)。固定遅延=最も rugged な一点での一発勝負(Bengio 1994 が指数的 rugged 化を理論保証)。注: Rohde&Plaut 1999 の阻害は言語課題知見で parity への転用は仮説止まり(過剰一般化しない)。
+5. **★軌跡の太陽** (§4 #3, ユーザー確定): 終端のみ → 後半窓の R² 窓平均 fitness。
+
+### 6d. 実装の根拠にしない表層比喩 (機序不一致、critic 指摘)
+- 逐次軌跡=archive セル隣接 (幾何近接 ≠ 順序 retrieval cue) / narrative 駆動=stepping-stone(受動保存 ≠ 能動的意味づけ) /
+  PAO 二重符号化=fitness×BD(双射符号化 ≠ 特徴づけ) / Dresler 2017 訓練=③(個体内 learning ≠ 集団 selection)。
+  → 対応・予言の **発想源**には使うが、**実装の機序的根拠**には使わない。
