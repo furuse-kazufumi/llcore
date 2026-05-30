@@ -156,7 +156,7 @@ AURORA-XCon=Coiffard 2025) し、gem-critic で premise まで監査した結果
 
 ### 6e. CPU→GPU transfer の honest 分解 (ユーザー方針 2026-05-30: 「CPU で原理検証できれば GPU でも進化成立」)
 スコープ確定 = **CPU で出来る範囲の原理検証**を deliverable とする (GPU は条件付き次段)。transfer 論理を honest に2分解:
-- **(a) 機構 (conditional)**: 「欺瞞構造+航行可能な流れを持つ landscape では ③(QD/選択)が hill-climbing/random を上回り load-bearing」。
+- **(a) 機構 (conditional)**: 「欺瞞構造+航行可能な流れを持つ landscape では ③(QD/選択)が 山登り (hill-climbing)/random を上回り load-bearing」。
   → **CPU で立証可能・GPU へ transfer する** (噛み合う歯車は大きくしても噛み合う)。ユーザーの transfer 論理はこの層では**正しい**。
 - **(b) 前提 (antecedent)**: 「実 GPU/LLM 訓練 landscape が (a) の欺瞞構造を**実際に持つ**か」。
   → **CPU では立証できない**。手順6 で実テキスト ESN+ridge proxy は**滑らか**だった (③不要) = proxy 地形 ≠ full-LLM 地形の可能性。これは GPU でしか試せない経験的問。
