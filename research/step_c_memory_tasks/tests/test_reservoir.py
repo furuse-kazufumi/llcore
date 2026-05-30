@@ -23,7 +23,7 @@ def test_gene_dim_matches_bounds():
     res = LeakyDelayLineReservoir(n_taps=8, in_dim=1)
     lo, hi = gene_bounds(res)
     assert lo.shape == hi.shape == (res.gene_dim,)
-    assert res.gene_dim == 8 + 8 * 1
+    assert res.gene_dim == res.n_taps + res.n_taps * res.in_dim
 
 
 def test_eval_once_returns_unit_interval_and_memory_helps():
