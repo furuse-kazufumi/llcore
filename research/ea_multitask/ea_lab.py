@@ -119,13 +119,17 @@ def _map_elites_core(
     archive: dict[tuple[int, ...], tuple[np.ndarray, float]] = {}
     evals = 0
 
-    # 初期 random batch (両モード共通)
+    # 初期 random batch。placement も selection_mode に従う (Codex F-High 対応:
+    # 初期ループで fitness ゲートを残すと randselect に ③ が混入し「②③だけの差」が崩れる)。
     for _ in range(min(init_batch, n_evals)):
         g = bounds[0] + (bounds[1] - bounds[0]) * rng.random(dim)
         f = eval_once(g, rng)
         evals += 1
         c = cell_of(behavior(g))
-        if c not in archive or f > archive[c][1]:
+        if selection_mode == "elite":
+            if c not in archive or f > archive[c][1]:  # ③ fitness ゲート
+                archive[c] = (g, f)
+        else:  # 'random': ③ 殺し — 初期から無条件上書き
             archive[c] = (g, f)
 
     while evals < n_evals:
