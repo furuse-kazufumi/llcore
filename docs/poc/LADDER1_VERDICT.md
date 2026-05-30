@@ -86,8 +86,9 @@ readout で解くのは、本設定 (最終状態 readout・本探索予算・he
 2. **reservoir を勾配学習 (backprop)** で per-bit 分離保持: GPU/学習フェーズ (実 LLM landscape
    測定と同じ投資判断、現時点では保留)。
 3. **Step C verdict (2) E-A = 多タスク分布** (風/天候、hold-out 汎化で③寄与、③ablation=MAP-E
-   vs MAP-E_randselect): **parity の degree-5 床に縛られない** → **最有力** (CPU 可、欺瞞性を
-   別構造で確保、③ 寄与を汎化で測れる)。
+   vs MAP-E_randselect): **parity の degree-5 床に縛られない** → **次の優先経路** (CPU 可、
+   欺瞞性を別構造で確保、③ 寄与を汎化で測れる)。**ただしこれは比較実験で優位が実証された
+   verdict ではなく、parity 経路が degree ボトルネックで詰んだことに基づく優先順位づけ**である。
 
 ## §6(g) 反証打ち切りへの含意
 
