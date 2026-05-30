@@ -208,11 +208,22 @@ def run_ea_methods_over_seeds(
     test_scores: dict[str, list[float]] = {m: [] for m in methods}
     train_scores: dict[str, list[float]] = {m: [] for m in methods}
 
-    def _honest_both(gene: np.ndarray, seed_offset: int) -> tuple[float, float]:
-        te = honest_reevaluate(eval_test, gene, n_trials=honest_n_trials,
-                               rng=np.random.default_rng(base_seed + seed_offset))
-        tr = honest_reevaluate(eval_train, gene, n_trials=honest_n_trials,
-                               rng=np.random.default_rng(base_seed + seed_offset + 100_000_000))
+    # --- seed 設計 (Codex F3 対応) ---
+    # (1) 進化 RNG は (method_idx, s) ごとに SeedSequence で一意・無相関化 (旧 base+s+{0,1,2,3} は
+    #     隣接 s でエイリアスし method 間で seed 値が再利用されていた)。method_idx 0-3 を使用。
+    # (2) honest 再評価は **同一 replicate s で全 method 共通の seed** (common random numbers)。
+    #     こうすると index s の 4 method は同一の fresh タスク draw で採点され、index s による
+    #     pairing が真の matched replicate になって paired Wilcoxon の前提を満たす。
+    def _evo_rng(method_idx: int, s: int) -> np.random.Generator:
+        return np.random.default_rng(np.random.SeedSequence([base_seed, method_idx, s]))
+
+    def _honest_both(gene: np.ndarray, s: int) -> tuple[float, float]:
+        te = honest_reevaluate(
+            eval_test, gene, n_trials=honest_n_trials,
+            rng=np.random.default_rng(np.random.SeedSequence([base_seed, 7, s])))
+        tr = honest_reevaluate(
+            eval_train, gene, n_trials=honest_n_trials,
+            rng=np.random.default_rng(np.random.SeedSequence([base_seed, 8, s])))
         return te, tr
 
     for s in range(n_seeds):
@@ -220,31 +231,31 @@ def run_ea_methods_over_seeds(
         r = map_elites_full(
             eval_train, behavior, dim=dim, bounds=bounds, behavior_bounds=behavior_bounds,
             grid_shape=grid_shape, n_evals=n_evals, init_batch=init_batch, sigma=sigma,
-            rng=np.random.default_rng(base_seed + s))
-        te, tr = _honest_both(r.best_gene, s + 10_000_000)
+            rng=_evo_rng(0, s))
+        te, tr = _honest_both(r.best_gene, s)
         test_scores["map_elites"].append(te); train_scores["map_elites"].append(tr)
 
         # --- MAP-E randselect (②③殺し①のみ) ---
         r = map_elites_randselect(
             eval_train, behavior, dim=dim, bounds=bounds, behavior_bounds=behavior_bounds,
             grid_shape=grid_shape, n_evals=n_evals, init_batch=init_batch, sigma=sigma,
-            rng=np.random.default_rng(base_seed + s + 1))
-        te, tr = _honest_both(r.best_gene, s + 20_000_000)
+            rng=_evo_rng(1, s))
+        te, tr = _honest_both(r.best_gene, s)
         test_scores["map_elites_randselect"].append(te)
         train_scores["map_elites_randselect"].append(tr)
 
         # --- panmictic GA (①③, ②なし) ---
         r = panmictic_ga(
             eval_train, dim=dim, bounds=bounds, n_evals=n_evals, pop_size=_PANMICTIC_POP,
-            tournament_k=3, sigma=sigma, elitism=1, rng=np.random.default_rng(base_seed + s + 2))
-        te, tr = _honest_both(r.best_gene, s + 30_000_000)
+            tournament_k=3, sigma=sigma, elitism=1, rng=_evo_rng(2, s))
+        te, tr = _honest_both(r.best_gene, s)
         test_scores["panmictic_ga"].append(te); train_scores["panmictic_ga"].append(tr)
 
         # --- pure random (同予算) ---
-        rrng = np.random.default_rng(base_seed + s + 3)
+        rrng = _evo_rng(3, s)
         cands = [bounds[0] + (bounds[1] - bounds[0]) * rrng.random(dim) for _ in range(n_evals)]
         best = max(cands, key=lambda g: eval_train(g, rrng))
-        te, tr = _honest_both(best, s + 40_000_000)
+        te, tr = _honest_both(best, s)
         test_scores["random"].append(te); train_scores["random"].append(tr)
 
     return {
