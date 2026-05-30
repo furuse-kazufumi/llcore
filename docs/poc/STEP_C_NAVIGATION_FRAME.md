@@ -105,8 +105,8 @@
      参照)」で航行する fitness。`reservoir.make_eval_once` に `eval_window:int` を足し、`_collect` が
      `run(...)[-1]` → `run(...)[-eval_window:]` を返す改修で実装可 (per-gene ridge は流用)。
    - **反証可能仮説**: 軌跡ベース fitness では C1 多峰性が下がり (中途半端な川も窓内で部分点 → 勾配が
-     立つ) かつ C3 で③優位が変わる (流れ持続を直接報酬化 → niching が効きやすい or 逆に hill-climb でも
-     届く)。終端のみ fitness との A/B を strict gate で比較。
+     立つ) かつ C3 で③優位が変わる (流れ持続を直接報酬化 → ニッチ化 (niching) が効きやすい or 逆に 山登り (hill-climb) でも
+     届く)。終端のみ fitness との A/B を 厳格ゲート (strict gate) で比較。
    - **honest 留保**: 窓を広げると「連続想起 (memory continuity B)」を測る別タスクに化けるので、
      窓幅は「答えが利用可能な時刻範囲」に限定し標準タスク定義を逸脱しない (地形捏造禁止 §7 と同精神)。
    - CPU med (eval_once コストは窓幅にほぼ不変、readout 評価が窓分増えるのみ)。
