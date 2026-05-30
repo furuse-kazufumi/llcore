@@ -140,7 +140,9 @@ positive bias (③実在に寄せたい誘惑) を排し、C3 不成立を素直
 
 5. **(e) ③ ablation は MAP-E vs random/RR/GA であり、より clean な MAP-E_randselect は未実施**: 本 verdict の③分離は MAP-E vs {random / RR-hillclimb / panmictic-GA} だが、navigation frame §7e が指す **MAP-E vs MAP-E_randselect** (archive-elite 選択を fresh random gene 引きに置換=②③を殺し①変異のみ残す) の方が③の最も clean な分離。後続実験の標準 ablation に採用予定 (本件では未走)。
 
-6. **(f) 結論は『③は無力』でなく『この基質・タスク帯で出番無し』**: delayed_parity は基質が床 (confounded)、flip_flop は too-easy (③不要)、delayed_recall は滑らか。**③が効く欺瞞かつ航行可能な regime がこの基質の標準記憶タスク帯に現れなかった**だけであり、③ そのものの一般的無力を主張しない (手順4 で③の存在証明は済んでいる)。strict gate の min_effect=0.147 は Cliff's delta small-effect 境界を実務 cutoff として **流用** したもので、本統計 (paired_sign_delta) は教科書的 Cliff's delta ではない (意味づけを曖昧にしない)。
+6. **(f) 結論は『③は無力』でなく『この基質・タスク帯で③の有無を測れなかった (非診断)』**: delayed_parity は基質が床 (confounded)、flip_flop は天井 (ceiling, confounded)、delayed_recall は滑らか。**③の有無を有効分離できる欺瞞かつ航行可能な regime がこの基質の標準記憶タスク帯に現れなかった**だけであり、③ そのものの一般的無力を主張しない (手順4 で③の存在証明は済んでいる)。strict gate の min_effect=0.147 は Cliff's delta small-effect 境界を実務 cutoff として **流用** したもので、本統計 (paired_sign_delta) は教科書的 Cliff's delta ではない (意味づけを曖昧にしない)。
+
+7. **(g) 反証条件 (無限後退を 1 段で止める打ち切り基準)**: 留保 (a)(f) と §7-1 の「結合 reservoir で parity が解けて初めて③の clean テスト可能」は、放置すれば本 negative を「基質が貧しかっただけ」で吸収し③検定を次基質へ無限後退させる (navigation frame §7e が警戒する反証不能の罠)。これを止めるため、navigation frame §7e の事前登録 negative を継承して **先約束する**: 「**結合 reservoir (parity の床を上げる) + lexicase baseline (wrong-tool 排除) + 軌跡 fitness (BD アライメント是正) を全部入れてもなお C3 が strict gate を不通過 (全条件で d<0.2) なら、③ は本 landscape パラダイムでは非 load-bearing と確定する**」。この 3 点を満たした基質で③が立たなければ、それ以上「適切な基質ならいつか③が立つ」とは主張しない (= 反証可能性の担保)。
 
 ---
 
