@@ -3,35 +3,36 @@
 > 自動生成: `libexec/raptor-auto-summary` (Stop hook)
 > 次回 ccr 起動時に CLAUDE.md SESSION START で自動的に読み取られる。
 
-- **最終更新**: 2026-05-30 15:32:40
+- **最終更新**: 2026-05-30 15:42:06
 - **プロジェクト**: `D:/projects/llcore`
 - **ブランチ**: `main`
 
 ## 直近の git log
 
 ```
-30e09db docs(step-c): 環境豊穣化テーゼの反証可能化を統合 (wkackrdhl, §7e)
-c1f5d32 auto: STEP_C_NAVIGATION_FRAME.md 編集前 (2026-05-30 15:28)
-56c1920 docs(step-c): frame doc readability 3層化 — かみ砕いた説明+用語集+日本語(英語)
-63a283d auto: STEP_C_NAVIGATION_FRAME.md 編集前 (2026-05-30 14:52)
-54f5e74 auto: STEP_C_NAVIGATION_FRAME.md 編集前 (2026-05-30 14:45)
-47f37f0 auto: STEP_C_NAVIGATION_FRAME.md 編集前 (2026-05-30 14:45)
-c26fec3 auto: STEP_C_NAVIGATION_FRAME.md 編集前 (2026-05-30 14:45)
-fbe9c37 auto: STEP_C_NAVIGATION_FRAME.md 編集前 (2026-05-30 14:45)
-fe2efa9 auto: STEP_C_NAVIGATION_FRAME.md 編集前 (2026-05-30 14:45)
-1bae123 auto: STEP_C_NAVIGATION_FRAME.md 編集前 (2026-05-30 14:44)
+81eec9d auto: STEP_C_VERDICT.md 編集前 (2026-05-30 15:41)
+25d785e auto: STEP_C_VERDICT.md 編集前 (2026-05-30 15:41)
+1a9bdd5 auto: STEP_C_VERDICT.md 編集前 (2026-05-30 15:40)
+6913581 auto: STEP_C_VERDICT.md 編集前 (2026-05-30 15:40)
+b9b1fc8 auto: STEP_C_VERDICT.md 編集前 (2026-05-30 15:40)
+eb020fd auto: STEP_C_VERDICT.md 編集前 (2026-05-30 15:40)
+4413ec0 auto: STEP_C_VERDICT.md 編集前 (2026-05-30 15:39)
+e2ffcab auto: STEP_C_VERDICT.md 編集前 (2026-05-30 15:39)
+596f7e4 auto: STEP_C_VERDICT.md 編集前 (2026-05-30 15:38)
+954d1af auto: STEP_C_VERDICT.md 編集前 (2026-05-30 15:38)
 ```
 
 ## 現在の git status
 
 ```
-M docs/SESSION_SUMMARY.md
+M docs/poc/STEP_C_VERDICT.md
 ```
 
 ## 直近 2 時間に変更されたファイル
 
 ```
-15:29 docs/SESSION_SUMMARY.md
+15:41 docs/poc/STEP_C_VERDICT.md
+15:32 docs/SESSION_SUMMARY.md
 15:28 docs/poc/STEP_C_NAVIGATION_FRAME.md
 15:28 research/step_c_memory_tasks/exp_c2c3_results.json
 14:11 research/step_c_memory_tasks/exp_c2c3_compare.py
