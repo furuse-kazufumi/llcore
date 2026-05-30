@@ -32,8 +32,8 @@ for _stream in (sys.stdout, sys.stderr):
 
 _HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(_HERE))
-sys.path.insert(0, str(_HERE.parents[1] / "step_c_memory_tasks"))
-sys.path.insert(0, str(_HERE.parents[1] / "src"))
+sys.path.insert(0, str(_HERE.parents[0] / "step_c_memory_tasks"))  # research/step_c_memory_tasks
+sys.path.insert(0, str(_HERE.parents[1] / "src"))  # llcore/src
 
 from ea_lab import map_elites_full  # noqa: E402
 from llcore.evolution.honest_eval import honest_reevaluate  # noqa: E402
