@@ -102,3 +102,30 @@ AURORA-XCon=Coiffard 2025) し、gem-critic で premise まで監査した結果
   → verdict の framing = 「**CPU が機構(conditional)を立証 / GPU は前提(実 LLM 地形が欺瞞的か)を試す**」。
   P1-P4+軌跡 fitness は全て CPU で**機構(a)を厚くする** = 「出来る範囲」に合致。`feedback_benchmark_honest_disclosure` 準拠で
   transfer を unfalsifiable bridge にしない (機構と前提を必ず分離記載)。
+
+## 7. ④過剰繁殖 と生態系 (ユーザー 2026-05-30: 「④もGPUでないと厳しい、捕食者・食料の概念まで要る」)
+
+### 7a. ④空転の診断 (なぜ現 setup で ④ が働かないか)
+- Darwin の④ (over-reproduction) = **有限資源下で生存可能数を超える個体が生まれる** → 競争 → ③(選択)が意味を持つ (Malthus→Darwin)。
+- 現 Step C (MAP-Elites/GA, **固定 pop_size=20 / 固定 n_evals=2000**) は**固定予算の選択**であって**過剰繁殖×資源希少が無い**。
+  → 選択はあるが「淘汰の圧」が外生的に与えた予算配分にすぎない = **④ 空転** (監査 EVOLUTION_SOUNDNESS_AUDIT の「③④空転」と一致する根本原因)。
+- つまり ③ が空転して見えたのは、**④ (過剰繁殖→希少→密度依存選択) が構造的に不在**で選択圧が内生的に生まれていないから、とも読める。
+
+### 7b. 捕食者・食料 の machinery 写像
+- **食料/資源 = 密度依存選択 (density-dependent selection) / carrying capacity**。有限食料が pop を律速 → 過剰繁殖が希少に出会う → 選択が内生化。logistic 成長 / Lotka-Volterra。
+- **捕食者 = 共進化/赤の女王 (Van Valen 1973) の移動する選択標的**。動的選択圧 = 環境複雑性テーゼ「新ニッチを生み続ける環境」(wkackrdhl が裏取り中)。
+- 合わせて = **内生的・動的選択圧を自己生成する生態系** → ④③ が空転をやめる。古典 ALife: Tierra (Ray 1991) / Avida (Adami&Ofria) / PolyWorld (Yaeger 1994)。
+
+### 7c. CPU→GPU 分解 (§6e と同型、④ にも適用)
+- **(a) 機構**: 「有限資源+過剰繁殖 → 密度依存選択が生まれ ③ が働く」「捕食者共進化 → 動的選択圧」。
+  → **CPU の toy ecology (agent-based, 有限資源, 変動 pop) でプロトタイプ可能**。古典 ALife は modest hardware で動いた = 機構は GPU 非依存。
+- **(b) スケール/現実性**: 大集団・実 LLM agent・豊かな per-agent 計算 → GPU。
+- **honest 帰結**: ユーザー「④もGPUでないと厳しい」は**スケール/現実性については正しい**が、**機構(a) は CPU で立証可能**。
+  → 「出来る範囲の CPU 原理検証」に **④ toy ecology**(「資源希少が選択圧を生み ③ を非空転化するか」の最小検証)を含められる。
+  ただし現 Step C の固定予算 GA からは構造改修 (資源動態+変動 pop) が要り、③ の landscape 改修より大きい変更 = 段階を踏む。
+
+### 7d. 統合 (③ landscape 航行 と ④ 生態系 の関係)
+- §1-6 (③/navigation) は「**与えられた landscape をどう航行するか**」、§7 (④/ecology) は「**そもそも選択圧をどう内生させるか**」。
+- 監査の「③④空転」= landscape が平坦(③側の問題) **かつ** 過剰繁殖×資源希少が不在(④側の問題) の二重欠如。
+- environment-complexity workflow (wkackrdhl, 反証ガード付き) が Red Queen/niche construction/POET を裏取り中 → **完了時に「CPU toy ecology で ④ を非空転化する最小実験」を design 出力**へ統合する。
+  反証可能形 (unfalsifiable 回避): 「有限資源+変動 pop を入れると、固定予算 baseline より ③ の load-bearing 度(MAP-E−random の δ)が有意に上がる」を strict gate で検定。上がらなければ「④ 生態系も Step C 課題では不要」と negative 決着。
