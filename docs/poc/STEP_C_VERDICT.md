@@ -150,7 +150,7 @@ positive bias (③実在に寄せたい誘惑) を排し、C3 不成立を素直
 
 撤退は「③ 路線の打ち止め」ではなく「この基質・タスク帯では出番無し」の決着なので、confound を潰す次の安価な CPU 実験が続く。
 
-1. **梯子・段1 (多細胞 = 結合 reservoir)** — 留保 (a) を潰す最優先。単一 reservoir が parity を解けない (床) のが confound なので、**結合 reservoir で delayed_parity が解けるか** (基質の床を上げられるか) を測る。解けて初めて parity 上で③の clean なテストが可能になる。CPU 安価。
+1. **梯子・段1 (多細胞 = 結合 reservoir + lexicase baseline)** — 留保 (a)(d)(g) を潰す最優先。単一 reservoir が parity を解けない (床) のが confound なので、**結合 reservoir で delayed_parity が解けるか** (基質の床を上げられるか) を測る。解けて初めて parity 上で③の clean なテストが可能になる。同時に **lexicase baseline を追加して wrong-tool (QD=次善) 交絡を排除**する。これは §6(g) の反証条件の前半 2 点であり、本実験を「基質が貧しかっただけ」で無限後退させないための打ち切り装置でもある (床を上げ wrong-tool を外してもなお③が立たなければ確定 negative)。CPU 安価。
 2. **E-A (多タスク分布)** — navigation frame §7e。単一固定タスクを window/seq_len/型混合の記憶タスク **分布** に拡張し、hold-out window への **汎化** で③寄与が出るか。flip_flop の too-easy (固定タスクは一発勝負で滑らかになりやすい) を分布化で崩す。前提3点 (難度の分布形状一致 / pseudo-multimodality 常時併走 / hold-out は外挿) を事前登録。CPU 安価。
 3. **GPU (前段検定後)** — 上記 CPU 機構実験で③の load-bearing 条件を厚くした上で、**実 LLM fitness 地形が欺瞞構造を実際に持つか** (前提 b) を試す。これは CPU では立証不能な経験的問であり、GPU 投資は本 verdict ではなく機構検証の進捗に条件づける。
 
