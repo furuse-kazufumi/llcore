@@ -100,7 +100,7 @@ def p2_easy_no_selection() -> bool:
         )
         print(
             f"  n_train={n_train:2d}: GA={r.ga_mean:.4f} RAND={r.random_mean:.4f} diff={r.diff:+.4f} "
-            f"win={r.win_rate:.2f} p={r.wilcoxon_p:.4g} delta={r.cliff_delta:+.2f} passes={r.passes}"
+            f"win={r.win_rate:.2f} p={r.wilcoxon_p:.4g} delta={r.paired_sign_delta:+.2f} passes={r.passes}"
         )
         results.append(r)
     # 全ノイズ水準で「進化成立」の合格条件 (passes) は立たない = ③ 未証明
