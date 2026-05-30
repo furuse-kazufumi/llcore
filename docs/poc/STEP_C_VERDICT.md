@@ -112,14 +112,15 @@ C1: any_multimodal?
         C3: 多峰タスクのいずれかで MAP-E が 3 baseline 全てに strict gate 勝利?
         ├─ Yes → 【③ 実在・load-bearing】 … 該当せず
         │
-        └─ No  ← 本件 (両タスク c3_all_pass=False / 全 baseline passes=False)
-              → 【③ 路線 CPU 撤退】
-                 多峰でも③は hill-climbing から分離できず load-bearing でない。
+        └─ N/A ← 本件 (両タスク c3_all_pass=False だが C3 自体が床/天井で confounded=非診断)
+              → 【③ 路線 CPU 撤退 (= 本基質では分離不能の決着)】
+                 多峰でも③を hill-climbing から **分離できなかった** (Yes/No いずれも未達=N/A)。
+                 これは「③不要」の証明ではなく「本基質では③検定が成立しなかった」決着。
                  negative result を「失敗でなく決着」として verdict 化
                  (STEP_C_DESIGN §2「撤退の条件: ... or C3 不成立」)。
 ```
 
-- **C3 ✗ (両タスク)** → ③ 実在の条件 (C1-C4 全成立) を満たさない = **撤退**。特に delayed_parity / flip_flop とも RR-hillclimb に strict gate で勝てない (passes=False) = ③ を hill-climbing から分離できていない (手順4 §7b の教訓に準拠)。
+- **C3 ✗ (両タスク)** → ③ 実在の条件 (C1-C4 全成立) を満たさない = **撤退**。ただし delayed_parity / flip_flop とも C3 が confounded (床/天井) のため、これは③不要の積極的判定ではなく **分離不能 (N/A)**。「RR-hillclimb に勝てない=③を hill-climbing から分離できていない」は **QD≈baseline の観測であって、QD=③ を暗黙等置してはならない** — Boldi/Ding/Spector 2023 (arXiv:2311.02283「Objectives Are All You Need」) により欺瞞では lexicase>QD=wrong-tool であり、QD≈baseline は「③無力」でなく「QD が次善 (wrong-tool)」を意味しうる。**lexicase baseline を前提検定していない**まま「③ を hill-climbing から分離できていない」と読むと、引用一次情報と矛盾する (navigation frame §6a: lexicase baseline で前提検定すべき)。wrong-tool 交絡は未排除のまま残る (§6d 参照)。
 - **C4 は MAP-E 非勝利のため moot** — 勝因帰属は MAP-E が勝った場合にのみ意味を持つ。本件は C3 で既に撤退が確定するため C4 は結論を左右しない。
 - **GPU 投資は本 verdict では判断しない** (STEP_C_DESIGN §2)。撤退の根拠は「GPU = 実 LLM 損失地形の欺瞞性を測る賭け」に限定される前段となる。
 
