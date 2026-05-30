@@ -42,7 +42,7 @@ window=5) を解けない = **基質の床** (Minsky-Papert、全 method held-ou
 |---|---|---|---|---|
 | parallel_gated (乗法結合) | 0.012 | 0.130 | reservoir表現力 | 積項はノイズ。substrate が clean な per-bit 表現を持たず h^i⊙h^j が a·b を復元しない。データ飢餓仮説は n_train=400 でも棄却 |
 | quadratic_readout (明示2次) | 0.055 | 0.130 | readout | **degree-2 は 2-bit XOR のみ**。理想 per-bit positive control (`exp_quad_positive_control.py`, raw held-out R²) で **window=2→R²=+1.0000 / window=3→−0.064 / window=4→−0.052 / window=5→−0.086** = degree-2 readout は degree-2 単項式のみ可解、degree≥3 は不能を実証 |
-| evolved_search (進化) | 0.018 | 0.045 | reservoir表現力 | **探索不足でなく表現力限界**。3L-random の見かけ 0.135 は elitism+lucky-draw の水増し、honest 再評価で崩れ baseline 以下 |
+| evolved_search (進化) | 0.018 (3L-evolved honest) | 0.045 (1L-8) | reservoir表現力 | **探索不足でなく表現力限界**。3L-evolved の fresh-seed honest 再評価天井 0.018 が baseline (1L-8 random max 0.045) 以下 = 探索強化は無効。3L-random の見かけ天井 0.135 は random search の **単一 eval-seed への lucky-draw (selection-on-noise)** で別物 (elitism ではない、random に elite 持越しは無い) |
 | wide_single (幅) | 0.045 | 0.045 | readout | 幅 8→64 で悪化。床は readout 側 (Minsky-Papert)、幅では超えられない |
 | hybrid_max (全部入り) | 0.282 | 0.075 | reservoir表現力 | 最大表現力でも未解決。**quad入り全構成は clip前 raw R² 負** (2次特徴は分散のみ増)。clip後の小正値は lucky-seed 探索分散で解でない |
 
