@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" font-family="sans-serif" role="img" aria-label="だまし地形と進化">
-  <rect width="720" height="360" fill="#0f1420"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 380" font-family="sans-serif" role="img" aria-label="だまし地形と進化">
+  <rect width="720" height="380" fill="#0f1420"/>
   <text x="360" y="30" fill="#e8eef7" font-size="19" text-anchor="middle" font-weight="bold">だまし地形と進化（いいものを選んで残す）</text>
   <!-- 地形 -->
   <path d="M40,310 L40,260 Q140,150 240,130 Q310,150 380,210 Q470,120 560,88 Q640,110 680,150 L680,310 Z"
