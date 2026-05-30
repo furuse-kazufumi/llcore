@@ -3,9 +3,17 @@
 """C4: MAP-E の勝因が coverage でなく archive ratchet か (init_batch を変えて確認).
 
 C1 で多峰だったタスク (delayed_parity / flip_flop) で init_batch を 30/200/1000 と
-変えて honest 再評価到達を比較する。小 init_batch でも到達するなら勝因は archive
-ratchet (= ③ の差し survival 経由)、大 init_batch でしか到達しないなら単なる
-初期 coverage 由来。
+変えて honest 再評価到達を比較する。
+
+CONFOUND (Codex pair-review BLOCKER 2026-05-30): n_evals 固定のため init_batch を
+増やすと ratchet 段数 (= n_evals - init_batch) が同時に減る。init_batch=1000 は
+「random coverage 重・ratchet 軽 (1000 段)」、init_batch=30 は「ratchet 重 (1970 段)」
+の対比。よって「小 init_batch=ratchet 由来 / 大=coverage 由来」と単純帰属はできない
+(初期 coverage と ratchet 段数を分離した識別ではない)。
+
+honest な読み方 (方向性のみ): init_batch=1000 は coverage が最も厚い (random 1000 点)
+にもかかわらず到達が低いなら、その差分は ratchet 段数の寄与に帰属できる (coverage の
+不足では説明不能)。逆に init_batch=1000 が 30 と同等以上なら ratchet の追加寄与は小さい。
 """
 from __future__ import annotations
 
