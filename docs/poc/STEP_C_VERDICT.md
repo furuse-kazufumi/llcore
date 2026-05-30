@@ -80,7 +80,14 @@ C1 で多峰が出た delayed_parity / flip_flop に対してのみ測定 (`exp_
 
 ### 3.3 C4 — 勝因は探索量でなく diversity 維持か
 
-`exp_c4_ablation` は flip_flop 完了時点で未完。ただし **C3 が両タスク✗ = MAP-E が勝っていない**ため、C4 (= 勝因帰属の ablation) は **moot / N/A**。勝因を問う前提 (MAP-E が勝っている) が成立しないので、C4 は結論に寄与しない。
+`exp_c4_ablation` **完走** (init_batch 30/200/1000 × 2 タスク)。結果は **両タスクとも init_batch 不変**:
+
+| task | init_batch=30 | 200 | 1000 |
+|---|---|---|---|
+| delayed_parity | 0.0036 | 0.0015 | 0.0023 (全て床 ≈0) |
+| flip_flop | 0.9472 | 0.9492 | 0.9482 (全て天井 ≈0.95) |
+
+**C3 が両タスク✗ = MAP-E が勝っていない**ため、C4 (= 勝因帰属の ablation) は **moot / N/A**。勝因を問う前提 (MAP-E が勝っている) が成立しない。さらに init_batch を変えても結果が動かない (床/天井で固定) ことは「**archive-ratchet の勝因シグナルが存在しない**」ことの実測裏付けであり、moot 判定と整合する (coverage か ratchet かを論じる以前に、勝敗が床/天井で潰れている)。
 
 ---
 
