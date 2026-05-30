@@ -268,6 +268,83 @@ class HybridMaxReservoir:
             return _quadratic_expand(base, pair_cap=self.pair_cap)
         return base
 
+    def _run_branch_batch(self, gene: np.ndarray, branch: int, inputs: np.ndarray):
+        """1 枝の K 層ダイナミクスを **バッチ B 本同時に** 流す (features_batch 用の高速版).
+
+        ``_run_branch`` と数値的に等価だが、B 本の sequence を 1 つの時間ループで処理する
+        (Python ループは時間 T のみ、枝・層・バッチは numpy ベクトル化)。
+
+        Parameters
+        ----------
+        inputs : np.ndarray
+            shape (B, T, in_dim) のバッチ入力。
+
+        Returns
+        -------
+        all_last : np.ndarray
+            shape (B, taps_per_branch) — 全層の最終状態を層順 concat。
+        top_last : np.ndarray
+            shape (B, layer_taps[-1]) — 最上層の最終状態 (ゲート用)。
+        """
+        B = inputs.shape[0]
+        T = inputs.shape[1]
+        leaks: list[np.ndarray] = []
+        w_ins: list[np.ndarray] = []
+        hs: list[np.ndarray] = []
+        for n_k, d_k, leak_slice, w_slice in self._branch_slices(branch):
+            leaks.append(_sigmoid(gene[leak_slice]))          # (n_k,)
+            w_ins.append(gene[w_slice].reshape(n_k, d_k))      # (n_k, d_k)
+            hs.append(np.zeros((B, n_k), dtype=np.float64))    # (B, n_k)
+
+        for t in range(T):
+            u = inputs[:, t, :]  # (B, in_dim)
+            for k in range(self.n_layers):
+                drive = u @ w_ins[k].T                         # (B, n_k)
+                hs[k] = (1.0 - leaks[k]) * hs[k] + leaks[k] * np.tanh(drive + hs[k])
+                u = hs[k]
+        all_last = np.concatenate(hs, axis=1)  # (B, taps_per_branch)
+        top_last = hs[-1]                        # (B, layer_taps[-1])
+        return all_last, top_last
+
+    def features_batch(self, gene: np.ndarray, inputs: np.ndarray) -> np.ndarray:
+        """B 本の sequence をまとめて流し readout 特徴行列を返す (features の batch 版).
+
+        単一 ``features`` と数値的に等価 (row-wise)。collect ループの Python オーバヘッドを
+        消すための高速路。``features(gene, inputs[i])`` を縦に積んだものに一致する。
+
+        Parameters
+        ----------
+        inputs : np.ndarray
+            shape (B, T, in_dim)。
+
+        Returns
+        -------
+        feats : np.ndarray
+            shape (B, feature_dim)。finite 保証。
+        """
+        gene = np.asarray(gene, dtype=np.float64)
+        inputs = np.asarray(inputs, dtype=np.float64)
+        if inputs.ndim != 3:
+            raise ValueError(f"inputs must be (B, T, in_dim), got {inputs.shape}")
+
+        a_all, a_top = self._run_branch_batch(gene, 0, inputs)
+        b_all, b_top = self._run_branch_batch(gene, 1, inputs)
+
+        parts = [a_all, b_all]
+        if self.use_gate:
+            parts.append(a_top * b_top)
+        base = np.concatenate(parts, axis=1)  # (B, base_dim)
+
+        if not self.use_quadratic:
+            return base
+        # quadratic 展開を batch でベクトル化 ([base, base^2, 先頭 pair_cap の上三角ペア積])。
+        out_parts = [base, base * base]
+        m = min(base.shape[1], self.pair_cap)
+        if m >= 2:
+            iu, ju = np.triu_indices(m, k=1)
+            out_parts.append(base[:, iu] * base[:, ju])
+        return np.concatenate(out_parts, axis=1)
+
     def random_gene(self, rng: np.random.Generator) -> np.ndarray:
         """gene_bounds の範囲で一様乱数 gene を生成する."""
         lo, hi = gene_bounds(self)
