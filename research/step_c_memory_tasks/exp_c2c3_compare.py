@@ -26,6 +26,14 @@ from pathlib import Path
 
 import numpy as np
 
+# Windows cp932 console で R²/τ/日本語 を出力するため UTF-8 へ reconfigure
+# (memory: feedback_cli_utf8_stdout_pattern。tee/pipe 経由でも UTF-8 byte を吐く)
+try:
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
+except Exception:
+    pass
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "step4_selection"))
 
 from memory_tasks import DelayedParityTask, FlipFlopTask
