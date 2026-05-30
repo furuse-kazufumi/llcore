@@ -15,7 +15,7 @@
 - :func:`honest_reevaluate` — gene を進化と独立な fresh rng で n_trials 回平均 (水増し排除)
 - :func:`equal_budget` — evolve() の fitness 呼出回数 (= random search の標本数)
 - :func:`evolution_vs_random` — 多 seed で 進化 vs 同予算 random を公正比較し統計量を返す
-- :class:`FalsificationResult` — 比較結果 (diff / win_rate / wilcoxon_p / cliff_delta / passes)
+- :class:`FalsificationResult` — 比較結果 (diff / win_rate / wilcoxon_p / paired_sign_delta / passes)
 
 semver: 新規追加のみ。既存シンボル不変。
 """
