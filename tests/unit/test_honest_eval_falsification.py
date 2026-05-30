@@ -102,7 +102,84 @@ def test_result_fields_consistent() -> None:
         honest_n_trials=1, base_seed=42,
     )
     assert r.n_seeds == 12
-    assert -1.0 <= r.cliff_delta <= 1.0
+    assert -1.0 <= r.paired_sign_delta <= 1.0
     assert 0.0 <= r.win_rate <= 1.0
     assert 0.0 <= r.wilcoxon_p <= 1.0
     assert abs(r.diff - (r.ga_mean - r.random_mean)) < 1e-12
+
+
+# ---------------------------------------------------------------------------
+# Codex pair-review (2026-05-30) 由来の契約・公平性回帰テスト
+# ---------------------------------------------------------------------------
+
+
+def test_budget_fairness_eval_count_matches_equal_budget() -> None:
+    """[予算公平性 regression / Codex Q4] evolve() の eval_once 呼出回数 = equal_budget.
+
+    elite が再評価されず、random search と同じ評価予算で比較されることを実数で固定する。
+    """
+    from llcore.evolution.minimal_ga import evolve
+
+    calls = {"n": 0}
+
+    def _counting(gene, rng) -> float:
+        calls["n"] += 1
+        return _unimodal(gene, rng)
+
+    pop_size, n_gen, elitism = 10, 10, 1
+    evolve(
+        _counting, pop_size=pop_size, n_generations=n_gen, elitism=elitism,
+        rng=np.random.default_rng(0),
+    )
+    assert calls["n"] == equal_budget(pop_size, n_gen, elitism), (
+        f"eval 回数 {calls['n']} != equal_budget {equal_budget(pop_size, n_gen, elitism)}"
+    )
+
+
+def test_passes_requires_min_seeds() -> None:
+    """[Codex Q1/Q8] 構造のある landscape でも n_seeds<min_seeds なら passes=False.
+
+    監査 §5 の「≥15 seed」を passes が強制することを確認 (少 seed で「進化成立」と認めない)。
+    """
+    r = evolution_vs_random(
+        _unimodal, pop_size=10, n_generations=10, n_seeds=5,
+        honest_n_trials=1, base_seed=20260530,
+    )
+    assert r.diff > 0.0  # 効果自体は出る
+    assert not r.passes  # だが seed 不足で合格させない
+    assert r.n_seeds == 5
+
+
+def test_passes_requires_non_negligible_effect() -> None:
+    """[Codex Q1] |paired_sign_delta| が min_effect 未満なら passes=False (効果量ゲート)."""
+    # min_effect を 1.0 超に上げると、δ<=1.0 は必ず非合格になる。
+    r = evolution_vs_random(
+        _unimodal, pop_size=10, n_generations=10, n_seeds=15,
+        honest_n_trials=1, base_seed=20260530, min_effect=1.0001,
+    )
+    assert not r.passes
+
+
+def test_equal_budget_rejects_invalid_elitism() -> None:
+    """[Codex Q8] 負 / pop_size 超の elitism は ValueError (契約境界)."""
+    import pytest
+
+    with pytest.raises(ValueError):
+        equal_budget(10, 10, -1)
+    with pytest.raises(ValueError):
+        equal_budget(10, 10, 11)
+
+
+def test_paired_p_is_one_sided() -> None:
+    """[Codex Q3] p 値が片側 (進化優位方向) であることを符号検定経路で確認.
+
+    全 seed で ga>rand なら片側 p = 0.5**n。両側ならその 2 倍になるので片側性を弁別できる。
+    """
+    from llcore.evolution.honest_eval import _paired_p, _sign_test_p_greater
+
+    ga = np.array([1.0, 1.0, 1.0, 1.0, 1.0])
+    rand = np.array([0.0, 0.0, 0.0, 0.0, 0.0])
+    # 片側符号検定: 全勝 (wins=5) → P(X>=5)=0.5**5=0.03125
+    assert abs(_sign_test_p_greater(ga - rand) - 0.5 ** 5) < 1e-12
+    # _paired_p も片側 (scipy 有無に依らず 0.05 未満で有意)
+    assert _paired_p(ga, rand) < 0.05
