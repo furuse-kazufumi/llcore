@@ -50,7 +50,8 @@ CONFIGS = [
     ("3L-8x8x8", (8, 8, 8)),
 ]
 N_RANDOM = 400      # random search 1 seed あたりの gene 本数 (到達天井の推定)
-N_SEEDS = 10        # paired 比較用 seed 数 (strict_compare min_seeds=15 は最終③で、ここは天井推定)
+N_SEEDS = 15        # strict_compare の min_seeds=15 と一致させ、判定の機械的 False を排除
+assert N_SEEDS >= 15, "strict_compare の min_seeds=15 を満たすため N_SEEDS>=15 が必要"
 GENE_BASE = 700_001
 EVAL_BASE = 900_001
 OUT_JSON = _HERE / "exp_l1_results.json"
