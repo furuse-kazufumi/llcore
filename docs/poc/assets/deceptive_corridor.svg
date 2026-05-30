@@ -29,9 +29,9 @@
     <animate attributeName="cy" dur="9s" repeatCount="indefinite"
       values="138;138;112;196;108;96;96;138" keyTimes="0;0.38;0.48;0.58;0.68;0.78;0.95;1"/>
   </circle>
-  <!-- 凡例 -->
-  <circle cx="52" cy="338" r="7" fill="#ff6b6b"/>
-  <text x="66" y="343" fill="#ff9a9a" font-size="13">ふつうの山登り（今より高い方へ歩くだけ）→ ニセの頂上で止まる</text>
-  <circle cx="402" cy="338" r="7" fill="#5ad18a"/>
-  <text x="416" y="343" fill="#7ee0a8" font-size="13">進化（③）→ 谷をとび石で渡って本物の頂上へ</text>
+  <!-- 凡例 (2行に分けて重なり回避) -->
+  <circle cx="54" cy="338" r="7" fill="#ff6b6b"/>
+  <text x="68" y="343" fill="#ff9a9a" font-size="13">ふつうの山登り → ニセの頂上で止まる</text>
+  <circle cx="54" cy="362" r="7" fill="#5ad18a"/>
+  <text x="68" y="367" fill="#7ee0a8" font-size="13">進化（③）→ 谷をとび石で渡って本物の頂上へ</text>
 </svg>
