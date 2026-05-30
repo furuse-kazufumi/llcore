@@ -21,6 +21,10 @@ class DelayedParityTask:
     in_dim: int = 1
     out_dim: int = 1
 
+    def __post_init__(self) -> None:
+        if self.window > self.seq_len:
+            raise ValueError(f"window={self.window} exceeds seq_len={self.seq_len}")
+
     def generate(self, rng: np.random.Generator) -> tuple[np.ndarray, np.ndarray]:
         bits = rng.choice([-1.0, 1.0], size=self.seq_len)
         inputs = bits.reshape(self.seq_len, 1)
