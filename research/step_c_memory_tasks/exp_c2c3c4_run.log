@@ -29,3 +29,14 @@
 結果を保存: D:\projects\llcore\research\step_c_memory_tasks\exp_c2c3_results.json
 === exp_c2c3 done (exit=0) ===
 === exp_c4 start ===
+
+[delayed_parity]
+  init_batch=30: mean honest R²=0.0036
+  init_batch=200: mean honest R²=0.0015
+  init_batch=1000: mean honest R²=0.0023
+
+[flip_flop]
+  init_batch=30: mean honest R²=0.9472
+  init_batch=200: mean honest R²=0.9492
+  init_batch=1000: mean honest R²=0.9482
+=== exp_c4 done (exit=0) ===
