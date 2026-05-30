@@ -26,6 +26,7 @@ for _stream in (sys.stdout, sys.stderr):
 
 _HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(_HERE))
+sys.path.insert(0, str(_HERE / "candidates"))                     # research/ea_multitask/candidates
 sys.path.insert(0, str(_HERE.parents[0] / "step_c_memory_tasks"))  # research/step_c_memory_tasks
 sys.path.insert(0, str(_HERE.parents[0] / "step4_selection"))      # research/step4_selection
 sys.path.insert(0, str(_HERE.parents[1] / "src"))                  # llcore/src
@@ -33,7 +34,6 @@ sys.path.insert(0, str(_HERE.parents[1] / "src"))                  # llcore/src
 import numpy as np  # noqa: E402
 
 from ea_lab import run_ea_methods_over_seeds  # noqa: E402
-from memory_tasks import FlipFlopTask  # noqa: E402
 from reservoir import (  # noqa: E402
     LeakyDelayLineReservoir,
     gene_bounds,
@@ -42,14 +42,17 @@ from reservoir import (  # noqa: E402
 )
 from strict_compare import strict_compare  # noqa: E402
 from task_mixture import TaskMixture, split_regimes  # noqa: E402
+from variable_delay_recall import VariableDelayRecallTask  # noqa: E402
 
-# --- config (exp_ea1 診断で調整) ---
+# --- config (exp_ea1 診断 + ③検定土俵探索 workflow で確定) ---
+# 勝者分布 = variable_delay_recall (medium 難易度 + 正の汎化ギャップ + niche 構造、敵対検証 trustworthy)。
+# FlipFlop は too-easy (全 regime ≈0.95 飽和, 汎化ギャップ負) のため不採用。
 N_TAPS = 8
 IN_DIM = 2
-SEQ_LEN = 60
-TRAIN_PP = (0.1, 0.2)   # 学習 regime (pulse_prob)
-TEST_PP = (0.3, 0.4)    # hold-out regime (extrapolation)
-N_SEEDS = 15            # strict gate 要件
+DISTRACTOR_AMP = 0.2      # 遅延区間ノイズ (診断で medium 難易度に着地した値)
+TRAIN_D = (15, 30)        # 学習 regime (遅延長 D = seq_len)
+TEST_D = (45, 60)         # hold-out regime (より長い遅延への extrapolation = 時定数外挿)
+N_SEEDS = 15              # strict gate 要件
 N_EVALS = 400
 HONEST_N = 16
 SIGMA = 0.12
@@ -58,7 +61,7 @@ GRID = (6, 6)
 
 def main() -> None:
     print("=== exp_ea3: ③ablation 本実験 (C-gen3/C-gen4) ===")
-    print(f"FlipFlop seq_len={SEQ_LEN}  train_pp={TRAIN_PP} test_pp={TEST_PP}  "
+    print(f"variable_delay_recall amp={DISTRACTOR_AMP}  train_D={TRAIN_D} test_D={TEST_D}  "
           f"n_seeds={N_SEEDS} n_evals={N_EVALS}\n", flush=True)
 
     res = LeakyDelayLineReservoir(n_taps=N_TAPS, in_dim=IN_DIM)
