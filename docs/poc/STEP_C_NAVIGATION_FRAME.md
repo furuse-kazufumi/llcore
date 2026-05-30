@@ -82,7 +82,7 @@
 ## 2. C1-C4 への含意 (verdict 解釈枠)
 
 - **C3 (MAP-E vs random) = 「川か湖の小島か」の決定的判別器**。
-  - C3 ✓ → 実記憶タスクは**自然な川**を持つ (手で corridor を作らずとも navigable) = ③実在。
+  - C3 ✓ → 実記憶タスクは**自然な川**を持つ (手で 回廊 (corridor) を作らずとも navigable) = ③実在。
   - C3 ✗ (MAP-E ≈ random) → **湖の小島** (多峰だが流れ無し、運のみ) = 精密化された撤退理由 (「多峰 ≠ 航行可能」)。
 - **C1 (遺伝子・多峰, valley_fraction) は川/湖を区別しない**。parity=1.000 (全中点が谷) は遺伝子空間では
   むしろ湖の小島寄りの兆候だが、MAP-E は behavior 空間で飛ぶため C3 が disambiguator。
