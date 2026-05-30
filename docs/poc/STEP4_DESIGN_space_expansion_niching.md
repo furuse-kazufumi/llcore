@@ -1,5 +1,7 @@
 # CPU 手順 4 設計ノート — 空間拡張 + 分離機構で ③ を立てる
 
+> **凡例 — 進化4要素 (Darwin/Mayr)**: ①変異 (variation) / ②遺伝 (heredity) / ③適者生存・選択 (selection = 適応度の差による差し survival) / ④過剰繁殖 (over-reproduction)。本書の「①」〜「④」はこの番号を指す (特に「③」= 適者生存)。平易な用語集 → [`YOUGO_平易版.md`](./YOUGO_平易版.md)。
+
 **位置づけ**: `EVOLUTION_SOUNDNESS_AUDIT_2026-05-30.md` の CPU 手順 4。手順 1 (honest_eval CI ゲート,
 commit 5ee1c13) / 手順 2 (per-gene ridge readout un-flatten, commit c578f6f) の上に立つ。
 **ステータス**: 設計 + 方向選択待ち (アーキ固定は **ユーザー steering 案件** — 複数の妥当な道があり成果に
