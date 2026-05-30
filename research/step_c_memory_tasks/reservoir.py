@@ -168,7 +168,7 @@ def make_eval_once(
         s_tr, y_tr = _collect(gene, n_train, rng)
         readout = fit_ridge_readout(s_tr, y_tr, ridge_lambda=ridge_lambda)
 
-        # held-out で R² を評価 (train と同じ rng を継続 → independent な系列)
+        # eval は train で進めた rng の続きから draw → train 列とは独立 (leakage なし)
         s_ev, y_ev = _collect(gene, n_eval, rng)
         pred = np.atleast_2d(readout(s_ev))  # (n_eval, out_dim)
         mse = float(np.mean((pred - y_ev) ** 2))
