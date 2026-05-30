@@ -74,7 +74,7 @@
 |---|---|---|---|---|
 | 記憶の宮殿 / loci (区別可能な目印) | MAP-Elites (行動空間を網羅する品質多様性探索) アーカイブ (archive) / behavior descriptor (行動記述子, BD) | method of loci | 区別可能な loci ほど物語が綴れる → richer BD で C3 が出やすい | low |
 | 飛び石の物語 (順に辿る) | 飛び石 (stepping-stone) を archive で保持し dip を跨ぐ ラチェット (ratchet) | Lehman&Stanley novelty search | 手順4 で③の勝因と実証済 | — |
-| **河川 / 有向フロー** (谷沿いに上流→下流) | 状態軌跡 h[0]→…→h[T] = **線アトラクタ (line attractor)** に乗ると記憶が運ばれる | **Sussillo&Barak 2013** (flip-flop RNN は近似線アトラクタ。spec §3 既引用) / **Howard&Kahana 2002 TCM** (記憶=ゆっくり漂う時間文脈=川) | (a) 流れの持続を BD 軸に / (b) attractor 基質では川が干上がらず valley_fraction 低下 | low/med |
+| **河川 / 有向フロー** (谷沿いに上流→下流) | 状態軌跡 h[0]→…→h[T] = **線アトラクタ (line attractor)** に乗ると記憶が運ばれる | **Sussillo&Barak 2013** (flip-flop RNN は近似線アトラクタ。spec §3 既引用) / **Howard&Kahana 2002 TCM** (記憶=ゆっくり漂う時間文脈=川) | (a) 流れの持続を BD 軸に / (b) attractor 基質では川が干上がらず 谷率 (valley_fraction) 低下 | low/med |
 | **湖の小島の山** (平原に孤立した針、流れ無し) | 平坦低 fitness 平原の孤立最適解 (needle in haystack) | deceptive/plateau landscape | **C3 = 川/湖 の判別器**。MAP-E>random=川(③実在) / MAP-E≈random=湖の小島(運のみ、③無力) | (測定中) |
 | **川・湖の幅と深さ** (スケール) | basin 幅 / barrier 深さ / **mutation sigma=0.15・grid=12×12 = 測る定規** | scale/resolution | river が sigma より細い・grid より細かいと**不可視** → 結果は scale 依存 → **sigma・grid sweep robustness**。barrier 深さ = ratchet 難度 | low |
 | **移動する太陽** (外部・時変の方位参照で平地を航行) | **BD = 方位磁石** (fitness 平坦時に behavior で航行 = QD が湖を渡れる理由) / 補助自己教師信号 / **軌跡** (終端でなく時間発展) | 補助目的 / 内発報酬 / TCM 文脈ドリフト | **軌跡ベース fitness/BD** (終端のみ評価の honest 限界を直撃) + **next-input 予測の補助"太陽"** が平坦な湖に勾配を与える | low/med |
