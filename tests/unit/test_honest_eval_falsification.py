@@ -69,7 +69,10 @@ def test_machinery_healthy_on_structured_landscape() -> None:
     assert isinstance(r, FalsificationResult)
     assert r.diff > 0.0, f"進化が random を上回らない: diff={r.diff}"
     assert r.win_rate >= 0.8, f"勝率が低い: {r.win_rate}"
-    assert r.passes, f"機構健全の合格条件 (diff>0 & p<0.05) 未達: p={r.wilcoxon_p}, δ={r.cliff_delta}"
+    assert r.passes, (
+        f"機構健全の合格条件 (diff>0 & 片側 p<0.05 & n_seeds>=15 & |δ|>=0.147) 未達: "
+        f"p={r.wilcoxon_p}, δ={r.paired_sign_delta}"
+    )
 
 
 # ---------------------------------------------------------------------------
