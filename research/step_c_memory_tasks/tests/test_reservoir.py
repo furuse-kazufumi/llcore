@@ -26,12 +26,14 @@ def test_gene_dim_matches_bounds():
     assert res.gene_dim == res.n_taps + res.n_taps * res.in_dim
 
 
-def test_eval_once_returns_unit_interval_and_memory_helps():
+def test_eval_once_returns_unit_interval():
     task = DelayedRecallTask(seq_len=15, in_dim=1)
     res = LeakyDelayLineReservoir(n_taps=8, in_dim=1)
     eval_once = make_eval_once(res, task, n_train=40, n_eval=40)
     f = eval_once(_slow_leak_gene(res), np.random.default_rng(3))
     assert 0.0 <= f <= 1.0
+    # honest observation: fast-leak でも DelayedRecall は高 R² (t=0 cue が力学系の
+    # 固定点で保持される) → このタスクは記憶を強く要求しない兆候。C1 landscape で扱う。
 
 
 def test_behavior_in_bounds():
