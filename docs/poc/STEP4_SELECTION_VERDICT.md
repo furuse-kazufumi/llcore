@@ -1,5 +1,7 @@
 # 手順 4 verdict — ③ が立つ状態を発見 (deceptive corridor + behavioral niching)
 
+> **凡例 — 進化4要素 (Darwin/Mayr)**: ①変異 (variation) / ②遺伝 (heredity) / ③適者生存・選択 (selection = 適応度の差による差し survival) / ④過剰繁殖 (over-reproduction)。本書の「①」〜「④」はこの番号を指す (特に「③」= 適者生存)。平易な用語集 → [`YOUGO_平易版.md`](./YOUGO_平易版.md)。
+
 **Goal** (ユーザー 2026-05-30): 「推奨の方法 (MAP-Elites) で進め、③ が立つという状態を探す」。
 **結論**: **③ が立つ状態を発見した (存在証明)。** ただし条件付き — load-bearing になるのは
 **欺瞞的 (deceptive) landscape** に限る。境界も特定済。
