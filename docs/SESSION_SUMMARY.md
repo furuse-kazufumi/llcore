@@ -3,50 +3,48 @@
 > 自動生成: `libexec/raptor-auto-summary` (Stop hook)
 > 次回 ccr 起動時に CLAUDE.md SESSION START で自動的に読み取られる。
 
-- **最終更新**: 2026-05-30 19:54:35
+- **最終更新**: 2026-05-30 20:52:55
 - **プロジェクト**: `D:/projects/llcore`
 - **ブランチ**: `main`
 
 ## 直近の git log
 
 ```
-b8e0c5e auto: exp_mech_evolved_search.py 編集前 (2026-05-30 18:19)
-cb0ed41 auto: exp_mech_hybrid_max.py 編集前 (2026-05-30 18:10)
-91fedab auto: exp_mech_hybrid_max.py 編集前 (2026-05-30 18:10)
-a4b5fce auto: exp_mech_hybrid_max.py 編集前 (2026-05-30 18:10)
-957fc12 auto: exp_mech_hybrid_max.py 編集前 (2026-05-30 18:10)
-1edda19 auto: exp_mech_hybrid_max.py 編集前 (2026-05-30 18:10)
-3402d5e auto: exp_mech_hybrid_max.py 編集前 (2026-05-30 18:09)
-d382bfc auto: test_mech_hybrid_max.py 編集前 (2026-05-30 18:09)
-e74ae60 auto: test_mech_hybrid_max.py 編集前 (2026-05-30 18:09)
-12b87ec auto: mech_hybrid_max.py 編集前 (2026-05-30 18:09)
+d120792 auto: exp_ea1_substrate_and_gap.py 編集前 (2026-05-30 20:50)
+79e3a29 auto: exp_ea1_substrate_and_gap.py 編集前 (2026-05-30 20:50)
+9ad8c82 research(ea): E-A ハーネス ea_lab — ③ablation + train/test 汎化 runner (Codex 修正済)
+0067f84 auto: test_ea_lab.py 編集前 (2026-05-30 20:47)
+fbccd75 auto: E_A_DESIGN_multitask_generalization.md 編集前 (2026-05-30 20:47)
+f18a8fd auto: ea_lab.py 編集前 (2026-05-30 20:46)
+ba406a6 auto: ea_lab.py 編集前 (2026-05-30 20:46)
+91fb26c auto: ea_lab.py 編集前 (2026-05-30 20:46)
+d594ca5 research(ea): E-A フェーズ kickoff — 多タスク分布設計 + TaskMixture
+757a5dd research(ladder1): VERDICT を Codex pair-review で修正 + evolved_search 結果JSON
 ```
 
 ## 現在の git status
 
 ```
-M docs/SESSION_SUMMARY.md
- D research/ladder1_multi_reservoir/exp_mech_evolved_search.out.txt
- M research/ladder1_multi_reservoir/exp_mech_evolved_search.py
-?? docs/poc/LADDER1_VERDICT.md
-?? research/ladder1_multi_reservoir/exp_mech_hybrid_max_results.json
-?? research/ladder1_multi_reservoir/exp_mech_parallel_gated_results_deepdata.json
+M research/ea_multitask/exp_ea1_substrate_and_gap.py
+?? research/ea_multitask/exp_ea3_ablation.py
 ```
 
 ## 直近 2 時間に変更されたファイル
 
 ```
-19:45 docs/SESSION_SUMMARY.md
-18:45 docs/poc/LADDER1_VERDICT.md
-18:41 .pytest_cache/v/cache/nodeids
-18:35 research/ladder1_multi_reservoir/exp_mech_parallel_gated_results_deepdata.json
-18:23 research/ladder1_multi_reservoir/exp_mech_hybrid_max_results.json
-18:19 research/ladder1_multi_reservoir/exp_mech_evolved_search.py
-18:10 research/ladder1_multi_reservoir/exp_mech_hybrid_max.py
-18:09 research/ladder1_multi_reservoir/tests/test_mech_hybrid_max.py
-18:09 research/ladder1_multi_reservoir/mech_hybrid_max.py
-18:04 research/ladder1_multi_reservoir/exp_mech_parallel_gated_results.json
-17:55 research/ladder1_multi_reservoir/exp_mech_parallel_gated.py
+20:51 research/ea_multitask/exp_ea3_ablation.py
+20:50 research/ea_multitask/exp_ea1_substrate_and_gap.py
+20:47 .pytest_cache/v/cache/nodeids
+20:47 research/ea_multitask/tests/test_ea_lab.py
+20:47 docs/poc/E_A_DESIGN_multitask_generalization.md
+20:46 research/ea_multitask/ea_lab.py
+20:40 research/ea_multitask/tests/test_task_mixture.py
+20:38 research/ea_multitask/task_mixture.py
+20:37 research/ladder1_multi_reservoir/exp_mech_evolved_search_results.json
+20:32 docs/poc/LADDER1_VERDICT.md
+20:29 research/ladder1_multi_reservoir/exp_quad_positive_control_results.json
+20:29 research/ladder1_multi_reservoir/exp_quad_positive_control.py
+19:54 docs/SESSION_SUMMARY.md
 ```
 
 ---
