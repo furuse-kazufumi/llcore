@@ -69,9 +69,10 @@ def main() -> None:
     behavior = make_behavior(res)
     dim = res.gene_dim
 
-    all_pp = tuple(sorted(set(TRAIN_PP) | set(TEST_PP)))
-    regimes = [FlipFlopTask(seq_len=SEQ_LEN, pulse_prob=pp) for pp in all_pp]
-    test_idx = [i for i, pp in enumerate(all_pp) if pp in TEST_PP]
+    all_D = tuple(sorted(set(TRAIN_D) | set(TEST_D)))
+    regimes = [VariableDelayRecallTask(seq_len=D, distractor_amp=DISTRACTOR_AMP, in_dim=IN_DIM)
+               for D in all_D]
+    test_idx = [i for i, D in enumerate(all_D) if D in TEST_D]
     train_regimes, test_regimes = split_regimes(regimes, test_idx=test_idx)
     ev_tr = make_eval_once(res, TaskMixture(train_regimes), n_train=48, n_eval=48)
     ev_te = make_eval_once(res, TaskMixture(test_regimes), n_train=48, n_eval=48)
