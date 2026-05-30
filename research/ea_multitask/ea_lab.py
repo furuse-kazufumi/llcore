@@ -104,8 +104,14 @@ def _map_elites_core(
     sigma: float,
     rng: np.random.Generator,
     selection_mode: str,
+    archive_out: dict[tuple[int, ...], tuple[np.ndarray, float]] | None = None,
 ) -> MapElitesResult:
-    """MAP-Elites 本体. selection_mode='elite' で full、'random' で ②③殺し ablation."""
+    """MAP-Elites 本体. selection_mode='elite' で full、'random' で ②③殺し ablation.
+
+    ``archive_out`` は test 専用 probe (None=production 不変)。渡すと最終 archive を共有参照で
+    受け取れる → global-best 読み出し化後も randselect の archive 占有者 (= ③無しの無条件上書き
+    結果) を直接検証できる。
+    """
     if selection_mode not in ("elite", "random"):
         raise ValueError(f"selection_mode must be 'elite'|'random', got {selection_mode!r}")
     bd_lo, bd_hi = behavior_bounds
@@ -116,7 +122,8 @@ def _map_elites_core(
         idx = np.clip((frac * grid).astype(int), 0, grid - 1)
         return tuple(int(i) for i in idx)
 
-    archive: dict[tuple[int, ...], tuple[np.ndarray, float]] = {}
+    archive: dict[tuple[int, ...], tuple[np.ndarray, float]] = (
+        archive_out if archive_out is not None else {})
     evals = 0
     # global best-of-budget (Codex F2 対応): best_gene を「最終 archive 占有者の max」でなく
     # 「予算内で評価した全個体の max-fitness」にする。randselect は無条件上書きで強個体を忘れる
