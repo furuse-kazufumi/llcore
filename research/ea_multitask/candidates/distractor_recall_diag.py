@@ -196,6 +196,7 @@ def main() -> None:
     test_mean = float(test_arr.mean())
     gap = train_mean - test_mean
     overall_difficulty = _difficulty_class(test_mean)
+    train_amps = tuple(a for a in AMPS if a not in TEST_AMPS)
 
     out = {
         "experiment": "distractor_recall diagnostic (C-gen1 ceiling + C-gen2 gap + niche)",
