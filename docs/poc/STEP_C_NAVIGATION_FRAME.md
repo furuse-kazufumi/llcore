@@ -203,6 +203,18 @@ AURORA-XCon=Coiffard 2025) し、gem-critic で premise まで監査した結果
 - environment-complexity workflow (wkackrdhl, 反証ガード付き) が 赤の女王 (Red Queen)/ニッチ構築 (niche construction)/POET を裏取り中 → **完了時に「CPU toy ecology で ④ を非空転化する最小実験」を design 出力**へ統合する。
   反証可能形 (unfalsifiable 回避): 「有限資源+変動 pop を入れると、固定予算 基準 (baseline) より ③ の load-bearing 度(MAP-E−random の δ)が有意に上がる」を 厳格ゲート (strict gate) で検定。上がらなければ「④ 生態系も Step C 課題では不要」と negative 決着。
 
+### 7e. 環境豊穣化テーゼの反証可能化 (wkackrdhl workflow 7 agents, gem-critic 判定=needs_changes だが水準高)
+テーゼ「知的進化には豊かな環境が要る」の**反証不能の罠**=③が負けるたび「環境が貧しい」で吸収 (後付け吸収/無限後退/proxy すり替え)。これを反証可能化:
+- **測定対象 = QD-score でなく hold-out 汎化 success rate** (訓練分布外への汎化=真の探索能力 proxy)。指標が上がっただけでは「知的進化」と認定しない。
+- **★③ ablation = MAP-E vs MAP-E_randselect** (archive-elite 選択を fresh random gene 引きに置換=②遺伝③選択を殺し①変異のみ残す)。**これが③の最も clean な分離** (現 verdict の MAP-E vs random/RR/GA も③分離の一形だが randselect ablation がより厳密 → 後続実験の標準 ablation に採用)。
+- **事前登録 negative**: 有界レバー A〜D を個別/全部盛りで実装し③寄与が全条件で効果量 d<0.2 なら「③は環境を盛っても非 load-bearing=テーゼこの形で誤り」と先約束。
+- **6 交絡対照**: 易化/増計算/ノイズ低減/真の構造 vs 見かけ多様性(Gigerenzer)/pseudo-multimodality=basin collapse/表象帰属(Keijzer-Arnellos)。
+**確定 future-work 実験 (CPU 安価順)**:
+- **★E-A 多タスク分布(風/天候) = 最も決定的・CPU最小** (gem-critic 選定): 単一固定→window/seq_len/型混合の記憶タスク分布。hold-out window への汎化で③寄与が出るか (Kashtan-Noor-Alon 2007 modularly-varying-goals)。**前提3点 (critic 必須・事前登録)**: 難度の**分布形状**一致 (平均だけでない)/pseudo-multimodality **常時**併走/hold-out は**外挿**。
+- E-B 時変 fitness(季節/移動する太陽): 最適 basin が周期移動、populations 維持が hill-climb を上回るか。
+- E-C 共進化(赤の女王): 試験生成器を別集団で同時進化 (Hillis 1990 / MCC=Brant&Stanley 2017)。CPU medium。
+**honest 留保 (critic)**: (1) 上位テーゼ核「複数フィールド相互作用 (地形+流れ+風+気温)」は E-A〜C で未実装→「真の豊穣化は未実装」の逃げ道は完全には封じられない。(2) 内部数値 (parity spread≈0.0007 / |δ|≥0.147 校正 / 監査『ノイズで③立たず』) は raptor 環境から未検証。(3) グレーゾーン 0.2≤d<0.5 の事前約束欠落。理論支柱は「示唆」格 (Bengio1994=gradient≠fitness ruggedness / Dang-Jansen-Lehre=single-vs-pop≠③-vs-random / Godfrey-Smith ECT=テーゼと同義の循環 等の誤転用 critic 指摘)。詳細=task output wkackrdhl。
+
 ## 8. 海 vs landscape パラダイム (ユーザー 2026-05-30: 「生命誕生に倣うなら landscape より海から始めた方が良かった」)
 
 ### 8a. 2つのパラダイム
