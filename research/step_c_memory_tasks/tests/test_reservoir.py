@@ -45,6 +45,16 @@ def test_behavior_in_bounds():
     assert np.all(np.isfinite(bd))
 
 
+def test_in_dim_2_run_and_bounds():
+    res = LeakyDelayLineReservoir(n_taps=6, in_dim=2)
+    assert res.gene_dim == res.n_taps + res.n_taps * res.in_dim
+    lo, hi = gene_bounds(res)
+    assert lo.shape == hi.shape == (res.gene_dim,)
+    rng = np.random.default_rng(0)
+    states = res.run(res.random_gene(rng), np.sign(rng.normal(size=(10, 2))))
+    assert states.shape == (10, 6) and np.all(np.isfinite(states))
+
+
 def _slow_leak_gene(res):
     g = np.zeros(res.gene_dim)
     g[: res.n_taps] = -3.0
