@@ -122,7 +122,7 @@
 
 ## 6. story-method workflow 接地 (w2tb55l9v, 7 agents) — premise 監査 + 確定 future-work
 
-記憶術 → QD の対応を文献接地 (Mouret&Clune 2015 / Lehman&Stanley 2011 / Maguire 2003 / Hopfield 1982 /
+記憶術 → 品質多様性 (Quality-Diversity, QD) の対応を文献接地 (Mouret&Clune 2015 / Lehman&Stanley 2011 / Maguire 2003 / Hopfield 1982 /
 Bengio 1994,2009 / Sel4Sel=Frans,Soros,Witkowski 2021 arXiv:2106.09153 / CMA-ME=Fontaine 2020 GECCO /
 AURORA-XCon=Coiffard 2025) し、gem-critic で premise まで監査した結果。
 
