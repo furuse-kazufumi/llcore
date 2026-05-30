@@ -34,7 +34,19 @@
 
 1. **流れ診断 (archive 連結性)**: MAP-E の archive で最良セルが改善飛び石の連結鎖で到達可能か (川) / 孤立セルか (湖)。1 run から計算。CPU low。
 2. **スケール robustness**: sigma ∈ {0.05,0.15,0.30} × grid ∈ {8,12,20} sweep で C1 多峰性・C3 が定規に依存するか。CPU low-med。
-3. **軌跡の太陽**: 終端のみ → 状態軌跡の動的性質 (線アトラクタ度) を fitness/BD に。CPU med。
+3. **★軌跡の太陽 (移動する太陽の軌跡ベース fitness) — ユーザー確定 (2026-05-30, verdict 後に実施)**:
+   現 `make_eval_once` は `res.run(gene, inputs)[-1]` で**終端状態しか読まない**。これを**軌跡ベース**へ:
+   - **設計 (最小拡張)**: 終端1点でなく**後半の時間窓 (例 t ∈ [T-k, T]) の状態**で held-out R² を測り、
+     窓平均を fitness にする。線アトラクタ (持続する川) に乗った解は答えを**広い窓で安定保持**して
+     高得点、終端でたまたま符号化しただけの脆い解は窓平均で減点される = 「移動する太陽 (時間を通じた
+     参照)」で航行する fitness。`reservoir.make_eval_once` に `eval_window:int` を足し、`_collect` が
+     `run(...)[-1]` → `run(...)[-eval_window:]` を返す改修で実装可 (per-gene ridge は流用)。
+   - **反証可能仮説**: 軌跡ベース fitness では C1 多峰性が下がり (中途半端な川も窓内で部分点 → 勾配が
+     立つ) かつ C3 で③優位が変わる (流れ持続を直接報酬化 → niching が効きやすい or 逆に hill-climb でも
+     届く)。終端のみ fitness との A/B を strict gate で比較。
+   - **honest 留保**: 窓を広げると「連続想起 (memory continuity B)」を測る別タスクに化けるので、
+     窓幅は「答えが利用可能な時刻範囲」に限定し標準タスク定義を逸脱しない (地形捏造禁止 §7 と同精神)。
+   - CPU med (eval_once コストは窓幅にほぼ不変、readout 評価が窓分増えるのみ)。
 4. **補助の太陽**: next-input 予測の self-supervised 補助目的を足し、平坦な湖に勾配が出るか。CPU med。
 5. **attractor 基質 vs leaky**: 同タスクで Hopfield/gated 基質の valley_fraction が落ちるか (川が干上がらない予言)。CPU med、要設計。
 
