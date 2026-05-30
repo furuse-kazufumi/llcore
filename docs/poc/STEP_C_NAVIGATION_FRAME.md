@@ -90,3 +90,15 @@ AURORA-XCon=Coiffard 2025) し、gem-critic で premise まで監査した結果
 - 逐次軌跡=archive セル隣接 (幾何近接 ≠ 順序 retrieval cue) / narrative 駆動=stepping-stone(受動保存 ≠ 能動的意味づけ) /
   PAO 二重符号化=fitness×BD(双射符号化 ≠ 特徴づけ) / Dresler 2017 訓練=③(個体内 learning ≠ 集団 selection)。
   → 対応・予言の **発想源**には使うが、**実装の機序的根拠**には使わない。
+
+### 6e. CPU→GPU transfer の honest 分解 (ユーザー方針 2026-05-30: 「CPU で原理検証できれば GPU でも進化成立」)
+スコープ確定 = **CPU で出来る範囲の原理検証**を deliverable とする (GPU は条件付き次段)。transfer 論理を honest に2分解:
+- **(a) 機構 (conditional)**: 「欺瞞構造+航行可能な流れを持つ landscape では ③(QD/選択)が hill-climbing/random を上回り load-bearing」。
+  → **CPU で立証可能・GPU へ transfer する** (噛み合う歯車は大きくしても噛み合う)。ユーザーの transfer 論理はこの層では**正しい**。
+- **(b) 前提 (antecedent)**: 「実 GPU/LLM 訓練 landscape が (a) の欺瞞構造を**実際に持つ**か」。
+  → **CPU では立証できない**。手順6 で実テキスト ESN+ridge proxy は**滑らか**だった (③不要) = proxy 地形 ≠ full-LLM 地形の可能性。これは GPU でしか試せない経験的問。
+- **帰結 (honest)**: 「CPU 原理検証 → GPU 成立」は**機構(a)については成立し、GPU 投資を合理化する** (賭けでなく前提検定にする)。
+  ただし**前提(b)は保証されない** — 実 LLM 地形が滑らかなら CPU 原理が健全でも GPU で ③ は効かない。
+  → verdict の framing = 「**CPU が機構(conditional)を立証 / GPU は前提(実 LLM 地形が欺瞞的か)を試す**」。
+  P1-P4+軌跡 fitness は全て CPU で**機構(a)を厚くする** = 「出来る範囲」に合致。`feedback_benchmark_honest_disclosure` 準拠で
+  transfer を unfalsifiable bridge にしない (機構と前提を必ず分離記載)。
