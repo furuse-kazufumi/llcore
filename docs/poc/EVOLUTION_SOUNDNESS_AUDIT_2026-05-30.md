@@ -1,5 +1,7 @@
 # llcore 進化機構 健全性監査 (Evolution Soundness Audit)
 
+> **凡例 — 進化4要素 (Darwin/Mayr)**: ①変異 (variation) / ②遺伝 (heredity) / ③適者生存・選択 (selection = 適応度の差による差し survival) / ④過剰繁殖 (over-reproduction)。本書の「①」〜「④」はこの番号を指す (特に「③」= 適者生存)。4要件の holds/空転 判定は §1、平易な用語集は [`YOUGO_平易版.md`](./YOUGO_平易版.md)。
+
 **実施**: 2026-05-29〜30 / **手法**: 5-lens 経験的調査 (コード読込 + 反証実験を py-3.11 実走) + synthesis 独立再現
 **目的**: 「PoC が個別に動く」と「進化 (変異×選択×遺伝が累積改善・開放端性を生む) が成立する」を峻別し、
 後者を falsifiable に検証する。
