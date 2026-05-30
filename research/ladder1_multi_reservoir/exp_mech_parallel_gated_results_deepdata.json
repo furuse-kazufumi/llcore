@@ -1,0 +1,123 @@
+{
+  "task": "delayed_parity(seq_len=20,window=5)",
+  "mechanism": "parallel_gated",
+  "n_random": 200,
+  "n_seeds": 6,
+  "n_train": 160,
+  "n_eval": 80,
+  "floor_threshold_max_r2": 0.5,
+  "configs": {
+    "1L-8(baseline)": {
+      "n_taps": 8,
+      "gene_dim": 16,
+      "feature_dim": 8,
+      "search": "random",
+      "per_seed_max_r2": [
+        0.0,
+        0.042072854924311565,
+        0.0,
+        0.019728535610427977,
+        0.0,
+        0.0
+      ],
+      "mean": 0.010300231755789924,
+      "std": 0.015930953065631876,
+      "max": 0.042072854924311565,
+      "seconds": 127.9
+    },
+    "parallel_gated(K4t6)": {
+      "n_reservoirs": 4,
+      "n_taps": 6,
+      "gene_dim": 48,
+      "feature_dim": 60,
+      "search": "random",
+      "per_seed_max_r2": [
+        0.0,
+        0.01218642827255434,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean": 0.0020310713787590564,
+      "std": 0.004541613670059473,
+      "max": 0.01218642827255434,
+      "seconds": 332.6
+    },
+    "linear_only(K4t6)": {
+      "n_reservoirs": 4,
+      "n_taps": 6,
+      "gene_dim": 48,
+      "feature_dim": 24,
+      "search": "random",
+      "per_seed_max_r2": [
+        0.0,
+        0.043434763348805694,
+        0.0,
+        0.014750074535598512,
+        0.0016808865858749522,
+        0.0
+      ],
+      "mean": 0.009977620745046526,
+      "std": 0.015862173302625463,
+      "max": 0.043434763348805694,
+      "seconds": 622.2
+    },
+    "parallel_gated(K4t6)-ES": {
+      "n_reservoirs": 4,
+      "n_taps": 6,
+      "gene_dim": 48,
+      "feature_dim": 60,
+      "search": "evolved_search(ES)",
+      "es_pop": 20,
+      "es_gens": 15,
+      "es_sigma": 0.6,
+      "es_elite": 4,
+      "per_seed_max_r2": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean": 0.0,
+      "std": 0.0,
+      "max": 0.0,
+      "seconds": 756.2
+    }
+  },
+  "baseline_1L8_max_r2": 0.042072854924311565,
+  "mechanism_max_r2": 0.01218642827255434,
+  "linear_only_max_r2": 0.043434763348805694,
+  "floor_lifted": false,
+  "comparisons": {
+    "parallel_gated(K4t6)_vs_1L-8(baseline)": {
+      "mean_a": 0.0020310713787590564,
+      "mean_b": 0.010300231755789924,
+      "diff": -0.008269160377030868,
+      "wilcoxon_p": 1.0,
+      "paired_sign_delta": -0.3333333333333333,
+      "win_rate": 0.0,
+      "passes": false
+    },
+    "parallel_gated(K4t6)_vs_linear_only(K4t6)": {
+      "mean_a": 0.0020310713787590564,
+      "mean_b": 0.009977620745046526,
+      "diff": -0.00794654936628747,
+      "wilcoxon_p": 1.0,
+      "paired_sign_delta": -0.5,
+      "win_rate": 0.0,
+      "passes": false
+    },
+    "parallel_gated(K4t6)-ES_vs_parallel_gated(K4t6)": {
+      "mean_a": 0.0,
+      "mean_b": 0.0020310713787590564,
+      "diff": -0.0020310713787590564,
+      "wilcoxon_p": 1.0,
+      "paired_sign_delta": -0.16666666666666666,
+      "win_rate": 0.0,
+      "passes": false
+    }
+  }
+}

@@ -168,6 +168,40 @@ def main() -> None:
         print("    parity 非可解の主因は探索不足ではなく DeepReservoir+ridge の表現力限界。")
     print(f"\nbaseline_max_r2={baseline_max_r2:.6f} mechanism_max_r2={mechanism_max_r2:.6f}")
 
+    # --- JSON ダンプ (stdout buffering に依存せず結果を確実に保存) ---
+    out_json = {
+        "task": "delayed_parity(seq_len=20,window=5)",
+        "n_seeds": N_SEEDS, "n_random": N_RANDOM,
+        "es_config": {"pop_size": ES_CONFIG.pop_size, "n_generations": ES_CONFIG.n_generations,
+                      "tournament_k": ES_CONFIG.tournament_k, "elitism": ES_CONFIG.elitism,
+                      "mutation_sigma": ES_CONFIG.mutation_sigma,
+                      "honest_n_trials": ES_CONFIG.honest_n_trials, "budget": ES_CONFIG.budget},
+        "baseline_1L8_max_r2": baseline_max_r2,
+        "mechanism_max_r2": mechanism_max_r2,
+        "floor_lifted": floor_lifted,
+        "configs": {
+            "1L-8_random": {"per_seed": base_vals.tolist(), "mean": float(base_vals.mean()),
+                            "std": float(base_vals.std()), "max": float(base_vals.max())},
+            "3L_random": {"per_seed": rand3l_vals.tolist(), "mean": float(rand3l_vals.mean()),
+                          "std": float(rand3l_vals.std()), "max": float(rand3l_vals.max())},
+            "3L_evolved": {"per_seed": mech_vals.tolist(), "mean": float(mech_vals.mean()),
+                           "std": float(mech_vals.std()), "max": float(mech_vals.max())},
+        },
+        "substrate_gain_3Lrand_minus_1L8": substrate_gain,
+        "search_gain_3Levolved_minus_3Lrand": search_gain,
+        "strict_compare": {
+            "3L-evolved_vs_1L-8-random": {"diff": r_vs_base.diff, "p": r_vs_base.wilcoxon_p,
+                                          "delta": r_vs_base.paired_sign_delta,
+                                          "passes": r_vs_base.passes},
+            "3L-evolved_vs_3L-random": {"diff": r_vs_rand.diff, "p": r_vs_rand.wilcoxon_p,
+                                        "delta": r_vs_rand.paired_sign_delta,
+                                        "passes": r_vs_rand.passes},
+        },
+    }
+    (_HERE / "exp_mech_evolved_search_results.json").write_text(
+        __import__("json").dumps(out_json, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+
 
 if __name__ == "__main__":
     main()

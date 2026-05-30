@@ -1,0 +1,205 @@
+{
+  "task": "delayed_parity(seq_len=20,window=5,in_dim=1)",
+  "protocol": {
+    "n_random": 300,
+    "n_seeds": 8,
+    "n_train": 48,
+    "n_eval": 48,
+    "ridge_lambda": 0.01,
+    "floor_threshold": 0.5,
+    "es": {
+      "mu": 12,
+      "lambda": 24,
+      "generations": 12,
+      "sigma0": 0.6,
+      "sigma_decay": 0.92
+    }
+  },
+  "configs": {
+    "HM-depthonly-2x8": {
+      "per_seed_max_r2": [
+        0.1131012292821646,
+        0.1457922491409206,
+        0.0,
+        0.0,
+        0.0,
+        0.11139744839849619,
+        0.0,
+        0.0
+      ],
+      "mean": 0.04628636585269767,
+      "std": 0.06053639212655726,
+      "min": 0.0,
+      "max": 0.1457922491409206,
+      "layer_taps": [
+        8,
+        8
+      ],
+      "use_gate": false,
+      "use_quadratic": false,
+      "gene_dim": 176,
+      "feature_dim": 32,
+      "search": "random",
+      "wall_s": 11.6
+    },
+    "HM-gate-2x8": {
+      "per_seed_max_r2": [
+        0.0,
+        0.2824863675120608,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean": 0.0353107959390076,
+      "std": 0.09342358465036359,
+      "min": 0.0,
+      "max": 0.2824863675120608,
+      "layer_taps": [
+        8,
+        8
+      ],
+      "use_gate": true,
+      "use_quadratic": false,
+      "gene_dim": 176,
+      "feature_dim": 40,
+      "search": "random",
+      "wall_s": 11.1
+    },
+    "HM-quad-2x8": {
+      "per_seed_max_r2": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean": 0.0,
+      "std": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "layer_taps": [
+        8,
+        8
+      ],
+      "use_gate": false,
+      "use_quadratic": true,
+      "gene_dim": 176,
+      "feature_dim": 130,
+      "search": "random",
+      "wall_s": 186.9
+    },
+    "HM-full-2x8": {
+      "per_seed_max_r2": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean": 0.0,
+      "std": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "layer_taps": [
+        8,
+        8
+      ],
+      "use_gate": true,
+      "use_quadratic": true,
+      "gene_dim": 176,
+      "feature_dim": 146,
+      "search": "random",
+      "wall_s": 211.0
+    },
+    "HM-full-1x8": {
+      "per_seed_max_r2": [
+        0.0,
+        0.08334765765397656,
+        0.0,
+        0.0,
+        0.0,
+        0.03504003220099672,
+        0.0,
+        0.0
+      ],
+      "mean": 0.01479846123187166,
+      "std": 0.028334343680420974,
+      "min": 0.0,
+      "max": 0.08334765765397656,
+      "layer_taps": [
+        8
+      ],
+      "use_gate": true,
+      "use_quadratic": true,
+      "gene_dim": 32,
+      "feature_dim": 114,
+      "search": "random",
+      "wall_s": 129.6
+    },
+    "HM-full-2x8-ES": {
+      "per_seed_max_r2": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean": 0.0,
+      "std": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "layer_taps": [
+        8,
+        8
+      ],
+      "use_gate": true,
+      "use_quadratic": true,
+      "gene_dim": 176,
+      "feature_dim": 146,
+      "search": "evolved_search(ES)",
+      "wall_s": 151.7
+    }
+  },
+  "baseline_1L8": {
+    "per_seed_max_r2": [
+      0.0,
+      0.03796839759345805,
+      0.0,
+      0.04526137601612634,
+      0.0,
+      0.07473848405296823,
+      0.0,
+      0.0
+    ],
+    "mean": 0.019746032207819078,
+    "std": 0.027287327804326245,
+    "min": 0.0,
+    "max": 0.07473848405296823,
+    "gene_dim": 16,
+    "search": "random",
+    "wall_s": 4.0
+  },
+  "summary": {
+    "baseline_1L8_max_r2": 0.07473848405296823,
+    "mechanism_max_r2": 0.2824863675120608,
+    "mechanism_random_best": 0.2824863675120608,
+    "mechanism_es_best": 0.0,
+    "floor_lifted": false,
+    "baseline_floor_lifted": false,
+    "config_curve": "HM-depthonly-2x8=0.146; HM-gate-2x8=0.282; HM-quad-2x8=0.000; HM-full-2x8=0.000; HM-full-1x8=0.083; HM-full-ES=0.000",
+    "attribution": "reservoir_expressivity",
+    "attribution_note": "最大構成でも held-out で parity を解けず。CPU reservoir+ridge パラダイムの表現力床の証拠。"
+  }
+}
