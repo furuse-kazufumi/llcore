@@ -54,7 +54,8 @@ def main() -> None:
                 vals.append(honest_reevaluate(eval_once, r.best_gene, n_trials=20,
                                               rng=np.random.default_rng(99 + s)))
             print(f"  init_batch={init_batch}: mean honest R²={np.mean(vals):.4f}")
-        # 小 init_batch でも到達 → ratchet 由来 (C4 成立) / 大でしか到達 → coverage 由来。
+        # 方向性の読み (docstring CONFOUND 参照): init_batch=1000 (coverage 最厚・ratchet
+        # 軽) が 30 (ratchet 重) より低ければ差分=ratchet 寄与。同等以上なら ratchet 寄与小。
 
 
 if __name__ == "__main__":
