@@ -181,6 +181,14 @@ def run_ea_methods_over_seeds(
     全 method 同一 n_evals 予算。best gene を **進化と独立な fresh seed** で eval_test /
     eval_train の双方で honest 再評価 (elitism noisy 持越し artifact 排除)。主指標は test。
     """
+    # equal budget 保証 (Codex F-Low 対応): panmictic_ga は pop_size=20 の初期評価を行うため
+    # n_evals < 20 だと開始時点で予算超過し equal-budget が崩れる。明示的に弾く。
+    _PANMICTIC_POP = 20
+    if n_evals < _PANMICTIC_POP:
+        raise ValueError(
+            f"n_evals={n_evals} < panmictic pop_size={_PANMICTIC_POP}; "
+            "equal-budget が保証できない。n_evals を pop_size 以上にすること。"
+        )
     init_batch = max(20, n_evals // 10)
     methods = ("map_elites", "map_elites_randselect", "panmictic_ga", "random")
     test_scores: dict[str, list[float]] = {m: [] for m in methods}
