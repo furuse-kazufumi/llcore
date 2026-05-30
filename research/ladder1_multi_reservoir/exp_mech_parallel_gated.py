@@ -44,11 +44,15 @@ from reservoir import LeakyDelayLineReservoir, make_eval_once as single_eval
 from memory_tasks import DelayedParityTask
 from strict_compare import strict_compare
 
-# 探索 budget (タスク指定)。
-N_RANDOM = 300       # random search 1 seed あたりの gene 本数
-N_SEEDS = 8          # 固定 seed 数
-N_TRAIN = 48         # held-out 評価の train 本数
-N_EVAL = 48          # held-out 評価の eval 本数 (train と別 draw)
+# 探索 budget (タスク指定)。env で上書き可 (データ飢餓 confound の切り分け用に
+# N_TRAIN を feature_dim より大きく取った再測定を別 run で行うため)。
+import os as _os
+
+N_RANDOM = int(_os.environ.get("PG_N_RANDOM", "300"))   # random search 1 seed あたりの gene 本数
+N_SEEDS = int(_os.environ.get("PG_N_SEEDS", "8"))       # 固定 seed 数
+N_TRAIN = int(_os.environ.get("PG_N_TRAIN", "48"))      # held-out 評価の train 本数
+N_EVAL = int(_os.environ.get("PG_N_EVAL", "48"))        # held-out 評価の eval 本数 (train と別 draw)
+_TAG = _os.environ.get("PG_TAG", "")                    # 出力 JSON 名のサフィックス
 GENE_BASE = 730_001
 EVAL_BASE = 930_001
 OUT_JSON = _HERE / "exp_mech_parallel_gated_results.json"
