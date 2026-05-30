@@ -262,15 +262,16 @@ def main() -> None:
 
     # ===== 3) 機構 best (full) を ES (evolved_search) で測る =====
     print(f"\n[evolved_search] full anchor を ES (μ={ES_MU},λ={ES_LAMBDA},gen={ES_GENERATIONS}) で測定…")
-    from mech_hybrid_max import gene_bounds as mech_bounds
     full_res = HybridMaxReservoir(layer_taps=(8, 8), in_dim=task.in_dim,
                                   use_gate=True, use_quadratic=True)
-    full_eval = mech_eval_once(full_res, task, n_train=N_TRAIN, n_eval=N_EVAL,
-                               ridge_lambda=RIDGE_LAMBDA)
     lo, hi = mech_bounds(full_res)
     t0 = time.time()
     es_vals = np.array([
-        es_search_ceiling(full_res, full_eval, lo, hi, s) for s in seeds
+        es_search_ceiling(
+            full_res,
+            lambda g, s=s: eval_on_dataset(full_res, g, datasets[s], ridge_lambda=RIDGE_LAMBDA),
+            lo, hi, s)
+        for s in seeds
     ])
     dt = time.time() - t0
     es_best = float(es_vals.max())
