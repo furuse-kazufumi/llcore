@@ -132,7 +132,7 @@ positive bias (③実在に寄せたい誘惑) を排し、C3 不成立を素直
 
 1. **(a) delayed_parity の C3✗ は基質ボトルネックで confounded — clean な③テストではない**: mean R² ≈ 0.003-0.004 / reach-rate 0.0 は「③が効かない」証拠ではなく、**③以前に単一 reservoir 基質が XOR (parity) を解けず床に張り付いた**結果 (navigation frame §6b #3)。この failure は「③無力」とは読めない。clean な③テストには parity を解ける基質 (多細胞=結合 reservoir 等) が必要 (§7 次実験)。
 
-2. **(b) flip_flop は too-easy で C2 (欺瞞) 不成立**: 全 method ≈ 0.95 / reach-rate 1.0 = 欺瞞トラップが機能していない。C2 (hill-climbing が詰まる) が成立しないので、そもそも ③ の出番が無い regime。C3✗ は「③が負けた」でなく「③が要らなかった」。
+2. **(b) flip_flop は天井効果 (ceiling) で C2 (欺瞞) 不成立 = C3 が confounded (非診断)**: 全 method ≈ 0.95 / reach-rate 1.0 = metric が頂上付近に飽和・分散圧縮し、欺瞞トラップが機能していない。この飽和帯での C3 null は「③の差が存在しない」証拠ではなく「**飽和帯では metric が差を分離できない=非診断的**」を意味する。delayed_parity の床 (a) と **対称に、flip_flop も天井で C3 が confounded** であり、正しい読みは「両タスクとも C3 が非診断 (床と天井で別々に潰れた)」。C3✗ は「③が負けた」でも「③が要らなかった」でもなく「③の有無をこの帯では測れなかった」。加えて MAP-E vs random は δ=+0.33 (medium) / p=0.15 で **underpowered = inconclusive** (§3.2 留保) であり、null として受容できない。
 
 3. **(c) reservoir+ridge proxy ≠ full LLM / CPU→GPU 分解 (機構 vs 前提)**: 基質は固定 reservoir 力学の gene 化 + per-gene ridge readout で、backprop full LLM とは別物 (navigation frame §6e)。本 verdict は **機構 (a)** = 「欺瞞構造+航行可能な流れを持つ landscape で③が立つか」を CPU で検証したものであり、**前提 (b)** = 「実 GPU/LLM 訓練 landscape が実際に欺瞞構造を持つか」は CPU では立証できない (GPU でしか試せない経験的問)。撤退は機構層の結果であって前提を否定するものではない。
 
