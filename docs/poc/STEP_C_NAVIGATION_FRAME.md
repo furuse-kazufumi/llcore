@@ -144,7 +144,7 @@ AURORA-XCon=Coiffard 2025) し、gem-critic で premise まで監査した結果
 > 全て CPU low・既存 step_c 部品の最小拡張・strict gate(n≥15, 片側Wilcoxon p<0.05, |δ|≥0.147)・two-way 反証。
 > **順序が重要**: unaligned BD 上では③検証が無効化されるため P3 を先に。
 1. **P3 [BD アライメント]** (③の前提チェック・最優先): 課題構造 BD(依存距離×系列位置) / AURORA風 PCA-BD vs 現 BD。弁別性指標(隣接セル間 behavior距離÷セル内分散>1)+collision率を測定。`make_behavior` 差替のみ。
-2. **P1 [基質 ablation]**: leaky(S0) → scalar forget gate(S1, 真に1パラメタ追加で最安, まず S0 vs S1) → 必要なら 1-step modern-Hopfield(S2, Ramsauer 2020)。③設定固定で基質だけ振り「③の利得が基質非依存に残るか/基質を強くすると逓減するか」を分離。
+2. **P1 [基質 アブレーション (ablation)]**: leaky(S0) → scalar forget gate(S1, 真に1パラメタ追加で最安, まず S0 vs S1) → 必要なら 1-step modern-Hopfield(S2, Ramsauer 2020)。③設定固定で基質だけ振り「③の利得が基質非依存に残るか/基質を強くすると逓減するか」を分離。
 3. **P4 [選択スケジュール] + lexicase baseline**: λ(t)=1→0 (novelty→fitness, 手書きスケジュールであり Sel4Sel の学習選択の再現ではない=overclaim 除去) vs 純fitness/純novelty。**L4=lexicase 選択を baseline に追加** (6a の前提検定: parity を依存距離別 sub-objective に分解)。
 4. **P2 [カリキュラム]**: 多様遅延ニッチ+③ vs 単調 continuation(Elman 1993/Bengio 2009)。固定遅延=最も rugged な一点での一発勝負(Bengio 1994 が指数的 rugged 化を理論保証)。注: Rohde&Plaut 1999 の阻害は言語課題知見で parity への転用は仮説止まり(過剰一般化しない)。
 5. **★軌跡の太陽** (§4 #3, ユーザー確定): 終端のみ → 後半窓の R² 窓平均 fitness。
