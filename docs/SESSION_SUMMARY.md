@@ -3,23 +3,23 @@
 > 自動生成: `libexec/raptor-auto-summary` (Stop hook)
 > 次回 ccr 起動時に CLAUDE.md SESSION START で自動的に読み取られる。
 
-- **最終更新**: 2026-05-30 14:42:41
+- **最終更新**: 2026-05-30 14:49:45
 - **プロジェクト**: `D:/projects/llcore`
 - **ブランチ**: `main`
 
 ## 直近の git log
 
 ```
-dac2bc0 auto: STEP_C_NAVIGATION_FRAME.md 編集前 (2026-05-30 14:42)
-ade1aba auto: STEP_C_NAVIGATION_FRAME.md 編集前 (2026-05-30 14:42)
-522550e auto: STEP_C_NAVIGATION_FRAME.md 編集前 (2026-05-30 14:42)
-ccd6b79 auto: STEP_C_NAVIGATION_FRAME.md 編集前 (2026-05-30 14:42)
-271a97d auto: STEP_C_NAVIGATION_FRAME.md 編集前 (2026-05-30 14:41)
-d402f65 auto: STEP_C_NAVIGATION_FRAME.md 編集前 (2026-05-30 14:41)
-ec14ab1 auto: STEP_C_NAVIGATION_FRAME.md 編集前 (2026-05-30 14:41)
-460e5c1 auto: STEP_C_NAVIGATION_FRAME.md 編集前 (2026-05-30 14:41)
-c4c6b4c auto: STEP_C_NAVIGATION_FRAME.md 編集前 (2026-05-30 14:41)
-d206b59 auto: STEP_C_NAVIGATION_FRAME.md 編集前 (2026-05-30 14:40)
+54f5e74 auto: STEP_C_NAVIGATION_FRAME.md 編集前 (2026-05-30 14:45)
+47f37f0 auto: STEP_C_NAVIGATION_FRAME.md 編集前 (2026-05-30 14:45)
+c26fec3 auto: STEP_C_NAVIGATION_FRAME.md 編集前 (2026-05-30 14:45)
+fbe9c37 auto: STEP_C_NAVIGATION_FRAME.md 編集前 (2026-05-30 14:45)
+fe2efa9 auto: STEP_C_NAVIGATION_FRAME.md 編集前 (2026-05-30 14:45)
+1bae123 auto: STEP_C_NAVIGATION_FRAME.md 編集前 (2026-05-30 14:44)
+c872c04 auto: STEP_C_NAVIGATION_FRAME.md 編集前 (2026-05-30 14:44)
+dea0d85 auto: STEP_C_NAVIGATION_FRAME.md 編集前 (2026-05-30 14:44)
+d9b9353 auto: STEP_C_NAVIGATION_FRAME.md 編集前 (2026-05-30 14:44)
+0c46981 auto: STEP_C_NAVIGATION_FRAME.md 編集前 (2026-05-30 14:43)
 ```
 
 ## 現在の git status
@@ -31,9 +31,9 @@ M docs/poc/STEP_C_NAVIGATION_FRAME.md
 ## 直近 2 時間に変更されたファイル
 
 ```
-14:42 docs/poc/STEP_C_NAVIGATION_FRAME.md
+14:45 docs/poc/STEP_C_NAVIGATION_FRAME.md
+14:42 docs/SESSION_SUMMARY.md
 14:38 research/step_c_memory_tasks/exp_c2c3_results.json
-14:16 docs/SESSION_SUMMARY.md
 14:11 research/step_c_memory_tasks/exp_c2c3_compare.py
 14:10 research/step_c_memory_tasks/exp_c4_ablation.py
 14:10 research/step_c_memory_tasks/exp_c2c3c4_run.log
