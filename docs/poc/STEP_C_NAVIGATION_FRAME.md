@@ -116,7 +116,7 @@
 ## 5. honest 留保
 
 - 比喩接地は**発見的**。「川」「太陽」は物理事実でなく、machinery への写像が成り立つ範囲でのみ有効。
-- 文献 (Sussillo&Barak / Howard&Kahana 等) は記憶ダイナミクスの定説だが、**我々の reservoir+ridge proxy は
+- 文献 (Sussillo&Barak / Howard&Kahana 等) は記憶ダイナミクスの定説だが、**我々の リザバー (reservoir)+ridge proxy は
   backprop full RNN/LLM とは別物**。予言の転用は proxy の限界内に留める。
 - 本 doc は**生きたメモ** (対話で拡張中)。確定 verdict は C1-C4 実数 + adversarial verify を経てから。
 
