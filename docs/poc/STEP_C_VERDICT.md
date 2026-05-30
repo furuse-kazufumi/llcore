@@ -73,7 +73,8 @@ C1 で多峰が出た delayed_parity / flip_flop に対してのみ測定 (`exp_
 | random-restart hill-climb | +0.0036 | 0.26 | +0.07 | **False** |
 | panmictic-GA | -0.0041 | 0.97 | -0.20 | **False** |
 
-→ 全 method が **≈0.95 で頂上到達** (reach-rate τ=0.8 で全 1.0)。MAP-E は random に対して符号は正だが p=0.15 で有意でなく、panmictic-GA には負け、3/3 で passes=False。C2 = baseline が大域に届く (詰まらない) = 欺瞞トラップが機能していない。
+→ 全 method が **≈0.95 で天井に飽和 (ceiling, reach-rate τ=0.8 で全 1.0)**。metric が頂上付近で分散圧縮しており、この飽和帯では C3 は **③有無を分離できない (非診断)**。MAP-E は random に対して符号は正 (diff=+0.0041, δ=+0.33 = Cliff 慣例で medium かつ gate 自身の 0.147 閾値を上回る正方向効果) だが p=0.15 で有意に届かず、panmictic-GA には負け、3/3 で passes=False。C2 = baseline が大域に届く (詰まらない) = 欺瞞トラップが機能していない。
+> **検出力留保 (n=15):** MAP-E vs random は δ=+0.33 が正 (medium) でありながら p=0.15 でのみ落ちている。n=15 で medium effect が p<0.05 に届かないのは典型的事象であり、これを「null の受容」と取り違えてはならない。本ペアは **non-significant かつ underpowered = inconclusive (保留)** に格下げする (撤退ではなく、n=15 が real な medium effect を解像できていない可能性を残す)。
 
 **c3_all_pass: 両タスク False** (`exp_c2c3_results.json`)。
 
