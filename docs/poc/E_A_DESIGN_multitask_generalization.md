@@ -58,11 +58,16 @@ Step C 実測より、**単一 leaky reservoir + ridge で解ける**タスク�
 | **panmictic-GA** | なし (単一集団) | tournament 選択 | elitism + tournament | ①③ (③選択あり、②niching なし) |
 | **random search** | なし | なし | best のみ保持 | 床/規模対照 |
 
-判定の切り分け (因子分解):
-- **MAP-E > MAP-E_randselect** → **②③ (niching + 選択) が ① 変異だけより寄与**。
-- **MAP-E > panmictic-GA** → **② (niching) が ③ 選択だけ (panmictic) より上乗せ**。
-- **MAP-E > random** → 全体が無探索に勝つ。
-③ の load-bearing は MAP-E が **MAP-E_randselect と panmictic-GA の両方**に strict gate で勝つことで主張。
+判定の切り分け (因子分解、Codex pair-review で交絡を明記):
+- **MAP-E > MAP-E_randselect** → **②③ (niching elite 維持 + 選択) の joint 寄与が ① 変異だけより大**
+  (この対照は selection 圧の有無だけが差なので最もクリーン)。②単独 vs ③単独は本対照では分離不可。
+- **MAP-E > panmictic-GA** → **行動ビニング構造全体 (② niching を含むが、archive/niche 保持機構
+  ごと) が、選択のみの panmictic より上乗せ**。これは「② 単独の寄与」ではなく「ビニング構造の寄与」
+  (panmictic は archive/binning を一切持たないため交絡。② 単独分離には binning 有り×selection 無しの
+  randselect 対照を併用)。
+- **MAP-E > random** → 全体が無探索に勝つ (床/規模対照)。
+③ (選択圧/分離) の load-bearing は MAP-E が **MAP-E_randselect (最もクリーンな selection 対照) と
+panmictic-GA の両方**に strict gate で勝つことで主張。負ければ「滑らか/③不要」を honest negative とする。
 
 ## fitness と主指標
 
