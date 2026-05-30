@@ -3,13 +3,15 @@
 > 自動生成: `libexec/raptor-auto-summary` (Stop hook)
 > 次回 ccr 起動時に CLAUDE.md SESSION START で自動的に読み取られる。
 
-- **最終更新**: 2026-05-30 13:48:59
+- **最終更新**: 2026-05-30 13:50:46
 - **プロジェクト**: `D:/projects/llcore`
 - **ブランチ**: `main`
 
 ## 直近の git log
 
 ```
+9a82ca7 docs(step-c): 軌跡ベース fitness(移動する太陽)を verdict 後ユーザー確定実験に昇格
+08ee040 auto: STEP_C_NAVIGATION_FRAME.md 編集前 (2026-05-30 13:50)
 93b1464 docs(step-c): 探索の航行枠 — 比喩↔machinery↔反証予言の生きたメモ
 b11439e fix(step-c): C2 を測定可能に — reach-rate(複数閾値)+per-seed配列保存
 22a6765 auto: exp_c2c3_compare.py 編集前 (2026-05-30 13:36)
@@ -18,22 +20,19 @@ c5594b3 auto: exp_c4_ablation.py 編集前 (2026-05-30 13:12)
 3722fc5 auto: exp_c4_ablation.py 編集前 (2026-05-30 13:12)
 17c8f8f feat(step-c): exp_c1 各記憶タスクの C1 多峰性測定
 a9a7ee8 feat(step-c): C1 多峰性診断 (収束点間の谷検出)
-ac0a5fc feat(step-c): 強化版 honest 基準の strict_compare (片側/効果量/seed ゲート)
-dbc2314 fix(step-c): reservoir eval_once コメント明確化 + test 名修正 + in_dim=2 path test
 ```
 
 ## 現在の git status
 
 ```
-M docs/SESSION_SUMMARY.md
- M research/step_c_memory_tasks/exp_c2c3c4_run.log
+(clean)
 ```
 
 ## 直近 2 時間に変更されたファイル
 
 ```
-13:48 docs/poc/STEP_C_NAVIGATION_FRAME.md
-13:44 docs/SESSION_SUMMARY.md
+13:50 docs/poc/STEP_C_NAVIGATION_FRAME.md
+13:49 docs/SESSION_SUMMARY.md
 13:37 research/step_c_memory_tasks/exp_c2c3c4_run.log
 13:36 research/step_c_memory_tasks/exp_c2c3_compare.py
 13:28 docs/poc/STEP_C_VERDICT_SCAFFOLD.md
