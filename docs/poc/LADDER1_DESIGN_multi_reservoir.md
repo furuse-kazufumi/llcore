@@ -91,4 +91,26 @@ load-bearing 確定**。梯子段1 はこの打ち切り条件の主要部分 (�
 
 ## 結果
 
-(exp 完了後に追記)
+### ① 表現力 sanity — deep 機構 (DeepESN, N_SEEDS=15, random search)
+
+`exp_l1_results.json` (delayed_parity, seq_len=20/window=5, N_RANDOM=400):
+
+| 構成 | total_taps | max R² (mean±std) | vs 1L-8 (strict) |
+|---|---|---|---|
+| 1L-8 (床) | 8 | 0.021 ± 0.036 | — (Step C 床を再現) |
+| 1L-16 (taps増のみ) | 16 | 0.019 ± 0.035 | δ=−0.33 FAIL (無効) |
+| 2L-8×8 (深さ2・同規模) | 16 | 0.051 ± 0.068 | δ=+0.47 p=0.010 **PASS** |
+| 3L-8×8×8 (深さ3) | 24 | 0.096 ± 0.096 | δ=+0.60 p=0.004 **PASS** |
+| 深さの寄与: 2L vs 1L-16 (同規模16) | — | +0.032 | δ=+0.47 p=0.010 **PASS** |
+
+**確定した2点 (honest に分離)**:
+1. ✅ **深さ (層間非線形合成) が統計的に有意に効く**。同規模の taps 増 (1L-16) は無効 (δ=−0.33) なのに深さ2は床を有意に持ち上げる → 「効くのは規模でなく深さ＝多細胞の非線形分業」。Step C の単細胞床を**部分的に緩和**。
+2. ⚠️ **絶対値は低く parity 未解決** (2L=0.05/3L=0.10、完全解 R²=1 に程遠い)。**「床が統計的に持ち上がった」≠「外れた」**。random search の探索不足が残り、真の表現力天井は進化探索で測る必要。
+
+**最初の run の教訓 (自己訂正)**: 初回 N_SEEDS=10 < strict_compare の min_seeds=15 で全 `passes=False` の機械的偽陰性を出した。N_SEEDS=15 + `assert N_SEEDS>=15` で修正済 ([[feedback_benchmark_honest_disclosure]])。
+
+### 床外し機構の診断 (ワークフロー ladder1-floor-break, 5機構)
+
+深さ以外の床外し原理を並列に切り分け中: `parallel_gated` (乗法結合=多細胞分業) / `quadratic_readout` (明示2次=readout 対照) / `evolved_search` (進化で真天井) / `wide_single` (幅の効果) / `hybrid_max` (上限 anchor)。各機構を held-out R² で測定し、床外しを reservoir 表現力/readout/幅/探索/artifact のどれに帰属するか adversarial verify。
+
+(ワークフロー完了後に追記 → LADDER1_VERDICT.md に統合)
