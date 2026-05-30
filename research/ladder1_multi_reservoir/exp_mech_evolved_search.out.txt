@@ -1,0 +1,6 @@
+=== 測定: 機構 evolved_search (床外し / 非外し) ===
+task=delayed_parity(seq_len=20,window=5)  n_seeds=8
+baseline=1L-8 random(n=300)  mechanism=3L-8x8x8 (μ+λ)-ES (pop=30,gen=40,budget=1190)
+参考=3L-8x8x8 random(n=300)  honest_n_trials=16
+
+[1L-8 random   ] max R²  mean=0.0057 std=0.0150 (min=0.000 max=0.045)  131.7s gene_dim=16

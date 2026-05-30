@@ -1,0 +1,131 @@
+{
+  "task": "delayed_parity(seq_len=20,window=5)",
+  "mechanism": "parallel_gated",
+  "n_random": 300,
+  "n_seeds": 8,
+  "n_train": 48,
+  "n_eval": 48,
+  "floor_threshold_max_r2": 0.5,
+  "configs": {
+    "1L-8(baseline)": {
+      "n_taps": 8,
+      "gene_dim": 16,
+      "feature_dim": 8,
+      "search": "random",
+      "per_seed_max_r2": [
+        0.0,
+        0.0,
+        0.0,
+        0.014421393582556785,
+        0.0,
+        0.024180167840090805,
+        0.1300505611210624,
+        0.0
+      ],
+      "mean": 0.021081515317963748,
+      "std": 0.04205704942802222,
+      "max": 0.1300505611210624,
+      "seconds": 94.4
+    },
+    "parallel_gated(K4t6)": {
+      "n_reservoirs": 4,
+      "n_taps": 6,
+      "gene_dim": 48,
+      "feature_dim": 60,
+      "search": "random",
+      "per_seed_max_r2": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean": 0.0,
+      "std": 0.0,
+      "max": 0.0,
+      "seconds": 326.4
+    },
+    "linear_only(K4t6)": {
+      "n_reservoirs": 4,
+      "n_taps": 6,
+      "gene_dim": 48,
+      "feature_dim": 24,
+      "search": "random",
+      "per_seed_max_r2": [
+        0.0,
+        0.0,
+        0.0,
+        0.033445167954222255,
+        0.0,
+        0.00621501952803305,
+        0.08795195252958221,
+        0.0
+      ],
+      "mean": 0.01595151750147969,
+      "std": 0.02927700547397596,
+      "max": 0.08795195252958221,
+      "seconds": 373.6
+    },
+    "parallel_gated(K4t6)-ES": {
+      "n_reservoirs": 4,
+      "n_taps": 6,
+      "gene_dim": 48,
+      "feature_dim": 60,
+      "search": "evolved_search(ES)",
+      "es_pop": 20,
+      "es_gens": 15,
+      "es_sigma": 0.6,
+      "es_elite": 4,
+      "per_seed_max_r2": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean": 0.0,
+      "std": 0.0,
+      "max": 0.0,
+      "seconds": 423.1
+    }
+  },
+  "baseline_1L8_max_r2": 0.1300505611210624,
+  "mechanism_max_r2": 0.0,
+  "linear_only_max_r2": 0.08795195252958221,
+  "floor_lifted": false,
+  "comparisons": {
+    "parallel_gated(K4t6)_vs_1L-8(baseline)": {
+      "mean_a": 0.0,
+      "mean_b": 0.021081515317963748,
+      "diff": -0.021081515317963748,
+      "wilcoxon_p": 1.0,
+      "paired_sign_delta": -0.375,
+      "win_rate": 0.0,
+      "passes": false
+    },
+    "parallel_gated(K4t6)_vs_linear_only(K4t6)": {
+      "mean_a": 0.0,
+      "mean_b": 0.01595151750147969,
+      "diff": -0.01595151750147969,
+      "wilcoxon_p": 1.0,
+      "paired_sign_delta": -0.375,
+      "win_rate": 0.0,
+      "passes": false
+    },
+    "parallel_gated(K4t6)-ES_vs_parallel_gated(K4t6)": {
+      "mean_a": 0.0,
+      "mean_b": 0.0,
+      "diff": 0.0,
+      "wilcoxon_p": 1.0,
+      "paired_sign_delta": 0.0,
+      "win_rate": 0.0,
+      "passes": false
+    }
+  }
+}

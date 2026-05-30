@@ -55,7 +55,7 @@ N_EVAL = int(_os.environ.get("PG_N_EVAL", "48"))        # held-out 評価の eva
 _TAG = _os.environ.get("PG_TAG", "")                    # 出力 JSON 名のサフィックス
 GENE_BASE = 730_001
 EVAL_BASE = 930_001
-OUT_JSON = _HERE / "exp_mech_parallel_gated_results.json"
+OUT_JSON = _HERE / (f"exp_mech_parallel_gated_results{('_' + _TAG) if _TAG else ''}.json")
 
 # ES (evolved_search) ハイパラ — random と同 budget (評価回数) になるよう揃える。
 ES_POP = 20          # λ (子個体数)
