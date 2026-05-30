@@ -1,11 +1,1 @@
-=== exp_c2c3 (augmented: reach-rate + JSON) start ===
-Traceback (most recent call last):
-  File "D:\projects\llcore\research\step_c_memory_tasks\exp_c2c3_compare.py", line 112, in <module>
-    main()
-  File "D:\projects\llcore\research\step_c_memory_tasks\exp_c2c3_compare.py", line 78, in main
-    print(f"\n[{name}] mean honest R\xb2: "
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-UnicodeEncodeError: 'cp932' codec can't encode character '\xb2' in position 32: illegal multibyte sequence
-=== exp_c2c3 done (exit=1) ===
-=== exp_c4 start ===
-=== exp_c4 done (exit=127) ===
+=== exp_c2c3 (utf8-fixed + 中間保存) start ===
