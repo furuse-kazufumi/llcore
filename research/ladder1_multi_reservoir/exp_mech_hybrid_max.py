@@ -202,12 +202,18 @@ def main() -> None:
           f"n_train={N_TRAIN} n_eval={N_EVAL} ridge_lambda={RIDGE_LAMBDA}")
     print(f"floor_lifted 閾値: held-out max R² > {FLOOR_THRESHOLD}\n")
 
+    # 各 seed の train/eval データを 1 度だけ生成し全 gene / 全 config で共有 (公平 + 高速)。
+    # eval は train の続きから draw → held-out 分離維持 (leakage なし)。
+    datasets = {s: make_batched_dataset(task, N_TRAIN, N_EVAL,
+                                        np.random.default_rng(EVAL_BASE + s)) for s in seeds}
+
     base_res = LeakyDelayLineReservoir(n_taps=8, in_dim=task.in_dim)
-    base_eval = single_eval_once(base_res, task, n_train=N_TRAIN, n_eval=N_EVAL,
-                                 ridge_lambda=RIDGE_LAMBDA)
     t0 = time.time()
     base_vals = np.array([
-        random_search_ceiling(base_eval, base_res.random_gene, N_RANDOM, s) for s in seeds
+        random_search_ceiling(
+            lambda g, s=s: _eval_single_on_dataset(base_res, g, datasets[s], RIDGE_LAMBDA),
+            base_res.random_gene, N_RANDOM, s)
+        for s in seeds
     ])
     dt = time.time() - t0
     baseline_max_r2 = float(base_vals.max())
