@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" font-family="sans-serif" role="img" aria-label="だまし地形と進化">
+  <rect width="720" height="360" fill="#0f1420"/>
+  <text x="360" y="30" fill="#e8eef7" font-size="19" text-anchor="middle" font-weight="bold">だまし地形と進化（いいものを選んで残す）</text>
+  <!-- 地形 -->
+  <path d="M40,310 L40,260 Q140,150 240,130 Q310,150 380,210 Q470,120 560,88 Q640,110 680,150 L680,310 Z"
+        fill="#1d2b45" stroke="#3a567f" stroke-width="2"/>
+  <!-- とび石 -->
+  <ellipse cx="380" cy="196" rx="14" ry="5" fill="#33507a"/>
+  <text x="240" y="116" fill="#ffcf6e" font-size="13" text-anchor="middle">ニセの頂上</text>
+  <text x="392" y="190" fill="#9fb3d1" font-size="12">とび石</text>
+  <text x="560" y="76" fill="#7ee0a8" font-size="13" text-anchor="middle">本物の頂上</text>
+  <!-- 赤: ふつうの山登り (ニセ頂上で止まる) -->
+  <circle r="9" fill="#ff6b6b" stroke="#2a0d0d" stroke-width="1">
+    <animate attributeName="cx" dur="9s" repeatCount="indefinite"
+      values="40;140;240;240;240;240;40" keyTimes="0;0.14;0.3;0.55;0.9;0.96;1"/>
+    <animate attributeName="cy" dur="9s" repeatCount="indefinite"
+      values="260;185;128;128;128;128;260" keyTimes="0;0.14;0.3;0.55;0.9;0.96;1"/>
+  </circle>
+  <!-- 緑: 進化(③) 群れ。谷をとび石で渡り本物の頂上へ -->
+  <circle r="8" fill="#5ad18a" stroke="#0c2a18" stroke-width="1">
+    <animate attributeName="cx" dur="9s" repeatCount="indefinite"
+      values="240;240;312;380;470;560;560;240" keyTimes="0;0.32;0.42;0.52;0.62;0.72;0.95;1"/>
+    <animate attributeName="cy" dur="9s" repeatCount="indefinite"
+      values="128;128;104;188;100;88;88;128" keyTimes="0;0.32;0.42;0.52;0.62;0.72;0.95;1"/>
+  </circle>
+  <circle r="7" fill="#3fae71" opacity="0.85">
+    <animate attributeName="cx" dur="9s" repeatCount="indefinite"
+      values="240;240;300;380;460;560;560;240" keyTimes="0;0.38;0.48;0.58;0.68;0.78;0.95;1"/>
+    <animate attributeName="cy" dur="9s" repeatCount="indefinite"
+      values="138;138;112;196;108;96;96;138" keyTimes="0;0.38;0.48;0.58;0.68;0.78;0.95;1"/>
+  </circle>
+  <!-- 凡例 -->
+  <circle cx="52" cy="338" r="7" fill="#ff6b6b"/>
+  <text x="66" y="343" fill="#ff9a9a" font-size="13">ふつうの山登り（今より高い方へ歩くだけ）→ ニセの頂上で止まる</text>
+  <circle cx="402" cy="338" r="7" fill="#5ad18a"/>
+  <text x="416" y="343" fill="#7ee0a8" font-size="13">進化（③）→ 谷をとび石で渡って本物の頂上へ</text>
+</svg>

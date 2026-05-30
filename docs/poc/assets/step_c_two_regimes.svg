@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 330" font-family="sans-serif" role="img" aria-label="Step C の2つの結果">
+  <rect width="720" height="330" fill="#0f1420"/>
+  <text x="360" y="28" fill="#e8eef7" font-size="18" text-anchor="middle" font-weight="bold">Step C の結果 — どちらも「進化（③）の出番」が無かった</text>
+  <line x1="360" y1="48" x2="360" y2="292" stroke="#2a3550" stroke-width="1"/>
+
+  <!-- 左: delayed_parity = むずかしすぎ (湖の底) -->
+  <text x="180" y="64" fill="#9fb3d1" font-size="13" text-anchor="middle">むずかしすぎる問題（XOR）</text>
+  <rect x="40" y="170" width="280" height="100" fill="#16314f" stroke="#2f547f"/>
+  <path d="M40,176 q35,-9 70,0 t70,0 t70,0 t70,0" fill="none" stroke="#3a6fa0" stroke-width="2">
+    <animate attributeName="d" dur="3.5s" repeatCount="indefinite"
+      values="M40,176 q35,-9 70,0 t70,0 t70,0 t70,0;M40,176 q35,9 70,0 t70,0 t70,0 t70,0;M40,176 q35,-9 70,0 t70,0 t70,0 t70,0"/>
+  </path>
+  <g fill="#7fb0d8" stroke="#0f1420" stroke-width="1">
+    <circle cx="92" cy="244" r="7"><animate attributeName="cy" dur="2.5s" repeatCount="indefinite" values="244;238;244"/></circle>
+    <circle cx="150" cy="250" r="7"><animate attributeName="cy" dur="2.9s" repeatCount="indefinite" values="250;243;250"/></circle>
+    <circle cx="210" cy="246" r="7"><animate attributeName="cy" dur="2.2s" repeatCount="indefinite" values="246;240;246"/></circle>
+    <circle cx="268" cy="252" r="7"><animate attributeName="cy" dur="3.2s" repeatCount="indefinite" values="252;245;252"/></circle>
+  </g>
+  <text x="180" y="300" fill="#9fb3d1" font-size="12" text-anchor="middle">全員ゼロ点（脳が解けない＝湖の底）</text>
+
+  <!-- 右: flip_flop = かんたんすぎ (なめらかな山の天井) -->
+  <text x="540" y="64" fill="#9fb3d1" font-size="13" text-anchor="middle">かんたんすぎる問題（覚えるだけ）</text>
+  <path d="M400,272 Q540,96 680,272 Z" fill="#1d3a2b" stroke="#3a7f56" stroke-width="2"/>
+  <line x1="448" y1="128" x2="636" y2="128" stroke="#7ee0a8" stroke-width="1.5" stroke-dasharray="4 4"/>
+  <text x="632" y="123" fill="#7ee0a8" font-size="11" text-anchor="end">満点（天井）</text>
+  <g fill="#7ee0a8" stroke="#0f1420" stroke-width="1">
+    <circle cx="516" cy="138" r="7"><animate attributeName="cx" dur="2.6s" repeatCount="indefinite" values="516;524;516"/></circle>
+    <circle cx="544" cy="133" r="7"><animate attributeName="cx" dur="3.0s" repeatCount="indefinite" values="544;536;544"/></circle>
+    <circle cx="532" cy="145" r="7"><animate attributeName="cx" dur="2.3s" repeatCount="indefinite" values="532;540;532"/></circle>
+    <circle cx="562" cy="140" r="7"><animate attributeName="cx" dur="3.1s" repeatCount="indefinite" values="562;554;562"/></circle>
+  </g>
+  <text x="540" y="300" fill="#9fb3d1" font-size="12" text-anchor="middle">全員ほぼ満点（かんたん＝なめらかな山）</text>
+
+  <text x="360" y="322" fill="#ffcf6e" font-size="13" text-anchor="middle">「ニセ頂上を越える、だましだが渡れる坂道」が現れず＝③の差が見えない</text>
+</svg>
