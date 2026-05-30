@@ -79,21 +79,52 @@ ES_SIGMA0 = 0.6      # 初期変異強度 (gene 空間 leak∈[-4,4]/w∈[-2,2] 
 ES_SIGMA_DECAY = 0.92  # 世代ごとの sigma 減衰 (収束のための annealing)
 
 
-def random_search_ceiling(eval_once, random_gene, n_random: int, seed_idx: int) -> float:
+def _single_features_batch(res: LeakyDelayLineReservoir, gene: np.ndarray,
+                           inputs: np.ndarray) -> np.ndarray:
+    """単層 LeakyDelayLineReservoir の最終状態を B 本同時に計算 (baseline 高速路).
+
+    reservoir.run の数式と等価だが B 本を 1 時間ループでベクトル化。最終状態のみ返す
+    (= baseline readout 特徴 = 単層状態そのもの、2次特徴なし)。
+    """
+    gene = np.asarray(gene, dtype=np.float64)
+    leak = _hm_sigmoid(gene[: res.n_taps])               # (n_taps,)
+    w_in = gene[res.n_taps:].reshape(res.n_taps, res.in_dim)
+    B, T = inputs.shape[0], inputs.shape[1]
+    h = np.zeros((B, res.n_taps), dtype=np.float64)
+    for t in range(T):
+        drive = inputs[:, t, :] @ w_in.T                 # (B, n_taps)
+        h = (1.0 - leak) * h + leak * np.tanh(drive + h)
+    return h
+
+
+def _eval_single_on_dataset(res: LeakyDelayLineReservoir, gene: np.ndarray,
+                            dataset, ridge_lambda: float) -> float:
+    """baseline 単層 reservoir の held-out R² を前計算データセットで採点する."""
+    x_tr, y_tr, x_ev, y_ev = dataset
+    s_tr = _single_features_batch(res, gene, x_tr)
+    readout = fit_ridge_readout(s_tr, y_tr, ridge_lambda=ridge_lambda)
+    s_ev = _single_features_batch(res, gene, x_ev)
+    pred = np.atleast_2d(readout(s_ev))
+    mse = float(np.mean((pred - y_ev) ** 2))
+    var = float(np.mean((y_ev - y_ev.mean(axis=0)) ** 2))
+    r2 = 1.0 - mse / max(var, 1e-12)
+    return float(np.clip(r2, 0.0, 1.0))
+
+
+def random_search_ceiling(score_gene, random_gene, n_random: int, seed_idx: int) -> float:
     """1 seed の random search で到達した max held-out R² を返す.
 
-    全 gene を同一 eval データ (default_rng(EVAL_BASE+seed_idx)) で採点 → gene 間公平。
+    全 gene を同一の前計算データセットで採点 (score_gene が seed 固定データを束縛) → gene 間公平。
     """
     gene_rng = np.random.default_rng(GENE_BASE + seed_idx)
     best = 0.0
     for _ in range(n_random):
         gene = random_gene(gene_rng)
-        eval_rng = np.random.default_rng(EVAL_BASE + seed_idx)  # 全 gene 同一 train/eval
-        best = max(best, eval_once(gene, eval_rng))
+        best = max(best, score_gene(gene))
     return best
 
 
-def es_search_ceiling(res: HybridMaxReservoir, eval_once, lo, hi, seed_idx: int) -> float:
+def es_search_ceiling(res: HybridMaxReservoir, score_gene, lo, hi, seed_idx: int) -> float:
     """1 seed の (μ,λ) ES で到達した max held-out R² を返す (evolved_search).
 
     - 初期 μ 個体を bounds 内一様乱数で生成。
