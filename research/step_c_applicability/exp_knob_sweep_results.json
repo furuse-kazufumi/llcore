@@ -1,0 +1,484 @@
+{
+  "design": {
+    "knob": "dip_depth_d",
+    "knob_meaning": "dip carved into a monotone ramp(0.60->1.00) over behavior[0.40,0.90], depth d at center b=0.65; d=0 strictly-monotone smooth ramp (exp5), d=1 deep dip (exp4 deceptive corridor)",
+    "d_levels": [
+      0.0,
+      0.2,
+      0.4,
+      0.5,
+      0.6,
+      0.7,
+      0.85,
+      1.0
+    ],
+    "D": 24,
+    "n_seeds": 20,
+    "n_evals": 6000,
+    "honest_n_trials": 30,
+    "sigma": 0.1,
+    "base_seed": 20260530,
+    "noise": 0.008,
+    "global_peak_proxy": 0.8,
+    "strict_gate": "diff>0 ∧ one-sided Wilcoxon p<0.05 ∧ n>=15 ∧ |paired_sign_delta|>=0.147"
+  },
+  "threshold_d_star": 0.2,
+  "levels": [
+    {
+      "d": 0.0,
+      "valley_floor": 0.6,
+      "means": {
+        "map_elites": 0.9960052535238662,
+        "rr_hillclimb": 0.9982581603535982,
+        "panmictic_ga": 0.9976043848831709,
+        "random": 0.8530323852521642
+      },
+      "reach_rate": {
+        "map_elites": 1.0,
+        "rr_hillclimb": 1.0,
+        "panmictic_ga": 1.0,
+        "random": 1.0
+      },
+      "me_minus_best_baseline": -0.0022529068297320043,
+      "best_baseline_name": "rr_hillclimb",
+      "gates": {
+        "rr_hillclimb": {
+          "name_a": "map_elites",
+          "name_b": "rr_hillclimb",
+          "mean_a": 0.9960052535238662,
+          "mean_b": 0.9982581603535982,
+          "diff": -0.0022529068297320654,
+          "win_rate": 0.25,
+          "wilcoxon_p": 0.9681386947631836,
+          "paired_sign_delta": -0.5,
+          "n_seeds": 20,
+          "passes": false
+        },
+        "panmictic_ga": {
+          "name_a": "map_elites",
+          "name_b": "panmictic_ga",
+          "mean_a": 0.9960052535238662,
+          "mean_b": 0.9976043848831709,
+          "diff": -0.0015991313593048673,
+          "win_rate": 0.35,
+          "wilcoxon_p": 0.9115734100341797,
+          "paired_sign_delta": -0.3,
+          "n_seeds": 20,
+          "passes": false
+        },
+        "random": {
+          "name_a": "map_elites",
+          "name_b": "random",
+          "mean_a": 0.9960052535238662,
+          "mean_b": 0.8530323852521642,
+          "diff": 0.14297286827170186,
+          "win_rate": 1.0,
+          "wilcoxon_p": 9.5367431640625e-07,
+          "paired_sign_delta": 1.0,
+          "n_seeds": 20,
+          "passes": true
+        }
+      },
+      "load_bearing": false
+    },
+    {
+      "d": 0.2,
+      "valley_floor": 0.48,
+      "means": {
+        "map_elites": 0.9955636526336695,
+        "rr_hillclimb": 0.7195969446033224,
+        "panmictic_ga": 0.6868422566055397,
+        "random": 0.7490838063479186
+      },
+      "reach_rate": {
+        "map_elites": 1.0,
+        "rr_hillclimb": 0.15,
+        "panmictic_ga": 0.05,
+        "random": 0.1
+      },
+      "me_minus_best_baseline": 0.24647984628575093,
+      "best_baseline_name": "random",
+      "gates": {
+        "rr_hillclimb": {
+          "name_a": "map_elites",
+          "name_b": "rr_hillclimb",
+          "mean_a": 0.9955636526336695,
+          "mean_b": 0.7195969446033224,
+          "diff": 0.27596670803034723,
+          "win_rate": 0.85,
+          "wilcoxon_p": 1.33514404296875e-05,
+          "paired_sign_delta": 0.7,
+          "n_seeds": 20,
+          "passes": true
+        },
+        "panmictic_ga": {
+          "name_a": "map_elites",
+          "name_b": "panmictic_ga",
+          "mean_a": 0.9955636526336695,
+          "mean_b": 0.6868422566055397,
+          "diff": 0.30872139602813,
+          "win_rate": 0.95,
+          "wilcoxon_p": 1.9073486328125e-06,
+          "paired_sign_delta": 0.9,
+          "n_seeds": 20,
+          "passes": true
+        },
+        "random": {
+          "name_a": "map_elites",
+          "name_b": "random",
+          "mean_a": 0.9955636526336695,
+          "mean_b": 0.7490838063479186,
+          "diff": 0.2464798462857511,
+          "win_rate": 1.0,
+          "wilcoxon_p": 9.5367431640625e-07,
+          "paired_sign_delta": 1.0,
+          "n_seeds": 20,
+          "passes": true
+        }
+      },
+      "load_bearing": true
+    },
+    {
+      "d": 0.4,
+      "valley_floor": 0.36,
+      "means": {
+        "map_elites": 0.9965702547356775,
+        "rr_hillclimb": 0.6818475833656639,
+        "panmictic_ga": 0.6515460330551794,
+        "random": 0.6759187201546191
+      },
+      "reach_rate": {
+        "map_elites": 1.0,
+        "rr_hillclimb": 0.1,
+        "panmictic_ga": 0.0,
+        "random": 0.0
+      },
+      "me_minus_best_baseline": 0.31472267137001364,
+      "best_baseline_name": "rr_hillclimb",
+      "gates": {
+        "rr_hillclimb": {
+          "name_a": "map_elites",
+          "name_b": "rr_hillclimb",
+          "mean_a": 0.9965702547356775,
+          "mean_b": 0.6818475833656639,
+          "diff": 0.31472267137001364,
+          "win_rate": 1.0,
+          "wilcoxon_p": 9.5367431640625e-07,
+          "paired_sign_delta": 1.0,
+          "n_seeds": 20,
+          "passes": true
+        },
+        "panmictic_ga": {
+          "name_a": "map_elites",
+          "name_b": "panmictic_ga",
+          "mean_a": 0.9965702547356775,
+          "mean_b": 0.6515460330551794,
+          "diff": 0.345024221680498,
+          "win_rate": 1.0,
+          "wilcoxon_p": 9.5367431640625e-07,
+          "paired_sign_delta": 1.0,
+          "n_seeds": 20,
+          "passes": true
+        },
+        "random": {
+          "name_a": "map_elites",
+          "name_b": "random",
+          "mean_a": 0.9965702547356775,
+          "mean_b": 0.6759187201546191,
+          "diff": 0.3206515345810582,
+          "win_rate": 1.0,
+          "wilcoxon_p": 9.5367431640625e-07,
+          "paired_sign_delta": 1.0,
+          "n_seeds": 20,
+          "passes": true
+        }
+      },
+      "load_bearing": true
+    },
+    {
+      "d": 0.5,
+      "valley_floor": 0.3,
+      "means": {
+        "map_elites": 0.992798832658767,
+        "rr_hillclimb": 0.6463483201516013,
+        "panmictic_ga": 0.6462580825286707,
+        "random": 0.6577464689504195
+      },
+      "reach_rate": {
+        "map_elites": 1.0,
+        "rr_hillclimb": 0.0,
+        "panmictic_ga": 0.0,
+        "random": 0.0
+      },
+      "me_minus_best_baseline": 0.33505236370834746,
+      "best_baseline_name": "random",
+      "gates": {
+        "rr_hillclimb": {
+          "name_a": "map_elites",
+          "name_b": "rr_hillclimb",
+          "mean_a": 0.992798832658767,
+          "mean_b": 0.6463483201516013,
+          "diff": 0.3464505125071655,
+          "win_rate": 1.0,
+          "wilcoxon_p": 9.5367431640625e-07,
+          "paired_sign_delta": 1.0,
+          "n_seeds": 20,
+          "passes": true
+        },
+        "panmictic_ga": {
+          "name_a": "map_elites",
+          "name_b": "panmictic_ga",
+          "mean_a": 0.992798832658767,
+          "mean_b": 0.6462580825286707,
+          "diff": 0.3465407501300962,
+          "win_rate": 1.0,
+          "wilcoxon_p": 9.5367431640625e-07,
+          "paired_sign_delta": 1.0,
+          "n_seeds": 20,
+          "passes": true
+        },
+        "random": {
+          "name_a": "map_elites",
+          "name_b": "random",
+          "mean_a": 0.992798832658767,
+          "mean_b": 0.6577464689504195,
+          "diff": 0.3350523637083473,
+          "win_rate": 1.0,
+          "wilcoxon_p": 9.5367431640625e-07,
+          "paired_sign_delta": 1.0,
+          "n_seeds": 20,
+          "passes": true
+        }
+      },
+      "load_bearing": true
+    },
+    {
+      "d": 0.6,
+      "valley_floor": 0.24,
+      "means": {
+        "map_elites": 0.9947524231562197,
+        "rr_hillclimb": 0.6416443272190162,
+        "panmictic_ga": 0.6417726900645795,
+        "random": 0.6479457193547142
+      },
+      "reach_rate": {
+        "map_elites": 1.0,
+        "rr_hillclimb": 0.0,
+        "panmictic_ga": 0.0,
+        "random": 0.0
+      },
+      "me_minus_best_baseline": 0.34680670380150547,
+      "best_baseline_name": "random",
+      "gates": {
+        "rr_hillclimb": {
+          "name_a": "map_elites",
+          "name_b": "rr_hillclimb",
+          "mean_a": 0.9947524231562197,
+          "mean_b": 0.6416443272190162,
+          "diff": 0.35310809593720344,
+          "win_rate": 1.0,
+          "wilcoxon_p": 9.5367431640625e-07,
+          "paired_sign_delta": 1.0,
+          "n_seeds": 20,
+          "passes": true
+        },
+        "panmictic_ga": {
+          "name_a": "map_elites",
+          "name_b": "panmictic_ga",
+          "mean_a": 0.9947524231562197,
+          "mean_b": 0.6417726900645795,
+          "diff": 0.35297973309164016,
+          "win_rate": 1.0,
+          "wilcoxon_p": 9.5367431640625e-07,
+          "paired_sign_delta": 1.0,
+          "n_seeds": 20,
+          "passes": true
+        },
+        "random": {
+          "name_a": "map_elites",
+          "name_b": "random",
+          "mean_a": 0.9947524231562197,
+          "mean_b": 0.6479457193547142,
+          "diff": 0.3468067038015055,
+          "win_rate": 1.0,
+          "wilcoxon_p": 9.5367431640625e-07,
+          "paired_sign_delta": 1.0,
+          "n_seeds": 20,
+          "passes": true
+        }
+      },
+      "load_bearing": true
+    },
+    {
+      "d": 0.7,
+      "valley_floor": 0.18000000000000002,
+      "means": {
+        "map_elites": 0.996345830422146,
+        "rr_hillclimb": 0.6378790180276305,
+        "panmictic_ga": 0.6384176085419704,
+        "random": 0.6411303770927015
+      },
+      "reach_rate": {
+        "map_elites": 1.0,
+        "rr_hillclimb": 0.0,
+        "panmictic_ga": 0.0,
+        "random": 0.0
+      },
+      "me_minus_best_baseline": 0.3552154533294445,
+      "best_baseline_name": "random",
+      "gates": {
+        "rr_hillclimb": {
+          "name_a": "map_elites",
+          "name_b": "rr_hillclimb",
+          "mean_a": 0.996345830422146,
+          "mean_b": 0.6378790180276305,
+          "diff": 0.35846681239451544,
+          "win_rate": 1.0,
+          "wilcoxon_p": 9.5367431640625e-07,
+          "paired_sign_delta": 1.0,
+          "n_seeds": 20,
+          "passes": true
+        },
+        "panmictic_ga": {
+          "name_a": "map_elites",
+          "name_b": "panmictic_ga",
+          "mean_a": 0.996345830422146,
+          "mean_b": 0.6384176085419704,
+          "diff": 0.35792822188017565,
+          "win_rate": 1.0,
+          "wilcoxon_p": 9.5367431640625e-07,
+          "paired_sign_delta": 1.0,
+          "n_seeds": 20,
+          "passes": true
+        },
+        "random": {
+          "name_a": "map_elites",
+          "name_b": "random",
+          "mean_a": 0.996345830422146,
+          "mean_b": 0.6411303770927015,
+          "diff": 0.3552154533294444,
+          "win_rate": 1.0,
+          "wilcoxon_p": 9.5367431640625e-07,
+          "paired_sign_delta": 1.0,
+          "n_seeds": 20,
+          "passes": true
+        }
+      },
+      "load_bearing": true
+    },
+    {
+      "d": 0.85,
+      "valley_floor": 0.09000000000000001,
+      "means": {
+        "map_elites": 0.9967892212965623,
+        "rr_hillclimb": 0.6519102131080498,
+        "panmictic_ga": 0.6343585704630453,
+        "random": 0.6349989553117081
+      },
+      "reach_rate": {
+        "map_elites": 1.0,
+        "rr_hillclimb": 0.05,
+        "panmictic_ga": 0.0,
+        "random": 0.0
+      },
+      "me_minus_best_baseline": 0.3448790081885126,
+      "best_baseline_name": "rr_hillclimb",
+      "gates": {
+        "rr_hillclimb": {
+          "name_a": "map_elites",
+          "name_b": "rr_hillclimb",
+          "mean_a": 0.9967892212965623,
+          "mean_b": 0.6519102131080498,
+          "diff": 0.3448790081885125,
+          "win_rate": 1.0,
+          "wilcoxon_p": 9.5367431640625e-07,
+          "paired_sign_delta": 1.0,
+          "n_seeds": 20,
+          "passes": true
+        },
+        "panmictic_ga": {
+          "name_a": "map_elites",
+          "name_b": "panmictic_ga",
+          "mean_a": 0.9967892212965623,
+          "mean_b": 0.6343585704630453,
+          "diff": 0.36243065083351683,
+          "win_rate": 1.0,
+          "wilcoxon_p": 9.5367431640625e-07,
+          "paired_sign_delta": 1.0,
+          "n_seeds": 20,
+          "passes": true
+        },
+        "random": {
+          "name_a": "map_elites",
+          "name_b": "random",
+          "mean_a": 0.9967892212965623,
+          "mean_b": 0.6349989553117081,
+          "diff": 0.3617902659848542,
+          "win_rate": 1.0,
+          "wilcoxon_p": 9.5367431640625e-07,
+          "paired_sign_delta": 1.0,
+          "n_seeds": 20,
+          "passes": true
+        }
+      },
+      "load_bearing": true
+    },
+    {
+      "d": 1.0,
+      "valley_floor": 0.0,
+      "means": {
+        "map_elites": 0.997402197749517,
+        "rr_hillclimb": 0.6483254693946408,
+        "panmictic_ga": 0.6310678306322928,
+        "random": 0.6305513330324884
+      },
+      "reach_rate": {
+        "map_elites": 1.0,
+        "rr_hillclimb": 0.05,
+        "panmictic_ga": 0.0,
+        "random": 0.0
+      },
+      "me_minus_best_baseline": 0.34907672835487624,
+      "best_baseline_name": "rr_hillclimb",
+      "gates": {
+        "rr_hillclimb": {
+          "name_a": "map_elites",
+          "name_b": "rr_hillclimb",
+          "mean_a": 0.997402197749517,
+          "mean_b": 0.6483254693946408,
+          "diff": 0.349076728354876,
+          "win_rate": 1.0,
+          "wilcoxon_p": 9.5367431640625e-07,
+          "paired_sign_delta": 1.0,
+          "n_seeds": 20,
+          "passes": true
+        },
+        "panmictic_ga": {
+          "name_a": "map_elites",
+          "name_b": "panmictic_ga",
+          "mean_a": 0.997402197749517,
+          "mean_b": 0.6310678306322928,
+          "diff": 0.3663343671172242,
+          "win_rate": 1.0,
+          "wilcoxon_p": 9.5367431640625e-07,
+          "paired_sign_delta": 1.0,
+          "n_seeds": 20,
+          "passes": true
+        },
+        "random": {
+          "name_a": "map_elites",
+          "name_b": "random",
+          "mean_a": 0.997402197749517,
+          "mean_b": 0.6305513330324884,
+          "diff": 0.36685086471702855,
+          "win_rate": 1.0,
+          "wilcoxon_p": 9.5367431640625e-07,
+          "paired_sign_delta": 1.0,
+          "n_seeds": 20,
+          "passes": true
+        }
+      },
+      "load_bearing": true
+    }
+  ]
+}

@@ -548,7 +548,11 @@ def step_once(
     if r.ok and r.used_z3:
         wp = write_unsat_witness(new_net, witness_dir, step_id)
         return new_net, StepVerdict("unsat", elapsed, str(wp), r.reason)
-    if not r.ok and r.used_z3 and r.counterexample is not None:
+    if not r.ok and r.used_z3:
+        # NOTE: verify_gene_safe reports a violation without an assignment and via a
+        # tanh over-approximation; write_sat_witness searches for a *genuine* real
+        # violation. (The previous `counterexample is not None` guard was dead code —
+        # verify_gene_safe never sets it — so violations fell through to "timeout".)
         wp, genuine = write_sat_witness(new_net, r, witness_dir, step_id)
         if genuine:
             return new_net, StepVerdict("sat", elapsed, str(wp), r.reason)
