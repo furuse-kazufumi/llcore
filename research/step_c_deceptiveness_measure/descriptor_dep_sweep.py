@@ -117,14 +117,15 @@ def main() -> int:
                   flush=True)
 
     # summarize flips
+    bins_grid = (8, 16, 32)
     summary = {}
     for dname in descriptors:
-        verds = {out["sweep"][dname][str(b)]["below_threshold"] for b in (8, 12, 16, 24, 32)}
+        verds = {out["sweep"][dname][str(b)]["below_threshold"] for b in bins_grid}
         summary[dname] = {"verdicts_seen": sorted(str(v) for v in verds),
                           "flips_across_bins": len(verds) > 1}
     # across all descriptor+bins, are both below and above achievable?
     all_cells = [out["sweep"][d][str(b)]["below_threshold"]
-                 for d in descriptors for b in (8, 12, 16, 24, 32)]
+                 for d in descriptors for b in bins_grid]
     out["flip_summary"] = {
         "per_descriptor": summary,
         "any_below_achievable": any(all_cells),
