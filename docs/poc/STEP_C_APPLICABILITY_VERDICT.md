@@ -65,10 +65,14 @@ gate を適用。advantage = MAP-E mean − best baseline mean。reach = honest 
   この幅の正体 — panmictic-GA は RR-hillclimb より少し深い dip まで (population の確率的越境で) 渡れる
   ので、RR が先に (d≈0.13) 落ち、GA が後 (d≈0.16) に落ちる。**「閾値帯」(threshold band) d∈[0.13,0.16]**
   と呼ぶのが最も honest。
-- **random は全 d で beaten** — genotypic corridor で b≈0.5 に固着し大域 (b=0.9) に構造的に到達不能
-  (dip 深さ非依存)。**よって random を撃破しても③の証拠にならない** (自明)。意味ある baseline は
-  climbing 系 (RR/GA) のみ。`load_bearing` の判定は 3 baseline 全勝を要求するので random の自明勝利が
-  positive を水増ししない設計 (n_baselines_beaten が d≤0.10 で 1/3 = random のみ、を明示)。
+- **random の扱い (Codex pair-review で訂正)**: 当初「random は d 非依存で自明に beaten」と書いたが
+  **これは誤り**。実測では random の reach は d とともに下がり (d=0: 1.00 → d=0.10: 0.50 → d=0.16: 0.25)、
+  **d≥0.16 では climbing baseline (RR/GA) が dip で崩れて random を下回るため、random が最強 baseline になる**
+  (`best_baseline_name=random`)。`load_bearing` 判定は **3 baseline 全勝**を要求する = MAP-E は各 d で
+  最強 baseline (高 d では random) を strict gate で上回る必要があり、**むしろ保守的**。よって random の
+  扱いを誤っても閾値判定は健全 (3 全勝を課すので自明勝利による水増しは構造的に起きない)。ただし
+  「random は意味ある baseline でない」という当初の narrative は撤回する。d≤0.10 で beaten=1/3 (random のみ)
+  なのは「smooth 側では MAP-E が climbing baseline に勝てない」ことの裏返しで、③不在の正しい指標。
 
 ## 3. honest-disclosure チェック (`feedback_benchmark_honest_disclosure`)
 
