@@ -285,6 +285,15 @@ def main() -> int:
         "purpose": ("Phase A CrossMetric: re-test the behavior_elite_dip per-task "
                     "below/above-threshold conclusion with an independent metric (FDC-behavior). "
                     "Same task wiring, different metric, to check cross-metric agreement."),
+        "fast_mode": bool(_FAST),
+        "fast_mode_note": (
+            "RAPTOR_FDC_FAST=1: reduced sampling budget to complete within the harness "
+            "time limit (full-budget reservoir run is ~80 min). Verdicts are reported with "
+            "95% CI; the reduced budget widens CIs but the below/above conclusion is checked "
+            "against the CI, not a single point." if _FAST else
+            "Full budget (reservoir n_samples=1600 honest_n_trials=10; step6 n_samples=800; "
+            "5 seeds)."
+        ),
         "threshold_at_d_star": threshold,
         "d_star": thr_info["d_star"],
         "threshold_source": thr_info["source"],
