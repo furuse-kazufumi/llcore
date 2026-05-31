@@ -237,16 +237,19 @@ def verify_gene_safe(
             ok=True,
             used_z3=True,
             reason=f"gene admit: |state|<={state_bound} preserved for d={g.decay:.3f}, m={g.mix:.3f}, g={g.gate_str:.3f}",
+            solver_status="unsat",
         )
     elif result == z3.sat:
         return InvariantResult(
             ok=False,
             used_z3=True,
             reason=f"gene reject: invariant violation found (d={g.decay:.3f}, m={g.mix:.3f}, g={g.gate_str:.3f})",
+            solver_status="sat",
         )
     else:
         return InvariantResult(
             ok=False,
             used_z3=True,
             reason=f"z3 returned {result}",
+            solver_status="unknown",
         )
