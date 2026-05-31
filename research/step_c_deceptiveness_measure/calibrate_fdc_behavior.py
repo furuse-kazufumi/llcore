@@ -101,6 +101,17 @@ def main() -> int:
 
     spearman = _spearman(ms, ds)
 
+    # --- 診断: 操作的 metric は best-behavior 推定 (= 到達可能 best) に anchor するため、
+    #     dip が local 峰高さを超える高 d で reference が global 峰側 (b≈0.69) から
+    #     local 峰側 (b≈0.47) へ relocate し、metric が **反転** する (honest disclosure)。
+    #     これを (a) 単調な低 d 部分集合の Spearman と (b) TRUE global 最適 (b=0.9, 構築上既知) を
+    #     reference にした control で特性化する。control は操作的 metric ではない (真の最適を知れない)
+    #     が、collapse の原因が「reference relocation」であることを切り分ける。
+    low_mask = ds <= 0.20
+    spearman_low = _spearman(ms[low_mask], ds[low_mask])
+
+    best_behs = np.array([c.get("best_behavior_mean", float("nan")) for c in curve])
+
     # monotone (non-decreasing) チェック — 推定ノイズを考慮して厳密単調と「CI 重複を許す単調」両方
     diffs = np.diff(ms)
     strictly_monotone = bool(np.all(diffs >= 0))
