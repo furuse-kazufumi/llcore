@@ -56,8 +56,12 @@ from metric_downhill_necessity import deceptiveness_with_ci  # noqa: E402
 from exp_knob_sweep import D as SYNTH_D  # noqa: E402
 from exp_knob_sweep import behavior_mean, make_corridor_eval  # noqa: E402
 
-# Shared grid for calibration AND real-task application (identical pipeline).
-N_BINS = 24       # = exp_knob_sweep MAP-Elites grid; calibration_results.json also used 24.
+# Shared grid for calibration AND real-task application (IDENTICAL pipeline so the threshold
+# and the real-task numbers come from the same estimator+grid). The reservoir per-eval cost is
+# ~100ms (stochastic ridge R2), so the real-task sampling budget must be modest; n_bins is set
+# to 12 to keep per-bin occupancy dense (n_samples/12 >= ~25) despite the smaller n_samples.
+# Calibration is RE-RUN at this same n_bins so the comparison stays fair.
+N_BINS = 12
 D_STAR = 0.16     # the dip-depth knob value where phase-3 became load-bearing (exp_knob_sweep).
 
 
