@@ -5,17 +5,4 @@ Phase A CrossMetric #3: DOWNHILL-NECESSITY on REAL tasks
     d=0.00: downhill=0.0000
     d=0.05: downhill=0.0000
     d=0.10: downhill=0.0000
-    d=0.13: downhill=0.6768
-    d=0.16: downhill=0.6879
-    d=0.20: downhill=0.6000
-    d=0.30: downhill=0.5258
-    d=0.40: downhill=0.3808
-    d=0.50: downhill=0.1470
-    d=0.60: downhill=0.1515
-    d=0.70: downhill=0.1545
-    d=0.85: downhill=0.3692
-    d=1.00: downhill=0.1818
-    spearman_vs_d=0.2033 metric_at_dstar(d*=0.16)=0.6879 monotone=False
-=== reservoir tasks (behavior 2D -> PCA 1D -> downhill) ===
-    config: {'n_seeds': 5, 'n_samples': 1600, 'fitness_trials': 10} n_bins=24
 EXITCODE=127
