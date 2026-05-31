@@ -328,11 +328,13 @@ def run_sweep(
             gates[b] = asdict(g)
             n_beaten += int(g.passes)
         all_pass = n_beaten == len(baselines)
+        beats_climber = gates["rr_hillclimb"]["passes"] or gates["panmictic_ga"]["passes"]
         results.append(LevelResult(
-            d=d, valley_floor=_LOCAL_H * (1.0 - d), means=means, reach_rate=reach,
+            d=d, dip_center_corridor=_RAMP_AT_CENTER * (1.0 - d), means=means, reach_rate=reach,
             me_minus_best_baseline=advantage, best_baseline_name=best_b,
             gates=gates, load_bearing=all_pass,
-            partial_load_bearing=(n_beaten >= 1 and not all_pass),
+            beats_any_baseline=(n_beaten >= 1),
+            beats_climbing_baseline=beats_climber,
             n_baselines_beaten=n_beaten,
         ))
         print(f"d={d:.2f} (floor={_LOCAL_H*(1-d):.3f}): "
