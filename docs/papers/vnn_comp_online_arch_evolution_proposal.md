@@ -13,7 +13,7 @@ The Verification of Neural Networks Competition (VNN-COMP) has, across its first
 
 We propose a new VNN-COMP category — `online-arch-evo` — and falsifiably claim:
 
-1. **No existing category measures online architecture evolution verification.** We give three concrete benchmark queries that α,β-CROWN provably cannot answer in its current form, and show why (§2).
+1. **No existing category measures online architecture evolution verification.** We give three concrete benchmark queries that cannot be *expressed* in the current one-network-per-call VNN-COMP I/O contract that α,β-CROWN implements, and show why the gap is a contract mismatch rather than a verifier weakness (§2).
 2. **A precise benchmark specification is possible.** We give an input format (`.vnnlib` + `.onnx` + a new `.changeop_seq` file), an output format (per-step `sat`/`unsat`/`timeout`/`error`), a scoring rule with a wall-clock budget, and a submission protocol — all CPU-completable (§4, §5).
 3. **A reference implementation exists.** We adapt the present authors' llcore PoC 1a (a Z3 state-norm invariant verifier; 5.8 ms per query) into a category-conformant tool that handles a 5-step `ChangeOp` sequence with per-step verdicts (§6).
 4. **The category is open-ended by construction.** It uses (a) wall-clock-bounded scoring of arbitrarily long mutation streams, (b) a kernel-typed `ChangeOp` interface that admits unseen kernel families (rwkv / mamba / hopfield / linear-attention) without spec changes, (c) a minimal-criterion coevolution round in which `ChangeOp` *populations* compete (after Brant & Stanley's POET), and (d) a MODES (Bedau evolutionary activity statistics) integrity sensor that rejects saturated/gaming submissions (§4.4).
