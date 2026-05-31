@@ -35,9 +35,11 @@ def p1_tautology():
     rng = np.random.default_rng(0)
     G = rng.random((5000, D))
     b = G.mean(axis=1)
+    erng = np.random.default_rng(1)
     for d in (0.0, 0.16, 0.5, 1.0):
         ef = make_corridor_eval(d)
-        f = np.array([ef(g) for g in G])
+        # corridor_eval(gene, rng); noise is tiny (_NOISE=0.008) so corr ~ structural.
+        f = np.array([ef(g, erng) for g in G])
         c = np.corrcoef(f, b)[0, 1]
         print(f"  d={d:.2f}: corr(fitness, behavior=mean) = {c:+.4f}")
     print("  -> |corr|~1 confirms fitness is determined by the behavior axis itself.")
