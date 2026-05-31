@@ -71,9 +71,10 @@ Codex は当初版を **「現状の結論は信頼できない、再実行要�
 **③ は本分布で load-bearing でない (honest negative)。**
 
 - **C-gen3 PASS / C-gen4 FAIL**。MAP-E は「②③を殺し①変異だけ残した randselect」には strict gate で
-  有意に勝つ(p=0.006, δ=+0.73)。だが **panmictic-GA(選択あり・niching なし)にも random にも有意差なし**。
+  有意に勝つ(p=0.015, δ=+0.60)。だが **panmictic-GA(選択あり・niching なし)には逆に僅かに負け
+  (−0.019)、random にも有意差なし**。
 - 解釈: **MAP-E > randselect が示すのは「何らかの選択 > 無選択ドリフト」**であって、③(behavioral
-  niching=分離)固有の寄与ではない。② niching を外した panmictic が MAP-E と同等(全 method ≈0.63-0.70 で
+  niching=分離)固有の寄与ではない。② niching を外した panmictic が MAP-E と同等以上(全 method ≈0.62-0.70 で
   天井近傍)=**この多タスク汎化 landscape は十分に滑らかで、分離(③)が無くても単純な選択 or random で
   同じ汎化に到達する**。
 - = Step C / step4 (exp5/exp7 smooth) / 梯子段1 と**一貫**: ③ は **欺瞞的 corridor 限定で load-bearing**
