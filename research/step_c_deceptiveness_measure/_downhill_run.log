@@ -1,8 +1,29 @@
 Phase A CrossMetric #3: DOWNHILL-NECESSITY on REAL tasks
 ========================================================================================
 === reconfirm downhill_necessity calibration on synthetic knob ===
-    D=24 n_seeds=3 n_samples=4000 n_bins=24
+    D=24 n_seeds=3 n_samples=4000 n_bins=12
     d=0.00: downhill=0.0000
     d=0.05: downhill=0.0000
     d=0.10: downhill=0.0000
-EXITCODE=127
+    d=0.13: downhill=0.0000
+    d=0.16: downhill=0.2222
+    d=0.20: downhill=0.5000
+    d=0.30: downhill=0.4444
+    d=0.40: downhill=0.3492
+    d=0.50: downhill=0.0556
+    d=0.60: downhill=0.1667
+    d=0.70: downhill=0.1111
+    d=0.85: downhill=0.2381
+    d=1.00: downhill=0.1111
+    spearman_vs_d=0.4945 metric_at_dstar(d*=0.16)=0.2222 monotone=False
+=== reservoir tasks (behavior 2D -> PCA 1D -> downhill) ===
+    config: {'n_seeds': 3, 'n_samples': 250, 'fitness_trials': 2} n_bins=12
+    variable_delay_recall: 0.4630 CI[0.0035,0.9225] below=False (84s)
+    flip_flop: 0.3889 CI[-0.4478,1.2256] below=False (117s)
+=== step6 text proxy (ESN; behavior=(rho,leak) -> PCA 1D -> downhill) ===
+    corpus=24000 vocab=87 N=40; config: {'n_seeds': 3, 'n_samples': 600, 'fitness_trials': 1} n_bins=12
+    step6_text_proxy: 0.6111 CI[0.3721,0.8502] below=False (200s)
+========================================================================================
+all_below_threshold=False  agrees_with_behavior_elite_dip=True (eb_all_below=False)
+wrote D:\projects\llcore\research\step_c_deceptiveness_measure\downhill_necessity_crossmetric.json
+EXITCODE=0
