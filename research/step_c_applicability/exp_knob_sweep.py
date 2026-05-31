@@ -345,7 +345,7 @@ def run_sweep(
             beats_climbing_baseline=beats_climber,
             n_baselines_beaten=n_beaten,
         ))
-        print(f"d={d:.2f} (floor={_LOCAL_H*(1-d):.3f}): "
+        print(f"d={d:.2f} (dip_center={_RAMP_AT_CENTER*(1-d):.3f}): "
               f"MAP-E={means['map_elites']:.4f}(reach {reach['map_elites']:.2f}) "
               f"RR={means['rr_hillclimb']:.4f}(r {reach['rr_hillclimb']:.2f}) "
               f"GA={means['panmictic_ga']:.4f} rnd={means['random']:.4f} | "
