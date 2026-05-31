@@ -144,9 +144,10 @@ numeric は無理だが、**観測パターンの同型性**で定性配置は�
 - **手順6 実テキスト proxy** (`STEP4_SELECTION_VERDICT.md §7`): 滑らか/単峰、MAP-E は baseline に
   有意差なし → **d < d* 側**。
 
-→ **定性結論: ③をクリーンに検定できた実 task (E-A multitask / flip_flop / 手順6 proxy) は、いずれも
-本特性化軸の d < d* (smooth 側) に落ちる**。これが過去の honest negative を **統一的に説明**する:
-**実 task が「③無力」だったのではなく、実 task の (自然な) 欺瞞性が閾値 d*=0.16 に届かなかった**。
+→ **定性結論 (状況証拠・断定でない): ③をクリーンに検定できた実 task (E-A multitask / flip_flop /
+手順6 proxy) の観測指紋は、いずれも本特性化軸の d < d* (smooth 側) と整合的**。これは過去の honest
+negative を説明する **作業仮説**を与える: **「実 task が『③無力』だった」のではなく「実 task の (自然な)
+欺瞞性が閾値に届かなかった」可能性が、観測と矛盾しない** (numeric 配置は §4.3 の通り未実証なので断定はしない)。
 delayed_parity は床効果で本軸に乗らない (別の confound) ので配置から除外する。
 
 ### 配置の信頼度 (overclaim 回避)
