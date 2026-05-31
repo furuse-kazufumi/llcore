@@ -108,7 +108,7 @@ class NetworkState:
 class StepVerdict:
     """Verdict for one STEP. Mirrors the spec's verdict set."""
 
-    verdict: str  # sat | unsat | timeout | error | refuse | unsupported
+    verdict: str  # sat | unsat | timeout | error | refuse | unsupported | unknown
     step_time_ms: float
     witness_path: str | None
     detail: str = ""
