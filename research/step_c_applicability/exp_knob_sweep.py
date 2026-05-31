@@ -118,19 +118,26 @@ def behavior_mean(gene: np.ndarray) -> np.ndarray:
 def make_corridor_eval(d: float) -> Callable[[np.ndarray, np.random.Generator], float]:
     """dip depth d の corridor fitness を返す.
 
-    d=0: 谷の床=局所峰 (単調登坂路, smooth)。d=1: 谷の床=0 (深い dip, exp4 deceptive)。
+    局所峰→大域峰を結ぶ単調登坂 ramp に、深さ d の谷 (dip) を彫る:
+    - d=0: 谷無し → 厳密単調増加の登坂路 (smooth, exp5 相当)。hill-climb が大域へ登れる。
+    - d=1: 谷の床≈0 の深い dip (exp4 deceptive)。hill-climb は downhill 拒否で罠。
     局所峰 (0.60@0.4) と大域峰 (1.0@0.9) は全 d で固定。
     """
     if not (0.0 <= d <= 1.0):
         raise ValueError(f"d must be in [0,1], got {d}")
-    bridge_h = _LOCAL_H * (1.0 - d)
 
     def corridor_eval(gene: np.ndarray, rng: np.random.Generator) -> float:
         b = float(gene.mean())
         local = _LOCAL_H * np.exp(-((b - _LOCAL_B) ** 2) / (2 * _LOCAL_W ** 2))
         glob = _GLOB_H * np.exp(-((b - _GLOB_B) ** 2) / (2 * _GLOB_W ** 2))
-        bridge = bridge_h if (_VALLEY_LO <= b <= _VALLEY_HI) else 0.0
-        return float(max(local, glob, bridge) + rng.normal(0, _NOISE))
+        if _VALLEY_LO <= b <= _VALLEY_HI:
+            t = (b - _VALLEY_LO) / (_VALLEY_HI - _VALLEY_LO)
+            ramp = _LOCAL_H + t * (_GLOB_H - _LOCAL_H)  # 単調登坂 (局所峰→大域峰)
+            dip = d * np.exp(-((b - _DIP_CENTER) ** 2) / (2 * _DIP_W ** 2))  # 谷
+            corridor = ramp * (1.0 - dip)
+        else:
+            corridor = 0.0
+        return float(max(local, glob, corridor) + rng.normal(0, _NOISE))
 
     return corridor_eval
 
