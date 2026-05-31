@@ -199,10 +199,34 @@ def main() -> int:
         },
         "curve": curve,
         "spearman_with_d": spearman,
+        "spearman_with_d_low_range_le_0p20": spearman_low,
         "strictly_monotone": strictly_monotone,
         "noise_tolerant_monotone": tol_monotone,
         "metric_at_dstar": metric_at_dstar,
         "reproduces_threshold": reproduces_threshold,
+        "high_d_collapse": {
+            "observed": True,
+            "cause": (
+                "Operational metric anchors to the BEST-SAMPLED behavior (best reachable point), "
+                "not the true global optimum. Under uniform sampling, mean(gene) concentrates near 0.5 "
+                "(CLT) and never reaches the global peak at b=0.9 (max sampled b ~ 0.69). "
+                "While the dip is shallow (d<=0.20) the best sample sits at b~0.69 on the global-peak "
+                "side of the dip, so deepening the dip degrades FDC monotonically. Once d>=0.30 the dip "
+                "drops the corridor below the FIXED local peak (0.60 @ b=0.40), so the best sample "
+                "relocates to b~0.47 (local-peak side); proximity to that smooth local structure correlates "
+                "well again and FDC jumps back up -> metric INVERTS."
+            ),
+            "monotone_range": "d in [0.0, 0.20]",
+        },
+        "true_reference_control": {
+            "note": (
+                "NOT the operational metric (real tasks cannot know the true optimum). Uses the "
+                "construction-known global-best behavior b=0.9 as the FDC reference. Confirms the metric "
+                "IS perfectly monotone in d when the reference is the true optimum."
+            ),
+            "curve": control_curve,
+            "spearman_with_d": spearman_true_ref,
+        },
     }
     out_path = _HERE / "calibrate_fdc_behavior_results.json"
     out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")

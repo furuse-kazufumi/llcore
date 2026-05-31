@@ -20,7 +20,8 @@
       "ci95_hi": 0.02671147297565457,
       "fdc_mean": 0.980201917679226,
       "fdc_std": 0.007887148703737185,
-      "any_degenerate": false
+      "any_degenerate": false,
+      "best_behavior_mean": 0.7109277553893752
     },
     {
       "d": 0.05,
@@ -30,7 +31,8 @@
       "ci95_hi": 0.04834005486293567,
       "fdc_mean": 0.9602345132252182,
       "fdc_std": 0.00978230465449608,
-      "any_degenerate": false
+      "any_degenerate": false,
+      "best_behavior_mean": 0.7165591617939269
     },
     {
       "d": 0.1,
@@ -40,7 +42,8 @@
       "ci95_hi": 0.09961207031318953,
       "fdc_mean": 0.9071300199374864,
       "fdc_std": 0.007691720464770533,
-      "any_degenerate": false
+      "any_degenerate": false,
+      "best_behavior_mean": 0.7072184723093684
     },
     {
       "d": 0.13,
@@ -50,7 +53,8 @@
       "ci95_hi": 0.1563036584144718,
       "fdc_mean": 0.8549039992059997,
       "fdc_std": 0.012786267504039705,
-      "any_degenerate": false
+      "any_degenerate": false,
+      "best_behavior_mean": 0.7148970704797619
     },
     {
       "d": 0.16,
@@ -60,7 +64,8 @@
       "ci95_hi": 0.2337916440294713,
       "fdc_mean": 0.7718244351463628,
       "fdc_std": 0.006407109593972394,
-      "any_degenerate": false
+      "any_degenerate": false,
+      "best_behavior_mean": 0.7089522664142954
     },
     {
       "d": 0.2,
@@ -70,7 +75,8 @@
       "ci95_hi": 0.3910608112357303,
       "fdc_mean": 0.6123880428128526,
       "fdc_std": 0.003934628620972855,
-      "any_degenerate": false
+      "any_degenerate": false,
+      "best_behavior_mean": 0.6966508713477758
     },
     {
       "d": 0.3,
@@ -80,7 +86,8 @@
       "ci95_hi": 0.12170035062438866,
       "fdc_mean": 0.8985721750568223,
       "fdc_std": 0.02312793137693752,
-      "any_degenerate": false
+      "any_degenerate": false,
+      "best_behavior_mean": 0.5094202353080922
     },
     {
       "d": 0.5,
@@ -90,7 +97,8 @@
       "ci95_hi": 0.14448318491168893,
       "fdc_mean": 0.8821527637354759,
       "fdc_std": 0.03038764888788463,
-      "any_degenerate": false
+      "any_degenerate": false,
+      "best_behavior_mean": 0.48963668918002645
     },
     {
       "d": 1.0,
@@ -100,12 +108,70 @@
       "ci95_hi": 0.07738701312571279,
       "fdc_mean": 0.9257487693829203,
       "fdc_std": 0.003577460638754313,
-      "any_degenerate": false
+      "any_degenerate": false,
+      "best_behavior_mean": 0.46249703057185887
     }
   ],
   "spearman_with_d": 0.39999999999999997,
+  "spearman_with_d_low_range_le_0p20": 1.0,
   "strictly_monotone": false,
   "noise_tolerant_monotone": false,
   "metric_at_dstar": 0.22817556485363727,
-  "reproduces_threshold": false
+  "reproduces_threshold": false,
+  "high_d_collapse": {
+    "observed": true,
+    "cause": "Operational metric anchors to the BEST-SAMPLED behavior (best reachable point), not the true global optimum. Under uniform sampling, mean(gene) concentrates near 0.5 (CLT) and never reaches the global peak at b=0.9 (max sampled b ~ 0.69). While the dip is shallow (d<=0.20) the best sample sits at b~0.69 on the global-peak side of the dip, so deepening the dip degrades FDC monotonically. Once d>=0.30 the dip drops the corridor below the FIXED local peak (0.60 @ b=0.40), so the best sample relocates to b~0.47 (local-peak side); proximity to that smooth local structure correlates well again and FDC jumps back up -> metric INVERTS.",
+    "monotone_range": "d in [0.0, 0.20]"
+  },
+  "true_reference_control": {
+    "note": "NOT the operational metric (real tasks cannot know the true optimum). Uses the construction-known global-best behavior b=0.9 as the FDC reference. Confirms the metric IS perfectly monotone in d when the reference is the true optimum.",
+    "curve": [
+      {
+        "d": 0.0,
+        "fdc_true_ref": 0.9848584944019629,
+        "deceptiveness_true_ref": 0.015141505598037064
+      },
+      {
+        "d": 0.05,
+        "fdc_true_ref": 0.9609955883500559,
+        "deceptiveness_true_ref": 0.03900441164994406
+      },
+      {
+        "d": 0.1,
+        "fdc_true_ref": 0.901970222037699,
+        "deceptiveness_true_ref": 0.09802977796230095
+      },
+      {
+        "d": 0.13,
+        "fdc_true_ref": 0.8642230521578996,
+        "deceptiveness_true_ref": 0.13577694784210037
+      },
+      {
+        "d": 0.16,
+        "fdc_true_ref": 0.772466731623236,
+        "deceptiveness_true_ref": 0.22753326837676402
+      },
+      {
+        "d": 0.2,
+        "fdc_true_ref": 0.6236519020626337,
+        "deceptiveness_true_ref": 0.37634809793736634
+      },
+      {
+        "d": 0.3,
+        "fdc_true_ref": 0.03720929822880786,
+        "deceptiveness_true_ref": 0.9627907017711921
+      },
+      {
+        "d": 0.5,
+        "fdc_true_ref": -0.5414574199954327,
+        "deceptiveness_true_ref": 1.0
+      },
+      {
+        "d": 1.0,
+        "fdc_true_ref": -0.7624244738028755,
+        "deceptiveness_true_ref": 1.0
+      }
+    ],
+    "spearman_with_d": 0.9958246164193105
+  }
 }
