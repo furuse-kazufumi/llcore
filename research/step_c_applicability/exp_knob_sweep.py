@@ -390,6 +390,21 @@ def main() -> int:
               f"RRreach={r.reach_rate['rr_hillclimb']:.2f} "
               f"GAreach={r.reach_rate['panmictic_ga']:.2f}  {status}")
 
+    # robustness: 閾値近傍 (reduced levels) を別 base_seed でも走らせ d* の seed 非依存を成果物に残す
+    # (Codex 指摘: 単一 seed の artifact では "777/31337 一致" を検証できない)。
+    robustness: dict[str, object] = {}
+    for bs in (777, 31337):
+        r2 = run_sweep(d_levels=[0.10, 0.13, 0.16, 0.20], base_seed=bs)
+        d_star_2 = next((r.d for r in r2 if r.load_bearing), None)
+        robustness[str(bs)] = {
+            "d_star_strict": d_star_2,
+            "per_level": {f"{r.d:.2f}": {"load_bearing": r.load_bearing,
+                                         "n_baselines_beaten": r.n_baselines_beaten,
+                                         "advantage": r.me_minus_best_baseline}
+                          for r in r2},
+        }
+        print(f"robustness base_seed={bs}: d*_strict={d_star_2}")
+
     out_path = Path(__file__).resolve().parent / "exp_knob_sweep_results.json"
     payload = {
         "design": {
