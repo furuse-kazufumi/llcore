@@ -298,3 +298,15 @@ NeurIPS workshop 投稿準備として、Codex Q7「workshop は framing 修正 
 - **§9 limitations 追加** (Codex Finding #1/#2 を paper 本体に反映): item 10 (spec⇔reference-impl conformance gap: .onnx/.vnnlib は NotImplementedError、JSON dummy のみ受理) + item 11 (sat witness 未実装→audited TPR/FPR 比較不可)。
 - **Codex pair-review (gpt-5.4, 2026-05-31)**: revised paper を再 review。**§9 item 10/11 は code-faithful と確認**。4 件修正: Kwon の特徴付け (spec repair ❌→adaptive shielding) / Appendix A cross-check に新規 5 件追加 / §2.12 表 2020–2024→2020–2025 / IVAN speedup を geometric-mean・benchmark 依存に限定。
 - word count 8198→約 10,200。**workshop 投稿可能水準を維持しつつ framing の stale/overclaim を是正、関連研究の最重要 gap (IVAN) を補完**。TMLR full submission は依然 parser + sat witness 実装が前提 (不変)。
+
+---
+
+## B2: 実 .onnx/.vnnlib パーサ + benchmark generator (2026-05-31, §9 item 10 解消)
+
+ユーザー指示で Path B (VNN-COMP organizer エンゲージ) の前提作業に着手。**§9 item 10 (spec⇔impl conformance gap) を解消**:
+- `parse_model_onnx`/`write_model_onnx`: RwkvTimeMix 連鎖を **custom-op** (op_type `RwkvTimeMix`, domain `llcore.rwkv`, 属性 decay/mix/gate_str) で読み書き。**onnx は optional dep** (1.21.0 導入、無ければ NotImplementedError)。
+- `parse_invariant_vnnlib`/`write_invariant_vnnlib`: scalar `X_0`(入力)/`Y_0`(状態) box bound subset の **stdlib S-expression パーサ** (コメント・`(- c)` 負号対応)。JSON dummy 経路は後方互換温存。
+- `scripts/vnncomp_benchmark/generate_properties.py`: **seed → onnx/vnnlib/changeop/instances.csv** を生成 (VNN-COMP benchmark-proposal 規約準拠)。seed=42 で 3 instance 生成→**parse 往復 + verify_net に通る**ことを実機確認 (safe/unsafe 混在 = benchmark として妥当)。
+- tests +9 (parser 往復 / JSON dummy 一致 / end-to-end verify / generator parseable+deterministic) = 7a **17→26 pass**、本流 **208→217 pass**、回帰ゼロ。commit llcore 0cf173a。
+- paper §9 item 10 を「実装済み (残る骨組みはモデルクラス=単一 kernel/family・scalar state・custom-op 規約)」へ更新 (code-faithful 維持)。
+- **残**: §9 item 11 (sat witness) は未実装のまま。kernel/operator 語彙拡張・multi-dim state は近期タスク。これで Path B の「benchmark 実体準備」の地盤ができた (実 .onnx/.vnnlib を出せる)。
