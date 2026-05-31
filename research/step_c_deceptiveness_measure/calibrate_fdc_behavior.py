@@ -79,6 +79,9 @@ def main() -> int:
             eval_once, behavior_mean, bounds, CORRIDOR_D, rng,
             n_samples=N_SAMPLES, honest_n_trials=HONEST_N, n_repeats=N_REPEATS,
         )
+        best_beh_mean = float(
+            np.mean([r["best_behavior"][0] for r in res["per_repeat"]])
+        )
         entry = {
             "d": d,
             "metric": res["deceptiveness_mean"],
@@ -88,6 +91,7 @@ def main() -> int:
             "fdc_mean": res["fdc_mean"],
             "fdc_std": res["fdc_std"],
             "any_degenerate": res["any_degenerate"],
+            "best_behavior_mean": best_beh_mean,
         }
         curve.append(entry)
         print(f"  d={d:.2f}: deceptiveness={res['deceptiveness_mean']:.4f} "
