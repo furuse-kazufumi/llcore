@@ -403,6 +403,22 @@ def test_sat_spurious_becomes_unknown(tmp_path: Path) -> None:
     assert w["confirmed_real_violation"] is False
 
 
+def test_verify_gene_safe_sets_solver_status() -> None:
+    """verify_gene_safe distinguishes z3 sat vs unsat via solver_status (Codex fix)."""
+    if not ref.is_z3_available():
+        pytest.skip("z3 not available")
+    from llcore.verifier import verify_gene_safe
+
+    safe = verify_gene_safe(
+        StateUpdateGene(decay=0.9, mix=0.1, gate_str=0.1), max_input_abs=1.0, state_bound=1.0
+    )
+    assert safe.ok and safe.solver_status == "unsat"
+    unsafe = verify_gene_safe(
+        StateUpdateGene(decay=0.0, mix=1.0, gate_str=0.0), max_input_abs=1.0, state_bound=0.5
+    )
+    assert (not unsafe.ok) and unsafe.solver_status == "sat"
+
+
 def test_write_sat_witness_recomputes_genuine(tmp_path: Path) -> None:
     """write_sat_witness confirms a genuine z3 candidate by recomputation (unit)."""
     from llcore.verifier import InvariantResult
