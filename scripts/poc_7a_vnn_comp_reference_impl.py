@@ -558,9 +558,14 @@ def step_once(
         # None` guard was dead code — verify_gene_safe never sets it — so violations
         # used to fall through to "timeout".)
         wp, confirmed = write_sat_witness(new_net, r, witness_dir, step_id)
-        if confirmed:
-            return new_net, StepVerdict("sat", elapsed, str(wp), r.reason)
         status = getattr(r, "solver_status", "unknown")
+        if confirmed:
+            detail = (
+                r.reason
+                if status == "sat"
+                else f"real counterexample confirmed by grid scan (z3 status was {status})"
+            )
+            return new_net, StepVerdict("sat", elapsed, str(wp), detail)
         if status == "sat":
             reason = "z3 sat candidate not confirmed by real tanh on the scanned grid (likely tanh-abstraction artifact)"
         else:
