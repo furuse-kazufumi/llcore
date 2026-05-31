@@ -236,3 +236,105 @@ def test_serve_protocol_smoke(tmp_path: Path) -> None:
     assert lines[2].startswith("unsat ")
     assert lines[3].startswith("error ")
     assert lines[-1].startswith("OK ") and lines[-1].endswith(" 2")
+
+
+# ---------------------------------------------------------------------------
+# Real .onnx / .vnnlib parser + writer round-trips (§9 item 10)
+# ---------------------------------------------------------------------------
+
+
+def test_vnnlib_roundtrip(tmp_path: Path) -> None:
+    """write_invariant_vnnlib -> parse_invariant_vnnlib recovers (state_bound, max_input_abs)."""
+    p = tmp_path / "inv.vnnlib"
+    ref.write_invariant_vnnlib(state_bound=2.0, max_input_abs=1.5, path=p)
+    sb, ia = ref.parse_invariant_vnnlib(p)
+    assert sb == pytest.approx(2.0)
+    assert ia == pytest.approx(1.5)
+
+
+def test_vnnlib_parse_handwritten(tmp_path: Path) -> None:
+    """A hand-written .vnnlib (comments + (- c) negation) parses to the right bounds."""
+    p = tmp_path / "inv.vnnlib"
+    p.write_text(
+        "; comment line\n"
+        "(declare-const X_0 Real)\n"
+        "(declare-const Y_0 Real)\n"
+        "(assert (<= X_0 0.8))\n"
+        "(assert (>= X_0 (- 0.8)))\n"
+        "(assert (or (>= Y_0 1.25) (<= Y_0 (- 1.25))))\n",
+        encoding="utf-8",
+    )
+    sb, ia = ref.parse_invariant_vnnlib(p)
+    assert sb == pytest.approx(1.25)
+    assert ia == pytest.approx(0.8)
+
+
+def test_vnnlib_missing_bounds_raises(tmp_path: Path) -> None:
+    """A .vnnlib without the Y_0 state bound is rejected (no silent default)."""
+    p = tmp_path / "bad.vnnlib"
+    p.write_text("(declare-const X_0 Real)\n(assert (<= X_0 1.0))\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="X_0 / Y_0"):
+        ref.parse_invariant_vnnlib(p)
+
+
+def test_vnnlib_matches_json_dummy(tmp_path: Path) -> None:
+    """Real .vnnlib and the JSON dummy yield the same (state_bound, max_input_abs)."""
+    jp = tmp_path / "inv.json"
+    jp.write_text(json.dumps({"state_bound": 1.0, "max_input_abs": 1.0}), encoding="utf-8")
+    vp = tmp_path / "inv.vnnlib"
+    ref.write_invariant_vnnlib(state_bound=1.0, max_input_abs=1.0, path=vp)
+    assert ref.parse_invariant_vnnlib(jp) == ref.parse_invariant_vnnlib(vp)
+
+
+def test_onnx_roundtrip(tmp_path: Path) -> None:
+    """write_model_onnx -> parse_model_onnx recovers the RwkvTimeMix block chain."""
+    pytest.importorskip("onnx")
+    net = ref.NetworkState(
+        blocks=[
+            StateUpdateGene(decay=0.5, mix=0.3, gate_str=0.4),
+            StateUpdateGene(decay=0.9, mix=-0.2, gate_str=1.5),
+        ]
+    )
+    p = tmp_path / "model.onnx"
+    ref.write_model_onnx(net, p)
+    parsed = ref.parse_model_onnx(p)
+    assert len(parsed.blocks) == 2
+    for a, b in zip(net.blocks, parsed.blocks):
+        assert a.decay == pytest.approx(b.decay)
+        assert a.mix == pytest.approx(b.mix)
+        assert a.gate_str == pytest.approx(b.gate_str)
+
+
+def test_onnx_matches_json_dummy(tmp_path: Path) -> None:
+    """A network from the JSON dummy, written to .onnx and parsed back, is identical."""
+    pytest.importorskip("onnx")
+    jp = tmp_path / "model.json"
+    jp.write_text(
+        json.dumps(
+            {"blocks": [
+                {"decay": 0.5, "mix": 0.3, "gate_str": 0.4},
+                {"decay": 0.7, "mix": -0.1, "gate_str": 1.0},
+            ]}
+        ),
+        encoding="utf-8",
+    )
+    from_json = ref.parse_model_onnx(jp)
+    op = tmp_path / "model.onnx"
+    ref.write_model_onnx(from_json, op)
+    from_onnx = ref.parse_model_onnx(op)
+    assert len(from_json.blocks) == len(from_onnx.blocks) == 2
+    for a, b in zip(from_json.blocks, from_onnx.blocks):
+        assert (a.decay, a.mix, a.gate_str) == pytest.approx((b.decay, b.mix, b.gate_str))
+
+
+def test_onnx_parsed_net_verifies(tmp_path: Path) -> None:
+    """End-to-end: a network parsed from .onnx feeds the verifier and admits."""
+    pytest.importorskip("onnx")
+    net = ref.NetworkState(blocks=[StateUpdateGene(decay=0.5, mix=0.3, gate_str=0.4)])
+    p = tmp_path / "model.onnx"
+    ref.write_model_onnx(net, p)
+    parsed = ref.parse_model_onnx(p)
+    parsed.invariant_state_bound = 1.0
+    parsed.invariant_max_input_abs = 1.0
+    r = ref.verify_net(parsed)
+    assert r.ok
