@@ -354,20 +354,34 @@ def main() -> int:
     results = run_sweep(d_levels=d_levels)
     print("=" * 88)
 
-    # 閾値 d*: ③が初めて load-bearing になる最小 d
-    threshold = None
+    # 閾値 d*: ③が初めて **厳格 load-bearing** (3 baseline 全勝) になる最小 d
+    threshold_strict = next((r.d for r in results if r.load_bearing), None)
+    # 閾値 (緩): ③が初めて **climbing baseline (RR or GA) に 1 つでも** strict gate 勝利する最小 d。
+    # random は genotypic corridor で全 d 罠落ちのため beaten は自明 → climbing baseline で測る。
+    def _beats_climber(r: LevelResult) -> bool:
+        return r.gates["rr_hillclimb"]["passes"] or r.gates["panmictic_ga"]["passes"]
+    threshold_loose = next((r.d for r in results if _beats_climber(r)), None)
+
+    print(f"\n③ 厳格 load-bearing 閾値 d* (3 baseline 全勝) = "
+          f"{'%.2f' % threshold_strict if threshold_strict is not None else 'なし'}")
+    print(f"③ 部分 load-bearing 閾値 (climbing baseline=RR/GA に初勝利) = "
+          f"{'%.2f' % threshold_loose if threshold_loose is not None else 'なし'}")
+    print("  注: random は genotypic corridor で全 d 罠落ち → beaten は自明。"
+          "意味ある baseline は climbing 系 (RR-hillclimb / panmictic-GA)。")
+
+    # transition の sharpness: 境界をまたぐ advantage / 勝利 baseline 数の変化
+    print("transition (d, advantage, n_baselines_beaten/3, RR reach, GA reach, status):")
     for r in results:
         if r.load_bearing:
-            threshold = r.d
-            break
-    print(f"\n③ が load-bearing になり始める閾値 d* = "
-          f"{'%.2f' % threshold if threshold is not None else 'なし (全 d で非 load-bearing)'}")
-
-    # transition の sharpness: load-bearing 境界をまたぐ advantage の変化
-    advs = [(r.d, r.me_minus_best_baseline, r.load_bearing) for r in results]
-    print("transition (d, advantage, load_bearing):")
-    for d, a, lb in advs:
-        print(f"   d={d:.2f}: adv={a:+.4f} {'LB' if lb else '  '}")
+            status = "STRICT-LB"
+        elif _beats_climber(r):
+            status = "partial-LB"
+        else:
+            status = "not-LB"
+        print(f"   d={r.d:.2f}: adv={r.me_minus_best_baseline:+.4f} "
+              f"beaten={r.n_baselines_beaten}/3 "
+              f"RRreach={r.reach_rate['rr_hillclimb']:.2f} "
+              f"GAreach={r.reach_rate['panmictic_ga']:.2f}  {status}")
 
     out_path = Path(__file__).resolve().parent / "exp_knob_sweep_results.json"
     payload = {
