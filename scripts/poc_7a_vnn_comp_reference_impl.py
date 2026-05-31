@@ -549,19 +549,22 @@ def step_once(
         wp = write_unsat_witness(new_net, witness_dir, step_id)
         return new_net, StepVerdict("unsat", elapsed, str(wp), r.reason)
     if not r.ok and r.used_z3:
-        # NOTE: verify_gene_safe reports a violation without an assignment and via a
-        # tanh over-approximation; write_sat_witness searches for a *genuine* real
-        # violation. (The previous `counterexample is not None` guard was dead code —
-        # verify_gene_safe never sets it — so violations fell through to "timeout".)
-        wp, genuine = write_sat_witness(new_net, r, witness_dir, step_id)
-        if genuine:
+        # `verify_gene_safe` reports a violation (or gives up) WITHOUT an assignment
+        # and via a tanh over-approximation, and it does not separate z3 `sat` from
+        # z3 `unknown` in `ok`/`used_z3` alone (we read `solver_status` for that).
+        # `write_sat_witness` independently searches for a REAL violation; only a
+        # grid-confirmed real witness yields `sat`. (The old `counterexample is not
+        # None` guard was dead code — verify_gene_safe never sets it — so violations
+        # used to fall through to "timeout".)
+        wp, confirmed = write_sat_witness(new_net, r, witness_dir, step_id)
+        if confirmed:
             return new_net, StepVerdict("sat", elapsed, str(wp), r.reason)
-        # Spurious z3 candidate (tanh over-approximation): the real next-state is
-        # within bound, so we cannot soundly claim a violation. Report unknown.
-        return new_net, StepVerdict(
-            "unknown", elapsed, str(wp),
-            "z3 sat candidate spurious under tanh abstraction (real s_next within state_bound)",
-        )
+        status = getattr(r, "solver_status", "unknown")
+        if status == "sat":
+            reason = "z3 sat candidate not confirmed by real tanh on the scanned grid (likely tanh-abstraction artifact)"
+        else:
+            reason = f"z3 inconclusive ({status}); no real violation confirmed on the scanned grid"
+        return new_net, StepVerdict("unknown", elapsed, str(wp), reason)
     # used_z3=False fallback path (z3 unavailable); treat as unsat by mathematical argument
     if r.ok and not r.used_z3:
         return new_net, StepVerdict("unsat", elapsed, None, "z3 unavailable, fallback admit")
