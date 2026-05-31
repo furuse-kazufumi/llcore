@@ -64,6 +64,26 @@ def _spearman(x: np.ndarray, y: np.ndarray) -> float:
     return float(np.corrcoef(rx, ry)[0, 1])
 
 
+def _fdc_true_reference(d: float, true_b: float, rng: np.random.Generator) -> float:
+    """control: TRUE global 最適 behavior (b=true_b, 構築上既知) を reference にした FDC.
+
+    操作的 metric ではない (実 task では真の最適を知れない) が、操作的 metric の高 d collapse の
+    原因が「best-sample reference の relocation」であることを切り分けるための diagnostic。
+    """
+    bounds = (np.zeros(CORRIDOR_D), np.ones(CORRIDOR_D))
+    eval_once = make_corridor_eval(d)
+    lo, hi = bounds
+    genes = lo + (hi - lo) * rng.random((N_SAMPLES, CORRIDOR_D))
+    fits = np.array([
+        float(np.mean([eval_once(g, rng) for _ in range(HONEST_N)])) for g in genes
+    ])
+    behs = np.array([np.atleast_1d(behavior_mean(g)) for g in genes])
+    dist = np.linalg.norm(behs - np.array([true_b])[None, :], axis=1)
+    if np.std(fits) < 1e-9 or np.std(dist) < 1e-9:
+        return 0.0
+    return float(np.corrcoef(fits, -dist)[0, 1])
+
+
 def main() -> int:
     bounds = (np.zeros(CORRIDOR_D), np.ones(CORRIDOR_D))
     print("FDC-behavior deceptiveness CALIBRATION on synthetic dip-depth knob")
