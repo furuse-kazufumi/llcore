@@ -35,11 +35,13 @@ exp4 の corridor (behavior=mean の genotypic corridor) を保ち、局所峰 (
 - 中間 d: ramp 中央の谷の深さが連続変化。**唯一の自由度が「欺瞞 (dip) の深さ」**になる。
 
 なぜ dip depth を primary に選んだか (justification, design note 参照):
-1. exp4↔exp5 の **唯一の差**が dip の有無 (exp5 は smooth_eval で dip を消した)。dip depth は
-   その差を連続化した最小の 1 パラメータ → exp4/exp5 を端点として厳密に含む。
-2. behavior=mean の **genotypic corridor 構造を全 d で不変**に保つ → `random` の失敗 (b≈0.5 固着で
-   大域到達不能) は d 非依存の定数。これにより d を変えたときの MAP-E 優位の変化が
-   「dip 越え (③ の本質効果) の難易/不要化」だけに帰属し、corridor 幅などの交絡を排除できる。
+1. exp4/exp5 の **本質的な差**が dip の有無。dip depth はその差を連続化した最小の 1 パラメータ
+   → exp4/exp5 を **着想元**とし、d=0=smooth control・d=1=deep-dip control で挟む (eval 関数の厳密内挿
+   ではない点は冒頭注を参照)。
+2. behavior=mean の **genotypic corridor 構造を全 d で不変**に保つ (corridor 幅などの交絡を排除)。
+   **注 (Codex pair-review で訂正)**: `random` は「d 非依存の定数敗北」ではない — その reach は d とともに
+   下がり (1.00→0.25)、d≥0.16 では climbing baseline が崩れて random が最強 baseline になる。
+   load_bearing は 3 baseline 全勝を要求するので、この事実は閾値判定を **保守側**にするだけで水増ししない。
 3. 峰の高さ・位置を固定するので「大域最適の価値」も d 非依存 → 優位の大小が欺瞞性のみの関数。
 4. ramp 基線にすることで d=0 で hill-climb に **連続した上り勾配**を与え「dip が無ければ登れる」
    を保証 → 閾値は「勾配の有無」でなく「dip の深さ」の純粋な関数になる。
