@@ -317,15 +317,18 @@ def run_sweep(
         best_b = max(baselines, key=lambda b: means[b])
         advantage = means["map_elites"] - means[best_b]
         gates: dict[str, dict] = {}
-        all_pass = True
+        n_beaten = 0
         for b in baselines:
             g = strict_gate(res["map_elites"], res[b], "map_elites", b)
             gates[b] = asdict(g)
-            all_pass = all_pass and g.passes
+            n_beaten += int(g.passes)
+        all_pass = n_beaten == len(baselines)
         results.append(LevelResult(
             d=d, valley_floor=_LOCAL_H * (1.0 - d), means=means, reach_rate=reach,
             me_minus_best_baseline=advantage, best_baseline_name=best_b,
             gates=gates, load_bearing=all_pass,
+            partial_load_bearing=(n_beaten >= 1 and not all_pass),
+            n_baselines_beaten=n_beaten,
         ))
         print(f"d={d:.2f} (floor={_LOCAL_H*(1-d):.3f}): "
               f"MAP-E={means['map_elites']:.4f}(reach {reach['map_elites']:.2f}) "
