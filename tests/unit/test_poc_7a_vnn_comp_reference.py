@@ -381,7 +381,7 @@ def test_sat_genuine_emits_witness(tmp_path: Path) -> None:
     assert v.witness_path is not None
     w = json.loads(Path(v.witness_path).read_text(encoding="utf-8"))
     assert w["genuine_violation"] is True
-    assert abs(w["real_s_next_abs"]) > w["state_bound"]
+    assert w["max_abs_s_next_on_grid"] > w["state_bound"]
 
 
 def test_sat_spurious_becomes_unknown(tmp_path: Path) -> None:
