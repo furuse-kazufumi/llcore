@@ -446,6 +446,47 @@ def write_unsat_witness(net: NetworkState, witness_dir: Path, step: int) -> Path
     return path
 
 
+def write_sat_witness(
+    net: NetworkState, result: InvariantResult, witness_dir: Path, step: int
+) -> tuple[Path, bool]:
+    """Emit a JSON `sat` witness and report whether the violation is *genuine*.
+
+    The verifier abstracts ``tanh`` (treating ``tanh_val`` as a free variable with
+    ``tanh_val^2 <= preact^2``), so a z3 `sat` can be **spurious** — a candidate
+    in the relaxed system that is not a real violation. We recompute the true
+    next-state with the actual ``tanh`` (``eval_step``) and check whether the
+    invariant is genuinely breached. Returns ``(path, genuine)``. A spurious
+    candidate (``genuine=False``) must NOT be reported as `sat` (that would risk
+    a false positive / VNN-COMP −150 penalty); the caller reports `unknown`.
+    """
+    witness_dir.mkdir(parents=True, exist_ok=True)
+    path = witness_dir / f"witness_step_{step:04d}_sat.json"
+    ce = dict(result.counterexample or {})
+    sb = float(net.invariant_state_bound)
+    s_next_real: float | None = None
+    genuine = False
+    if all(k in ce for k in ("decay", "mix", "gate_str", "s", "x")):
+        gene = StateUpdateGene(decay=ce["decay"], mix=ce["mix"], gate_str=ce["gate_str"])
+        s_next_real = float(eval_step(np.array([ce["s"]]), np.array([ce["x"]]), gene)[0])
+        genuine = abs(s_next_real) > sb + 1e-9
+    witness = {
+        "step": step,
+        "kernel": "RwkvTimeMix",
+        "verdict_candidate": "sat",
+        "counterexample": ce,
+        "state_bound": sb,
+        "recomputed_s_next_real_tanh": s_next_real,
+        "genuine_violation": genuine,
+        "note": (
+            "genuine: real |s_next| exceeds state_bound (independently recomputable from this assignment)"
+            if genuine
+            else "spurious: z3 candidate from the tanh over-approximation; real |s_next| is within state_bound"
+        ),
+    }
+    path.write_text(json.dumps(witness, ensure_ascii=False, indent=2), encoding="utf-8")
+    return path, genuine
+
+
 # ---------------------------------------------------------------------------
 # Step driver
 # ---------------------------------------------------------------------------
