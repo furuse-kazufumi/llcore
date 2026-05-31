@@ -101,6 +101,16 @@ gate を適用。advantage = MAP-E mean − best baseline mean。reach = honest 
    実 LLM fitness の次元/ノイズ/欺瞞構造とは別物。本特性化は **機構層** (「dip 深さがこの閾値を超えると
    ③が立つ」) の証明であって、**前提層** (「実 task の欺瞞性が d* を超えるか」) は CPU では立証不能
    (STEP_C_VERDICT §6c の機構/前提分解を継承)。
+7. **knob は exp4/exp5 の "厳密内挿" ではない (Codex pair-review で訂正)**: 本 landscape は全 d で
+   `max(local, glob, ramp*(1-dip))` を使う。exp4 endpoint は `max(local, glob)` のみ、exp5 endpoint は
+   別の広い Gaussian (`smooth_eval`) なので、**d=0/d=1 は exp5/exp4 の eval 関数そのものではない**。
+   正確には「exp4/exp5 に**着想を得た** ramp-with-dip の新 toy family」で、d=0 = 単調 smooth control
+   (RR/GA が大域到達・③優位なし を実測再現)、d=1 = 深い dip の deceptive corridor。よって d*=0.16 は
+   **この新 family 内の閾値**であって「exp4↔exp5 間の純粋な 1-parameter 閾値」ではない。主張をこの水準に限定する。
+8. **random narrative の訂正 + robustness 証跡**: §2 の通り random は d 非依存でなく、当初 narrative を撤回
+   (Codex Med)。また「777/31337 で d* 一致」は当初本文主張のみだったが、`exp_knob_sweep_results.json` の
+   `robustness_other_base_seeds` に閾値近傍 reduced sweep の実測 (両 seed とも d*_strict=0.16) を**成果物として保存**した。
+   なお `dip_center_corridor` (旧 `valley_floor` 0.6×(1-d) は計算誤り→中央 ramp 高 0.8×(1-d) に訂正) も results に記録。
 
 ## 4. 実 task の honest 配置 — この軸のどこに落ちるか
 
