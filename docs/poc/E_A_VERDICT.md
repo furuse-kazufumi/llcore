@@ -100,6 +100,10 @@ Codex は当初版を **「現状の結論は信頼できない、再実行要�
 - 全 method equal budget・hold-out 厳守(train/test regime 分離・リークなし)・fresh-seed honest 再評価。
 - research/ea_multitask/(task_mixture / ea_lab / exp_ea1 / exp_ea3 / candidates)。exp_ea3_results.json。
 - ④土俵候補は workflow で並列設計+敵対検証(variable_delay_recall=trustworthy 採用)。
-- **Codex pair-review 未実施(次セッション)**: 結果が strict gate で明快(C-gen4 FAIL)なため verdict 先行。
+- **Codex pair-review 完了 (2026-05-31)**: gpt-5.4 read-only。7 findings → rerun blocker 3 件 (F3 seed/
+  F2 archive 忘却/F7 honest_n) を実コード検証の上で修正+再実行。**結論は修正前後で不変** = honest-negative
+  は方法論的に健全 (上記「Codex pair-review」節)。
+- 残課題 (F6): budget(400)/grid(6×6)/descriptor(w_in 無視) の sweep は未実施。結論は本設定での観測に限定し、
+  「滑らかで③不要」を landscape 一般の断定でなく **この設定での頑健な観測** として記述 (誇張回避)。
 - 関連: [[project_llcore_init_2026_05_29]] / [[feedback_codex_pair_review_for_llcore]] /
-  [[feedback_benchmark_honest_disclosure]] / Step C verdict / 梯子段1 VERDICT。push 未。
+  [[feedback_external_ai_verify]] / [[feedback_benchmark_honest_disclosure]] / Step C verdict / 梯子段1 VERDICT。push 未。
