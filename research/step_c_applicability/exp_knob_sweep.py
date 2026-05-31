@@ -118,9 +118,11 @@ _RAMP_AT_CENTER = _LOCAL_H + (
 
 
 def behavior_mean(gene: np.ndarray) -> np.ndarray:
-    """behavior = 全 dim の平均 (1D). 高 behavior = genotype 極値 = random 不到達 corridor.
+    """behavior = 全 dim の平均 (1D). 高 behavior = genotype 極値 = random が到達しにくい corridor.
 
-    d に依存しない (corridor 構造を固定)。これにより random の失敗は全 d で定数。
+    behavior 写像自体は d 非依存 (corridor 構造を固定) だが、**random の到達率は d 依存**
+    (高 d ほど高 fitness 域が痩せて reach が下がる)。"random の失敗は全 d で定数" は誤りだった
+    (Codex pair-review で訂正)。
     """
     return np.array([gene.mean()])
 
