@@ -110,53 +110,198 @@ class StepVerdict:
 
 
 # ---------------------------------------------------------------------------
-# Mock ONNX / vnnlib parsers (the reference impl uses simplified JSON dummies)
+# ONNX / vnnlib parsers + writers
+#
+# Two encodings are supported on each side:
+#   * a JSON dummy (kept for fast tests / no extra deps), and
+#   * the real `.onnx` / `.vnnlib` formats (the spec's normative inputs).
+#
+# `.onnx` encoding convention (llcore `online-arch-evo` reference): the chain of
+# RwkvTimeMix blocks is stored as one custom-op node per block, op_type
+# "RwkvTimeMix" in domain "llcore.rwkv", carrying float attributes decay / mix /
+# gate_str. Nodes are read in graph order. This is a documented convention
+# (RwkvTimeMix is not a standard ONNX op); real onnx package required.
+#
+# `.vnnlib` encoding convention: a scalar input X_0 and scalar state Y_0, with
+# a box precondition |X_0| <= max_input_abs and the *negated* invariant
+# (a violation has |Y_0| > state_bound). The parser supports this subset
+# (declare-const + assert with <=/>=/and/or and (- c) negation).
 # ---------------------------------------------------------------------------
+
+_RWKV_OP = "RwkvTimeMix"
+_RWKV_DOMAIN = "llcore.rwkv"
+
+
+def _require_onnx():  # noqa: ANN202
+    """Lazy-import onnx so the JSON-dummy path works without the dependency."""
+    try:
+        import onnx  # noqa: PLC0415
+        from onnx import TensorProto, helper  # noqa: PLC0415
+    except ImportError as e:  # pragma: no cover - exercised only when onnx absent
+        raise NotImplementedError(
+            "real .onnx support requires the 'onnx' package "
+            "(pip install onnx, or llmesh-llcore[vnncomp])"
+        ) from e
+    return onnx, helper, TensorProto
+
+
+def write_model_onnx(net: NetworkState, path: Path) -> Path:
+    """Serialise a NetworkState to a real `.onnx` file (RwkvTimeMix chain)."""
+    onnx, helper, TensorProto = _require_onnx()
+    n = len(net.blocks)
+    nodes = [
+        helper.make_node(
+            _RWKV_OP,
+            inputs=[f"s_{i}"],
+            outputs=[f"s_{i + 1}"],
+            name=f"block_{i}",
+            domain=_RWKV_DOMAIN,
+            decay=float(blk.decay),
+            mix=float(blk.mix),
+            gate_str=float(blk.gate_str),
+        )
+        for i, blk in enumerate(net.blocks)
+    ]
+    in_name = "s_0"
+    out_name = f"s_{n}" if n > 0 else "s_0"
+    inp = helper.make_tensor_value_info(in_name, TensorProto.FLOAT, [1])
+    out = helper.make_tensor_value_info(out_name, TensorProto.FLOAT, [1])
+    graph = helper.make_graph(nodes, "rwkv_chain", [inp], [out])
+    model = helper.make_model(
+        graph,
+        opset_imports=[helper.make_opsetid("", 18), helper.make_opsetid(_RWKV_DOMAIN, 1)],
+        producer_name="llcore-poc7a",
+    )
+    onnx.save(model, str(path))
+    return path
 
 
 def parse_model_onnx(path: Path) -> NetworkState:
-    """Parse the model file.
+    """Parse the model file into a NetworkState.
 
-    For the reference impl we accept either a real .onnx file (not yet
-    implemented; returns error) or a JSON dummy with shape::
-
-        {"blocks": [{"decay": 0.5, "mix": 0.3, "gate_str": 0.4}, ...]}
-
-    This is the *mock parse path* documented in the impl spec §11. A real
-    ONNX parser is future work.
+    Accepts a real `.onnx` (RwkvTimeMix-chain convention, see module header) or a
+    JSON dummy ``{"blocks": [{"decay":.., "mix":.., "gate_str":..}, ...]}``.
     """
     if not path.exists():
         raise FileNotFoundError(f"model not found: {path}")
-    text = path.read_text(encoding="utf-8")
     if path.suffix.lower() == ".onnx":
-        # Real ONNX: not yet implemented in PoC 7a
-        raise NotImplementedError("real .onnx parse not implemented in PoC 7a; use .json dummy")
-    data = json.loads(text)
+        onnx, _helper, _tp = _require_onnx()
+        model = onnx.load(str(path))
+        blocks: list[StateUpdateGene] = []
+        for node in model.graph.node:
+            if node.op_type != _RWKV_OP:
+                continue
+            attrs = {a.name: a.f for a in node.attribute}
+            missing = {"decay", "mix", "gate_str"} - attrs.keys()
+            if missing:
+                raise ValueError(f"RwkvTimeMix node {node.name!r} missing attrs {sorted(missing)}")
+            blocks.append(
+                StateUpdateGene(
+                    decay=float(attrs["decay"]),
+                    mix=float(attrs["mix"]),
+                    gate_str=float(attrs["gate_str"]),
+                )
+            )
+        return NetworkState(blocks=blocks)
+    data = json.loads(path.read_text(encoding="utf-8"))
     blocks = [
-        StateUpdateGene(
-            decay=float(b["decay"]),
-            mix=float(b["mix"]),
-            gate_str=float(b["gate_str"]),
-        )
+        StateUpdateGene(decay=float(b["decay"]), mix=float(b["mix"]), gate_str=float(b["gate_str"]))
         for b in data["blocks"]
     ]
     return NetworkState(blocks=blocks)
 
 
+def _tokenize_sexpr(text: str) -> list[str]:
+    """Tokenise an SMT-LIB/vnnlib subset (strip `;` line comments)."""
+    lines = [ln.split(";", 1)[0] for ln in text.splitlines()]
+    flat = " ".join(lines).replace("(", " ( ").replace(")", " ) ")
+    return flat.split()
+
+
+def _parse_sexpr(tokens: list[str]) -> list:
+    """Parse tokens into a list of top-level S-expression forms (nested lists)."""
+    pos = 0
+
+    def parse_one():  # noqa: ANN202
+        nonlocal pos
+        tok = tokens[pos]
+        pos += 1
+        if tok == "(":
+            lst: list = []
+            while pos < len(tokens) and tokens[pos] != ")":
+                lst.append(parse_one())
+            if pos >= len(tokens):
+                raise ValueError("unbalanced parentheses in vnnlib")
+            pos += 1  # consume ')'
+            return lst
+        return tok
+
+    forms: list = []
+    while pos < len(tokens):
+        forms.append(parse_one())
+    return forms
+
+
+def _sexpr_num(node) -> float:  # noqa: ANN001
+    """Convert an atom number or ``(- c)`` negation to float."""
+    if isinstance(node, list) and len(node) == 2 and node[0] == "-":
+        return -float(node[1])
+    return float(node)
+
+
+def write_invariant_vnnlib(state_bound: float, max_input_abs: float, path: Path) -> Path:
+    """Serialise the invariant to a real `.vnnlib` file (scalar X_0/Y_0 subset)."""
+    ia = float(max_input_abs)
+    sb = float(state_bound)
+    text = (
+        "; llcore online-arch-evo invariant (vnnlib subset)\n"
+        "; X_0 = scalar input, Y_0 = scalar state; property: |Y_0| <= state_bound\n"
+        "; given |X_0| <= max_input_abs. The assertions encode the *negation*\n"
+        "; (a counterexample has |Y_0| > state_bound) so unsat means the invariant holds.\n"
+        "(declare-const X_0 Real)\n"
+        "(declare-const Y_0 Real)\n"
+        f"(assert (<= X_0 {ia}))\n"
+        f"(assert (>= X_0 (- {ia})))\n"
+        f"(assert (or (>= Y_0 {sb}) (<= Y_0 (- {sb}))))\n"
+    )
+    path.write_text(text, encoding="utf-8")
+    return path
+
+
 def parse_invariant_vnnlib(path: Path) -> tuple[float, float]:
-    """Parse the invariant.
+    """Parse the invariant into ``(state_bound, max_input_abs)``.
 
-    The reference impl accepts either a real .vnnlib (subset) or a JSON dummy::
-
-        {"state_bound": 1.0, "max_input_abs": 1.0}
-
-    Returns (state_bound, max_input_abs).
+    Accepts a real `.vnnlib` (scalar X_0/Y_0 subset, see module header) or a JSON
+    dummy ``{"state_bound": 1.0, "max_input_abs": 1.0}``.
     """
     if not path.exists():
         raise FileNotFoundError(f"invariant not found: {path}")
     if path.suffix.lower() == ".vnnlib":
-        # Real .vnnlib: not yet implemented in PoC 7a (would need S-expression parser)
-        raise NotImplementedError(".vnnlib parse not implemented in PoC 7a; use .json dummy")
+        forms = _parse_sexpr(_tokenize_sexpr(path.read_text(encoding="utf-8")))
+        max_input_abs: float | None = None
+        state_bound: float | None = None
+
+        def walk(node) -> None:  # noqa: ANN001
+            nonlocal max_input_abs, state_bound
+            if not isinstance(node, list):
+                return
+            if len(node) == 3 and node[0] in ("<=", ">=") and node[1] == "X_0":
+                v = abs(_sexpr_num(node[2]))
+                max_input_abs = v if max_input_abs is None else max(max_input_abs, v)
+            if len(node) == 3 and node[0] in ("<=", ">=") and node[1] == "Y_0":
+                v = abs(_sexpr_num(node[2]))
+                state_bound = v if state_bound is None else max(state_bound, v)
+            for child in node:
+                walk(child)
+
+        for form in forms:
+            walk(form)
+        if state_bound is None or max_input_abs is None:
+            raise ValueError(
+                ".vnnlib did not declare the expected X_0 / Y_0 box bounds "
+                "(llcore online-arch-evo scalar convention)"
+            )
+        return state_bound, max_input_abs
     data = json.loads(path.read_text(encoding="utf-8"))
     return float(data.get("state_bound", 1.0)), float(data.get("max_input_abs", 1.0))
 
