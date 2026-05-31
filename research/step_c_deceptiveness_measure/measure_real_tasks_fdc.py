@@ -54,6 +54,15 @@ sys.path.insert(0, str(_HERE.parents[1] / "src"))
 
 from metric_fdc_behavior import deceptiveness_with_ci  # noqa: E402
 
+# 軽量予算モード (RAPTOR_FDC_FAST=1): 重い reservoir 評価 (full は ~80 分) を CI 内で
+# 完走させるための縮小予算。honest disclosure: full budget でないことを出力に明記する。
+import os as _os  # noqa: E402
+_FAST = _os.environ.get("RAPTOR_FDC_FAST", "") == "1"
+_FAST_NS_RES = int(_os.environ.get("RAPTOR_FDC_NS_RES", "300"))   # reservoir n_samples
+_FAST_HT_RES = int(_os.environ.get("RAPTOR_FDC_HT_RES", "4"))     # reservoir honest_n_trials
+_FAST_NS_S6 = int(_os.environ.get("RAPTOR_FDC_NS_S6", "400"))     # step6 n_samples
+_FAST_NR = int(_os.environ.get("RAPTOR_FDC_NR", "3"))            # n_repeats (seeds)
+
 
 def _utf8() -> None:
     for s in (sys.stdout, sys.stderr):
