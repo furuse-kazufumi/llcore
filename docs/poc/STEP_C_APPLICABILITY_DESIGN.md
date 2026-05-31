@@ -59,18 +59,19 @@ f(b)      = max(local(b), glob(b), ramp(b)*(1-dip(b))) + N(0, 0.008)   (b∈[0.4
 ```
 
 - **d=0.0**: 谷無し → b: 0.4→0.9 が **厳密に単調増加** (downhill 0 step・正の勾配が常に存在)。
-  = 真の smooth (exp5 相当)。hill-climbing は連続した上り勾配で大域へ登れる → ③不要のはず。
-- **d=1.0**: 谷の床 ≈ 0 → 深い dip。= exp4 の deceptive corridor。hill-climb は downhill 拒否で罠。
+  = monotone smooth **control** (exp5 着想)。hill-climbing は連続した上り勾配で大域へ登れる → ③不要のはず。
+- **d=1.0**: 谷の床 ≈ 0 → 深い dip = deep-dip deceptive **control** (exp4 着想)。hill-climb は downhill 拒否で罠。
 - **中間 d**: dip の深さが連続変化。**唯一の自由度が「欺瞞 (dip) の深さ」**。
 
 ### なぜ dip 深さを primary に選んだか
 
-1. exp4↔exp5 の **唯一の差**が dip の有無 (exp5 は `smooth_eval` で dip を消した)。dip 深さは
-   その差を連続化した最小の 1 パラメータ → **exp4/exp5 を端点として厳密に含む** (内挿の妥当性が
-   一次情報で担保される)。
-2. behavior=mean の **genotypic corridor 構造を全 d で不変**に保つ → `random` の失敗 (CLT で
-   b≈0.5 固着・大域到達不能) は **d 非依存の定数**。これにより d を変えたときの MAP-E 優位の変化が
-   「dip 越え (= ③ の本質効果) の難易/不要化」だけに帰属し、corridor 幅などの交絡を排除できる。
+1. exp4/exp5 の **本質的な差**が dip の有無。dip 深さはその差を連続化した最小の 1 パラメータ
+   → exp4/exp5 を **着想元**とし d=0 (smooth control)/d=1 (deep-dip control) で挟む
+   (eval 関数の厳密内挿ではない = 上記訂正ボックス)。
+2. behavior=mean の **genotypic corridor 構造を全 d で不変**に保つ (corridor 幅の交絡を排除)。
+   ただし **`random` の reach は d 依存** (高 d で最強 baseline 化、当初の「d 非依存定数」は誤り→訂正)。
+   MAP-E 優位の変化は「dip 越え (= ③ の本質効果) の難易/不要化」に帰属し、load_bearing は 3 baseline
+   全勝で保守的に判定する。
 3. 峰の高さ・位置を固定するので「大域最適の価値」も d 非依存 → 優位の大小が**欺瞞性のみの関数**。
 4. **ramp 基線**にすることで d=0 で hill-climb に **連続した上り勾配**を与え「dip が無ければ登れる」を
    保証 → 閾値が「勾配の有無」でなく「dip の深さ」の純粋な関数になる
