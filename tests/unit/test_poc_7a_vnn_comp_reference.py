@@ -400,7 +400,7 @@ def test_sat_spurious_becomes_unknown(tmp_path: Path) -> None:
     assert v.verdict == "unknown"
     assert v.witness_path is not None
     w = json.loads(Path(v.witness_path).read_text(encoding="utf-8"))
-    assert w["genuine_violation"] is False
+    assert w["confirmed_real_violation"] is False
 
 
 def test_write_sat_witness_recomputes_genuine(tmp_path: Path) -> None:
