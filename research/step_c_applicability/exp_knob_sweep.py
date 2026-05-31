@@ -339,8 +339,9 @@ def run_sweep(
 
 
 def main() -> int:
-    # >=6 levels: smooth(0.0) → deceptive(1.0)。閾値近傍を見るため非等間隔も含め 8 levels。
-    d_levels = [0.0, 0.2, 0.4, 0.5, 0.6, 0.7, 0.85, 1.0]
+    # >=6 levels: smooth(0.0) → deceptive(1.0)。閾値が [0.10, 0.20] にあると判明したので
+    # その近傍を密に取り transition の sharp/gradual を解像する (計 13 levels)。
+    d_levels = [0.0, 0.05, 0.10, 0.13, 0.16, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.85, 1.0]
     print("Step C 適用条件: dip depth d sweep (smooth d=0 → deceptive d=1)")
     print(f"D={D} behavior=mean genotypic corridor / n_seeds=20 n_evals=6000 "
           f"strict gate (p<0.05 ∧ |δ|>=0.147 ∧ n>=15)")
