@@ -1,0 +1,36 @@
+{
+  "metric": "fdc_behavior",
+  "purpose": "Phase A CrossMetric: re-test behavior_elite_dip below-threshold conclusion with FDC-behavior",
+  "threshold_at_d_star": null,
+  "d_star": null,
+  "threshold_source": "calibrate_fdc_behavior_results.json",
+  "rng_seed": 12345,
+  "measure_params": {
+    "n_samples": 2000,
+    "honest_n_trials": 10,
+    "n_repeats": 5
+  },
+  "tasks": {
+    "flip_flop": {
+      "status": "unavailable",
+      "error": "ModuleNotFoundError: No module named 'step_c_memory_tasks.tasks'"
+    },
+    "variable_delay_recall": {
+      "status": "unavailable",
+      "error": "ModuleNotFoundError: No module named 'ea_multitask.tasks'"
+    },
+    "step6_text_proxy": {
+      "status": "unavailable",
+      "error": "ModuleNotFoundError: No module named 'step6_real_proxy.task'"
+    }
+  },
+  "calibration_spearman_vs_d": null,
+  "summary": {
+    "n_measured": 0,
+    "n_below_threshold": 0,
+    "all_below_threshold": false,
+    "tasks_below": [],
+    "tasks_above": [],
+    "agrees_with_behavior_elite_dip": false
+  }
+}
