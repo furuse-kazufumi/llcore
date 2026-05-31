@@ -463,24 +463,53 @@ def write_sat_witness(
     path = witness_dir / f"witness_step_{step:04d}_sat.json"
     ce = dict(result.counterexample or {})
     sb = float(net.invariant_state_bound)
-    s_next_real: float | None = None
+    ia = float(net.invariant_max_input_abs)
     genuine = False
-    if all(k in ce for k in ("decay", "mix", "gate_str", "s", "x")):
+    method = "none"
+    w_x: float | None = None
+    w_s: float | None = None
+    s_next_real: float | None = None
+
+    if all(k in ce for k in ("decay", "mix", "gate_str")):
         gene = StateUpdateGene(decay=ce["decay"], mix=ce["mix"], gate_str=ce["gate_str"])
-        s_next_real = float(eval_step(np.array([ce["s"]]), np.array([ce["x"]]), gene)[0])
-        genuine = abs(s_next_real) > sb + 1e-9
+        # (1) check z3's own candidate assignment with the real tanh.
+        if "s" in ce and "x" in ce:
+            sn = float(eval_step(np.array([float(ce["s"])]), np.array([float(ce["x"])]), gene)[0])
+            if abs(sn) > sb + 1e-9:
+                genuine, method, w_x, w_s, s_next_real = True, "z3_candidate", float(ce["x"]), float(ce["s"]), sn
+        # (2) if z3's candidate was spurious, grid-scan the real (tanh) map over the
+        #     box |s|<=state_bound, |x|<=max_input_abs to find a genuine violation.
+        #     Numerical scan (scalar block) — finding none is treated as "no real
+        #     violation found", NOT a soundness proof of safety.
+        if not genuine:
+            xs = np.linspace(-ia, ia, scan_n)
+            best, bx, bs = 0.0, 0.0, 0.0
+            for sv in np.linspace(-sb, sb, scan_n):
+                row = eval_step(np.full(scan_n, sv, dtype=float), xs, gene)
+                k = int(np.argmax(np.abs(row)))
+                if abs(row[k]) > best:
+                    best, bx, bs = abs(float(row[k])), float(xs[k]), float(sv)
+            if best > sb + 1e-9:
+                genuine, method, w_x, w_s, s_next_real = True, "grid_scan", bx, bs, best
+
     witness = {
         "step": step,
         "kernel": "RwkvTimeMix",
         "verdict_candidate": "sat",
-        "counterexample": ce,
+        "z3_counterexample": ce,
         "state_bound": sb,
-        "recomputed_s_next_real_tanh": s_next_real,
+        "max_input_abs": ia,
         "genuine_violation": genuine,
+        "confirmation_method": method,  # z3_candidate | grid_scan | none
+        "witness_input_x": w_x,
+        "witness_state_s": w_s,
+        "real_s_next_abs": s_next_real,
         "note": (
-            "genuine: real |s_next| exceeds state_bound (independently recomputable from this assignment)"
+            "genuine: a real (x, s) assignment drives |s_next| above state_bound "
+            "(recompute with eval_step to verify)"
             if genuine
-            else "spurious: z3 candidate from the tanh over-approximation; real |s_next| is within state_bound"
+            else "spurious: z3's sat came from the tanh over-approximation; no real violation "
+            "found on the scanned grid (numerical scan, not a soundness proof)"
         ),
     }
     path.write_text(json.dumps(witness, ensure_ascii=False, indent=2), encoding="utf-8")
