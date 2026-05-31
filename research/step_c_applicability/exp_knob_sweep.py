@@ -418,6 +418,7 @@ def main() -> int:
         },
         "threshold_d_star_strict": threshold_strict,
         "threshold_d_star_loose_climber": threshold_loose,
+        "robustness_other_base_seeds": robustness,
         "levels": [asdict(r) for r in results],
     }
     out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")

@@ -29,10 +29,62 @@
   },
   "threshold_d_star_strict": 0.16,
   "threshold_d_star_loose_climber": 0.13,
+  "robustness_other_base_seeds": {
+    "777": {
+      "d_star_strict": 0.16,
+      "per_level": {
+        "0.10": {
+          "load_bearing": false,
+          "n_baselines_beaten": 1,
+          "advantage": -0.005668980791944778
+        },
+        "0.13": {
+          "load_bearing": false,
+          "n_baselines_beaten": 2,
+          "advantage": -0.006072529797592097
+        },
+        "0.16": {
+          "load_bearing": true,
+          "n_baselines_beaten": 3,
+          "advantage": 0.23117216424728626
+        },
+        "0.20": {
+          "load_bearing": true,
+          "n_baselines_beaten": 3,
+          "advantage": 0.25328300205309107
+        }
+      }
+    },
+    "31337": {
+      "d_star_strict": 0.16,
+      "per_level": {
+        "0.10": {
+          "load_bearing": false,
+          "n_baselines_beaten": 1,
+          "advantage": -0.003292076224715834
+        },
+        "0.13": {
+          "load_bearing": false,
+          "n_baselines_beaten": 2,
+          "advantage": -2.1379686197753323e-05
+        },
+        "0.16": {
+          "load_bearing": true,
+          "n_baselines_beaten": 3,
+          "advantage": 0.22767652577498743
+        },
+        "0.20": {
+          "load_bearing": true,
+          "n_baselines_beaten": 3,
+          "advantage": 0.26139353284253375
+        }
+      }
+    }
+  },
   "levels": [
     {
       "d": 0.0,
-      "valley_floor": 0.6,
+      "dip_center_corridor": 0.8,
       "means": {
         "map_elites": 0.9960052535238662,
         "rr_hillclimb": 0.9982581603535982,
@@ -86,12 +138,13 @@
         }
       },
       "load_bearing": false,
-      "partial_load_bearing": true,
+      "beats_any_baseline": true,
+      "beats_climbing_baseline": false,
       "n_baselines_beaten": 1
     },
     {
       "d": 0.05,
-      "valley_floor": 0.57,
+      "dip_center_corridor": 0.76,
       "means": {
         "map_elites": 0.9956206905568352,
         "rr_hillclimb": 0.9979331135146248,
@@ -145,12 +198,13 @@
         }
       },
       "load_bearing": false,
-      "partial_load_bearing": true,
+      "beats_any_baseline": true,
+      "beats_climbing_baseline": false,
       "n_baselines_beaten": 1
     },
     {
       "d": 0.1,
-      "valley_floor": 0.54,
+      "dip_center_corridor": 0.7200000000000001,
       "means": {
         "map_elites": 0.9977794640585209,
         "rr_hillclimb": 0.9975874334696382,
@@ -204,12 +258,13 @@
         }
       },
       "load_bearing": false,
-      "partial_load_bearing": true,
+      "beats_any_baseline": true,
+      "beats_climbing_baseline": false,
       "n_baselines_beaten": 1
     },
     {
       "d": 0.13,
-      "valley_floor": 0.522,
+      "dip_center_corridor": 0.6960000000000001,
       "means": {
         "map_elites": 0.9942619010810783,
         "rr_hillclimb": 0.8857610358858812,
@@ -263,12 +318,13 @@
         }
       },
       "load_bearing": false,
-      "partial_load_bearing": true,
+      "beats_any_baseline": true,
+      "beats_climbing_baseline": true,
       "n_baselines_beaten": 2
     },
     {
       "d": 0.16,
-      "valley_floor": 0.504,
+      "dip_center_corridor": 0.672,
       "means": {
         "map_elites": 0.9930092567965485,
         "rr_hillclimb": 0.7555092376577591,
@@ -322,12 +378,13 @@
         }
       },
       "load_bearing": true,
-      "partial_load_bearing": false,
+      "beats_any_baseline": true,
+      "beats_climbing_baseline": true,
       "n_baselines_beaten": 3
     },
     {
       "d": 0.2,
-      "valley_floor": 0.48,
+      "dip_center_corridor": 0.6400000000000001,
       "means": {
         "map_elites": 0.9955636526336695,
         "rr_hillclimb": 0.7195969446033224,
@@ -381,12 +438,13 @@
         }
       },
       "load_bearing": true,
-      "partial_load_bearing": false,
+      "beats_any_baseline": true,
+      "beats_climbing_baseline": true,
       "n_baselines_beaten": 3
     },
     {
       "d": 0.3,
-      "valley_floor": 0.42,
+      "dip_center_corridor": 0.5599999999999999,
       "means": {
         "map_elites": 0.9951407316195666,
         "rr_hillclimb": 0.6920890019886927,
@@ -440,12 +498,13 @@
         }
       },
       "load_bearing": true,
-      "partial_load_bearing": false,
+      "beats_any_baseline": true,
+      "beats_climbing_baseline": true,
       "n_baselines_beaten": 3
     },
     {
       "d": 0.4,
-      "valley_floor": 0.36,
+      "dip_center_corridor": 0.48,
       "means": {
         "map_elites": 0.9965702547356775,
         "rr_hillclimb": 0.6818475833656639,
@@ -499,12 +558,13 @@
         }
       },
       "load_bearing": true,
-      "partial_load_bearing": false,
+      "beats_any_baseline": true,
+      "beats_climbing_baseline": true,
       "n_baselines_beaten": 3
     },
     {
       "d": 0.5,
-      "valley_floor": 0.3,
+      "dip_center_corridor": 0.4,
       "means": {
         "map_elites": 0.992798832658767,
         "rr_hillclimb": 0.6463483201516013,
@@ -558,12 +618,13 @@
         }
       },
       "load_bearing": true,
-      "partial_load_bearing": false,
+      "beats_any_baseline": true,
+      "beats_climbing_baseline": true,
       "n_baselines_beaten": 3
     },
     {
       "d": 0.6,
-      "valley_floor": 0.24,
+      "dip_center_corridor": 0.32000000000000006,
       "means": {
         "map_elites": 0.9947524231562197,
         "rr_hillclimb": 0.6416443272190162,
@@ -617,12 +678,13 @@
         }
       },
       "load_bearing": true,
-      "partial_load_bearing": false,
+      "beats_any_baseline": true,
+      "beats_climbing_baseline": true,
       "n_baselines_beaten": 3
     },
     {
       "d": 0.7,
-      "valley_floor": 0.18000000000000002,
+      "dip_center_corridor": 0.24000000000000005,
       "means": {
         "map_elites": 0.996345830422146,
         "rr_hillclimb": 0.6378790180276305,
@@ -676,12 +738,13 @@
         }
       },
       "load_bearing": true,
-      "partial_load_bearing": false,
+      "beats_any_baseline": true,
+      "beats_climbing_baseline": true,
       "n_baselines_beaten": 3
     },
     {
       "d": 0.85,
-      "valley_floor": 0.09000000000000001,
+      "dip_center_corridor": 0.12000000000000002,
       "means": {
         "map_elites": 0.9967892212965623,
         "rr_hillclimb": 0.6519102131080498,
@@ -735,12 +798,13 @@
         }
       },
       "load_bearing": true,
-      "partial_load_bearing": false,
+      "beats_any_baseline": true,
+      "beats_climbing_baseline": true,
       "n_baselines_beaten": 3
     },
     {
       "d": 1.0,
-      "valley_floor": 0.0,
+      "dip_center_corridor": 0.0,
       "means": {
         "map_elites": 0.997402197749517,
         "rr_hillclimb": 0.6483254693946408,
@@ -794,7 +858,8 @@
         }
       },
       "load_bearing": true,
-      "partial_load_bearing": false,
+      "beats_any_baseline": true,
+      "beats_climbing_baseline": true,
       "n_baselines_beaten": 3
     }
   ]
