@@ -338,3 +338,42 @@ def test_onnx_parsed_net_verifies(tmp_path: Path) -> None:
     parsed.invariant_max_input_abs = 1.0
     r = ref.verify_net(parsed)
     assert r.ok
+
+
+def test_generate_properties_produces_parseable_instances(tmp_path: Path) -> None:
+    """The seed-based benchmark generator emits .onnx/.vnnlib that round-trip + verify."""
+    pytest.importorskip("onnx")
+    gen_dir = _PROJ_ROOT / "scripts" / "vnncomp_benchmark"
+    if str(gen_dir) not in sys.path:
+        sys.path.insert(0, str(gen_dir))
+    import generate_properties as gen  # noqa: PLC0415
+
+    csv_path = gen.generate(seed=7, out_dir=tmp_path, n_instances=3)
+    rows = [r for r in csv_path.read_text(encoding="utf-8").splitlines() if r.strip()]
+    assert len(rows) == 3
+    for row in rows:
+        cols = row.split(",")
+        onnx_rel, vnnlib_rel = cols[0], cols[1]
+        net = ref.parse_model_onnx(tmp_path / onnx_rel)
+        sb, ia = ref.parse_invariant_vnnlib(tmp_path / vnnlib_rel)
+        assert len(net.blocks) >= 1
+        assert sb > 0.0 and ia > 0.0
+        net.invariant_state_bound = sb
+        net.invariant_max_input_abs = ia
+        # verifier runs to a definite verdict (ok True/False both valid for a benchmark mix)
+        assert ref.verify_net(net).used_z3 in (True, False)
+
+
+def test_generate_properties_deterministic(tmp_path: Path) -> None:
+    """Same seed -> identical instances.csv + .vnnlib content (reproducibility)."""
+    pytest.importorskip("onnx")
+    gen_dir = _PROJ_ROOT / "scripts" / "vnncomp_benchmark"
+    if str(gen_dir) not in sys.path:
+        sys.path.insert(0, str(gen_dir))
+    import generate_properties as gen  # noqa: PLC0415
+
+    a, b = tmp_path / "a", tmp_path / "b"
+    gen.generate(seed=99, out_dir=a, n_instances=2)
+    gen.generate(seed=99, out_dir=b, n_instances=2)
+    assert (a / "instances.csv").read_text() == (b / "instances.csv").read_text()
+    assert (a / "vnnlib" / "invariant_0.vnnlib").read_text() == (b / "vnnlib" / "invariant_0.vnnlib").read_text()
