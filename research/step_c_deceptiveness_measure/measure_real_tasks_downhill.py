@@ -223,7 +223,7 @@ def measure_reservoir_tasks(metric_at_dstar):
     t0 = time.time()
     train = [VariableDelayRecallTask(seq_len=Dly, distractor_amp=0.2, in_dim=2)
              for Dly in (15, 30)]
-    ev = make_eval_once(res, TaskMixture(train), 48, 48)
+    ev = make_eval_once(res, TaskMixture(train), n_train=48, n_eval=48)
     d_ea = _tag(_estimate_real("variable_delay_recall", ev, behavior, bounds, dim, **cfg),
                 metric_at_dstar)
     out["variable_delay_recall"] = d_ea
