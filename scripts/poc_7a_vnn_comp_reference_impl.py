@@ -447,7 +447,7 @@ def write_unsat_witness(net: NetworkState, witness_dir: Path, step: int) -> Path
 
 
 def write_sat_witness(
-    net: NetworkState, result: InvariantResult, witness_dir: Path, step: int
+    net: NetworkState, result: InvariantResult, witness_dir: Path, step: int, scan_n: int = 121
 ) -> tuple[Path, bool]:
     """Emit a JSON `sat` witness and report whether the violation is *genuine*.
 
