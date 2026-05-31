@@ -486,7 +486,7 @@ def write_sat_witness(
             mag = abs(float(row[k]))
             if mag > best:
                 best, block_idx, w_x, w_s, s_next_real = mag, bi, float(xs[k]), float(sv), float(row[k])
-    genuine = best > sb + 1e-9
+    confirmed = best > sb + 1e-9
 
     witness = {
         "step": step,
@@ -495,7 +495,7 @@ def write_sat_witness(
         "z3_counterexample": ce,  # informational; verify_gene_safe usually omits it
         "state_bound": sb,
         "max_input_abs": ia,
-        "genuine_violation": genuine,
+        "confirmed_real_violation": confirmed,  # True = grid found a real (tanh) violation
         "confirmation_method": "real_tanh_grid_scan",
         "witness_block_index": block_idx,
         "witness_input_x": w_x,
@@ -503,16 +503,18 @@ def write_sat_witness(
         "real_s_next": s_next_real,
         "max_abs_s_next_on_grid": best,
         "note": (
-            "genuine: block {bi}, real eval_step(s={s}, x={x}) gives |s_next|={m:.6f} > "
-            "state_bound={sb} (independently recomputable)".format(bi=block_idx, s=w_s, x=w_x, m=best, sb=sb)
-            if genuine
-            else "spurious: verifier flagged a violation but no real (tanh) violation was found on "
-            "the scanned grid (max |s_next|={m:.6f} <= state_bound={sb}); numerical scan, "
-            "not a soundness proof".format(m=best, sb=sb)
+            "confirmed: block {bi}, real eval_step(s={s}, x={x}) gives |s_next|={m:.6f} > "
+            "state_bound={sb} (independently recomputable counterexample)".format(
+                bi=block_idx, s=w_s, x=w_x, m=best, sb=sb)
+            if confirmed
+            else "NOT confirmed: no real (tanh) violation found on the scanned grid "
+            "(max |s_next|={m:.6f} <= state_bound={sb}). This is a finite numerical scan — "
+            "neither a soundness proof of safety nor a proof the verifier's flag was spurious; "
+            "the verdict is therefore 'unknown'.".format(m=best, sb=sb)
         ),
     }
     path.write_text(json.dumps(witness, ensure_ascii=False, indent=2), encoding="utf-8")
-    return path, genuine
+    return path, confirmed
 
 
 # ---------------------------------------------------------------------------
