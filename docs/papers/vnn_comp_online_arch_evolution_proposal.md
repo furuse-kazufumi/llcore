@@ -136,7 +136,7 @@ This is intentionally analogous to the role NAS-Bench-201 played for the NAS com
 
 | Work | Network | Query | Budget | Open-ended? |
 |---|---|---|---|---|
-| VNN-COMP 2020–2024 | one fixed `.onnx` | one `.vnnlib` | per-query, GPU | No |
+| VNN-COMP 2020–2025 | one fixed `.onnx` | one `.vnnlib` | per-query, GPU | No |
 | α,β-CROWN | one fixed `.onnx` | one `.vnnlib` | per-query, GPU | No |
 | Marabou Incremental | one fixed network | sequence of same-network queries | per-sequence | No |
 | TorchLean | one fixed network | mechanised proof | per-property, slow | No |
