@@ -62,6 +62,7 @@ if str(_SRC) not in sys.path:
     sys.path.insert(0, str(_SRC))
 
 from llcore.state_update import StateUpdateGene  # noqa: E402
+from llcore.state_update.genes import eval_step  # noqa: E402
 from llcore.verifier import (  # noqa: E402
     InvariantResult,
     is_z3_available,
