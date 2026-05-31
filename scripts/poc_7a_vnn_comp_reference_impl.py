@@ -521,8 +521,15 @@ def step_once(
         wp = write_unsat_witness(new_net, witness_dir, step_id)
         return new_net, StepVerdict("unsat", elapsed, str(wp), r.reason)
     if not r.ok and r.used_z3 and r.counterexample is not None:
-        # sat witness emission not implemented in PoC 7a; record detail only
-        return new_net, StepVerdict("sat", elapsed, None, r.reason)
+        wp, genuine = write_sat_witness(new_net, r, witness_dir, step_id)
+        if genuine:
+            return new_net, StepVerdict("sat", elapsed, str(wp), r.reason)
+        # Spurious z3 candidate (tanh over-approximation): the real next-state is
+        # within bound, so we cannot soundly claim a violation. Report unknown.
+        return new_net, StepVerdict(
+            "unknown", elapsed, str(wp),
+            "z3 sat candidate spurious under tanh abstraction (real s_next within state_bound)",
+        )
     # used_z3=False fallback path (z3 unavailable); treat as unsat by mathematical argument
     if r.ok and not r.used_z3:
         return new_net, StepVerdict("unsat", elapsed, None, "z3 unavailable, fallback admit")
