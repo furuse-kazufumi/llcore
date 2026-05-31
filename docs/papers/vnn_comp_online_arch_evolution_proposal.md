@@ -575,6 +575,11 @@ We verified that the following works are referenced and described correctly agai
 - AURORA: Cully; arXiv:1905.11874.
 - MODES: Dolson et al. 2019 (Bedau lineage 1998–2003).
 - DNNV: Shriver, Elbaum, Dwyer; CAV 2021; arXiv:2105.12841.
+- IVAN (Incremental Verification of Neural Networks): Ugare, Banerjee, Misailovic, Singh; PLDI 2023; arXiv:2304.01874.
+- MUC-G4: Li & Li; arXiv:2506.04268 (2025).
+- Certified Continual Learning for Neural Network Regression: Pham & Sun; arXiv:2407.06697 (2024).
+- Adaptive GR(1) Specification Repair for shielding: Georgescu et al.; arXiv:2511.02605 (2025).
+- Adaptive shielding via hidden-parameter inference: Kwon et al.; arXiv:2506.11033 (2025).
 - llcore PoC 1a: this repository, `docs/poc/poc_1a_verdict.md`.
 
 All are cited in §2; none are mis-attributed.

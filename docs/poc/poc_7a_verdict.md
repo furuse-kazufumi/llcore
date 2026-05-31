@@ -286,3 +286,15 @@ spec §3.1 は `sat` verdict にも `witness_path` を必須とするが、`poc_
 | **GECCO 2027 short** | 後続 | 低 | empirical coevolution 結果 (10-instance pilot) 必要、現原稿では弱い |
 
 → **次稿戦略**: 短期 = NeurIPS workshop submission (framing 修正のみで提出可)、中期 = TMLR (parser + sat witness 実装後)、後期 = GECCO short (pilot 結果蓄積後)。
+
+---
+
+## Workshop-prep 改訂適用 (2026-05-31)
+
+NeurIPS workshop 投稿準備として、Codex Q7「workshop は framing 修正 + adjacent work 追加で提出可」を実施。**workflow で並列 web 検証** ([[feedback_external_ai_verify]] = 引用は実在検証してから採用):
+
+- **framing 修正** (Codex Finding #4 解消): VNN-COMP 2025 = **6th edition** (arXiv:2512.19007 一次確認) → abstract/§2.1 を「first six editions (2020–2025)」に。α,β-CROWN は 2021–2025 の **5 連覇**(edition 数 6 と連覇数 5 を正確に区別)。「provably cannot answer」→「cannot be *expressed* in the one-network-per-call I/O contract = contract mismatch」に軟化。Query C も contract-mismatch framing に鋭利化。
+- **adjacent work 追加** (Codex Q5): Codex 提案 4 本(shielding 系)は実在検証 OK だが多くが orthogonal。discovery agent が **より的確な 3 本**を発見し §2.9.1 新設で追加: **IVAN** (Ugare et al., PLDI 2023, arXiv:2304.01874 = 論文が見落としていた直接の先行研究「different-network same-property」proof reuse) / **MUC-G4** (Li & Li, arXiv:2506.04268, 2025, MUC-guided 圧縮 incremental) / **Certified Continual Learning** (Pham & Sun, arXiv:2407.06697, 2024)。shielding 系 (Georgescu 2511.02605 / Kwon 2506.11033) は orthogonal contrast として明記。ProSh は relevance=low で discard。
+- **§9 limitations 追加** (Codex Finding #1/#2 を paper 本体に反映): item 10 (spec⇔reference-impl conformance gap: .onnx/.vnnlib は NotImplementedError、JSON dummy のみ受理) + item 11 (sat witness 未実装→audited TPR/FPR 比較不可)。
+- **Codex pair-review (gpt-5.4, 2026-05-31)**: revised paper を再 review。**§9 item 10/11 は code-faithful と確認**。4 件修正: Kwon の特徴付け (spec repair ❌→adaptive shielding) / Appendix A cross-check に新規 5 件追加 / §2.12 表 2020–2024→2020–2025 / IVAN speedup を geometric-mean・benchmark 依存に限定。
+- word count 8198→約 10,200。**workshop 投稿可能水準を維持しつつ framing の stale/overclaim を是正、関連研究の最重要 gap (IVAN) を補完**。TMLR full submission は依然 parser + sat witness 実装が前提 (不変)。
