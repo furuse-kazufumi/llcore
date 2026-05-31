@@ -418,7 +418,7 @@ def main() -> int:
     payload = {
         "design": {
             "knob": "dip_depth_d",
-            "knob_meaning": "dip carved into a monotone ramp(0.60->1.00) over behavior[0.40,0.90], depth d at center b=0.65; d=0 strictly-monotone smooth ramp (exp5), d=1 deep dip (exp4 deceptive corridor)",
+            "knob_meaning": "exp4/exp5-INSPIRED ramp-with-dip toy family (NOT a literal interpolation of their eval functions): dip carved into a monotone ramp(0.60->1.00) over behavior[0.40,0.90], depth d at center b=0.65; d=0 = monotone smooth control, d=1 = deep-dip deceptive control. d* is a threshold WITHIN this family.",
             "d_levels": d_levels,
             "D": D, "n_seeds": 20, "n_evals": 6000, "honest_n_trials": 30,
             "sigma": 0.10, "base_seed": 20260530, "noise": _NOISE,
