@@ -11,19 +11,24 @@
 連続 knob = dip depth d ∈ [0,1]** で内挿し、③の優位 (MAP-E − best baseline + strict gate
 pass/fail) を **d の関数として測る**。閾値 d* (③が立ち始める dip depth) を特定する。
 
-== 選んだ knob: dip depth d ==
+== 選んだ knob: dip depth d (ramp に彫った谷の深さ) ==
 exp4 の corridor (behavior=mean の genotypic corridor) を保ち、局所峰 (b=0.4, 高さ0.60) と
-大域峰 (b=0.9, 高さ1.0) を **固定**したまま、その間の谷 (valley) の床の高さだけを動かす:
+大域峰 (b=0.9, 高さ1.0) を **固定**したまま、その間を結ぶ登坂 ramp に彫る **谷 (dip) の深さ**
+だけを動かす:
 
     local(b)  = 0.60 * exp(-(b-0.40)^2 / (2*0.08^2))
     glob(b)   = 1.00 * exp(-(b-0.90)^2 / (2*0.06^2))
-    bridge(b) = 0.60*(1-d)  for b in [0.40, 0.90] else 0       # 谷を埋める床
-    f(b)      = max(local(b), glob(b), bridge(b)) + noise
+    t(b)      = clip((b-0.40)/(0.90-0.40), 0, 1)
+    ramp(b)   = 0.60 + t(b)*(1.00-0.60)                       # 局所峰→大域峰を結ぶ単調登坂
+    dip(b)    = d * exp(-(b-0.65)^2 / (2*0.07^2))             # 谷の中央 b=0.65 に深さ d を彫る
+    f(b)      = max(local(b), glob(b), ramp(b)*(1-dip(b))) + noise   for b in [0.40,0.90]
 
-- d=0.0: 谷の床 = 0.60 = 局所峰の高さ → b: 0.4→0.9 に **単調非減少**の登坂路が出来る
-  (downhill 0 step)。= smooth (exp5 相当)。hill-climbing が大域へ登れる → ③不要のはず。
+- d=0.0: ramp に谷無し → b: 0.4→0.9 が **厳密に単調増加** (downhill 0 step, 正の勾配が常に存在)。
+  = 真の smooth (exp5 相当)。hill-climbing は連続した上り勾配で大域へ登れる → ③不要のはず。
+  **注**: 単純な「平床 (flat floor)」では勾配 0 で hill-climb の登坂信号が消え、谷が浅くても
+  smooth にならない (平床は弱い罠)。だから床でなく **正の勾配を持つ ramp** を基線にした。
 - d=1.0: 谷の床 ≈ 0 → 深い dip。= exp4 の deceptive corridor。hill-climb は downhill 拒否で罠。
-- 中間 d: dip の深さが連続変化。**唯一の自由度が「欺瞞の深さ」**になる。
+- 中間 d: ramp 中央の谷の深さが連続変化。**唯一の自由度が「欺瞞 (dip) の深さ」**になる。
 
 なぜ dip depth を primary に選んだか (justification, design note 参照):
 1. exp4↔exp5 の **唯一の差**が dip の有無 (exp5 は smooth_eval で dip を消した)。dip depth は
@@ -32,6 +37,8 @@ exp4 の corridor (behavior=mean の genotypic corridor) を保ち、局所峰 (
    大域到達不能) は d 非依存の定数。これにより d を変えたときの MAP-E 優位の変化が
    「dip 越え (③ の本質効果) の難易/不要化」だけに帰属し、corridor 幅などの交絡を排除できる。
 3. 峰の高さ・位置を固定するので「大域最適の価値」も d 非依存 → 優位の大小が欺瞞性のみの関数。
+4. ramp 基線にすることで d=0 で hill-climb に **連続した上り勾配**を与え「dip が無ければ登れる」
+   を保証 → 閾値は「勾配の有無」でなく「dip の深さ」の純粋な関数になる。
 
 == 規律 (一次情報の方針を継承) ==
 - ea_lab.py の seed 設計を踏襲: 進化 RNG = SeedSequence([base, method_idx, s]) で一意化、
