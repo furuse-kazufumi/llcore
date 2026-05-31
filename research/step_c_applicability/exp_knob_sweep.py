@@ -283,7 +283,9 @@ class LevelResult:
     me_minus_best_baseline: float  # ③ advantage = MAP-E mean − best baseline mean
     best_baseline_name: str
     gates: dict[str, dict]  # MAP-E vs 各 baseline の完全 strict gate
-    load_bearing: bool  # ③が立つ = 3 baseline 全てに strict gate 勝利
+    load_bearing: bool  # ③が立つ (厳格) = 3 baseline 全てに strict gate 勝利
+    partial_load_bearing: bool  # ③が一部 baseline に勝つ (= 少なくとも 1 baseline に strict gate 勝利)
+    n_baselines_beaten: int  # strict gate を通過した baseline 数 (0-3)
 
 
 def run_sweep(
