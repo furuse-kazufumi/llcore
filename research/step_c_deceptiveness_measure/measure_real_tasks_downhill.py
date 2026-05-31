@@ -232,7 +232,7 @@ def measure_reservoir_tasks(metric_at_dstar):
           f"({time.time()-t0:.0f}s)", flush=True)
 
     t1 = time.time()
-    ev = make_eval_once(res, FlipFlopTask(), 48, 48)
+    ev = make_eval_once(res, FlipFlopTask(), n_train=48, n_eval=48)
     d_ff = _tag(_estimate_real("flip_flop", ev, behavior, bounds, dim, **cfg), metric_at_dstar)
     out["flip_flop"] = d_ff
     print(f"    flip_flop: {d_ff['mean']:.4f} CI[{d_ff['ci95_lo']:.4f},{d_ff['ci95_hi']:.4f}] "

@@ -1,0 +1,5 @@
+per_eval_ms=99.638
+ns=1600 ft=10 nseed=5 -> 84000 evals, 8370s/task, 2tasks=16739s
+ns=900 ft=6 nseed=3 -> 17550 evals, 1749s/task, 2tasks=3497s
+ns=600 ft=5 nseed=3 -> 9900 evals, 986s/task, 2tasks=1973s
+ns=500 ft=4 nseed=3 -> 6750 evals, 673s/task, 2tasks=1345s
