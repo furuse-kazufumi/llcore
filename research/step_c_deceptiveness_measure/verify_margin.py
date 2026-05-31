@@ -2,32 +2,30 @@
 """
 verify_margin.py -- Phase B adversarial verification, lens=sampling_threshold_margin.
 
-Uses the ACTUAL metric (metric_behavior_elite_dip.deceptiveness_estimate) and the
-ACTUAL real-task wiring (reservoir make_behavior, step6 ESN), re-measured under
-seed/sample/bin/threshold perturbations.
+The real-task EA evals are ~100ms each; re-measuring at full budget over many seed
+banks is multi-hour (the downhill cross-metric author hit the same wall). So this
+script splits the work:
 
-Tests:
- T1 metric_at_dstar (threshold) stability: re-derive the d*=0.16 raw value across
-    base_seed / n_seeds / n_samples / n_bins. Is 0.0153 stable or seed-noise?
- T2 real-task value stability: re-measure each task across base_seed / n_samples /
-    n_bins; report mean/std and the margin to the threshold in std units.
- T3 verdict robustness: under each perturbation, does below/above flip?
- T4 honest summary of what the on-disk conclusion actually is.
+ PART 1 (cheap, RE-MEASURED): threshold (metric_at_dstar) stability on the SYNTHETIC
+   corridor across base_seed / n_seeds / n_samples / n_bins. The threshold is the
+   quantity the whole below/above verdict hangs on; if it is seed-fragile the verdict
+   is fragile. Synthetic eval is fast (deterministic ramp), so we can sweep widely.
 
-ASCII-only output. Writes verify_margin_results.json.
+ PART 2 (from existing per-seed data, NO re-run): margin analysis of the on-disk
+   real-task estimates. We recompute, from the stored per_seed arrays, the margin to
+   the threshold in std units, the seed-noise CV, and whether the 95% CI brackets the
+   threshold -- i.e. whether the below/above verdict could flip under resampling.
+
+ASCII-only. Writes verify_margin_results.json.
 """
 from __future__ import annotations
-import json, sys, time
+import json, sys, math
 from pathlib import Path
 import numpy as np
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parents[0] / "step_c_applicability"))
-sys.path.insert(0, str(HERE.parents[0] / "step_c_memory_tasks"))
-sys.path.insert(0, str(HERE.parents[0] / "ea_multitask"))
-sys.path.insert(0, str(HERE.parents[0] / "ea_multitask" / "candidates"))
-sys.path.insert(0, str(HERE.parents[0] / "step6_real_proxy"))
 sys.path.insert(0, str(HERE.parents[1] / "src"))
 
 for s in (sys.stdout, sys.stderr):
@@ -36,126 +34,115 @@ for s in (sys.stdout, sys.stderr):
         try: rc(encoding="utf-8")
         except Exception: pass
 
-from metric_behavior_elite_dip import deceptiveness, deceptiveness_estimate  # noqa
+from metric_behavior_elite_dip import deceptiveness_estimate  # noqa
+from exp_knob_sweep import D as SYN_D, behavior_mean, make_corridor_eval  # noqa
+
+THR = 0.015281642817850516  # stored metric_at_dstar (d=0.16)
+SBOUNDS = (np.zeros(SYN_D), np.ones(SYN_D))
+EV_DSTAR = make_corridor_eval(0.16)
 
 
-def synth_eval_behavior():
-    from exp_knob_sweep import D as SYN_D, behavior_mean, make_corridor_eval
-    return SYN_D, behavior_mean, make_corridor_eval
+def t_mult(n):
+    return {2: 12.71, 3: 4.303, 4: 3.182, 5: 2.776, 6: 2.571,
+            7: 2.447, 8: 2.365, 9: 2.306, 10: 2.262}.get(n, 1.96)
 
 
-def reservoir_setup():
-    from reservoir import (LeakyDelayLineReservoir, gene_bounds, make_behavior,
-                           make_eval_once)
-    from memory_tasks import FlipFlopTask
-    from task_mixture import TaskMixture
-    from variable_delay_recall import VariableDelayRecallTask
-    res = LeakyDelayLineReservoir(n_taps=8, in_dim=2)
-    bounds = gene_bounds(res); behavior = make_behavior(res); dim = res.gene_dim
-    train_regimes = [VariableDelayRecallTask(seq_len=D, distractor_amp=0.2, in_dim=2)
-                     for D in (15, 30)]
-    ev_vdr = make_eval_once(res, TaskMixture(train_regimes), n_train=48, n_eval=48)
-    ev_ff = make_eval_once(res, FlipFlopTask(), n_train=48, n_eval=48)
-    return bounds, behavior, dim, ev_vdr, ev_ff
-
-
-def step6_setup():
-    from esn_landscape import ESN, load_corpus, next_char_accuracy
-    idx, V, _ = load_corpus(max_chars=24000)
-    esn = ESN(n_reservoir=40, vocab=V, seed=0)
-    n_train, n_eval, washout = 3000, 1500, 80
-    def eval_once(gene, rng):
-        rho = 0.1 + 1.4 * float(gene[0]); leak = 0.05 + 0.95 * float(gene[1])
-        in_s = 0.3 + 1.2 * float(gene[2])
-        return next_char_accuracy(esn, idx, np.array([rho, leak, in_s]),
-                                  n_train=n_train, n_eval=n_eval, washout=washout)
-    def behavior(gene):
-        return np.array([float(gene[0]), float(gene[1])], dtype=np.float64)
-    return (np.zeros(3), np.ones(3)), behavior, 3, eval_once
+def ci95(per_seed):
+    a = np.asarray(per_seed, float)
+    m = float(a.mean()); s = float(a.std(ddof=1)) if len(a) > 1 else 0.0
+    se = s / math.sqrt(len(a)) if len(a) > 1 else 0.0
+    t = t_mult(len(a))
+    return m, s, m - t * se, m + t * se
 
 
 def main():
-    out = {"lens": "sampling_threshold_margin", "ts": time.strftime("%Y-%m-%d %H:%M")}
+    out = {"lens": "sampling_threshold_margin"}
 
-    SYN_D, behavior_mean, make_corridor_eval = synth_eval_behavior()
-    ev_dstar = make_corridor_eval(0.16)
-    sbounds = (np.zeros(SYN_D), np.ones(SYN_D))
-
-    # ---- T1: threshold (metric_at_dstar) stability ----
-    t1 = []
-    base_cfg = dict(n_samples=4000, n_bins=24, honest_n_trials=1)
-    for bs in (20260531, 1, 777, 999999):
-        est = deceptiveness_estimate(ev_dstar, behavior_mean, sbounds, SYN_D,
-                                     n_seeds=5, base_seed=bs, **base_cfg)
-        t1.append({"vary": "base_seed", "base_seed": bs, "mean": round(est.mean, 5),
-                   "std": round(est.std, 5), "per_seed": [round(x, 4) for x in est.per_seed]})
+    # =========================================================================
+    # PART 1 -- threshold (d*) raw-value stability, RE-MEASURED on synthetic.
+    # =========================================================================
+    p1 = []
+    base = dict(n_samples=4000, n_bins=24, honest_n_trials=1)
+    for bs in (20260531, 1, 777, 424242):
+        est = deceptiveness_estimate(EV_DSTAR, behavior_mean, SBOUNDS, SYN_D,
+                                     n_seeds=5, base_seed=bs, **base)
+        p1.append({"vary": "base_seed", "val": bs, "mean": round(est.mean, 5),
+                   "std": round(est.std, 5),
+                   "per_seed": [round(x, 4) for x in est.per_seed]})
     for ns in (3, 5, 10):
-        est = deceptiveness_estimate(ev_dstar, behavior_mean, sbounds, SYN_D,
-                                     n_seeds=ns, base_seed=20260531, **base_cfg)
-        t1.append({"vary": "n_seeds", "n_seeds": ns, "mean": round(est.mean, 5),
+        est = deceptiveness_estimate(EV_DSTAR, behavior_mean, SBOUNDS, SYN_D,
+                                     n_seeds=ns, base_seed=20260531, **base)
+        p1.append({"vary": "n_seeds", "val": ns, "mean": round(est.mean, 5),
                    "std": round(est.std, 5)})
     for nsamp in (2000, 4000, 8000):
-        est = deceptiveness_estimate(ev_dstar, behavior_mean, sbounds, SYN_D,
+        est = deceptiveness_estimate(EV_DSTAR, behavior_mean, SBOUNDS, SYN_D,
                                      n_seeds=5, base_seed=20260531,
                                      n_samples=nsamp, n_bins=24, honest_n_trials=1)
-        t1.append({"vary": "n_samples", "n_samples": nsamp, "mean": round(est.mean, 5),
+        p1.append({"vary": "n_samples", "val": nsamp, "mean": round(est.mean, 5),
                    "std": round(est.std, 5)})
     for nb in (16, 24, 32):
-        est = deceptiveness_estimate(ev_dstar, behavior_mean, sbounds, SYN_D,
+        est = deceptiveness_estimate(EV_DSTAR, behavior_mean, SBOUNDS, SYN_D,
                                      n_seeds=5, base_seed=20260531,
                                      n_samples=4000, n_bins=nb, honest_n_trials=1)
-        t1.append({"vary": "n_bins", "n_bins": nb, "mean": round(est.mean, 5),
+        p1.append({"vary": "n_bins", "val": nb, "mean": round(est.mean, 5),
                    "std": round(est.std, 5)})
-    out["T1_threshold_stability"] = t1
-    thr_vals = [r["mean"] for r in t1]
-    out["T1_threshold_range"] = {"min": round(min(thr_vals), 5), "max": round(max(thr_vals), 5),
-                                 "stored_metric_at_dstar": 0.015281642817850516,
-                                 "spread_factor": round(max(thr_vals) / max(min(thr_vals), 1e-9), 2)}
+    out["P1_threshold_stability"] = p1
+    means = [r["mean"] for r in p1]
+    out["P1_summary"] = {
+        "stored_threshold": THR,
+        "remeasured_min": round(min(means), 5),
+        "remeasured_max": round(max(means), 5),
+        "remeasured_spread_factor": round(max(means) / max(min(means), 1e-9), 2),
+        "stored_threshold_std_5seed": 0.01015,
+        "stored_threshold_cv": round(0.01015 / THR, 2),
+        "note": ("threshold raw value at d=0.16 moves by this factor under seed/sample/bin "
+                 "perturbation; its own 5-seed std is ~67% of its value (CV>0.6)."),
+    }
 
-    # ---- T2/T3: real-task value + verdict stability vs the stored threshold ----
-    THR = 0.015281642817850516
-    rbounds, rbeh, rdim, ev_vdr, ev_ff = reservoir_setup()
-    real = {}
-    rcfg = dict(n_samples=1600, n_bins=16, honest_n_trials=10)
-    for name, ev in (("variable_delay_recall", ev_vdr), ("flip_flop", ev_ff)):
-        rows = []
-        for bs in (20260531, 1, 777):
-            est = deceptiveness_estimate(ev, rbeh, rbounds, rdim,
-                                         n_seeds=5, base_seed=bs, **rcfg)
-            margin_std = (est.mean - THR) / (est.std + 1e-12)
-            rows.append({"base_seed": bs, "mean": round(est.mean, 5), "std": round(est.std, 5),
-                         "ci95_lo": round(est.ci95_lo, 5), "ci95_hi": round(est.ci95_hi, 5),
-                         "below_thr": bool(est.mean < THR),
-                         "margin_to_thr_in_std": round(float(margin_std), 2),
-                         "ci_brackets_thr": bool(est.ci95_lo < THR < est.ci95_hi)})
-        real[name] = rows
-    # step6 cheaper
-    sbounds6, sbeh6, sdim6, ev6 = step6_setup()
-    rows6 = []
-    for bs in (20260531, 1, 777):
-        est = deceptiveness_estimate(ev6, sbeh6, sbounds6, sdim6,
-                                     n_seeds=5, base_seed=bs,
-                                     n_samples=800, n_bins=16, honest_n_trials=1)
-        margin_std = (est.mean - THR) / (est.std + 1e-12)
-        rows6.append({"base_seed": bs, "mean": round(est.mean, 5), "std": round(est.std, 5),
-                      "ci95_lo": round(est.ci95_lo, 5), "ci95_hi": round(est.ci95_hi, 5),
-                      "below_thr": bool(est.mean < THR),
-                      "margin_to_thr_in_std": round(float(margin_std), 2),
-                      "ci_brackets_thr": bool(est.ci95_lo < THR < est.ci95_hi)})
-    real["step6_text_proxy"] = rows6
-    out["T2_real_task_stability"] = real
+    # =========================================================================
+    # PART 2 -- margin analysis of the EXISTING real-task estimates (no re-run).
+    # =========================================================================
+    res = json.loads((HERE / "measure_real_tasks_results.json").read_text(encoding="utf-8"))
+    tasks = res["real_tasks"]
+    p2 = {}
+    for name, rec in tasks.items():
+        per = rec["per_seed"]
+        m, s, lo, hi = ci95(per)
+        margin = m - THR
+        p2[name] = {
+            "per_seed": [round(x, 4) for x in per],
+            "mean": round(m, 5), "std": round(s, 5),
+            "cv_seed_noise": round(s / m, 3) if m else None,
+            "ci95": [round(lo, 5), round(hi, 5)],
+            "threshold": round(THR, 5),
+            "margin_to_threshold": round(margin, 5),
+            "margin_in_std_units": round(margin / (s + 1e-12), 2),
+            "below_threshold_pointest": bool(m < THR),
+            "ci_brackets_threshold": bool(lo < THR < hi),
+            "verdict_could_flip_under_resample": bool(lo < THR < hi),
+        }
+    out["P2_real_margin"] = p2
 
-    # verdict flip summary
-    flip = {}
-    for name, rows in real.items():
-        verdicts = set(r["below_thr"] for r in rows)
-        flip[name] = {"below_set": sorted(str(v) for v in verdicts),
-                      "verdict_flips_across_seeds": len(verdicts) > 1,
-                      "any_ci_brackets_thr": any(r["ci_brackets_thr"] for r in rows)}
-    out["T3_verdict_flip"] = flip
+    # =========================================================================
+    # PART 3 -- combined honest summary.
+    # =========================================================================
+    below = {k: v["below_threshold_pointest"] for k, v in p2.items()}
+    flippable = {k: v["verdict_could_flip_under_resample"] for k, v in p2.items()}
+    out["P3_summary"] = {
+        "on_disk_conclusion_all_below_threshold": res["conclusion"]["all_below_threshold"],
+        "on_disk_below_per_task": res["conclusion"]["below_threshold_per_task"],
+        "recomputed_below_per_task": below,
+        "verdict_flippable_per_task": flippable,
+        "brief_premise_was": "all below, max 0.041, d*=0.1234",
+        "brief_premise_matches_disk": False,
+        "actual_real_values": {k: round(ci95(tasks[k]["per_seed"])[0], 4) for k in tasks},
+        "actual_threshold": round(THR, 4),
+    }
 
     (HERE / "verify_margin_results.json").write_text(json.dumps(out, indent=2), encoding="utf-8")
     print("WROTE verify_margin_results.json")
+    print(json.dumps(out["P1_summary"], indent=2))
+    print(json.dumps(out["P3_summary"], indent=2))
 
 
 if __name__ == "__main__":
