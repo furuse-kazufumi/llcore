@@ -267,7 +267,8 @@ def measure_step6(metric_at_dstar):
         return np.array([float(gene[0]), float(gene[1])], dtype=np.float64)
 
     # deterministic fitness (ESN next-char) -> fitness_trials=1; ~30-40ms/eval. 3 seeds.
-    cfg = dict(n_seeds=3, n_samples=800, fitness_trials=1)
+    # 600 samples / 12 bins = 50/bin. (600+300)*3 = 2700 evals ~= 100s.
+    cfg = dict(n_seeds=3, n_samples=600, fitness_trials=1)
     print("=== step6 text proxy (ESN; behavior=(rho,leak) -> PCA 1D -> downhill) ===", flush=True)
     print(f"    corpus={len(idx)} vocab={V} N=40; config: {cfg} n_bins={N_BINS}", flush=True)
     t0 = time.time()
