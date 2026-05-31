@@ -7,9 +7,13 @@
   load-bearing (MAP-E が 3 baseline 全勝, p=1.9e-6, δ=+1.00)。exp5 の **smooth** で消失。
 - `docs/poc/E_A_VERDICT.md` / `STEP_C_VERDICT.md` — 実 proxy / 記憶タスクは滑らかで③不要 (honest negative)。
 
-開いた問い: ③が「立つ↔立たない」の二値結果しか無い。本実験は exp4↔exp5 を **1 つの
-連続 knob = dip depth d ∈ [0,1]** で内挿し、③の優位 (MAP-E − best baseline + strict gate
-pass/fail) を **d の関数として測る**。閾値 d* (③が立ち始める dip depth) を特定する。
+開いた問い: ③が「立つ↔立たない」の二値結果しか無い。本実験は **exp4/exp5 に着想を得た
+ramp-with-dip の新 toy family** を 1 つの連続 knob = dip depth d ∈ [0,1] で sweep し、③の優位
+(MAP-E − best baseline + strict gate pass/fail) を **d の関数として測る**。閾値 d* (③が立ち始める
+dip depth) を特定する。**注 (Codex pair-review)**: これは exp4/exp5 の eval 関数そのものの厳密内挿
+ではない (本 family は全 d で `max(local, glob, ramp*(1-dip))` を使い、exp4=`max(local,glob)`/
+exp5=広 Gaussian とは別)。d=0 は monotone smooth control、d=1 は deep-dip deceptive control で、
+得られる d* は **この family 内の閾値**。
 
 == 選んだ knob: dip depth d (ramp に彫った谷の深さ) ==
 exp4 の corridor (behavior=mean の genotypic corridor) を保ち、局所峰 (b=0.4, 高さ0.60) と
