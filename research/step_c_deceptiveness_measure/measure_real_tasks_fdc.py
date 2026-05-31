@@ -202,7 +202,10 @@ def measure_step6_text_proxy(threshold: float) -> dict:
 
     bounds = (np.zeros(3), np.ones(3))
     # deterministic fitness -> honest_n_trials=1。per-eval ~30-40ms なので n_samples 控えめ。
-    n_samples, honest_n, n_repeats = 800, 1, 5
+    if _FAST:
+        n_samples, honest_n, n_repeats = _FAST_NS_S6, 1, _FAST_NR
+    else:
+        n_samples, honest_n, n_repeats = 800, 1, 5
 
     print("=== step6 text proxy (ESN x real text; behavior=(rho,leak)) [FDC-behavior] ===",
           flush=True)
