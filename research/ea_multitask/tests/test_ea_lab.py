@@ -80,12 +80,17 @@ def test_randselect_has_no_fitness_gate_even_in_init_batch() -> None:
     """回帰 (Codex F-High): randselect は init batch でも fitness ゲートを持たない.
 
     単一 cell (grid=(1,1)) かつ higher-gene=higher-fitness の決定論 landscape で、
-    全 eval を init_batch に含めて実行。elite は cell に **max** を残すが、random は
-    fitness ゲート無しで **最後に置いた gene** を残すため、elite.best >= random.best
-    が常に成立し、両者は一般に一致しない (= ③ が randselect から完全に除去されている)。"""
+    全 eval を init_batch に含めて実行。**archive 占有者**を probe で直接検証する: elite は
+    cell に **max** gene を残す (③ ratchet) が、random は fitness ゲート無しで **最後に置いた
+    gene** を残す。よって elite 占有者 fitness >= random 占有者 fitness が常に成立し、両者は
+    一般に一致しない (= ③ が randselect の archive 動態から完全に除去されている)。
+
+    注: best_fitness は Codex F2 修正で **global best-of-budget** に変えたため両 mode で一致する
+    (= 読み出しの公平化)。③除去の witness は **archive 占有者** に移した。"""
     dim = 1
     bounds = (np.full(dim, 0.0), np.full(dim, 1.0))
     bbounds = (np.full(2, 0.0), np.full(2, 1.0))
+    CELL = (0, 0)
 
     def behave(g):  # 全 gene を 1 cell に写像
         return np.array([0.0, 0.0])
@@ -95,16 +100,22 @@ def test_randselect_has_no_fitness_gate_even_in_init_batch() -> None:
 
     kw = dict(dim=dim, bounds=bounds, behavior_bounds=bbounds, grid_shape=(1, 1),
               n_evals=12, init_batch=12, sigma=0.3)
+
+    def _occupant(mode, seed):
+        from ea_lab import _map_elites_core
+        arch: dict = {}
+        _map_elites_core(ev, behave, **kw, rng=np.random.default_rng(seed),
+                         selection_mode=mode, archive_out=arch)
+        return arch[CELL][1]  # 占有者 fitness
+
+    # elite 占有者 = max gene ≥ random 占有者 (= 最後に置いた gene)
+    assert _occupant("elite", 0) >= _occupant("random", 0)
+    # global-best 読み出しは両 mode で一致する (公平化の確認)
     elite = _map_elites_core_elite(ev, behave, **kw)
     rand = _map_elites_core_rand(ev, behave, **kw)
-    # elite は max を保持 → random (最後の gene 保持) 以上
-    assert elite.best_fitness >= rand.best_fitness
-    # 一般に一致しない (max != last) ことを高確率で確認: 複数 seed で少なくとも 1 回は厳密に上回る
-    strictly = [
-        _map_elites_core_elite(ev, behave, **kw, _seed=s).best_fitness
-        > _map_elites_core_rand(ev, behave, **kw, _seed=s).best_fitness
-        for s in range(5)
-    ]
+    assert elite.best_fitness == pytest.approx(rand.best_fitness)
+    # archive 占有者は一般に一致しない (max != last): 複数 seed で少なくとも 1 回は厳密に上回る
+    strictly = [_occupant("elite", s) > _occupant("random", s) for s in range(5)]
     assert any(strictly)
 
 
