@@ -281,14 +281,15 @@ def run_methods_crn(
 @dataclass
 class LevelResult:
     d: float  # dip depth knob
-    valley_floor: float  # 谷の床の高さ = 0.60*(1-d)
+    dip_center_corridor: float  # dip 中央 (b=0.65) の無ノイズ corridor 高さ = _RAMP_AT_CENTER*(1-d)
     means: dict[str, float]
     reach_rate: dict[str, float]  # honest fitness > 0.8 (大域峰 proxy) の割合
     me_minus_best_baseline: float  # ③ advantage = MAP-E mean − best baseline mean
     best_baseline_name: str
     gates: dict[str, dict]  # MAP-E vs 各 baseline の完全 strict gate
     load_bearing: bool  # ③が立つ (厳格) = 3 baseline 全てに strict gate 勝利
-    partial_load_bearing: bool  # ③が一部 baseline に勝つ (= 少なくとも 1 baseline に strict gate 勝利)
+    beats_any_baseline: bool  # 少なくとも 1 baseline に strict gate 勝利 (random 自明勝利も含む点に注意)
+    beats_climbing_baseline: bool  # climbing baseline (RR-hillclimb or panmictic-GA) に勝利 = 意味ある部分 LB
     n_baselines_beaten: int  # strict gate を通過した baseline 数 (0-3)
 
 
