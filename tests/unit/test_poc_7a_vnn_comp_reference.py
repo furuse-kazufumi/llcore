@@ -364,6 +364,60 @@ def test_generate_properties_produces_parseable_instances(tmp_path: Path) -> Non
         assert ref.verify_net(net).used_z3 in (True, False)
 
 
+def test_sat_genuine_emits_witness(tmp_path: Path) -> None:
+    """A genuine invariant violation yields verdict 'sat' + a self-checkable witness."""
+    if not ref.is_z3_available():
+        pytest.skip("z3 not available")
+    # decay=0, mix=1, gate_str=0 -> s_next = tanh(x); max real |s_next| = tanh(1) ~= 0.762
+    # state_bound=0.4 < 0.762 so a real violation exists (grid scan confirms it).
+    net = ref.NetworkState(
+        blocks=[StateUpdateGene(decay=0.0, mix=1.0, gate_str=0.0)],
+        invariant_state_bound=0.4,
+        invariant_max_input_abs=1.0,
+    )
+    co = {"step": 1, "op": "reparam_inplace", "family_id": "f", "target": {"layer": "L0"}, "args": {"decay": 0.0}}
+    _, v = ref.step_once(net, co, tmp_path, 1)
+    assert v.verdict == "sat"
+    assert v.witness_path is not None
+    w = json.loads(Path(v.witness_path).read_text(encoding="utf-8"))
+    assert w["genuine_violation"] is True
+    assert abs(w["real_s_next_abs"]) > w["state_bound"]
+
+
+def test_sat_spurious_becomes_unknown(tmp_path: Path) -> None:
+    """A z3 sat from the tanh over-approximation with no real violation -> 'unknown' (sound)."""
+    if not ref.is_z3_available():
+        pytest.skip("z3 not available")
+    # max real |s_next| = tanh(1) ~= 0.762 < 0.85, so NO real violation exists, but z3's
+    # tanh over-approx can pick tanh_val up to 1.0 > 0.85 -> spurious sat. Must report unknown.
+    net = ref.NetworkState(
+        blocks=[StateUpdateGene(decay=0.0, mix=1.0, gate_str=0.0)],
+        invariant_state_bound=0.85,
+        invariant_max_input_abs=1.0,
+    )
+    co = {"step": 1, "op": "reparam_inplace", "family_id": "f", "target": {"layer": "L0"}, "args": {"decay": 0.0}}
+    _, v = ref.step_once(net, co, tmp_path, 1)
+    assert v.verdict == "unknown"
+    assert v.witness_path is not None
+    w = json.loads(Path(v.witness_path).read_text(encoding="utf-8"))
+    assert w["genuine_violation"] is False
+
+
+def test_write_sat_witness_recomputes_genuine(tmp_path: Path) -> None:
+    """write_sat_witness confirms a genuine z3 candidate by recomputation (unit)."""
+    from llcore.verifier import InvariantResult
+
+    net = ref.NetworkState(
+        blocks=[StateUpdateGene(decay=0.0, mix=1.0, gate_str=0.0)],
+        invariant_state_bound=0.5,
+        invariant_max_input_abs=1.0,
+    )
+    ce = {"decay": 0.0, "mix": 1.0, "gate_str": 0.0, "s": 0.0, "x": 1.0, "tanh_val": 1.0}
+    res = InvariantResult(ok=False, used_z3=True, reason="sat", counterexample=ce)
+    _path, genuine = ref.write_sat_witness(net, res, tmp_path, 1)
+    assert genuine is True  # real tanh(1.0)=0.762 > 0.5
+
+
 def test_generate_properties_deterministic(tmp_path: Path) -> None:
     """Same seed -> identical instances.csv + .vnnlib content (reproducibility)."""
     pytest.importorskip("onnx")
