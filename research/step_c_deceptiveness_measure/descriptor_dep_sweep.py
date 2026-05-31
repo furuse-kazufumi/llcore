@@ -103,7 +103,7 @@ def main() -> int:
     t_all = time.time()
     for dname, dfn in descriptors.items():
         out["sweep"][dname] = {}
-        for n_bins in (8, 12, 16, 24, 32):
+        for n_bins in (8, 16, 32):
             t0 = time.time()
             mean, std, vals = _est(ev_ff, dfn, bounds, dim, n_bins)
             below = bool(mean < METRIC_AT_DSTAR)
