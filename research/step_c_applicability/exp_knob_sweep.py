@@ -105,6 +105,10 @@ _VALLEY_HI = 0.90
 _DIP_CENTER = 0.65  # 谷 (dip) を彫る中央位置 (局所/大域の中点付近)
 _DIP_W = 0.07  # 谷の Gaussian 幅
 _GLOBAL_PEAK_PROXY = 0.8  # honest fitness > これ で大域峰到達と判定 (exp4 と同一 proxy)
+# ramp の dip 中央での高さ (= 谷を彫る前の基準値)。dip 後の中央 corridor = _RAMP_AT_CENTER*(1-d)。
+_RAMP_AT_CENTER = _LOCAL_H + (
+    (_DIP_CENTER - _VALLEY_LO) / (_VALLEY_HI - _VALLEY_LO)
+) * (_GLOB_H - _LOCAL_H)  # = 0.80
 
 
 def behavior_mean(gene: np.ndarray) -> np.ndarray:
