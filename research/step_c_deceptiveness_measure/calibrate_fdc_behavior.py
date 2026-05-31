@@ -156,6 +156,23 @@ def main() -> int:
     sep_above_ok = bool(np.all(at_or_above >= metric_at_dstar)) if len(at_or_above) else True
     reproduces_threshold = bool(sep_below_ok and sep_above_ok)
 
+    # --- TRUE-reference control sweep (diagnostic for the high-d collapse) ---
+    control_curve: list[dict] = []
+    for d in D_LEVELS:
+        rng = np.random.default_rng(np.random.SeedSequence([BASE_SEED, 99, int(d * 1000)]))
+        fdc_true = _fdc_true_reference(d, true_b=0.9, rng=rng)
+        control_curve.append({"d": d, "fdc_true_ref": fdc_true,
+                              "deceptiveness_true_ref": 1.0 - max(0.0, fdc_true)})
+    cm = np.array([c["deceptiveness_true_ref"] for c in control_curve])
+    spearman_true_ref = _spearman(cm, ds)
+
+    print("=" * 90)
+    print("DIAGNOSTIC: operational best-behavior reference vs TRUE global (b=0.9) reference")
+    for c, cc in zip(curve, control_curve):
+        print(f"  d={c['d']:.2f}: op_best_beh={c['best_behavior_mean']:.3f} "
+              f"op_dec={c['metric']:.4f} | TRUE-ref_dec={cc['deceptiveness_true_ref']:.4f}")
+    print(f"  Spearman(metric,d) restricted to d<=0.20 = {spearman_low:+.4f}")
+    print(f"  Spearman(TRUE-ref metric, d) over full sweep = {spearman_true_ref:+.4f}")
     print("=" * 90)
     print(f"Spearman(metric, d) = {spearman:+.4f}")
     print(f"strictly monotone (mean) = {strictly_monotone} ; "
