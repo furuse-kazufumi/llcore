@@ -394,7 +394,8 @@ def main() -> int:
             "global_peak_proxy": _GLOBAL_PEAK_PROXY,
             "strict_gate": "diff>0 ∧ one-sided Wilcoxon p<0.05 ∧ n>=15 ∧ |paired_sign_delta|>=0.147",
         },
-        "threshold_d_star": threshold,
+        "threshold_d_star_strict": threshold_strict,
+        "threshold_d_star_loose_climber": threshold_loose,
         "levels": [asdict(r) for r in results],
     }
     out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
