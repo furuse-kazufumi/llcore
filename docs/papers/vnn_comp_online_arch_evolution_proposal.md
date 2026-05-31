@@ -42,7 +42,7 @@ To make the gap precise, we point at three queries we have actually attempted to
 >
 > **Query B — "How long can the population evolve before the invariant breaks?"** Given a population of 64 candidate networks and a mutation budget of 1000 `ChangeOp` applications per individual, report the per-step verdict trace and the first step at which *φ* fails. α,β-CROWN has no API for sequences; the practitioner is forced into a Python `for`-loop with 64 000 independent VNN-COMP invocations and no shared state.
 >
-> **Query C — "Does this mutation family preserve the invariant?"** Given a *family* of `ChangeOp` (e.g., "all linear re-parametrisations of the gating tensor"), prove that *no* member of the family violates *φ*. α,β-CROWN's input is one network at a time; the universal quantifier over the mutation family must be discharged outside the tool, by hand.
+> **Query C — "Does this mutation family preserve the invariant?"** Given a *family* of `ChangeOp` (e.g., "all linear re-parametrisations of the gating tensor"), prove that *no* member of the family violates *φ*. The obstacle here is a *contract mismatch*, not an algorithmic limit: the VNN-COMP I/O contract binds each invocation to a single concrete `.onnx`, so the universal quantifier *∀m ∈ family* over the mutation family has no slot in which to be *expressed* — it can only be discharged by hand, looping a verifier such as α,β-CROWN over enumerated members, with no way to state the family as one query. The verifier's bound-propagation machinery is not what is missing; the input format is.
 
 Queries A, B, and C correspond, respectively, to (i) a *commit gate*, (ii) a *survival curve*, and (iii) a *family soundness proof*. None of them fits the current VNN-COMP I/O contract.
 
