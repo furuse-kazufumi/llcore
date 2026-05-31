@@ -28,8 +28,12 @@ falsifiable 命題:
 依存: z3-solver (optional, `pip install llmesh-llcore[z3]`).
 honest 留保:
     - 単一 RwkvTimeMix kernel + 単一 family (reparam_inplace) のみ full support
-    - ONNX 実物 parser ではなく "kernel name + params" 形式の mock parse
-    - sat witness は emit せず (PoC 1a の counter-example 機能はあるが JSON 化 TBD)
+    - 実 .onnx / .vnnlib の読み書きを実装済 (§9 item 10 解消):
+        * .onnx = RwkvTimeMix 連鎖を custom-op (domain "llcore.rwkv", 属性 decay/mix/gate_str)
+          で表す llcore 規約。real onnx package 必須 (optional dep; 無ければ NotImplementedError)。
+        * .vnnlib = scalar X_0(入力)/Y_0(状態) の box bound subset。
+        JSON dummy 経路も後方互換で温存。
+    - sat witness は依然 emit せず (§9 item 11; PoC 1a の counter-example の JSON 化は TBD)
 """
 from __future__ import annotations
 
