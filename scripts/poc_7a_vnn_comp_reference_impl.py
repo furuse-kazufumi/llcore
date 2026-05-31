@@ -449,15 +449,17 @@ def write_unsat_witness(net: NetworkState, witness_dir: Path, step: int) -> Path
 def write_sat_witness(
     net: NetworkState, result: InvariantResult, witness_dir: Path, step: int, scan_n: int = 121
 ) -> tuple[Path, bool]:
-    """Emit a JSON `sat` witness and report whether the violation is *genuine*.
+    """Emit a JSON `sat` witness and report whether a REAL violation is confirmed.
 
-    The verifier abstracts ``tanh`` (treating ``tanh_val`` as a free variable with
-    ``tanh_val^2 <= preact^2``), so a z3 `sat` can be **spurious** — a candidate
-    in the relaxed system that is not a real violation. We recompute the true
-    next-state with the actual ``tanh`` (``eval_step``) and check whether the
-    invariant is genuinely breached. Returns ``(path, genuine)``. A spurious
-    candidate (``genuine=False``) must NOT be reported as `sat` (that would risk
-    a false positive / VNN-COMP −150 penalty); the caller reports `unknown`.
+    The verifier (verify_gene_safe) abstracts ``tanh`` (``tanh_val^2 <= preact^2``),
+    so its `sat` can be an over-approximation artifact, and it returns no assignment.
+    We therefore confirm independently: grid-scan the true next-state
+    ``eval_step(s, x, block)`` over the box ``|s| <= state_bound, |x| <= max_input_abs``
+    for each block. Returns ``(path, confirmed)`` — ``confirmed=True`` means a real,
+    independently-recomputable counterexample ``(s, x)`` exists (the caller reports
+    `sat`); ``confirmed=False`` means no real violation was found on the finite grid,
+    which is NOT a soundness proof of safety, so the caller reports `unknown`
+    (never a false `sat` / VNN-COMP −150 penalty).
     """
     witness_dir.mkdir(parents=True, exist_ok=True)
     path = witness_dir / f"witness_step_{step:04d}_sat.json"
@@ -465,14 +467,11 @@ def write_sat_witness(
     sb = float(net.invariant_state_bound)
     ia = float(net.invariant_max_input_abs)
 
-    # The verifier (verify_gene_safe) reports "violation found" but does not hand
-    # back the assignment, and its z3 model uses a tanh OVER-APPROXIMATION, so a
-    # reported violation may be spurious. We therefore look for a *genuine*
-    # violation directly: grid-scan the real (tanh) next-state over the box
-    # |s| <= state_bound, |x| <= max_input_abs for each block. A genuine hit gives
-    # an independently recomputable witness (x, s). Finding none on the grid is a
-    # numerical "no real violation found", NOT a soundness proof of safety.
-    genuine = False
+    # verify_gene_safe reports a violation (or gives up) WITHOUT an assignment and via
+    # a tanh OVER-APPROXIMATION, so we confirm independently: grid-scan the real (tanh)
+    # next-state over the box |s| <= state_bound, |x| <= max_input_abs for each block.
+    # A grid hit is an independently recomputable witness (x, s); finding none on the
+    # finite grid is "no real violation found", NOT a soundness proof of safety.
     block_idx: int | None = None
     w_x: float | None = None
     w_s: float | None = None
