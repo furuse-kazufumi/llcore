@@ -100,8 +100,10 @@ _LOCAL_B = 0.40
 _GLOB_B = 0.90
 _LOCAL_W = 0.08
 _GLOB_W = 0.06
-_VALLEY_LO = 0.40  # bridge (谷の床) を張る behavior 区間
+_VALLEY_LO = 0.40  # 局所峰→大域峰を結ぶ ramp を張る behavior 区間
 _VALLEY_HI = 0.90
+_DIP_CENTER = 0.65  # 谷 (dip) を彫る中央位置 (局所/大域の中点付近)
+_DIP_W = 0.07  # 谷の Gaussian 幅
 _GLOBAL_PEAK_PROXY = 0.8  # honest fitness > これ で大域峰到達と判定 (exp4 と同一 proxy)
 
 
