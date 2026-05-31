@@ -147,7 +147,11 @@ def measure_reservoir_tasks(threshold: float) -> dict:
 
     # behavior_elite_dip と比較可能にするため n_samples/honest_n_trials を踏襲。
     # n_repeats=5。確率的 fitness は honest_n_trials=10 で noise 平均化。
-    n_samples, honest_n, n_repeats = 1600, 10, 5
+    # 環境変数 RAPTOR_FDC_FAST=1 で軽量予算 (CI 完走用; honest に budget を記録)。
+    if _FAST:
+        n_samples, honest_n, n_repeats = _FAST_NS_RES, _FAST_HT_RES, _FAST_NR
+    else:
+        n_samples, honest_n, n_repeats = 1600, 10, 5
     out: dict = {}
 
     print("=== reservoir tasks (behavior = (eff_mem_norm, std(leak))) [FDC-behavior] ===",
