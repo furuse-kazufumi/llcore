@@ -219,10 +219,11 @@ def measure_reservoir_tasks(metric_at_dstar):
     bounds = gene_bounds(res)
     behavior = make_behavior(res)
     dim = res.gene_dim
-    # honest budget: per-eval ~8.7ms (stochastic ridge R2). 900 samples / 24 bins (1D,
-    # center-concentrated) keeps >=~37/bin; fitness_trials=6 suppresses decision noise;
-    # 3 seeds meets the 3+ seed requirement. ~145s/task (vs 731s at 1600x10x5 = timeout).
-    cfg = dict(n_seeds=3, n_samples=900, fitness_trials=6)
+    # honest budget under ~100ms/eval (measured): n_samples=300, fitness_trials=2, 3 seeds.
+    # -> (300*2 + 150)*3 = 2250 evals/task ~= 225s/task. 300/12 bins = 25/bin (dense enough).
+    # fitness_trials=2 is the honest minimum for stochastic ridge R2 here; std over 3 seeds +
+    # the decision-noise caveat are reported. (1600x10x5 = 84000 evals/task = timeout.)
+    cfg = dict(n_seeds=3, n_samples=300, fitness_trials=2)
     out = {}
     print("=== reservoir tasks (behavior 2D -> PCA 1D -> downhill) ===", flush=True)
     print(f"    config: {cfg} n_bins={N_BINS}", flush=True)
