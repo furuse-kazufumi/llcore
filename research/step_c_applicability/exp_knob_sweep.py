@@ -372,7 +372,8 @@ def main() -> int:
     # 閾値 d*: ③が初めて **厳格 load-bearing** (3 baseline 全勝) になる最小 d
     threshold_strict = next((r.d for r in results if r.load_bearing), None)
     # 閾値 (緩): ③が初めて **climbing baseline (RR or GA) に 1 つでも** strict gate 勝利する最小 d。
-    # random は genotypic corridor で全 d 罠落ちのため beaten は自明 → climbing baseline で測る。
+    # random は d≤0.10 で MAP-E に最も多く撃破される (smooth 側では climbing baseline に勝てない) が、
+    # 高 d では逆に最強 baseline になる (reach 変動)。意味ある「③ が立つ」基準は climbing baseline 撃破。
     def _beats_climber(r: LevelResult) -> bool:
         return r.gates["rr_hillclimb"]["passes"] or r.gates["panmictic_ga"]["passes"]
     threshold_loose = next((r.d for r in results if _beats_climber(r)), None)
