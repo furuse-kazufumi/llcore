@@ -382,8 +382,8 @@ def main() -> int:
           f"{'%.2f' % threshold_strict if threshold_strict is not None else 'なし'}")
     print(f"③ 部分 load-bearing 閾値 (climbing baseline=RR/GA に初勝利) = "
           f"{'%.2f' % threshold_loose if threshold_loose is not None else 'なし'}")
-    print("  注: random は genotypic corridor で全 d 罠落ち → beaten は自明。"
-          "意味ある baseline は climbing 系 (RR-hillclimb / panmictic-GA)。")
+    print("  注: random の reach は d 依存 (高 d で最強 baseline 化)。'③ が立つ' の意味ある基準は "
+          "climbing baseline (RR-hillclimb / panmictic-GA) 撃破。load_bearing は 3 baseline 全勝で保守的。")
 
     # transition の sharpness: 境界をまたぐ advantage / 勝利 baseline 数の変化
     print("transition (d, advantage, n_baselines_beaten/3, RR reach, GA reach, status):")
