@@ -24,20 +24,47 @@ extrapolation)。4 method を equal budget で進化→best gene を **test regi
 - **panmictic-GA (①③, ②なし)**: tournament 選択、niching なし。
 - **random (同予算)**: 対照。
 
-## 結果
+## 結果 (Codex pair-review 後の修正版、2026-05-31)
+
+下表は **方法論修正後の再実行値** (HONEST_N=30 / CRN pairing / global-best-of-budget)。
+修正前の旧値と結論は同じ (③ は load-bearing でない) で、むしろより明快になった
+(panmictic が MAP-E をわずかに上回る)。旧値・修正内容は次節「Codex pair-review」を参照。
 
 | method | test 汎化 R² (mean±std) | train | gap |
 |---|---|---|---|
-| **MAP-E (full)** | **0.696 ± 0.068** | 0.908 | +0.212 |
-| MAP-E_randselect (②③殺し) | 0.536 ± 0.206 | 0.777 | +0.241 |
-| panmictic-GA (②なし) | 0.665 ± 0.098 | 0.904 | +0.238 |
-| random | 0.635 ± 0.108 | 0.892 | +0.257 |
+| **MAP-E (full)** | **0.682 ± 0.115** | 0.898 | +0.216 |
+| MAP-E_randselect (②③殺し) | 0.557 ± 0.108 | 0.872 | +0.315 |
+| panmictic-GA (②なし) | 0.702 ± 0.083 | 0.915 | +0.213 |
+| random | 0.620 ± 0.105 | 0.877 | +0.258 |
 
 | ゲート | 比較 | diff | p (片側) | δ | passes |
 |---|---|---|---|---|---|
-| **C-gen3** | MAP-E > randselect | +0.161 | 0.0062 | +0.73 | **True** |
-| C-gen4a | MAP-E > panmictic | +0.031 | 0.126 | +0.07 | False |
-| C-gen4b | MAP-E > random | +0.062 | 0.076 | +0.47 | False |
+| **C-gen3** | MAP-E > randselect | +0.126 | 0.0151 | +0.60 | **True** |
+| C-gen4a | MAP-E > panmictic | **−0.019** | 0.598 | −0.07 | False |
+| C-gen4b | MAP-E > random | +0.062 | 0.126 | +0.20 | False |
+
+## Codex pair-review (gpt-5.4, read-only, 2026-05-31) — verdict 信頼性監査
+
+verdict 先行 commit で deferred にしていた pair-review を実施 ([[feedback_codex_pair_review_for_llcore]])。
+Codex は当初版を **「現状の結論は信頼できない、再実行要」** と判定。7 findings を実コードで一件ずつ
+検証 ([[feedback_external_ai_verify]]) し、rerun blocker 3 件を修正した:
+
+- **F3 (High) seed 設計**: 進化 seed が method 間でエイリアス (`base+s+{0,1,2,3}`)、かつ honest 再評価
+  seed が method 毎に異なり **index s が真の matched replicate でない** → paired Wilcoxon の前提崩壊。
+  → 進化 seed を `SeedSequence([base,method_idx,s])` で一意化 + honest 再評価を index s で **全 method
+  共通 (common random numbers)** に。同一 replicate で 4 method が同じタスク draw で採点される。
+- **F2 (Med) randselect archive 忘却**: `best` を最終 archive (6×6=36 occupant) の max から選んでいた。
+  randselect は無条件上書きで強個体を忘れ、全 400 から best を採る random より不利 → C-gen3 の gap を
+  水増し (③有利方向のバイアス)。→ 全 method で **global best-of-budget** を読み出す (full MAP-E は
+  fitness ゲートで global best が退避しないため数値不変、randselect のみ公平化)。
+- **F7 (Med) honest_n<30**: `HONEST_N=16` は honest_eval §5 の確率的 fitness 基準 (≥30) 未満。→ 30 に。
+- F1/F4/F5 (Low) = equal budget・train/test リーク無し・strict gate ロジックは健全 (バグ無し確認)。
+- F6 (Med) 結論の射程: 単一 budget(400)/grid(6×6)/descriptor(w_in 無視) に対し結論が広い → 下記で限定。
+
+**修正の効き**: randselect を global-best 化で強くした (0.536→0.557) のに C-gen3 はまだ PASS
+(③ vs 無選択ドリフトの差は本物)。一方 panmictic が MAP-E を逆転 (0.702>0.682) し C-gen4a は
+**負の diff** に。**結論は修正前後で不変** = honest-negative は方法論的に健全な土台で確認された。
+回帰テスト 22 pass (`tests/test_ea_lab.py`、③除去 witness を archive 占有者に移して維持)。
 
 ## 結論 (honest)
 
