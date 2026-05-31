@@ -1,0 +1,32 @@
+Phase A CrossMetric #3: DOWNHILL-NECESSITY on REAL tasks
+========================================================================================
+=== reconfirm downhill_necessity calibration on synthetic knob ===
+    D=24 n_seeds=3 n_samples=4000 n_bins=24
+    d=0.00: downhill=0.0000
+    d=0.05: downhill=0.0000
+    d=0.10: downhill=0.0000
+    d=0.13: downhill=0.6768
+    d=0.16: downhill=0.6879
+    d=0.20: downhill=0.6000
+    d=0.30: downhill=0.5258
+    d=0.40: downhill=0.3808
+    d=0.50: downhill=0.1470
+    d=0.60: downhill=0.1515
+    d=0.70: downhill=0.1545
+    d=0.85: downhill=0.3692
+    d=1.00: downhill=0.1818
+    spearman_vs_d=0.2033 metric_at_dstar(d*=0.16)=0.6879 monotone=False
+=== reservoir tasks (behavior 2D -> PCA 1D -> downhill) ===
+    config: {'n_seeds': 5, 'n_samples': 1600, 'fitness_trials': 10} n_bins=24
+Traceback (most recent call last):
+  File "D:\projects\llcore\research\step_c_deceptiveness_measure\measure_real_tasks_downhill.py", line 342, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "D:\projects\llcore\research\step_c_deceptiveness_measure\measure_real_tasks_downhill.py", line 281, in main
+    reservoir = measure_reservoir_tasks(metric_at_dstar)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\projects\llcore\research\step_c_deceptiveness_measure\measure_real_tasks_downhill.py", line 226, in measure_reservoir_tasks
+    ev = make_eval_once(res, TaskMixture(train), 48, 48)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: make_eval_once() takes 2 positional arguments but 4 were given
+EXITCODE=1
