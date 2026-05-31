@@ -41,10 +41,12 @@ from metric_behavior_elite_dip import deceptiveness
 
 METRIC_AT_DSTAR = 0.015281642817850516
 
-# budget (reduced but multi-seed; disclosed)
-N_SAMPLES = 400
-N_TRIALS = 3
-N_SEEDS = 3
+# budget (reduced but multi-seed; disclosed). Kept small to fit harness limit
+# (~100ms/eval). The point is the FLIP of the verdict across descriptors/bins,
+# not a magnitude claim; small budget is itself part of the artifact finding.
+N_SAMPLES = 220
+N_TRIALS = 2
+N_SEEDS = 2
 BASE_SEED = 20260531
 
 
