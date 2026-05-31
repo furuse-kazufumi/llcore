@@ -14,9 +14,15 @@
 - `STEP_C_VERDICT.md` — 記憶タスクは床/天井で C3 が非診断 (③をクリーンに検定できず N/A)。
 
 問題: 「exp4 では③が立つ / smooth では立たない」という **二値 (binary)** の結果しかない。
-科学的空白 = **「滑らか↔欺瞞」を連続パラメータで内挿し、③の優位を knob の関数として測る
+科学的空白 = **「滑らか↔欺瞞」を連続パラメータで sweep し、③の優位を knob の関数として測る
 制御された特性化 (parametric characterization)**。これにより過去の binary negative を
 **特性化曲線**に変換し、「③が立ち始める欺瞞性の閾値 d*」を特定する。
+
+> **⚠ 訂正 (Codex pair-review, 結果後)**: 本 knob は exp4/exp5 の eval 関数そのものの**厳密内挿ではない**
+> (本 family は全 d で `max(local, glob, ramp*(1-dip))` を使い、exp4=`max(local,glob)`/exp5=広 Gaussian
+> とは別)。正確には **exp4/exp5 に着想を得た ramp-with-dip の新 toy family** で、d=0=monotone smooth
+> control・d=1=deep-dip deceptive control。得られる d* は **この family 内の閾値**。また `random` は
+> 「d 非依存の定数敗北」ではなく reach が d 依存 (高 d で最強 baseline 化)。詳細は VERDICT §3 item 7-8。
 
 ## 2. Falsifiable な仮説
 
