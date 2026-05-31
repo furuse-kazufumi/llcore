@@ -367,7 +367,7 @@ def main() -> int:
     payload = {
         "design": {
             "knob": "dip_depth_d",
-            "knob_meaning": "valley floor height = 0.60*(1-d); d=0 smooth (monotone path), d=1 deep dip (exp4)",
+            "knob_meaning": "dip carved into a monotone ramp(0.60->1.00) over behavior[0.40,0.90], depth d at center b=0.65; d=0 strictly-monotone smooth ramp (exp5), d=1 deep dip (exp4 deceptive corridor)",
             "d_levels": d_levels,
             "D": D, "n_seeds": 20, "n_evals": 6000, "honest_n_trials": 30,
             "sigma": 0.10, "base_seed": 20260530, "noise": _NOISE,
