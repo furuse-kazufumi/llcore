@@ -63,6 +63,7 @@ class InvariantResult:
     used_z3: bool
     reason: str
     counterexample: dict[str, float] | None = None
+    solver_status: str = "unknown"  # "sat" | "unsat" | "unknown" (z3 verdict; "unknown" also = no-z3/timeout)
 
 
 def verify_state_norm_invariant(
