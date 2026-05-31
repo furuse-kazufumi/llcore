@@ -1,0 +1,111 @@
+{
+  "metric_name": "FDC-behavior (Fitness-Distance Correlation in behavior space)",
+  "definition": "Sample genes uniformly in bounds; honest-evaluate each (avg over honest_n_trials); estimate global-best behavior b* = behavior of the max-fitness sampled gene; for each sample compute proximity = -||behavior - b*||; FDC = Pearson corr(fitness, proximity); deceptiveness = 1 - max(0, FDC). Easy/non-deceptive -> FDC~+1 -> deceptiveness~0; deceptive -> FDC low/negative -> deceptiveness>=1. Applies to any (genotype,behavior,fitness) landscape.",
+  "config": {
+    "synthetic_corridor_D": 24,
+    "behavior": "mean(gene)",
+    "bounds": "[0,1]^24",
+    "n_samples": 4000,
+    "honest_n_trials": 20,
+    "n_repeats": 5,
+    "base_seed": 20260531,
+    "d_star": 0.16
+  },
+  "curve": [
+    {
+      "d": 0.0,
+      "metric": 0.019798082320773937,
+      "metric_std": 0.007887148703737185,
+      "ci95_lo": 0.012884691665893304,
+      "ci95_hi": 0.02671147297565457,
+      "fdc_mean": 0.980201917679226,
+      "fdc_std": 0.007887148703737185,
+      "any_degenerate": false
+    },
+    {
+      "d": 0.05,
+      "metric": 0.039765486774781866,
+      "metric_std": 0.00978230465449608,
+      "ci95_lo": 0.031190918686628065,
+      "ci95_hi": 0.04834005486293567,
+      "fdc_mean": 0.9602345132252182,
+      "fdc_std": 0.00978230465449608,
+      "any_degenerate": false
+    },
+    {
+      "d": 0.1,
+      "metric": 0.09286998006251349,
+      "metric_std": 0.007691720464770532,
+      "ci95_lo": 0.08612788981183744,
+      "ci95_hi": 0.09961207031318953,
+      "fdc_mean": 0.9071300199374864,
+      "fdc_std": 0.007691720464770533,
+      "any_degenerate": false
+    },
+    {
+      "d": 0.13,
+      "metric": 0.1450960007940003,
+      "metric_std": 0.012786267504039705,
+      "ci95_lo": 0.13388834317352882,
+      "ci95_hi": 0.1563036584144718,
+      "fdc_mean": 0.8549039992059997,
+      "fdc_std": 0.012786267504039705,
+      "any_degenerate": false
+    },
+    {
+      "d": 0.16,
+      "metric": 0.22817556485363727,
+      "metric_std": 0.006407109593972394,
+      "ci95_lo": 0.22255948567780323,
+      "ci95_hi": 0.2337916440294713,
+      "fdc_mean": 0.7718244351463628,
+      "fdc_std": 0.006407109593972394,
+      "any_degenerate": false
+    },
+    {
+      "d": 0.2,
+      "metric": 0.38761195718714736,
+      "metric_std": 0.003934628620972855,
+      "ci95_lo": 0.38416310313856444,
+      "ci95_hi": 0.3910608112357303,
+      "fdc_mean": 0.6123880428128526,
+      "fdc_std": 0.003934628620972855,
+      "any_degenerate": false
+    },
+    {
+      "d": 0.3,
+      "metric": 0.10142782494317788,
+      "metric_std": 0.02312793137693752,
+      "ci95_lo": 0.0811552992619671,
+      "ci95_hi": 0.12170035062438866,
+      "fdc_mean": 0.8985721750568223,
+      "fdc_std": 0.02312793137693752,
+      "any_degenerate": false
+    },
+    {
+      "d": 0.5,
+      "metric": 0.1178472362645242,
+      "metric_std": 0.03038764888788463,
+      "ci95_lo": 0.09121128761735948,
+      "ci95_hi": 0.14448318491168893,
+      "fdc_mean": 0.8821527637354759,
+      "fdc_std": 0.03038764888788463,
+      "any_degenerate": false
+    },
+    {
+      "d": 1.0,
+      "metric": 0.07425123061707968,
+      "metric_std": 0.003577460638754313,
+      "ci95_lo": 0.07111544810844657,
+      "ci95_hi": 0.07738701312571279,
+      "fdc_mean": 0.9257487693829203,
+      "fdc_std": 0.003577460638754313,
+      "any_degenerate": false
+    }
+  ],
+  "spearman_with_d": 0.39999999999999997,
+  "strictly_monotone": false,
+  "noise_tolerant_monotone": false,
+  "metric_at_dstar": 0.22817556485363727,
+  "reproduces_threshold": false
+}

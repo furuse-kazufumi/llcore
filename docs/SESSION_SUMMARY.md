@@ -3,49 +3,49 @@
 > 自動生成: `libexec/raptor-auto-summary` (Stop hook)
 > 次回 ccr 起動時に CLAUDE.md SESSION START で自動的に読み取られる。
 
-- **最終更新**: 2026-05-31 10:46:38
+- **最終更新**: 2026-05-31 12:13:37
 - **プロジェクト**: `D:/projects/llcore`
 - **ブランチ**: `main`
 
 ## 直近の git log
 
 ```
-c75d086 docs(7a): §9 item 10 を実装済みに更新 + verdict に B2 (パーサ/generator) 記録
-0cf173a feat(7a): 実 .onnx/.vnnlib パーサ+writer 実装 + seed ベース benchmark generator (§9 item 10 解消)
-c992ba7 auto: test_poc_7a_vnn_comp_reference.py 編集前 (2026-05-31 10:43)
-8155522 auto: test_poc_7a_vnn_comp_reference.py 編集前 (2026-05-31 10:40)
-65b1dd1 auto: poc_7a_vnn_comp_reference_impl.py 編集前 (2026-05-31 10:39)
-21c5666 auto: poc_7a_vnn_comp_reference_impl.py 編集前 (2026-05-31 10:39)
-32483e0 docs(vnncomp): B1 カテゴリ提案 issue/discussion ドラフト (RFC, honest framing)
-50e7a06 docs(vnncomp): VNN-COMP 2026 rules の日本語版 (忠実訳 + かみくだき版)
-f12745e docs(7a): VNN-COMP 提案の平易版解説 (ユーザー理解用, 3層 readability)
-4c09fb0 paper(7a): workshop-prep 改訂 — framing 是正 + IVAN/MUC-G4/Certified-CL 追加 + §9 conformance/witness
+e58606c research(step-c): ③ 適用条件 PoC — 欺瞞性閾値 d*=0.16 を特性化 (Codex pair-review 反映)
+ce8ac97 auto: STEP_C_APPLICABILITY_DESIGN.md 編集前 (2026-05-31 11:36)
+2e2f5e9 auto: STEP_C_APPLICABILITY_DESIGN.md 編集前 (2026-05-31 11:36)
+932e1e2 auto: exp_knob_sweep.py 編集前 (2026-05-31 11:35)
+75aac3b auto: exp_knob_sweep.py 編集前 (2026-05-31 11:35)
+01e72fc auto: exp_knob_sweep.py 編集前 (2026-05-31 11:35)
+604aa3a auto: exp_knob_sweep.py 編集前 (2026-05-31 11:35)
+7e61185 auto: exp_knob_sweep.py 編集前 (2026-05-31 11:35)
+333915d auto: exp_knob_sweep.py 編集前 (2026-05-31 11:34)
+bbebdf7 auto: exp_knob_sweep.py 編集前 (2026-05-31 11:34)
 ```
 
 ## 現在の git status
 
 ```
-(clean)
+M docs/SESSION_SUMMARY.md
 ```
 
 ## 直近 2 時間に変更されたファイル
 
 ```
+12:02 docs/SESSION_SUMMARY.md
+11:41 research/step_c_applicability/exp_knob_sweep_results.json
+11:36 docs/poc/STEP_C_APPLICABILITY_DESIGN.md
+11:35 research/step_c_applicability/exp_knob_sweep.py
+11:32 docs/poc/STEP_C_APPLICABILITY_VERDICT.md
+11:15 .pytest_cache/v/cache/nodeids
+11:14 scripts/poc_7a_vnn_comp_reference_impl.py
+11:11 tests/unit/test_poc_7a_vnn_comp_reference.py
+11:10 src/llcore/verifier/invariants.py
+11:01 .pytest_cache/v/cache/lastfailed
 10:46 docs/poc/poc_7a_verdict.md
 10:45 docs/papers/vnn_comp_online_arch_evolution_proposal.md
-10:44 .pytest_cache/v/cache/nodeids
-10:43 tests/unit/test_poc_7a_vnn_comp_reference.py
 10:43 scripts/vnncomp_benchmark/README.md
 10:42 scripts/vnncomp_benchmark/generate_properties.py
-10:39 scripts/poc_7a_vnn_comp_reference_impl.py
 10:35 docs/papers/vnncomp_category_proposal_issue_draft.md
-10:34 docs/papers/vnncomp2026_rules_かみくだき.md
-10:32 docs/papers/vnncomp2026_rules_ja.md
-10:25 docs/SESSION_SUMMARY.md
-10:14 docs/papers/vnn_comp_proposal_かみくだき.md
-09:23 docs/poc/E_A_VERDICT.md
-09:07 research/ea_multitask/exp_ea3_results.json
-08:54 research/ea_multitask/tests/test_ea_lab.py
 ```
 
 ---
