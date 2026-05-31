@@ -464,52 +464,51 @@ def write_sat_witness(
     ce = dict(result.counterexample or {})
     sb = float(net.invariant_state_bound)
     ia = float(net.invariant_max_input_abs)
+
+    # The verifier (verify_gene_safe) reports "violation found" but does not hand
+    # back the assignment, and its z3 model uses a tanh OVER-APPROXIMATION, so a
+    # reported violation may be spurious. We therefore look for a *genuine*
+    # violation directly: grid-scan the real (tanh) next-state over the box
+    # |s| <= state_bound, |x| <= max_input_abs for each block. A genuine hit gives
+    # an independently recomputable witness (x, s). Finding none on the grid is a
+    # numerical "no real violation found", NOT a soundness proof of safety.
     genuine = False
-    method = "none"
+    block_idx: int | None = None
     w_x: float | None = None
     w_s: float | None = None
     s_next_real: float | None = None
-
-    if all(k in ce for k in ("decay", "mix", "gate_str")):
-        gene = StateUpdateGene(decay=ce["decay"], mix=ce["mix"], gate_str=ce["gate_str"])
-        # (1) check z3's own candidate assignment with the real tanh.
-        if "s" in ce and "x" in ce:
-            sn = float(eval_step(np.array([float(ce["s"])]), np.array([float(ce["x"])]), gene)[0])
-            if abs(sn) > sb + 1e-9:
-                genuine, method, w_x, w_s, s_next_real = True, "z3_candidate", float(ce["x"]), float(ce["s"]), sn
-        # (2) if z3's candidate was spurious, grid-scan the real (tanh) map over the
-        #     box |s|<=state_bound, |x|<=max_input_abs to find a genuine violation.
-        #     Numerical scan (scalar block) — finding none is treated as "no real
-        #     violation found", NOT a soundness proof of safety.
-        if not genuine:
-            xs = np.linspace(-ia, ia, scan_n)
-            best, bx, bs = 0.0, 0.0, 0.0
-            for sv in np.linspace(-sb, sb, scan_n):
-                row = eval_step(np.full(scan_n, sv, dtype=float), xs, gene)
-                k = int(np.argmax(np.abs(row)))
-                if abs(row[k]) > best:
-                    best, bx, bs = abs(float(row[k])), float(xs[k]), float(sv)
-            if best > sb + 1e-9:
-                genuine, method, w_x, w_s, s_next_real = True, "grid_scan", bx, bs, best
+    best = 0.0
+    xs = np.linspace(-ia, ia, scan_n)
+    for bi, blk in enumerate(net.blocks):
+        for sv in np.linspace(-sb, sb, scan_n):
+            row = eval_step(np.full(scan_n, sv, dtype=float), xs, blk)
+            k = int(np.argmax(np.abs(row)))
+            mag = abs(float(row[k]))
+            if mag > best:
+                best, block_idx, w_x, w_s, s_next_real = mag, bi, float(xs[k]), float(sv), float(row[k])
+    genuine = best > sb + 1e-9
 
     witness = {
         "step": step,
         "kernel": "RwkvTimeMix",
         "verdict_candidate": "sat",
-        "z3_counterexample": ce,
+        "z3_counterexample": ce,  # informational; verify_gene_safe usually omits it
         "state_bound": sb,
         "max_input_abs": ia,
         "genuine_violation": genuine,
-        "confirmation_method": method,  # z3_candidate | grid_scan | none
+        "confirmation_method": "real_tanh_grid_scan",
+        "witness_block_index": block_idx,
         "witness_input_x": w_x,
         "witness_state_s": w_s,
-        "real_s_next_abs": s_next_real,
+        "real_s_next": s_next_real,
+        "max_abs_s_next_on_grid": best,
         "note": (
-            "genuine: a real (x, s) assignment drives |s_next| above state_bound "
-            "(recompute with eval_step to verify)"
+            "genuine: block {bi}, real eval_step(s={s}, x={x}) gives |s_next|={m:.6f} > "
+            "state_bound={sb} (independently recomputable)".format(bi=block_idx, s=w_s, x=w_x, m=best, sb=sb)
             if genuine
-            else "spurious: z3's sat came from the tanh over-approximation; no real violation "
-            "found on the scanned grid (numerical scan, not a soundness proof)"
+            else "spurious: verifier flagged a violation but no real (tanh) violation was found on "
+            "the scanned grid (max |s_next|={m:.6f} <= state_bound={sb}); numerical scan, "
+            "not a soundness proof".format(m=best, sb=sb)
         ),
     }
     path.write_text(json.dumps(witness, ensure_ascii=False, indent=2), encoding="utf-8")
