@@ -67,7 +67,7 @@ def main():
               f"0.05*fit={thr:.4f} -> {flag}")
 
     print("\n=== (2) baseline valley_fraction vs budget (D60, clip=hard, sigma=0.15) ===")
-    for (nr, ne, ntr) in ((4, 120, 24), (8, 150, 40), (8, 400, 48), (12, 400, 64)):
+    for (nr, ne, ntr) in ((4, 120, 24), (8, 150, 40), (8, 300, 48)):
         t0 = time.time()
         e = make_eval_once_clipswitch(res, task, n_train=ntr, n_eval=ntr, clip="hard")
         lo, hi = gene_bounds(res)
