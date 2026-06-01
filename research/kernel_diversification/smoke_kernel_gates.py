@@ -222,7 +222,7 @@ def lipschitz_verdict(kernel: str, th: np.ndarray) -> str:
 
     solver.add(z3.Or(j >= 1, j <= -1))
     r = solver.check()
-    return {z3.unsat: "unsat", z3.sat: "sat"}.get(r, "unknown")
+    return "unsat" if r == z3.unsat else "sat" if r == z3.sat else "unknown"
 
 
 def empirical_L(kernel: str, th: np.ndarray, n: int = 2000, seed: int = 0) -> float:

@@ -1,0 +1,256 @@
+{
+  "proposition": "P: smooth/③不要 は正規化(clip/scale)の人工物か (C1 midpoint-valley で否定形検定)",
+  "mode": "smoke",
+  "seeds": [
+    20260530,
+    20260531
+  ],
+  "n_restarts": 4,
+  "n_evals": 120,
+  "n_train": 24,
+  "n_eval": 24,
+  "grid": [
+    {
+      "clip": "hard",
+      "sigma": 0.15,
+      "bounds": "current"
+    },
+    {
+      "clip": "none",
+      "sigma": 0.15,
+      "bounds": "current"
+    },
+    {
+      "clip": "soft",
+      "sigma": 0.15,
+      "bounds": "current"
+    },
+    {
+      "clip": "hard",
+      "sigma": 0.1,
+      "bounds": "current"
+    },
+    {
+      "clip": "hard",
+      "sigma": 0.2,
+      "bounds": "current"
+    },
+    {
+      "clip": "hard",
+      "sigma": 0.15,
+      "bounds": "wide"
+    }
+  ],
+  "total_wall_clock_s": 369.30308866500854,
+  "any_flip": false,
+  "flip_settings": [],
+  "spread_ratios_clip_none_over_hard": [
+    {
+      "task": "vdr_D60",
+      "spread_hard": 0.34109901709062773,
+      "spread_none": 0.34109901709062773,
+      "ratio_none_over_hard": 1.0
+    }
+  ],
+  "results": [
+    {
+      "setting": "vdr_D60|clip=hard|sigma=0.15|bounds=current",
+      "task": "vdr_D60",
+      "clip": "hard",
+      "sigma": 0.15,
+      "bounds": "current",
+      "verdict": "deceptive",
+      "valley_mean": 1.0,
+      "valley_std": 0.0,
+      "valley_fractions": [
+        1.0,
+        1.0
+      ],
+      "is_multimodal_flags": [
+        true,
+        true
+      ],
+      "is_multimodal_unanimous": true,
+      "n_optima_list": [
+        4,
+        4
+      ],
+      "spread": {
+        "n_optima": 4,
+        "spread": 0.34109901709062773,
+        "std": 0.13882190405994776,
+        "min": 0.43423500934173964,
+        "max": 0.7753340264323674,
+        "finite_rate": 1.0
+      },
+      "degenerate": false,
+      "note": ""
+    },
+    {
+      "setting": "vdr_D60|clip=none|sigma=0.15|bounds=current",
+      "task": "vdr_D60",
+      "clip": "none",
+      "sigma": 0.15,
+      "bounds": "current",
+      "verdict": "deceptive",
+      "valley_mean": 1.0,
+      "valley_std": 0.0,
+      "valley_fractions": [
+        1.0,
+        1.0
+      ],
+      "is_multimodal_flags": [
+        true,
+        true
+      ],
+      "is_multimodal_unanimous": true,
+      "n_optima_list": [
+        4,
+        4
+      ],
+      "spread": {
+        "n_optima": 4,
+        "spread": 0.34109901709062773,
+        "std": 0.13882190405994776,
+        "min": 0.43423500934173964,
+        "max": 0.7753340264323674,
+        "finite_rate": 1.0
+      },
+      "degenerate": false,
+      "note": ""
+    },
+    {
+      "setting": "vdr_D60|clip=soft|sigma=0.15|bounds=current",
+      "task": "vdr_D60",
+      "clip": "soft",
+      "sigma": 0.15,
+      "bounds": "current",
+      "verdict": "deceptive",
+      "valley_mean": 1.0,
+      "valley_std": 0.0,
+      "valley_fractions": [
+        1.0,
+        1.0
+      ],
+      "is_multimodal_flags": [
+        true,
+        true
+      ],
+      "is_multimodal_unanimous": true,
+      "n_optima_list": [
+        4,
+        4
+      ],
+      "spread": {
+        "n_optima": 4,
+        "spread": 0.24116591493419154,
+        "std": 0.09911839450503894,
+        "min": 0.40885448202849123,
+        "max": 0.6500203969626828,
+        "finite_rate": 1.0
+      },
+      "degenerate": false,
+      "note": ""
+    },
+    {
+      "setting": "vdr_D60|clip=hard|sigma=0.1|bounds=current",
+      "task": "vdr_D60",
+      "clip": "hard",
+      "sigma": 0.1,
+      "bounds": "current",
+      "verdict": "deceptive",
+      "valley_mean": 0.9166666666666667,
+      "valley_std": 0.08333333333333331,
+      "valley_fractions": [
+        0.8333333333333334,
+        1.0
+      ],
+      "is_multimodal_flags": [
+        true,
+        true
+      ],
+      "is_multimodal_unanimous": true,
+      "n_optima_list": [
+        4,
+        4
+      ],
+      "spread": {
+        "n_optima": 4,
+        "spread": 0.2961658088026117,
+        "std": 0.12483769822069735,
+        "min": 0.4734882756912472,
+        "max": 0.7696540844938589,
+        "finite_rate": 1.0
+      },
+      "degenerate": false,
+      "note": ""
+    },
+    {
+      "setting": "vdr_D60|clip=hard|sigma=0.2|bounds=current",
+      "task": "vdr_D60",
+      "clip": "hard",
+      "sigma": 0.2,
+      "bounds": "current",
+      "verdict": "deceptive",
+      "valley_mean": 1.0,
+      "valley_std": 0.0,
+      "valley_fractions": [
+        1.0,
+        1.0
+      ],
+      "is_multimodal_flags": [
+        true,
+        true
+      ],
+      "is_multimodal_unanimous": true,
+      "n_optima_list": [
+        4,
+        4
+      ],
+      "spread": {
+        "n_optima": 4,
+        "spread": 0.3500810217025877,
+        "std": 0.1368537042023403,
+        "min": 0.49299097362118693,
+        "max": 0.8430719953237746,
+        "finite_rate": 1.0
+      },
+      "degenerate": false,
+      "note": ""
+    },
+    {
+      "setting": "vdr_D60|clip=hard|sigma=0.15|bounds=wide",
+      "task": "vdr_D60",
+      "clip": "hard",
+      "sigma": 0.15,
+      "bounds": "wide",
+      "verdict": "deceptive",
+      "valley_mean": 0.8333333333333334,
+      "valley_std": 0.0,
+      "valley_fractions": [
+        0.8333333333333334,
+        0.8333333333333334
+      ],
+      "is_multimodal_flags": [
+        true,
+        true
+      ],
+      "is_multimodal_unanimous": true,
+      "n_optima_list": [
+        4,
+        4
+      ],
+      "spread": {
+        "n_optima": 4,
+        "spread": 0.47164130470298116,
+        "std": 0.18065339183400406,
+        "min": 0.33656617641061015,
+        "max": 0.8082074811135913,
+        "finite_rate": 1.0
+      },
+      "degenerate": false,
+      "note": ""
+    }
+  ],
+  "verdict_summary": "any_flip=False → P 棄却 (robust に滑らか / honest-negative を独立追認)"
+}

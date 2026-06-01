@@ -1,0 +1,64 @@
+{
+  "meta": {
+    "seed": 20260601,
+    "n_gene_per_kernel": 32,
+    "L": 64,
+    "dim": 8,
+    "max_input_abs": 1.0,
+    "state_norm_K": 56.568542494923804,
+    "n_kernels": 4,
+    "note": "tiny dynamic smoke: bounded |x|<=1 through each kernel, check finite state + state_norm bounded. diagonal scalar mocks (except rwkv = existing run_sequence). NOT full kernel impl."
+  },
+  "per_kernel": [
+    {
+      "kernel": "rwkv",
+      "n_gene": 32,
+      "finite_state": true,
+      "state_norm_ok": true,
+      "max_state_norm": 2.651224031228111,
+      "state_norm_K": 56.568542494923804,
+      "n_nonfinite_genes": 0,
+      "n_norm_exceed_genes": 0,
+      "sample_final_norm": 0.6681341428777563,
+      "note": "via existing run_sequence (backcompat)"
+    },
+    {
+      "kernel": "mamba_selective",
+      "n_gene": 32,
+      "finite_state": true,
+      "state_norm_ok": true,
+      "max_state_norm": 1.7805996865944118,
+      "state_norm_K": 56.568542494923804,
+      "n_nonfinite_genes": 0,
+      "n_norm_exceed_genes": 0,
+      "sample_final_norm": 0.20403426877175265,
+      "note": "research diagonal mock"
+    },
+    {
+      "kernel": "hopfield_dense",
+      "n_gene": 32,
+      "finite_state": true,
+      "state_norm_ok": true,
+      "max_state_norm": 2.2636706374025994,
+      "state_norm_K": 56.568542494923804,
+      "n_nonfinite_genes": 0,
+      "n_norm_exceed_genes": 0,
+      "sample_final_norm": 1.4027883289888186,
+      "note": "research diagonal mock"
+    },
+    {
+      "kernel": "linear_attn",
+      "n_gene": 32,
+      "finite_state": true,
+      "state_norm_ok": true,
+      "max_state_norm": 21.817084658290554,
+      "state_norm_K": 56.568542494923804,
+      "n_nonfinite_genes": 0,
+      "n_norm_exceed_genes": 0,
+      "sample_final_norm": 0.6616393845969623,
+      "note": "research diagonal mock"
+    }
+  ],
+  "bg5_rwkv_backcompat_bit_match": true,
+  "all_ok": true
+}
