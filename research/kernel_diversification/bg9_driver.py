@@ -444,7 +444,7 @@ def run_substrate(
 
     # --- A1 ablation: theta-only MAP-E (kernel_id 抜き) ---
     a1 = run_theta_only_mapelites(
-        eval_once, dim=dim, bounds=bounds, n_evals=n_evals, n_seeds=n_seeds,
+        eval_once, dim=GA_DIM, bounds=bounds, n_evals=n_evals, n_seeds=n_seeds,
         honest_n_trials=honest_n_trials, sigma=SIGMA, base_seed=base_seed,
     )
     a1_gates: dict[str, dict] = {}
