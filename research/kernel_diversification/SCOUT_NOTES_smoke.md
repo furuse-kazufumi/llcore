@@ -50,8 +50,35 @@ DESIGN_kernel_diversification_3b.md の §2-§5 + BREAK_GATES.md BG1/BG2/BG3/BG5
   保守性が DESIGN claim と乖離 → 要 encoding 精緻化 (上記)。
 - BG4 (swap 健全) / BG6-9 (specialist / 欺瞞地形) は **本 smoke 対象外** (別実験、未着手)。
 
+## 追記 (2026-06-01): 最小 skeleton + 動的 smoke 着地
+
+`kernels.py` (KernelGenome union genome + 4 kernel forward dynamics, 対角 mock,
+rwkv は既存 run_sequence 再利用) と `smoke_kernels.py` (有界入力動的 smoke) を追加。
+`smoke_results.json` に数値接地。**src 非改変** (BG5 bit 一致で機械担保)。
+
+### 動的 smoke 結果 (N_GENE=32/kernel, L=64, dim=8, |x|<=1, seed=20260601)
+
+| kernel | finite_state | state_norm_ok | max_state_norm | 経路 |
+|---|---|---|---|---|
+| rwkv | True | True | 2.651 | 既存 run_sequence |
+| mamba_selective | True | True | 1.781 | research mock |
+| hopfield_dense | True | True | 2.264 | research mock |
+| linear_attn | True | True | **21.817** | research mock |
+| BG5 後方互換 | — | — | bit 一致 | — |
+
+- **all_ok=True** (全 kernel finite + state_norm 緩い上界 K=√8·20≈56.6 以下 + BG5 bit 一致)。
+- **honest 留保 (linear_attn)**: un-gated 経路で max_norm=21.8 と唯一 1 を大きく超える。
+  これは `s'=lam*s + softplus(w*x)*v_gain*x` の softplus*x 寄与が 1 step で >1 を作るため
+  (gate 検証 BG1 で admit=0.420 = 最も reject される、という gate smoke の結果と整合)。
+  発散はしない (lam<1 減衰で有界化) が、「ungated だと state が 1 を大きく超え得る」=
+  state_norm gate が load-bearing であることの動的裏付け。緩い K では pass だが、
+  STATE_BOUND=1 の厳格 gate (smoke_kernel_gates.py BG1) では reject 寄りになる二面性を記録。
+- BG4 (kernel 軌跡 finite) の最小版に相当 = 上記「次ステップ候補 2」を消化。
+
 ## 次の実装ステップ候補 (本 scout の含意)
 1. mamba/linear_attn の Lipschitz encoding を achievable 上界の定数注入に精緻化 (over-approx 緩和)。
-2. BG4 (kernel_swap random walk finite) smoke を追加。
+2. ~~BG4 (kernel_swap random walk finite) smoke を追加。~~ → smoke_kernels.py で finite 確認済 (2026-06-01)。
+   残: kernel_id_shift mutation を絡めた random walk 版 (op 適用後 decode 健全)。
 3. `KernelGenome` codec + decode を実装し ea_lab/selection_lab に dim=5 で接続 (Stage 3b 着手)。
+   → kernels.py に KernelGenome.as_array/from_array (dim=5) 着地済。残: ea_lab 接続。
 4. memory_tasks multi-task で BG6 (specialist 写像) を測る = 命題3b の最初の falsification。
