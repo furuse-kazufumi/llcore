@@ -225,6 +225,11 @@ class SettingResult:
     # 副次: raw R² spread (代表 seed)
     spread: dict = field(default_factory=dict)
     degenerate: bool = False  # G3: pairs==0 等で判定不能だった seed があるか
+    # ノイズ検証 (本研究の主要 caveat)
+    eval_noise_std: float = float("nan")     # fitness 評価ノイズ std
+    valley_threshold: float = float("nan")   # C1 谷判定の有効閾 ~0.05*|fit|
+    noise_dominated: bool = False            # eval_noise_std > valley_threshold か
+    noisy_flat_null_vf: float = float("nan") # 同ノイズの flat landscape の valley_fraction (null)
     note: str = ""
 
 
