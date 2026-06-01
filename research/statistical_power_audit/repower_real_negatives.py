@@ -30,54 +30,45 @@ MIN_EFFECT = 0.147
 N_SWEEP = [10, 15, 20, 30, 45, 60, 90, 120, 200, 300]
 
 
-def _gate_pass_on_delta(delta: np.ndarray, *, alpha: float = ALPHA,
-                        min_effect: float = MIN_EFFECT,
-                        cond: str = "full") -> bool:
-    """paired delta 配列 (a-b) に gate を適用。a,b の元を復元せず delta 直接で評価.
+def _batch_gate_powers(samples: np.ndarray, *, alpha: float = ALPHA,
+                       min_effect: float = MIN_EFFECT) -> dict[str, float]:
+    """(B, n) の paired-delta 標本群に gate を vectorized 適用し条件別 power を返す.
 
-    片側 Wilcoxon は delta vs 0 と等価 (signed-rank)。psd は (#正-#負)/n。
-    cond: 'full' | 'p_only' | 'effect_only' | 'diff_only' で律速分解。
+    片側 Wilcoxon は delta vs 0 と等価 (signed-rank)。AC.wilcoxon_p_greater_batch
+    (正規近似, G3 で校正済) を使う。psd=(#正-#負)/n。diff=mean。
+    返り値: full / p_only / effect_only / diff_only の pass 率。
     """
-    diff = float(np.mean(delta))
-    psd = AC._paired_sign_delta(delta)
-    # 片側 Wilcoxon p (delta vs 0)。AC._paired_p は (a,b) を取るので delta と 0 配列で呼ぶ。
-    p = AC._paired_p(delta, np.zeros_like(delta))
-    c_diff = diff > 0.0
+    diffs = samples.mean(axis=1)
+    pos = (samples > 0).sum(axis=1)
+    neg = (samples < 0).sum(axis=1)
+    n = samples.shape[1]
+    psd = (pos - neg) / n
+    p = AC.wilcoxon_p_greater_batch(samples)
+    c_diff = diffs > 0.0
     c_p = p < alpha
-    c_eff = abs(psd) >= min_effect
-    if cond == "full":
-        return bool(c_diff and c_p and c_eff)
-    if cond == "p_only":
-        return bool(c_p)
-    if cond == "effect_only":
-        return bool(c_eff)
-    if cond == "diff_only":
-        return bool(c_diff)
-    raise ValueError(cond)
+    c_eff = np.abs(psd) >= min_effect
+    return {
+        "full": float(np.mean(c_diff & c_p & c_eff)),
+        "p_only": float(np.mean(c_p)),
+        "effect_only": float(np.mean(c_eff)),
+        "diff_only": float(np.mean(c_diff)),
+    }
 
 
 def _bootstrap_power(delta_pop: np.ndarray, n: int, *, B: int, rng: np.random.Generator,
                      cond: str = "full") -> float:
-    """delta_pop から復元抽出 n で B 回再標本し gate pass 率 = power."""
+    """delta_pop から復元抽出 n で B 回再標本し gate pass 率 = power (vectorized)."""
     npop = len(delta_pop)
-    passes = 0
-    for _ in range(B):
-        idx = rng.integers(0, npop, size=n)
-        sample = delta_pop[idx]
-        if _gate_pass_on_delta(sample, cond=cond):
-            passes += 1
-    return passes / B
+    idx = rng.integers(0, npop, size=(B, n))
+    samples = delta_pop[idx]
+    return _batch_gate_powers(samples)[cond]
 
 
 def _parametric_power(mean: float, sd: float, n: int, *, B: int,
                       rng: np.random.Generator, cond: str = "full") -> float:
-    """正規 N(mean, sd) から n を B 回 draw し gate pass 率 = power."""
-    passes = 0
-    for _ in range(B):
-        sample = rng.normal(mean, sd, size=n)
-        if _gate_pass_on_delta(sample, cond=cond):
-            passes += 1
-    return passes / B
+    """正規 N(mean, sd) から n を B 回 draw し gate pass 率 = power (vectorized)."""
+    samples = rng.normal(mean, sd, size=(B, n))
+    return _batch_gate_powers(samples)[cond]
 
 
 def _n80_from_curve(ns: list[int], powers: list[float]) -> float | None:
