@@ -150,7 +150,7 @@ null-ridge FPR=0/0 は null_seeds=4 の床値、かつ ~7x 縮小予算 (n_evals
 | **flip_flop** (δ=+0.33, p=0.15) | StepC: inconclusive (正しい自認), 監査: n80≈82–89 | **更新: (C) なお判別不能**。vs random は A 層 n80≈82.8 で床上だが fresh 非現実的、vs RR は psd=0.067 で床未満=null 寄りと分離して確定。 |
 | **step6 exp7** (実 ESN proxy, n=8/6, ③ negative) | 監査: n≤10 盲点域, 「③不在を主張できない, n≥15 で再測必須」 | **大幅更新: 地形が本当に滑らか (③ 不要) を noise-free で確定**。step6 の③ negative は「underpower だから保留」ではなく **「ESN proxy 地形が真に単峰だから③が不要」**が正しい説明 (EXP2)。再測しても多峰は出ない。 |
 | **谷深さ N/A** (normalization_confound, behavior=mean collinear で計測不能) | 「instrument 不能」(谷閾 ≪ eval noise) | **解消: 決定論化で計測可能化**。計測した結果 vf≈0 (単峰)。ただし §6.2 で「閾値近接の浅い谷 (max dip 0.0435 が 0.05 床直下)」が surviving refutation として残る。 |
-| **K4 clip = 唯一の能動的 suppression 機序** (統計監査 §4/§5/§8) | 「clip が真の landscape 構造を隠蔽 = 唯一の能動的 suppression」 | **降格: 診断的所見**。verdict-flip=False、clip=False は MAP-E をむしろ劣化。Codex F2 の予言どおり。 |
+| **K4 clip = 唯一の能動的 suppression 機序** (統計監査 §4/§5/§8) | 「clip が真の landscape 構造を隠蔽 = 唯一の能動的 suppression」 | **降格: 診断的所見** (label = `not_load_bearing_at_this_budget`, CF4)。verdict-flip=False、clip=False は MAP-E をむしろ劣化。Codex F2 の予言どおり。FPR 0/0 + ~7x 縮小予算ゆえ「null 確定」でなく「at this budget で非載荷」と限定。 |
 | **統計監査 最終判定 (c) 部分 underpower** | 一律抑制ではないが小 n + ridge clip で Type II 偏向 | **方向維持 + 中身入替**: (i) 中効果 case は psd 床で n では決着不能 (C-gen4b で実証, §6.1)、(ii) ridge clip の Type II 偏向は **K4 降格により実質消失** (verdict を変えない)、(iii) 「③不要」の多くは underpower でなく **地形が真に滑らか** (EXP2)。 |
 
 **§6/§7 の Codex cleanup (F1 Type I event 定義統一 / F3 consolidate JSON 訂正 / F4 sweet-spot ラベル削除) は本 Step D では未実施** (EXP1/2/3 の 3 実験のみ完走)。
