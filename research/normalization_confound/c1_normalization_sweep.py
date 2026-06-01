@@ -278,20 +278,47 @@ def run_setting(
         degenerate_any = True
     r.degenerate = degenerate_any
 
-    # verdict (G2/G3 遵守):
-    #  - degenerate → undetermined (smooth/deceptive と結論しない)
+    # --- ノイズ検証 (本研究の主要 caveat。budget_sensitivity_check の決定的所見を内蔵) ---
+    fit_mean, noise_std = measure_eval_noise(
+        eval_once, dim=res.gene_dim, bounds=bounds, base_seed=seeds[0])
+    r.eval_noise_std = noise_std
+    r.valley_threshold = 0.05 * (abs(fit_mean) + 1e-9)
+    r.noise_dominated = bool(np.isfinite(noise_std) and noise_std > r.valley_threshold)
+    # 同ノイズの flat landscape を C1 にかけた null (ノイズだけで出る谷の基準線)
+    r.noisy_flat_null_vf = noisy_flat_null_valley(
+        noise_std if np.isfinite(noise_std) else 0.0,
+        dim=res.gene_dim, bounds=bounds, n_restarts=n_restarts, n_evals=n_evals,
+        sigma=sigma, base_seed=seeds[0])
+
+    # verdict (G2/G3 + noise-aware):
+    #  - degenerate → undetermined
     #  - seed 間 is_multimodal 不一致 → undetermined (反転と断定しない)
-    #  - 全 seed multimodal → deceptive / 全 seed unimodal → smooth
+    #  - **noise_dominated かつ valley_mean が noisy-flat null を上回らない →
+    #     noise_confounded** (deceptive と断定しない=本研究の honest 判断)
+    #  - 全 seed unimodal → smooth
+    #  - 全 seed multimodal かつ null を margin>=0.1 で上回る → deceptive
+    margin = r.valley_mean - r.noisy_flat_null_vf
     if degenerate_any:
         r.verdict = "undetermined"
         r.note = "degenerate (n_optima<2 or non-finite R²)"
     elif not r.is_multimodal_unanimous:
         r.verdict = "undetermined"
         r.note = f"seed-inconsistent is_multimodal ({n_mm}/{len(r.is_multimodal_flags)})"
-    elif n_mm == len(r.is_multimodal_flags):
-        r.verdict = "deceptive"   # 分離 peak = 多峰
+    elif n_mm == 0:
+        r.verdict = "smooth"      # 連結 manifold = 単峰 (谷ゼロ)
+    elif r.noise_dominated and margin < 0.1:
+        # 谷が出ても、同ノイズの flat null と区別できない → ノイズ起源と判断
+        r.verdict = "noise_confounded"
+        r.note = (f"valley_fraction({r.valley_mean:.2f}) ~ noisy-flat null"
+                  f"({r.noisy_flat_null_vf:.2f}); noise_std({noise_std:.3f}) "
+                  f">> valley_thr({r.valley_threshold:.4f}). 谷はノイズ人工物の疑い")
+    elif n_mm == len(r.is_multimodal_flags) and margin >= 0.1:
+        r.verdict = "deceptive"   # null を有意に超える分離 peak
+        r.note = f"valley_fraction exceeds noisy-flat null by margin={margin:.2f}"
     else:
-        r.verdict = "smooth"      # 連結 manifold = 単峰
+        r.verdict = "undetermined"
+        r.note = (f"multimodal but within noise null (margin={margin:.2f}); "
+                  "cannot confirm geometric valley")
     return r
 
 
