@@ -174,8 +174,10 @@ VERIFY が独立再現し、本 agent も raw per-seed (`exp1_freshrun_partial.j
   = PASS は前半 seed に支えられ、近傍データは逆方向に走っている。これはどの開示フィールドにも記録されていなかった。
 - **多重比較**: p=0.038 は α=0.05 では PASS だが、EXP1 の 3 case だけでも Bonferroni α=0.0167 を **超過 (FAIL)**。③ research family 全体では更に厳しい。
 - **含意**: C-gen4b を「③ load-bearing 候補」と呼ぶことは妥当だが、**「③ は NOT null」という headline は単発の境界 p=0.038 に寄りかかりすぎ**。
-  走行内ドリフトは「候補が偽陽性かもしれない」真の証拠。**推奨 remediation: (a) p の n 軌跡と後半 seed の符号反転を開示フィールドに記録 (本節で実施)、
-  (b) 多重比較補正後の閾値を併報、(c) fresh seed を n=64 超へ延長 — ドリフトが続けば候補は生き残らない可能性。**
+  走行内ドリフトは「候補が偽陽性かもしれない」真の証拠。**remediation 状況: (a) p の n 軌跡と後半 seed の符号反転を開示フィールドに記録
+  → `exp1_repower_proper_n_results.json` の `cgen4b_drift_disclosure` に実施済 (cumulative_trajectory + chunks + drift_summary)。
+  (b) 多重比較補正後の閾値を併報 → 同フィールド `multiple_comparison` (Bonferroni α=0.0167, passes_bonferroni=False) に実施済。
+  (c) fresh seed を n=64 超へ延長 → 高価 (~34s/seed) ゆえ未実施 = 次サイクル TODO (§6.1c)。**
 - power_calc 器自体は G3 校正済みで正しく、prong 1 (null-at-power) は honest に処理済み (どの case も null_confirmed_at_power を主張せず、
   flip_flop vs RR の power 曲線が n と共に減少することを正しくラベル) = この点は refute されない。
 
