@@ -1,0 +1,242 @@
+{
+  "_meta": {
+    "script": "ablate_suppression_knobs",
+    "wall_clock_s": 1488.957,
+    "src_unchanged": true,
+    "src_changed_files": [],
+    "exit_ok": true,
+    "design": "(C) suppression ablation (OFAT)",
+    "n_seeds": 15,
+    "n_evals": 600,
+    "base_seed": 20260530,
+    "note": "各 toggle は src 無改変で research 側引数/再計算。反転は type1_guard_sweep.py の Type I コストと必ずペアで読む。"
+  },
+  "cases": {
+    "corridor_d=0.13": {
+      "baseline_all_on": {
+        "best_baseline": "rr_hillclimb",
+        "diff": 0.039004772531524366,
+        "wilcoxon_p": 0.1947021484375,
+        "paired_sign_delta": -0.06666666666666667,
+        "cliff_delta_textbook": -0.013333333333333334,
+        "passes_vs_best": false,
+        "n_baselines_beaten": 1,
+        "load_bearing": false
+      },
+      "toggles": {
+        "K1_freshseed_OFF": {
+          "best_baseline": "rr_hillclimb",
+          "diff": 0.029940756051808053,
+          "wilcoxon_p": 0.210601806640625,
+          "paired_sign_delta": -0.06666666666666667,
+          "cliff_delta_textbook": -0.0044444444444444444,
+          "passes_vs_best": false,
+          "n_baselines_beaten": 1,
+          "load_bearing": false
+        },
+        "K2_min_effect=0.1": {
+          "best_baseline": "rr_hillclimb",
+          "diff": 0.039004772531524366,
+          "wilcoxon_p": 0.1947021484375,
+          "paired_sign_delta": -0.06666666666666667,
+          "cliff_delta_textbook": -0.013333333333333334,
+          "passes_vs_best": false,
+          "n_baselines_beaten": 1,
+          "load_bearing": false
+        },
+        "K2_min_effect=0.05": {
+          "best_baseline": "rr_hillclimb",
+          "diff": 0.039004772531524366,
+          "wilcoxon_p": 0.1947021484375,
+          "paired_sign_delta": -0.06666666666666667,
+          "cliff_delta_textbook": -0.013333333333333334,
+          "passes_vs_best": false,
+          "n_baselines_beaten": 1,
+          "load_bearing": false
+        },
+        "K2_min_effect=0.0": {
+          "best_baseline": "rr_hillclimb",
+          "diff": 0.039004772531524366,
+          "wilcoxon_p": 0.1947021484375,
+          "paired_sign_delta": -0.06666666666666667,
+          "cliff_delta_textbook": -0.013333333333333334,
+          "passes_vs_best": false,
+          "n_baselines_beaten": 1,
+          "load_bearing": false
+        },
+        "K2_alpha=0.1": {
+          "best_baseline": "rr_hillclimb",
+          "diff": 0.039004772531524366,
+          "wilcoxon_p": 0.1947021484375,
+          "paired_sign_delta": -0.06666666666666667,
+          "cliff_delta_textbook": -0.013333333333333334,
+          "passes_vs_best": false,
+          "n_baselines_beaten": 1,
+          "load_bearing": false
+        },
+        "K2_alpha=0.2": {
+          "best_baseline": "rr_hillclimb",
+          "diff": 0.039004772531524366,
+          "wilcoxon_p": 0.1947021484375,
+          "paired_sign_delta": -0.06666666666666667,
+          "cliff_delta_textbook": -0.013333333333333334,
+          "passes_vs_best": false,
+          "n_baselines_beaten": 1,
+          "load_bearing": false
+        },
+        "K2_min_seeds=10": {
+          "best_baseline": "rr_hillclimb",
+          "diff": 0.039004772531524366,
+          "wilcoxon_p": 0.1947021484375,
+          "paired_sign_delta": -0.06666666666666667,
+          "cliff_delta_textbook": -0.013333333333333334,
+          "passes_vs_best": false,
+          "n_baselines_beaten": 1,
+          "load_bearing": false
+        },
+        "K2_min_seeds=5": {
+          "best_baseline": "rr_hillclimb",
+          "diff": 0.039004772531524366,
+          "wilcoxon_p": 0.1947021484375,
+          "paired_sign_delta": -0.06666666666666667,
+          "cliff_delta_textbook": -0.013333333333333334,
+          "passes_vs_best": false,
+          "n_baselines_beaten": 1,
+          "load_bearing": false
+        }
+      }
+    },
+    "C-gen4b_MAPE_vs_random": {
+      "baseline_all_on": {
+        "passes": false,
+        "p": 0.126190185546875,
+        "diff": 0.06254864753354647,
+        "paired_sign_delta": 0.2
+      },
+      "toggles": {
+        "K2_min_effect=0.1": {
+          "passes": false,
+          "p": 0.126190185546875
+        },
+        "K2_min_effect=0.05": {
+          "passes": false,
+          "p": 0.126190185546875
+        },
+        "K2_min_effect=0.0": {
+          "passes": false,
+          "p": 0.126190185546875
+        },
+        "K2_alpha=0.1": {
+          "passes": false,
+          "p": 0.126190185546875
+        },
+        "K2_alpha=0.2": {
+          "passes": true,
+          "p": 0.126190185546875
+        }
+      },
+      "source": "D:\\projects\\llcore\\research\\ea_multitask\\exp_ea3_results.json"
+    },
+    "flip_flop_MAPE_vs_random": {
+      "baseline_all_on": {
+        "passes": false,
+        "p": 0.151397705078125,
+        "diff": 0.004095723875934939,
+        "paired_sign_delta": 0.3333333333333333
+      },
+      "toggles": {
+        "K2_min_effect=0.1": {
+          "passes": false,
+          "p": 0.151397705078125
+        },
+        "K2_min_effect=0.05": {
+          "passes": false,
+          "p": 0.151397705078125
+        },
+        "K2_min_effect=0.0": {
+          "passes": false,
+          "p": 0.151397705078125
+        },
+        "K2_alpha=0.1": {
+          "passes": false,
+          "p": 0.151397705078125
+        },
+        "K2_alpha=0.2": {
+          "passes": true,
+          "p": 0.151397705078125
+        }
+      },
+      "source": "D:\\projects\\llcore\\research\\step_c_memory_tasks\\exp_c2c3_results.json"
+    },
+    "K3_readout_global_vs_archive": {
+      "readout_global_best_current": {
+        "diff": 0.0011193025965781978,
+        "wilcoxon_p": 0.000762939453125,
+        "paired_sign_delta": 0.7333333333333333,
+        "passes": true,
+        "full_mean": 0.999383408586676,
+        "randselect_mean": 0.9982641059900976
+      },
+      "readout_archive_max_old": {
+        "diff": 0.03185314581821022,
+        "wilcoxon_p": 3.0517578125e-05,
+        "paired_sign_delta": 1.0,
+        "passes": true,
+        "full_mean": 0.999383408586676,
+        "randselect_mean": 0.9675302627684659
+      },
+      "flipped_global_to_archive": false,
+      "note": "global-best (現行) で③ gap が消えるなら archive-ratchet 自体が③効果の 可能性。archive-max で PASS かつ global-best で FAIL = 読み出しが③を隠す。"
+    },
+    "K4_clip_spread": {
+      "copy": {
+        "clip_true_std": 0.36956232840155195,
+        "clip_false_std": 0.4463949023077046,
+        "clip_true_mean": 0.35435914472965296,
+        "clip_false_mean": 0.28258194283433613,
+        "n_floored_to_zero": 78,
+        "n_genes": 200,
+        "frac_floored": 0.39,
+        "floored_raw_r2_min": -0.5195323113144543,
+        "floored_raw_r2_max": -0.004708951029605002,
+        "floored_raw_r2_spread": 0.09824190628915591,
+        "flattening_hidden_by_clip": true
+      },
+      "addition": {
+        "clip_true_std": 0.014520871447621573,
+        "clip_false_std": 0.2185061938712676,
+        "clip_true_mean": 0.0030037926818003106,
+        "clip_false_mean": -0.26759761025946893,
+        "n_floored_to_zero": 185,
+        "n_genes": 200,
+        "frac_floored": 0.925,
+        "floored_raw_r2_min": -1.3606876167017927,
+        "floored_raw_r2_max": -0.0016835556516545669,
+        "floored_raw_r2_spread": 0.20787539976869568,
+        "flattening_hidden_by_clip": true
+      }
+    }
+  },
+  "verdict_flips": [
+    {
+      "case": "C-gen4b_MAPE_vs_random",
+      "knob": "K2_alpha=0.2",
+      "from": "no",
+      "to": "evolution",
+      "type1_cost": "alpha↑が p で落ちる underpowered case を救う。ただし null FPR も alpha まで上がる(type1_guard で確認)。"
+    },
+    {
+      "case": "flip_flop_MAPE_vs_random",
+      "knob": "K2_alpha=0.2",
+      "from": "no",
+      "to": "evolution",
+      "type1_cost": "alpha↑が p で落ちる underpowered case を救う。ただし null FPR も alpha まで上がる(type1_guard で確認)。"
+    }
+  ],
+  "flip_summary": {
+    "n_flips": 2,
+    "knobs_that_flipped": [
+      "K2_alpha=0.2"
+    ]
+  }
+}

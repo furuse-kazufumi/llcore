@@ -209,6 +209,21 @@ py -3.11 -m pytest tests/unit/test_poc_1a_z3_invariant.py -v   # 回帰 (10 pass
 - attractor 多様性探索の別 PoC で Hurwitz (双安定 admit) を扱う
 - 進化ループに `verify_lipschitz_contraction` を online gate として接続し毎世代 certify
 
+## 8. Codex pair-review (gpt-5.4) 訂正 (2026-06-01)
+
+commit 前ゲートの Codex 相互レビュー ([[feedback_codex_pair_review_for_llcore]]) を実施。**soundness blocker なし**(`unsat⟹L<1` は健全、独自軸#6 ✓ は維持)。ただし verdict の **説明過剰主張 (overclaim)** を以下のとおり honest に訂正 (各 finding を実コードで再検証済、[[feedback_external_ai_verify]]):
+
+1. **(high) 「t=0 由来の保守的 false-reject / completeness 放棄」は本モデルでは誤り → criterion は実質 exact**。`gene.clipped()` で `decay∈[0,1]` が強制されるため `|J(0)|=decay<1` (decay=1 境界を除く)、かつ `t=1` は `pre=0` (s=x=0) で到達可能。J は t について線形なので `sup|J|=max(|J(0)|,|J(1)|)` が到達域 (0,1] 上の真の上限そのもの (decay<1 では Z3 の [0,1] と一致)。t=0 起因の過剰排除は起きない。**§6.1 の「completeness 放棄」「53 件 false-reject」表現を撤回** (decay=1 の marginal だけが境界)。
+2. **(high) 「99 件発散 / 53 件 false-reject」の定量分類を撤回**。これは有限本数・有限長の trajectory ratio test 依存で、全 `(|s|≤1,|x|≤1)` に対する真の Lipschitz 定数を判定しない。Z3 sat = 到達域に `|J|≥1` の点が実在 = **正しい reject** (有限軌道が膨張領域を励起しなかっただけ)。§3/§4 の 99/53 は **"sampled finite-horizon behavior"** に格下げ。質的主張「contraction は state_norm より強い」と代表反例 `gene=(0,0,2)` は妥当。
+3. **(medium) Banach 一意固定点は scope 過大 → 「固定入力 x の self-map `F_x(s)` の contraction = その入力列に対する一意応答軌道」に限定**。時変入力では固定点でなく一意応答。§1/§7 末尾の「同一入力」限定は正しいが前段の一般表現と不整合だったので統一。
+4. **(medium) no-z3 は API 単体では fail-closed でない** (`contraction=None` の tri-state を caller 規約に委譲)。online gate (Stage 1c) 接続時は呼出側が None を必ず reject 扱いにすること (将来 enum 化検討)。
+5. **(medium) 大量 sweep (~16000 / 8000 grid / 3000 boundary) は本 commit 差分で未再現**。敵対検証レンズ agent の ephemeral run の数値で、再現スクリプトが repo 未同梱 (= 「実験結果を残す」規律違反)。→ §3 の当該数値は **"adversarial-lens run, 差分外で未再現"** として扱う。**follow-up**: sweep を `research/poc_1b_sweeps/` に再現スクリプト + results JSON で永続化。
+6. **(low) exactness 直接固定テスト follow-up**: `verify_lipschitz_contraction(g).contraction == (_lipschitz_upper_bound(...)<1)` を負 `gate_str` 含む広域ランダムで固定する回帰テストを追加する。
+
+→ 独自軸#6 の **✓ 判定は soundness 健全のため維持**。本訂正は説明の honest 化 (claim 降格) であり、機構の実証 (Z3 で状態方向 contraction を per-gene gate 化) は揺らがない。Codex 結論: 「実装コアに soundness blocker なし、ブロッカーは主に verdict の過剰主張」。
+
+---
+
 ## 関連 memory
 
 - [[project_llcore_init_2026_05_29]]
