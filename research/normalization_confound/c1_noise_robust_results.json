@@ -20,24 +20,24 @@
   "sigma": 0.15,
   "n_train": 32,
   "n_eval": 32,
-  "total_wall_clock_s": 12.43397068977356,
+  "total_wall_clock_s": 13.613503217697144,
   "any_flip": false,
-  "has_geometric_valley": true,
+  "has_geometric_valley": false,
   "denoise_collapse_per_setting": {
-    "task|clip=hard|bounds=current": {
+    "vdr_D15|clip=hard|bounds=current": {
       "n_avg_min": 1,
       "n_avg_max": 4,
       "valley_at_min_navg": 0.25,
       "valley_at_max_navg": 0.3333333333333333,
-      "null_at_max_navg": 0.16666666666666666,
-      "tracks_null": false,
+      "null_at_max_navg": 0.3333333333333333,
+      "tracks_null": true,
       "decreased": false
     }
   },
   "results": [
     {
-      "setting": "task|clip=hard|bounds=current|n_avg=1",
-      "task": "task",
+      "setting": "vdr_D15|clip=hard|bounds=current|n_avg=1",
+      "task": "vdr_D15",
       "clip": "hard",
       "bounds": "current",
       "n_avg": 1,
@@ -48,16 +48,17 @@
         0.16666666666666666
       ],
       "valley_mean": 0.25,
+      "mean_pairs": 6.0,
       "null_vf": 0.3333333333333333,
       "margin": -0.08333333333333331,
       "optima_r2_min": 0.8948939830011847,
       "optima_r2_max": 0.976011236252288,
       "verdict": "noise_confounded",
-      "note": "valley(0.25) ~ null(0.33) margin=-0.08; SEM=0.088"
+      "note": "valley(0.25) ~ null(0.33) margin=-0.08; SEM=0.088, mean_pairs=6.0"
     },
     {
-      "setting": "task|clip=hard|bounds=current|n_avg=4",
-      "task": "task",
+      "setting": "vdr_D15|clip=hard|bounds=current|n_avg=4",
+      "task": "vdr_D15",
       "clip": "hard",
       "bounds": "current",
       "n_avg": 4,
@@ -68,13 +69,14 @@
         0.3333333333333333
       ],
       "valley_mean": 0.3333333333333333,
-      "null_vf": 0.16666666666666666,
-      "margin": 0.16666666666666666,
+      "mean_pairs": 6.0,
+      "null_vf": 0.3333333333333333,
+      "margin": 0.0,
       "optima_r2_min": 0.8290425646254022,
       "optima_r2_max": 0.9610462133503047,
-      "verdict": "geometric_valley",
-      "note": "valley(0.33) exceeds denoised null(0.17) margin=0.17"
+      "verdict": "noise_confounded",
+      "note": "valley(0.33) ~ null(0.33) margin=0.00; SEM=0.044, mean_pairs=6.0"
     }
   ],
-  "verdict_summary": "geometric_valley 検出 → 真の多峰 (正規化人工物でない)。③ablation escalation を要検討。"
+  "verdict_summary": "geometric_valley なし。valley_fraction が n_avg 増で null と同軌道なら 『既存 C1 の谷=評価ノイズ起源』を頑健に確証。よって prior の vdr 地形を C1 で smooth とも deceptive とも言えない (C1 は stochastic fitness に計測不能)。『③不要』を主張するには noise-robust C1 か deterministic fitness が必要。"
 }

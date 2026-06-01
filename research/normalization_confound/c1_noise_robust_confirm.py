@@ -340,7 +340,7 @@ def main() -> None:
             {"setting": r.setting, "task": r.task, "clip": r.clip, "bounds": r.bounds,
              "n_avg": r.n_avg, "noise_std": r.noise_std, "sem": r.sem,
              "valley_fractions": r.valley_fractions, "valley_mean": r.valley_mean,
-             "null_vf": r.null_vf, "margin": r.margin,
+             "mean_pairs": r.mean_pairs, "null_vf": r.null_vf, "margin": r.margin,
              "optima_r2_min": r.optima_r2_min, "optima_r2_max": r.optima_r2_max,
              "verdict": r.verdict, "note": r.note}
             for r in results

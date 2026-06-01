@@ -1,0 +1,14 @@
+=== noise-robust C1 confirmation (mode=quick) ===
+tasks=['vdr_D15'] seeds=[20260530, 20260531, 20260601] n_avgs=[1, 4, 16] clip_bounds=[('hard', 'current'), ('none', 'current'), ('hard', 'wide')]
+n_restarts=4 n_evals=60 sigma=0.15 n_train=40
+予測: valley_fraction が n_avg 増で noisy-flat null と同軌道で減衰 → ノイズ起源確証
+反証条件: 谷が null より高い plateau に残る → 真の幾何谷 (正規化人工物でない真の多峰)
+
+[vdr_D15|clip=hard|bounds=current|n_avg=1] verdict=noise_confounded valley_mean=0.333 null_vf=0.444 margin=-0.111 noise_std=0.061 SEM=0.0608 R2[0.881,0.971] (18.2s)
+[vdr_D15|clip=hard|bounds=current|n_avg=4] verdict=noise_confounded valley_mean=0.611 null_vf=0.389 margin=+0.222 noise_std=0.061 SEM=0.0304 R2[0.879,0.969] (46.8s)
+[vdr_D15|clip=hard|bounds=current|n_avg=16] verdict=noise_confounded valley_mean=0.667 null_vf=0.889 margin=-0.222 noise_std=0.061 SEM=0.0152 R2[0.895,0.968] (176.6s)
+[vdr_D15|clip=none|bounds=current|n_avg=1] verdict=noise_confounded valley_mean=0.333 null_vf=0.444 margin=-0.111 noise_std=0.061 SEM=0.0608 R2[0.881,0.971] (7.1s)
+[vdr_D15|clip=none|bounds=current|n_avg=4] verdict=noise_confounded valley_mean=0.611 null_vf=0.389 margin=+0.222 noise_std=0.061 SEM=0.0304 R2[0.879,0.969] (35.5s)
+[vdr_D15|clip=none|bounds=current|n_avg=16] verdict=noise_confounded valley_mean=0.667 null_vf=0.889 margin=-0.222 noise_std=0.061 SEM=0.0152 R2[0.895,0.968] (143.7s)
+[vdr_D15|clip=hard|bounds=wide|n_avg=1] verdict=noise_confounded valley_mean=0.444 null_vf=0.444 margin=+0.000 noise_std=0.066 SEM=0.0658 R2[0.888,0.971] (7.7s)
+[vdr_D15|clip=hard|bounds=wide|n_avg=4] verdict=noise_confounded valley_mean=0.667 null_vf=0.389 margin=+0.278 noise_std=0.066 SEM=0.0329 R2[0.867,0.961] (31.7s)
