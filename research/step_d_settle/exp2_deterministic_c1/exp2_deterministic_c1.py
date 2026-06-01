@@ -438,16 +438,30 @@ def _aggregate_and_verdict(partial):
     else:
         overall = "still_inconclusive"
 
+    corridor = summary.get("note_corridor_d016", {})
     return {
         "per_landscape": summary,
         "diagnostic_valid": diagnostic_valid,
-        "control_pos_corridor": {
-            "all_multimodal": pos.get("all_multimodal"),
-            "vf_mean": pos.get("valley_fraction_mean"),
+        "diagnostic_valid_dim3": diag_dim3,
+        "diagnostic_valid_dim40": diag_dim40,
+        "control_pos_multipeak": {
+            "dim3_all_multimodal": pos3.get("all_multimodal"),
+            "dim3_vf_mean": pos3.get("valley_fraction_mean"),
+            "dim40_all_multimodal": pos40.get("all_multimodal"),
+            "dim40_vf_mean": pos40.get("valley_fraction_mean"),
         },
         "control_neg_quadratic": {
-            "all_smooth": neg.get("all_smooth"),
-            "vf_mean": neg.get("valley_fraction_mean"),
+            "dim3_all_smooth": neg3.get("all_smooth"),
+            "dim3_vf_mean": neg3.get("valley_fraction_mean"),
+            "dim40_all_smooth": neg40.get("all_smooth"),
+            "dim40_vf_mean": neg40.get("valley_fraction_mean"),
+        },
+        "corridor_not_a_c1_control": {
+            "vf_mean": corridor.get("valley_fraction_mean"),
+            "all_smooth": corridor.get("all_smooth"),
+            "note": ("genotypic corridor は単一 basin trap → C1 谷を出さず vf≈0。"
+                     "corridor の欺瞞性は behavioral-reach であって multi-basin ではない "
+                     "= C1 の正 control にならない事を実測で記録。"),
         },
         "real_landscape_verdicts": verdicts,
         "third_axis_verdict": overall,
