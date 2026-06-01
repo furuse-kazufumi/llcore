@@ -345,6 +345,10 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--smoke", action="store_true",
                     help="tiny smoke (n_seeds=3, n_evals=40, null 1 seed)")
+    ap.add_argument("--phase", choices=("both", "verdict", "null"), default="both",
+                    help="G1 分割実行 (TRIZ #1): 'verdict'=verdict-flip のみ, "
+                         "'null'=null-ridge FPR のみ, 'both'=両方 (full は両方で G1 超過のため "
+                         "分割 run を推奨)。phase 別 partial JSON に書き、最後に merge 判定。")
     args = ap.parse_args()
 
     guard = AC.RunGuard.start("exp3_clip_verdict_flip")
