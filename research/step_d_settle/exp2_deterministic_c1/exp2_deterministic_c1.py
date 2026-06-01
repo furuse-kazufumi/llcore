@@ -402,7 +402,10 @@ def finalize():
         "n_cells_total": len(partial.get("cells", {})),
         "cells": partial.get("cells", {}),
         "aggregate": agg,
-        "eval_noise_std_all_zero": all(v["eval_noise_std"] == 0.0 for v in sc.values()),
+        # eval noise が全 landscape で machine-epsilon 以下 (<1e-12) = 決定論。
+        # 谷閾 0.05*|fit|~0.03 を 11 桁下回る → noise floor 完全回避を実測で示す。
+        "eval_noise_std_max": max((v["eval_noise_std"] for v in sc.values()), default=0.0),
+        "eval_noise_below_machine_eps": all(v["eval_noise_std"] < 1e-12 for v in sc.values()),
         "honest_caveat": (
             "決定論 fitness (eval_noise_std=0 全 landscape 実測) で normalization_confound の "
             "noise floor (谷閾 ≪ eval noise std で計測不能) を構造的に回避した。"
