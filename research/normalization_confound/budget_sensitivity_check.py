@@ -79,6 +79,31 @@ def main():
               f"valley_fraction={rep['valley_fraction']:.3f} "
               f"n_optima={rep['n_optima']} is_mm={rep['is_multimodal']} ({dt:.1f}s)")
 
+    print("\n=== (3) C1 control: 既知 smooth(単峰) landscape で valley_fraction が 0 か ===")
+    print("    a) noiseless 単峰 (二次関数) → 谷ゼロが正解。b) noisy-flat (一定+評価ノイズ) →")
+    print("       谷が出るなら『C1 谷判定は評価ノイズで偽陽性を出す』証拠 (本研究の主要 caveat)")
+    dim = res.gene_dim
+    lo, hi = gene_bounds(res)
+    center = 0.5 * (lo + hi)
+
+    def smooth_eval(g, rng):
+        # 単峰二次 (滑らか・ノイズなし) → 谷は存在しないはず
+        return -float(np.mean((g - center) ** 2))
+
+    # noisy-flat: D60 baseline と同程度の評価ノイズ std を一定地形に乗せる
+    _, base_noise = eval_noise(res, task, n_train=48, n_eval=48, K=20)
+
+    def noisy_flat_eval(g, rng):
+        return float(rng.normal(0.5, base_noise))
+
+    for label, ev in (("noiseless_unimodal", smooth_eval), ("noisy_flat", noisy_flat_eval)):
+        rep = multimodality_report(ev, dim=dim, bounds=(lo, hi),
+                                   n_restarts=8, n_evals=300, sigma=0.15,
+                                   base_seed=20260530)
+        print(f"  [{label}] valley_fraction={rep['valley_fraction']:.3f} "
+              f"n_optima={rep['n_optima']} is_mm={rep['is_multimodal']} "
+              f"(noise std used={base_noise:.4f})")
+
 
 if __name__ == "__main__":
     main()
