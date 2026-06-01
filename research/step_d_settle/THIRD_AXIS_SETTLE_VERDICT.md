@@ -96,7 +96,7 @@ G3 gate sanity: known-positive p=3.05e-5 psd=1.0 (PASS), known-null FPR=0.028 (<
 | **flip_flop** vs RR-hillclimb | **(B 寄り = null 確定ではなく null 寄り)** | psd=0.067 < 0.147 床。`P(\|psd\|≥床)` は n と共に **減少** (0.612@n15 → 0.095@n255) = 効果が床以下。full gate はどんな n でも不可。ただし「効果ゼロ」の積極的確証 (diff→0 への収束を fresh で示す) は未取得のため **厳密には (B) でなく「null 寄り」** と honest に留める。 |
 | **ESN_3param** 地形 (実 text proxy, dim=3) | **(B) adequate power で null 確定** | 決定論化 (eval noise std=0) で normalization_confound の noise-floor 偽陽性経路を物理的に除去。それでも valley_fraction=0.000 が 6 cell × 3 seed 全一致 → 実地形は真に単峰 = **③ 不要を noise-free で確定**。診断器は pos/neg control を正しく分離。 |
 | **ESN_perneuron40** 地形 (実 text proxy, dim=40) | **(B) adequate power で null 確定 (smooth 寄り)** | vf_mean=0.096 < 0.2 床、is_multimodal=False が 3 seed 全一致。3param よりわずかに valley の兆候はあるが多峰判定に届かず。**ただし §6.2 の閾値近接性 (vf=0.121 は 0.2 まで 0.079) に留意。** |
-| **K4 ridge clip** (suppression 機序候補) | **(B 寄り = null 確定/降格)** | verdict_flip=False 全 task。clip を外しても③は出ず、むしろ MAP-E が劣化 (addition: +0.010→−1.212)。null-ridge FPR は clip 差ゼロ。→ K4 は「能動的 suppression」でなく **診断的所見**に降格。低予算ゆえ §6.3 で「at this budget」と限定。 |
+| **K4 ridge clip** (suppression 機序候補) | **(B 寄り = `not_load_bearing_at_this_budget`/降格)** | verdict_flip=False 全 task。clip を外しても③は出ず、むしろ MAP-E が劣化 (addition: +0.010→−1.212)。null-ridge FPR は clip 差ゼロ。→ K4 は「能動的 suppression」でなく **診断的所見**に降格。FPR 0/0 + ~7x 縮小予算ゆえ verdict label は「null 確定」でなく **`not_load_bearing_at_this_budget`** に統一 (CF4; §6.3 で「at this budget」と開示済)。 |
 
 **総括の一文:** **③ が「実問題近傍で proper power に乗せれば load-bearing」と (A) で確定した case は一つもない。**
 最も近いのは C-gen4b で「③ は NOT null の方向 (gate PASS) だが小効果 (dz≈0.28) ゆえ検出力が乗らず、かつ近傍データはドリフトで反証寄り」=
