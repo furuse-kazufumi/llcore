@@ -289,7 +289,7 @@ def main() -> None:
         for (clip, bounds_kind) in clip_bounds:
             for n_avg in n_avgs:
                 t0 = time.time()
-                r = run_navg_point(res=res, task=vdr[name], clip=clip,
+                r = run_navg_point(res=res, task=vdr[name], task_name=name, clip=clip,
                                    bounds_kind=bounds_kind, n_avg=n_avg, seeds=seeds,
                                    n_restarts=n_restarts, n_evals=n_evals, sigma=sigma,
                                    n_train=n_train, n_eval=n_eval)
