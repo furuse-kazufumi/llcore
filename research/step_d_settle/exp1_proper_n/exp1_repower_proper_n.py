@@ -905,6 +905,21 @@ def main() -> int:
             print(f"  {name}: [{v['verdict']}]")
             print(f"     {v['reason']}")
 
+        # [§6.1 a/b] C-gen4b 走行内ドリフト + 多重比較補正の開示 (追記専用; 元数値不変)
+        drift = _cgen4b_drift_disclosure(partial_path)
+        if drift is not None:
+            mc = drift["multiple_comparison"]
+            ds = drift["drift_summary"]
+            print("\n--- [§6.1 a/b] C-gen4b drift disclosure ---")
+            print(f"  first_half diff={ds['first_half_diff']:+.4f} "
+                  f"(frac_pos={ds['first_half_frac_pos']:.3f}) / "
+                  f"second_half diff={ds['second_half_diff']:+.4f} "
+                  f"(frac_pos={ds['second_half_frac_pos']:.3f}) / "
+                  f"last16 diff={ds['last16_diff']:+.4f}")
+            print(f"  final p={mc['final_p_exact']:.4f} "
+                  f"uncorrected_PASS={mc['passes_uncorrected']} "
+                  f"Bonferroni(α={mc['alpha_bonferroni']:.4f})_PASS={mc['passes_bonferroni']}")
+
         meta = guard.finish()
         g1_ok = meta["wall_clock_s"] < 900.0
         payload = {
