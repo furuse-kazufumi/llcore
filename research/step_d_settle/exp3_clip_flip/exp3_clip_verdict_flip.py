@@ -378,15 +378,49 @@ def main() -> int:
           f"known_null_fpr={g3['known_null_fpr']:.3f} valid={g3['diagnostic_valid']}\n",
           flush=True)
 
-    # --- (1) verdict-flip ---
-    vflip = measure_verdict_flip(n_seeds=n_seeds, n_evals=n_evals, honest_n=honest_n,
-                                 n_tr=n_tr, grid_k=grid_k)
-
-    # --- (2) null-ridge FPR (null は verdict より軽い n_evals でも H0 は崩れない) ---
     null_n_evals = max(40, n_evals - 20) if not args.smoke else n_evals
-    null = measure_null_ridge_fpr(null_seeds=null_seeds, n_seeds=n_seeds,
-                                  n_evals=null_n_evals, honest_n=honest_n,
-                                  n_tr=n_tr, grid_k=grid_k)
+    vflip_partial = EXP3_DIR / "exp3_verdict_partial.json"
+    null_partial = EXP3_DIR / "exp3_null_partial.json"
+
+    # --- phase 別実行 (G1 分割; TRIZ #1) ---
+    # 各 phase を partial JSON に書き、'both' でなくても後続 run が前 phase の partial を
+    # 読み込んで merge 判定できる (chunked-resumable, exp_c2c3 と同パターン)。
+    run_verdict = args.phase in ("both", "verdict")
+    run_null = args.phase in ("both", "null")
+
+    if run_verdict:
+        vflip = measure_verdict_flip(n_seeds=n_seeds, n_evals=n_evals, honest_n=honest_n,
+                                     n_tr=n_tr, grid_k=grid_k)
+        vflip_partial.write_text(
+            json.dumps({"verdict_flip": vflip, "g3_gate_sanity": g3,
+                        "wall_clock_s": round(time.time() - t0, 3)},
+                       ensure_ascii=False, indent=2, default=AC._json_default),
+            encoding="utf-8")
+    else:
+        vflip = (json.loads(vflip_partial.read_text(encoding="utf-8"))["verdict_flip"]
+                 if vflip_partial.exists() else None)
+
+    if run_null:
+        null = measure_null_ridge_fpr(null_seeds=null_seeds, n_seeds=n_seeds,
+                                      n_evals=null_n_evals, honest_n=honest_n,
+                                      n_tr=n_tr, grid_k=grid_k)
+        null_partial.write_text(
+            json.dumps({"null_ridge_fpr": null,
+                        "wall_clock_s": round(time.time() - t0, 3)},
+                       ensure_ascii=False, indent=2, default=AC._json_default),
+            encoding="utf-8")
+    else:
+        null = (json.loads(null_partial.read_text(encoding="utf-8"))["null_ridge_fpr"]
+                if null_partial.exists() else None)
+
+    # merge: 片 phase だけ走らせた場合は他方を partial から復元。両方無いと判定不能。
+    if vflip is None or null is None:
+        meta = guard.finish()
+        print(f"[exp3] phase={args.phase} 完了。merge 判定には verdict/null 両 partial が必要。"
+              f"(verdict={'有' if vflip is not None else '無'} "
+              f"null={'有' if null is not None else '無'}) "
+              f"(RunGuard {meta['wall_clock_s']}s, src_unchanged={meta['src_unchanged']})")
+        return 0
 
     # --- 統合判定 (3 値) ---
     any_real_flip = any(
