@@ -208,12 +208,22 @@ def _landscapes():
         # (B) per-neuron leak — high-dim, MAP-E 本領域
         ("ESN_perneuron40", _eval_perneuron, 40, (0.0, 1.0),
          [(12, 200, 0.12), (24, 300, 0.12)], "real"),
-        # (C+) positive control: 決定論化 corridor (d=0.16) → 多峰であるべき
-        ("ctrl_corridor_d016", _corridor_det(), _DIM_CORRIDOR, (0.0, 1.0),
+        # (C+ dim3) positive control: 分離多峰 Gaussian (ESN_3param と dim 一致) → 多峰必須
+        ("ctrl_multipeak_dim3", _multipeak3(), 3, (0.0, 1.0),
          [(12, 200, 0.12), (24, 300, 0.12)], "control_pos"),
-        # (C-) negative control: noiseless 単峰二次 → smooth であるべき
-        ("ctrl_quadratic_unimodal", _quadratic_eval, 24, (0.0, 1.0),
+        # (C+ dim40) positive control: 分離多峰 Gaussian (ESN_perneuron40 と dim 一致) → 多峰必須
+        ("ctrl_multipeak_dim40", _multipeak40(), 40, (0.0, 1.0),
+         [(12, 200, 0.12), (24, 300, 0.12)], "control_pos"),
+        # (C- dim3) negative control: noiseless 単峰二次 (dim3) → smooth であるべき
+        ("ctrl_quadratic_dim3", _quadratic_eval, 3, (0.0, 1.0),
          [(12, 200, 0.12), (24, 300, 0.12)], "control_neg"),
+        # (C- dim40) negative control: noiseless 単峰二次 (dim40) → smooth であるべき
+        ("ctrl_quadratic_dim40", _quadratic_eval, 40, (0.0, 1.0),
+         [(12, 200, 0.12), (24, 300, 0.12)], "control_neg"),
+        # (note) corridor d=0.16 決定論版 = C1 の正 control にならない事を記録する診断ノート
+        # (genotypic corridor は単一 basin trap で C1 谷を出さない, 上記 _corridor_det docstring)
+        ("note_corridor_d016", _corridor_det(), _DIM_CORRIDOR, (0.0, 1.0),
+         [(24, 300, 0.12)], "control_note"),
     ]
 
 

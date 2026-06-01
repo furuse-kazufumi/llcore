@@ -1,0 +1,208 @@
+{
+  "_meta": {
+    "script": "exp1_repower_proper_n",
+    "wall_clock_s": 0.9,
+    "src_unchanged": true,
+    "src_changed_files": [],
+    "exit_ok": true,
+    "experiment": "EXP1 proper-n 再検定 (C-gen4b / flip_flop)",
+    "smoke": true,
+    "layer": "a",
+    "B": 1000,
+    "n_sweep": [
+      15,
+      30,
+      64
+    ],
+    "alpha": 0.05,
+    "min_effect": 0.147,
+    "crn_seed": 20260601,
+    "G1_wall_clock_lt_900": true,
+    "cgen4b_target_n": 64,
+    "flipflop_extra": 0,
+    "chunk_seconds_budget": 820.0,
+    "honest_disclosure": "psd≈0.20 床は p<0.05 飽和後に binding に転じ、大 n でも P(|psd|>=0.147) が ~0.80 で頭打ち = power の構造的天井。中効果ゆえ現実的 n では確定不能。flip_flop vs RR は psd=0.067<0.147 で床未満 = 効果が床以下 (null 寄り)。"
+  },
+  "power_engine_calibration_G3": {
+    "null_power": 0.02,
+    "big_effect_power": 1.0,
+    "cgen4b_sim_n15": 0.574,
+    "cgen4b_sim_n30": 0.834,
+    "checks": {
+      "null_le_0.06": true,
+      "big_ge_0.95": true,
+      "cgen4b_n15_059pm008": true,
+      "cgen4b_n30_083pm008": true
+    },
+    "power_engine_valid": true
+  },
+  "layer_a_bootstrap": {
+    "C-gen4b_MAPE_vs_random": {
+      "note": "diff>0 符号一貫 underpowered 候補",
+      "source": "D:\\projects\\llcore\\research\\ea_multitask\\exp_ea3_results.json",
+      "n_observed": 15,
+      "diff": 0.06254864753354647,
+      "sd": 0.17902389874722355,
+      "cohen_dz": 0.3493871375344323,
+      "paired_sign_delta_obs": 0.2,
+      "cliff_delta_textbook": 0.39555555555555555,
+      "wilcoxon_p_exact_obs": 0.126190185546875,
+      "n_sweep": [
+        15,
+        30,
+        64
+      ],
+      "power_curve_full": [
+        0.302,
+        0.482,
+        0.683
+      ],
+      "p_psd_floor_curve": [
+        0.734,
+        0.608,
+        0.707
+      ],
+      "median_psd_curve": [
+        0.2,
+        0.2,
+        0.1875
+      ],
+      "cond_p_only_curve": [
+        0.307,
+        0.531,
+        0.814
+      ],
+      "cond_effect_only_curve": [
+        0.734,
+        0.608,
+        0.707
+      ],
+      "n80_full_gate": null,
+      "psd_floor_below_threshold": false,
+      "p_psd_floor_ceiling": 0.734
+    },
+    "flip_flop_MAPE_vs_random": {
+      "note": "",
+      "source": "D:\\projects\\llcore\\research\\step_c_memory_tasks\\exp_c2c3_results.json",
+      "n_observed": 15,
+      "diff": 0.004095723875934939,
+      "sd": 0.01322637602448281,
+      "cohen_dz": 0.30966334756803454,
+      "paired_sign_delta_obs": 0.3333333333333333,
+      "cliff_delta_textbook": 0.27111111111111114,
+      "wilcoxon_p_exact_obs": 0.151397705078125,
+      "n_sweep": [
+        15,
+        30,
+        64
+      ],
+      "power_curve_full": [
+        0.322,
+        0.444,
+        0.728
+      ],
+      "p_psd_floor_curve": [
+        0.843,
+        0.826,
+        0.948
+      ],
+      "median_psd_curve": [
+        0.3333333333333333,
+        0.3333333333333333,
+        0.34375
+      ],
+      "cond_p_only_curve": [
+        0.322,
+        0.447,
+        0.729
+      ],
+      "cond_effect_only_curve": [
+        0.843,
+        0.826,
+        0.948
+      ],
+      "n80_full_gate": null,
+      "psd_floor_below_threshold": false,
+      "p_psd_floor_ceiling": 0.948
+    },
+    "flip_flop_MAPE_vs_rr_hillclimb": {
+      "note": "",
+      "source": "D:\\projects\\llcore\\research\\step_c_memory_tasks\\exp_c2c3_results.json",
+      "n_observed": 15,
+      "diff": 0.0035795090737160843,
+      "sd": 0.013486297824204138,
+      "cohen_dz": 0.2654182133878035,
+      "paired_sign_delta_obs": 0.06666666666666667,
+      "cliff_delta_textbook": 0.28,
+      "wilcoxon_p_exact_obs": 0.262237548828125,
+      "n_sweep": [
+        15,
+        30,
+        64
+      ],
+      "power_curve_full": [
+        0.141,
+        0.21,
+        0.264
+      ],
+      "p_psd_floor_curve": [
+        0.599,
+        0.421,
+        0.337
+      ],
+      "median_psd_curve": [
+        0.06666666666666667,
+        0.06666666666666667,
+        0.0625
+      ],
+      "cond_p_only_curve": [
+        0.145,
+        0.244,
+        0.422
+      ],
+      "cond_effect_only_curve": [
+        0.599,
+        0.421,
+        0.337
+      ],
+      "n80_full_gate": null,
+      "psd_floor_below_threshold": true,
+      "p_psd_floor_ceiling": 0.599
+    }
+  },
+  "layer_b_fresh_eval": {},
+  "verdicts": {
+    "C-gen4b_MAPE_vs_random": {
+      "verdict": "still_inconclusive",
+      "reason": "psd_obs=+0.200 (床 0.147 以上だが ~0.20 帯)、P(|psd|>=床) 上限=0.734 が ~0.80 で頭打ち → psd 床が構造的律速、現実的 n では power が 0.80 を超えず確定不能 (中効果 honest negative)。 (fresh 未到達/不足)",
+      "psd_obs": 0.2,
+      "diff_obs": 0.06254864753354647,
+      "p_psd_floor_ceiling": 0.734,
+      "n80": null,
+      "fresh_n": 0,
+      "fresh_gate_passes": false,
+      "fresh_diff": null
+    },
+    "flip_flop_MAPE_vs_random": {
+      "verdict": "still_inconclusive",
+      "reason": "psd_obs=+0.333 (床 0.147 以上だが ~0.20 帯)、P(|psd|>=床) 上限=0.948 が ~0.80 で頭打ち → psd 床が構造的律速、現実的 n では power が 0.80 を超えず確定不能 (中効果 honest negative)。 (fresh 未到達/不足)",
+      "psd_obs": 0.3333333333333333,
+      "diff_obs": 0.004095723875934939,
+      "p_psd_floor_ceiling": 0.948,
+      "n80": null,
+      "fresh_n": 0,
+      "fresh_gate_passes": false,
+      "fresh_diff": null
+    },
+    "flip_flop_MAPE_vs_rr_hillclimb": {
+      "verdict": "still_inconclusive",
+      "reason": "psd_obs=+0.067 は床 0.147 未満 → full gate は n に依らず不可 (効果が床以下 = null 寄り、しかし『効果無し』の積極的確証ではない)。",
+      "psd_obs": 0.06666666666666667,
+      "diff_obs": 0.0035795090737160843,
+      "p_psd_floor_ceiling": 0.599,
+      "n80": null,
+      "fresh_n": 0,
+      "fresh_gate_passes": false
+    }
+  }
+}
