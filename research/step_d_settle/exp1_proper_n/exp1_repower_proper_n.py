@@ -236,6 +236,62 @@ def _calibrate_power_engine(B: int) -> dict:
     }
 
 
+def _floor_effect_population(B_calib: int = 20000, *,
+                             min_effect: float = MIN_EFFECT,
+                             seed: int = 20260601) -> np.ndarray:
+    """psd≈min_effect (床効果) を持つ paired-delta 母集団を構築する (CF1 用).
+
+    既存 power engine (_batch_gate_powers / _calibrate_power_engine の `_param`) と
+    整合する Normal(mean, sd) 由来の合成母集団。median paired_sign_delta が
+    `min_effect` (=0.147) に一致するよう mean/sd を校正する。床効果を「ちょうど検出
+    できるか」の power をこの母集団から bootstrap して測るのが目的。
+
+    paired_sign_delta = (#pos - #neg)/n。Normal(m, s) の単発標本では
+    E[psd] ≈ 2*Phi(m/s) - 1。よって m/s = Phi^{-1}((min_effect+1)/2) で固定し、
+    分散 (絶対効果量) は実 C-gen4b の sd≈0.18 帯にそろえて現実的にする。
+    """
+    from math import erf, sqrt
+    # Phi^{-1}((psd+1)/2): psd=2*Phi(z)-1 を満たす z。erf 経由で数値解 (二分法)。
+    target = (min_effect + 1.0) / 2.0  # Phi(z) の目標値
+
+    def _phi(z: float) -> float:
+        return 0.5 * (1.0 + erf(z / sqrt(2.0)))
+
+    lo_z, hi_z = 0.0, 5.0
+    for _ in range(80):
+        mid = 0.5 * (lo_z + hi_z)
+        if _phi(mid) < target:
+            lo_z = mid
+        else:
+            hi_z = mid
+    z_ratio = 0.5 * (lo_z + hi_z)  # = mean/sd
+    sd = 0.18  # 実 C-gen4b 帯 (absolute scale は psd に無関係だが現実的値で固定)
+    mean = z_ratio * sd
+    rng = np.random.default_rng([seed, 147])
+    pop = rng.normal(mean, sd, size=B_calib)
+    return pop
+
+
+def _floor_effect_power_at_n(n: int, B: int, *, min_effect: float = MIN_EFFECT,
+                             seed: int = 20260601) -> dict:
+    """到達 n において床効果 (psd≈min_effect) を full gate で検出できる power (CF1).
+
+    `_batch_gate_powers` を psd=min_effect 校正母集団に適用。返り値の `full` が
+    「床サイズの効果に対する検出力」= null 枝が `null_confirmed_at_power` を名乗る
+    ための最低条件 (>=0.80) を与える。median_psd で母集団校正の妥当性も併報。
+    """
+    pop = _floor_effect_population(min_effect=min_effect, seed=seed)
+    rng = np.random.default_rng([seed, 148, int(n)])
+    idx = rng.integers(0, len(pop), size=(B, max(2, int(n))))
+    pw = _batch_gate_powers(pop[idx], min_effect=min_effect)
+    return {
+        "floor_effect_psd_target": float(min_effect),
+        "floor_pop_median_psd": float(pw["median_psd"]),
+        "floor_effect_power_at_n": float(pw["full"]),
+        "n": int(n),
+    }
+
+
 def _n80_from_curve(ns: list[int], powers: list[float]) -> float | None:
     for i in range(len(ns)):
         if powers[i] >= 0.80:
