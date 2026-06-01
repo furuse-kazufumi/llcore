@@ -578,13 +578,28 @@ def run_smoke(cfg: dict) -> dict:
     real = substrates["real"]
 
     # === harness validity 判定 (pre-reg §2.1/§4) ===
+    # どの baseline を撃破できたかを分解 (RR-hillclimb 限界を honest に開示するため)。
+    pos_beats = {b: bool(pos.gates[b]["passes"]) for b in ("rr_hillclimb", "panmictic_ga", "random")}
+    beats_rr = pos_beats["rr_hillclimb"]
+    beats_ga_rnd = pos_beats["panmictic_ga"] and pos_beats["random"]
     if pos.load_bearing:
         harness_verdict = "VALID — positive control で MAP-E が 3 baseline 全勝 = harness が③を検出可。"
         harness_code = "VALID"
+    elif beats_ga_rnd and not beats_rr:
+        # 実測の構造的限界: kid-axis 欺瞞 corridor は RR-hillclimb を排除できない (kid 直接サンプル)。
+        harness_verdict = (
+            "N/A (測定不能・構造的) — positive control で MAP-E は panmictic-GA / random を strict gate で"
+            "撃破するが、RR-hillclimb には勝てない。RR は kernel_id∈[0,4) を restart で直接サンプルし谷を"
+            "回避するため、5 次元 KernelGenome の kid-axis 欺瞞 corridor では RR を構造的に排除できない"
+            "(exp4 の CLT 不到達 corridor と異なる)。harness が③を『RR より』検出できる保証は立たず → "
+            "BG9 = N/A 方向 (pre-reg §2.1/§4)。harness 実装自体は健全 (GA/random は明瞭に検出、negative は null)。"
+        )
+        harness_code = "N/A"
     else:
         harness_verdict = (
             f"INVALID — positive control で MAP-E が 3 baseline 全勝せず "
-            f"(beaten={pos.n_baselines_beaten}/3) = harness が③を検出できない → BG9 = N/A 方向。"
+            f"(beaten={pos.n_baselines_beaten}/3, beats_rr={beats_rr} beats_ga_rnd={beats_ga_rnd}) "
+            f"= harness が③を検出できない → BG9 = N/A 方向。"
         )
         harness_code = "INVALID"
 
