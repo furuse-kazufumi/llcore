@@ -174,7 +174,7 @@ def _k3_archive_vs_global(*, n_seeds: int, n_evals: int, base_seed: int,
 # ---------------------------------------------------------------------------
 
 
-def _k4_clip_spread(*, base_seed: int, n_genes: int = 200) -> dict:
+def _k4_clip_spread(*, base_seed: int, n_genes: int = 120, n_tr: int = 32) -> dict:
     """同一 gene 集団で clip=True/False の fitness 分散・符号を比較.
 
     clip=True で floor 0.0 に潰れた gene の raw R² 符号を見て、平坦化が clip 由来か
@@ -182,7 +182,7 @@ def _k4_clip_spread(*, base_seed: int, n_genes: int = 200) -> dict:
     """
     rng = np.random.default_rng(base_seed)
     out: dict[str, dict] = {}
-    for tname, task in (("copy", CopyTask(state_dim=8, out_dim=8, seq_len=24)),
+    for tname, task in (("copy", CopyTask(state_dim=8, out_dim=8, seq_len=16)),
                         ("addition", AdditionTask(state_dim=8))):
         lo, hi = np.array([0.0, -1.0, -2.0]), np.array([1.0, 1.0, 2.0])
         genes = [lo + (hi - lo) * rng.random(3) for _ in range(n_genes)]
@@ -191,9 +191,9 @@ def _k4_clip_spread(*, base_seed: int, n_genes: int = 200) -> dict:
             g = StateUpdateGene(decay=float(gv[0]), mix=float(gv[1]), gate_str=float(gv[2]))
             # 同一 seed で clip True/False を測り fitness 分散を直接比較 (CRN)。
             seed = int(rng.integers(1 << 30))
-            clipped.append(ridge_fitness(g, task, n_train=48, n_eval=48,
+            clipped.append(ridge_fitness(g, task, n_train=n_tr, n_eval=n_tr,
                                          rng=np.random.default_rng(seed), clip=True))
-            raw.append(ridge_fitness(g, task, n_train=48, n_eval=48,
+            raw.append(ridge_fitness(g, task, n_train=n_tr, n_eval=n_tr,
                                      rng=np.random.default_rng(seed), clip=False))
         clipped, raw = np.array(clipped), np.array(raw)
         n_floored = int(np.sum(clipped <= 1e-9))
