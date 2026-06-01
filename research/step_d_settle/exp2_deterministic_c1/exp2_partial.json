@@ -1,95 +1,56 @@
 {
   "cells": {
-    "ESN_3param|nr=4|ne=60|seed=20260530": {
+    "ESN_3param|nr=12|ne=200|seed=20260530": {
       "label": "ESN_3param",
       "group": "real",
       "dim": 3,
-      "n_restarts": 4,
-      "n_evals": 60,
+      "n_restarts": 12,
+      "n_evals": 200,
       "sigma": 0.12,
       "base_seed": 20260530,
       "valley_fraction": 0.0,
-      "n_optima": 4,
+      "n_optima": 12,
       "is_multimodal": false,
-      "wall_s": 16.58
+      "wall_s": 178.95
     },
-    "ESN_perneuron40|nr=4|ne=60|seed=20260530": {
-      "label": "ESN_perneuron40",
+    "ESN_3param|nr=12|ne=200|seed=20260531": {
+      "label": "ESN_3param",
       "group": "real",
-      "dim": 40,
-      "n_restarts": 4,
-      "n_evals": 60,
-      "sigma": 0.12,
-      "base_seed": 20260530,
-      "valley_fraction": 0.0,
-      "n_optima": 4,
-      "is_multimodal": false,
-      "wall_s": 18.36
-    },
-    "ctrl_multipeak_dim3|nr=4|ne=60|seed=20260530": {
-      "label": "ctrl_multipeak_dim3",
-      "group": "control_pos",
       "dim": 3,
-      "n_restarts": 4,
-      "n_evals": 60,
+      "n_restarts": 12,
+      "n_evals": 200,
       "sigma": 0.12,
-      "base_seed": 20260530,
-      "valley_fraction": 0.8333333333333334,
-      "n_optima": 4,
-      "is_multimodal": true,
-      "wall_s": 0.01
-    },
-    "ctrl_multipeak_dim40|nr=4|ne=60|seed=20260530": {
-      "label": "ctrl_multipeak_dim40",
-      "group": "control_pos",
-      "dim": 40,
-      "n_restarts": 4,
-      "n_evals": 60,
-      "sigma": 0.12,
-      "base_seed": 20260530,
-      "valley_fraction": 0.16666666666666666,
-      "n_optima": 4,
+      "base_seed": 20260531,
+      "valley_fraction": 0.0,
+      "n_optima": 12,
       "is_multimodal": false,
-      "wall_s": 0.0
+      "wall_s": 158.39
     },
-    "ctrl_quadratic_dim3|nr=4|ne=60|seed=20260530": {
-      "label": "ctrl_quadratic_dim3",
-      "group": "control_neg",
+    "ESN_3param|nr=12|ne=200|seed=20260601": {
+      "label": "ESN_3param",
+      "group": "real",
       "dim": 3,
-      "n_restarts": 4,
-      "n_evals": 60,
+      "n_restarts": 12,
+      "n_evals": 200,
       "sigma": 0.12,
-      "base_seed": 20260530,
+      "base_seed": 20260601,
       "valley_fraction": 0.0,
-      "n_optima": 4,
+      "n_optima": 12,
       "is_multimodal": false,
-      "wall_s": 0.0
+      "wall_s": 164.66
     },
-    "ctrl_quadratic_dim40|nr=4|ne=60|seed=20260530": {
-      "label": "ctrl_quadratic_dim40",
-      "group": "control_neg",
-      "dim": 40,
-      "n_restarts": 4,
-      "n_evals": 60,
+    "ESN_3param|nr=24|ne=300|seed=20260530": {
+      "label": "ESN_3param",
+      "group": "real",
+      "dim": 3,
+      "n_restarts": 24,
+      "n_evals": 300,
       "sigma": 0.12,
       "base_seed": 20260530,
       "valley_fraction": 0.0,
-      "n_optima": 4,
+      "n_optima": 24,
       "is_multimodal": false,
-      "wall_s": 0.0
-    },
-    "note_corridor_d016|nr=4|ne=60|seed=20260530": {
-      "label": "note_corridor_d016",
-      "group": "control_note",
-      "dim": 24,
-      "n_restarts": 4,
-      "n_evals": 60,
-      "sigma": 0.12,
-      "base_seed": 20260530,
-      "valley_fraction": 0.0,
-      "n_optima": 4,
-      "is_multimodal": false,
-      "wall_s": 0.02
+      "wall_s": 442.39
     }
   },
   "_meta": {
@@ -101,8 +62,8 @@
       20260601
     ],
     "budget_note": "real substrate (A/B) は重いので restarts 12/24 × n_evals 200/300 に抑制。silent truncation 禁止: 未完 cell は partial に残し再起動で完走。",
-    "last_run_wall_s": 38.93,
-    "last_run_cells": 7
+    "last_run_wall_s": 949.24,
+    "last_run_cells": 4
   },
   "self_check": {
     "ESN_3param": {

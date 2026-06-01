@@ -49,9 +49,11 @@ AUDIT_DIR = REPO_ROOT / "research" / "statistical_power_audit"
 EA_DIR = REPO_ROOT / "research" / "ea_multitask"
 STEP_C_DIR = REPO_ROOT / "research" / "step_c_memory_tasks"
 STEP4_DIR = REPO_ROOT / "research" / "step4_selection"
+EA_CANDIDATES_DIR = EA_DIR / "candidates"  # variable_delay_recall.py はここ (exp_ea3 L29)
 
 # read-only import path (src/既存 lab 改造禁止)
-for _p in (str(SRC_DIR), str(AUDIT_DIR), str(EA_DIR), str(STEP_C_DIR), str(STEP4_DIR)):
+for _p in (str(SRC_DIR), str(AUDIT_DIR), str(EA_DIR), str(EA_CANDIDATES_DIR),
+           str(STEP_C_DIR), str(STEP4_DIR)):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 

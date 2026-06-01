@@ -1,13 +1,13 @@
 {
   "_meta": {
     "script": "exp1_repower_proper_n",
-    "wall_clock_s": 17.691,
+    "wall_clock_s": 868.946,
     "src_unchanged": true,
     "src_changed_files": [],
     "exit_ok": true,
     "experiment": "EXP1 proper-n 再検定 (C-gen4b / flip_flop)",
     "smoke": false,
-    "layer": "a",
+    "layer": "b",
     "B": 5000,
     "n_sweep": [
       15,
@@ -40,247 +40,59 @@
     },
     "power_engine_valid": true
   },
-  "layer_a_bootstrap": {
+  "layer_a_bootstrap": {},
+  "layer_b_fresh_eval": {
     "C-gen4b_MAPE_vs_random": {
-      "note": "diff>0 符号一貫 underpowered 候補",
-      "source": "D:\\projects\\llcore\\research\\ea_multitask\\exp_ea3_results.json",
-      "n_observed": 15,
+      "n_total": 15,
+      "mean_mape": 0.6822201947702451,
+      "mean_random": 0.6196715472366987,
       "diff": 0.06254864753354647,
-      "sd": 0.17902389874722355,
+      "wilcoxon_p_exact": 0.126190185546875,
+      "paired_sign_delta": 0.2,
       "cohen_dz": 0.3493871375344323,
-      "paired_sign_delta_obs": 0.2,
-      "cliff_delta_textbook": 0.39555555555555555,
-      "wilcoxon_p_exact_obs": 0.126190185546875,
-      "n_sweep": [
-        15,
-        30,
-        64,
-        82,
-        128,
-        169,
-        255
-      ],
-      "power_curve_full": [
-        0.3036,
-        0.4804,
-        0.6764,
-        0.6464,
-        0.7224,
-        0.7814,
-        0.7938
-      ],
-      "p_psd_floor_curve": [
-        0.7132,
-        0.6046,
-        0.6968,
-        0.65,
-        0.7224,
-        0.7816,
-        0.7938
-      ],
-      "median_psd_curve": [
-        0.2,
-        0.2,
-        0.1875,
-        0.1951219512195122,
-        0.203125,
-        0.20710059171597633,
-        0.2
-      ],
-      "cond_p_only_curve": [
-        0.307,
-        0.5344,
-        0.8216,
-        0.8982,
-        0.9796,
-        0.9966,
-        1.0
-      ],
-      "cond_effect_only_curve": [
-        0.7132,
-        0.6046,
-        0.6968,
-        0.65,
-        0.7224,
-        0.7816,
-        0.7938
-      ],
-      "n80_full_gate": null,
-      "psd_floor_below_threshold": false,
-      "p_psd_floor_ceiling": 0.7938
-    },
-    "flip_flop_MAPE_vs_random": {
-      "note": "",
-      "source": "D:\\projects\\llcore\\research\\step_c_memory_tasks\\exp_c2c3_results.json",
-      "n_observed": 15,
-      "diff": 0.004095723875934939,
-      "sd": 0.01322637602448281,
-      "cohen_dz": 0.30966334756803454,
-      "paired_sign_delta_obs": 0.3333333333333333,
-      "cliff_delta_textbook": 0.27111111111111114,
-      "wilcoxon_p_exact_obs": 0.151397705078125,
-      "n_sweep": [
-        15,
-        30,
-        64,
-        82,
-        128,
-        169,
-        255
-      ],
-      "power_curve_full": [
-        0.2874,
-        0.446,
-        0.712,
-        0.7978,
-        0.932,
-        0.9718,
-        0.996
-      ],
-      "p_psd_floor_curve": [
-        0.8324,
-        0.8354,
-        0.9494,
-        0.954,
-        0.986,
-        0.9944,
-        0.9986
-      ],
-      "median_psd_curve": [
-        0.3333333333333333,
-        0.3333333333333333,
-        0.34375,
-        0.34146341463414637,
-        0.328125,
-        0.33727810650887574,
-        0.3333333333333333
-      ],
-      "cond_p_only_curve": [
-        0.2874,
-        0.4474,
-        0.7134,
-        0.8014,
-        0.9338,
-        0.9726,
-        0.996
-      ],
-      "cond_effect_only_curve": [
-        0.8324,
-        0.8354,
-        0.9494,
-        0.954,
-        0.986,
-        0.9944,
-        0.9986
-      ],
-      "n80_full_gate": 82.75409836065577,
-      "psd_floor_below_threshold": false,
-      "p_psd_floor_ceiling": 0.9986
-    },
-    "flip_flop_MAPE_vs_rr_hillclimb": {
-      "note": "",
-      "source": "D:\\projects\\llcore\\research\\step_c_memory_tasks\\exp_c2c3_results.json",
-      "n_observed": 15,
-      "diff": 0.0035795090737160843,
-      "sd": 0.013486297824204138,
-      "cohen_dz": 0.2654182133878035,
-      "paired_sign_delta_obs": 0.06666666666666667,
-      "cliff_delta_textbook": 0.28,
-      "wilcoxon_p_exact_obs": 0.262237548828125,
-      "n_sweep": [
-        15,
-        30,
-        64,
-        82,
-        128,
-        169,
-        255
-      ],
-      "power_curve_full": [
-        0.155,
-        0.2058,
-        0.252,
-        0.2018,
-        0.1782,
-        0.1666,
-        0.095
-      ],
-      "p_psd_floor_curve": [
-        0.612,
-        0.403,
-        0.3258,
-        0.2274,
-        0.1856,
-        0.171,
-        0.0954
-      ],
-      "median_psd_curve": [
-        0.06666666666666667,
-        0.06666666666666667,
-        0.0625,
-        0.07317073170731707,
-        0.078125,
-        0.0650887573964497,
-        0.06666666666666667
-      ],
-      "cond_p_only_curve": [
-        0.1562,
-        0.2492,
-        0.4282,
-        0.4994,
-        0.675,
-        0.7652,
-        0.8952
-      ],
-      "cond_effect_only_curve": [
-        0.612,
-        0.403,
-        0.3258,
-        0.2274,
-        0.1856,
-        0.171,
-        0.0954
-      ],
-      "n80_full_gate": null,
-      "psd_floor_below_threshold": true,
-      "p_psd_floor_ceiling": 0.612
+      "gate_passes": false,
+      "cond_diff_pos": true,
+      "cond_p": false,
+      "cond_n": true,
+      "cond_effect": true
     }
   },
-  "layer_b_fresh_eval": {},
   "verdicts": {
     "C-gen4b_MAPE_vs_random": {
       "verdict": "still_inconclusive",
-      "reason": "psd_obs=+0.200 (床 0.147 以上だが中効果帯)、P(|psd|>=床) 上限=0.794<0.80 → psd 床が構造的律速、full gate の効果量条件が n を上げても飽和して 0.80 power に届かない (中効果ゆえ psd 床が binding = honest negative)。 (fresh 未到達/不足)",
-      "psd_obs": 0.2,
-      "diff_obs": 0.06254864753354647,
-      "p_psd_floor_ceiling": 0.7938,
+      "reason": "psd_obs=+0.000 (床 0.147 以上だが中効果帯)、P(|psd|>=床) 上限=0.000<0.80 → psd 床が構造的律速、full gate の効果量条件が n を上げても飽和して 0.80 power に届かない (中効果ゆえ psd 床が binding = honest negative)。 fresh n=15 で gate_pass=False, diff=0.06254864753354647.",
+      "psd_obs": 0.0,
+      "diff_obs": 0.0,
+      "p_psd_floor_ceiling": 0.0,
+      "psd_floor_caps_power": true,
+      "n80": null,
+      "fresh_n": 15,
+      "fresh_gate_passes": false,
+      "fresh_diff": 0.06254864753354647
+    },
+    "flip_flop_MAPE_vs_random": {
+      "verdict": "still_inconclusive",
+      "reason": "psd_obs=+0.000 (床 0.147 以上だが中効果帯)、P(|psd|>=床) 上限=0.000<0.80 → psd 床が構造的律速、full gate の効果量条件が n を上げても飽和して 0.80 power に届かない (中効果ゆえ psd 床が binding = honest negative)。 (fresh 未到達/不足)",
+      "psd_obs": 0.0,
+      "diff_obs": 0.0,
+      "p_psd_floor_ceiling": 0.0,
       "psd_floor_caps_power": true,
       "n80": null,
       "fresh_n": 0,
       "fresh_gate_passes": false,
       "fresh_diff": null
     },
-    "flip_flop_MAPE_vs_random": {
+    "flip_flop_MAPE_vs_rr_hillclimb": {
       "verdict": "still_inconclusive",
-      "reason": "psd_obs=+0.333 で効果量条件は n と共に満たせる (P(|psd|>=床) 上限=0.999>=0.80) が、A 層 full power n80=82.75409836065577 (検定 p が律速)、fresh 真再走未到達/未 PASS のため確定保留。 (fresh 未到達/不足)",
-      "psd_obs": 0.3333333333333333,
-      "diff_obs": 0.004095723875934939,
-      "p_psd_floor_ceiling": 0.9986,
-      "psd_floor_caps_power": false,
-      "n80": 82.75409836065577,
+      "reason": "psd_obs=+0.000 (床 0.147 以上だが中効果帯)、P(|psd|>=床) 上限=0.000<0.80 → psd 床が構造的律速、full gate の効果量条件が n を上げても飽和して 0.80 power に届かない (中効果ゆえ psd 床が binding = honest negative)。 (fresh 未到達/不足)",
+      "psd_obs": 0.0,
+      "diff_obs": 0.0,
+      "p_psd_floor_ceiling": 0.0,
+      "psd_floor_caps_power": true,
+      "n80": null,
       "fresh_n": 0,
       "fresh_gate_passes": false,
       "fresh_diff": null
-    },
-    "flip_flop_MAPE_vs_rr_hillclimb": {
-      "verdict": "still_inconclusive",
-      "reason": "psd_obs=+0.067 は床 0.147 未満 → full gate は n に依らず不可 (効果が床以下 = null 寄り、しかし『効果無し』の積極的確証ではない)。",
-      "psd_obs": 0.06666666666666667,
-      "diff_obs": 0.0035795090737160843,
-      "p_psd_floor_ceiling": 0.612,
-      "n80": null,
-      "fresh_n": 0,
-      "fresh_gate_passes": false
     }
   }
 }

@@ -1,17 +1,17 @@
-[23:56:57] EXP2 start (smoke=True) per_run_budget=820.0s
-[23:56:59] self-check ESN_3param: det_fit=0.3513 eval_noise_std=0.000e+00 (machine-epsilon; valley_thr ~0.05*|fit|)
-[23:57:00] self-check ESN_perneuron40: det_fit=0.3673 eval_noise_std=0.000e+00 (machine-epsilon; valley_thr ~0.05*|fit|)
-[23:57:00] self-check ctrl_multipeak_dim3: det_fit=0.0407 eval_noise_std=2.168e-19 (machine-epsilon; valley_thr ~0.05*|fit|)
-[23:57:00] self-check ctrl_multipeak_dim40: det_fit=0.0000 eval_noise_std=3.944e-31 (machine-epsilon; valley_thr ~0.05*|fit|)
-[23:57:00] self-check ctrl_quadratic_dim3: det_fit=-0.0672 eval_noise_std=1.388e-17 (machine-epsilon; valley_thr ~0.05*|fit|)
-[23:57:00] self-check ctrl_quadratic_dim40: det_fit=-0.0945 eval_noise_std=1.388e-17 (machine-epsilon; valley_thr ~0.05*|fit|)
-[23:57:00] self-check note_corridor_d016: det_fit=0.6007 eval_noise_std=1.110e-16 (machine-epsilon; valley_thr ~0.05*|fit|)
-[23:57:00] total cells=7 done_before=0
-[23:57:16] cell ESN_3param|nr=4|ne=60|seed=20260530: vf=0.000 n_optima=4 is_mm=False (16.6s)
-[23:57:35] cell ESN_perneuron40|nr=4|ne=60|seed=20260530: vf=0.000 n_optima=4 is_mm=False (18.4s)
-[23:57:35] cell ctrl_multipeak_dim3|nr=4|ne=60|seed=20260530: vf=0.833 n_optima=4 is_mm=True (0.0s)
-[23:57:35] cell ctrl_multipeak_dim40|nr=4|ne=60|seed=20260530: vf=0.167 n_optima=4 is_mm=False (0.0s)
-[23:57:35] cell ctrl_quadratic_dim3|nr=4|ne=60|seed=20260530: vf=0.000 n_optima=4 is_mm=False (0.0s)
-[23:57:35] cell ctrl_quadratic_dim40|nr=4|ne=60|seed=20260530: vf=0.000 n_optima=4 is_mm=False (0.0s)
-[23:57:35] cell note_corridor_d016|nr=4|ne=60|seed=20260530: vf=0.000 n_optima=4 is_mm=False (0.0s)
-[23:57:35] run finished: 7 cells, wall=38.9s (per-run G1 OK)
+[23:58:12] EXP2 start (smoke=False) per_run_budget=820.0s
+[23:58:14] self-check ESN_3param: det_fit=0.3513 eval_noise_std=0.000e+00 (machine-epsilon; valley_thr ~0.05*|fit|)
+[23:58:15] self-check ESN_perneuron40: det_fit=0.3673 eval_noise_std=0.000e+00 (machine-epsilon; valley_thr ~0.05*|fit|)
+[23:58:15] self-check ctrl_multipeak_dim3: det_fit=0.0407 eval_noise_std=2.168e-19 (machine-epsilon; valley_thr ~0.05*|fit|)
+[23:58:15] self-check ctrl_multipeak_dim40: det_fit=0.0000 eval_noise_std=3.944e-31 (machine-epsilon; valley_thr ~0.05*|fit|)
+[23:58:15] self-check ctrl_quadratic_dim3: det_fit=-0.0672 eval_noise_std=1.388e-17 (machine-epsilon; valley_thr ~0.05*|fit|)
+[23:58:15] self-check ctrl_quadratic_dim40: det_fit=-0.0945 eval_noise_std=1.388e-17 (machine-epsilon; valley_thr ~0.05*|fit|)
+[23:58:15] self-check note_corridor_d016: det_fit=0.6007 eval_noise_std=1.110e-16 (machine-epsilon; valley_thr ~0.05*|fit|)
+[23:58:15] total cells=39 done_before=0
+[00:01:14] cell ESN_3param|nr=12|ne=200|seed=20260530: vf=0.000 n_optima=12 is_mm=False (178.9s)
+[00:03:52] cell ESN_3param|nr=12|ne=200|seed=20260531: vf=0.000 n_optima=12 is_mm=False (158.4s)
+[00:06:37] cell ESN_3param|nr=12|ne=200|seed=20260601: vf=0.000 n_optima=12 is_mm=False (164.7s)
+[00:13:59] cell ESN_3param|nr=24|ne=300|seed=20260530: vf=0.000 n_optima=24 is_mm=False (442.4s)
+[00:13:59] per-run budget reached, stopping. 4 cells this run.
+[00:13:59] run finished: 4 cells, wall=949.2s (per-run G1 OVER)
+[00:14:26] EXP2 start (smoke=False) per_run_budget=430.0s
+[00:14:26] total cells=39 done_before=4
