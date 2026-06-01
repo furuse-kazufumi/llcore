@@ -123,7 +123,18 @@ def _exp7():
 
 
 def _corridor_det():
-    """決定論化した corridor eval (d=0.16, noise=0). eval_once(g, rng) 形, rng は無視."""
+    """決定論化した corridor eval (d=0.16, noise=0). eval_once(g, rng) 形, rng は無視.
+
+    重要 (honest disclosure): corridor は **C1 midpoint-valley 診断の正 control にならない**。
+    検証結果 (本 dir log) — corridor は behavior=mean(g) のみで fitness が決まる genotypic
+    corridor で、24-D の hill-climb(sigma=0.12)は random start(mean≈0.5)から mean を
+    大域峰 0.9 まで押し上げられず **全 restart が同一 basin (mean≈0.542, fit≈0.679) に trap**
+    する。distinct な第二峰が得られないので midpoint も同 mean→同 fit→valley_fraction=0。
+    = corridor の欺瞞性は「MAP-E が reach できる範囲(=behavioral niche)」の欺瞞であって、
+    C1 が測る「複数 basin + 谷」の欺瞞ではない。よって corridor は C1 の正 control 失格。
+    本実験では corridor を「C1 診断の限界を示す診断ノート」として記録し (group=control_note)、
+    C1 の正 control には **dim 一致の多峰 Gaussian (峰が gene 空間で分離) ** を使う。
+    """
     global _CORRIDOR
     if _CORRIDOR is None:
         from exp_knob_sweep import make_corridor_eval  # noqa: E402
@@ -131,6 +142,38 @@ def _corridor_det():
         zrng = _ZeroNormRng()
         _CORRIDOR = lambda g, rng=None: raw(g, zrng)  # noqa: E731
     return _CORRIDOR
+
+
+def _make_multipeak(dim, peaks):
+    """分離した複数 Gaussian 峰 (高さ不均一) の max = 真の多基底地形 (C1 正 control).
+
+    峰が gene 空間で十分離れているので hill-climb は distinct 峰に収束し、その midpoint は
+    谷に落ちる → C1 が is_multimodal=True を返すべき正 control (診断器の health check)。
+    """
+    peaks = [(np.asarray(c, float), float(h), float(w)) for c, h, w in peaks]
+
+    def ev(g, rng=None):
+        g = np.asarray(g, float)
+        return float(max(h * np.exp(-np.sum((g - c) ** 2) / (2 * w * w))
+                         for c, h, w in peaks))
+    return ev
+
+
+def _multipeak3():
+    """dim=3 多峰 (ESN_3param と dim 一致の C1 正 control)."""
+    return _make_multipeak(3, [
+        ([0.2, 0.2, 0.2], 1.00, 0.12),
+        ([0.8, 0.8, 0.8], 0.85, 0.12),
+        ([0.2, 0.8, 0.5], 0.90, 0.12),
+    ])
+
+
+def _multipeak40():
+    """dim=40 多峰 (ESN_perneuron40 と dim 一致の C1 正 control). 峰中心は固定 corner-ish."""
+    rng = np.random.default_rng(7)
+    cs = [rng.integers(0, 2, 40).astype(float) * 0.8 + 0.1 for _ in range(5)]
+    peaks = [(c, 1.0 - 0.05 * i, 0.30) for i, c in enumerate(cs)]
+    return _make_multipeak(40, peaks)
 
 
 def _quadratic_eval(g, rng=None):
