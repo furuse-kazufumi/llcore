@@ -22,11 +22,16 @@
 測る地形 (exp7 と同 substrate):
   (A) 3-param ESN gene (dim=3, [0,1]^3): exp6 で「滑らか broad ridge」視認地形。
   (B) per-neuron leak (dim=40): high-dim, MAP-E 本領域。多峰なら ③ load-bearing 余地。
-診断器健全性 control:
-  (C+) positive control = make_corridor_eval(0.16) を **決定論化** (noise を 0 に固定)
+診断器健全性 control (CF3 訂正: 実装と一致させた記述):
+  (C+) positive control = **dim 別の分離多峰 Gaussian** (_multipeak3 / _multipeak40,
+       実 landscape ESN_3param/ESN_perneuron40 と dim 一致) を決定論評価
        → C1 が多峰 (is_multimodal=True) を返すべき (診断器が決定論地形で多峰検出可)。
-  (C-) negative control = noiseless 単峰二次関数 → smooth (vf≈0) を返すべき。
-  両 control 成立で diagnostic_valid=True (G3)。
+  (C-) negative control = noiseless 単峰二次関数 (dim3/dim40) → smooth (vf≈0) を返すべき。
+  両 control が dim3/dim40 で成立すると diagnostic_valid=True (G3)。
+  **corridor (make_corridor_eval(0.16) の決定論版) は C1 正 control に「ならない」**: genotypic
+  corridor は単一 basin trap で C1 谷を出さず vf≈0 になるため、G3 には使わず `note`
+  (group=control_note) として「C1 診断の限界を示す診断ノート」に降格して記録する
+  (詳細は _corridor_det / _landscapes の note 行を参照)。
 
 破綻ゲート:
 - G1: per-run wall_clock<900s。実 substrate は重い (3-param ~57ms/call, per-neuron ~39ms/call)
