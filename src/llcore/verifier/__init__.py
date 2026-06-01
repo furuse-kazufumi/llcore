@@ -24,8 +24,11 @@ honest 留保:
 
 from .invariants import (
     InvariantResult,
+    LipschitzResult,
+    empirical_lipschitz,
     is_z3_available,
     verify_gene_safe,
+    verify_lipschitz_contraction,
     verify_state_norm_invariant,
 )
 from .changeop import (
