@@ -38,7 +38,8 @@
   ので **chunked-resumable** (cell 単位で partial JSON 追記、複数回起動で全 cell 完走)。
 - G2: 決定論再現 = 同 gene で eval_once 2 回呼び bit 一致 (assert) +
   3 base_seed で is_multimodal flag 全一致。
-- G3: diagnostic_valid = corridor control 多峰 ∧ quadratic control smooth。
+- G3: diagnostic_valid = dim 別分離多峰 Gaussian control が多峰 ∧ quadratic control が smooth
+  (dim3 / dim40 の両方で成立)。corridor は C1 正 control にならないため G3 から除外し note 扱い (CF3)。
 - G4: 書込は本 dir 配下のみ、git 非実行。
 
 判定 (3 値):
