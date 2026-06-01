@@ -130,16 +130,32 @@ REAL_TASKS = ("selective_copy", "bistable_denoise", "weighted_accum")  # BG9-3 P
 #     - MAP-E: kernel_id bin (4 niche) を stepping-stone に保持して谷を跨ぎ、かつ各 niche 内で
 #       theta corridor を ratchet → target basin 到達。
 #   = 「kernel_id 障壁を跨ぐ diversity 維持」が load-bearing になる純 harness validity 基質。
+#
+#   ===== 実測で得た honest 構造的知見 (smoke で確定、§報告に反映) =====
+#   上記 (ii) の theta corridor を入れて kid-axis 谷を彫っても、**RR-hillclimb は谷を回避できてしまう**:
+#   selection_lab.random_restart_hillclimb は予算 n_evals に対し ~n_evals/20 回の random restart を行い、
+#   各 restart は kernel_id∈[0,4) を **直接一様サンプル** する。target kid-basin (幅 ~0.16) に当たる確率は
+#   1 restart で低くても、~20-75 restart 累積でほぼ確実に 1 回 in-basin に落ち、そこから theta を
+#   in-basin で climb して target へ到達する。予算を増やすと RR は **むしろ強くなる** (restart 増)。
+#   結果 (8 seed, n_evals 800/1500): MAP-E は GA / random を p<0.004 δ=+1.0 で**確実に撃破**するが、
+#   **RR-hillclimb には勝てない** (diff≈-0.02, RR が 7/8 seed で target 到達)。theta corridor を更に
+#   締めて RR を排除しようとすると MAP-E 自身も target に届かず分離が崩れる (探索が starve)。
+#   → exp4 の corridor が RR を排除できたのは behavior=mean(24 dim) の **CLT 不到達**ゆえ。kernel_id は
+#     **単一の直接サンプル可能座標**なので、5 次元 KernelGenome では kid-axis 欺瞞 corridor で RR を
+#     構造的に排除できない。これは harness validity の限界 = pre-reg §2.1/§4 の **N/A (測定不能) 方向**。
+#   本実装は最も faithful かつ MAP-E が GA/random を明瞭に撃破する config を採用し、RR 限界を honest に
+#   記録する (verdict 側で "GA/random は検出可・RR は kid 直接サンプルで排除不能" を明示)。
 # ---------------------------------------------------------------------------
 _POS_LOCAL_KID = 0.5   # 局所峰の kernel_id (rwkv basin, init/random が自然に落ちる低 kernel_id)
-_POS_GLOB_KID = 3.5    # target 峰の kernel_id (linear_attn basin, 実働 kernel, hopfield 回避)
+_POS_GLOB_KID = 3.6    # target 峰の kernel_id (linear_attn basin, 実働 kernel, hopfield 回避)
 _POS_DIP_KID = 2.0     # 谷の中央 kernel_id (中間 basin = 跨ぐべき障壁)
-_POS_KID_W = 0.45      # kernel_id 峰/谷の Gaussian 幅 (1 bin ≈ 1.0 単位に対し basin を 1 bin に収める)
-_POS_DIP_W = 0.55      # 谷の幅
+_POS_KID_W = 0.16      # target kernel_id 峰の Gaussian 幅 (狭く = restart 直撃を減らす)
+_POS_KID_W_LOCAL = 0.70  # 局所峰 (trap) の幅 (広く = init/restart の多くを罠へ)
+_POS_DIP_W = 0.80      # 谷の幅 (中間 basin を広く覆う)
 _POS_LOCAL_CEIL = 0.55  # 局所峰 (低 kernel_id) の天井 fitness — random/RR が届く上限
 _POS_GLOB_CEIL = 1.00  # target 峰の天井 fitness
 _POS_THETA_TARGET = 0.85  # target basin が要求する正規化 theta-mean (CLT 中央 ~0.5 から離す)
-_POS_THETA_W = 0.18    # theta corridor の許容幅 (狭いほど random が CLT で不到達)
+_POS_THETA_W = 0.13    # theta corridor の許容幅 (狭いほど random が CLT で不到達)
 _POS_NOISE = 0.008     # exp_knob_sweep と同一低ノイズ
 POS_GLOBAL_PEAK_PROXY = 0.8  # honest fitness > これ で target basin 到達と判定 (exp4 と同 proxy)
 
