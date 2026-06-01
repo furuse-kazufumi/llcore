@@ -407,7 +407,6 @@ def run_substrate(
     behavior: Callable[[np.ndarray], np.ndarray],
     behavior_bounds: tuple[np.ndarray, np.ndarray],
     *,
-    dim: int,
     n_evals: int,
     n_seeds: int,
     honest_n_trials: int,
@@ -415,7 +414,11 @@ def run_substrate(
     min_seeds_gate: int,
     is_positive_control: bool = False,
 ) -> SubstrateResult:
-    """1 基質に対し 4 method を CRN で回し、MAP-E が 3 baseline 全勝か + A1 ablation を測る."""
+    """1 基質に対し 4 method を CRN で回し、MAP-E が 3 baseline 全勝か + A1 ablation を測る.
+
+    kernel-channel 数 (dim=8) は呼び出し側で eval_once 構築時に焼き込み済 (固定射影 P)。本関数の
+    GA は GA_DIM=5 の gene ベクトルを進化させるため kernel-channel dim を引数に取らない。
+    """
     lo, hi = kernel_ga_bounds()
     bounds = (lo, hi)
     baselines = ("rr_hillclimb", "panmictic_ga", "random")
