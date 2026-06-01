@@ -1,7 +1,7 @@
 {
   "_meta": {
     "script": "repower_real_negatives",
-    "wall_clock_s": 176.875,
+    "wall_clock_s": 7.563,
     "src_unchanged": true,
     "src_changed_files": [],
     "exit_ok": true,
@@ -17,11 +17,11 @@
     "note": "実 per-seed paired delta を exp_ea3/exp_c2c3 results JSON から復元 (仮定値でない)。"
   },
   "power_engine_calibration_G3": {
-    "null_power_bootstrap": 0.024,
+    "null_power_bootstrap": 0.02,
     "null_power_parametric": 0.05,
     "big_effect_power": 1.0,
     "cgen4b_sim_n15": 0.576,
-    "cgen4b_sim_n30": 0.838,
+    "cgen4b_sim_n30": 0.843,
     "checks": {
       "null_le_0.06": true,
       "big_ge_0.95": true,
@@ -41,7 +41,7 @@
       "paired_sign_delta": 0.2,
       "cliff_delta_textbook": 0.39555555555555555,
       "wilcoxon_p_onesided": 0.126190185546875,
-      "observed_power_at_n": 0.325,
+      "observed_power_at_n": 0.304,
       "n80_parametric": null,
       "n80_bootstrap": null,
       "power_curve_n": [
@@ -50,19 +50,19 @@
         60
       ],
       "power_curve_bootstrap": [
-        0.336,
+        0.305,
         0.474,
         0.649
       ],
       "power_curve_parametric": [
         0.33,
-        0.514,
+        0.517,
         0.774
       ],
       "cond_power_at_n": {
-        "p_only": 0.307,
-        "effect_only": 0.706,
-        "diff_only": 0.921
+        "p_only": 0.29,
+        "effect_only": 0.688,
+        "diff_only": 0.924
       },
       "limiting_condition": "p_only",
       "underpowered": true,
@@ -94,7 +94,7 @@
       "paired_sign_delta": -0.06666666666666667,
       "cliff_delta_textbook": 0.0044444444444444444,
       "wilcoxon_p_onesided": 0.5980224609375,
-      "observed_power_at_n": 0.052,
+      "observed_power_at_n": 0.038,
       "n80_parametric": null,
       "n80_bootstrap": null,
       "power_curve_n": [
@@ -103,19 +103,19 @@
         60
       ],
       "power_curve_bootstrap": [
-        0.041,
-        0.024,
-        0.007
+        0.029,
+        0.029,
+        0.013
       ],
       "power_curve_parametric": [
-        0.021,
-        0.002,
+        0.018,
+        0.007,
         0.003
       ],
       "cond_power_at_n": {
-        "p_only": 0.036,
-        "effect_only": 0.649,
-        "diff_only": 0.323
+        "p_only": 0.045,
+        "effect_only": 0.615,
+        "diff_only": 0.334
       },
       "limiting_condition": "p_only",
       "underpowered": false,
@@ -147,7 +147,7 @@
       "paired_sign_delta": 0.3333333333333333,
       "cliff_delta_textbook": 0.27111111111111114,
       "wilcoxon_p_onesided": 0.151397705078125,
-      "observed_power_at_n": 0.302,
+      "observed_power_at_n": 0.269,
       "n80_parametric": null,
       "n80_bootstrap": null,
       "power_curve_n": [
@@ -156,19 +156,19 @@
         60
       ],
       "power_curve_bootstrap": [
-        0.343,
-        0.455,
-        0.689
+        0.25,
+        0.454,
+        0.703
       ],
       "power_curve_parametric": [
-        0.322,
-        0.484,
-        0.697
+        0.299,
+        0.503,
+        0.694
       ],
       "cond_power_at_n": {
-        "p_only": 0.317,
-        "effect_only": 0.817,
-        "diff_only": 0.884
+        "p_only": 0.293,
+        "effect_only": 0.867,
+        "diff_only": 0.913
       },
       "limiting_condition": "p_only",
       "underpowered": true,
@@ -200,7 +200,7 @@
       "paired_sign_delta": 0.06666666666666667,
       "cliff_delta_textbook": 0.28,
       "wilcoxon_p_onesided": 0.262237548828125,
-      "observed_power_at_n": 0.158,
+      "observed_power_at_n": 0.151,
       "n80_parametric": null,
       "n80_bootstrap": null,
       "power_curve_n": [
@@ -209,19 +209,19 @@
         60
       ],
       "power_curve_bootstrap": [
-        0.155,
-        0.214,
-        0.227
+        0.151,
+        0.21,
+        0.25
       ],
       "power_curve_parametric": [
-        0.231,
-        0.372,
-        0.568
+        0.22,
+        0.396,
+        0.577
       ],
       "cond_power_at_n": {
-        "p_only": 0.17,
-        "effect_only": 0.596,
-        "diff_only": 0.867
+        "p_only": 0.149,
+        "effect_only": 0.62,
+        "diff_only": 0.846
       },
       "limiting_condition": "p_only",
       "underpowered": true,
@@ -253,7 +253,7 @@
       "paired_sign_delta": -0.2,
       "cliff_delta_textbook": -0.15555555555555556,
       "wilcoxon_p_onesided": 0.848602294921875,
-      "observed_power_at_n": 0.004,
+      "observed_power_at_n": 0.007,
       "n80_parametric": null,
       "n80_bootstrap": null,
       "power_curve_n": [
@@ -262,18 +262,18 @@
         60
       ],
       "power_curve_bootstrap": [
-        0.004,
         0.002,
+        0.0,
         0.0
       ],
       "power_curve_parametric": [
-        0.006,
-        0.004,
+        0.007,
+        0.001,
         0.0
       ],
       "cond_power_at_n": {
-        "p_only": 0.005,
-        "effect_only": 0.69,
+        "p_only": 0.002,
+        "effect_only": 0.735,
         "diff_only": 0.203
       },
       "limiting_condition": "p_only",
@@ -306,27 +306,27 @@
       "paired_sign_delta": 0.6,
       "cliff_delta_textbook": 0.6177777777777778,
       "wilcoxon_p_onesided": 0.01507568359375,
-      "observed_power_at_n": 0.762,
-      "n80_parametric": 16.935483870967744,
-      "n80_bootstrap": 18.290816326530617,
+      "observed_power_at_n": 0.733,
+      "n80_parametric": 16.823204419889507,
+      "n80_bootstrap": 20.209205020920507,
       "power_curve_n": [
         15,
         30,
         60
       ],
       "power_curve_bootstrap": [
-        0.757,
-        0.953,
-        0.998
+        0.717,
+        0.956,
+        0.999
       ],
       "power_curve_parametric": [
-        0.776,
-        0.962,
-        0.995
+        0.778,
+        0.959,
+        0.998
       ],
       "cond_power_at_n": {
-        "p_only": 0.758,
-        "effect_only": 0.984,
+        "p_only": 0.748,
+        "effect_only": 0.982,
         "diff_only": 0.993
       },
       "limiting_condition": "p_only",

@@ -164,12 +164,11 @@ def main() -> int:
         n80_boot = _n80_from_curve(n_sweep, boot_curve)
         n80_param = _n80_from_curve(n_sweep, param_curve)
 
-        # gate 条件分解 (現行 n での各単独 power)
-        cond_power = {
-            c: _bootstrap_power(delta, n_obs, B=B, rng=rng, cond=c)
-            for c in ("p_only", "effect_only", "diff_only")
-        }
-        # 律速 = full に最も近い (最小) 単独 power の条件
+        # gate 条件分解 (現行 n での各単独 power, 1 batch を再利用)
+        idx = rng.integers(0, n_obs, size=(B, n_obs))
+        all_pw = _batch_gate_powers(delta[idx])
+        cond_power = {c: all_pw[c] for c in ("p_only", "effect_only", "diff_only")}
+        # 律速 = 各単独条件のうち最小 power (= full を最も律速する条件)
         limiting = min(cond_power, key=cond_power.get)
 
         underpowered = bool(mean > 0 and obs_power < 0.80)
