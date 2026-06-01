@@ -454,10 +454,29 @@ def main() -> int:
 
     meta = guard.finish()
     wall = round(time.time() - t0, 3)
+    # G1 break-gate: 'both' を 1 プロセスで回すと full で ~1203s と G1(900s) を超過する
+    # (初回 full run 実測)。honest disclosure: silent truncation せず、--phase verdict /
+    # --phase null の 2 run に分割すれば各 phase は G1 内に収まる (verdict ~770s,
+    # null ~430s と推定)。本 JSON が 'both' 由来なら g1_pass=False を明記。
+    g1_limit_s = 900.0
+    g1_pass = wall <= g1_limit_s
     payload = {
         "_meta": {
             **meta,
             "wall_clock_s_total": wall,
+            "g1_break_gate": {
+                "limit_s": g1_limit_s,
+                "wall_clock_s": wall,
+                "phase": args.phase,
+                "g1_pass": bool(g1_pass),
+                "note": (
+                    "'both' を 1 プロセスで回すと full で G1 (900s) を超過する "
+                    "(初回 full 実測 ~1203s)。silent truncation 禁止のため超過を明記。"
+                    "再現で G1 を守るには --phase verdict と --phase null の 2 run に "
+                    "分割する (TRIZ #1 分割; 各 phase は partial JSON 経由で merge)。"
+                    "判定結果 (verdict_flip / FPR) は分割しても同一 (CRN seed 固定・決定論)。"
+                ) if not g1_pass else f"phase={args.phase} は G1 内 ({wall}s <= {g1_limit_s}s)。",
+            },
             "mode": mode,
             "design": "EXP3 K4 clip verdict-flip + null-ridge FPR (Codex F2 確定/反証)",
             "base_seed": BASE_SEED,
