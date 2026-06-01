@@ -350,6 +350,7 @@ def run_methods_crn(
     sigma: float,
     base_seed: int,
     init_batch: int = ME_INIT_BATCH,
+    seed_offset: int = 0,
 ) -> dict[str, np.ndarray]:
     """4 method (MAP-E/RR-hillclimb/panmictic-GA/random) を CRN paired で n_seeds 走らせ honest 再評価.
 
@@ -357,6 +358,10 @@ def run_methods_crn(
     - honest 再評価 RNG = SeedSequence([base, 7, s]) を **全 method 共通 (CRN)** に
       → index s の 4 method が同一 fresh タスク draw で採点 = matched replicate (paired Wilcoxon 前提充足)。
     全 method equal budget (同一 n_evals)。fresh-seed honest 再評価で elitism 持越し artifact 排除。
+
+    ``seed_offset``: chunked/resumable 実行用。**絶対 seed index** ``s ∈ [seed_offset, seed_offset+n_seeds)``
+    で回す (CRN seed は絶対 s を key にするので、chunk 分割しても seed の一意性・再現性を保つ)。
+    本番 (BG9-5) で 15 seed を 3 chunk (5 seed/chunk, 各 <900s) に分割する際に使う。
     """
     out: dict[str, list[float]] = {m: [] for m in _BASE_METHODS}
 
@@ -369,7 +374,7 @@ def run_methods_crn(
             rng=np.random.default_rng(np.random.SeedSequence([base_seed, 7, s])),
         )
 
-    for s in range(n_seeds):
+    for s in range(seed_offset, seed_offset + n_seeds):
         r_me = map_elites(
             eval_once, behavior, dim=dim, bounds=bounds, behavior_bounds=behavior_bounds,
             grid_shape=grid_shape, n_evals=n_evals, init_batch=min(init_batch, n_evals),
