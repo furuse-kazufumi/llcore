@@ -71,6 +71,10 @@ __all__ = [
     "is_z3_available",
     "verify_gene_safe",
     "verify_state_norm_invariant",
+    # Stage 1b — Lipschitz contraction
+    "LipschitzResult",
+    "verify_lipschitz_contraction",
+    "empirical_lipschitz",
     # Stage 3a changeop
     "ChangeOp",
     "ChangeOpSequence",
