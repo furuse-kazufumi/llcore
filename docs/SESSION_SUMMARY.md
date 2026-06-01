@@ -3,43 +3,35 @@
 > 自動生成: `libexec/raptor-auto-summary` (Stop hook)
 > 次回 ccr 起動時に CLAUDE.md SESSION START で自動的に読み取られる。
 
-- **最終更新**: 2026-05-31 17:50:34
+- **最終更新**: 2026-06-01 20:35:12
 - **プロジェクト**: `D:/projects/llcore`
 - **ブランチ**: `main`
 
 ## 直近の git log
 
 ```
+c025bd7 @ research(llcore ③): 谷深さ実測 verdict = N/A (測定確立せず, honest)
+5801699 auto: verify_margin.py 編集前 (2026-05-31 18:10)
+83e407e auto: VERIFY_descriptor_dependence.md 編集前 (2026-05-31 18:06)
+473c914 auto: verify_circular_synth_probe.py 編集前 (2026-05-31 18:02)
+3e309e4 auto: verify_circular_synth_probe.py 編集前 (2026-05-31 18:02)
+e4b050b auto: VERIFY_descriptor_dependence.md 編集前 (2026-05-31 18:01)
+046d21b auto: descriptor_dep_sweep.py 編集前 (2026-05-31 17:59)
+b3c7249 auto: descriptor_dep_sweep.py 編集前 (2026-05-31 17:59)
+9a1f3c5 auto: descriptor_dep_sweep.py 編集前 (2026-05-31 17:59)
 b7f8869 auto: measure_real_tasks_fdc.py 編集前 (2026-05-31 17:39)
-e4495e0 auto: measure_real_tasks_fdc.py 編集前 (2026-05-31 17:38)
-8e24721 auto: measure_real_tasks_fdc.py 編集前 (2026-05-31 17:38)
-468afeb auto: measure_real_tasks_fdc.py 編集前 (2026-05-31 17:38)
-053618c auto: VERIFY_DOWNHILL_CROSSMETRIC.md 編集前 (2026-05-31 17:20)
-3014d54 auto: measure_real_tasks_downhill.py 編集前 (2026-05-31 17:09)
-3384bf8 auto: measure_real_tasks_downhill.py 編集前 (2026-05-31 17:08)
-4973f90 auto: measure_real_tasks_downhill.py 編集前 (2026-05-31 17:08)
-a4e8922 auto: measure_real_tasks_downhill.py 編集前 (2026-05-31 17:08)
-cb7fbc6 auto: measure_real_tasks_downhill.py 編集前 (2026-05-31 17:08)
 ```
 
 ## 現在の git status
 
 ```
 M docs/SESSION_SUMMARY.md
- M research/step_c_deceptiveness_measure/fdc_behavior_crossmetric.json
- M research/step_c_deceptiveness_measure/measure_real_tasks_fdc.py
 ```
 
 ## 直近 2 時間に変更されたファイル
 
 ```
-17:49 docs/SESSION_SUMMARY.md
-17:46 research/step_c_deceptiveness_measure/fdc_behavior_crossmetric.json
-17:39 research/step_c_deceptiveness_measure/measure_real_tasks_fdc.py
-17:20 research/step_c_deceptiveness_measure/VERIFY_DOWNHILL_CROSSMETRIC.md
-17:16 research/step_c_deceptiveness_measure/_downhill_run.log
-17:16 research/step_c_deceptiveness_measure/downhill_necessity_crossmetric.json
-17:09 research/step_c_deceptiveness_measure/measure_real_tasks_downhill.py
+20:26 docs/SESSION_SUMMARY.md
 ```
 
 ---
