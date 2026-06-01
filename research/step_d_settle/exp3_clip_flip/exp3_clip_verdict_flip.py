@@ -427,8 +427,21 @@ def main() -> int:
         v["verdict_flip_false_reveals_third"] for v in vflip.values()
     )
     fpr_inflated = null["clip_false_inflates_fpr"]
+    # [CF2] G3 sanity (known-positive PASS ∧ known-null FPR<=0.10) を統合判定に渡す。
+    # diagnostic_valid=False なら判定器自体が信用できないため、過大確定 (null_confirmed /
+    # not_load_bearing) を名乗らず still_inconclusive に落とす (sanity 不成立ゆえ判定保留)。
+    diagnostic_valid = bool(g3.get("diagnostic_valid", False))
 
-    if any_real_flip and not fpr_inflated:
+    if not diagnostic_valid:
+        # [CF2] 判定器 sanity 不成立 → どの方向の確定も保留
+        verdict = "still_inconclusive"
+        verdict_text = (
+            "判定保留 (CF2): G3 gate sanity が不成立 "
+            f"(known_positive_passes={g3.get('known_positive_passes')}, "
+            f"known_null_fpr={g3.get('known_null_fpr')}) ゆえ verdict-flip / FPR の "
+            "判定器自体が信用できない → K4 の確定 (反証/降格) も載荷も名乗らず判定保留。"
+        )
+    elif any_real_flip and not fpr_inflated:
         verdict = "load_bearing"
         verdict_text = (
             "K4 確定: 低 R² task で clip=False が③ verdict-flip を起こし "
@@ -437,12 +450,14 @@ def main() -> int:
             "clip は active suppression。"
         )
     elif not any_real_flip:
-        verdict = "null_confirmed_at_power"
+        # [CF4] FPR 0/0 + ~7x 縮小予算ゆえ「null 確定」より「at this budget で非載荷」が正確。
+        verdict = "not_load_bearing_at_this_budget"
         verdict_text = (
             "K4 反証/降格: clip=False でも③ verdict-flip が起きない "
             "(spread 平坦化は診断量だが verdict は変えない) → "
             "K4 を『唯一の能動的 suppression 機序』から『spread を潰すが verdict 非 "
-            "load-bearing な診断的所見』に降格。"
+            "load-bearing な診断的所見』に降格。null-ridge FPR=0/0 + ~7x 縮小予算ゆえ "
+            "『null 確定』ではなく『この予算 (at this budget) で非載荷』と限定する (CF4)。"
         )
     else:  # any_real_flip and fpr_inflated
         verdict = "still_inconclusive"

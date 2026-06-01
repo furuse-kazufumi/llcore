@@ -35,7 +35,8 @@
       "phase": "both",
       "g1_pass": false,
       "note": "G1 違反 (honest disclosure): この authoritative 結果は --phase both を 1 プロセスで 回した初回 full run で wall_clock=1202.9s と G1(900s) を超過。silent truncation は していない (全 verdict-flip + null-FPR を完走)。再現で G1 を守る remedy = --phase verdict と --phase null の 2 run に分割 (TRIZ #1 分割; partial JSON で merge)。分割等価性は smoke で検証済 (per-seed/FPR/G3 配列が both と split で完全一致, 決定論 G2)。full 分割の実走では verdict phase が並列 sibling agent との CPU 競合で kill (verdict_EXIT=-1) されたが、これは予算ではなく環境競合 (本実験は src 非改変・決定論なので再走で同値再現可)。verdict phase 単独 ~770s / null phase 単独 ~430s と推定 (both 1203s の内訳; 各 phase は G1 内)。"
-    }
+    },
+    "cf2_and_cf4_amendment": "[CF2] 統合判定に g3.diagnostic_valid を配線: diagnostic_valid=False なら still_inconclusive に降格 (sanity 不成立ゆえ判定保留)。現 run は diagnostic_valid=True ゆえ verdict 不変。[CF4] K4 null verdict label を null_confirmed_at_power → not_load_bearing_at_this_budget に 精緻化 (数値不変, label 後付け訂正)。partial 不在ゆえ JSON フィールド直接更新。"
   },
   "g3_gate_sanity": {
     "known_positive_passes": true,
@@ -571,7 +572,8 @@
     "null_fpr_clip_false": 0.0,
     "null_fpr_delta": 0.0,
     "clip_false_inflates_fpr": false,
-    "third_axis_verdict": "null_confirmed_at_power",
-    "verdict_text": "K4 反証/降格: clip=False でも③ verdict-flip が起きない (spread 平坦化は診断量だが verdict は変えない) → K4 を『唯一の能動的 suppression 機序』から『spread を潰すが verdict 非 load-bearing な診断的所見』に降格。"
+    "third_axis_verdict": "not_load_bearing_at_this_budget",
+    "verdict_text": "K4 反証/降格: clip=False でも③ verdict-flip が起きない (spread 平坦化は診断量だが verdict は変えない) → K4 を『唯一の能動的 suppression 機序』から『spread を潰すが verdict 非 load-bearing な診断的所見』に降格。null-ridge FPR=0/0 + ~7x 縮小予算ゆえ 『null 確定』ではなく『この予算 (at this budget) で非載荷』と限定する (CF4)。",
+    "verdict_label_correction_cf4": "旧 label=null_confirmed_at_power → 新 label=not_load_bearing_at_this_budget。FPR 0/0 (null_seeds=4 の床値) + ~7x 縮小予算 (n_evals 60 vs 400, n_tr 16 vs 48) ゆえ 『null 確定』より『at this budget 限定の非載荷』が正確 (Codex CF4)。数値は不変、label のみ後付け訂正。"
   }
 }
