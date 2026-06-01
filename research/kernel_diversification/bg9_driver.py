@@ -420,8 +420,10 @@ def run_substrate(
     bounds = (lo, hi)
     baselines = ("rr_hillclimb", "panmictic_ga", "random")
 
+    # NOTE: GA は dim=5 の gene ベクトル ([kernel_id, theta0..3]) を進化させる。kernel-channel 数
+    # (dim 引数, =8) は eval_once の内部 (固定射影 P) に既に焼き込まれており GA dim ではない。
     res = run_methods_crn(
-        eval_once, behavior, dim=dim, bounds=bounds, behavior_bounds=behavior_bounds,
+        eval_once, behavior, dim=GA_DIM, bounds=bounds, behavior_bounds=behavior_bounds,
         grid_shape=GRID_SHAPE, n_evals=n_evals, n_seeds=n_seeds,
         honest_n_trials=honest_n_trials, sigma=SIGMA, base_seed=base_seed,
     )
