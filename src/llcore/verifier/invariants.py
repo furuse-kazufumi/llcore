@@ -29,6 +29,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+import numpy as np
+
 try:
     import z3
     _HAS_Z3 = True
