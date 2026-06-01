@@ -1,0 +1,168 @@
+{
+  "_meta": {
+    "script": "type1_guard_sweep",
+    "wall_clock_s": 293.985,
+    "src_unchanged": true,
+    "src_changed_files": [],
+    "exit_ok": true,
+    "design": "(D) Type I guard sweet spot",
+    "n_seeds": 15,
+    "n_evals": 1500,
+    "null_repeat_seeds": [
+      20260530,
+      777,
+      31337,
+      11,
+      99
+    ],
+    "borderline_d": 0.14,
+    "n_perm_shuffle": 500,
+    "alpha_nominal": 0.05,
+    "note": "FPR は load_bearing(3 baseline 全勝)で測定。負の結果(=sweet spot=現行設定)も valid。"
+  },
+  "level_table": {
+    "baseline_all_on": {
+      "gate_kw": {},
+      "fpr_d0_corridor": 0.0,
+      "fpr_pure_null": 0.0,
+      "fpr_pure_null_K1_OFF": 0.0,
+      "fpr_shuffle_null": 0.046799999999999994,
+      "tpr_borderline": 0.2,
+      "net_true_positive_gain": 0.1532,
+      "sweet_spot": false
+    },
+    "K2_min_effect=0.10": {
+      "gate_kw": {
+        "min_effect": 0.1
+      },
+      "fpr_d0_corridor": 0.0,
+      "fpr_pure_null": 0.0,
+      "fpr_pure_null_K1_OFF": 0.0,
+      "fpr_shuffle_null": 0.0464,
+      "tpr_borderline": 0.2,
+      "net_true_positive_gain": 0.15360000000000001,
+      "sweet_spot": false
+    },
+    "K2_min_effect=0.05": {
+      "gate_kw": {
+        "min_effect": 0.05
+      },
+      "fpr_d0_corridor": 0.0,
+      "fpr_pure_null": 0.0,
+      "fpr_pure_null_K1_OFF": 0.0,
+      "fpr_shuffle_null": 0.046,
+      "tpr_borderline": 0.2,
+      "net_true_positive_gain": 0.15400000000000003,
+      "sweet_spot": true
+    },
+    "K2_min_effect=0.0": {
+      "gate_kw": {
+        "min_effect": 0.0
+      },
+      "fpr_d0_corridor": 0.0,
+      "fpr_pure_null": 0.0,
+      "fpr_pure_null_K1_OFF": 0.0,
+      "fpr_shuffle_null": 0.048799999999999996,
+      "tpr_borderline": 0.2,
+      "net_true_positive_gain": 0.1512,
+      "sweet_spot": false
+    },
+    "K2_alpha=0.10": {
+      "gate_kw": {
+        "alpha": 0.1
+      },
+      "fpr_d0_corridor": 0.0,
+      "fpr_pure_null": 0.0,
+      "fpr_pure_null_K1_OFF": 0.0,
+      "fpr_shuffle_null": 0.0896,
+      "tpr_borderline": 0.2,
+      "net_true_positive_gain": 0.11040000000000001,
+      "sweet_spot": false
+    },
+    "K2_alpha=0.20": {
+      "gate_kw": {
+        "alpha": 0.2
+      },
+      "fpr_d0_corridor": 0.0,
+      "fpr_pure_null": 0.0,
+      "fpr_pure_null_K1_OFF": 0.0,
+      "fpr_shuffle_null": 0.1724,
+      "tpr_borderline": 0.2,
+      "net_true_positive_gain": 0.027600000000000013,
+      "sweet_spot": false
+    },
+    "K2_min_seeds=10": {
+      "gate_kw": {
+        "min_seeds": 10
+      },
+      "fpr_d0_corridor": 0.0,
+      "fpr_pure_null": 0.0,
+      "fpr_pure_null_K1_OFF": 0.0,
+      "fpr_shuffle_null": 0.0528,
+      "tpr_borderline": 0.2,
+      "net_true_positive_gain": 0.1472,
+      "sweet_spot": false
+    },
+    "K2_min_seeds=5": {
+      "gate_kw": {
+        "min_seeds": 5
+      },
+      "fpr_d0_corridor": 0.0,
+      "fpr_pure_null": 0.0,
+      "fpr_pure_null_K1_OFF": 0.0,
+      "fpr_shuffle_null": 0.048,
+      "tpr_borderline": 0.2,
+      "net_true_positive_gain": 0.15200000000000002,
+      "sweet_spot": false
+    }
+  },
+  "roc_points": [
+    {
+      "level": "baseline_all_on",
+      "fpr": 0.046799999999999994,
+      "tpr": 0.2
+    },
+    {
+      "level": "K2_min_effect=0.10",
+      "fpr": 0.0464,
+      "tpr": 0.2
+    },
+    {
+      "level": "K2_min_effect=0.05",
+      "fpr": 0.046,
+      "tpr": 0.2
+    },
+    {
+      "level": "K2_min_effect=0.0",
+      "fpr": 0.048799999999999996,
+      "tpr": 0.2
+    },
+    {
+      "level": "K2_alpha=0.10",
+      "fpr": 0.0896,
+      "tpr": 0.2
+    },
+    {
+      "level": "K2_alpha=0.20",
+      "fpr": 0.1724,
+      "tpr": 0.2
+    },
+    {
+      "level": "K2_min_seeds=10",
+      "fpr": 0.0528,
+      "tpr": 0.2
+    },
+    {
+      "level": "K2_min_seeds=5",
+      "fpr": 0.048,
+      "tpr": 0.2
+    }
+  ],
+  "sweet_spot": "K2_min_effect=0.05",
+  "K1_off_danger": {
+    "pure_null_FPR_K1_ON": 0.0,
+    "pure_null_FPR_K1_OFF": 0.0,
+    "K1_off_inflates_fpr": false,
+    "verdict": "この null/budget では K1 OFF の FPR 増は限定的"
+  }
+}

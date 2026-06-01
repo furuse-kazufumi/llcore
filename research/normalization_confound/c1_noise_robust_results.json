@@ -1,0 +1,80 @@
+{
+  "proposition": "P_robust: 既存 C1 の valley≈1.0 は評価ノイズ起源。noise-robust C1 (n_avg seed 平均 + SEM scale 谷閾) で valley_fraction が noisy-flat null と同軌道で減衰すれば確証。null より高い plateau なら真の幾何谷 (反証)。",
+  "mode": "smoke",
+  "seeds": [
+    20260530,
+    20260531
+  ],
+  "n_avgs": [
+    1,
+    4
+  ],
+  "clip_bounds": [
+    [
+      "hard",
+      "current"
+    ]
+  ],
+  "n_restarts": 4,
+  "n_evals": 40,
+  "sigma": 0.15,
+  "n_train": 32,
+  "n_eval": 32,
+  "total_wall_clock_s": 12.43397068977356,
+  "any_flip": false,
+  "has_geometric_valley": true,
+  "denoise_collapse_per_setting": {
+    "task|clip=hard|bounds=current": {
+      "n_avg_min": 1,
+      "n_avg_max": 4,
+      "valley_at_min_navg": 0.25,
+      "valley_at_max_navg": 0.3333333333333333,
+      "null_at_max_navg": 0.16666666666666666,
+      "tracks_null": false,
+      "decreased": false
+    }
+  },
+  "results": [
+    {
+      "setting": "task|clip=hard|bounds=current|n_avg=1",
+      "task": "task",
+      "clip": "hard",
+      "bounds": "current",
+      "n_avg": 1,
+      "noise_std": 0.08793328479191215,
+      "sem": 0.08793328479191215,
+      "valley_fractions": [
+        0.3333333333333333,
+        0.16666666666666666
+      ],
+      "valley_mean": 0.25,
+      "null_vf": 0.3333333333333333,
+      "margin": -0.08333333333333331,
+      "optima_r2_min": 0.8948939830011847,
+      "optima_r2_max": 0.976011236252288,
+      "verdict": "noise_confounded",
+      "note": "valley(0.25) ~ null(0.33) margin=-0.08; SEM=0.088"
+    },
+    {
+      "setting": "task|clip=hard|bounds=current|n_avg=4",
+      "task": "task",
+      "clip": "hard",
+      "bounds": "current",
+      "n_avg": 4,
+      "noise_std": 0.08793328479191215,
+      "sem": 0.043966642395956074,
+      "valley_fractions": [
+        0.3333333333333333,
+        0.3333333333333333
+      ],
+      "valley_mean": 0.3333333333333333,
+      "null_vf": 0.16666666666666666,
+      "margin": 0.16666666666666666,
+      "optima_r2_min": 0.8290425646254022,
+      "optima_r2_max": 0.9610462133503047,
+      "verdict": "geometric_valley",
+      "note": "valley(0.33) exceeds denoised null(0.17) margin=0.17"
+    }
+  ],
+  "verdict_summary": "geometric_valley 検出 → 真の多峰 (正規化人工物でない)。③ablation escalation を要検討。"
+}

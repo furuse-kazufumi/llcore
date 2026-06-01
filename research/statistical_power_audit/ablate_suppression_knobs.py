@@ -331,6 +331,13 @@ def main() -> int:
     payload = {
         "_meta": {**meta, "design": "(C) suppression ablation (OFAT)",
                   "n_seeds": n_seeds, "n_evals": n_evals, "base_seed": base_seed,
+                  "k3_seeds": k3_seeds, "k3_evals": k3_evals,
+                  "budget_reduction_disclosure": (
+                      "K3/K4 の ridge_fitness は ~35ms/call と重い。読み出し方式 (global vs "
+                      "archive) と clip spread の診断には大予算不要なので K3 を "
+                      f"n_seeds={k3_seeds}/n_evals={k3_evals}/honest_n=12/seq_len=16/n_tr=24 に、"
+                      "K4 を n_genes=120/seq_len=16/n_tr=32 に縮小 (G1<900s 遵守)。"
+                      "corridor/実 negative 系 (K1/K2) は full 予算。silent truncation なし。"),
                   "note": ("各 toggle は src 無改変で research 側引数/再計算。"
                            "反転は type1_guard_sweep.py の Type I コストと必ずペアで読む。")},
         "cases": results,

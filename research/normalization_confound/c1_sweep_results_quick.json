@@ -1,0 +1,550 @@
+{
+  "proposition": "P: smooth/③不要 は正規化(clip/scale)の人工物か (C1 midpoint-valley で否定形検定)",
+  "mode": "quick",
+  "seeds": [
+    20260530,
+    20260531,
+    20260601
+  ],
+  "n_restarts": 6,
+  "n_evals": 100,
+  "n_train": 40,
+  "n_eval": 40,
+  "grid": [
+    {
+      "clip": "hard",
+      "sigma": 0.15,
+      "bounds": "current"
+    },
+    {
+      "clip": "none",
+      "sigma": 0.15,
+      "bounds": "current"
+    },
+    {
+      "clip": "soft",
+      "sigma": 0.15,
+      "bounds": "current"
+    },
+    {
+      "clip": "hard",
+      "sigma": 0.1,
+      "bounds": "current"
+    },
+    {
+      "clip": "hard",
+      "sigma": 0.2,
+      "bounds": "current"
+    },
+    {
+      "clip": "hard",
+      "sigma": 0.15,
+      "bounds": "wide"
+    }
+  ],
+  "total_wall_clock_s": 1851.9615004062653,
+  "any_flip": false,
+  "flip_settings": [],
+  "baseline_verdicts": {
+    "vdr_D60": "noise_confounded",
+    "vdr_D15": "noise_confounded"
+  },
+  "spread_ratios_clip_none_over_hard": [
+    {
+      "task": "vdr_D60",
+      "spread_hard": 0.42131214959743335,
+      "spread_none": 0.42131214959743335,
+      "ratio_none_over_hard": 1.0
+    },
+    {
+      "task": "vdr_D15",
+      "spread_hard": 0.06612112864011355,
+      "spread_none": 0.06612112864011355,
+      "ratio_none_over_hard": 1.0
+    }
+  ],
+  "noise_caveat": "C1 谷判定閾値 0.05*|fit| << fitness 評価ノイズ std (budget_sensitivity_check で noiseless 単峰→vf=0.0 真陰性 / noisy-flat→vf=1.0 偽陽性 を実証)。よって deceptive verdict は noisy-flat null を margin>=0.1 で超えた場合のみ採用し、超えなければ noise_confounded として保留する。これが本研究の主要 caveat。",
+  "results": [
+    {
+      "setting": "vdr_D60|clip=hard|sigma=0.15|bounds=current",
+      "task": "vdr_D60",
+      "clip": "hard",
+      "sigma": 0.15,
+      "bounds": "current",
+      "verdict": "noise_confounded",
+      "valley_mean": 0.888888888888889,
+      "valley_std": 0.0831479419283098,
+      "valley_fractions": [
+        1.0,
+        0.8666666666666667,
+        0.8
+      ],
+      "is_multimodal_flags": [
+        true,
+        true,
+        true
+      ],
+      "is_multimodal_unanimous": true,
+      "n_optima_list": [
+        6,
+        6,
+        6
+      ],
+      "eval_noise_std": 0.15676705898194596,
+      "valley_threshold": 0.01417221674012629,
+      "noise_dominated": true,
+      "noisy_flat_null_vf": 1.0,
+      "spread": {
+        "n_optima": 6,
+        "spread": 0.42131214959743335,
+        "std": 0.1404231349273409,
+        "min": 0.408068548548572,
+        "max": 0.8293806981460053,
+        "finite_rate": 1.0
+      },
+      "degenerate": false,
+      "note": "valley_fraction(0.89) ~ noisy-flat null(1.00); noise_std(0.157) >> valley_thr(0.0142). 谷はノイズ人工物の疑い"
+    },
+    {
+      "setting": "vdr_D60|clip=none|sigma=0.15|bounds=current",
+      "task": "vdr_D60",
+      "clip": "none",
+      "sigma": 0.15,
+      "bounds": "current",
+      "verdict": "noise_confounded",
+      "valley_mean": 0.8666666666666667,
+      "valley_std": 0.10886621079036349,
+      "valley_fractions": [
+        1.0,
+        0.8666666666666667,
+        0.7333333333333333
+      ],
+      "is_multimodal_flags": [
+        true,
+        true,
+        true
+      ],
+      "is_multimodal_unanimous": true,
+      "n_optima_list": [
+        6,
+        6,
+        6
+      ],
+      "eval_noise_std": 0.20607603039011366,
+      "valley_threshold": 0.01296437903500842,
+      "noise_dominated": true,
+      "noisy_flat_null_vf": 1.0,
+      "spread": {
+        "n_optima": 6,
+        "spread": 0.42131214959743335,
+        "std": 0.1553447649547195,
+        "min": 0.408068548548572,
+        "max": 0.8293806981460053,
+        "finite_rate": 1.0
+      },
+      "degenerate": false,
+      "note": "valley_fraction(0.87) ~ noisy-flat null(1.00); noise_std(0.206) >> valley_thr(0.0130). 谷はノイズ人工物の疑い"
+    },
+    {
+      "setting": "vdr_D60|clip=soft|sigma=0.15|bounds=current",
+      "task": "vdr_D60",
+      "clip": "soft",
+      "sigma": 0.15,
+      "bounds": "current",
+      "verdict": "noise_confounded",
+      "valley_mean": 0.8666666666666667,
+      "valley_std": 0.10886621079036349,
+      "valley_fractions": [
+        1.0,
+        0.8666666666666667,
+        0.7333333333333333
+      ],
+      "is_multimodal_flags": [
+        true,
+        true,
+        true
+      ],
+      "is_multimodal_unanimous": true,
+      "n_optima_list": [
+        6,
+        6,
+        6
+      ],
+      "eval_noise_std": 0.19448344203017692,
+      "valley_threshold": 0.01232064146542768,
+      "noise_dominated": true,
+      "noisy_flat_null_vf": 1.0,
+      "spread": {
+        "n_optima": 6,
+        "spread": 0.2933118536400097,
+        "std": 0.10641981565486526,
+        "min": 0.38683147669895274,
+        "max": 0.6801433303389625,
+        "finite_rate": 1.0
+      },
+      "degenerate": false,
+      "note": "valley_fraction(0.87) ~ noisy-flat null(1.00); noise_std(0.194) >> valley_thr(0.0123). 谷はノイズ人工物の疑い"
+    },
+    {
+      "setting": "vdr_D60|clip=hard|sigma=0.1|bounds=current",
+      "task": "vdr_D60",
+      "clip": "hard",
+      "sigma": 0.1,
+      "bounds": "current",
+      "verdict": "noise_confounded",
+      "valley_mean": 0.888888888888889,
+      "valley_std": 0.0831479419283098,
+      "valley_fractions": [
+        1.0,
+        0.8,
+        0.8666666666666667
+      ],
+      "is_multimodal_flags": [
+        true,
+        true,
+        true
+      ],
+      "is_multimodal_unanimous": true,
+      "n_optima_list": [
+        6,
+        6,
+        6
+      ],
+      "eval_noise_std": 0.15676705898194596,
+      "valley_threshold": 0.01417221674012629,
+      "noise_dominated": true,
+      "noisy_flat_null_vf": 1.0,
+      "spread": {
+        "n_optima": 6,
+        "spread": 0.4349386097452146,
+        "std": 0.12904548267538846,
+        "min": 0.40381282334258906,
+        "max": 0.8387514330878036,
+        "finite_rate": 1.0
+      },
+      "degenerate": false,
+      "note": "valley_fraction(0.89) ~ noisy-flat null(1.00); noise_std(0.157) >> valley_thr(0.0142). 谷はノイズ人工物の疑い"
+    },
+    {
+      "setting": "vdr_D60|clip=hard|sigma=0.2|bounds=current",
+      "task": "vdr_D60",
+      "clip": "hard",
+      "sigma": 0.2,
+      "bounds": "current",
+      "verdict": "noise_confounded",
+      "valley_mean": 0.9333333333333332,
+      "valley_std": 0.09428090415820632,
+      "valley_fractions": [
+        1.0,
+        0.8,
+        1.0
+      ],
+      "is_multimodal_flags": [
+        true,
+        true,
+        true
+      ],
+      "is_multimodal_unanimous": true,
+      "n_optima_list": [
+        6,
+        6,
+        6
+      ],
+      "eval_noise_std": 0.15676705898194596,
+      "valley_threshold": 0.01417221674012629,
+      "noise_dominated": true,
+      "noisy_flat_null_vf": 1.0,
+      "spread": {
+        "n_optima": 6,
+        "spread": 0.3330713465012418,
+        "std": 0.10851985807909832,
+        "min": 0.4932415217403707,
+        "max": 0.8263128682416125,
+        "finite_rate": 1.0
+      },
+      "degenerate": false,
+      "note": "valley_fraction(0.93) ~ noisy-flat null(1.00); noise_std(0.157) >> valley_thr(0.0142). 谷はノイズ人工物の疑い"
+    },
+    {
+      "setting": "vdr_D60|clip=hard|sigma=0.15|bounds=wide",
+      "task": "vdr_D60",
+      "clip": "hard",
+      "sigma": 0.15,
+      "bounds": "wide",
+      "verdict": "noise_confounded",
+      "valley_mean": 0.9111111111111111,
+      "valley_std": 0.0831479419283098,
+      "valley_fractions": [
+        1.0,
+        0.8,
+        0.9333333333333333
+      ],
+      "is_multimodal_flags": [
+        true,
+        true,
+        true
+      ],
+      "is_multimodal_unanimous": true,
+      "n_optima_list": [
+        6,
+        6,
+        6
+      ],
+      "eval_noise_std": 0.1536660956467654,
+      "valley_threshold": 0.018708439392035935,
+      "noise_dominated": true,
+      "noisy_flat_null_vf": 1.0,
+      "spread": {
+        "n_optima": 6,
+        "spread": 0.1972613393087942,
+        "std": 0.07307980195971958,
+        "min": 0.45876984491939476,
+        "max": 0.656031184228189,
+        "finite_rate": 1.0
+      },
+      "degenerate": false,
+      "note": "valley_fraction(0.91) ~ noisy-flat null(1.00); noise_std(0.154) >> valley_thr(0.0187). 谷はノイズ人工物の疑い"
+    },
+    {
+      "setting": "vdr_D15|clip=hard|sigma=0.15|bounds=current",
+      "task": "vdr_D15",
+      "clip": "hard",
+      "sigma": 0.15,
+      "bounds": "current",
+      "verdict": "noise_confounded",
+      "valley_mean": 0.8000000000000002,
+      "valley_std": 1.1102230246251565e-16,
+      "valley_fractions": [
+        0.8,
+        0.8,
+        0.8
+      ],
+      "is_multimodal_flags": [
+        true,
+        true,
+        true
+      ],
+      "is_multimodal_unanimous": true,
+      "n_optima_list": [
+        6,
+        6,
+        6
+      ],
+      "eval_noise_std": 0.06170337817681665,
+      "valley_threshold": 0.038789410949236304,
+      "noise_dominated": true,
+      "noisy_flat_null_vf": 1.0,
+      "spread": {
+        "n_optima": 6,
+        "spread": 0.06612112864011355,
+        "std": 0.022674863998233735,
+        "min": 0.9158867072053885,
+        "max": 0.982007835845502,
+        "finite_rate": 1.0
+      },
+      "degenerate": false,
+      "note": "valley_fraction(0.80) ~ noisy-flat null(1.00); noise_std(0.062) >> valley_thr(0.0388). 谷はノイズ人工物の疑い"
+    },
+    {
+      "setting": "vdr_D15|clip=none|sigma=0.15|bounds=current",
+      "task": "vdr_D15",
+      "clip": "none",
+      "sigma": 0.15,
+      "bounds": "current",
+      "verdict": "noise_confounded",
+      "valley_mean": 0.8000000000000002,
+      "valley_std": 1.1102230246251565e-16,
+      "valley_fractions": [
+        0.8,
+        0.8,
+        0.8
+      ],
+      "is_multimodal_flags": [
+        true,
+        true,
+        true
+      ],
+      "is_multimodal_unanimous": true,
+      "n_optima_list": [
+        6,
+        6,
+        6
+      ],
+      "eval_noise_std": 0.06170337817681665,
+      "valley_threshold": 0.038789410949236304,
+      "noise_dominated": true,
+      "noisy_flat_null_vf": 1.0,
+      "spread": {
+        "n_optima": 6,
+        "spread": 0.06612112864011355,
+        "std": 0.022674863998233735,
+        "min": 0.9158867072053885,
+        "max": 0.982007835845502,
+        "finite_rate": 1.0
+      },
+      "degenerate": false,
+      "note": "valley_fraction(0.80) ~ noisy-flat null(1.00); noise_std(0.062) >> valley_thr(0.0388). 谷はノイズ人工物の疑い"
+    },
+    {
+      "setting": "vdr_D15|clip=soft|sigma=0.15|bounds=current",
+      "task": "vdr_D15",
+      "clip": "soft",
+      "sigma": 0.15,
+      "bounds": "current",
+      "verdict": "noise_confounded",
+      "valley_mean": 0.6444444444444444,
+      "valley_std": 0.03142696805273544,
+      "valley_fractions": [
+        0.6666666666666666,
+        0.6,
+        0.6666666666666666
+      ],
+      "is_multimodal_flags": [
+        true,
+        true,
+        true
+      ],
+      "is_multimodal_unanimous": true,
+      "n_optima_list": [
+        6,
+        6,
+        6
+      ],
+      "eval_noise_std": 0.035935631042584106,
+      "valley_threshold": 0.032442722231992766,
+      "noise_dominated": true,
+      "noisy_flat_null_vf": 1.0,
+      "spread": {
+        "n_optima": 6,
+        "spread": 0.029988056151662446,
+        "std": 0.010287185097026608,
+        "min": 0.7239457108743429,
+        "max": 0.7539337670260053,
+        "finite_rate": 1.0
+      },
+      "degenerate": false,
+      "note": "valley_fraction(0.64) ~ noisy-flat null(1.00); noise_std(0.036) >> valley_thr(0.0324). 谷はノイズ人工物の疑い"
+    },
+    {
+      "setting": "vdr_D15|clip=hard|sigma=0.1|bounds=current",
+      "task": "vdr_D15",
+      "clip": "hard",
+      "sigma": 0.1,
+      "bounds": "current",
+      "verdict": "noise_confounded",
+      "valley_mean": 0.6444444444444444,
+      "valley_std": 0.0831479419283098,
+      "valley_fractions": [
+        0.6666666666666666,
+        0.5333333333333333,
+        0.7333333333333333
+      ],
+      "is_multimodal_flags": [
+        true,
+        true,
+        true
+      ],
+      "is_multimodal_unanimous": true,
+      "n_optima_list": [
+        6,
+        6,
+        6
+      ],
+      "eval_noise_std": 0.06170337817681665,
+      "valley_threshold": 0.038789410949236304,
+      "noise_dominated": true,
+      "noisy_flat_null_vf": 1.0,
+      "spread": {
+        "n_optima": 6,
+        "spread": 0.10866368964397166,
+        "std": 0.038312280327948194,
+        "min": 0.873137578434555,
+        "max": 0.9818012680785266,
+        "finite_rate": 1.0
+      },
+      "degenerate": false,
+      "note": "valley_fraction(0.64) ~ noisy-flat null(1.00); noise_std(0.062) >> valley_thr(0.0388). 谷はノイズ人工物の疑い"
+    },
+    {
+      "setting": "vdr_D15|clip=hard|sigma=0.2|bounds=current",
+      "task": "vdr_D15",
+      "clip": "hard",
+      "sigma": 0.2,
+      "bounds": "current",
+      "verdict": "noise_confounded",
+      "valley_mean": 0.7777777777777778,
+      "valley_std": 0.08314794192830985,
+      "valley_fractions": [
+        0.8,
+        0.6666666666666666,
+        0.8666666666666667
+      ],
+      "is_multimodal_flags": [
+        true,
+        true,
+        true
+      ],
+      "is_multimodal_unanimous": true,
+      "n_optima_list": [
+        6,
+        6,
+        6
+      ],
+      "eval_noise_std": 0.06170337817681665,
+      "valley_threshold": 0.038789410949236304,
+      "noise_dominated": true,
+      "noisy_flat_null_vf": 1.0,
+      "spread": {
+        "n_optima": 6,
+        "spread": 0.041722040987803743,
+        "std": 0.014378108605806753,
+        "min": 0.9364343308993276,
+        "max": 0.9781563718871313,
+        "finite_rate": 1.0
+      },
+      "degenerate": false,
+      "note": "valley_fraction(0.78) ~ noisy-flat null(1.00); noise_std(0.062) >> valley_thr(0.0388). 谷はノイズ人工物の疑い"
+    },
+    {
+      "setting": "vdr_D15|clip=hard|sigma=0.15|bounds=wide",
+      "task": "vdr_D15",
+      "clip": "hard",
+      "sigma": 0.15,
+      "bounds": "wide",
+      "verdict": "noise_confounded",
+      "valley_mean": 0.6222222222222222,
+      "valley_std": 0.0831479419283098,
+      "valley_fractions": [
+        0.6,
+        0.5333333333333333,
+        0.7333333333333333
+      ],
+      "is_multimodal_flags": [
+        true,
+        true,
+        true
+      ],
+      "is_multimodal_unanimous": true,
+      "n_optima_list": [
+        6,
+        6,
+        6
+      ],
+      "eval_noise_std": 0.06534683413385979,
+      "valley_threshold": 0.03902685101247854,
+      "noise_dominated": true,
+      "noisy_flat_null_vf": 1.0,
+      "spread": {
+        "n_optima": 6,
+        "spread": 0.11961487108311286,
+        "std": 0.042800814029963705,
+        "min": 0.8587901394010815,
+        "max": 0.9784050104841944,
+        "finite_rate": 1.0
+      },
+      "degenerate": false,
+      "note": "valley_fraction(0.62) ~ noisy-flat null(1.00); noise_std(0.065) >> valley_thr(0.0390). 谷はノイズ人工物の疑い"
+    }
+  ],
+  "verdict_summary": "any_flip=False → 反転なし。ただし noise_confounded が支配的なら『robust smooth』とも『人工物』とも断定できず、C1 は本 fitness に対し計測不能 (noise > 谷閾) と結論。"
+}

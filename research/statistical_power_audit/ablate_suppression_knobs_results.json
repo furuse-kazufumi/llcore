@@ -1,108 +1,299 @@
 {
   "_meta": {
     "script": "ablate_suppression_knobs",
-    "wall_clock_s": 1488.957,
+    "wall_clock_s": 203.592,
     "src_unchanged": true,
     "src_changed_files": [],
     "exit_ok": true,
     "design": "(C) suppression ablation (OFAT)",
     "n_seeds": 15,
-    "n_evals": 600,
+    "n_evals": 1500,
     "base_seed": 20260530,
+    "k3_seeds": 10,
+    "k3_evals": 120,
+    "budget_reduction_disclosure": "K3/K4 の ridge_fitness は ~35ms/call と重い。読み出し方式 (global vs archive) と clip spread の診断には大予算不要なので K3 を n_seeds=10/n_evals=120/honest_n=12/seq_len=16/n_tr=24 に、K4 を n_genes=120/seq_len=16/n_tr=32 に縮小 (G1<900s 遵守)。corridor/実 negative 系 (K1/K2) は full 予算。silent truncation なし。",
     "note": "各 toggle は src 無改変で research 側引数/再計算。反転は type1_guard_sweep.py の Type I コストと必ずペアで読む。"
   },
   "cases": {
     "corridor_d=0.13": {
       "baseline_all_on": {
-        "best_baseline": "rr_hillclimb",
-        "diff": 0.039004772531524366,
-        "wilcoxon_p": 0.1947021484375,
-        "paired_sign_delta": -0.06666666666666667,
-        "cliff_delta_textbook": -0.013333333333333334,
+        "best_baseline": "panmictic_ga",
+        "diff": -0.009300969247936308,
+        "wilcoxon_p": 0.924285888671875,
+        "paired_sign_delta": -0.6,
+        "cliff_delta_textbook": -0.6266666666666667,
         "passes_vs_best": false,
-        "n_baselines_beaten": 1,
+        "n_baselines_beaten": 2,
         "load_bearing": false
       },
       "toggles": {
         "K1_freshseed_OFF": {
-          "best_baseline": "rr_hillclimb",
-          "diff": 0.029940756051808053,
-          "wilcoxon_p": 0.210601806640625,
-          "paired_sign_delta": -0.06666666666666667,
-          "cliff_delta_textbook": -0.0044444444444444444,
+          "best_baseline": "panmictic_ga",
+          "diff": -0.012497819938695306,
+          "wilcoxon_p": 0.946502685546875,
+          "paired_sign_delta": -0.6,
+          "cliff_delta_textbook": -0.6177777777777778,
           "passes_vs_best": false,
-          "n_baselines_beaten": 1,
+          "n_baselines_beaten": 2,
           "load_bearing": false
         },
         "K2_min_effect=0.1": {
-          "best_baseline": "rr_hillclimb",
-          "diff": 0.039004772531524366,
-          "wilcoxon_p": 0.1947021484375,
-          "paired_sign_delta": -0.06666666666666667,
-          "cliff_delta_textbook": -0.013333333333333334,
+          "best_baseline": "panmictic_ga",
+          "diff": -0.009300969247936308,
+          "wilcoxon_p": 0.924285888671875,
+          "paired_sign_delta": -0.6,
+          "cliff_delta_textbook": -0.6266666666666667,
           "passes_vs_best": false,
-          "n_baselines_beaten": 1,
+          "n_baselines_beaten": 2,
           "load_bearing": false
         },
         "K2_min_effect=0.05": {
-          "best_baseline": "rr_hillclimb",
-          "diff": 0.039004772531524366,
-          "wilcoxon_p": 0.1947021484375,
-          "paired_sign_delta": -0.06666666666666667,
-          "cliff_delta_textbook": -0.013333333333333334,
+          "best_baseline": "panmictic_ga",
+          "diff": -0.009300969247936308,
+          "wilcoxon_p": 0.924285888671875,
+          "paired_sign_delta": -0.6,
+          "cliff_delta_textbook": -0.6266666666666667,
           "passes_vs_best": false,
-          "n_baselines_beaten": 1,
+          "n_baselines_beaten": 2,
           "load_bearing": false
         },
         "K2_min_effect=0.0": {
-          "best_baseline": "rr_hillclimb",
-          "diff": 0.039004772531524366,
-          "wilcoxon_p": 0.1947021484375,
-          "paired_sign_delta": -0.06666666666666667,
-          "cliff_delta_textbook": -0.013333333333333334,
+          "best_baseline": "panmictic_ga",
+          "diff": -0.009300969247936308,
+          "wilcoxon_p": 0.924285888671875,
+          "paired_sign_delta": -0.6,
+          "cliff_delta_textbook": -0.6266666666666667,
           "passes_vs_best": false,
-          "n_baselines_beaten": 1,
+          "n_baselines_beaten": 2,
           "load_bearing": false
         },
         "K2_alpha=0.1": {
-          "best_baseline": "rr_hillclimb",
-          "diff": 0.039004772531524366,
-          "wilcoxon_p": 0.1947021484375,
-          "paired_sign_delta": -0.06666666666666667,
-          "cliff_delta_textbook": -0.013333333333333334,
+          "best_baseline": "panmictic_ga",
+          "diff": -0.009300969247936308,
+          "wilcoxon_p": 0.924285888671875,
+          "paired_sign_delta": -0.6,
+          "cliff_delta_textbook": -0.6266666666666667,
           "passes_vs_best": false,
-          "n_baselines_beaten": 1,
+          "n_baselines_beaten": 2,
           "load_bearing": false
         },
         "K2_alpha=0.2": {
-          "best_baseline": "rr_hillclimb",
-          "diff": 0.039004772531524366,
-          "wilcoxon_p": 0.1947021484375,
-          "paired_sign_delta": -0.06666666666666667,
-          "cliff_delta_textbook": -0.013333333333333334,
+          "best_baseline": "panmictic_ga",
+          "diff": -0.009300969247936308,
+          "wilcoxon_p": 0.924285888671875,
+          "paired_sign_delta": -0.6,
+          "cliff_delta_textbook": -0.6266666666666667,
           "passes_vs_best": false,
-          "n_baselines_beaten": 1,
+          "n_baselines_beaten": 2,
           "load_bearing": false
         },
         "K2_min_seeds=10": {
-          "best_baseline": "rr_hillclimb",
-          "diff": 0.039004772531524366,
-          "wilcoxon_p": 0.1947021484375,
-          "paired_sign_delta": -0.06666666666666667,
-          "cliff_delta_textbook": -0.013333333333333334,
+          "best_baseline": "panmictic_ga",
+          "diff": -0.009300969247936308,
+          "wilcoxon_p": 0.924285888671875,
+          "paired_sign_delta": -0.6,
+          "cliff_delta_textbook": -0.6266666666666667,
           "passes_vs_best": false,
-          "n_baselines_beaten": 1,
+          "n_baselines_beaten": 2,
           "load_bearing": false
         },
         "K2_min_seeds=5": {
-          "best_baseline": "rr_hillclimb",
-          "diff": 0.039004772531524366,
-          "wilcoxon_p": 0.1947021484375,
-          "paired_sign_delta": -0.06666666666666667,
-          "cliff_delta_textbook": -0.013333333333333334,
+          "best_baseline": "panmictic_ga",
+          "diff": -0.009300969247936308,
+          "wilcoxon_p": 0.924285888671875,
+          "paired_sign_delta": -0.6,
+          "cliff_delta_textbook": -0.6266666666666667,
           "passes_vs_best": false,
-          "n_baselines_beaten": 1,
+          "n_baselines_beaten": 2,
           "load_bearing": false
+        }
+      }
+    },
+    "corridor_d=0.14": {
+      "baseline_all_on": {
+        "best_baseline": "panmictic_ga",
+        "diff": 0.04577931773025615,
+        "wilcoxon_p": 0.5765380859375,
+        "paired_sign_delta": -0.3333333333333333,
+        "cliff_delta_textbook": -0.36,
+        "passes_vs_best": false,
+        "n_baselines_beaten": 2,
+        "load_bearing": false
+      },
+      "toggles": {
+        "K1_freshseed_OFF": {
+          "best_baseline": "panmictic_ga",
+          "diff": 0.036469677473435075,
+          "wilcoxon_p": 0.619232177734375,
+          "paired_sign_delta": -0.3333333333333333,
+          "cliff_delta_textbook": -0.38666666666666666,
+          "passes_vs_best": false,
+          "n_baselines_beaten": 2,
+          "load_bearing": false
+        },
+        "K2_min_effect=0.1": {
+          "best_baseline": "panmictic_ga",
+          "diff": 0.04577931773025615,
+          "wilcoxon_p": 0.5765380859375,
+          "paired_sign_delta": -0.3333333333333333,
+          "cliff_delta_textbook": -0.36,
+          "passes_vs_best": false,
+          "n_baselines_beaten": 2,
+          "load_bearing": false
+        },
+        "K2_min_effect=0.05": {
+          "best_baseline": "panmictic_ga",
+          "diff": 0.04577931773025615,
+          "wilcoxon_p": 0.5765380859375,
+          "paired_sign_delta": -0.3333333333333333,
+          "cliff_delta_textbook": -0.36,
+          "passes_vs_best": false,
+          "n_baselines_beaten": 2,
+          "load_bearing": false
+        },
+        "K2_min_effect=0.0": {
+          "best_baseline": "panmictic_ga",
+          "diff": 0.04577931773025615,
+          "wilcoxon_p": 0.5765380859375,
+          "paired_sign_delta": -0.3333333333333333,
+          "cliff_delta_textbook": -0.36,
+          "passes_vs_best": false,
+          "n_baselines_beaten": 2,
+          "load_bearing": false
+        },
+        "K2_alpha=0.1": {
+          "best_baseline": "panmictic_ga",
+          "diff": 0.04577931773025615,
+          "wilcoxon_p": 0.5765380859375,
+          "paired_sign_delta": -0.3333333333333333,
+          "cliff_delta_textbook": -0.36,
+          "passes_vs_best": false,
+          "n_baselines_beaten": 2,
+          "load_bearing": false
+        },
+        "K2_alpha=0.2": {
+          "best_baseline": "panmictic_ga",
+          "diff": 0.04577931773025615,
+          "wilcoxon_p": 0.5765380859375,
+          "paired_sign_delta": -0.3333333333333333,
+          "cliff_delta_textbook": -0.36,
+          "passes_vs_best": false,
+          "n_baselines_beaten": 2,
+          "load_bearing": false
+        },
+        "K2_min_seeds=10": {
+          "best_baseline": "panmictic_ga",
+          "diff": 0.04577931773025615,
+          "wilcoxon_p": 0.5765380859375,
+          "paired_sign_delta": -0.3333333333333333,
+          "cliff_delta_textbook": -0.36,
+          "passes_vs_best": false,
+          "n_baselines_beaten": 2,
+          "load_bearing": false
+        },
+        "K2_min_seeds=5": {
+          "best_baseline": "panmictic_ga",
+          "diff": 0.04577931773025615,
+          "wilcoxon_p": 0.5765380859375,
+          "paired_sign_delta": -0.3333333333333333,
+          "cliff_delta_textbook": -0.36,
+          "passes_vs_best": false,
+          "n_baselines_beaten": 2,
+          "load_bearing": false
+        }
+      }
+    },
+    "corridor_d=0.15": {
+      "baseline_all_on": {
+        "best_baseline": "rr_hillclimb",
+        "diff": 0.1909063151497928,
+        "wilcoxon_p": 0.001007080078125,
+        "paired_sign_delta": 0.6,
+        "cliff_delta_textbook": 0.48444444444444446,
+        "passes_vs_best": true,
+        "n_baselines_beaten": 3,
+        "load_bearing": true
+      },
+      "toggles": {
+        "K1_freshseed_OFF": {
+          "best_baseline": "rr_hillclimb",
+          "diff": 0.17982191510204973,
+          "wilcoxon_p": 0.001007080078125,
+          "paired_sign_delta": 0.6,
+          "cliff_delta_textbook": 0.5022222222222222,
+          "passes_vs_best": true,
+          "n_baselines_beaten": 3,
+          "load_bearing": true
+        },
+        "K2_min_effect=0.1": {
+          "best_baseline": "rr_hillclimb",
+          "diff": 0.1909063151497928,
+          "wilcoxon_p": 0.001007080078125,
+          "paired_sign_delta": 0.6,
+          "cliff_delta_textbook": 0.48444444444444446,
+          "passes_vs_best": true,
+          "n_baselines_beaten": 3,
+          "load_bearing": true
+        },
+        "K2_min_effect=0.05": {
+          "best_baseline": "rr_hillclimb",
+          "diff": 0.1909063151497928,
+          "wilcoxon_p": 0.001007080078125,
+          "paired_sign_delta": 0.6,
+          "cliff_delta_textbook": 0.48444444444444446,
+          "passes_vs_best": true,
+          "n_baselines_beaten": 3,
+          "load_bearing": true
+        },
+        "K2_min_effect=0.0": {
+          "best_baseline": "rr_hillclimb",
+          "diff": 0.1909063151497928,
+          "wilcoxon_p": 0.001007080078125,
+          "paired_sign_delta": 0.6,
+          "cliff_delta_textbook": 0.48444444444444446,
+          "passes_vs_best": true,
+          "n_baselines_beaten": 3,
+          "load_bearing": true
+        },
+        "K2_alpha=0.1": {
+          "best_baseline": "rr_hillclimb",
+          "diff": 0.1909063151497928,
+          "wilcoxon_p": 0.001007080078125,
+          "paired_sign_delta": 0.6,
+          "cliff_delta_textbook": 0.48444444444444446,
+          "passes_vs_best": true,
+          "n_baselines_beaten": 3,
+          "load_bearing": true
+        },
+        "K2_alpha=0.2": {
+          "best_baseline": "rr_hillclimb",
+          "diff": 0.1909063151497928,
+          "wilcoxon_p": 0.001007080078125,
+          "paired_sign_delta": 0.6,
+          "cliff_delta_textbook": 0.48444444444444446,
+          "passes_vs_best": true,
+          "n_baselines_beaten": 3,
+          "load_bearing": true
+        },
+        "K2_min_seeds=10": {
+          "best_baseline": "rr_hillclimb",
+          "diff": 0.1909063151497928,
+          "wilcoxon_p": 0.001007080078125,
+          "paired_sign_delta": 0.6,
+          "cliff_delta_textbook": 0.48444444444444446,
+          "passes_vs_best": true,
+          "n_baselines_beaten": 3,
+          "load_bearing": true
+        },
+        "K2_min_seeds=5": {
+          "best_baseline": "rr_hillclimb",
+          "diff": 0.1909063151497928,
+          "wilcoxon_p": 0.001007080078125,
+          "paired_sign_delta": 0.6,
+          "cliff_delta_textbook": 0.48444444444444446,
+          "passes_vs_best": true,
+          "n_baselines_beaten": 3,
+          "load_bearing": true
         }
       }
     },
@@ -170,49 +361,49 @@
     },
     "K3_readout_global_vs_archive": {
       "readout_global_best_current": {
-        "diff": 0.0011193025965781978,
-        "wilcoxon_p": 0.000762939453125,
-        "paired_sign_delta": 0.7333333333333333,
-        "passes": true,
-        "full_mean": 0.999383408586676,
-        "randselect_mean": 0.9982641059900976
+        "diff": 0.001593919847289449,
+        "wilcoxon_p": 0.1875,
+        "paired_sign_delta": 0.4,
+        "passes": false,
+        "full_mean": 0.9955622721736745,
+        "randselect_mean": 0.9939683523263849
       },
       "readout_archive_max_old": {
-        "diff": 0.03185314581821022,
-        "wilcoxon_p": 3.0517578125e-05,
-        "paired_sign_delta": 1.0,
-        "passes": true,
-        "full_mean": 0.999383408586676,
-        "randselect_mean": 0.9675302627684659
+        "diff": 0.08113891283129546,
+        "wilcoxon_p": 0.0048828125,
+        "paired_sign_delta": 0.6,
+        "passes": false,
+        "full_mean": 0.9955622721736745,
+        "randselect_mean": 0.914423359342379
       },
       "flipped_global_to_archive": false,
       "note": "global-best (現行) で③ gap が消えるなら archive-ratchet 自体が③効果の 可能性。archive-max で PASS かつ global-best で FAIL = 読み出しが③を隠す。"
     },
     "K4_clip_spread": {
       "copy": {
-        "clip_true_std": 0.36956232840155195,
-        "clip_false_std": 0.4463949023077046,
-        "clip_true_mean": 0.35435914472965296,
-        "clip_false_mean": 0.28258194283433613,
-        "n_floored_to_zero": 78,
-        "n_genes": 200,
-        "frac_floored": 0.39,
-        "floored_raw_r2_min": -0.5195323113144543,
-        "floored_raw_r2_max": -0.004708951029605002,
-        "floored_raw_r2_spread": 0.09824190628915591,
+        "clip_true_std": 0.3548356535800371,
+        "clip_false_std": 0.5033324216440154,
+        "clip_true_mean": 0.303317702161067,
+        "clip_false_mean": 0.15565419935371966,
+        "n_floored_to_zero": 56,
+        "n_genes": 120,
+        "frac_floored": 0.4666666666666667,
+        "floored_raw_r2_min": -0.6663882542519433,
+        "floored_raw_r2_max": -0.00818958275662629,
+        "floored_raw_r2_spread": 0.16650506316111963,
         "flattening_hidden_by_clip": true
       },
       "addition": {
-        "clip_true_std": 0.014520871447621573,
-        "clip_false_std": 0.2185061938712676,
-        "clip_true_mean": 0.0030037926818003106,
-        "clip_false_mean": -0.26759761025946893,
-        "n_floored_to_zero": 185,
-        "n_genes": 200,
+        "clip_true_std": 0.028174850348547584,
+        "clip_false_std": 0.37987067034234984,
+        "clip_true_mean": 0.0060911316404303455,
+        "clip_false_mean": -0.41003196202977144,
+        "n_floored_to_zero": 111,
+        "n_genes": 120,
         "frac_floored": 0.925,
-        "floored_raw_r2_min": -1.3606876167017927,
-        "floored_raw_r2_max": -0.0016835556516545669,
-        "floored_raw_r2_spread": 0.20787539976869568,
+        "floored_raw_r2_min": -1.8739864199565113,
+        "floored_raw_r2_max": -0.000257082251972518,
+        "floored_raw_r2_spread": 0.36672209122982746,
         "flattening_hidden_by_clip": true
       }
     }

@@ -1,0 +1,178 @@
+{
+  "_meta": {
+    "title": "llcore 統計的検出力 自己監査 — 統合結果",
+    "date": "2026-06-01",
+    "design_propositions": "H0_suppress (DESIGN.proposition)。S1-S4 (suppress) / R1-R3 (robust)。",
+    "break_gates_status": {
+      "G1_cpu_completion": {
+        "calibrate_s": 575.244,
+        "repower_s": 332.38,
+        "ablate_s": 203.592,
+        "type1_s": 293.985,
+        "all_under_900s": true
+      },
+      "G3_power_engine_valid": true,
+      "G4_src_unchanged": true
+    }
+  },
+  "S1_calibration": {
+    "d_fn_n15": 0.15,
+    "d_fn_n10": null,
+    "load_bearing_at_0.16_n15": true,
+    "load_bearing_at_0.16_n10": false,
+    "s1_typeII_at_n15": false,
+    "s1_typeII_at_n10": true,
+    "interpretation": "n=15 (実験標準) では d_fn=0.15 <= 0.16 = 既知真陽性 d*=0.16 を取り逃がさない (S1 は n=15 で不成立)。だが n=10 では d=0.16 (cliff>=0.15, p<0.01) すら n 床で no-effect 判定 = 中〜大効果取り逃がし (S1 は n<=10 で成立)。"
+  },
+  "S2_repower": {
+    "C-gen4b": {
+      "observed_power": 0.3124,
+      "n80_param": 63.75782881002088,
+      "n80_boot": 255.3072625698326,
+      "underpowered": true,
+      "limiting": "p_only",
+      "diff": 0.06254864753354647,
+      "cohen_dz": 0.3493871375344323
+    },
+    "flip_flop_vs_random": {
+      "observed_power": 0.2732,
+      "n80_param": 88.68320610687024,
+      "n80_boot": 81.73228346456695,
+      "underpowered": true,
+      "limiting": "p_only",
+      "diff": 0.004095723875934939,
+      "cohen_dz": 0.30966334756803454
+    },
+    "C-gen4a_control_diff_neg": {
+      "observed_power": 0.0322,
+      "n80_param": null,
+      "n80_boot": null,
+      "underpowered": false,
+      "limiting": "p_only",
+      "diff": -0.019301454685659743,
+      "cohen_dz": -0.13253371658783117
+    },
+    "C-gen3_pass_control": {
+      "observed_power": 0.7412,
+      "n80_param": 16.10986547085202,
+      "n80_boot": 17.806691449814128,
+      "underpowered": true,
+      "limiting": "p_only",
+      "diff": 0.12571150622290786,
+      "cohen_dz": 0.6759732633083546
+    },
+    "s2_underpowered_and_n80_ge_30": true,
+    "limiting_condition_all": "p_only (Wilcoxon p<0.05 + 小 n が律速、min_effect 床ではない)",
+    "interpretation": "diff>0 符号一貫の C-gen4b (power=0.31, n80~64) と flip_flop (power=0.27, n80~89) は underpowered で 80% power に現行 n=15 の 2 倍以上を要す = S2 成立。対照 C-gen4a (diff<0) は power=0.03 で underpowered でない = 真に効果無し (健全)。"
+  },
+  "S3_ablation": {
+    "n_flips": 2,
+    "knobs_that_flipped": [
+      "K2_alpha=0.2"
+    ],
+    "flips": [
+      {
+        "case": "C-gen4b_MAPE_vs_random",
+        "knob": "K2_alpha=0.2",
+        "from": "no",
+        "to": "evolution",
+        "type1_cost": "alpha↑が p で落ちる underpowered case を救う。ただし null FPR も alpha まで上がる(type1_guard で確認)。"
+      },
+      {
+        "case": "flip_flop_MAPE_vs_random",
+        "knob": "K2_alpha=0.2",
+        "from": "no",
+        "to": "evolution",
+        "type1_cost": "alpha↑が p で落ちる underpowered case を救う。ただし null FPR も alpha まで上がる(type1_guard で確認)。"
+      }
+    ],
+    "K3_archive_vs_global": {
+      "readout_global_best_current": {
+        "diff": 0.001593919847289449,
+        "wilcoxon_p": 0.1875,
+        "paired_sign_delta": 0.4,
+        "passes": false,
+        "full_mean": 0.9955622721736745,
+        "randselect_mean": 0.9939683523263849
+      },
+      "readout_archive_max_old": {
+        "diff": 0.08113891283129546,
+        "wilcoxon_p": 0.0048828125,
+        "paired_sign_delta": 0.6,
+        "passes": false,
+        "full_mean": 0.9955622721736745,
+        "randselect_mean": 0.914423359342379
+      },
+      "flipped_global_to_archive": false
+    },
+    "K4_clip_spread": {
+      "copy": {
+        "clip_true_std": 0.3548356535800371,
+        "clip_false_std": 0.5033324216440154,
+        "clip_true_mean": 0.303317702161067,
+        "clip_false_mean": 0.15565419935371966,
+        "n_floored_to_zero": 56,
+        "n_genes": 120,
+        "frac_floored": 0.4666666666666667,
+        "floored_raw_r2_min": -0.6663882542519433,
+        "floored_raw_r2_max": -0.00818958275662629,
+        "floored_raw_r2_spread": 0.16650506316111963,
+        "flattening_hidden_by_clip": true
+      },
+      "addition": {
+        "clip_true_std": 0.028174850348547584,
+        "clip_false_std": 0.37987067034234984,
+        "clip_true_mean": 0.0060911316404303455,
+        "clip_false_mean": -0.41003196202977144,
+        "n_floored_to_zero": 111,
+        "n_genes": 120,
+        "frac_floored": 0.925,
+        "floored_raw_r2_min": -1.8739864199565113,
+        "floored_raw_r2_max": -0.000257082251972518,
+        "floored_raw_r2_spread": 0.36672209122982746,
+        "flattening_hidden_by_clip": true
+      }
+    },
+    "s3_any_flip": true,
+    "interpretation": "実 negative gate 緩和では K2_alpha=0.20 のみが C-gen4b/flip_flop を PASS に反転 (min_effect 緩和は p で落ちる case を救えず無反転)。corridor d=0.13 は base_seed で MAP-E が勝たないため如何なる緩和でも反転せず (真の負を誤って ungate しない)。K3: archive-max 読み出しは③ gap を ~50x 水増し (Codex F2 の global-best 化が正しく ③過大評価を除去)。K4: clip は ridge fitness の spread を最大 13x 平坦化し floored gene の raw R² 符号構造を隠蔽 = ridge 系 landscape での真の suppression 機序。"
+  },
+  "S4_type1_guard": {
+    "baseline_fpr": {
+      "fpr_d0_corridor": 0.0,
+      "fpr_pure_null": 0.0,
+      "fpr_shuffle_null": 0.046799999999999994,
+      "tpr_borderline": 0.2
+    },
+    "K2_alpha=0.20_fpr": {
+      "fpr_shuffle_null": 0.1724,
+      "tpr_borderline": 0.2,
+      "net_true_positive_gain": 0.027600000000000013
+    },
+    "K2_min_effect=0.05_fpr": {
+      "fpr_shuffle_null": 0.046,
+      "tpr_borderline": 0.2,
+      "net_true_positive_gain": 0.15400000000000003
+    },
+    "sweet_spot": "K2_min_effect=0.05",
+    "K1_off_danger": {
+      "pure_null_FPR_K1_ON": 0.0,
+      "pure_null_FPR_K1_OFF": 0.0,
+      "K1_off_inflates_fpr": false,
+      "verdict": "この null/budget では K1 OFF の FPR 増は限定的"
+    },
+    "s4_flip_knob_alpha20_sweetspot": false,
+    "interpretation": "baseline (全 ON) の null FPR は d0/pure=0.00, shuffle=0.047 (≈名目 alpha=0.05) = gate は適切に校正 (むしろ保守的)。反転をもたらした K2_alpha=0.20 は shuffle FPR を 0.172 (>2*alpha) に上げる一方 borderline TPR は 0.20 のまま不変 = 純 Type I コスト、sweet spot ではない。min_effect 緩和は FPR も TPR も動かさない (= min_effect は binding 制約でない)。sweet_spot=K2_min_effect=0.05 は baseline と実質同等。"
+  },
+  "criteria_evaluation": {
+    "S1_typeII_at_n15": false,
+    "S1_typeII_at_n10": true,
+    "S2_underpowered": true,
+    "S3_flip": true,
+    "S4_flip_is_sweet_spot": false,
+    "suppress_all_S1_S4": false,
+    "R1_detects_known_positive_n15": true,
+    "R2_diff_neg_control_healthy": true,
+    "R3_relaxation_inflates_fpr": true
+  },
+  "verdict": "H0_suppress: NUANCED (条件付き支持). 実験標準 n=15 では gate は既知真陽性 (d*=0.16) を正しく検出し校正は健全 (S1 不成立, R1 成立)。しかし (S2) 実 negative の C-gen4b/flip_flop は observed power 0.27-0.31 で underpowered、80% power に n~64-89 (現行の 4-6 倍) を要する = これらの honest-negative は『③不在の証拠』でなく 『inconclusive』。律速は一貫して片側 Wilcoxon p<0.05 + 小 n であり、容疑の min_effect=0.147 床ではない。(S1 補足) n<=10 では d=0.16 (cliff δ=+1.0) すら n 床で取り逃がす — step6 exp7 の n=8/6 は この盲点域。(S4) 反転をもたらす唯一の緩和 K2_alpha=0.20 は null FPR を 2x 超に上げる純 Type I コストで sweet spot でなく、min_effect/min_seeds 緩和は TPR を全く上げない。結論: 統計が一律に進化を抑えているのではなく、(a) 実 negative の一部は underpowered=inconclusive (真の Type II 候補、n 増で再測すべき)、(b) clip=True は ridge landscape を平坦化し真の構造を隠す (K4 = 唯一の能動的 suppression 機序)、(c) しかし gate 閾値自体 (p/min_effect/n の連言) は健全で、緩めると Type I が代償として増える。"
+}
