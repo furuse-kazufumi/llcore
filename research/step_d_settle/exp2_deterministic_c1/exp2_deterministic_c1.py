@@ -392,10 +392,18 @@ def _aggregate_and_verdict(partial):
             "all_smooth": all(not c["is_multimodal"] for c in lst),
         }
 
-    # G3 diagnostic validity
-    pos = summary.get("ctrl_corridor_d016", {})
-    neg = summary.get("ctrl_quadratic_unimodal", {})
-    diagnostic_valid = bool(pos.get("all_multimodal")) and bool(neg.get("all_smooth"))
+    # G3 diagnostic validity: dim 一致の正 control が多峰 ∧ 負 control が smooth。
+    # dim3 / dim40 をそれぞれ要求 (実 landscape の各次元で診断器健全性を担保)。
+    pos3 = summary.get("ctrl_multipeak_dim3", {})
+    pos40 = summary.get("ctrl_multipeak_dim40", {})
+    neg3 = summary.get("ctrl_quadratic_dim3", {})
+    neg40 = summary.get("ctrl_quadratic_dim40", {})
+    diag_dim3 = bool(pos3.get("all_multimodal")) and bool(neg3.get("all_smooth"))
+    diag_dim40 = bool(pos40.get("all_multimodal")) and bool(neg40.get("all_smooth"))
+    diagnostic_valid = diag_dim3 and diag_dim40
+
+    # 各実 landscape の dim に対応する診断健全性を割当て
+    _dim_diag = {3: diag_dim3, 40: diag_dim40}
 
     # 実 substrate 判定
     real_labels = [k for k, v in summary.items() if v["group"] == "real"]
@@ -405,7 +413,8 @@ def _aggregate_and_verdict(partial):
     for lbl in real_labels:
         s = summary[lbl]
         consistent = s["is_multimodal_consistent"]
-        if not diagnostic_valid:
+        dim_ok = _dim_diag.get(s.get("dim"), diagnostic_valid)
+        if not dim_ok:
             v = "still_inconclusive"
         elif s["all_multimodal"] and consistent:
             v = "load_bearing"            # 欺瞞(多峰)確定
