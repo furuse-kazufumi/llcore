@@ -372,15 +372,19 @@ def main() -> None:
     args = ap.parse_args()
 
     # mode 別パラメータ (G1 予算管理)
+    # microbench (budget_sensitivity_check): D60 eval ~55-65ms。C1 report = n_restarts*n_evals
+    # eval 呼出。n_evals=400 は 1 report ~210s → 全 sweep 30 分超 (G1 違反)。よって detect は
+    # n_evals=150 に縮小 (budget_sensitivity §2 で valley_fraction が n_evals 150 vs 300 で
+    # 0.893 同値 = 縮小が valley_fraction を 0.05 超動かさないことを確認済 → G1 の縮小条件を満たす)。
     if args.mode == "smoke":
         seeds = [20260530, 20260531]
         n_restarts, n_evals, n_train, n_eval = 4, 120, 24, 24
     elif args.mode == "detect":
         seeds = [20260530, 20260531, 20260601]   # G2: 3 seed 系列
-        n_restarts, n_evals, n_train, n_eval = 8, 400, 48, 48
+        n_restarts, n_evals, n_train, n_eval = 8, 150, 48, 48
     else:  # confirm
         seeds = [20260530, 20260531, 20260601]
-        n_restarts, n_evals, n_train, n_eval = 16, 400, 48, 48
+        n_restarts, n_evals, n_train, n_eval = 16, 150, 48, 48
 
     all_tasks = build_tasks()
     sel = [t.strip() for t in args.tasks.split(",") if t.strip()]
