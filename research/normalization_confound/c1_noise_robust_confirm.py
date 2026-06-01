@@ -186,49 +186,60 @@ class NAvgResult:
     note: str = ""
 
 
-def run_navg_point(*, res, task, clip, bounds_kind, n_avg, seeds, n_restarts,
+def run_navg_point(*, res, task, task_name, clip, bounds_kind, n_avg, seeds, n_restarts,
                    n_evals, sigma, n_train, n_eval):
     bounds = widened_bounds(res) if bounds_kind == "wide" else gene_bounds(res)
     eval_once = make_eval_once_clipswitch(res, task, n_train=n_train, n_eval=n_eval, clip=clip)
-    setting = f"{getattr(task, 'name', 'task')}|clip={clip}|bounds={bounds_kind}|n_avg={n_avg}"
-    r = NAvgResult(setting=setting, task=getattr(task, "name", "task"),
-                   clip=clip, bounds=bounds_kind, n_avg=n_avg)
+    setting = f"{task_name}|clip={clip}|bounds={bounds_kind}|n_avg={n_avg}"
+    r = NAvgResult(setting=setting, task=task_name, clip=clip, bounds=bounds_kind, n_avg=n_avg)
     _, noise_std = measure_eval_noise(eval_once, dim=res.gene_dim, bounds=bounds,
                                       base_seed=seeds[0])
     r.noise_std = noise_std
     r.sem = (noise_std / np.sqrt(max(n_avg, 1))) if np.isfinite(noise_std) else float("nan")
-    r2_lo, r2_hi = [], []
+    r2_lo, r2_hi, pairs_list = [], [], []
     for sd in seeds:
         rep = noise_robust_c1(eval_once, dim=res.gene_dim, bounds=bounds,
                               n_restarts=n_restarts, n_evals=n_evals, sigma=sigma,
                               n_avg=n_avg, noise_std=noise_std, base_seed=sd)
         r.valley_fractions.append(rep["valley_fraction"])
+        pairs_list.append(rep["pairs"])
         ofits = [f for f in rep["optima_fits"] if np.isfinite(f)]
         if ofits:
             r2_lo.append(min(ofits))
             r2_hi.append(max(ofits))
     r.valley_mean = float(np.mean(r.valley_fractions)) if r.valley_fractions else float("nan")
+    r.mean_pairs = float(np.mean(pairs_list)) if pairs_list else 0.0
     r.optima_r2_min = float(min(r2_lo)) if r2_lo else float("nan")
     r.optima_r2_max = float(max(r2_hi)) if r2_hi else float("nan")
-    # null は flat なので 1 seed で十分安定 (どこでも同分布)
-    r.null_vf = noisy_flat_null_robust(noise_std if np.isfinite(noise_std) else 0.0,
+    # null は flat だが pair 数が少ないと量子化粗いので **実 eval と同じ seed 集合で平均** (CRN)。
+    null_vfs = [noisy_flat_null_robust(noise_std if np.isfinite(noise_std) else 0.0,
                                        dim=res.gene_dim, bounds=bounds,
                                        n_restarts=n_restarts, n_evals=min(n_evals, 60),
-                                       sigma=sigma, n_avg=n_avg, base_seed=seeds[0])
+                                       sigma=sigma, n_avg=n_avg, base_seed=sd)
+                for sd in seeds]
+    r.null_vf = float(np.mean(null_vfs))
     r.margin = r.valley_mean - r.null_vf
-    # verdict (noise-robust):
-    #  - 谷が null を margin>=0.1 で上回る → geometric_valley (真の谷=人工物でない)
-    #  - 谷が null と区別不能 (margin<0.1) かつ両方高い → noise_confounded (頑健に維持)
+    # verdict (noise-robust, 低統計に頑健化):
+    #  geometric_valley は (a) valley>=0.2 (b) margin>=0.15 (c) 十分な pair 数 (mean_pairs>=8)
+    #  の全てを要求。pair が少ない (mean_pairs<8) と valley_fraction の量子化が粗く 1 ペアで
+    #  margin が跳ねるため、その場合は geometric と断定しない (low_stats)。
     #  - 谷も null も低い (<0.2) → smooth_after_denoise (averaging で谷消失=ノイズ起源確証)
-    if r.valley_mean >= 0.2 and r.margin >= 0.1:
+    #  - それ以外 (谷が null と同程度 or low_stats) → noise_confounded (頑健に維持)
+    if r.valley_mean >= 0.2 and r.margin >= 0.15 and r.mean_pairs >= 8.0:
         r.verdict = "geometric_valley"
-        r.note = f"valley({r.valley_mean:.2f}) exceeds denoised null({r.null_vf:.2f}) margin={r.margin:.2f}"
+        r.note = (f"valley({r.valley_mean:.2f}) exceeds denoised null({r.null_vf:.2f}) "
+                  f"margin={r.margin:.2f}, mean_pairs={r.mean_pairs:.1f}")
     elif r.valley_mean < 0.2 and r.null_vf < 0.2:
         r.verdict = "smooth_after_denoise"
         r.note = f"averaging で谷消失 (valley={r.valley_mean:.2f}, null={r.null_vf:.2f})=ノイズ起源"
+    elif r.valley_mean >= 0.2 and r.margin >= 0.15 and r.mean_pairs < 8.0:
+        r.verdict = "noise_confounded"
+        r.note = (f"valley>null だが low_stats (mean_pairs={r.mean_pairs:.1f}<8); "
+                  f"幾何谷と断定不可。margin={r.margin:.2f}")
     else:
         r.verdict = "noise_confounded"
-        r.note = f"valley({r.valley_mean:.2f}) ~ null({r.null_vf:.2f}) margin={r.margin:.2f}; SEM={r.sem:.3f}"
+        r.note = (f"valley({r.valley_mean:.2f}) ~ null({r.null_vf:.2f}) margin={r.margin:.2f}; "
+                  f"SEM={r.sem:.3f}, mean_pairs={r.mean_pairs:.1f}")
     return r
 
 
