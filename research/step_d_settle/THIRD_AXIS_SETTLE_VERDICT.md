@@ -100,7 +100,8 @@ G3 gate sanity: known-positive p=3.05e-5 psd=1.0 (PASS), known-null FPR=0.028 (<
 
 **総括の一文:** **③ が「実問題近傍で proper power に乗せれば load-bearing」と (A) で確定した case は一つもない。**
 最も近いのは C-gen4b で「③ は NOT null の方向 (gate PASS) だが小効果 (dz≈0.28) ゆえ検出力が乗らず、かつ近傍データはドリフトで反証寄り」=
-**load_bearing 候補 / still_inconclusive**。一方、**地形そのもの (ESN_3param/perneuron40) は決定論測定で真に滑らか=③ 不要を (B) で確定**した。
+**load_bearing 候補 / still_inconclusive**。一方、**地形そのもの (ESN_3param/perneuron40) は決定論測定で滑らか=③ 不要を (B) で確定**した
+(§6.2c 留保: 「真に滑らか」でなく「C1 閾値直下の浅い谷を持つ弱 multi-basin」が精密)。
 すなわち「③不要に見えた過去 negative の多くは underpower でなく地形が本当に滑らかだったから」という像が、実 substrate 上で初めて noise-free に裏付けられた。
 
 ---
