@@ -178,6 +178,7 @@ class NAvgResult:
     sem: float = float("nan")
     valley_fractions: list[float] = field(default_factory=list)
     valley_mean: float = float("nan")
+    mean_pairs: float = float("nan")        # C1 谷判定の分母 (低統計検知)
     null_vf: float = float("nan")
     margin: float = float("nan")            # valley_mean - null_vf
     optima_r2_min: float = float("nan")
