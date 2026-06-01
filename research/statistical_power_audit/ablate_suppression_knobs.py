@@ -100,11 +100,11 @@ def _k1_corridor_scores(d: float, *, n_seeds: int, n_evals: int, base_seed: int,
 # ---------------------------------------------------------------------------
 
 
-def _ridge_eval_for_ea(task, *, clip: bool):
+def _ridge_eval_for_ea_sized(task, *, clip: bool, n_tr: int = 48):
     def ev(gene_vec: np.ndarray, rng: np.random.Generator) -> float:
         g = StateUpdateGene(decay=float(gene_vec[0]), mix=float(gene_vec[1]),
                             gate_str=float(gene_vec[2]))
-        return ridge_fitness(g, task, n_train=48, n_eval=48, rng=rng, clip=clip)
+        return ridge_fitness(g, task, n_train=n_tr, n_eval=n_tr, rng=rng, clip=clip)
     return ev
 
 

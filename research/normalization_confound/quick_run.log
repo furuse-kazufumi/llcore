@@ -7,3 +7,4 @@ grid (clip,sigma,bounds) x6: [('hard', 0.15, 'current'), ('none', 0.15, 'current
 [vdr_D60|clip=none|sigma=0.15|bounds=current] verdict=noise_confounded valley_mean=0.867 null_vf=1.000 noise_std=0.206(thr=0.0130) noise_dom=True mm_flags=[True, True, True] spread=0.4213 R2[0.408,0.829] (237.0s)
 [vdr_D60|clip=soft|sigma=0.15|bounds=current] verdict=noise_confounded valley_mean=0.867 null_vf=1.000 noise_std=0.194(thr=0.0123) noise_dom=True mm_flags=[True, True, True] spread=0.2933 R2[0.387,0.680] (203.9s)
 [vdr_D60|clip=hard|sigma=0.1|bounds=current] verdict=noise_confounded valley_mean=0.889 null_vf=1.000 noise_std=0.157(thr=0.0142) noise_dom=True mm_flags=[True, True, True] spread=0.4349 R2[0.404,0.839] (220.7s)
+[vdr_D60|clip=hard|sigma=0.2|bounds=current] verdict=noise_confounded valley_mean=0.933 null_vf=1.000 noise_std=0.157(thr=0.0142) noise_dom=True mm_flags=[True, True, True] spread=0.3331 R2[0.493,0.826] (191.6s)
