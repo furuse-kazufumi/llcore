@@ -477,10 +477,35 @@ def _flipflop_fresh_chunk(target_extra_seeds: int, partial_path: Path, *,
     return block
 
 
-def _evaluate_fresh_blocks(partial_path: Path) -> dict:
-    """B 層 partial の到達済 per-seed を full gate で評価 (C-gen4b 元15 + fresh 合算)."""
+def _power_from_population(delta: np.ndarray, B: int, n_sweep: list[int],
+                           seed: int = 20260601) -> dict:
+    """与えられた delta 母集団 (= 累積 fresh) から full power 曲線を再算出 (honest 更新).
+
+    元 n=15 bootstrap は (もし観測 15 が pessimistic tail なら) power を過小評価しうる。
+    累積 fresh delta を母集団に再 bootstrap して n80・床天井を更新する。
+    """
+    rng = np.random.default_rng([seed, 99])
+    curve, ppsd = [], []
+    for n in n_sweep:
+        idx = rng.integers(0, len(delta), size=(B, n))
+        pw = _batch_gate_powers(delta[idx])
+        curve.append(pw["full"]); ppsd.append(pw["p_psd_floor"])
+    return {"n_sweep": n_sweep, "power_curve_full": curve,
+            "p_psd_floor_curve": ppsd, "n80_full_gate": _n80_from_curve(n_sweep, curve),
+            "p_psd_floor_ceiling": max(ppsd) if ppsd else 0.0}
+
+
+def _evaluate_fresh_blocks(partial_path: Path, *, B: int = 5000,
+                           n_sweep: list[int] | None = None) -> dict:
+    """B 層 partial の到達済 per-seed を full gate で評価 (C-gen4b 元15 + fresh 合算).
+
+    さらに累積 fresh delta から power を再 bootstrap し、元 n=15 の pessimistic bias を
+    補正した更新 power 曲線/n80/床天井を `updated_power` に格納 (honest disclosure)。
+    """
     state = _load_partial(partial_path)
     out: dict[str, dict] = {}
+    if n_sweep is None:
+        n_sweep = N_SWEEP
 
     # --- C-gen4b: 元 exp_ea3 (s0..14) を fresh が拡張 ---
     if "C-gen4b" in state:
@@ -490,12 +515,15 @@ def _evaluate_fresh_blocks(partial_path: Path) -> dict:
         n = len(me)
         if n >= 2:
             g = eval_gate(me, rnd, "MAP-E", "random", min_seeds=15)
+            delta = me - rnd
+            updated = _power_from_population(delta, B, n_sweep)
             out["C-gen4b_MAPE_vs_random"] = {
                 "n_total": n, "mean_mape": float(me.mean()), "mean_random": float(rnd.mean()),
                 "diff": g.diff, "wilcoxon_p_exact": g.wilcoxon_p,
                 "paired_sign_delta": g.paired_sign_delta, "cohen_dz": g.cohen_dz,
                 "gate_passes": g.passes, "cond_diff_pos": g.cond_diff_pos,
                 "cond_p": g.cond_p, "cond_n": g.cond_n, "cond_effect": g.cond_effect,
+                "updated_power_from_fresh_pop": updated,
             }
 
     # --- flip_flop: 元 exp_c2c3 (15) + fresh 追加。CRN は異なる (元は base20260530, fresh は別) ---
