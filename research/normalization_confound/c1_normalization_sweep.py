@@ -364,8 +364,8 @@ def build_grid(*, full: bool):
 def main() -> None:
     _ensure_utf8_stdout()
     ap = argparse.ArgumentParser(description="C1 normalization-confound sweep (vdr)")
-    ap.add_argument("--mode", choices=["smoke", "detect", "confirm"], default="detect",
-                    help="smoke=tiny / detect=検出 (n_restarts=8) / confirm=確認 (n_restarts>=15)")
+    ap.add_argument("--mode", choices=["smoke", "quick", "detect", "confirm"], default="detect",
+                    help="smoke=tiny / quick=G1適合(全6設定×2task<30分) / detect / confirm")
     ap.add_argument("--tasks", default="vdr_D60,vdr_D15",
                     help="comma-separated: vdr_D60,vdr_D15,vdr_mixture,flip_flop")
     ap.add_argument("--full-grid", action="store_true",
