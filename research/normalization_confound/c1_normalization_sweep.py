@@ -439,12 +439,18 @@ def main() -> None:
     by_task: dict[str, list[SettingResult]] = {}
     for r in results:
         by_task.setdefault(r.task, []).append(r)
+    # 反転 (any_flip) = baseline が smooth (または noise_confounded で谷が null と区別不能)
+    # なのに、別の正規化設定で **deceptive** (= valley_fraction が noisy-flat null を margin
+    # >=0.1 で有意に超える) になること。noise_confounded → deceptive も反転に数える
+    # (正規化を外して『ノイズで説明できない真の谷』が出れば人工物の証拠)。
     flip_settings = []
+    baseline_verdicts = {}
     for task, rs in by_task.items():
         base = next((x for x in rs
                      if x.clip == "hard" and abs(x.sigma - 0.15) < 1e-9 and x.bounds == "current"),
                     None)
-        if base is None or base.verdict != "smooth":
+        baseline_verdicts[task] = base.verdict if base else None
+        if base is None or base.verdict not in ("smooth", "noise_confounded"):
             continue
         for x in rs:
             if x is base:
