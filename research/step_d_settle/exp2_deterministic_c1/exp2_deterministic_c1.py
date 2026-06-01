@@ -379,6 +379,7 @@ def _aggregate_and_verdict(partial):
         flag_consistent = (len(flags) == 1)
         summary[label] = {
             "group": group,
+            "dim": lst[0]["dim"],
             "n_cells": len(lst),
             "is_multimodal_set": flags,
             "is_multimodal_consistent": flag_consistent,
