@@ -81,7 +81,7 @@ psd 床が binding に転じ、大 n でも full gate power が ~0.80 を超え�
 **null-ridge FPR** (gene 非依存 target = 真の H0, n_null=4): clip=True FPR=**0.0** / clip=False FPR=**0.0** / delta=0.0 / `clip_false_inflates_fpr=False`。
 G3 gate sanity: known-positive p=3.05e-5 psd=1.0 (PASS), known-null FPR=0.028 (<0.10) → `diagnostic_valid=True`。
 
-**判定 = `null_confirmed_at_power`** (但し低予算; §6.3)。verdict_flip=False 全 task、かつ clip=False は MAP-E を**むしろ劣化**させた (= clip は信号を隠していない)。
+**判定 = `not_load_bearing_at_this_budget`** (CF4; 旧 label `null_confirmed_at_power` を FPR 0/0 + ~7x 縮小予算ゆえ精緻化。但し低予算; §6.3)。verdict_flip=False 全 task、かつ clip=False は MAP-E を**むしろ劣化**させた (= clip は信号を隠していない)。
 
 ---
 
