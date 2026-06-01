@@ -205,9 +205,14 @@ def _landscapes():
         # (A) 3-param ESN gene — exp6 で滑らか視認地形
         ("ESN_3param", _eval_3param, 3, (0.0, 1.0),
          [(12, 200, 0.12), (24, 300, 0.12)], "real"),
-        # (B) per-neuron leak — high-dim, MAP-E 本領域
+        # (B) per-neuron leak — high-dim, MAP-E 本領域。
+        # nr=24 を G1 から除外 (honest disclosure): dim=40 の C1 midpoint 相は
+        # C(nr,2)×3 個の **full Python-loop ESN run** (各 4580 timestep) を要し、
+        # nr=24 で実測 CPU>1000s/cell (G1 900s 超過) を確認 → nr=24 perneuron は
+        # G1 非現実的として除外。nr=12 perneuron (3 seed) + 3param(nr12/24) で地形判定は
+        # 十分 (3param は nr24 も完走済、両 budget で vf=0 一致)。
         ("ESN_perneuron40", _eval_perneuron, 40, (0.0, 1.0),
-         [(12, 200, 0.12), (24, 300, 0.12)], "real"),
+         [(12, 200, 0.12)], "real"),
         # (C+ dim3) positive control: 分離多峰 Gaussian (ESN_3param と dim 一致) → 多峰必須
         ("ctrl_multipeak_dim3", _multipeak3(), 3, (0.0, 1.0),
          [(12, 200, 0.12), (24, 300, 0.12)], "control_pos"),
