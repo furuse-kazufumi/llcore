@@ -1,3 +1,4 @@
-[23:49:59] EXP2 start (smoke=True) per_run_budget=820.0s
-[23:50:12] self-check ESN_3param: det_fit=0.3513 eval_noise_std=0.000e+00 (should be 0 for deterministic)
-[23:50:13] self-check ESN_perneuron40: det_fit=0.3673 eval_noise_std=0.000e+00 (should be 0 for deterministic)
+[23:51:16] EXP2 start (smoke=True) per_run_budget=820.0s
+[23:51:20] self-check ESN_3param: det_fit=0.3513 eval_noise_std=0.000e+00 (should be 0 for deterministic)
+[23:51:22] self-check ESN_perneuron40: det_fit=0.3673 eval_noise_std=0.000e+00 (should be 0 for deterministic)
+[23:51:22] self-check ctrl_corridor_d016: det_fit=0.6007 eval_noise_std=1.110e-16 (should be 0 for deterministic)

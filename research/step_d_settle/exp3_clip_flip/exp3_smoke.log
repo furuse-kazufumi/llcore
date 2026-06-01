@@ -1,0 +1,9 @@
+=== EXP3 clip verdict-flip + null-ridge FPR (smoke) ===
+n_seeds=3 n_evals=40 honest_n=6 n_tr=12 grid_k=8 null_seeds=[20260701]
+
+[G3] gate sanity: known_pos_passes=True known_null_fpr=0.028 valid=True
+
+[verdict-flip] task=addition clip=True ...
+[verdict-flip] task=addition clip=False ...
+  addition: clip=True LB=False (beaten=0/3)  clip=False LB=False (beaten=0/3)  flip=False
+[verdict-flip] task=flip_flop clip=True ...

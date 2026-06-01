@@ -166,7 +166,7 @@ def _landscapes():
         ("ESN_perneuron40", _eval_perneuron, 40, (0.0, 1.0),
          [(12, 200, 0.12), (24, 300, 0.12)], "real"),
         # (C+) positive control: 決定論化 corridor (d=0.16) → 多峰であるべき
-        ("ctrl_corridor_d016", _corridor_det, _DIM_CORRIDOR, (0.0, 1.0),
+        ("ctrl_corridor_d016", _corridor_det(), _DIM_CORRIDOR, (0.0, 1.0),
          [(12, 200, 0.12), (24, 300, 0.12)], "control_pos"),
         # (C-) negative control: noiseless 単峰二次 → smooth であるべき
         ("ctrl_quadratic_unimodal", _quadratic_eval, 24, (0.0, 1.0),
