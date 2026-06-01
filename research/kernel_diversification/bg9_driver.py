@@ -114,55 +114,88 @@ REAL_TASKS = ("selective_copy", "bistable_denoise", "weighted_accum")  # BG9-3 P
 
 # ---------------------------------------------------------------------------
 # positive control: synthetic kernel-barrier eval (kernel_id 軸 deceptive corridor)
-#   exp_knob_sweep.make_corridor_eval を kernel_id 軸へ翻案 (gene.mean() → gene[0]=kernel_id)。
+#   exp_knob_sweep.make_corridor_eval (genotypic corridor + dip) を **kernel_id 軸** へ翻案する。
+#   honest 設計上の落とし穴 (実測で発覚) と対策:
+#     - exp4 の corridor は behavior=mean(gene[24 dim]) で CLT により random が b≈0.5 に固着し
+#       高 behavior の corridor に **構造的に不到達** だから deceptive だった。
+#     - kernel_id を単純に gene[0] の関数にすると、random は kernel_id∈[0,4) を **直接一様サンプル**
+#       でき target basin (kid≈3.5) に容易に当たる → 谷を跨ぐ必要が無く RR-hillclimb も全勝で
+#       harness が壊れる (tiny smoke で実証: 全 method reach=1.00)。
+#   対策: target basin への到達を **(i) kernel_id の谷を跨ぐ ∧ (ii) theta が CLT 不到達の
+#   genotype corridor (theta-mean を上端へ押す)** の **両方** で律速する。
+#     - random: theta-mean が CLT で中央 (~0.5 正規化) に固着 → target の theta 条件に不到達
+#       → 局所峰 (低 kernel_id・theta 任意) の天井までしか出ない。
+#     - RR-hillclimb: theta-mean は climb できるが kernel_id の谷 (downhill) で (1+1) が止まり
+#       局所 kernel basin に詰まる。
+#     - MAP-E: kernel_id bin (4 niche) を stepping-stone に保持して谷を跨ぎ、かつ各 niche 内で
+#       theta corridor を ratchet → target basin 到達。
+#   = 「kernel_id 障壁を跨ぐ diversity 維持」が load-bearing になる純 harness validity 基質。
 # ---------------------------------------------------------------------------
-# 谷の中心 kernel_id (rwkv basin と target basin の中点付近に dip)。kernel_id∈[0,N_KERNELS)。
-_POS_LOCAL_KID = 0.5   # 局所峰: rwkv basin (init が自然に落ちる低 kernel_id)
-_POS_GLOB_KID = 3.5    # 大域峰: target = linear_attn basin (実際に働く kernel, hopfield 回避)
-_POS_DIP_KID = 2.0     # 谷の中央 (mamba/hopfield basin の境界帯 = 跨ぐべき障壁)
-_POS_LOCAL_H = 0.60
-_POS_GLOB_H = 1.00
-_POS_LOCAL_W = 0.30    # kernel_id 単位 (1 bin 幅程度) の Gaussian 幅
-_POS_GLOB_W = 0.30
-_POS_DIP_W = 0.55      # 谷の幅 (中間 2 kernel basin を覆う)
+_POS_LOCAL_KID = 0.5   # 局所峰の kernel_id (rwkv basin, init/random が自然に落ちる低 kernel_id)
+_POS_GLOB_KID = 3.5    # target 峰の kernel_id (linear_attn basin, 実働 kernel, hopfield 回避)
+_POS_DIP_KID = 2.0     # 谷の中央 kernel_id (中間 basin = 跨ぐべき障壁)
+_POS_KID_W = 0.45      # kernel_id 峰/谷の Gaussian 幅 (1 bin ≈ 1.0 単位に対し basin を 1 bin に収める)
+_POS_DIP_W = 0.55      # 谷の幅
+_POS_LOCAL_CEIL = 0.55  # 局所峰 (低 kernel_id) の天井 fitness — random/RR が届く上限
+_POS_GLOB_CEIL = 1.00  # target 峰の天井 fitness
+_POS_THETA_TARGET = 0.85  # target basin が要求する正規化 theta-mean (CLT 中央 ~0.5 から離す)
+_POS_THETA_W = 0.18    # theta corridor の許容幅 (狭いほど random が CLT で不到達)
 _POS_NOISE = 0.008     # exp_knob_sweep と同一低ノイズ
-_POS_THETA_BONUS = 0.0  # theta は positive control では fitness に無関与 (kernel_id 軸のみ deceptive)
 POS_GLOBAL_PEAK_PROXY = 0.8  # honest fitness > これ で target basin 到達と判定 (exp4 と同 proxy)
 
 
+def _norm_theta_mean(gene_vec5: np.ndarray) -> float:
+    """gene の theta 部 (gene[1:5]) の平均を GA bounds で [0,1] 正規化 (genotype corridor 軸).
+
+    GA は theta 各座標を ``kernel_ga_bounds`` の box [lo,hi] で一様初期化するので、random の
+    正規化 theta-mean は CLT で ~0.5 に固着する (4 座標平均 → 分散 1/12/4)。target が要求する
+    正規化 theta-mean=0.85 は ~0.5+0.35 ≈ 4σ 先 → random が構造的に不到達 = exp4 の CLT corridor。
+    """
+    lo, hi = kernel_ga_bounds()
+    th_lo, th_hi = lo[1:5], hi[1:5]
+    th = np.clip(np.asarray(gene_vec5[1:5], dtype=np.float64), th_lo, th_hi)
+    frac = (th - th_lo) / np.maximum(th_hi - th_lo, 1e-12)
+    return float(np.mean(frac))
+
+
 def make_kernel_barrier_eval(d: float = 1.0) -> EvalOnce:
-    """synthetic kernel-barrier eval を返す (kernel_id 軸の deceptive corridor).
+    """synthetic kernel-barrier eval を返す (kernel_id 障壁 + genotype theta corridor の deceptive 地形).
 
-    exp_knob_sweep.make_corridor_eval の構造を kernel_id 軸に翻案:
-      - 局所峰 (rwkv basin, kid=0.5, 高さ 0.60) ── init が自然に落ちる。
-      - target 峰 (linear_attn basin, kid=3.5, 高さ 1.00) ── 大域最適。
-      - その間 (kid≈2.0) に深さ d の **kernel_id 軸 fitness 谷 (dip)** を彫り、局所峰→target 峰を
-        結ぶ単調 ramp に dip を入れる。hill-climb は kernel_id を 0.5→3.5 へ連続増加で登りたいが、
-        中間の谷 (downhill) で (1+1) が拒否し局所峰に詰まる。MAP-E は kernel_id bin (4 niche) を
-        stepping-stone に保持して谷を跨ぎ target basin へ ratchet。
+    fitness = max(local_peak, target_peak):
+      - local_peak: 低 kernel_id (≈0.5) の Gaussian × 天井 _POS_LOCAL_CEIL。theta 不問。
+        init/random/RR が自然に届く「罠」の峰。
+      - target_peak: 高 kernel_id (≈3.5) の Gaussian × theta-corridor Gaussian × 天井 _POS_GLOB_CEIL。
+        **kernel_id の谷を跨ぐ ∧ theta-mean を _POS_THETA_TARGET へ押す** の両方を要求。さらに
+        kernel_id [local,glob] 区間に深さ d の谷 (dip) を彫り、hill-climb の連続登坂を downhill で阻む。
 
-    d=1.0 = 深い dip (deceptive)、d=0.0 = 谷無し単調 ramp (smooth control)。本 positive control は
-    d=1.0 を既定とする (harness validity は「③が在るとき検出できるか」の検定ゆえ deceptive を要求)。
+    d=1.0 = 深い dip (deceptive, 既定)、d=0.0 = 谷無し (smooth control)。harness validity は「③が
+    在るとき検出できるか」の検定ゆえ deceptive (d=1.0) を要求する。
 
-    fitness は **kernel_id 連続値のみ** の関数 (theta 無関与) なので、A1 theta-only MAP-E は
-    kernel_id niche を持てず → 優位が消えるはず (③優位が kernel diversity 由来であることの陽性対照)。
+    A1 theta-only MAP-E は kernel_id niche を持たないため、theta corridor は登れても kernel_id の
+    谷を跨げず局所 kernel basin に留まる → 優位が消えるはず (③優位が kernel diversity 由来である
+    ことの陽性対照: pre-reg §3 A1)。
     """
     if not (0.0 <= d <= 1.0):
         raise ValueError(f"d must be in [0,1], got {d}")
 
     def kernel_barrier_eval(gene_vec5: np.ndarray, rng: np.random.Generator) -> float:
         kid = float(np.clip(gene_vec5[0], 0.0, N_KERNELS - 1e-9))
-        local = _POS_LOCAL_H * np.exp(-((kid - _POS_LOCAL_KID) ** 2) / (2 * _POS_LOCAL_W ** 2))
-        glob = _POS_GLOB_H * np.exp(-((kid - _POS_GLOB_KID) ** 2) / (2 * _POS_GLOB_W ** 2))
-        # 局所峰→target 峰を結ぶ単調 ramp 区間 [local_kid, glob_kid] に谷を彫る
+        tm = _norm_theta_mean(gene_vec5)  # 正規化 theta-mean ∈ [0,1] (genotype corridor 軸)
+
+        # 局所峰 (低 kernel_id, theta 不問) — random/RR が届く罠
+        local = _POS_LOCAL_CEIL * np.exp(-((kid - _POS_LOCAL_KID) ** 2) / (2 * _POS_KID_W ** 2))
+
+        # target 峰: kernel_id basin × theta corridor。kernel_id ramp に dip を彫る。
+        kid_gauss = np.exp(-((kid - _POS_GLOB_KID) ** 2) / (2 * _POS_KID_W ** 2))
+        theta_gauss = np.exp(-((tm - _POS_THETA_TARGET) ** 2) / (2 * _POS_THETA_W ** 2))
         if _POS_LOCAL_KID <= kid <= _POS_GLOB_KID:
-            t = (kid - _POS_LOCAL_KID) / (_POS_GLOB_KID - _POS_LOCAL_KID)
-            ramp = _POS_LOCAL_H + t * (_POS_GLOB_H - _POS_LOCAL_H)
             dip = d * np.exp(-((kid - _POS_DIP_KID) ** 2) / (2 * _POS_DIP_W ** 2))
-            corridor = ramp * (1.0 - dip)
+            barrier = 1.0 - dip  # kernel_id 谷 (downhill) を跨ぐ律速
         else:
-            corridor = 0.0
-        return float(max(local, glob, corridor) + rng.normal(0, _POS_NOISE))
+            barrier = 1.0
+        target = _POS_GLOB_CEIL * kid_gauss * theta_gauss * barrier
+
+        return float(max(local, target) + rng.normal(0, _POS_NOISE))
 
     return kernel_barrier_eval
 
