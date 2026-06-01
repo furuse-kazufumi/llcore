@@ -660,13 +660,31 @@ def _verdict(layer_a: dict, fresh_eval: dict) -> dict:
                     "fresh_gate_passes": fr_pass, "fresh_psd": fr_psd}
 
         # (2) fresh 真再走で diff<=0 へ収束 → null_confirmed_at_power
+        #     [CF1] 非対称是正: load_bearing 枝(3)が power>=0.80 を要求するのと対称に、
+        #     null 枝も「床サイズ効果 (psd=MIN_EFFECT) を検出できる十分な検出力が
+        #     到達 fresh_n であったか」を要求する。床効果 power<0.80 では「単に負へ
+        #     ぶれただけ」を「power で null 確定」と誤主張しうるため、その場合は
+        #     null_confirmed_at_power を名乗らせず still_inconclusive (null 寄り) に落とす。
         if fr_diff is not None and fr_n >= 15 and fr_diff <= 0:
-            v = "null_confirmed_at_power"
-            reason = (f"fresh 真再走 n={fr_n} で diff={fr_diff:+.4f}<=0 へ収束 → ③不在を確証 "
-                      f"(STATISTICAL_POWER_VERDICT §6 準拠)。")
+            floor_pw = _floor_effect_power_at_n(fr_n, B_FLOOR)
+            floor_power = floor_pw["floor_effect_power_at_n"]
+            if floor_power >= 0.80:
+                v = "null_confirmed_at_power"
+                reason = (f"fresh 真再走 n={fr_n} で diff={fr_diff:+.4f}<=0 へ収束、かつ "
+                          f"床効果 (psd={MIN_EFFECT}) に対する検出力 power@n={fr_n}="
+                          f"{floor_power:.3f}>=0.80 (床サイズ効果なら検出できたはずの十分な "
+                          f"検出力下で負) → ③不在を確証 (STATISTICAL_POWER_VERDICT §6 準拠)。")
+            else:
+                v = "still_inconclusive"
+                reason = (f"fresh 真再走 n={fr_n} で diff={fr_diff:+.4f}<=0 だが、床効果 "
+                          f"(psd={MIN_EFFECT}) に対する検出力 power@n={fr_n}={floor_power:.3f}"
+                          f"<0.80 (床サイズ効果すら検出できる検出力に達していない) → "
+                          f"『power で null 確定』を名乗らず保留 (null 寄り; 単に負へぶれた "
+                          f"だけと区別不能 = CF1 非対称是正)。fresh n80 拡張で要再検定。")
             return {"verdict": v, "reason": reason, "psd_obs": psd_obs, "diff_obs": diff_obs,
                     "fresh_diff": fr_diff, "fresh_n": fr_n, "fresh_gate_passes": fr_pass,
-                    "n80": n80}
+                    "n80": n80, "floor_effect_power_at_fresh_n": floor_power,
+                    "floor_effect_power_check": floor_pw}
 
         # (3) load_bearing: fresh full gate PASS ∧ 更新 power が到達 fresh_n で >=0.80
         #     (= 単発の幸運でなく十分検出力下での PASS)。更新母集団で床天井も 0.80 以上。
