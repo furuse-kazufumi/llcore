@@ -614,6 +614,107 @@ def _evaluate_fresh_blocks(partial_path: Path, *, B: int = 5000,
 
 
 # ===========================================================================
+# [§6.1 a/b] C-gen4b 走行内ドリフト + 多重比較補正の開示フィールド
+# ===========================================================================
+def _cgen4b_drift_disclosure(partial_path: Path, *,
+                             chunk_size: int = 16,
+                             n_family_tests: int = 3) -> dict | None:
+    """C-gen4b fresh per-seed delta の n 軌跡 + chunk 別 diff/frac_pos + 多重比較補正.
+
+    §6.1(a): 累積 p / 累積 diff / 累積 psd の n 軌跡 (optional-stopping ドリフトの開示)
+             + chunk 別 (chunk_size seed ごと) diff・frac_pos (後半 seed 符号反転の開示)。
+    §6.1(b): Bonferroni 補正後の閾値 (α/n_family_tests) と最終 p の PASS/FAIL。
+    元数値は壊さず追記専用。partial が無ければ None。
+    """
+    state = _load_partial(partial_path)
+    if "C-gen4b" not in state:
+        return None
+    ps = state["C-gen4b"]["per_seed"]
+    me = np.asarray(ps["map_elites"], dtype=np.float64)
+    rnd = np.asarray(ps["random"], dtype=np.float64)
+    n_total = int(min(len(me), len(rnd)))
+    if n_total < 2:
+        return None
+    me = me[:n_total]
+    rnd = rnd[:n_total]
+    delta = me - rnd
+
+    # (a) 累積 n 軌跡 (n=2..n_total)。p は src exact (_paired_p)。
+    cum_n, cum_diff, cum_p, cum_psd, cum_frac_pos = [], [], [], [], []
+    for k in range(2, n_total + 1):
+        d_k = delta[:k]
+        cum_n.append(k)
+        cum_diff.append(float(d_k.mean()))
+        cum_p.append(float(_paired_p(me[:k], rnd[:k])))
+        cum_psd.append(float(_paired_sign_delta(d_k)))
+        cum_frac_pos.append(float(np.mean(d_k > 0)))
+
+    # (b) chunk 別 (符号反転の開示)
+    chunks = []
+    for start in range(0, n_total, chunk_size):
+        seg = delta[start:start + chunk_size]
+        if seg.size == 0:
+            continue
+        chunks.append({
+            "seed_range": [start, start + seg.size - 1],
+            "n": int(seg.size),
+            "diff": float(seg.mean()),
+            "frac_pos": float(np.mean(seg > 0)),
+            "psd": float(_paired_sign_delta(seg)),
+        })
+
+    # 前半/後半 + 末尾 chunk の要約
+    half = n_total // 2
+    first_half = delta[:half]
+    second_half = delta[half:]
+    last16 = delta[-16:] if n_total >= 16 else delta
+    last_chunk = delta[-(n_total % chunk_size or chunk_size):]
+
+    # 多重比較補正
+    alpha_bonf = ALPHA / n_family_tests
+    final_p = cum_p[-1]
+    return {
+        "n_total_fresh": n_total,
+        "source": "exp1_freshrun_partial.json (C-gen4b per_seed delta = map_elites - random)",
+        "cumulative_trajectory": {
+            "n": cum_n,
+            "cum_diff": cum_diff,
+            "cum_wilcoxon_p_exact": cum_p,
+            "cum_paired_sign_delta": cum_psd,
+            "cum_frac_pos": cum_frac_pos,
+        },
+        "chunk_size": chunk_size,
+        "chunks": chunks,
+        "drift_summary": {
+            "first_half_diff": float(first_half.mean()),
+            "first_half_frac_pos": float(np.mean(first_half > 0)),
+            "second_half_diff": float(second_half.mean()),
+            "second_half_frac_pos": float(np.mean(second_half > 0)),
+            "last16_diff": float(last16.mean()),
+            "last16_frac_pos": float(np.mean(last16 > 0)),
+            "last_chunk_diff": float(last_chunk.mean()),
+            "last_chunk_n": int(last_chunk.size),
+            "sign_reversal_in_tail": bool(second_half.mean() < first_half.mean()
+                                          and last16.mean() < 0),
+        },
+        "multiple_comparison": {
+            "n_family_tests": n_family_tests,
+            "alpha_uncorrected": ALPHA,
+            "alpha_bonferroni": alpha_bonf,
+            "final_p_exact": final_p,
+            "passes_uncorrected": bool(final_p < ALPHA),
+            "passes_bonferroni": bool(final_p < alpha_bonf),
+        },
+        "note": (
+            "§6.1(a)(b) 開示: 累積 p は n=40 付近で初 PASS→深く有意化後、末尾 seed の符号反転で "
+            "p≈0.038 へ 0.05 境界近くへ戻る (optional-stopping ドリフト)。Bonferroni α=ALPHA/3 で "
+            "最終 p は FAIL。これらは『③ load-bearing 候補』を覆さないが NOT-null headline を弱める。"
+            "§6.1(c) fresh n=80 延長は高価ゆえ未実施 (次サイクル TODO)。"
+        ),
+    }
+
+
+# ===========================================================================
 # 3 値判定 (falsifiable_criteria)
 # ===========================================================================
 def _verdict(layer_a: dict, fresh_eval: dict) -> dict:
