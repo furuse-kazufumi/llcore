@@ -135,6 +135,10 @@ corridor の欺瞞性は **behavioral-reach 欺瞞** (単一 basin に trap、�
 これにより STATISTICAL_POWER_VERDICT の §4/§5/§8 が断定していた「K4 = 唯一の能動的 suppression 機序」は **過大**と判明。
 Codex F2 が「有力候補に降格」と予言したとおり、本実験で **診断的所見に確定降格**した。
 
+**verdict label (CF4):** EXP3 の run verdict label は `null_confirmed_at_power` から **`not_load_bearing_at_this_budget`** に統一する。
+null-ridge FPR=0/0 は null_seeds=4 の床値、かつ ~7x 縮小予算 (n_evals 60 vs 400, n_tr 16 vs 48) ゆえ、
+「null を確定した」より「**この予算では K4 が load-bearing でない**」が正確 (Codex CF4)。判定の実体 (診断的所見への降格) は不変、label 語のみ精緻化。
+
 ---
 
 ## 5. 過去 verdict (E-A C-gen4 / StepC / step6 / 谷深さ N/A / 統計監査) をどう更新するか
