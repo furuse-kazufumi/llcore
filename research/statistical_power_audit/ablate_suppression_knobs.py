@@ -225,11 +225,13 @@ def main() -> int:
     if args.smoke:
         n_seeds, n_evals = 15, 600
         borderline_ds = [0.13]
-        k3_seeds, k3_evals = 15, 300
+        k3_seeds, k3_evals = 5, 80
     else:
         n_seeds, n_evals = 15, 1500
         borderline_ds = [0.13, 0.14, 0.15]
-        k3_seeds, k3_evals = 20, 600
+        # K3 は ridge_fitness が 35ms/call と重く、読み出し方式比較に大予算不要なので
+        # G1 (<900s) 内に収めるため縮小 (silent truncation 禁止: _meta に明記)。
+        k3_seeds, k3_evals = 10, 120
 
     results: dict[str, dict] = {}
     flips: list[dict] = []
