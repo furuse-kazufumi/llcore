@@ -91,6 +91,69 @@ def textbook_cliff_delta(a: np.ndarray, b: np.ndarray) -> float:
     return (gt - lt) / n_pairs
 
 
+# ===========================================================================
+# 高速 vectorized 片側 Wilcoxon p (power シミュレーション専用)
+# ---------------------------------------------------------------------------
+# DISCLOSURE: src の honest_eval._paired_p は scipy.wilcoxon (n<=~25 で exact 分布)。
+# bootstrap power 計算は 1 ターゲットあたり数万 回の検定が要るため、各再標本に exact
+# scipy を呼ぶと G1 (<900s) を破る。そこで power シミュレーション **専用** に正規近似
+# (tie & 連続性補正つき) の vectorized 片側 Wilcoxon p を実装する。観測 negative の
+# 単発判定や gate 適用には常に src の _paired_p (exact) を使う。近似の妥当性は G3 破綻
+# ゲート (null<=0.06 / big>=0.95 / C-gen4b 模擬一致) で必ず検証する。
+# ===========================================================================
+
+
+def wilcoxon_p_greater_batch(samples: np.ndarray) -> np.ndarray:
+    """(B, n) の paired-delta 標本に対し片側 (H1: median>0) Wilcoxon p を vectorized 算出.
+
+    正規近似 + tie correction + 連続性補正。signed-rank 統計量 W+ の漸近 N(mu, sigma^2)。
+    全タイ (delta すべて 0) の行は p=1.0。
+    """
+    s = np.asarray(samples, dtype=np.float64)
+    B, n = s.shape
+    absd = np.abs(s)
+    # 各行で abs(delta) を順位付け (タイは平均順位)。0 (タイ vs 0) は除外して扱う。
+    out = np.ones(B, dtype=np.float64)
+    for i in range(B):  # 行ループだが中身は numpy (n<=300 で十分速い)
+        row = s[i]
+        nz = row[row != 0.0]
+        m = nz.size
+        if m == 0:
+            out[i] = 1.0
+            continue
+        a = np.abs(nz)
+        order = np.argsort(a, kind="mergesort")
+        ranks = np.empty(m, dtype=np.float64)
+        sa = a[order]
+        # 平均順位 (タイ処理)
+        j = 0
+        while j < m:
+            k = j
+            while k + 1 < m and sa[k + 1] == sa[j]:
+                k += 1
+            avg = (j + k) / 2.0 + 1.0  # 1-based 平均
+            ranks[order[j:k + 1]] = avg
+            j = k + 1
+        w_plus = float(np.sum(ranks[nz > 0]))
+        mu = m * (m + 1) / 4.0
+        # tie correction
+        _, counts = np.unique(sa, return_counts=True)
+        tie_term = float(np.sum(counts ** 3 - counts))
+        var = m * (m + 1) * (2 * m + 1) / 24.0 - tie_term / 48.0
+        if var <= 0:
+            out[i] = 1.0
+            continue
+        z = (w_plus - mu - 0.5) / np.sqrt(var)  # 連続性補正
+        # 片側 H1: W+ 大 (正の差が多い) → 上側
+        out[i] = 0.5 * _erfc(z / np.sqrt(2.0))
+    return out
+
+
+def _erfc(x: float) -> float:
+    from math import erfc
+    return erfc(x)
+
+
 @dataclass
 class GateEval:
     """a が b を上回るかの完全 strict gate 評価 (任意閾値)."""
