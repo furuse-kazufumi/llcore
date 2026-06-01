@@ -108,15 +108,20 @@ def _ridge_eval_for_ea(task, *, clip: bool):
     return ev
 
 
-def _k3_archive_vs_global(*, n_seeds: int, n_evals: int, base_seed: int) -> dict:
+def _k3_archive_vs_global(*, n_seeds: int, n_evals: int, base_seed: int,
+                          honest_n: int = 12, n_tr: int = 24) -> dict:
     """K3: MAP-E の best 読み出しを global-best (現行) vs archive-max で比較.
 
     archive_out probe で最終 archive を取得し archive-max を再計算 (production 不変)。
     ridge clip=True landscape (memory task 系) で randselect との gap が読み出しで変わるか。
     behavior=decay 軸 (gene[0])。両モードを honest 再評価 (CRN) で採点。
+
+    予算注 (G1 破綻ゲート): ridge_fitness は train/predict で重い。読み出し方式の比較に
+    効果量精度は不要なので honest_n / n_train / n_eval を縮小 (smoke で global vs archive の
+    符号は安定確認済)。silent truncation 禁止のため _meta に縮小を明記。
     """
-    task = CopyTask(state_dim=8, out_dim=8, seq_len=24)
-    eval_once = _ridge_eval_for_ea(task, clip=True)
+    task = CopyTask(state_dim=8, out_dim=8, seq_len=16)
+    eval_once = _ridge_eval_for_ea_sized(task, clip=True, n_tr=n_tr)
     dim, bounds = 3, (np.array([0.0, -1.0, -2.0]), np.array([1.0, 1.0, 2.0]))
     bb = (np.array([0.0]), np.array([1.0]))
     behavior = lambda g: np.array([g[0]])  # noqa: E731
@@ -126,7 +131,7 @@ def _k3_archive_vs_global(*, n_seeds: int, n_evals: int, base_seed: int) -> dict
         return np.random.default_rng(np.random.SeedSequence([base_seed, mi, s]))
 
     def honest(gene, s):
-        return AC.honest_reevaluate(eval_once, gene, n_trials=30,
+        return AC.honest_reevaluate(eval_once, gene, n_trials=honest_n,
                                     rng=np.random.default_rng(
                                         np.random.SeedSequence([base_seed, 7, s])))
 
