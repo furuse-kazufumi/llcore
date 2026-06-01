@@ -1,0 +1,6 @@
+=== EXP3 clip verdict-flip + null-ridge FPR (full) ===
+n_seeds=15 n_evals=60 honest_n=8 n_tr=16 grid_k=12 null_seeds=[20260701, 20260801, 20260901, 20261001]
+
+[G3] gate sanity: known_pos_passes=True known_null_fpr=0.028 valid=True
+
+[verdict-flip] task=addition clip=True ...

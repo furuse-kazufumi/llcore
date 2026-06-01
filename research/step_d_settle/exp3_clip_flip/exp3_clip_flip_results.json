@@ -1,0 +1,339 @@
+{
+  "_meta": {
+    "script": "exp3_clip_verdict_flip",
+    "wall_clock_s": 85.469,
+    "src_unchanged": true,
+    "src_changed_files": [],
+    "exit_ok": true,
+    "wall_clock_s_total": 85.435,
+    "mode": "smoke",
+    "design": "EXP3 K4 clip verdict-flip + null-ridge FPR (Codex F2 確定/反証)",
+    "base_seed": 20260601,
+    "n_seeds": 3,
+    "n_evals_verdict": 40,
+    "n_evals_null": 40,
+    "honest_n": 6,
+    "n_tr": 12,
+    "grid_k": 8,
+    "null_seeds": [
+      20260701
+    ],
+    "ea_baselines": [
+      "map_elites_randselect",
+      "panmictic_ga",
+      "random"
+    ],
+    "supersedes": "research/statistical_power_audit/ablate_suppression_knobs.py K4_clip_spread (spread/floor 率のみ; verdict-flip 未測)",
+    "budget_reduction_disclosure": "ridge_fitness は ~10ms/call (n_tr=16)。verdict-flip / FPR の ③判定に効果量精度は不要なので n_evals/honest_n/n_tr を縮小: verdict n_evals=40, null n_evals=40, honest_n=6, n_tr=12, grid_k=8 (G1<900s 遵守)。exp_ea3 本実験は n_evals=400/honest_n=30/n_tr=48。本実験は③の有無 (verdict 反転) の検出が目的で精密な効果量は不要なため縮小。silent truncation なし。CRN seed は clip True/False 間で共通。",
+    "honest_caveats": "(1) ridge_fitness の clip=True 0.0 は raw R²<0 を潰した床で『信号皆無』とは識別不能 (ridge_readout docstring の Codex High finding)。(2) 縮小予算ゆえ underpowered な case では verdict_flip=False が 『clip 無関係』でなく『低 power で③検出不能』の可能性 (EXP1 の psd 床 問題と同根)。本実験は『clip を外しても③が出ないか』の方向性確認が主眼。(3) null-ridge FPR は len(null_seeds) 反復のみで MC 誤差大 (±1/sqrt(N))。FPR delta が 0.05 床近傍なら『分離不能』判定が妥当。"
+  },
+  "g3_gate_sanity": {
+    "known_positive_passes": true,
+    "known_positive_p": 3.0517578125e-05,
+    "known_positive_psd": 1.0,
+    "known_null_fpr": 0.0275,
+    "known_null_fpr_under_010": true,
+    "diagnostic_valid": true
+  },
+  "verdict_flip": {
+    "addition": {
+      "clip_true": {
+        "map_elites_mean": 0.0,
+        "map_elites_std": 0.0,
+        "per_baseline": {
+          "map_elites_randselect": {
+            "diff": -0.0010578692159104329,
+            "wilcoxon_p": 1.0,
+            "paired_sign_delta": -0.3333333333333333,
+            "cliff_delta_textbook": -0.3333333333333333,
+            "cond_diff_pos": false,
+            "cond_p": false,
+            "cond_effect": true,
+            "cond_n": true,
+            "passes": false
+          },
+          "panmictic_ga": {
+            "diff": -0.015058153069697766,
+            "wilcoxon_p": 1.0,
+            "paired_sign_delta": -0.6666666666666666,
+            "cliff_delta_textbook": -0.6666666666666666,
+            "cond_diff_pos": false,
+            "cond_p": false,
+            "cond_effect": true,
+            "cond_n": true,
+            "passes": false
+          },
+          "random": {
+            "diff": -0.006406927854254008,
+            "wilcoxon_p": 1.0,
+            "paired_sign_delta": -0.3333333333333333,
+            "cliff_delta_textbook": -0.3333333333333333,
+            "cond_diff_pos": false,
+            "cond_p": false,
+            "cond_effect": true,
+            "cond_n": true,
+            "passes": false
+          }
+        },
+        "n_baselines_beaten": 0,
+        "load_bearing": false
+      },
+      "clip_false": {
+        "map_elites_mean": -1.045247203459329,
+        "map_elites_std": 0.5553390200858501,
+        "per_baseline": {
+          "map_elites_randselect": {
+            "diff": -0.23832646442169744,
+            "wilcoxon_p": 0.75,
+            "paired_sign_delta": -0.3333333333333333,
+            "cliff_delta_textbook": -0.3333333333333333,
+            "cond_diff_pos": false,
+            "cond_p": false,
+            "cond_effect": true,
+            "cond_n": true,
+            "passes": false
+          },
+          "panmictic_ga": {
+            "diff": -0.6882165861872034,
+            "wilcoxon_p": 1.0,
+            "paired_sign_delta": -1.0,
+            "cliff_delta_textbook": -0.7777777777777778,
+            "cond_diff_pos": false,
+            "cond_p": false,
+            "cond_effect": true,
+            "cond_n": true,
+            "passes": false
+          },
+          "random": {
+            "diff": 1.2191585443249855,
+            "wilcoxon_p": 0.25,
+            "paired_sign_delta": 0.3333333333333333,
+            "cliff_delta_textbook": 0.3333333333333333,
+            "cond_diff_pos": true,
+            "cond_p": false,
+            "cond_effect": true,
+            "cond_n": true,
+            "passes": false
+          }
+        },
+        "n_baselines_beaten": 0,
+        "load_bearing": false
+      },
+      "verdict_flip_false_reveals_third": false,
+      "reverse_flip_clip_needed_for_third": false,
+      "per_seed_clip_true": {
+        "map_elites": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "map_elites_randselect": [
+          0.0,
+          0.003173607647731299,
+          0.0
+        ],
+        "panmictic_ga": [
+          0.0,
+          0.01945527366878071,
+          0.02571918554031259
+        ],
+        "random": [
+          0.0,
+          0.019220783562762023,
+          0.0
+        ]
+      },
+      "per_seed_clip_false": {
+        "map_elites": [
+          -1.2163878376426978,
+          -1.623480549617068,
+          -0.2958732231182209
+        ],
+        "map_elites_randselect": [
+          -0.8359114930581324,
+          -0.6396407128778797,
+          -0.945210011176882
+        ],
+        "panmictic_ga": [
+          -0.17001534354488848,
+          -0.7094647141419886,
+          -0.1916117941294995
+        ],
+        "random": [
+          -2.7343202230205286,
+          -0.2499077393934186,
+          -3.8089892809389965
+        ]
+      }
+    },
+    "flip_flop": {
+      "clip_true": {
+        "map_elites_mean": 0.44909479072722697,
+        "map_elites_std": 0.02151286243978836,
+        "per_baseline": {
+          "map_elites_randselect": {
+            "diff": 0.20854263350822297,
+            "wilcoxon_p": 0.25,
+            "paired_sign_delta": 0.3333333333333333,
+            "cliff_delta_textbook": 0.3333333333333333,
+            "cond_diff_pos": true,
+            "cond_p": false,
+            "cond_effect": true,
+            "cond_n": true,
+            "passes": false
+          },
+          "panmictic_ga": {
+            "diff": 0.10184528533741322,
+            "wilcoxon_p": 0.125,
+            "paired_sign_delta": 1.0,
+            "cliff_delta_textbook": 0.7777777777777778,
+            "cond_diff_pos": true,
+            "cond_p": false,
+            "cond_effect": true,
+            "cond_n": true,
+            "passes": false
+          },
+          "random": {
+            "diff": 0.01350762041633983,
+            "wilcoxon_p": 0.375,
+            "paired_sign_delta": 0.3333333333333333,
+            "cliff_delta_textbook": 0.5555555555555556,
+            "cond_diff_pos": true,
+            "cond_p": false,
+            "cond_effect": true,
+            "cond_n": true,
+            "passes": false
+          }
+        },
+        "n_baselines_beaten": 0,
+        "load_bearing": false
+      },
+      "clip_false": {
+        "map_elites_mean": 0.4279659964060418,
+        "map_elites_std": 0.02572040848105289,
+        "per_baseline": {
+          "map_elites_randselect": {
+            "diff": 0.3622574184747445,
+            "wilcoxon_p": 0.125,
+            "paired_sign_delta": 1.0,
+            "cliff_delta_textbook": 1.0,
+            "cond_diff_pos": true,
+            "cond_p": false,
+            "cond_effect": true,
+            "cond_n": true,
+            "passes": false
+          },
+          "panmictic_ga": {
+            "diff": 0.10247746059603251,
+            "wilcoxon_p": 0.125,
+            "paired_sign_delta": 1.0,
+            "cliff_delta_textbook": 0.5555555555555556,
+            "cond_diff_pos": true,
+            "cond_p": false,
+            "cond_effect": true,
+            "cond_n": true,
+            "passes": false
+          },
+          "random": {
+            "diff": 0.03707491322397388,
+            "wilcoxon_p": 0.25,
+            "paired_sign_delta": 0.3333333333333333,
+            "cliff_delta_textbook": 0.3333333333333333,
+            "cond_diff_pos": true,
+            "cond_p": false,
+            "cond_effect": true,
+            "cond_n": true,
+            "passes": false
+          }
+        },
+        "n_baselines_beaten": 0,
+        "load_bearing": false
+      },
+      "verdict_flip_false_reveals_third": false,
+      "reverse_flip_clip_needed_for_third": false,
+      "per_seed_clip_true": {
+        "map_elites": [
+          0.4646283507015623,
+          0.4639827290438185,
+          0.41867329243630014
+        ],
+        "map_elites_randselect": [
+          0.4687108042920281,
+          0.0,
+          0.2529456673649839
+        ],
+        "panmictic_ga": [
+          0.37190754325644587,
+          0.45843781790924476,
+          0.2114031550037506
+        ],
+        "random": [
+          0.45748561774670665,
+          0.4114236108749032,
+          0.43785228231105155
+        ]
+      },
+      "per_seed_clip_false": {
+        "map_elites": [
+          0.41436278005310356,
+          0.4639827290438185,
+          0.4055524801212034
+        ],
+        "map_elites_randselect": [
+          0.3912219440359069,
+          -0.3965011505714305,
+          0.20240494032941544
+        ],
+        "panmictic_ga": [
+          0.36969799913455387,
+          0.45843781790924476,
+          0.14832979038622926
+        ],
+        "random": [
+          0.323397356360249,
+          0.4114236108749032,
+          0.43785228231105155
+        ]
+      }
+    }
+  },
+  "null_ridge_fpr": {
+    "clip_true": {
+      "fpr": 0.0,
+      "n_null_repeats": 1,
+      "per_repeat": [
+        {
+          "null_seed": 20260701,
+          "load_bearing": false,
+          "n_baselines_beaten": 0,
+          "map_elites_mean": 0.005892779985611028
+        }
+      ]
+    },
+    "clip_false": {
+      "fpr": 0.0,
+      "n_null_repeats": 1,
+      "per_repeat": [
+        {
+          "null_seed": 20260701,
+          "load_bearing": false,
+          "n_baselines_beaten": 0,
+          "map_elites_mean": -0.7472721408349119
+        }
+      ]
+    },
+    "fpr_delta_false_minus_true": 0.0,
+    "clip_false_inflates_fpr": false,
+    "note": "null-ridge は gene 非依存 target (inputs と無相関ノイズ) = 真の H0。clip=False FPR > clip=True FPR + 0.05 なら『clip を外すとノイズを構造として 拾い偽陽性を増やす』= Type I コスト。clip は信号の有無を識別できない床だが FPR 抑制の役割があることになる。"
+  },
+  "summary": {
+    "any_real_verdict_flip": false,
+    "tasks_flipped": [],
+    "null_fpr_clip_true": 0.0,
+    "null_fpr_clip_false": 0.0,
+    "null_fpr_delta": 0.0,
+    "clip_false_inflates_fpr": false,
+    "third_axis_verdict": "null_confirmed_at_power",
+    "verdict_text": "K4 反証/降格: clip=False でも③ verdict-flip が起きない (spread 平坦化は診断量だが verdict は変えない) → K4 を『唯一の能動的 suppression 機序』から『spread を潰すが verdict 非 load-bearing な診断的所見』に降格。"
+  }
+}

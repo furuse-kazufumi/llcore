@@ -1,0 +1,98 @@
+{
+  "cells": {
+    "ESN_3param|nr=4|ne=60|seed=20260530": {
+      "label": "ESN_3param",
+      "group": "real",
+      "dim": 3,
+      "n_restarts": 4,
+      "n_evals": 60,
+      "sigma": 0.12,
+      "base_seed": 20260530,
+      "valley_fraction": 0.0,
+      "n_optima": 4,
+      "is_multimodal": false,
+      "wall_s": 18.29
+    },
+    "ESN_perneuron40|nr=4|ne=60|seed=20260530": {
+      "label": "ESN_perneuron40",
+      "group": "real",
+      "dim": 40,
+      "n_restarts": 4,
+      "n_evals": 60,
+      "sigma": 0.12,
+      "base_seed": 20260530,
+      "valley_fraction": 0.0,
+      "n_optima": 4,
+      "is_multimodal": false,
+      "wall_s": 17.95
+    },
+    "ctrl_corridor_d016|nr=4|ne=60|seed=20260530": {
+      "label": "ctrl_corridor_d016",
+      "group": "control_pos",
+      "dim": 24,
+      "n_restarts": 4,
+      "n_evals": 60,
+      "sigma": 0.12,
+      "base_seed": 20260530,
+      "valley_fraction": 0.0,
+      "n_optima": 4,
+      "is_multimodal": false,
+      "wall_s": 0.0
+    },
+    "ctrl_quadratic_unimodal|nr=4|ne=60|seed=20260530": {
+      "label": "ctrl_quadratic_unimodal",
+      "group": "control_neg",
+      "dim": 24,
+      "n_restarts": 4,
+      "n_evals": 60,
+      "sigma": 0.12,
+      "base_seed": 20260530,
+      "valley_fraction": 0.0,
+      "n_optima": 4,
+      "is_multimodal": false,
+      "wall_s": 0.02
+    }
+  },
+  "_meta": {
+    "substrate": "exp7 ESN(seed=0)+corpus(24000 chars) ridge readout",
+    "diagnostic": "landscape_map.multimodality_report (read-only)",
+    "base_seeds": [
+      20260530,
+      20260531,
+      20260601
+    ],
+    "budget_note": "real substrate (A/B) は重いので restarts 12/24 × n_evals 200/300 に抑制。silent truncation 禁止: 未完 cell は partial に残し再起動で完走。",
+    "last_run_wall_s": 40.4,
+    "last_run_cells": 4
+  },
+  "self_check": {
+    "ESN_3param": {
+      "det_fitness": 0.35133333333333333,
+      "eval_noise_mean": 0.37466666666666665,
+      "eval_noise_std": 0.0,
+      "dim": 3,
+      "group": "real"
+    },
+    "ESN_perneuron40": {
+      "det_fitness": 0.36733333333333335,
+      "eval_noise_mean": 0.39266666666666666,
+      "eval_noise_std": 0.0,
+      "dim": 40,
+      "group": "real"
+    },
+    "ctrl_corridor_d016": {
+      "det_fitness": 0.6007127508525605,
+      "eval_noise_mean": 0.678591472949076,
+      "eval_noise_std": 1.1102230246251565e-16,
+      "dim": 24,
+      "group": "control_pos"
+    },
+    "ctrl_quadratic_unimodal": {
+      "det_fitness": -0.10584432237719031,
+      "eval_noise_mean": -0.05793144908393668,
+      "eval_noise_std": 6.938893903907228e-18,
+      "dim": 24,
+      "group": "control_neg"
+    }
+  }
+}

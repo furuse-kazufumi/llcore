@@ -431,7 +431,8 @@ def main(argv):
         out = finalize()
         agg = out["aggregate"]
         print("\n=== EXP2 FINAL ===")
-        print(f"  eval_noise_std_all_zero = {out['eval_noise_std_all_zero']}")
+        print(f"  eval_noise_std_max = {out['eval_noise_std_max']:.2e} "
+              f"(below_machine_eps={out['eval_noise_below_machine_eps']})")
         print(f"  diagnostic_valid = {agg['diagnostic_valid']} "
               f"(corridor multimodal={agg['control_pos_corridor']['all_multimodal']}, "
               f"quadratic smooth={agg['control_neg_quadratic']['all_smooth']})")
