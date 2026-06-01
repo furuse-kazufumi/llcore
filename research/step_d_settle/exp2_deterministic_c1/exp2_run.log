@@ -15,3 +15,17 @@
 [00:13:59] run finished: 4 cells, wall=949.2s (per-run G1 OVER)
 [00:14:26] EXP2 start (smoke=False) per_run_budget=430.0s
 [00:14:26] total cells=39 done_before=4
+[00:26:05] EXP2 start (smoke=False) per_run_budget=430.0s
+[00:26:05] total cells=39 done_before=4
+[00:39:09] cell ESN_3param|nr=24|ne=300|seed=20260531: vf=0.000 n_optima=24 is_mm=False (784.5s)
+[00:39:09] per-run budget reached, stopping. 1 cells this run.
+[00:39:09] run finished: 1 cells, wall=786.5s (per-run G1 OK)
+[00:39:11] EXP2 start (smoke=False) per_run_budget=430.0s
+[00:39:11] total cells=39 done_before=5
+[00:44:30] EXP2 start (smoke=False) per_run_budget=300.0s
+[00:44:30] total cells=39 done_before=5
+[00:56:32] cell ESN_3param|nr=24|ne=300|seed=20260601: vf=0.000 n_optima=24 is_mm=False (721.1s)
+[00:56:32] per-run budget reached, stopping. 1 cells this run.
+[00:56:32] run finished: 1 cells, wall=722.3s (per-run G1 OK)
+[00:56:51] EXP2 start (smoke=False) per_run_budget=400.0s
+[00:56:51] total cells=39 done_before=6

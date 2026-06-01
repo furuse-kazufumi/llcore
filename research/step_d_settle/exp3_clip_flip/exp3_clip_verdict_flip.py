@@ -494,10 +494,12 @@ def main() -> int:
                 "ridge_fitness は ~10ms/call (n_tr=16)。verdict-flip / FPR の "
                 "③判定に効果量精度は不要なので n_evals/honest_n/n_tr を縮小: "
                 f"verdict n_evals={n_evals}, null n_evals={null_n_evals}, "
-                f"honest_n={honest_n}, n_tr={n_tr}, grid_k={grid_k} (G1<900s 遵守)。"
+                f"honest_n={honest_n}, n_tr={n_tr}, grid_k={grid_k}。"
                 "exp_ea3 本実験は n_evals=400/honest_n=30/n_tr=48。本実験は③の有無 "
                 "(verdict 反転) の検出が目的で精密な効果量は不要なため縮小。"
                 "silent truncation なし。CRN seed は clip True/False 間で共通。"
+                "注: 縮小後も 'both' 1 プロセスは full で ~1203s と G1(900s) 超過 — "
+                "g1_break_gate 参照。--phase 分割で各 phase は G1 内。"
             ),
             "honest_caveats": (
                 "(1) ridge_fitness の clip=True 0.0 は raw R²<0 を潰した床で『信号皆無』"

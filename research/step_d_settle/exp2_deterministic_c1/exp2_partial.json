@@ -51,6 +51,32 @@
       "n_optima": 24,
       "is_multimodal": false,
       "wall_s": 442.39
+    },
+    "ESN_3param|nr=24|ne=300|seed=20260531": {
+      "label": "ESN_3param",
+      "group": "real",
+      "dim": 3,
+      "n_restarts": 24,
+      "n_evals": 300,
+      "sigma": 0.12,
+      "base_seed": 20260531,
+      "valley_fraction": 0.0,
+      "n_optima": 24,
+      "is_multimodal": false,
+      "wall_s": 784.51
+    },
+    "ESN_3param|nr=24|ne=300|seed=20260601": {
+      "label": "ESN_3param",
+      "group": "real",
+      "dim": 3,
+      "n_restarts": 24,
+      "n_evals": 300,
+      "sigma": 0.12,
+      "base_seed": 20260601,
+      "valley_fraction": 0.0,
+      "n_optima": 24,
+      "is_multimodal": false,
+      "wall_s": 721.08
     }
   },
   "_meta": {
@@ -62,8 +88,8 @@
       20260601
     ],
     "budget_note": "real substrate (A/B) は重いので restarts 12/24 × n_evals 200/300 に抑制。silent truncation 禁止: 未完 cell は partial に残し再起動で完走。",
-    "last_run_wall_s": 949.24,
-    "last_run_cells": 4
+    "last_run_wall_s": 722.31,
+    "last_run_cells": 1
   },
   "self_check": {
     "ESN_3param": {

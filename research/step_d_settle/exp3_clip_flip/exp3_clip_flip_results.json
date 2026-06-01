@@ -27,8 +27,15 @@
       "random"
     ],
     "supersedes": "research/statistical_power_audit/ablate_suppression_knobs.py K4_clip_spread (spread/floor 率のみ; verdict-flip 未測)",
-    "budget_reduction_disclosure": "ridge_fitness は ~10ms/call (n_tr=16)。verdict-flip / FPR の ③判定に効果量精度は不要なので n_evals/honest_n/n_tr を縮小: verdict n_evals=60, null n_evals=40, honest_n=8, n_tr=16, grid_k=12 (G1<900s 遵守)。exp_ea3 本実験は n_evals=400/honest_n=30/n_tr=48。本実験は③の有無 (verdict 反転) の検出が目的で精密な効果量は不要なため縮小。silent truncation なし。CRN seed は clip True/False 間で共通。",
-    "honest_caveats": "(1) ridge_fitness の clip=True 0.0 は raw R²<0 を潰した床で『信号皆無』とは識別不能 (ridge_readout docstring の Codex High finding)。(2) 縮小予算ゆえ underpowered な case では verdict_flip=False が 『clip 無関係』でなく『低 power で③検出不能』の可能性 (EXP1 の psd 床 問題と同根)。本実験は『clip を外しても③が出ないか』の方向性確認が主眼。(3) null-ridge FPR は len(null_seeds) 反復のみで MC 誤差大 (±1/sqrt(N))。FPR delta が 0.05 床近傍なら『分離不能』判定が妥当。"
+    "budget_reduction_disclosure": "ridge_fitness は ~10ms/call (n_tr=16)。verdict-flip / FPR の ③判定に効果量精度は不要なので n_evals/honest_n/n_tr を縮小: verdict n_evals=60, null n_evals=40, honest_n=8, n_tr=16, grid_k=12。注: 縮小後も --phase both 1 プロセスは ~1203s と G1(900s) 超過 — g1_break_gate 参照。--phase 分割で各 phase は G1 内。exp_ea3 本実験は n_evals=400/honest_n=30/n_tr=48。本実験は③の有無 (verdict 反転) の検出が目的で精密な効果量は不要なため縮小。silent truncation なし。CRN seed は clip True/False 間で共通。",
+    "honest_caveats": "(1) ridge_fitness の clip=True 0.0 は raw R²<0 を潰した床で『信号皆無』とは識別不能 (ridge_readout docstring の Codex High finding)。(2) 縮小予算ゆえ underpowered な case では verdict_flip=False が 『clip 無関係』でなく『低 power で③検出不能』の可能性 (EXP1 の psd 床 問題と同根)。本実験は『clip を外しても③が出ないか』の方向性確認が主眼。(3) null-ridge FPR は len(null_seeds) 反復のみで MC 誤差大 (±1/sqrt(N))。FPR delta が 0.05 床近傍なら『分離不能』判定が妥当。",
+    "g1_break_gate": {
+      "limit_s": 900.0,
+      "wall_clock_s": 1202.914,
+      "phase": "both",
+      "g1_pass": false,
+      "note": "G1 違反 (honest disclosure): この authoritative 結果は --phase both を 1 プロセスで 回した初回 full run で wall_clock=1202.9s と G1(900s) を超過。silent truncation は していない (全 verdict-flip + null-FPR を完走)。再現で G1 を守る remedy = --phase verdict と --phase null の 2 run に分割 (TRIZ #1 分割; partial JSON で merge)。分割等価性は smoke で検証済 (per-seed/FPR/G3 配列が both と split で完全一致, 決定論 G2)。full 分割の実走では verdict phase が並列 sibling agent との CPU 競合で kill (verdict_EXIT=-1) されたが、これは予算ではなく環境競合 (本実験は src 非改変・決定論なので再走で同値再現可)。verdict phase 単独 ~770s / null phase 単独 ~430s と推定 (both 1203s の内訳; 各 phase は G1 内)。"
+    }
   },
   "g3_gate_sanity": {
     "known_positive_passes": true,
