@@ -248,9 +248,13 @@ def run_cells(per_run_budget_s=820.0, smoke=False):
             m, sd = _eval_noise_std(ev, dim, bounds)
             sc[label] = {"det_fitness": fval, "eval_noise_mean": m,
                          "eval_noise_std": sd, "dim": dim, "group": group}
+            # 注: 同 gene K 回評価は bit 一致 (det_fitness 検証 a1==a2 で確認済)。
+            # np.std が ~1e-16 を返すのは constant 配列の分散計算の ULP 誤差であって
+            # 評価ノイズではない。閾 1e-12 (谷閾 ~0.05*|fit|≈0.03 を 11 桁下回る)。
             log(f"self-check {label}: det_fit={fval:.4f} eval_noise_std={sd:.3e} "
-                f"(should be 0 for deterministic)", fh=fh)
-            assert sd == 0.0, f"eval_noise_std != 0 for {label} (not deterministic)"
+                f"(machine-epsilon; valley_thr ~0.05*|fit|)", fh=fh)
+            assert sd < 1e-12, (f"eval_noise_std={sd:.3e} >=1e-12 for {label} "
+                                f"(not deterministic enough)")
         partial["self_check"] = sc
         _save_partial(partial)
 
