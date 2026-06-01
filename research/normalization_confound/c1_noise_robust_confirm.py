@@ -272,12 +272,6 @@ def main() -> None:
 
     vdr = {f"vdr_D{t.seq_len}": t for t in make_regimes(delays=(15, 30, 45, 60),
                                                         distractor_amp=0.2, in_dim=2)}
-    for t in vdr.values():
-        if not hasattr(t, "name"):
-            try:
-                t.name = f"vdr_D{t.seq_len}"
-            except Exception:
-                pass
     sel = [s.strip() for s in args.tasks.split(",") if s.strip()]
 
     print(f"=== noise-robust C1 confirmation (mode={args.mode}) ===")
