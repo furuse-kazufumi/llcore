@@ -572,16 +572,24 @@ def _verdict(layer_a: dict, fresh_eval: dict) -> dict:
             return {"verdict": v, "reason": reason, "psd_obs": psd_obs, "n80": n80,
                     "p_psd_floor_ceiling": ceiling, "fresh_n": fr_n, "fresh_gate_passes": True}
 
-        # (4) psd≈0.20 床で P(|psd|床) が ~0.80 頭打ち & p 飽和 → 中効果ゆえ n では限界
+        # (4) still_inconclusive — 律速がどちらか (psd 床天井 vs p) で文面を分ける
         v = "still_inconclusive"
-        reason = (f"psd_obs={psd_obs:+.3f} (床 {MIN_EFFECT} 以上だが ~0.20 帯)、"
-                  f"P(|psd|>=床) 上限={ceiling:.3f} が ~0.80 で頭打ち → psd 床が構造的律速、"
-                  f"現実的 n では power が 0.80 を超えず確定不能 (中効果 honest negative)。"
-                  + (f" fresh n={fr_n} で gate_pass={fr_pass}, diff={fr_diff}." if fr_diff is not None
-                     else " (fresh 未到達/不足)"))
+        psd_floor_caps = ceiling < 0.80  # P(|psd|>=床) 自体が 0.80 未満 = 床が構造天井
+        if psd_floor_caps:
+            reason = (f"psd_obs={psd_obs:+.3f} (床 {MIN_EFFECT} 以上だが中効果帯)、"
+                      f"P(|psd|>=床) 上限={ceiling:.3f}<0.80 → psd 床が構造的律速、"
+                      f"full gate の効果量条件が n を上げても飽和して 0.80 power に届かない "
+                      f"(中効果ゆえ psd 床が binding = honest negative)。")
+        else:
+            # psd 床は満たせるが n80 到達せず or fresh 未確認 = p (検定力) 律速
+            reason = (f"psd_obs={psd_obs:+.3f} で効果量条件は n と共に満たせる "
+                      f"(P(|psd|>=床) 上限={ceiling:.3f}>=0.80) が、A 層 full power n80={n80} "
+                      f"(検定 p が律速)、fresh 真再走未到達/未 PASS のため確定保留。")
+        reason += (f" fresh n={fr_n} で gate_pass={fr_pass}, diff={fr_diff}." if fr_diff is not None
+                   else " (fresh 未到達/不足)")
         return {"verdict": v, "reason": reason, "psd_obs": psd_obs, "diff_obs": diff_obs,
-                "p_psd_floor_ceiling": ceiling, "n80": n80, "fresh_n": fr_n,
-                "fresh_gate_passes": fr_pass,
+                "p_psd_floor_ceiling": ceiling, "psd_floor_caps_power": bool(psd_floor_caps),
+                "n80": n80, "fresh_n": fr_n, "fresh_gate_passes": fr_pass,
                 "fresh_diff": fr_diff}
 
     for name in EXP1_TARGETS:
