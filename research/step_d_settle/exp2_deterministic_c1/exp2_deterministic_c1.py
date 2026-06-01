@@ -293,6 +293,15 @@ def run_cells(per_run_budget_s=820.0, smoke=False):
     meta.setdefault("budget_note",
                     "real substrate (A/B) は重いので restarts 12/24 × n_evals 200/300 に抑制。"
                     "silent truncation 禁止: 未完 cell は partial に残し再起動で完走。")
+    meta.setdefault("g1_exclusion",
+                    "ESN_perneuron40 の nr=24 budget を G1 から除外。理由: dim=40 の C1 "
+                    "midpoint 相は C(nr,2)*3 個の full Python-loop ESN run (各 4580 step) を要し、"
+                    "nr=24 で実測 CPU>1000s/cell (per-run wall>900s, G1 超過) を確認 (1 cell 実走で計測)。"
+                    "nr=12 perneuron (3 seed, vf 0.076-0.121 全 smooth) + ESN_3param (nr12/24 両 budget, "
+                    "vf=0 全 smooth) で地形 uni/multimodal 判定は十分。EXP1 sibling と CPU 競合下の計測。")
+    meta.setdefault("contention_note",
+                    "本実験は並列 sibling (EXP1) と CPU を共有して計測されたため一部 real cell の "
+                    "wall_s は solo 想定の ~1.5-2x。各 cell の wall_s は実測値を honest に記録。")
 
     landscapes = _landscapes()
 

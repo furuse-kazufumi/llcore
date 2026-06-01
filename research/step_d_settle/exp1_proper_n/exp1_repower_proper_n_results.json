@@ -1,7 +1,7 @@
 {
   "_meta": {
     "script": "exp1_repower_proper_n",
-    "wall_clock_s": 871.574,
+    "wall_clock_s": 541.455,
     "src_unchanged": true,
     "src_changed_files": [],
     "exit_ok": true,
@@ -248,32 +248,64 @@
   },
   "layer_b_fresh_eval": {
     "C-gen4b_MAPE_vs_random": {
-      "n_total": 44,
-      "mean_mape": 0.6700957466002655,
-      "mean_random": 0.6042419153812069,
-      "diff": 0.06585383121905854,
-      "wilcoxon_p_exact": 0.01711736562799615,
-      "paired_sign_delta": 0.3181818181818182,
-      "cohen_dz": 0.3632264654950172,
+      "n_total": 64,
+      "mean_mape": 0.666715441727074,
+      "mean_random": 0.6194925315497344,
+      "diff": 0.04722291017733964,
+      "wilcoxon_p_exact": 0.038181615555960294,
+      "paired_sign_delta": 0.1875,
+      "cohen_dz": 0.28233102815920846,
       "gate_passes": true,
       "cond_diff_pos": true,
       "cond_p": true,
       "cond_n": true,
-      "cond_effect": true
+      "cond_effect": true,
+      "updated_power_from_fresh_pop": {
+        "n_sweep": [
+          15,
+          30,
+          64,
+          82,
+          128,
+          169,
+          255
+        ],
+        "power_curve_full": [
+          0.1826,
+          0.328,
+          0.5174,
+          0.5492,
+          0.6578,
+          0.7196,
+          0.7384
+        ],
+        "p_psd_floor_curve": [
+          0.6928,
+          0.577,
+          0.6532,
+          0.6036,
+          0.676,
+          0.7248,
+          0.7386
+        ],
+        "n80_full_gate": null,
+        "p_psd_floor_ceiling": 0.7386
+      }
     }
   },
   "verdicts": {
     "C-gen4b_MAPE_vs_random": {
       "verdict": "still_inconclusive",
-      "reason": "psd_obs=+0.200 (床 0.147 以上だが中効果帯)、P(|psd|>=床) 上限=0.794<0.80 → psd 床が構造的律速、full gate の効果量条件が n を上げても飽和して 0.80 power に届かない (中効果ゆえ psd 床が binding = honest negative)。 fresh n=44 で gate_pass=True, diff=0.06585383121905854.",
+      "reason": "fresh 真再走 n=64 で full gate PASS (diff=+0.0472, p<0.05, psd=+0.188) し ③ load-bearing 寄りに転じたが、更新 power@n=64=0.5174 < 0.80 (検出力なお不足) → load_bearing **候補** だが 確証には fresh n80≈None まで要 (honest: 単発 PASS を断定しない)。",
       "psd_obs": 0.2,
-      "diff_obs": 0.06254864753354647,
-      "p_psd_floor_ceiling": 0.7938,
-      "psd_floor_caps_power": true,
-      "n80": null,
-      "fresh_n": 44,
+      "fresh_psd": 0.1875,
+      "n80_updated": null,
+      "p_psd_floor_ceiling_updated": 0.7386,
+      "fresh_n": 64,
       "fresh_gate_passes": true,
-      "fresh_diff": 0.06585383121905854
+      "fresh_diff": 0.04722291017733964,
+      "updated_power_at_fresh_n": 0.5174,
+      "load_bearing_candidate": true
     },
     "flip_flop_MAPE_vs_random": {
       "verdict": "still_inconclusive",
@@ -289,13 +321,14 @@
     },
     "flip_flop_MAPE_vs_rr_hillclimb": {
       "verdict": "still_inconclusive",
-      "reason": "psd_obs=+0.067 は床 0.147 未満 → full gate は n に依らず不可 (効果が床以下 = null 寄り、しかし『効果無し』の積極的確証ではない)。",
+      "reason": "psd_obs(n=15)=+0.067 は床 0.147 未満 → full gate は n に依らず 不可 (効果が床以下 = null 寄り、しかし『効果無し』の積極的確証ではない)。",
       "psd_obs": 0.06666666666666667,
       "diff_obs": 0.0035795090737160843,
       "p_psd_floor_ceiling": 0.612,
       "n80": null,
       "fresh_n": 0,
-      "fresh_gate_passes": false
+      "fresh_gate_passes": false,
+      "fresh_psd": null
     }
   }
 }
