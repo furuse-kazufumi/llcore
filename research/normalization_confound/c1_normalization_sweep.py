@@ -483,7 +483,14 @@ def main() -> None:
         "total_wall_clock_s": total_dt,
         "any_flip": any_flip,
         "flip_settings": flip_settings,
+        "baseline_verdicts": baseline_verdicts,
         "spread_ratios_clip_none_over_hard": spread_ratios,
+        "noise_caveat": (
+            "C1 谷判定閾値 0.05*|fit| << fitness 評価ノイズ std (budget_sensitivity_check で "
+            "noiseless 単峰→vf=0.0 真陰性 / noisy-flat→vf=1.0 偽陽性 を実証)。よって deceptive "
+            "verdict は noisy-flat null を margin>=0.1 で超えた場合のみ採用し、超えなければ "
+            "noise_confounded として保留する。これが本研究の主要 caveat。"
+        ),
         "results": [
             {
                 "setting": r.setting, "task": r.task, "clip": r.clip,
@@ -493,6 +500,10 @@ def main() -> None:
                 "is_multimodal_flags": r.is_multimodal_flags,
                 "is_multimodal_unanimous": r.is_multimodal_unanimous,
                 "n_optima_list": r.n_optima_list,
+                "eval_noise_std": r.eval_noise_std,
+                "valley_threshold": r.valley_threshold,
+                "noise_dominated": r.noise_dominated,
+                "noisy_flat_null_vf": r.noisy_flat_null_vf,
                 "spread": r.spread, "degenerate": r.degenerate, "note": r.note,
             }
             for r in results
@@ -500,7 +511,8 @@ def main() -> None:
         "verdict_summary": (
             "any_flip=True → P 採択 (人工物確定、③ablation escalation へ)"
             if any_flip else
-            "any_flip=False → P 棄却 (robust に滑らか / honest-negative を独立追認)"
+            "any_flip=False → 反転なし。ただし noise_confounded が支配的なら『robust smooth』"
+            "とも『人工物』とも断定できず、C1 は本 fitness に対し計測不能 (noise > 谷閾) と結論。"
         ),
     }
     Path(args.out).write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
