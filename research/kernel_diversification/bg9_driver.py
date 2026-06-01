@@ -498,9 +498,9 @@ SMOKE_DEFAULTS = dict(
 def run_smoke(cfg: dict) -> dict:
     """positive → negative → real の順で 3 基質を回し harness validity を確認する (pre-reg §6)."""
     t0 = time.time()
-    dim = cfg["dim"]
+    dim = cfg["dim"]  # kernel-channel 数 = eval 構築時にのみ使う (GA dim ではない)
     common = dict(
-        dim=dim, n_evals=cfg["n_evals"], n_seeds=cfg["n_seeds"],
+        n_evals=cfg["n_evals"], n_seeds=cfg["n_seeds"],
         honest_n_trials=cfg["honest_n_trials"], base_seed=cfg["base_seed"],
         min_seeds_gate=cfg["min_seeds_gate"],
     )
