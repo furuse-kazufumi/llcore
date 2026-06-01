@@ -628,10 +628,10 @@ def main() -> int:
               f"big={calib['big_effect_power']:.3f} cg4b_n15={calib['cgen4b_sim_n15']:.3f} "
               f"cg4b_n30={calib['cgen4b_sim_n30']:.3f} VALID={calib['power_engine_valid']}")
 
-        layer_a = {}
-        if args.layer in ("a", "both"):
-            print("\n--- A 層: CRN paired bootstrap re-power ---")
-            layer_a = layer_a_bootstrap(B, n_sweep)
+        # A 層は常に算出 (cheap ~18s)。verdict は A 層の psd_obs/床天井に依存するため
+        # --layer b 単独でも判定根拠を欠かさない (前 run の空 layer_a → psd_obs=0 バグ回避)。
+        print("\n--- A 層: CRN paired bootstrap re-power ---")
+        layer_a = layer_a_bootstrap(B, n_sweep)
 
         fresh_eval = {}
         partial_path = EXP1_DIR / "exp1_freshrun_partial.json"
