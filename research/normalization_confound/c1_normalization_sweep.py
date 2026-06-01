@@ -137,6 +137,43 @@ def raw_r2_spread(eval_once, *, dim, bounds, n_restarts, n_evals, sigma, base_se
 
 
 # --------------------------------------------------------------------------- #
+# ノイズ検証 (budget_sensitivity_check の決定的所見を harness に内蔵)
+#   所見: C1 谷判定の閾値 0.05*fit << 評価ノイズ std。flat+noise を C1 にかけると
+#   valley_fraction≈1.0 (偽陽性)、noiseless 単峰は 0.0 (真陰性)。よって stochastic な
+#   ridge fitness では「deceptive」verdict が評価ノイズの人工物でないことを **noisy-flat
+#   null と比較して** 確認しない限り信用できない。verdict を noise-aware にする。
+# --------------------------------------------------------------------------- #
+def measure_eval_noise(eval_once, *, dim, bounds, K=16, base_seed=20260530):
+    """ランダム gene 1 個を K 回 (異 seed) 評価し fitness 評価ノイズ std を測る."""
+    lo, hi = bounds
+    g = lo + (hi - lo) * np.random.default_rng(base_seed).random(dim)
+    vals = np.array([eval_once(g, np.random.default_rng(base_seed + 5000 + k))
+                     for k in range(K)], dtype=np.float64)
+    vals = vals[np.isfinite(vals)]
+    return float(vals.mean()) if vals.size else float("nan"), \
+        float(vals.std()) if vals.size else float("nan")
+
+
+def noisy_flat_null_valley(noise_std, *, dim, bounds, n_restarts, n_evals, sigma,
+                           base_seed, mean=0.5):
+    """同じ評価ノイズ std を持つ **flat** landscape の C1 valley_fraction (null 分布).
+
+    実 eval と同 (n_restarts/n_evals/sigma) で測る。これが C1 の『ノイズだけで出る谷』の
+    基準線。実設定の valley_fraction がこの null を有意に超えない限り deceptive と
+    断定してはならない。
+    """
+    rng_const = np.random.default_rng(base_seed)  # noqa: F841 (mean は固定)
+
+    def flat_eval(g, rng):
+        return float(rng.normal(mean, noise_std))
+
+    rep = multimodality_report(flat_eval, dim=dim, bounds=bounds,
+                               n_restarts=n_restarts, n_evals=n_evals,
+                               sigma=sigma, base_seed=base_seed)
+    return float(rep["valley_fraction"])
+
+
+# --------------------------------------------------------------------------- #
 # タスク/基質ファクトリ
 # --------------------------------------------------------------------------- #
 @dataclass
