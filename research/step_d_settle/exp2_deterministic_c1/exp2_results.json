@@ -9,8 +9,8 @@
       20260601
     ],
     "budget_note": "real substrate (A/B) は重いので restarts 12/24 × n_evals 200/300 に抑制。silent truncation 禁止: 未完 cell は partial に残し再起動で完走。",
-    "last_run_wall_s": 40.4,
-    "last_run_cells": 4
+    "last_run_wall_s": 38.93,
+    "last_run_cells": 7
   },
   "self_check": {
     "ESN_3param": {
@@ -27,22 +27,43 @@
       "dim": 40,
       "group": "real"
     },
-    "ctrl_corridor_d016": {
+    "ctrl_multipeak_dim3": {
+      "det_fitness": 0.04071498116195823,
+      "eval_noise_mean": 0.001762064310919854,
+      "eval_noise_std": 2.168404344971009e-19,
+      "dim": 3,
+      "group": "control_pos"
+    },
+    "ctrl_multipeak_dim40": {
+      "det_fitness": 3.1722302845216633e-19,
+      "eval_noise_mean": 1.8146010054362075e-15,
+      "eval_noise_std": 3.944304526105059e-31,
+      "dim": 40,
+      "group": "control_pos"
+    },
+    "ctrl_quadratic_dim3": {
+      "det_fitness": -0.06715156723227468,
+      "eval_noise_mean": -0.0670708843763241,
+      "eval_noise_std": 1.3877787807814457e-17,
+      "dim": 3,
+      "group": "control_neg"
+    },
+    "ctrl_quadratic_dim40": {
+      "det_fitness": -0.0944847670727724,
+      "eval_noise_mean": -0.06355790664592223,
+      "eval_noise_std": 1.3877787807814457e-17,
+      "dim": 40,
+      "group": "control_neg"
+    },
+    "note_corridor_d016": {
       "det_fitness": 0.6007127508525605,
       "eval_noise_mean": 0.678591472949076,
       "eval_noise_std": 1.1102230246251565e-16,
       "dim": 24,
-      "group": "control_pos"
-    },
-    "ctrl_quadratic_unimodal": {
-      "det_fitness": -0.10584432237719031,
-      "eval_noise_mean": -0.05793144908393668,
-      "eval_noise_std": 6.938893903907228e-18,
-      "dim": 24,
-      "group": "control_neg"
+      "group": "control_note"
     }
   },
-  "n_cells_total": 4,
+  "n_cells_total": 7,
   "cells": {
     "ESN_3param|nr=4|ne=60|seed=20260530": {
       "label": "ESN_3param",
@@ -55,7 +76,7 @@
       "valley_fraction": 0.0,
       "n_optima": 4,
       "is_multimodal": false,
-      "wall_s": 18.29
+      "wall_s": 16.58
     },
     "ESN_perneuron40|nr=4|ne=60|seed=20260530": {
       "label": "ESN_perneuron40",
@@ -68,12 +89,38 @@
       "valley_fraction": 0.0,
       "n_optima": 4,
       "is_multimodal": false,
-      "wall_s": 17.95
+      "wall_s": 18.36
     },
-    "ctrl_corridor_d016|nr=4|ne=60|seed=20260530": {
-      "label": "ctrl_corridor_d016",
+    "ctrl_multipeak_dim3|nr=4|ne=60|seed=20260530": {
+      "label": "ctrl_multipeak_dim3",
       "group": "control_pos",
-      "dim": 24,
+      "dim": 3,
+      "n_restarts": 4,
+      "n_evals": 60,
+      "sigma": 0.12,
+      "base_seed": 20260530,
+      "valley_fraction": 0.8333333333333334,
+      "n_optima": 4,
+      "is_multimodal": true,
+      "wall_s": 0.01
+    },
+    "ctrl_multipeak_dim40|nr=4|ne=60|seed=20260530": {
+      "label": "ctrl_multipeak_dim40",
+      "group": "control_pos",
+      "dim": 40,
+      "n_restarts": 4,
+      "n_evals": 60,
+      "sigma": 0.12,
+      "base_seed": 20260530,
+      "valley_fraction": 0.16666666666666666,
+      "n_optima": 4,
+      "is_multimodal": false,
+      "wall_s": 0.0
+    },
+    "ctrl_quadratic_dim3|nr=4|ne=60|seed=20260530": {
+      "label": "ctrl_quadratic_dim3",
+      "group": "control_neg",
+      "dim": 3,
       "n_restarts": 4,
       "n_evals": 60,
       "sigma": 0.12,
@@ -83,9 +130,22 @@
       "is_multimodal": false,
       "wall_s": 0.0
     },
-    "ctrl_quadratic_unimodal|nr=4|ne=60|seed=20260530": {
-      "label": "ctrl_quadratic_unimodal",
+    "ctrl_quadratic_dim40|nr=4|ne=60|seed=20260530": {
+      "label": "ctrl_quadratic_dim40",
       "group": "control_neg",
+      "dim": 40,
+      "n_restarts": 4,
+      "n_evals": 60,
+      "sigma": 0.12,
+      "base_seed": 20260530,
+      "valley_fraction": 0.0,
+      "n_optima": 4,
+      "is_multimodal": false,
+      "wall_s": 0.0
+    },
+    "note_corridor_d016|nr=4|ne=60|seed=20260530": {
+      "label": "note_corridor_d016",
+      "group": "control_note",
       "dim": 24,
       "n_restarts": 4,
       "n_evals": 60,
@@ -101,6 +161,7 @@
     "per_landscape": {
       "ESN_3param": {
         "group": "real",
+        "dim": 3,
         "n_cells": 1,
         "is_multimodal_set": [
           false
@@ -118,6 +179,7 @@
       },
       "ESN_perneuron40": {
         "group": "real",
+        "dim": 40,
         "n_cells": 1,
         "is_multimodal_set": [
           false
@@ -133,8 +195,45 @@
         "all_multimodal": false,
         "all_smooth": true
       },
-      "ctrl_corridor_d016": {
+      "ctrl_multipeak_dim3": {
         "group": "control_pos",
+        "dim": 3,
+        "n_cells": 1,
+        "is_multimodal_set": [
+          true
+        ],
+        "is_multimodal_consistent": true,
+        "valley_fraction_min": 0.8333333333333334,
+        "valley_fraction_max": 0.8333333333333334,
+        "valley_fraction_mean": 0.8333,
+        "n_optima_range": [
+          4,
+          4
+        ],
+        "all_multimodal": true,
+        "all_smooth": false
+      },
+      "ctrl_multipeak_dim40": {
+        "group": "control_pos",
+        "dim": 40,
+        "n_cells": 1,
+        "is_multimodal_set": [
+          false
+        ],
+        "is_multimodal_consistent": true,
+        "valley_fraction_min": 0.16666666666666666,
+        "valley_fraction_max": 0.16666666666666666,
+        "valley_fraction_mean": 0.1667,
+        "n_optima_range": [
+          4,
+          4
+        ],
+        "all_multimodal": false,
+        "all_smooth": true
+      },
+      "ctrl_quadratic_dim3": {
+        "group": "control_neg",
+        "dim": 3,
         "n_cells": 1,
         "is_multimodal_set": [
           false
@@ -150,8 +249,27 @@
         "all_multimodal": false,
         "all_smooth": true
       },
-      "ctrl_quadratic_unimodal": {
+      "ctrl_quadratic_dim40": {
         "group": "control_neg",
+        "dim": 40,
+        "n_cells": 1,
+        "is_multimodal_set": [
+          false
+        ],
+        "is_multimodal_consistent": true,
+        "valley_fraction_min": 0.0,
+        "valley_fraction_max": 0.0,
+        "valley_fraction_mean": 0.0,
+        "n_optima_range": [
+          4,
+          4
+        ],
+        "all_multimodal": false,
+        "all_smooth": true
+      },
+      "note_corridor_d016": {
+        "group": "control_note",
+        "dim": 24,
         "n_cells": 1,
         "is_multimodal_set": [
           false
@@ -169,16 +287,27 @@
       }
     },
     "diagnostic_valid": false,
-    "control_pos_corridor": {
-      "all_multimodal": false,
-      "vf_mean": 0.0
+    "diagnostic_valid_dim3": true,
+    "diagnostic_valid_dim40": false,
+    "control_pos_multipeak": {
+      "dim3_all_multimodal": true,
+      "dim3_vf_mean": 0.8333,
+      "dim40_all_multimodal": false,
+      "dim40_vf_mean": 0.1667
     },
     "control_neg_quadratic": {
+      "dim3_all_smooth": true,
+      "dim3_vf_mean": 0.0,
+      "dim40_all_smooth": true,
+      "dim40_vf_mean": 0.0
+    },
+    "corridor_not_a_c1_control": {
+      "vf_mean": 0.0,
       "all_smooth": true,
-      "vf_mean": 0.0
+      "note": "genotypic corridor は単一 basin trap → C1 谷を出さず vf≈0。corridor の欺瞞性は behavioral-reach であって multi-basin ではない = C1 の正 control にならない事を実測で記録。"
     },
     "real_landscape_verdicts": {
-      "ESN_3param": "still_inconclusive",
+      "ESN_3param": "null_confirmed_at_power",
       "ESN_perneuron40": "still_inconclusive"
     },
     "third_axis_verdict": "still_inconclusive"

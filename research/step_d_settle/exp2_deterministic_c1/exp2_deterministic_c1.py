@@ -510,9 +510,15 @@ def main(argv):
         print("\n=== EXP2 FINAL ===")
         print(f"  eval_noise_std_max = {out['eval_noise_std_max']:.2e} "
               f"(below_machine_eps={out['eval_noise_below_machine_eps']})")
+        cp = agg["control_pos_multipeak"]
+        cn = agg["control_neg_quadratic"]
         print(f"  diagnostic_valid = {agg['diagnostic_valid']} "
-              f"(corridor multimodal={agg['control_pos_corridor']['all_multimodal']}, "
-              f"quadratic smooth={agg['control_neg_quadratic']['all_smooth']})")
+              f"(dim3={agg['diagnostic_valid_dim3']} dim40={agg['diagnostic_valid_dim40']})")
+        print(f"    pos multipeak: dim3 mm={cp['dim3_all_multimodal']} (vf={cp['dim3_vf_mean']}) "
+              f"dim40 mm={cp['dim40_all_multimodal']} (vf={cp['dim40_vf_mean']})")
+        print(f"    neg quadratic: dim3 smooth={cn['dim3_all_smooth']} (vf={cn['dim3_vf_mean']}) "
+              f"dim40 smooth={cn['dim40_all_smooth']} (vf={cn['dim40_vf_mean']})")
+        print(f"    corridor (NOT a C1 control): vf={agg['corridor_not_a_c1_control']['vf_mean']}")
         for lbl, v in agg["real_landscape_verdicts"].items():
             s = agg["per_landscape"][lbl]
             print(f"  {lbl}: vf_mean={s['valley_fraction_mean']} "

@@ -11,7 +11,7 @@
       "valley_fraction": 0.0,
       "n_optima": 4,
       "is_multimodal": false,
-      "wall_s": 18.29
+      "wall_s": 16.58
     },
     "ESN_perneuron40|nr=4|ne=60|seed=20260530": {
       "label": "ESN_perneuron40",
@@ -24,12 +24,38 @@
       "valley_fraction": 0.0,
       "n_optima": 4,
       "is_multimodal": false,
-      "wall_s": 17.95
+      "wall_s": 18.36
     },
-    "ctrl_corridor_d016|nr=4|ne=60|seed=20260530": {
-      "label": "ctrl_corridor_d016",
+    "ctrl_multipeak_dim3|nr=4|ne=60|seed=20260530": {
+      "label": "ctrl_multipeak_dim3",
       "group": "control_pos",
-      "dim": 24,
+      "dim": 3,
+      "n_restarts": 4,
+      "n_evals": 60,
+      "sigma": 0.12,
+      "base_seed": 20260530,
+      "valley_fraction": 0.8333333333333334,
+      "n_optima": 4,
+      "is_multimodal": true,
+      "wall_s": 0.01
+    },
+    "ctrl_multipeak_dim40|nr=4|ne=60|seed=20260530": {
+      "label": "ctrl_multipeak_dim40",
+      "group": "control_pos",
+      "dim": 40,
+      "n_restarts": 4,
+      "n_evals": 60,
+      "sigma": 0.12,
+      "base_seed": 20260530,
+      "valley_fraction": 0.16666666666666666,
+      "n_optima": 4,
+      "is_multimodal": false,
+      "wall_s": 0.0
+    },
+    "ctrl_quadratic_dim3|nr=4|ne=60|seed=20260530": {
+      "label": "ctrl_quadratic_dim3",
+      "group": "control_neg",
+      "dim": 3,
       "n_restarts": 4,
       "n_evals": 60,
       "sigma": 0.12,
@@ -39,9 +65,22 @@
       "is_multimodal": false,
       "wall_s": 0.0
     },
-    "ctrl_quadratic_unimodal|nr=4|ne=60|seed=20260530": {
-      "label": "ctrl_quadratic_unimodal",
+    "ctrl_quadratic_dim40|nr=4|ne=60|seed=20260530": {
+      "label": "ctrl_quadratic_dim40",
       "group": "control_neg",
+      "dim": 40,
+      "n_restarts": 4,
+      "n_evals": 60,
+      "sigma": 0.12,
+      "base_seed": 20260530,
+      "valley_fraction": 0.0,
+      "n_optima": 4,
+      "is_multimodal": false,
+      "wall_s": 0.0
+    },
+    "note_corridor_d016|nr=4|ne=60|seed=20260530": {
+      "label": "note_corridor_d016",
+      "group": "control_note",
       "dim": 24,
       "n_restarts": 4,
       "n_evals": 60,
@@ -62,8 +101,8 @@
       20260601
     ],
     "budget_note": "real substrate (A/B) は重いので restarts 12/24 × n_evals 200/300 に抑制。silent truncation 禁止: 未完 cell は partial に残し再起動で完走。",
-    "last_run_wall_s": 40.4,
-    "last_run_cells": 4
+    "last_run_wall_s": 38.93,
+    "last_run_cells": 7
   },
   "self_check": {
     "ESN_3param": {
@@ -80,19 +119,40 @@
       "dim": 40,
       "group": "real"
     },
-    "ctrl_corridor_d016": {
+    "ctrl_multipeak_dim3": {
+      "det_fitness": 0.04071498116195823,
+      "eval_noise_mean": 0.001762064310919854,
+      "eval_noise_std": 2.168404344971009e-19,
+      "dim": 3,
+      "group": "control_pos"
+    },
+    "ctrl_multipeak_dim40": {
+      "det_fitness": 3.1722302845216633e-19,
+      "eval_noise_mean": 1.8146010054362075e-15,
+      "eval_noise_std": 3.944304526105059e-31,
+      "dim": 40,
+      "group": "control_pos"
+    },
+    "ctrl_quadratic_dim3": {
+      "det_fitness": -0.06715156723227468,
+      "eval_noise_mean": -0.0670708843763241,
+      "eval_noise_std": 1.3877787807814457e-17,
+      "dim": 3,
+      "group": "control_neg"
+    },
+    "ctrl_quadratic_dim40": {
+      "det_fitness": -0.0944847670727724,
+      "eval_noise_mean": -0.06355790664592223,
+      "eval_noise_std": 1.3877787807814457e-17,
+      "dim": 40,
+      "group": "control_neg"
+    },
+    "note_corridor_d016": {
       "det_fitness": 0.6007127508525605,
       "eval_noise_mean": 0.678591472949076,
       "eval_noise_std": 1.1102230246251565e-16,
       "dim": 24,
-      "group": "control_pos"
-    },
-    "ctrl_quadratic_unimodal": {
-      "det_fitness": -0.10584432237719031,
-      "eval_noise_mean": -0.05793144908393668,
-      "eval_noise_std": 6.938893903907228e-18,
-      "dim": 24,
-      "group": "control_neg"
+      "group": "control_note"
     }
   }
 }

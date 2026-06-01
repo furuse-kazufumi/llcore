@@ -1,27 +1,5 @@
-=== EXP1 proper-n 再検定 (smoke=True layer=a B=1000) ===
-n_sweep=[15, 30, 64] alpha=0.05 min_effect=0.147 CRN_seed=20260601
-[G3] power-engine: null=0.020 big=1.000 cg4b_n15=0.574 cg4b_n30=0.834 VALID=True
+=== EXP1 proper-n 再検定 (smoke=False layer=b B=5000) ===
+n_sweep=[15, 30, 64, 82, 128, 169, 255] alpha=0.05 min_effect=0.147 CRN_seed=20260601
+[G3] power-engine: null=0.023 big=1.000 cg4b_n15=0.593 cg4b_n30=0.842 VALID=True
 
---- A 層: CRN paired bootstrap re-power ---
-  [A] C-gen4b_MAPE_vs_random: diff=+0.0625 psd_obs=+0.200 p_exact=0.1262 dz=+0.35
-       power(full) @ [15, 30, 64] = ['0.302', '0.482', '0.683']  n80=None
-       P(|psd|>=0.147) @ n = ['0.734', '0.608', '0.707']  ceiling=0.734
-       median psd @ n = ['0.200', '0.200', '0.188']  floor_below_threshold=False
-  [A] flip_flop_MAPE_vs_random: diff=+0.0041 psd_obs=+0.333 p_exact=0.1514 dz=+0.31
-       power(full) @ [15, 30, 64] = ['0.322', '0.444', '0.728']  n80=None
-       P(|psd|>=0.147) @ n = ['0.843', '0.826', '0.948']  ceiling=0.948
-       median psd @ n = ['0.333', '0.333', '0.344']  floor_below_threshold=False
-  [A] flip_flop_MAPE_vs_rr_hillclimb: diff=+0.0036 psd_obs=+0.067 p_exact=0.2622 dz=+0.27
-       power(full) @ [15, 30, 64] = ['0.141', '0.210', '0.264']  n80=None
-       P(|psd|>=0.147) @ n = ['0.599', '0.421', '0.337']  ceiling=0.599
-       median psd @ n = ['0.067', '0.067', '0.062']  floor_below_threshold=True
-
-=== 3 値判定 ===
-  C-gen4b_MAPE_vs_random: [still_inconclusive]
-     psd_obs=+0.200 (床 0.147 以上だが ~0.20 帯)、P(|psd|>=床) 上限=0.734 が ~0.80 で頭打ち → psd 床が構造的律速、現実的 n では power が 0.80 を超えず確定不能 (中効果 honest negative)。 (fresh 未到達/不足)
-  flip_flop_MAPE_vs_random: [still_inconclusive]
-     psd_obs=+0.333 (床 0.147 以上だが ~0.20 帯)、P(|psd|>=床) 上限=0.948 が ~0.80 で頭打ち → psd 床が構造的律速、現実的 n では power が 0.80 を超えず確定不能 (中効果 honest negative)。 (fresh 未到達/不足)
-  flip_flop_MAPE_vs_rr_hillclimb: [still_inconclusive]
-     psd_obs=+0.067 は床 0.147 未満 → full gate は n に依らず不可 (効果が床以下 = null 寄り、しかし『効果無し』の積極的確証ではない)。
-
-[exp1] wrote D:\projects\llcore\research\step_d_settle\exp1_proper_n\exp1_repower_proper_n_results.json  (0.9s, G1<900=True, src_unchanged=True)
+--- B 層: fresh 真再走 (chunked-resumable) ---
