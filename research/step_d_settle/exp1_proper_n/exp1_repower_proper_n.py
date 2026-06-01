@@ -82,6 +82,7 @@ from llcore.evolution.honest_eval import _paired_p, _paired_sign_delta  # noqa: 
 
 ALPHA = 0.05
 MIN_EFFECT = 0.147
+B_FLOOR = 5000  # [CF1] 床効果 power 推定用 bootstrap 反復数
 # n80 域までの sweep (DESIGN: 既知 n80 = C-gen4b 255 / ff_vs_random 82)
 N_SWEEP = [15, 30, 64, 82, 128, 169, 255]
 CRN_SEED = 20260601  # case 間共有の resample index seed (paired bootstrap)
