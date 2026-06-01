@@ -284,11 +284,13 @@ def run_setting(
     r.eval_noise_std = noise_std
     r.valley_threshold = 0.05 * (abs(fit_mean) + 1e-9)
     r.noise_dominated = bool(np.isfinite(noise_std) and noise_std > r.valley_threshold)
-    # 同ノイズの flat landscape を C1 にかけた null (ノイズだけで出る谷の基準線)
+    # 同ノイズの flat landscape を C1 にかけた null (ノイズだけで出る谷の基準線)。
+    # null は flat なので山登りは無意味 (どこでも同分布) → n_evals を抑えて安価に。
+    # n_restarts は実設定と揃えてペア数 (谷判定の分母) を同条件にする。
     r.noisy_flat_null_vf = noisy_flat_null_valley(
         noise_std if np.isfinite(noise_std) else 0.0,
-        dim=res.gene_dim, bounds=bounds, n_restarts=n_restarts, n_evals=n_evals,
-        sigma=sigma, base_seed=seeds[0])
+        dim=res.gene_dim, bounds=bounds, n_restarts=n_restarts,
+        n_evals=min(n_evals, 60), sigma=sigma, base_seed=seeds[0])
 
     # verdict (G2/G3 + noise-aware):
     #  - degenerate → undetermined
