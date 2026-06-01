@@ -184,8 +184,7 @@ def _k4_clip_spread(*, base_seed: int, n_genes: int = 200) -> dict:
         clipped, raw = [], []
         for gv in genes:
             g = StateUpdateGene(decay=float(gv[0]), mix=float(gv[1]), gate_str=float(gv[2]))
-            r = np.random.default_rng(int(rng.integers(1 << 30)))
-            r2 = r.bit_generator.state  # ensure separate stream not needed; reuse below
+            # 同一 seed で clip True/False を測り fitness 分散を直接比較 (CRN)。
             seed = int(rng.integers(1 << 30))
             clipped.append(ridge_fitness(g, task, n_train=48, n_eval=48,
                                          rng=np.random.default_rng(seed), clip=True))
