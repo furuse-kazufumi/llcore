@@ -184,7 +184,7 @@ def state_norm_admit(kernel: str, th: np.ndarray) -> str:
 
     solver.add(z3.Or(s_next > STATE_BOUND, s_next < -STATE_BOUND))
     r = solver.check()
-    return {z3.unsat: "unsat", z3.sat: "sat"}.get(r, "unknown")
+    return "unsat" if r == z3.unsat else "sat" if r == z3.sat else "unknown"
 
 
 # ===========================================================================
