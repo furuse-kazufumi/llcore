@@ -419,18 +419,19 @@ def main() -> None:
             if (clip, sigma, bounds_kind) == ("hard", 0.15, "current"):
                 baseline_verdict = r.verdict
             print(f"[{r.setting}] verdict={r.verdict} "
-                  f"valley_mean={r.valley_mean:.3f} (std={r.valley_std:.3f}) "
+                  f"valley_mean={r.valley_mean:.3f} "
+                  f"null_vf={r.noisy_flat_null_vf:.3f} "
+                  f"noise_std={r.eval_noise_std:.3f}(thr={r.valley_threshold:.4f}) "
+                  f"noise_dom={r.noise_dominated} "
                   f"mm_flags={r.is_multimodal_flags} "
-                  f"n_optima={r.n_optima_list} "
                   f"spread={r.spread.get('spread', float('nan')):.4f} "
                   f"R2[{r.spread.get('min', float('nan')):.3f},{r.spread.get('max', float('nan')):.3f}] "
-                  f"finite={r.spread.get('finite_rate', float('nan')):.2f} "
                   f"({dt:.1f}s)")
         # タスク内 flip 判定
-        if baseline_verdict == "smooth":
+        if baseline_verdict in ("smooth", "noise_confounded"):
             for r in results:
                 if r.task == tspec.name and r.verdict == "deceptive":
-                    print(f"  >> FLIP[{tspec.name}]: baseline smooth -> {r.setting} deceptive")
+                    print(f"  >> FLIP[{tspec.name}]: baseline {baseline_verdict} -> {r.setting} deceptive")
     total_dt = time.time() - t_start
     print(f"\ntotal wall-clock = {total_dt:.1f}s")
 
