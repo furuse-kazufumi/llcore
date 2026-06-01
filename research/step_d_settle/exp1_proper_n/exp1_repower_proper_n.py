@@ -574,15 +574,34 @@ def _verdict(layer_a: dict, fresh_eval: dict) -> dict:
         fr_pass = fr.get("gate_passes", False)
         fr_diff = fr.get("diff", None)
         fr_n = fr.get("n_total", 0)
+        fr_psd = fr.get("paired_sign_delta", None)
+        # 累積 fresh 母集団から更新した power (元 n=15 の pessimistic bias 補正)
+        upd = fr.get("updated_power_from_fresh_pop", {})
+        upd_n80 = upd.get("n80_full_gate")
+        upd_ceiling = upd.get("p_psd_floor_ceiling", 0.0)
+        # 更新母集団で「到達済 fresh_n」での power を内挿評価
+        upd_power_at_frn = None
+        if upd.get("n_sweep") and upd.get("power_curve_full"):
+            ns_u = upd["n_sweep"]; pw_u = upd["power_curve_full"]
+            for i, nn in enumerate(ns_u):
+                if nn >= fr_n:
+                    upd_power_at_frn = pw_u[i]
+                    break
+            if upd_power_at_frn is None:
+                upd_power_at_frn = pw_u[-1]
 
-        # (1) psd 床未満 → どんな n でも gate 不可 = null 寄り (= still_inconclusive の床律速亜種)
-        if floor_below:
+        # (1) psd 床未満 → どんな n でも gate 不可 = null 寄り (= still_inconclusive の床律速亜種)。
+        #     ただし fresh で psd が床を回復 (元15 が pessimistic だった) 場合は (3)/(4) へ委譲。
+        fresh_recovers_floor = (fr_psd is not None and abs(fr_psd) >= MIN_EFFECT and fr_n >= 15)
+        if floor_below and not fresh_recovers_floor:
             v = "still_inconclusive"
-            reason = (f"psd_obs={psd_obs:+.3f} は床 {MIN_EFFECT} 未満 → full gate は n に依らず不可 "
-                      f"(効果が床以下 = null 寄り、しかし『効果無し』の積極的確証ではない)。")
+            reason = (f"psd_obs(n=15)={psd_obs:+.3f} は床 {MIN_EFFECT} 未満 → full gate は n に依らず "
+                      f"不可 (効果が床以下 = null 寄り、しかし『効果無し』の積極的確証ではない)。"
+                      + (f" fresh n={fr_n} でも psd={fr_psd:+.3f} で床未満を確認。"
+                         if fr_psd is not None else ""))
             return {"verdict": v, "reason": reason, "psd_obs": psd_obs, "diff_obs": diff_obs,
                     "p_psd_floor_ceiling": ceiling, "n80": n80, "fresh_n": fr_n,
-                    "fresh_gate_passes": fr_pass}
+                    "fresh_gate_passes": fr_pass, "fresh_psd": fr_psd}
 
         # (2) fresh 真再走で diff<=0 へ収束 → null_confirmed_at_power
         if fr_diff is not None and fr_n >= 15 and fr_diff <= 0:
@@ -593,14 +612,34 @@ def _verdict(layer_a: dict, fresh_eval: dict) -> dict:
                     "fresh_diff": fr_diff, "fresh_n": fr_n, "fresh_gate_passes": fr_pass,
                     "n80": n80}
 
-        # (3) A 層 power>=0.80 到達 ∧ fresh full gate PASS → load_bearing
-        a_reaches_80 = n80 is not None and ceiling >= 0.80
-        if a_reaches_80 and fr_pass:
+        # (3) load_bearing: fresh full gate PASS ∧ 更新 power が到達 fresh_n で >=0.80
+        #     (= 単発の幸運でなく十分検出力下での PASS)。更新母集団で床天井も 0.80 以上。
+        confirmed_power = (upd_power_at_frn is not None and upd_power_at_frn >= 0.80
+                           and upd_ceiling >= 0.80)
+        if fr_pass and confirmed_power:
             v = "load_bearing"
-            reason = (f"A 層 n80={n80} かつ P(|psd|床)上限={ceiling:.3f}>=0.80、"
-                      f"fresh 真再走 n={fr_n} で full gate PASS。")
-            return {"verdict": v, "reason": reason, "psd_obs": psd_obs, "n80": n80,
-                    "p_psd_floor_ceiling": ceiling, "fresh_n": fr_n, "fresh_gate_passes": True}
+            reason = (f"fresh 真再走 n={fr_n} で full gate PASS (diff={fr_diff:+.4f}, "
+                      f"psd={fr_psd:+.3f})、かつ累積 fresh 母集団 (psd≈{fr_psd:+.3f}) からの更新 power "
+                      f"が n={fr_n} で {upd_power_at_frn:.3f}>=0.80・床天井 {upd_ceiling:.3f}>=0.80 "
+                      f"= 十分検出力下での PASS。元 n=15 (psd={psd_obs:+.3f}) は pessimistic tail だった。")
+            return {"verdict": v, "reason": reason, "psd_obs": psd_obs, "fresh_psd": fr_psd,
+                    "n80_orig": n80, "n80_updated": upd_n80, "p_psd_floor_ceiling_orig": ceiling,
+                    "p_psd_floor_ceiling_updated": upd_ceiling, "fresh_n": fr_n,
+                    "fresh_gate_passes": True, "fresh_diff": fr_diff,
+                    "updated_power_at_fresh_n": upd_power_at_frn}
+
+        # (3b) fresh PASS だが更新 power が未だ <0.80 (n 不足) → load_bearing 候補だが確証保留
+        if fr_pass and not confirmed_power:
+            v = "still_inconclusive"
+            reason = (f"fresh 真再走 n={fr_n} で full gate PASS (diff={fr_diff:+.4f}, p<0.05, "
+                      f"psd={fr_psd:+.3f}) し ③ load-bearing 寄りに転じたが、更新 power@n={fr_n}="
+                      f"{upd_power_at_frn} < 0.80 (検出力なお不足) → load_bearing **候補** だが "
+                      f"確証には fresh n80≈{upd_n80} まで要 (honest: 単発 PASS を断定しない)。")
+            return {"verdict": v, "reason": reason, "psd_obs": psd_obs, "fresh_psd": fr_psd,
+                    "n80_updated": upd_n80, "p_psd_floor_ceiling_updated": upd_ceiling,
+                    "fresh_n": fr_n, "fresh_gate_passes": True, "fresh_diff": fr_diff,
+                    "updated_power_at_fresh_n": upd_power_at_frn,
+                    "load_bearing_candidate": True}
 
         # (4) still_inconclusive — 律速がどちらか (psd 床天井 vs p) で文面を分ける
         v = "still_inconclusive"
