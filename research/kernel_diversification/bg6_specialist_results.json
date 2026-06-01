@@ -2,12 +2,12 @@
   "meta": {
     "gate": "BG6 (specialist 出現 / task->best-kernel 写像が非定数か)",
     "config": {
-      "n_seeds": 3,
-      "n_evals": 240,
-      "pop_size": 16,
+      "n_seeds": 4,
+      "n_evals": 480,
+      "pop_size": 24,
       "sigma": 0.2,
       "dim": 8,
-      "honest_n_trials": 8,
+      "honest_n_trials": 12,
       "base_seed": 20260602
     },
     "n_kernels": 4,
@@ -34,212 +34,257 @@
   "per_task": [
     {
       "task": "flipflop",
-      "n_seeds": 3,
+      "n_seeds": 4,
       "per_seed": [
         {
           "seed": 0,
           "ga_best_kernel_index": 1,
           "ga_best_kernel_name": "mamba_selective",
-          "ga_best_honest_fitness": 0.6849244885053654,
-          "ga_best_kernel_id_continuous": 1.465046732216946,
+          "ga_best_honest_fitness": 0.6753397612400319,
+          "ga_best_kernel_id_continuous": 1.812842628025,
           "per_kernel_probe_honest": {
-            "rwkv": 0.5828336675387968,
-            "mamba_selective": 0.6217949947854197,
-            "hopfield_dense": 0.9594073301404654,
-            "linear_attn": 0.41896147664703093
+            "rwkv": 0.5840271292240579,
+            "mamba_selective": 0.6354327452802164,
+            "hopfield_dense": 0.9611815885381323,
+            "linear_attn": 0.4323972091082597
           },
           "probe_best_kernel": "hopfield_dense",
-          "probe_margin_best_vs_2nd": 0.33761233535504576
+          "probe_margin_best_vs_2nd": 0.32574884325791587
         },
         {
           "seed": 1,
           "ga_best_kernel_index": 1,
           "ga_best_kernel_name": "mamba_selective",
-          "ga_best_honest_fitness": 0.6502672691613531,
-          "ga_best_kernel_id_continuous": 1.5812034093452063,
+          "ga_best_honest_fitness": 0.6435817969713021,
+          "ga_best_kernel_id_continuous": 1.0214298987489028,
           "per_kernel_probe_honest": {
-            "rwkv": 0.6758688580847085,
-            "mamba_selective": 0.6496112437917378,
-            "hopfield_dense": 0.49569832250781537,
-            "linear_attn": 0.5001153384596517
+            "rwkv": 0.6786834727856715,
+            "mamba_selective": 0.6206578998036354,
+            "hopfield_dense": 0.49450023411328775,
+            "linear_attn": 0.5025603848802365
           },
           "probe_best_kernel": "rwkv",
-          "probe_margin_best_vs_2nd": 0.026257614292970688
+          "probe_margin_best_vs_2nd": 0.058025572982036144
         },
         {
           "seed": 2,
-          "ga_best_kernel_index": 1,
-          "ga_best_kernel_name": "mamba_selective",
-          "ga_best_honest_fitness": 0.6243851767233877,
-          "ga_best_kernel_id_continuous": 1.8905844272268164,
+          "ga_best_kernel_index": 0,
+          "ga_best_kernel_name": "rwkv",
+          "ga_best_honest_fitness": 0.7309724972035414,
+          "ga_best_kernel_id_continuous": 0.8352220929006916,
           "per_kernel_probe_honest": {
-            "rwkv": 0.5612064014206752,
-            "mamba_selective": 0.5726862590869684,
-            "hopfield_dense": 0.21225721411743875,
-            "linear_attn": 0.5258151521762815
+            "rwkv": 0.5588896160659325,
+            "mamba_selective": 0.5860379308139209,
+            "hopfield_dense": 0.2615799636761638,
+            "linear_attn": 0.5188270574635737
           },
           "probe_best_kernel": "mamba_selective",
-          "probe_margin_best_vs_2nd": 0.011479857666293114
+          "probe_margin_best_vs_2nd": 0.0271483147479884
+        },
+        {
+          "seed": 3,
+          "ga_best_kernel_index": 1,
+          "ga_best_kernel_name": "mamba_selective",
+          "ga_best_honest_fitness": 0.6298808711272033,
+          "ga_best_kernel_id_continuous": 1.0720016850126781,
+          "per_kernel_probe_honest": {
+            "rwkv": 0.6171827308301366,
+            "mamba_selective": 0.6356750613837403,
+            "hopfield_dense": 0.9841165041077272,
+            "linear_attn": 0.5209247741127878
+          },
+          "probe_best_kernel": "hopfield_dense",
+          "probe_margin_best_vs_2nd": 0.3484414427239869
         }
       ],
       "ga_best_kernel_counts": {
+        "rwkv": 1,
         "mamba_selective": 3
       },
       "probe_best_kernel_counts": {
         "rwkv": 1,
         "mamba_selective": 1,
-        "hopfield_dense": 1
+        "hopfield_dense": 2
       },
       "ga_best_kernel_mode": "mamba_selective",
-      "ga_best_kernel_mode_rate": 1.0,
-      "probe_best_kernel_mode": "rwkv",
-      "mean_probe_margin": 0.12511660243810319
+      "ga_best_kernel_mode_rate": 0.75,
+      "probe_best_kernel_mode": "hopfield_dense",
+      "mean_probe_margin": 0.18984104342798183
     },
     {
       "task": "delayed_recall",
-      "n_seeds": 3,
+      "n_seeds": 4,
       "per_seed": [
         {
           "seed": 0,
           "ga_best_kernel_index": 0,
           "ga_best_kernel_name": "rwkv",
-          "ga_best_honest_fitness": 0.9999999991202577,
-          "ga_best_kernel_id_continuous": 0.39120907155470275,
+          "ga_best_honest_fitness": 0.9999999991276024,
+          "ga_best_kernel_id_continuous": 0.0,
           "per_kernel_probe_honest": {
-            "rwkv": 0.9999999991252284,
-            "mamba_selective": 0.9691532291747169,
-            "hopfield_dense": 0.9999999990113964,
-            "linear_attn": 0.9999999993717382
+            "rwkv": 0.9999999991337156,
+            "mamba_selective": 0.9695522349099805,
+            "hopfield_dense": 0.999999998995272,
+            "linear_attn": 0.9999999993754017
           },
           "probe_best_kernel": "linear_attn",
-          "probe_margin_best_vs_2nd": 2.4650981256257865e-10
+          "probe_margin_best_vs_2nd": 2.4168611556518727e-10
         },
         {
           "seed": 1,
-          "ga_best_kernel_index": 0,
-          "ga_best_kernel_name": "rwkv",
-          "ga_best_honest_fitness": 0.9999999991222206,
-          "ga_best_kernel_id_continuous": 0.5212898476448117,
+          "ga_best_kernel_index": 3,
+          "ga_best_kernel_name": "linear_attn",
+          "ga_best_honest_fitness": 0.9999999995371104,
+          "ga_best_kernel_id_continuous": 3.4829623429403114,
           "per_kernel_probe_honest": {
-            "rwkv": 0.9999999991310156,
-            "mamba_selective": 0.9687706713585829,
-            "hopfield_dense": 0.9999999991058557,
-            "linear_attn": 0.9999999994436832
+            "rwkv": 0.9999999991372439,
+            "mamba_selective": 0.9693291959973208,
+            "hopfield_dense": 0.999999999100099,
+            "linear_attn": 0.9999999994241652
           },
           "probe_best_kernel": "linear_attn",
-          "probe_margin_best_vs_2nd": 3.1266766953308434e-10
+          "probe_margin_best_vs_2nd": 2.8692126452511957e-10
         },
         {
           "seed": 2,
           "ga_best_kernel_index": 3,
           "ga_best_kernel_name": "linear_attn",
-          "ga_best_honest_fitness": 0.999999999557784,
-          "ga_best_kernel_id_continuous": 3.373705832990412,
+          "ga_best_honest_fitness": 0.9999999995552886,
+          "ga_best_kernel_id_continuous": 3.160032406753821,
           "per_kernel_probe_honest": {
-            "rwkv": 0.9999999990173146,
-            "mamba_selective": 0.9771524228139603,
-            "hopfield_dense": 0.9999999984584801,
-            "linear_attn": 0.9999999994251907
+            "rwkv": 0.9999999990101255,
+            "mamba_selective": 0.9772928947793759,
+            "hopfield_dense": 0.999999998336885,
+            "linear_attn": 0.9999999994302954
           },
           "probe_best_kernel": "linear_attn",
-          "probe_margin_best_vs_2nd": 4.078760662551417e-10
+          "probe_margin_best_vs_2nd": 4.2016989887372347e-10
+        },
+        {
+          "seed": 3,
+          "ga_best_kernel_index": 3,
+          "ga_best_kernel_name": "linear_attn",
+          "ga_best_honest_fitness": 0.9999999995408791,
+          "ga_best_kernel_id_continuous": 3.832585812247473,
+          "per_kernel_probe_honest": {
+            "rwkv": 0.999999999071368,
+            "mamba_selective": 0.976599057716537,
+            "hopfield_dense": 0.9999999991771249,
+            "linear_attn": 0.999999999515274
+          },
+          "probe_best_kernel": "linear_attn",
+          "probe_margin_best_vs_2nd": 3.381490643050711e-10
         }
       ],
       "ga_best_kernel_counts": {
-        "rwkv": 2,
-        "linear_attn": 1
-      },
-      "probe_best_kernel_counts": {
+        "rwkv": 1,
         "linear_attn": 3
       },
-      "ga_best_kernel_mode": "rwkv",
-      "ga_best_kernel_mode_rate": 0.6666666666666666,
+      "probe_best_kernel_counts": {
+        "linear_attn": 4
+      },
+      "ga_best_kernel_mode": "linear_attn",
+      "ga_best_kernel_mode_rate": 0.75,
       "probe_best_kernel_mode": "linear_attn",
-      "mean_probe_margin": 3.223511827836016e-10
+      "mean_probe_margin": 3.2173158581727535e-10
     },
     {
       "task": "delayed_parity",
-      "n_seeds": 3,
+      "n_seeds": 4,
       "per_seed": [
         {
           "seed": 0,
-          "ga_best_kernel_index": 1,
-          "ga_best_kernel_name": "mamba_selective",
-          "ga_best_honest_fitness": 0.0,
-          "ga_best_kernel_id_continuous": 1.6171138122167903,
+          "ga_best_kernel_index": 0,
+          "ga_best_kernel_name": "rwkv",
+          "ga_best_honest_fitness": 0.0020994218856331868,
+          "ga_best_kernel_id_continuous": 0.268266076838744,
           "per_kernel_probe_honest": {
-            "rwkv": 0.0,
-            "mamba_selective": 0.0010766694405064947,
-            "hopfield_dense": 0.005481702896285939,
-            "linear_attn": 0.0015187780627339137
+            "rwkv": 0.0005203031797802552,
+            "mamba_selective": 0.0007177796270043298,
+            "hopfield_dense": 0.004004554026688811,
+            "linear_attn": 0.0010125187084892757
           },
           "probe_best_kernel": "hopfield_dense",
-          "probe_margin_best_vs_2nd": 0.003962924833552026
+          "probe_margin_best_vs_2nd": 0.002992035318199536
         },
         {
           "seed": 1,
           "ga_best_kernel_index": 0,
           "ga_best_kernel_name": "rwkv",
-          "ga_best_honest_fitness": 0.006113370325658937,
-          "ga_best_kernel_id_continuous": 0.29475358407333635,
+          "ga_best_honest_fitness": 0.006873924619326667,
+          "ga_best_kernel_id_continuous": 0.05171888618644531,
           "per_kernel_probe_honest": {
-            "rwkv": 0.0013812283377353657,
-            "mamba_selective": 0.0027345361174415245,
-            "hopfield_dense": 0.0005993744398088974,
-            "linear_attn": 0.0012347186144655575
+            "rwkv": 0.0009208188918235771,
+            "mamba_selective": 0.0018230240782943496,
+            "hopfield_dense": 0.00039958295987259823,
+            "linear_attn": 0.0024638504360321813
           },
-          "probe_best_kernel": "mamba_selective",
-          "probe_margin_best_vs_2nd": 0.0013533077797061588
+          "probe_best_kernel": "linear_attn",
+          "probe_margin_best_vs_2nd": 0.0006408263577378317
         },
         {
           "seed": 2,
-          "ga_best_kernel_index": 1,
-          "ga_best_kernel_name": "mamba_selective",
+          "ga_best_kernel_index": 0,
+          "ga_best_kernel_name": "rwkv",
           "ga_best_honest_fitness": 0.0,
-          "ga_best_kernel_id_continuous": 1.378417071808615,
+          "ga_best_kernel_id_continuous": 0.09090566182234094,
           "per_kernel_probe_honest": {
-            "rwkv": 0.0003113606338746716,
-            "mamba_selective": 0.0010062904660494698,
+            "rwkv": 0.00020757375591644775,
+            "mamba_selective": 0.0006708603106996466,
             "hopfield_dense": 0.0,
-            "linear_attn": 0.007533753410952915
+            "linear_attn": 0.005048972583332728
           },
           "probe_best_kernel": "linear_attn",
-          "probe_margin_best_vs_2nd": 0.006527462944903445
+          "probe_margin_best_vs_2nd": 0.004378112272633082
+        },
+        {
+          "seed": 3,
+          "ga_best_kernel_index": 3,
+          "ga_best_kernel_name": "linear_attn",
+          "ga_best_honest_fitness": 0.0039024181631334234,
+          "ga_best_kernel_id_continuous": 3.5482567451017024,
+          "per_kernel_probe_honest": {
+            "rwkv": 0.002342144067816863,
+            "mamba_selective": 0.0012672195621767728,
+            "hopfield_dense": 0.002920282291186784,
+            "linear_attn": 0.0
+          },
+          "probe_best_kernel": "hopfield_dense",
+          "probe_margin_best_vs_2nd": 0.0005781382233699213
         }
       ],
       "ga_best_kernel_counts": {
-        "rwkv": 1,
-        "mamba_selective": 2
-      },
-      "probe_best_kernel_counts": {
-        "mamba_selective": 1,
-        "hopfield_dense": 1,
+        "rwkv": 3,
         "linear_attn": 1
       },
-      "ga_best_kernel_mode": "mamba_selective",
-      "ga_best_kernel_mode_rate": 0.6666666666666666,
-      "probe_best_kernel_mode": "mamba_selective",
-      "mean_probe_margin": 0.0039478985193872095
+      "probe_best_kernel_counts": {
+        "hopfield_dense": 2,
+        "linear_attn": 2
+      },
+      "ga_best_kernel_mode": "rwkv",
+      "ga_best_kernel_mode_rate": 0.75,
+      "probe_best_kernel_mode": "hopfield_dense",
+      "mean_probe_margin": 0.0021472780429850928
     }
   ],
   "task_to_best_kernel_map_ga": {
     "flipflop": "mamba_selective",
-    "delayed_recall": "rwkv",
-    "delayed_parity": "mamba_selective"
+    "delayed_recall": "linear_attn",
+    "delayed_parity": "rwkv"
   },
   "task_to_best_kernel_map_probe": {
-    "flipflop": "rwkv",
+    "flipflop": "hopfield_dense",
     "delayed_recall": "linear_attn",
-    "delayed_parity": "mamba_selective"
+    "delayed_parity": "hopfield_dense"
   },
   "distinct_kernels_ga": [
+    "linear_attn",
     "mamba_selective",
     "rwkv"
   ],
   "distinct_kernels_probe": [
-    "linear_attn",
-    "mamba_selective",
-    "rwkv"
+    "hopfield_dense",
+    "linear_attn"
   ],
   "bg6_pass_ga": true,
   "bg6_pass_probe": true,

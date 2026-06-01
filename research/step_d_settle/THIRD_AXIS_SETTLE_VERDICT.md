@@ -192,8 +192,11 @@ VERIFY が独立再現し、本 agent も raw per-seed (`exp1_freshrun_partial.j
   C1 谷閾 0.05 の **直下 (13% 以内)**。ESN_perneuron40 の vf=0.121 は is_multimodal flip (0.2) まで **0.079**。
   閾値の小変更 (0.05→0.04, または vf 床 0.2→0.12) で両 verdict は反転しうる。
 - **含意**: 正確な表現は「**真に単峰**」ではなく「**C1 多峰性閾値を僅かに下回る浅い谷 (~2–4%) を持つ弱 multi-basin 地形**」。
-  (B) null 確定の方向は維持されるが robustness は閾値近接ゆえ限定的。**推奨: (a) 実 cell 決定論再確認を committed G2 ファイルに移植
-  (現状 control のみ再検証)、(b) dip 深さ分布と閾値マージンを results JSON に記録、(c) verdict 文言を閾値近接性込みに緩める。**
+  (B) null 確定の方向は維持されるが robustness は閾値近接ゆえ限定的。**remediation 状況: (a) 実 cell 決定論再確認を committed G2 ファイルに移植
+  → `verify_realcell_g2_and_dips.py` + `exp2_realcell_g2_reproduce.json` で ESN_3param/perneuron40 の bit 一致を移植済 (従来 control のみ → 実 cell 追加)。
+  (b) dip 深さ分布と閾値マージンを results JSON に記録 → `exp2_results.json` の `section6_2b_threshold_margin_disclosure` に実施済
+  (frac_downward_dip / max_rel_dip / margin_to_valley_threshold / vf_margin_to_flip)。
+  (c) verdict 文言を閾値近接性込みに緩める → §2/§3 の「真に単峰/真に滑らか」に §6.2c 留保を付記済 (CF4 と同期)。**
 
 ### 6.3 [clip_flip_validity, refuted=true, medium] K4 降格は低予算ゆえ「at this budget」限定
 

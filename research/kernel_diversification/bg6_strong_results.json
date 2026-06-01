@@ -1,0 +1,415 @@
+{
+  "meta": {
+    "gate": "BG9-3 strong BG6 validity gate (kernel-favoring suite が非 inert か)",
+    "preregistration": "BG9_PREREGISTRATION.md §2.3",
+    "config": {
+      "n_seeds": 5,
+      "probe_opt_evals": 80,
+      "ga_n_evals": 720,
+      "ga_pop_size": 24,
+      "ga_sigma": 0.2,
+      "dim": 8,
+      "honest_n_trials": 16,
+      "base_seed": 20260602
+    },
+    "wall_clock_sec": 719.6,
+    "n_kernels": 4,
+    "kernel_names": [
+      "rwkv",
+      "mamba_selective",
+      "hopfield_dense",
+      "linear_attn"
+    ],
+    "tasks": [
+      "selective_copy",
+      "bistable_denoise",
+      "weighted_accum",
+      "leaky_tracking"
+    ],
+    "evidence": "probe (per-kernel 固定最適化 held-out R²) + GA (kernel_id 探索 best-kernel mode)",
+    "honest_note": "smoke〜中規模 (3-5 seed)。本検定 (>=15 seed) は BG9 本番 (別段)。fitness は固定射影 P + per-gene held-out ridge readout で kernel 寄与を分離。kernel dynamics は対角 mock (full kernel 非主張)。整いすぎた弁別は内訳を疑う (feedback_benchmark_honest_disclosure)。"
+  },
+  "per_task": [
+    {
+      "task": "selective_copy",
+      "hypothesis_best_kernel": "mamba_selective",
+      "n_seeds": 5,
+      "probe_matrix_row": {
+        "rwkv": {
+          "mean": 0.14270987012780761,
+          "std": 0.08980989982316295
+        },
+        "mamba_selective": {
+          "mean": 0.40336713141176633,
+          "std": 0.15414996276905643
+        },
+        "hopfield_dense": {
+          "mean": 0.08645047136726466,
+          "std": 0.12414864925079977
+        },
+        "linear_attn": {
+          "mean": 0.2397635157674945,
+          "std": 0.17973245531055573
+        }
+      },
+      "probe_per_seed": [
+        {
+          "rwkv": 0.14555575021715927,
+          "mamba_selective": 0.4009892657306403,
+          "hopfield_dense": 0.0,
+          "linear_attn": 0.09883088364248818
+        },
+        {
+          "rwkv": 0.28073657058255097,
+          "mamba_selective": 0.11153687510748297,
+          "hopfield_dense": 0.11362787219600085,
+          "linear_attn": 0.10131499146980778
+        },
+        {
+          "rwkv": 0.051557499634199956,
+          "mamba_selective": 0.5544847791528459,
+          "hopfield_dense": 0.0,
+          "linear_attn": 0.4459187803297431
+        },
+        {
+          "rwkv": 0.041283397913731576,
+          "mamba_selective": 0.45808208332904626,
+          "hopfield_dense": 0.0,
+          "linear_attn": 0.472982372157964
+        },
+        {
+          "rwkv": 0.19441613229139615,
+          "mamba_selective": 0.49174265373881654,
+          "hopfield_dense": 0.31862448464032245,
+          "linear_attn": 0.07977055123746932
+        }
+      ],
+      "probe_best_kernel": "mamba_selective",
+      "probe_best_vs_2nd_margin": 0.16360361564427184,
+      "probe_best_counts": {
+        "rwkv": 1,
+        "mamba_selective": 3,
+        "linear_attn": 1
+      },
+      "probe_best_mode": "mamba_selective",
+      "probe_best_mode_rate": 0.6,
+      "ga_best_per_seed": [
+        "mamba_selective",
+        "mamba_selective",
+        "mamba_selective",
+        "linear_attn",
+        "mamba_selective"
+      ],
+      "ga_best_counts": {
+        "mamba_selective": 4,
+        "linear_attn": 1
+      },
+      "ga_best_mode": "mamba_selective",
+      "ga_best_mode_rate": 0.8,
+      "ga_best_honest_fitness_mean": 0.4146649436889621
+    },
+    {
+      "task": "bistable_denoise",
+      "hypothesis_best_kernel": "hopfield_dense",
+      "n_seeds": 5,
+      "probe_matrix_row": {
+        "rwkv": {
+          "mean": 0.9337821457233456,
+          "std": 0.05034892108480446
+        },
+        "mamba_selective": {
+          "mean": 0.7806991722193212,
+          "std": 0.06491632020482264
+        },
+        "hopfield_dense": {
+          "mean": 0.566283514183254,
+          "std": 0.46375058255556784
+        },
+        "linear_attn": {
+          "mean": 0.8775804010254031,
+          "std": 0.009031939721304495
+        }
+      },
+      "probe_per_seed": [
+        {
+          "rwkv": 0.9672768619763972,
+          "mamba_selective": 0.7603364039036979,
+          "hopfield_dense": 0.9822324484079059,
+          "linear_attn": 0.887912683939462
+        },
+        {
+          "rwkv": 0.9472699508169001,
+          "mamba_selective": 0.6629282679126927,
+          "hopfield_dense": 0.0,
+          "linear_attn": 0.8659280813263459
+        },
+        {
+          "rwkv": 0.9273253563002934,
+          "mamba_selective": 0.8109220010049792,
+          "hopfield_dense": 0.0,
+          "linear_attn": 0.8753026142751859
+        },
+        {
+          "rwkv": 0.9860051223974993,
+          "mamba_selective": 0.8396656030893408,
+          "hopfield_dense": 0.8788502672403565,
+          "linear_attn": 0.8881453430087487
+        },
+        {
+          "rwkv": 0.8410334371256387,
+          "mamba_selective": 0.829643585185895,
+          "hopfield_dense": 0.9703348552680074,
+          "linear_attn": 0.8706132825772729
+        }
+      ],
+      "probe_best_kernel": "rwkv",
+      "probe_best_vs_2nd_margin": 0.05620174469794248,
+      "probe_best_counts": {
+        "rwkv": 3,
+        "hopfield_dense": 2
+      },
+      "probe_best_mode": "rwkv",
+      "probe_best_mode_rate": 0.6,
+      "ga_best_per_seed": [
+        "linear_attn",
+        "rwkv",
+        "hopfield_dense",
+        "rwkv",
+        "rwkv"
+      ],
+      "ga_best_counts": {
+        "rwkv": 3,
+        "hopfield_dense": 1,
+        "linear_attn": 1
+      },
+      "ga_best_mode": "rwkv",
+      "ga_best_mode_rate": 0.6,
+      "ga_best_honest_fitness_mean": 0.8873836803236369
+    },
+    {
+      "task": "weighted_accum",
+      "hypothesis_best_kernel": "linear_attn",
+      "n_seeds": 5,
+      "probe_matrix_row": {
+        "rwkv": {
+          "mean": 0.6731098140486125,
+          "std": 0.327385496705019
+        },
+        "mamba_selective": {
+          "mean": 0.4088255718174006,
+          "std": 0.17783160783687593
+        },
+        "hopfield_dense": {
+          "mean": 0.3264012581296991,
+          "std": 0.39094516178884003
+        },
+        "linear_attn": {
+          "mean": 0.7713879339127627,
+          "std": 0.383438957717809
+        }
+      },
+      "probe_per_seed": [
+        {
+          "rwkv": 0.893187991475023,
+          "mamba_selective": 0.4459346362621802,
+          "hopfield_dense": 0.0,
+          "linear_attn": 0.9462093045202156
+        },
+        {
+          "rwkv": 0.02516701226297116,
+          "mamba_selective": 0.38365171713225116,
+          "hopfield_dense": 0.7761213319552577,
+          "linear_attn": 0.9706010301111117
+        },
+        {
+          "rwkv": 0.7922892417272478,
+          "mamba_selective": 0.08258279794319151,
+          "hopfield_dense": 0.022821725126906202,
+          "linear_attn": 0.004739302859014388
+        },
+        {
+          "rwkv": 0.881280970757709,
+          "mamba_selective": 0.5541339292177174,
+          "hopfield_dense": 0.0,
+          "linear_attn": 0.972974110653912
+        },
+        {
+          "rwkv": 0.7736238540201116,
+          "mamba_selective": 0.5778247785316626,
+          "hopfield_dense": 0.8330632335663317,
+          "linear_attn": 0.9624159214195602
+        }
+      ],
+      "probe_best_kernel": "linear_attn",
+      "probe_best_vs_2nd_margin": 0.09827811986415025,
+      "probe_best_counts": {
+        "rwkv": 1,
+        "linear_attn": 4
+      },
+      "probe_best_mode": "linear_attn",
+      "probe_best_mode_rate": 0.8,
+      "ga_best_per_seed": [
+        "linear_attn",
+        "linear_attn",
+        "linear_attn",
+        "linear_attn",
+        "linear_attn"
+      ],
+      "ga_best_counts": {
+        "linear_attn": 5
+      },
+      "ga_best_mode": "linear_attn",
+      "ga_best_mode_rate": 1.0,
+      "ga_best_honest_fitness_mean": 0.9776087700075287
+    },
+    {
+      "task": "leaky_tracking",
+      "hypothesis_best_kernel": "rwkv",
+      "n_seeds": 5,
+      "probe_matrix_row": {
+        "rwkv": {
+          "mean": 0.8579195459257696,
+          "std": 0.01252024137454585
+        },
+        "mamba_selective": {
+          "mean": 0.82749487126703,
+          "std": 0.02157713089571883
+        },
+        "hopfield_dense": {
+          "mean": 0.3439139131241907,
+          "std": 0.4212229767621214
+        },
+        "linear_attn": {
+          "mean": 0.7939800513125684,
+          "std": 0.06373142571712291
+        }
+      },
+      "probe_per_seed": [
+        {
+          "rwkv": 0.8411848159941242,
+          "mamba_selective": 0.8379989810822234,
+          "hopfield_dense": 0.8539481117231691,
+          "linear_attn": 0.6722322517835513
+        },
+        {
+          "rwkv": 0.8794971162306264,
+          "mamba_selective": 0.8456717295000253,
+          "hopfield_dense": 0.0,
+          "linear_attn": 0.8308250551570903
+        },
+        {
+          "rwkv": 0.8601977550304108,
+          "mamba_selective": 0.8384386273270181,
+          "hopfield_dense": 0.0,
+          "linear_attn": 0.81910909639288
+        },
+        {
+          "rwkv": 0.8563076854320133,
+          "mamba_selective": 0.785520568715799,
+          "hopfield_dense": 0.0,
+          "linear_attn": 0.7946225033519994
+        },
+        {
+          "rwkv": 0.8524103569416723,
+          "mamba_selective": 0.8298444497100841,
+          "hopfield_dense": 0.8656214538977842,
+          "linear_attn": 0.853111349877321
+        }
+      ],
+      "probe_best_kernel": "rwkv",
+      "probe_best_vs_2nd_margin": 0.030424674658739548,
+      "probe_best_counts": {
+        "rwkv": 3,
+        "hopfield_dense": 2
+      },
+      "probe_best_mode": "rwkv",
+      "probe_best_mode_rate": 0.6,
+      "ga_best_per_seed": [
+        "rwkv",
+        "rwkv",
+        "rwkv",
+        "rwkv",
+        "rwkv"
+      ],
+      "ga_best_counts": {
+        "rwkv": 5
+      },
+      "ga_best_mode": "rwkv",
+      "ga_best_mode_rate": 1.0,
+      "ga_best_honest_fitness_mean": 0.8571506576536436
+    }
+  ],
+  "validity": {
+    "thresholds": {
+      "MARGIN_THRESHOLD": 0.05,
+      "SEED_MODE_RATE_MIN": 0.5,
+      "MIN_SEEDS_FOR_STABLE": 3
+    },
+    "task_to_best_kernel_probe": {
+      "selective_copy": "mamba_selective",
+      "bistable_denoise": "rwkv",
+      "weighted_accum": "linear_attn",
+      "leaky_tracking": "rwkv"
+    },
+    "task_to_best_kernel_ga": {
+      "selective_copy": "mamba_selective",
+      "bistable_denoise": "rwkv",
+      "weighted_accum": "linear_attn",
+      "leaky_tracking": "rwkv"
+    },
+    "probe_distinct_kernels": [
+      "linear_attn",
+      "mamba_selective",
+      "rwkv"
+    ],
+    "ga_distinct_kernels": [
+      "linear_attn",
+      "mamba_selective",
+      "rwkv"
+    ],
+    "V1_non_constant_probe": true,
+    "V1_non_constant_ga": true,
+    "V2_non_fragile_tasks": [
+      "selective_copy",
+      "bistable_denoise",
+      "weighted_accum"
+    ],
+    "V2_fragile_tasks": [
+      "leaky_tracking"
+    ],
+    "V2_margins": {
+      "selective_copy": 0.16360361564427184,
+      "bistable_denoise": 0.05620174469794248,
+      "weighted_accum": 0.09827811986415025,
+      "leaky_tracking": 0.030424674658739548
+    },
+    "V3_seeds_ok": true,
+    "V3_seed_unstable_tasks": [],
+    "probe_ga_agree_tasks": [
+      "selective_copy",
+      "bistable_denoise",
+      "weighted_accum",
+      "leaky_tracking"
+    ],
+    "probe_ga_disagree_tasks": [],
+    "adopt_tasks": [
+      "selective_copy",
+      "bistable_denoise",
+      "weighted_accum"
+    ],
+    "adopt_kernels": [
+      "linear_attn",
+      "mamba_selective",
+      "rwkv"
+    ],
+    "adopt_non_constant": true,
+    "hypothesis_hits": [
+      "selective_copy",
+      "weighted_accum",
+      "leaky_tracking"
+    ],
+    "hypothesis_hit_rate": 0.75,
+    "verdict_code": "PASS",
+    "verdict": "PASS (real substrate 採用可) — probe 行列が非定数・非僅差・seed 安定。"
+  }
+}

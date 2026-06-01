@@ -12,7 +12,8 @@
     "last_run_wall_s": 4.95,
     "last_run_cells": 27,
     "g1_exclusion": "ESN_perneuron40 の nr=24 budget を G1 から除外。理由: dim=40 の C1 midpoint 相は C(nr,2)*3 個の full Python-loop ESN run (各 4580 step) を要し、nr=24 で実測 CPU>1000s/cell (per-run wall>900s, G1 超過) を確認 (1 cell 実走で計測)。nr=12 perneuron (3 seed, vf 0.076-0.121 全 smooth) + ESN_3param (nr12/24 両 budget, vf=0 全 smooth) で地形 uni/multimodal 判定は十分。EXP1 sibling と CPU 競合下の計測。",
-    "contention_note": "本実験は並列 sibling (EXP1) と CPU を共有して計測されたため一部 real cell の wall_s は solo 想定の ~1.5-2x。各 cell の wall_s は実測値を honest に記録。"
+    "contention_note": "本実験は並列 sibling (EXP1) と CPU を共有して計測されたため一部 real cell の wall_s は solo 想定の ~1.5-2x。各 cell の wall_s は実測値を honest に記録。",
+    "section6_2_amendment": "[§6.2(a)] 実 cell 決定論 G2 再現を exp2_realcell_g2_reproduce.json に移植 (verify_realcell_g2_and_dips.py)。[§6.2(b)] dip 深さ分布 + 閾値マージンを section6_2b_threshold_margin_disclosure に追記 (既存数値不変, 追記のみ)。"
   },
   "self_check": {
     "ESN_3param": {
@@ -693,5 +694,37 @@
   },
   "eval_noise_std_max": 1.1102230246251565e-16,
   "eval_noise_below_machine_eps": true,
-  "honest_caveat": "決定論 fitness (eval_noise_std=0 全 landscape 実測) で normalization_confound の noise floor (谷閾 ≪ eval noise std で計測不能) を構造的に回避した。本 proxy は reservoir computing (固定 reservoir 力学 + ridge readout closed-form) で あって backprop で学習する full LLM ではない (exp7 と同 honest 留保)。判定は exp7 と同 substrate (corpus 24000 chars, ESN seed=0, N=40) 上で成立。"
+  "honest_caveat": "決定論 fitness (eval_noise_std=0 全 landscape 実測) で normalization_confound の noise floor (谷閾 ≪ eval noise std で計測不能) を構造的に回避した。本 proxy は reservoir computing (固定 reservoir 力学 + ridge readout closed-form) で あって backprop で学習する full LLM ではない (exp7 と同 honest 留保)。判定は exp7 と同 substrate (corpus 24000 chars, ESN seed=0, N=40) 上で成立。",
+  "section6_2b_threshold_margin_disclosure": {
+    "valley_rel_threshold": 0.05,
+    "is_multimodal_vf_threshold": 0.2,
+    "ESN_3param": {
+      "n_pairs": 66,
+      "frac_downward_dip": 0.9090909090909091,
+      "max_rel_dip": 0.0434782607561438,
+      "mean_rel_dip": 0.019760743587267343,
+      "median_rel_dip": 0.02256944438566982,
+      "max_downward_dip": 0.0434782607561438,
+      "valley_threshold": 0.05,
+      "margin_to_valley_threshold": 0.006521739243856205
+    },
+    "ESN_perneuron40_dip": {
+      "n_pairs": 66,
+      "frac_downward_dip": 0.8939393939393939,
+      "max_rel_dip": 0.06462035525536276,
+      "mean_rel_dip": 0.021399218702288395,
+      "median_rel_dip": 0.02175482699446096,
+      "max_downward_dip": 0.06462035525536276,
+      "valley_threshold": 0.05,
+      "margin_to_valley_threshold": -0.01462035525536276
+    },
+    "ESN_perneuron40_vf_margin": {
+      "vf_max_observed": 0.12121212121212122,
+      "is_multimodal_threshold": 0.2,
+      "margin_to_flip": 0.0787878787878788
+    },
+    "note": [
+      "§6.2(b) 残務開示: 『滑らか/単峰=③不要』は閾値駆動。ESN_3param の midpoint は 大半が下方 dip するが max 相対 dip が C1 谷閾 0.05 の直下に留まり多峰判定に届かない。ESN_perneuron40 の vf_max は is_multimodal flip (0.2) まで僅かな余裕しか無い。閾値の小変更で両 verdict は反転しうる = (B) null 確定方向は維持されるが robustness は 閾値近接ゆえ限定的 (verdict 文言は『真に単峰』でなく『閾値直下の浅い谷を持つ弱 multi-basin』が正確)。"
+    ]
+  }
 }
