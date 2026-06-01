@@ -941,6 +941,8 @@ def main() -> int:
             "layer_b_fresh_eval": fresh_eval,
             "verdicts": verdicts,
         }
+        if drift is not None:
+            payload["cgen4b_drift_disclosure"] = drift
         out = _dump_json(EXP1_DIR / "exp1_repower_proper_n_results.json", payload)
         print(f"\n[exp1] wrote {out}  ({meta['wall_clock_s']}s, G1<900={g1_ok}, "
               f"src_unchanged={meta['src_unchanged']})")
