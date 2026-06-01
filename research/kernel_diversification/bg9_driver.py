@@ -198,10 +198,10 @@ def make_kernel_barrier_eval(d: float = 1.0) -> EvalOnce:
         kid = float(np.clip(gene_vec5[0], 0.0, N_KERNELS - 1e-9))
         tm = _norm_theta_mean(gene_vec5)  # 正規化 theta-mean ∈ [0,1] (genotype corridor 軸)
 
-        # 局所峰 (低 kernel_id, theta 不問) — random/RR が届く罠
-        local = _POS_LOCAL_CEIL * np.exp(-((kid - _POS_LOCAL_KID) ** 2) / (2 * _POS_KID_W ** 2))
+        # 局所峰 (低 kernel_id, theta 不問) — random/RR が届く罠 (幅広 = 多くの init を罠へ)
+        local = _POS_LOCAL_CEIL * np.exp(-((kid - _POS_LOCAL_KID) ** 2) / (2 * _POS_KID_W_LOCAL ** 2))
 
-        # target 峰: kernel_id basin × theta corridor。kernel_id ramp に dip を彫る。
+        # target 峰: kernel_id basin (狭) × theta corridor。kernel_id ramp に dip を彫る。
         kid_gauss = np.exp(-((kid - _POS_GLOB_KID) ** 2) / (2 * _POS_KID_W ** 2))
         theta_gauss = np.exp(-((tm - _POS_THETA_TARGET) ** 2) / (2 * _POS_THETA_W ** 2))
         if _POS_LOCAL_KID <= kid <= _POS_GLOB_KID:
