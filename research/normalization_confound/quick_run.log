@@ -1,0 +1,5 @@
+=== C1 正規化交絡 sweep (mode=quick) ===
+tasks=['vdr_D60', 'vdr_D15'] seeds=[20260530, 20260531, 20260601]
+n_restarts=6 n_evals=100 n_train=40 n_eval=40
+grid (clip,sigma,bounds) x6: [('hard', 0.15, 'current'), ('none', 0.15, 'current'), ('soft', 0.15, 'current'), ('hard', 0.1, 'current'), ('hard', 0.2, 'current'), ('hard', 0.15, 'wide')]
+

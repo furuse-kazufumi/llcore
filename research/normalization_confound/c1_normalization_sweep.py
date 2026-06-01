@@ -381,6 +381,13 @@ def main() -> None:
     if args.mode == "smoke":
         seeds = [20260530, 20260531]
         n_restarts, n_evals, n_train, n_eval = 4, 120, 24, 24
+    elif args.mode == "quick":
+        # G1 適合: detect の first setting が 535s/設定 (8r/150e/3seed+null) で 30分超過と判明。
+        # quick は n_evals/n_restarts を抑え null も安価化。3 seed は維持 (G2)。
+        # budget_sensitivity §2: valley_fraction は n_evals 120/150/300 でほぼ不変 (1.0/0.893/0.893)
+        # = 縮小が valley_fraction を 0.05 超動かさない (G1 縮小条件を満たす)。
+        seeds = [20260530, 20260531, 20260601]
+        n_restarts, n_evals, n_train, n_eval = 6, 100, 40, 40
     elif args.mode == "detect":
         seeds = [20260530, 20260531, 20260601]   # G2: 3 seed 系列
         n_restarts, n_evals, n_train, n_eval = 8, 150, 48, 48
