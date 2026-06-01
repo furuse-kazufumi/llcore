@@ -713,7 +713,7 @@ def main() -> int:
                                            chunk_seconds_budget=args.chunk_seconds)
                 print(f"  [B/flip_flop] n_done={fb['n_done']} "
                       f"(chunk {fb.get('wall_clock_chunk_s', 0)}s)")
-            fresh_eval = _evaluate_fresh_blocks(partial_path)
+            fresh_eval = _evaluate_fresh_blocks(partial_path, B=B, n_sweep=n_sweep)
             print("\n--- fresh 評価 (full gate) ---")
             for name, fr in fresh_eval.items():
                 print(f"  {name}: n={fr['n_total']} diff={fr['diff']:+.4f} "
@@ -721,7 +721,7 @@ def main() -> int:
                       f"pass={fr['gate_passes']}")
         elif args.layer == "both":
             # smoke: 既存 partial があれば評価のみ
-            fresh_eval = _evaluate_fresh_blocks(partial_path)
+            fresh_eval = _evaluate_fresh_blocks(partial_path, B=B, n_sweep=n_sweep)
 
         verdicts = _verdict(layer_a, fresh_eval)
         print("\n=== 3 値判定 ===")

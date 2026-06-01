@@ -29,3 +29,10 @@
 [00:56:32] run finished: 1 cells, wall=722.3s (per-run G1 OK)
 [00:56:51] EXP2 start (smoke=False) per_run_budget=400.0s
 [00:56:51] total cells=39 done_before=6
+[01:01:03] cell ESN_perneuron40|nr=12|ne=200|seed=20260530: vf=0.091 n_optima=12 is_mm=False (252.6s)
+[01:05:17] cell ESN_perneuron40|nr=12|ne=200|seed=20260531: vf=0.076 n_optima=12 is_mm=False (253.5s)
+[01:05:17] per-run budget reached, stopping. 2 cells this run.
+[01:05:17] run finished: 2 cells, wall=507.3s (per-run G1 OK)
+[01:05:38] EXP2 start (smoke=False) per_run_budget=400.0s
+[01:05:38] total cells=39 done_before=8
+[01:10:02] cell ESN_perneuron40|nr=12|ne=200|seed=20260601: vf=0.121 n_optima=12 is_mm=False (264.8s)

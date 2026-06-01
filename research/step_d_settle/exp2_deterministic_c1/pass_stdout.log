@@ -1,2 +1,3 @@
-[00:56:51] EXP2 start (smoke=False) per_run_budget=400.0s
-[00:56:51] total cells=39 done_before=6
+[01:05:38] EXP2 start (smoke=False) per_run_budget=400.0s
+[01:05:38] total cells=39 done_before=8
+[01:10:02] cell ESN_perneuron40|nr=12|ne=200|seed=20260601: vf=0.121 n_optima=12 is_mm=False (264.8s)

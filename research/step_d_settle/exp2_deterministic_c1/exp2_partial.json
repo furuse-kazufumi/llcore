@@ -77,6 +77,45 @@
       "n_optima": 24,
       "is_multimodal": false,
       "wall_s": 721.08
+    },
+    "ESN_perneuron40|nr=12|ne=200|seed=20260530": {
+      "label": "ESN_perneuron40",
+      "group": "real",
+      "dim": 40,
+      "n_restarts": 12,
+      "n_evals": 200,
+      "sigma": 0.12,
+      "base_seed": 20260530,
+      "valley_fraction": 0.09090909090909091,
+      "n_optima": 12,
+      "is_multimodal": false,
+      "wall_s": 252.6
+    },
+    "ESN_perneuron40|nr=12|ne=200|seed=20260531": {
+      "label": "ESN_perneuron40",
+      "group": "real",
+      "dim": 40,
+      "n_restarts": 12,
+      "n_evals": 200,
+      "sigma": 0.12,
+      "base_seed": 20260531,
+      "valley_fraction": 0.07575757575757576,
+      "n_optima": 12,
+      "is_multimodal": false,
+      "wall_s": 253.48
+    },
+    "ESN_perneuron40|nr=12|ne=200|seed=20260601": {
+      "label": "ESN_perneuron40",
+      "group": "real",
+      "dim": 40,
+      "n_restarts": 12,
+      "n_evals": 200,
+      "sigma": 0.12,
+      "base_seed": 20260601,
+      "valley_fraction": 0.12121212121212122,
+      "n_optima": 12,
+      "is_multimodal": false,
+      "wall_s": 264.8
     }
   },
   "_meta": {
@@ -88,8 +127,8 @@
       20260601
     ],
     "budget_note": "real substrate (A/B) は重いので restarts 12/24 × n_evals 200/300 に抑制。silent truncation 禁止: 未完 cell は partial に残し再起動で完走。",
-    "last_run_wall_s": 722.31,
-    "last_run_cells": 1
+    "last_run_wall_s": 507.34,
+    "last_run_cells": 2
   },
   "self_check": {
     "ESN_3param": {
