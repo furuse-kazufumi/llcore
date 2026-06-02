@@ -200,13 +200,34 @@ def _two_certifies(gene: CoupledGene) -> bool:
     return bool(certify_2norm_contraction(gene, t_domain="tmin1").certified)
 
 
+def _vertex_jacobians(gene: CoupledGene):
+    """The 4 t-box-vertex Jacobians J(t) = diag(decay)+diag((1-decay)t)W, t in
+    {t_min,1}^2. The achievable-t set is inside this box (sound over-approx)."""
+    g = gene.clipped()
+    t_lo = t_min_per_coord(g, max_input_abs=1.0)
+    verts = ((t_lo[0], t_lo[1]), (t_lo[0], 1.0), (1.0, t_lo[1]), (1.0, 1.0))
+    return [np.diag(g.decay) + np.diag((1.0 - g.decay) * np.asarray(t)) @ g.W for t in verts]
+
+
 def _sdp_certifies(gene: CoupledGene) -> bool:
-    """SDP common-Lyapunov. Short-circuit: 2-norm (subset of SDP, P=I) accept
-    without a solve; else run the SDP. Fail-closed if cvxpy unavailable/None."""
-    if _two_certifies(gene):
+    """SDP common-Lyapunov, BEHAVIOUR-PRESERVING fast path.
+
+    Short-circuits (all sound, decisions identical to a bare solve):
+      1. inf-norm or 2-norm certifies => contraction (subset of SDP, no solve).
+      2. rho(J_v) >= 1 at ANY t-box vertex => the vertex LMI P - J_v^T P J_v >> 0
+         is INFEASIBLE (discrete-Lyapunov necessity), so the common-P SDP cannot
+         exist => reject WITHOUT a solve. This prunes the (many) non-contracting
+         children that would otherwise each pay a full cvxpy canonicalisation.
+      3. otherwise run the genuine SDP.
+    Fail-closed if cvxpy unavailable/None."""
+    if _inf_certifies(gene) or _two_certifies(gene):
         return True
     if not CVXPY_AVAILABLE:
         return False
+    # necessary condition for common quadratic stability: rho<1 at every vertex.
+    for J in _vertex_jacobians(gene):
+        if float(np.max(np.abs(np.linalg.eigvals(J)))) >= 1.0:
+            return False
     r = certify_common_lyapunov(gene, t_domain="tmin1")
     return r.certified is True
 
