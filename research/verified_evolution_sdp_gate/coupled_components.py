@@ -145,7 +145,7 @@ class BenignDecayObjective:
 # rho(J)=0.5<1 (contracting) but sigma_max>1 and ||J||_inf>1 (both fixed norms
 # reject) => SDP-only region. The target is its free response; matching it needs
 # a gene in the SDP-only region, so only the SDP gate can reach the optimum.
-_NONNORMAL_REF = CoupledGene.make(decay=[0.5, 0.5], W=[[0.0, 0.0], [1.8, 0.0]])
+_NONNORMAL_REF = CoupledGene.make(decay=[0.5, 0.5], W=[[0.0, 0.0], [1.6, 0.0]])
 
 
 @dataclass(frozen=True)

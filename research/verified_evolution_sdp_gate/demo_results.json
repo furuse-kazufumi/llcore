@@ -1,0 +1,85 @@
+{
+  "substrate": "coupled n=2 RWKV-style dynamics core (gene = decay[2] + W[2x2])",
+  "direction": "rotation",
+  "verifier": "sdp_lyapunov (fail-closed, arc-correct backend)",
+  "seed": 20260603,
+  "evolution_realized": {
+    "best_fitness_gen0": 0.99685,
+    "best_fitness_final": 0.99815,
+    "improvement": 0.0013,
+    "improved": true
+  },
+  "verifier_load_bearing": {
+    "sdp_gate_admitted_divergent_frac": 0.0,
+    "ungated_admitted_divergent_frac": 0.1716,
+    "sdp_rejections": 664,
+    "sdp_fallbacks": 0,
+    "interpretation": "SDP-gated evolution admitted 0 divergent genes (dynamics never broke); ungated evolution drifted into divergent dynamics."
+  },
+  "evolved_core": {
+    "decay": [
+      0.2869,
+      0.6264
+    ],
+    "W": [
+      [
+        0.8349,
+        -0.5935
+      ],
+      [
+        1.4675,
+        0.017
+      ]
+    ],
+    "jacobian_abs_eigs_at_origin": [
+      0.889,
+      0.889
+    ],
+    "spectral_radius_lt_1": true,
+    "region_class": "sdp_only",
+    "empirical_spectral_radius": 0.889
+  },
+  "best_fitness_curve": [
+    0.99685,
+    0.99685,
+    0.99685,
+    0.99685,
+    0.99685,
+    0.99685,
+    0.99685,
+    0.99685,
+    0.99815,
+    0.99815,
+    0.99815,
+    0.99815,
+    0.99815,
+    0.99815,
+    0.99815,
+    0.99815,
+    0.99815,
+    0.99815,
+    0.99815,
+    0.99815,
+    0.99815,
+    0.99815,
+    0.99815,
+    0.99815,
+    0.99815,
+    0.99815,
+    0.99815,
+    0.99815,
+    0.99815,
+    0.99815,
+    0.99815,
+    0.99815,
+    0.99815,
+    0.99815,
+    0.99815,
+    0.99815,
+    0.99815,
+    0.99815,
+    0.99815,
+    0.99815,
+    0.99815
+  ]
+}
