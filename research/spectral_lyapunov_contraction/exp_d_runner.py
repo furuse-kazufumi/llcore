@@ -368,7 +368,9 @@ def main():
         print(f"D1 two_{dom}: admitted={d1[f'two_{dom}']['n_admitted']} false_admits={d1[f'two_{dom}']['n_false_admits']} "
               f"worst_emp_2={d1[f'two_{dom}']['worst_admitted_emp_2norm']:.6f} PASS={d1[f'two_{dom}']['passed']}")
         if CVXPY_AVAILABLE:
-            print(f"D1 sdp_{dom}: admitted={d1[f'sdp_{dom}']['n_admitted']} false_admits={d1[f'sdp_{dom}']['n_false_admits']} PASS={d1[f'sdp_{dom}']['passed']}")
+            sd = d1[f'sdp_{dom}']
+            print(f"D1 sdp_{dom}: admitted={sd['n_admitted']} false_admits={sd['n_false_admits']} "
+                  f"worst_emp_rho={sd['worst_admitted_emp_rho']:.6f} worst_pnorm_gain={sd['worst_admitted_emp_pnorm_gain']:.6f} PASS={sd['passed']}")
         dd = d2[dom]
         print(f"D2 {dom}: two_admit&inf_reject(rho<1)={dd['n_two_admit_inf_reject_rho_lt1']}/{dd['n_inf_reject_rho_lt1_total']} "
               f"(frac {dd['fraction_of_850']}) all={dd['n_two_admit_inf_reject_all']}")
