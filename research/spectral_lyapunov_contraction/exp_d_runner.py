@@ -83,6 +83,37 @@ def baseline_infnorm_admit(gene: CoupledGene, domain: str) -> tuple[bool, float]
     return bool(sup < 1.0), float(sup)
 
 
+def emp_pnorm_sup_fast(decay: np.ndarray, W: np.ndarray, P: np.ndarray, *,
+                       n_samples: int, seed: int) -> float:
+    """Dense empirical sup over the (s,x) box of the P-weighted contraction gain of J.
+
+    A common-quadratic-Lyapunov certificate (SDP) does NOT bound the identity 2-norm; it bounds the
+    P-WEIGHTED norm. The correct soundness oracle for that certificate is therefore the gain in the
+    P-metric: gain(J) = ||L J L^{-1}||_2 where P = L^T L (Cholesky), i.e. the largest singular value
+    of the J expressed in the coordinates that make P the identity. gain < 1 over the box <=>
+    contraction in ||.||_P. We report the empirical sup of that gain (from below).
+    """
+    P = np.asarray(P, dtype=np.float64)
+    P = 0.5 * (P + P.T)
+    L = np.linalg.cholesky(P)            # P = L L^T
+    Linv = np.linalg.inv(L)
+    rng = np.random.default_rng(seed)
+    S = np.vstack([rng.uniform(-1, 1, (n_samples, 2)), _STRUCT_S])
+    X = np.vstack([rng.uniform(-MAX_INPUT, MAX_INPUT, (n_samples, 2)), _STRUCT_X])
+    pre = S @ W.T + X
+    t = 1.0 - np.tanh(pre) ** 2
+    a = (1.0 - decay)[None, :] * t
+    J = a[:, :, None] * W[None, :, :]
+    J[:, 0, 0] += decay[0]
+    J[:, 1, 1] += decay[1]
+    # P-metric gain: ||L^T J L^{-T}||_2  (since ||z||_P = ||L^T z||_2). Use M = L^T J L^{-T}.
+    Lt = L.T
+    Ltinv = Linv.T
+    M = np.einsum("ij,njk,kl->nil", Lt, J, Ltinv)
+    sv = np.linalg.svd(M, compute_uv=False)
+    return float(sv[:, 0].max())
+
+
 def main():
     t0 = time.time()
     genes_raw, n_grid = build_population(3000, 0)
