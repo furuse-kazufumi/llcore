@@ -154,9 +154,11 @@ def main():
                 rL = certify_common_lyapunov(g, t_domain=dom)
                 rec[f"sdp_{dom}_admit"] = rL.certified
                 rec[f"sdp_{dom}_status"] = rL.solver_status
+                rec[f"sdp_{dom}_P"] = rL.P  # for the P-norm soundness oracle (None if not certified)
             else:
                 rec[f"sdp_{dom}_admit"] = None
                 rec[f"sdp_{dom}_status"] = "cvxpy_unavailable"
+                rec[f"sdp_{dom}_P"] = None
 
         # Vertex-soundness self-check on a 1-in-50 subsample (cheap, re-verifies the math live).
         if gi % 50 == 0:
