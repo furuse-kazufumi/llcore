@@ -234,23 +234,24 @@ def analyze(out: dict) -> dict:
                 "verdict": verdict,
             }
 
-            # B2: ungated violation rate vs gated violation rate (final pops)
-            none_pop = sum(r["final_pop_violations"] for r in gates["none"]) if gate != "none" else 0
-            # recompute ungated violations w.r.t. THIS gate's invariant
-            ung_viol = 0
-            ung_total = 0
-            for r in gates["none"]:
-                ls = r["final_pop_emp_L"]
-                if gate == "contraction":
-                    ung_viol += sum(1 for L in ls if L >= EMP_L_THRESHOLD)
-                    ung_total += len(ls)
-                else:  # state_norm: re-derive from genes not stored as bool; approx via emp_L irrelevant
-                    ung_total += r["final_pop_size"]
-            gated_viol = sum(r["final_pop_violations"] for r in recs)
-            gated_total = sum(r["final_pop_size"] for r in recs)
+            # B2: ungated violation rate vs gated violation rate (final pops),
+            # measured DIRECTLY per-gene for THIS gate's invariant.
+            def _count_viol(records, gate):
+                viol = 0
+                total = 0
+                for r in records:
+                    if gate == "contraction":
+                        viol += sum(1 for L in r["final_pop_emp_L"] if L >= EMP_L_THRESHOLD)
+                    else:  # state_norm
+                        viol += sum(1 for b in r["final_pop_statenorm_blowup"] if b)
+                    total += r["final_pop_size"]
+                return viol, total
+
+            ung_viol, ung_total = _count_viol(gates["none"], gate)
+            gated_viol, gated_total = _count_viol(recs, gate)
             analysis["B2"][f"{task_name}/{gate}"] = {
-                "ungated_violation_rate": (ung_viol / ung_total) if (gate == "contraction" and ung_total) else None,
-                "ungated_violations": ung_viol if gate == "contraction" else None,
+                "ungated_violation_rate": (ung_viol / ung_total) if ung_total else None,
+                "ungated_violations": ung_viol,
                 "ungated_total_genes": ung_total,
                 "gated_violations": gated_viol,
                 "gated_total_genes": gated_total,

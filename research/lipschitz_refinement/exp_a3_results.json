@@ -1,0 +1,21 @@
+{
+  "seed": 0,
+  "tol": 1e-06,
+  "n_emp_samples": 5000,
+  "n_total_genes": 6096,
+  "n_admitted_sampled": 2000,
+  "A3a_empirical_violations": 0,
+  "A3a_pass": true,
+  "A3a_worst_excess_emp_minus_Lach": 5.788380885718425e-11,
+  "A3a_worst_gene": {
+    "decay": 0.7333333333333333,
+    "mix": 0.19999999999999996,
+    "gate_str": 0.1333333333333333,
+    "empirical_L": 0.7688888889467727,
+    "L_achievable": 0.7688888888888888
+  },
+  "A3b_L_achievable_le_L_free_violations": 0,
+  "A3b_max_increase": 0.0,
+  "A3b_pass": true,
+  "violations_detail": []
+}
