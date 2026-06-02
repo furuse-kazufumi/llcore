@@ -145,6 +145,10 @@ def run_all() -> dict:
                     "final_pop_violations": final_viol,
                     "final_pop_size": len(final_genes),
                     "final_pop_emp_L": [empirical_lipschitz(g) for g in final_genes],
+                    # full final-pop genes so B2 can measure BOTH invariants directly.
+                    "final_pop_genes": [[g.decay, g.mix, g.gate_str] for g in final_genes],
+                    # direct per-gene state_norm long-seq blow-up flags (independent check).
+                    "final_pop_statenorm_blowup": [_state_norm_blowup(g) for g in final_genes],
                 })
             cells[task_name]["gates"][gate] = recs
             mean_test = float(np.mean([r["test_best_fitness"] for r in recs]))
