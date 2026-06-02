@@ -1,0 +1,79 @@
+{
+  "C2_gain_search": {
+    "points_scanned": 416111,
+    "value_level_gain_found": 0,
+    "examples": [],
+    "note": "value-level gain = lf>=1 & la<1. If 0, A2 structurally cannot gain on this map."
+  },
+  "C2_decay_eq_1_corner": {
+    "L_free": 1.0,
+    "L_achievable": 1.0,
+    "both_reject (>=1)": true
+  },
+  "C3_over_rejection_genes": {
+    "analytic_true_sup_is_exactly_1": true,
+    "explanation": "At d=1/3,g=-2: J(1)=1/3+(2/3)*(-2)=-1, so |J(1)|=1 EXACTLY (any mix). True box sup is exactly 1 => these genes are on the contraction boundary, NOT strictly contractive. Rejecting them is CORRECT (L<1 strict fails). L_achievable=1.0000000000000002 is float rounding of exactly 1; the verdict (reject) is the sound one. Free certifier rejects the identical 16.",
+    "samples": [
+      {
+        "d": 0.3333333333333333,
+        "m": -1.0,
+        "g": -2.0,
+        "L_achievable": 1.0000000000000002,
+        "J1": -1.0000000000000002,
+        "abs_J1": 1.0000000000000002,
+        "true_sup_fine_scan": 1.0000000000000002,
+        "J1_exact_decimal": "-0.99999999999999999999999999999999999999999999999997"
+      },
+      {
+        "d": 0.3333333333333333,
+        "m": -0.8666666666666667,
+        "g": -2.0,
+        "L_achievable": 1.0000000000000002,
+        "J1": -1.0000000000000002,
+        "abs_J1": 1.0000000000000002,
+        "true_sup_fine_scan": 1.0000000000000002,
+        "J1_exact_decimal": "-0.99999999999999999999999999999999999999999999999997"
+      },
+      {
+        "d": 0.3333333333333333,
+        "m": -0.7333333333333334,
+        "g": -2.0,
+        "L_achievable": 1.0000000000000002,
+        "J1": -1.0000000000000002,
+        "abs_J1": 1.0000000000000002,
+        "true_sup_fine_scan": 1.0000000000000002,
+        "J1_exact_decimal": "-0.99999999999999999999999999999999999999999999999997"
+      },
+      {
+        "d": 0.3333333333333333,
+        "m": -0.6,
+        "g": -2.0,
+        "L_achievable": 1.0000000000000002,
+        "J1": -1.0000000000000002,
+        "abs_J1": 1.0000000000000002,
+        "true_sup_fine_scan": 1.0000000000000002,
+        "J1_exact_decimal": "-0.99999999999999999999999999999999999999999999999997"
+      },
+      {
+        "d": 0.3333333333333333,
+        "m": -0.4666666666666667,
+        "g": -2.0,
+        "L_achievable": 1.0000000000000002,
+        "J1": -1.0000000000000002,
+        "abs_J1": 1.0000000000000002,
+        "true_sup_fine_scan": 1.0000000000000002,
+        "J1_exact_decimal": "-0.99999999999999999999999999999999999999999999999997"
+      },
+      {
+        "d": 0.3333333333333333,
+        "m": -0.33333333333333337,
+        "g": -2.0,
+        "L_achievable": 1.0000000000000002,
+        "J1": -1.0000000000000002,
+        "abs_J1": 1.0000000000000002,
+        "true_sup_fine_scan": 1.0000000000000002,
+        "J1_exact_decimal": "-0.99999999999999999999999999999999999999999999999997"
+      }
+    ]
+  }
+}

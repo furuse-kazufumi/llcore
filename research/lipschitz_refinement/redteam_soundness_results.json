@@ -1,0 +1,21 @@
+{
+  "seed_redteam": 12345,
+  "n_genes": 6096,
+  "production_formula_max_abs_err": 2.220446049250313e-16,
+  "false_admits_count": 0,
+  "false_admits": [],
+  "a3_bound_unsound_violations": 0,
+  "a3_violations_sample": [],
+  "a3_worst_excess_Ltrue_minus_Lach": 1.6653345369377348e-16,
+  "a3_worst_gene": [
+    0.42167980577616604,
+    0.806016009387079,
+    -1.3585658247961434,
+    0.3813333717565899,
+    0.3813333717565897
+  ],
+  "a1_containment_violations": 0,
+  "a1_violations_sample": [],
+  "a2_independent_gain": 0,
+  "Lachievable_vs_independent_analytic_max_abs_diff": 1.6653345369377348e-16
+}

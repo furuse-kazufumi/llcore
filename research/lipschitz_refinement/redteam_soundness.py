@@ -99,7 +99,7 @@ def verify_production_equals_formula(g: StateUpdateGene, rng) -> float:
     x = rng.uniform(-1.0, 1.0, size=200)
     maxd = 0.0
     for si, xi in zip(s, x):
-        prod = state_update(g, float(si), float(xi))
+        prod = eval_step(np.array([si]), np.array([xi]), g)[0]
         mine = g.decay * si + (1.0 - g.decay) * math.tanh(g.mix * xi + g.gate_str * si)
         maxd = max(maxd, abs(prod - mine))
     return maxd
