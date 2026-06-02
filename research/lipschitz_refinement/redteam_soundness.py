@@ -35,7 +35,7 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from llcore.state_update import StateUpdateGene  # noqa: E402
-from llcore.state_update.genes import state_update  # actual production step  # noqa: E402
+from llcore.state_update.genes import eval_step  # actual production step  # noqa: E402
 from achievable_lipschitz import (  # noqa: E402
     L_achievable,
     L_free,
