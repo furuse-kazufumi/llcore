@@ -63,15 +63,49 @@ shell, consistent with Track D). The large win is **inf → two_norm**.
 
 ## 4. exp2 — gated evolution (G0–G5)   [n=15 seeds, pop=24, gens=25]
 
-<!-- FILL from exp2_results.json (15-seed run) -->
+Mean best-fitness per gate (4 gates × 3 tasks × 15 paired seeds):
+
+| task | none | inf_norm | two_norm | sdp | sdp vs inf (paired) |
+|---|---|---|---|---|---|
+| **rotation** | 0.928 | **0.411** | 0.767 | **0.859** | Δ=+0.448, psd=1.00, **p=3.1e-5** |
+| benign | 0.999 | 0.999 | 0.999 | 0.999 | Δ=−0.000, psd=0.20, p=0.72 (null) |
+| nonnormal | 0.992 | 0.963 | 0.986 | 0.986 | Δ=+0.023, psd=1.00, p=3.1e-5 |
+
+Winner region (rotation, 15 runs): **sdp → 12 sdp_only + 3 two_norm_only** (every
+winner in an inf-REJECTED region); **inf_norm → 13 inf + 2 non_certified**. (nonnormal
+sdp → 8 sdp_only + 6 two_norm_only + 1 inf.) The GA realises the exp1 region ceilings:
+inf-gated rotation tops out at 0.41 (≈ region max 0.38); sdp at 0.86 (≈ 0.90).
 
 ## 5. Pre-registered gates — verdicts
 
-<!-- FILL: G0/G1/G2/G3/G4/G5 PASS/FAIL with numbers -->
+- **G0 control / src-untouched — PASS.** `none` gate is deterministic (same seed →
+  identical curves, test_skeleton) and admits 100 % of children. `git status` shows
+  **no src/ change** throughout.
+- **G1 gate soundness — PASS (children), with an honest end-to-end caveat.** Every gene
+  the inf/two/sdp gate *admits as a child* is provably contracting (‖J‖_∞<1 / σ_max<1 /
+  common-P LMI all ⟹ ρ<1; empirically 0 divergent admitted children — see §6 check).
+  Caveat: the inf-gated rotation final populations contained **1 divergent gene** total —
+  an **ungated initial-population elite** that the over-restrictive inf gate could not
+  replace (it rejects almost all rotation children), kept alive by elitism. The sound
+  gates two/sdp showed **0** because they admit rotation children and self-clean the
+  population. Fix for end-to-end soundness = gate the initial population too (added as the
+  `gate_initial` option; not enabled for these runs to keep the `none` control unmodified).
+- **G2 load-bearing — PASS (rotation/benign), marginal (nonnormal).** Ungated final pops
+  drift to non-contraction: **rotation 19.7 %, benign 16.7 %, nonnormal 1.9 %**; all sound
+  gates drive admitted children to 0. (nonnormal 1.9 % < 5 % → the gate has little to
+  exclude there; reported honestly, not a no-op elsewhere.)
+- **G3 permissiveness ordering — PASS.** |sdp|=3369 > |two|=2552 > |inf|=1860 over the
+  exp1 pool (SDP admits 1.8× more, all sound).
+- **G4 PRACTICAL PAYOFF — PASS (strong).** On rotation, sdp ≫ inf
+  (Δ=+0.448, one-sided Wilcoxon **p=3.1e-5**, psd=1.00) and two ≫ inf (p=3.1e-5);
+  the advantage is **attributed** to winners in the inf-rejected region (15/15 sdp
+  winners are two_norm_only/sdp_only). nonnormal also PASS (p=3.1e-5, small Δ=0.023).
+- **G5 HONEST NULL — PASS.** On benign, sdp vs inf is a null (Δ=−0.000, p=0.72): no
+  generic SDP/admission-size advantage. The G4 effect is task-structural.
 
 ## 6. Adversarial red-team (Lenses A–D)
 
-<!-- FILL from redteam_*.json -->
+<!-- FILL from redteam_*.json + the admitted-child soundness check -->
 
 ## 7. Honest disclosure / deviations
 
