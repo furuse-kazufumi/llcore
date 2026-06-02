@@ -169,15 +169,14 @@ class NonNormalObjective:
     that natural tasks are non-normal.)"""
 
     name: str = "nonnormal"
-    T: int = 24
+    T: int = 30
     s0: tuple = (0.5, 0.5)
 
     def _target(self) -> np.ndarray:
         return _free_response(_NONNORMAL_REF, np.array(self.s0), self.T)
 
     def fitness(self, gene: CoupledGene) -> float:
-        traj = _free_response(gene, np.array(self.s0), self.T)
-        return _exp_neg_mse(traj, self._target())
+        return _r2(_free_response(gene, np.array(self.s0), self.T), self._target())
 
 
 # --------------------------------------------------------------------------- #
