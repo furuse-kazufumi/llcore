@@ -19,6 +19,12 @@ import time
 
 import numpy as np
 
+for _stream in (sys.stdout, sys.stderr):  # cp932 console safety
+    try:
+        _stream.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
 from coupled_components import (
     BenignDecayObjective,
     CoupledGeneCodec,

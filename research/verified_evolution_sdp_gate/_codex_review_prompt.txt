@@ -1,0 +1,36 @@
+You are an adversarial reviewer (read-only) for an llcore CPU research experiment:
+"SDP-Lyapunov-gated coupled evolution" in research/verified_evolution_sdp_gate/.
+
+Context: llcore evolves a neural-dynamics gene (n=2 coupled RWKV-style map) under a
+fail-closed contraction verifier. Prior arc concluded the right verifier backend is
+SDP/Lyapunov (not Z3/SMT). This experiment integrates the SDP gate into a GA and asks
+whether a better verifier changes what evolution finds (G4 payoff) without admitting any
+divergent gene (G1 soundness), with a benign-task null (G5) to guard against artifacts.
+
+Read these files and find claim-vs-implementation gaps, soundness bugs, statistical
+flaws, and honest-disclosure gaps. Be specific and cite line numbers.
+
+Files (in priority order):
+1. PREREGISTRATION.md      — the falsifiable gates (G0-G5) + red-team lenses
+2. VERDICT.md              — the claimed results
+3. evolvable_core.py       — the GA loop + verifier admission
+4. coupled_components.py   — codec, objectives, verifier backends, oracle, region classifier
+5. exp_runner.py           — exp1/exp2 + paired_compare stats
+6. redteam.py              — lenses A-D
+
+Specifically probe:
+- Is the G4 payoff (sdp > inf_norm on rotation) genuinely fitness-structural, or an
+  admission-set-SIZE artifact? (Lens A controls this — is the control valid?)
+- Is the inf_norm gate's low rotation fitness genuine inf-space search hitting a ceiling,
+  or fail-closed fallback flooding? (Check fallback_count handling.)
+- Soundness: can a sound gate (inf/two/sdp) admit an empirically divergent gene? Is the
+  empirical oracle (emp rho<1) a valid soundness witness? Is the SDP-only thin-margin
+  region a soundness risk?
+- Statistics: paired_compare one-sided Wilcoxon + paired_sign_delta — correct? n=20 power?
+  optional stopping / multiple comparisons (sdp/two/none vs inf)?
+- Is the NonNormalObjective (target = free response of a hand-picked SDP-only reference)
+  a circular/tautological setup? Is that disclosed honestly?
+- Any place the VERDICT overclaims beyond what the numbers support?
+
+Output a numbered list of findings with severity (blocker/high/medium/low) and the exact
+file:line. Do not fix anything; just report.
