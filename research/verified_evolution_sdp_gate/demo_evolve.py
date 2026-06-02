@@ -18,8 +18,18 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 
 import numpy as np
+
+
+def _ensure_utf8_stdout() -> None:
+    """cp932 console safety (RAPTOR feedback_cli_utf8_stdout_pattern)."""
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8")
+        except Exception:
+            pass
 
 from coupled_components import (
     CoupledGeneCodec,
