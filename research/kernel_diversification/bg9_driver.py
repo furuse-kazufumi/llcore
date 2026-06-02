@@ -413,14 +413,16 @@ def run_theta_only_mapelites(
     sigma: float,
     base_seed: int,
     init_batch: int = ME_INIT_BATCH,
+    seed_offset: int = 0,
 ) -> np.ndarray:
     """A1 ablation: theta-only behavior (kernel_id 抜き) の MAP-E を CRN で n_seeds 走らせ honest 再評価.
 
     base_seed / honest 再評価 seed は run_methods_crn と完全に合わせる (同一 CRN replicate で paired 比較可)。
     進化 RNG は別 method_idx (=4) を使い run_methods_crn の 0-3 と衝突させない。
+    ``seed_offset`` は run_methods_crn と同義 (絶対 seed index で chunk 分割可)。
     """
     out: list[float] = []
-    for s in range(n_seeds):
+    for s in range(seed_offset, seed_offset + n_seeds):
         r = map_elites(
             eval_once, theta_only_behavior, dim=dim, bounds=bounds,
             behavior_bounds=theta_only_behavior_bounds(), grid_shape=GRID_SHAPE_THETA_ONLY,
