@@ -65,9 +65,21 @@
 
 **一方、CPU で genuinely 価値があった発見** = Track B の **B2 load-bearing**: 検証ゲートは進化の探索を測定可能に変える (非 contraction drift 15-30% を排除)。これは GPU 不要・実証済の "Verified × Evolvable" payoff であり、③ arc の negative とは独立した **positive な研究資産**。
 
+## Track C 追記 (2026-06-02 着地) — coupled 写像でも Z3 は decorative、真の solver 価値は SDP/Lyapunov
+
+n=2 結合写像 `s'=decay⊙s+(1−decay)⊙tanh(Ws+Vx)` の ∞-norm contraction を 3270 gene で独立検証
+(`coupled_z3_contraction/C_VERDICT.md` + `redteam_results.json`)。
+- **C1 soundness PASS** (513 admit / false admit 0 / worst 0.99986 / 60k heavy 0)。
+- **C2 PASS = coupling-awareness は load-bearing**: 対角 scalar heuristic が誤 admit する真 expansive **1267 gene** (emp ∞-norm 1.00–2.76) を結合認識証明器が全 reject。
+- **R3 = Z3 は依然 decorative**: Z3 vs 閉形式端点列挙 ∞-norm の不一致 **0/3270**。行 abs-sum が t に凸 → 端点最大 → 閉形式厳密。∞-norm box quantifier は行ごと 1-D 凸最大に分解 = ソルバ不要。
+- **C3 = ∞-norm は保守的**: rho<1 の真 contraction を **850 件 over-reject** (median gap 0.477)。**厳密条件 rho(J)<1 は固有値/SDP/Lyapunov-LMI = SMT で書けない**。
+
+**capstone 確定**: scalar (A/B) + coupled (C) の contraction 不変量は全て閉形式 → **Z3/SMT は本クラスで decorative**。
+solver が真に効くのは **非閉形式不変量 (spectral radius / Lyapunov 安定性)** = **SDP** territory であって SMT ではない。
+
 ## 次のアクション候補 (CPU)
 
-1. **coupled-state contraction の Z3 検証** (非対角写像で Z3 が閉形式を超える領域 = Z3 投資の正当化テスト)。Track A/B が示した「スカラでは Z3 不要」の自然な続き。
+1. ✅ **DONE (Track C)**: coupled ∞-norm 検証 → 「coupling は効くが Z3 は依然不要」。→ **次 = Track D: SDP/Lyapunov contraction certifier** (rho<1 を cvxpy/SCS or Lyapunov P-matrix 探索で証明、C3 が取りこぼした 850 gene を certify)。**solver が初めて閉形式を超える領域 = verifier 投資の真の正当化テスト**。CPU 可 (SDP は CPU)。falsifiable: SDP が strictly more を sound に certify するか。
 2. **Track B を N≥100 seed で再走** (cost-regime の underpowered を解消、または null を確定)。
 3. **load-bearing ゲートを task-family 横断で検証** (現在 CopyTask 2 variant のみ)。
 
