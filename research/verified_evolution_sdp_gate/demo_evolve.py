@@ -57,6 +57,7 @@ def _frac_divergent(genotypes, codec) -> float:
 
 
 def main() -> dict:
+    _ensure_utf8_stdout()
     codec = CoupledGeneCodec()
     obj = RotationObjective()
     cfg = EvolveConfig(pop_size=30, n_generations=40, resample_cap=50)
