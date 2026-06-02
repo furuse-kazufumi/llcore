@@ -126,8 +126,6 @@ proving the single default-run divergent was an ungated initial elite, not a gat
 
 ## 7. Honest disclosure / deviations
 
-## 7. Honest disclosure / deviations
-
 - **Config deviation from PREREGISTRATION §4** (pop=30, gens=40, n=20): run at
   pop=24, gens=25, **n=15** for CPU tractability (cvxpy per-call canonicalisation is the
   bottleneck). n=15 still satisfies the G4 strict-gate threshold (n≥15). The gates are
