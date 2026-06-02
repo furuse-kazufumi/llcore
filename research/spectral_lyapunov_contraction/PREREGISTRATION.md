@@ -87,11 +87,20 @@ soundness.
 ## PRE-REGISTERED GATES (verbatim)
 
 ### D1 — Soundness (0 false admits required)
-Every gene the **2-norm-vertex** certifier (and the **SDP-Lyapunov** certifier, if cvxpy runs) ADMITS
-must be empirically NON-EXPANSIVE on a dense (s,x) box sample: empirical `||J||_2 <= 1 + tol` AND
-empirical spectral-radius sup `rho(J) < 1 + tol` (tol = 1e-6 to absorb from-below SVD float noise; the
-certifier itself uses strict `< 1`). **PASS iff 0 false admits** (no admitted gene has empirical
-`||J||_2 > 1 + tol` or `rho > 1 + tol`). Run for both `free01` and `tmin1` domains.
+Every gene a certifier ADMITS must be empirically NON-EXPANSIVE on a dense (s,x) box sample, **in the
+metric that certifier actually proves** (tol = 1e-6 to absorb from-below SVD float noise; the certifiers
+themselves use strict `< 1`):
+- **2-norm-vertex** proves `||J||_2 < 1` ⇒ oracle: empirical `||J||_2 <= 1 + tol` AND empirical
+  spectral-radius sup `rho(J) <= 1 + tol`.
+- **SDP-Lyapunov** proves contraction in the **P-WEIGHTED** norm `||z||_P = sqrt(z^T P z)` (which implies
+  `rho(J) < 1`), and does NOT bound the identity-weighted `||J||_2`. ⇒ oracle: empirical `rho(J) <= 1 + tol`
+  AND empirical P-norm contraction gain `sup ||L^T J L^{-T}||_2 <= 1 + tol` (P = L L^T, Cholesky). Using
+  `||J||_2 <= 1` for the SDP would be the WRONG test — it would mislabel genuinely Lyapunov-contractive
+  genes whose identity 2-norm exceeds 1 as "false admits". (This refinement was made during the run when
+  the vertex-soundness self-check surfaced SDP "false admits" that all had empirical `rho < 1`; documented
+  honestly in `D_VERDICT.md`. The 2-norm-vertex oracle is unchanged.)
+
+**PASS iff 0 false admits** per certifier × domain. Run for both `free01` and `tmin1` domains.
 3-valued: PASS (0 false admits) / FAIL (>=1 false admit — would indicate an UNSOUND certificate).
 
 ### D2 — Tightness gain of 2-norm-vertex over ∞-norm

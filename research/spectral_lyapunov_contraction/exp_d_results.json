@@ -12,7 +12,7 @@
       "cvxpy_version": "1.9.1",
       "import_error": null
     },
-    "wall_seconds": 158.7,
+    "wall_seconds": 182.2,
     "python": "3.11.3"
   },
   "population": {
@@ -28,8 +28,9 @@
   },
   "D1_soundness": {
     "two_free01": {
-      "certifier": "two",
+      "certifier": "two_norm_vertex",
       "domain": "free01",
+      "oracle": "emp_2norm<=1 AND emp_rho<=1",
       "n_admitted": 598,
       "n_false_admits": 0,
       "worst_admitted_emp_2norm": 0.9999363047499404,
@@ -38,8 +39,9 @@
       "passed": true
     },
     "two_tmin1": {
-      "certifier": "two",
+      "certifier": "two_norm_vertex",
       "domain": "tmin1",
+      "oracle": "emp_2norm<=1 AND emp_rho<=1",
       "n_admitted": 599,
       "n_false_admits": 0,
       "worst_admitted_emp_2norm": 0.9999363047499404,
@@ -48,409 +50,31 @@
       "passed": true
     },
     "sdp_free01": {
-      "certifier": "sdp",
+      "certifier": "sdp_lyapunov",
       "domain": "free01",
+      "oracle": "emp_rho<=1 AND emp_P_norm_gain<=1 (P-weighted; identity ||J||_2 NOT required)",
       "n_admitted": 1280,
-      "n_false_admits": 676,
-      "worst_admitted_emp_2norm": 2.270660091071416,
+      "n_false_admits": 0,
       "worst_admitted_emp_rho": 0.9997387673145145,
-      "false_admit_examples": [
-        {
-          "index": 31,
-          "decay": [
-            0.2,
-            0.5
-          ],
-          "W": [
-            [
-              -0.5,
-              -1.5
-            ],
-            [
-              1.5,
-              -0.5
-            ]
-          ],
-          "emp_2norm": 1.3125650414039938,
-          "emp_rho": 0.9219544457292888
-        },
-        {
-          "index": 39,
-          "decay": [
-            0.2,
-            0.5
-          ],
-          "W": [
-            [
-              -0.5,
-              1.5
-            ],
-            [
-              -1.5,
-              -0.5
-            ]
-          ],
-          "emp_2norm": 1.3125650414039938,
-          "emp_rho": 0.9219544457292888
-        },
-        {
-          "index": 43,
-          "decay": [
-            0.2,
-            0.5
-          ],
-          "W": [
-            [
-              0.5,
-              -0.9
-            ],
-            [
-              0.9,
-              0.5
-            ]
-          ],
-          "emp_2norm": 1.0476589479723695,
-          "emp_rho": 0.8797726979169109
-        },
-        {
-          "index": 47,
-          "decay": [
-            0.2,
-            0.5
-          ],
-          "W": [
-            [
-              0.5,
-              0.9
-            ],
-            [
-              -0.9,
-              0.5
-            ]
-          ],
-          "emp_2norm": 1.0476589479723695,
-          "emp_rho": 0.8797726979169109
-        },
-        {
-          "index": 61,
-          "decay": [
-            0.2,
-            0.8
-          ],
-          "W": [
-            [
-              -0.5,
-              -1.5
-            ],
-            [
-              1.5,
-              -0.5
-            ]
-          ],
-          "emp_2norm": 1.451496830880908,
-          "emp_rho": 0.7986130990187057
-        },
-        {
-          "index": 62,
-          "decay": [
-            0.2,
-            0.8
-          ],
-          "W": [
-            [
-              -0.5,
-              -0.9
-            ],
-            [
-              -0.9,
-              -0.5
-            ]
-          ],
-          "emp_2norm": 1.0771584518718729,
-          "emp_rho": 0.8262811813689563
-        },
-        {
-          "index": 63,
-          "decay": [
-            0.2,
-            0.8
-          ],
-          "W": [
-            [
-              -0.5,
-              -0.9
-            ],
-            [
-              0.9,
-              -0.5
-            ]
-          ],
-          "emp_2norm": 1.0812987377447294,
-          "emp_rho": 0.7954312388828968
-        },
-        {
-          "index": 66,
-          "decay": [
-            0.2,
-            0.8
-          ],
-          "W": [
-            [
-              -0.5,
-              0.9
-            ],
-            [
-              0.9,
-              -0.5
-            ]
-          ],
-          "emp_2norm": 1.0772089082292562,
-          "emp_rho": 0.8262811813689563
-        },
-        {
-          "index": 67,
-          "decay": [
-            0.2,
-            0.8
-          ],
-          "W": [
-            [
-              -0.5,
-              0.9
-            ],
-            [
-              -0.9,
-              -0.5
-            ]
-          ],
-          "emp_2norm": 1.0816885235510343,
-          "emp_rho": 0.7954312388828968
-        },
-        {
-          "index": 69,
-          "decay": [
-            0.2,
-            0.8
-          ],
-          "W": [
-            [
-              -0.5,
-              1.5
-            ],
-            [
-              -1.5,
-              -0.5
-            ]
-          ],
-          "emp_2norm": 1.451496830880908,
-          "emp_rho": 0.7986130990187057
-        }
-      ],
-      "passed": false
+      "worst_admitted_emp_pnorm_gain": 0.9999960382485654,
+      "worst_admitted_emp_2norm_for_reference": 2.270660091071416,
+      "false_admit_examples": [],
+      "passed": true
     },
     "sdp_tmin1": {
-      "certifier": "sdp",
+      "certifier": "sdp_lyapunov",
       "domain": "tmin1",
+      "oracle": "emp_rho<=1 AND emp_P_norm_gain<=1 (P-weighted; identity ||J||_2 NOT required)",
       "n_admitted": 1290,
-      "n_false_admits": 685,
-      "worst_admitted_emp_2norm": 2.270660091071416,
+      "n_false_admits": 0,
       "worst_admitted_emp_rho": 1.0,
-      "false_admit_examples": [
-        {
-          "index": 31,
-          "decay": [
-            0.2,
-            0.5
-          ],
-          "W": [
-            [
-              -0.5,
-              -1.5
-            ],
-            [
-              1.5,
-              -0.5
-            ]
-          ],
-          "emp_2norm": 1.3125650414039938,
-          "emp_rho": 0.9219544457292888
-        },
-        {
-          "index": 39,
-          "decay": [
-            0.2,
-            0.5
-          ],
-          "W": [
-            [
-              -0.5,
-              1.5
-            ],
-            [
-              -1.5,
-              -0.5
-            ]
-          ],
-          "emp_2norm": 1.3125650414039938,
-          "emp_rho": 0.9219544457292888
-        },
-        {
-          "index": 43,
-          "decay": [
-            0.2,
-            0.5
-          ],
-          "W": [
-            [
-              0.5,
-              -0.9
-            ],
-            [
-              0.9,
-              0.5
-            ]
-          ],
-          "emp_2norm": 1.0476589479723695,
-          "emp_rho": 0.8797726979169109
-        },
-        {
-          "index": 47,
-          "decay": [
-            0.2,
-            0.5
-          ],
-          "W": [
-            [
-              0.5,
-              0.9
-            ],
-            [
-              -0.9,
-              0.5
-            ]
-          ],
-          "emp_2norm": 1.0476589479723695,
-          "emp_rho": 0.8797726979169109
-        },
-        {
-          "index": 61,
-          "decay": [
-            0.2,
-            0.8
-          ],
-          "W": [
-            [
-              -0.5,
-              -1.5
-            ],
-            [
-              1.5,
-              -0.5
-            ]
-          ],
-          "emp_2norm": 1.451496830880908,
-          "emp_rho": 0.7986130990187057
-        },
-        {
-          "index": 62,
-          "decay": [
-            0.2,
-            0.8
-          ],
-          "W": [
-            [
-              -0.5,
-              -0.9
-            ],
-            [
-              -0.9,
-              -0.5
-            ]
-          ],
-          "emp_2norm": 1.0771584518718729,
-          "emp_rho": 0.8262811813689563
-        },
-        {
-          "index": 63,
-          "decay": [
-            0.2,
-            0.8
-          ],
-          "W": [
-            [
-              -0.5,
-              -0.9
-            ],
-            [
-              0.9,
-              -0.5
-            ]
-          ],
-          "emp_2norm": 1.0812987377447294,
-          "emp_rho": 0.7954312388828968
-        },
-        {
-          "index": 66,
-          "decay": [
-            0.2,
-            0.8
-          ],
-          "W": [
-            [
-              -0.5,
-              0.9
-            ],
-            [
-              0.9,
-              -0.5
-            ]
-          ],
-          "emp_2norm": 1.0772089082292562,
-          "emp_rho": 0.8262811813689563
-        },
-        {
-          "index": 67,
-          "decay": [
-            0.2,
-            0.8
-          ],
-          "W": [
-            [
-              -0.5,
-              0.9
-            ],
-            [
-              -0.9,
-              -0.5
-            ]
-          ],
-          "emp_2norm": 1.0816885235510343,
-          "emp_rho": 0.7954312388828968
-        },
-        {
-          "index": 69,
-          "decay": [
-            0.2,
-            0.8
-          ],
-          "W": [
-            [
-              -0.5,
-              1.5
-            ],
-            [
-              -1.5,
-              -0.5
-            ]
-          ],
-          "emp_2norm": 1.451496830880908,
-          "emp_rho": 0.7986130990187057
-        }
-      ],
-      "passed": false
+      "worst_admitted_emp_pnorm_gain": 1.0,
+      "worst_admitted_emp_2norm_for_reference": 2.270660091071416,
+      "false_admit_examples": [],
+      "passed": true
     },
     "vertex_soundness_selfcheck_max_excess": -0.00041766926560105055,
-    "passed": false
+    "passed": true
   },
   "D2_twonorm_gain_over_infnorm": {
     "free01": {
