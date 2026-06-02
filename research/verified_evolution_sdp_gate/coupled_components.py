@@ -93,52 +93,63 @@ def _free_response(gene: CoupledGene, s0: np.ndarray, T: int) -> np.ndarray:
     return np.stack(traj)
 
 
-def _exp_neg_mse(traj: np.ndarray, target: np.ndarray) -> float:
-    mse = float(np.mean(np.sum((traj - target) ** 2, axis=1)))
-    return float(np.exp(-mse))
+def _r2(traj: np.ndarray, target: np.ndarray) -> float:
+    """Coefficient of determination over steps k=1..T (skip the trivial k=0 match).
+
+    R^2 = 1 - SS_res/SS_tot in (-inf, 1]. Project-standard discriminative metric
+    (Step C / E-A / ridge readout): a 'lazy decay-to-0' gene scores low/negative
+    on a rotation target (does not explain its variance), so the landscape has
+    headroom — no exp(-MSE) ceiling (the demo's 0.997 saturation, ③/llive trap)."""
+    tr, tg = traj[1:], target[1:]
+    ss_res = float(np.sum((tr - tg) ** 2))
+    ss_tot = float(np.sum((tg - tg.mean(axis=0)) ** 2))
+    if ss_tot < 1e-12:
+        return 0.0
+    return 1.0 - ss_res / ss_tot
 
 
 @dataclass(frozen=True)
 class RotationObjective:
     """Reproduce a damped 2-D rotation from a fixed start. Rewards COUPLED
     contracting dynamics near the stability boundary (complex Jacobian
-    eigenvalues => antisymmetric W => large ||J||_inf even when rho<1)."""
+    eigenvalues => antisymmetric W => ||J||_inf > 1 even when rho<1, sigma_max<1).
+    Optimum lives in the 2-norm region the inf-norm OVER-REJECTS."""
 
     name: str = "rotation"
-    T: int = 24
-    radius: float = 0.9
-    period: float = 12.0
-    s0: tuple = (0.5, 0.0)
+    T: int = 30
+    radius: float = 0.93
+    period: float = 10.0
+    amp: float = 0.4
+    s0: tuple = (0.4, 0.0)
 
     def _target(self) -> np.ndarray:
         w = 2.0 * np.pi / self.period
         ks = np.arange(self.T + 1)
-        amp = 0.5 * self.radius ** ks
-        return np.stack([amp * np.cos(w * ks), amp * np.sin(w * ks)], axis=1)
+        a = self.amp * self.radius ** ks
+        return np.stack([a * np.cos(w * ks), a * np.sin(w * ks)], axis=1)
 
     def fitness(self, gene: CoupledGene) -> float:
-        traj = _free_response(gene, np.array(self.s0), self.T)
-        return _exp_neg_mse(traj, self._target())
+        return _r2(_free_response(gene, np.array(self.s0), self.T), self._target())
 
 
 @dataclass(frozen=True)
 class BenignDecayObjective:
     """Reproduce a simple diagonal exponential decay (no rotation). Optimum lives
-    INSIDE the inf-norm region (decay~0.8, W~0) => honest-null control (G5)."""
+    INSIDE the inf-norm region (decay~rate, W~0) => honest-null control (G5)."""
 
     name: str = "benign"
-    T: int = 24
-    rate: float = 0.8
-    s0: tuple = (0.5, 0.5)
+    T: int = 30
+    rate: float = 0.85
+    amp: float = 0.4
+    s0: tuple = (0.4, 0.4)
 
     def _target(self) -> np.ndarray:
         ks = np.arange(self.T + 1)
-        amp = 0.5 * self.rate ** ks
-        return np.stack([amp, amp], axis=1)
+        a = self.amp * self.rate ** ks
+        return np.stack([a, a], axis=1)
 
     def fitness(self, gene: CoupledGene) -> float:
-        traj = _free_response(gene, np.array(self.s0), self.T)
-        return _exp_neg_mse(traj, self._target())
+        return _r2(_free_response(gene, np.array(self.s0), self.T), self._target())
 
 
 # Reference NON-NORMAL contracting gene (strictly lower-triangular coupling):
