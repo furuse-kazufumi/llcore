@@ -185,10 +185,23 @@ def evolve(codec: GeneCodec, objective: Objective, verifier: VerifierBackend,
         return np.array([objective.fitness(codec.to_gene(g)) for g in genotypes],
                         dtype=np.float64)
 
-    # initial population (not gated: the gate acts on CHILDREN, where the
-    # admission decision of evolution lives; mirrors src minimal_ga).
+    # initial population. By default NOT gated (the gate acts on CHILDREN, where the
+    # admission decision of evolution lives; mirrors src minimal_ga). Set
+    # ``gate_initial=True`` for END-TO-END soundness: then every initial gene must also
+    # pass the verifier (resample/fallback like a child), so NO ungated gene can survive
+    # via elitism — the whole evolved population is gate-certified.
+    def _gated_random() -> np.ndarray:
+        for _ in range(cfg.resample_cap + 1):
+            g = codec.clip(codec.random(rng))
+            if _admits(g):
+                return g
+        return fallback.copy()
+
     if initial_genotypes is None:
-        pop = [codec.clip(codec.random(rng)) for _ in range(cfg.pop_size)]
+        if gate_initial:
+            pop = [_gated_random() for _ in range(cfg.pop_size)]
+        else:
+            pop = [codec.clip(codec.random(rng)) for _ in range(cfg.pop_size)]
     else:
         if len(initial_genotypes) != cfg.pop_size:
             raise ValueError("initial_genotypes size != pop_size")
