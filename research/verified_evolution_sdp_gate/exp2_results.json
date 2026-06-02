@@ -1,8 +1,8 @@
 {
   "config": {
-    "n_seeds": 2,
+    "n_seeds": 15,
     "pop": 24,
-    "gens": 30,
+    "gens": 25,
     "base_seed": 1000
   },
   "runs": {
@@ -18,9 +18,113 @@
         },
         {
           "seed": 1001,
-          "best": 0.9486312183478287,
+          "best": 0.9318230995021298,
+          "winner_region": "non_certified",
+          "final_divergent": 4,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1002,
+          "best": 0.9080525181364166,
+          "winner_region": "non_certified",
+          "final_divergent": 1,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1003,
+          "best": 0.9663670172745321,
           "winner_region": "non_certified",
           "final_divergent": 5,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1004,
+          "best": 0.9372235053844074,
+          "winner_region": "non_certified",
+          "final_divergent": 4,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1005,
+          "best": 0.9351129973243308,
+          "winner_region": "non_certified",
+          "final_divergent": 3,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1006,
+          "best": 0.9602908330118892,
+          "winner_region": "non_certified",
+          "final_divergent": 6,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1007,
+          "best": 0.8206999617752302,
+          "winner_region": "non_certified",
+          "final_divergent": 4,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1008,
+          "best": 0.9096892738324573,
+          "winner_region": "non_certified",
+          "final_divergent": 5,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1009,
+          "best": 0.8778877184046273,
+          "winner_region": "non_certified",
+          "final_divergent": 4,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1010,
+          "best": 0.9615889360731841,
+          "winner_region": "non_certified",
+          "final_divergent": 7,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1011,
+          "best": 0.9588811598876541,
+          "winner_region": "non_certified",
+          "final_divergent": 3,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1012,
+          "best": 0.9365713250523652,
+          "winner_region": "non_certified",
+          "final_divergent": 9,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1013,
+          "best": 0.9028808509697356,
+          "winner_region": "non_certified",
+          "final_divergent": 3,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1014,
+          "best": 0.9378599979689242,
+          "winner_region": "non_certified",
+          "final_divergent": 8,
           "n_rejections": 0,
           "fallback": 0
         }
@@ -31,51 +135,363 @@
           "best": 0.4289222624498825,
           "winner_region": "inf",
           "final_divergent": 0,
-          "n_rejections": 392,
+          "n_rejections": 321,
           "fallback": 0
         },
         {
           "seed": 1001,
-          "best": 0.4016330921531629,
+          "best": 0.36927198861915433,
           "winner_region": "inf",
           "final_divergent": 0,
-          "n_rejections": 612,
+          "n_rejections": 530,
+          "fallback": 4
+        },
+        {
+          "seed": 1002,
+          "best": 0.39868645167955763,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 299,
+          "fallback": 0
+        },
+        {
+          "seed": 1003,
+          "best": 0.3790545996289608,
+          "winner_region": "non_certified",
+          "final_divergent": 1,
+          "n_rejections": 293,
+          "fallback": 0
+        },
+        {
+          "seed": 1004,
+          "best": 0.4325186772899743,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 353,
+          "fallback": 0
+        },
+        {
+          "seed": 1005,
+          "best": 0.4006853721159327,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 442,
+          "fallback": 0
+        },
+        {
+          "seed": 1006,
+          "best": 0.40089112109644576,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 234,
+          "fallback": 0
+        },
+        {
+          "seed": 1007,
+          "best": 0.532013200881508,
+          "winner_region": "non_certified",
+          "final_divergent": 0,
+          "n_rejections": 509,
+          "fallback": 0
+        },
+        {
+          "seed": 1008,
+          "best": 0.43168870979931995,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 405,
+          "fallback": 1
+        },
+        {
+          "seed": 1009,
+          "best": 0.42767437575011913,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 338,
+          "fallback": 0
+        },
+        {
+          "seed": 1010,
+          "best": 0.3931104989595833,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 361,
+          "fallback": 3
+        },
+        {
+          "seed": 1011,
+          "best": 0.37930132455534904,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 281,
+          "fallback": 0
+        },
+        {
+          "seed": 1012,
+          "best": 0.41248713328478936,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 454,
+          "fallback": 0
+        },
+        {
+          "seed": 1013,
+          "best": 0.3891623116511621,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 388,
+          "fallback": 0
+        },
+        {
+          "seed": 1014,
+          "best": 0.38958498289044774,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 384,
           "fallback": 0
         }
       ],
       "two_norm": [
         {
           "seed": 1000,
-          "best": 0.8594994970787226,
+          "best": 0.8320859480148745,
           "winner_region": "two_norm_only",
           "final_divergent": 0,
-          "n_rejections": 507,
+          "n_rejections": 408,
           "fallback": 0
         },
         {
           "seed": 1001,
-          "best": 0.8723408909718494,
+          "best": 0.7776285362148319,
           "winner_region": "two_norm_only",
           "final_divergent": 0,
-          "n_rejections": 685,
+          "n_rejections": 600,
+          "fallback": 2
+        },
+        {
+          "seed": 1002,
+          "best": 0.7219031156361317,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 395,
+          "fallback": 0
+        },
+        {
+          "seed": 1003,
+          "best": 0.6826568069789195,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 383,
+          "fallback": 0
+        },
+        {
+          "seed": 1004,
+          "best": 0.7932521407162617,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 317,
+          "fallback": 0
+        },
+        {
+          "seed": 1005,
+          "best": 0.6770114094958435,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 459,
+          "fallback": 0
+        },
+        {
+          "seed": 1006,
+          "best": 0.9017382750990308,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 402,
+          "fallback": 0
+        },
+        {
+          "seed": 1007,
+          "best": 0.7815492009305505,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 416,
+          "fallback": 0
+        },
+        {
+          "seed": 1008,
+          "best": 0.8404268609704066,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 537,
+          "fallback": 1
+        },
+        {
+          "seed": 1009,
+          "best": 0.7795315688811769,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 366,
+          "fallback": 0
+        },
+        {
+          "seed": 1010,
+          "best": 0.7972897366626925,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 451,
+          "fallback": 3
+        },
+        {
+          "seed": 1011,
+          "best": 0.6726257577555818,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 290,
+          "fallback": 0
+        },
+        {
+          "seed": 1012,
+          "best": 0.6974273796280779,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 490,
+          "fallback": 1
+        },
+        {
+          "seed": 1013,
+          "best": 0.7903543764495975,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 398,
+          "fallback": 0
+        },
+        {
+          "seed": 1014,
+          "best": 0.75876717961364,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 422,
           "fallback": 0
         }
       ],
       "sdp": [
         {
           "seed": 1000,
-          "best": 0.8747438111087226,
-          "winner_region": "sdp_only",
+          "best": 0.8736035580254444,
+          "winner_region": "two_norm_only",
           "final_divergent": 0,
-          "n_rejections": 405,
+          "n_rejections": 307,
           "fallback": 0
         },
         {
           "seed": 1001,
-          "best": 0.9124100948383509,
+          "best": 0.9192441571364363,
           "winner_region": "sdp_only",
           "final_divergent": 0,
-          "n_rejections": 528,
+          "n_rejections": 411,
+          "fallback": 0
+        },
+        {
+          "seed": 1002,
+          "best": 0.8364756805296742,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 333,
+          "fallback": 0
+        },
+        {
+          "seed": 1003,
+          "best": 0.6761949150446716,
+          "winner_region": "sdp_only",
+          "final_divergent": 0,
+          "n_rejections": 270,
+          "fallback": 0
+        },
+        {
+          "seed": 1004,
+          "best": 0.942773896831158,
+          "winner_region": "sdp_only",
+          "final_divergent": 0,
+          "n_rejections": 330,
+          "fallback": 0
+        },
+        {
+          "seed": 1005,
+          "best": 0.9481452687574752,
+          "winner_region": "sdp_only",
+          "final_divergent": 0,
+          "n_rejections": 373,
+          "fallback": 0
+        },
+        {
+          "seed": 1006,
+          "best": 0.8943329611774822,
+          "winner_region": "sdp_only",
+          "final_divergent": 0,
+          "n_rejections": 282,
+          "fallback": 0
+        },
+        {
+          "seed": 1007,
+          "best": 0.8817998936329063,
+          "winner_region": "sdp_only",
+          "final_divergent": 0,
+          "n_rejections": 364,
+          "fallback": 0
+        },
+        {
+          "seed": 1008,
+          "best": 0.8093897984171798,
+          "winner_region": "sdp_only",
+          "final_divergent": 0,
+          "n_rejections": 364,
+          "fallback": 0
+        },
+        {
+          "seed": 1009,
+          "best": 0.7313931862724443,
+          "winner_region": "sdp_only",
+          "final_divergent": 0,
+          "n_rejections": 258,
+          "fallback": 0
+        },
+        {
+          "seed": 1010,
+          "best": 0.9480227381183426,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 347,
+          "fallback": 1
+        },
+        {
+          "seed": 1011,
+          "best": 0.7072658075449301,
+          "winner_region": "sdp_only",
+          "final_divergent": 0,
+          "n_rejections": 171,
+          "fallback": 0
+        },
+        {
+          "seed": 1012,
+          "best": 0.9279053651514209,
+          "winner_region": "sdp_only",
+          "final_divergent": 0,
+          "n_rejections": 348,
+          "fallback": 0
+        },
+        {
+          "seed": 1013,
+          "best": 0.9398507410355268,
+          "winner_region": "sdp_only",
+          "final_divergent": 0,
+          "n_rejections": 318,
+          "fallback": 0
+        },
+        {
+          "seed": 1014,
+          "best": 0.8544151180351984,
+          "winner_region": "sdp_only",
+          "final_divergent": 0,
+          "n_rejections": 292,
           "fallback": 0
         }
       ]
@@ -86,7 +502,7 @@
           "seed": 1000,
           "best": 0.9987178911543695,
           "winner_region": "inf",
-          "final_divergent": 2,
+          "final_divergent": 0,
           "n_rejections": 0,
           "fallback": 0
         },
@@ -97,6 +513,110 @@
           "final_divergent": 5,
           "n_rejections": 0,
           "fallback": 0
+        },
+        {
+          "seed": 1002,
+          "best": 0.9996694414685543,
+          "winner_region": "sdp_only",
+          "final_divergent": 4,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1003,
+          "best": 0.9935664786495533,
+          "winner_region": "non_certified",
+          "final_divergent": 11,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1004,
+          "best": 0.9976428404641762,
+          "winner_region": "inf",
+          "final_divergent": 3,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1005,
+          "best": 0.9998152420080333,
+          "winner_region": "non_certified",
+          "final_divergent": 4,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1006,
+          "best": 0.9989593155289748,
+          "winner_region": "inf",
+          "final_divergent": 1,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1007,
+          "best": 0.998883364673686,
+          "winner_region": "sdp_only",
+          "final_divergent": 4,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1008,
+          "best": 0.9982272352762208,
+          "winner_region": "inf",
+          "final_divergent": 4,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1009,
+          "best": 0.9997711641322188,
+          "winner_region": "sdp_only",
+          "final_divergent": 2,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1010,
+          "best": 0.9989536975036228,
+          "winner_region": "non_certified",
+          "final_divergent": 3,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1011,
+          "best": 0.9995747790267052,
+          "winner_region": "inf",
+          "final_divergent": 1,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1012,
+          "best": 0.9999099528615094,
+          "winner_region": "non_certified",
+          "final_divergent": 10,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1013,
+          "best": 0.9999889861837162,
+          "winner_region": "inf",
+          "final_divergent": 4,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1014,
+          "best": 0.9990547001817414,
+          "winner_region": "inf",
+          "final_divergent": 4,
+          "n_rejections": 0,
+          "fallback": 0
         }
       ],
       "inf_norm": [
@@ -105,15 +625,119 @@
           "best": 0.9987640480317053,
           "winner_region": "inf",
           "final_divergent": 0,
-          "n_rejections": 278,
+          "n_rejections": 229,
           "fallback": 0
         },
         {
           "seed": 1001,
-          "best": 0.9999879848617507,
+          "best": 0.9999783258319435,
           "winner_region": "inf",
           "final_divergent": 0,
-          "n_rejections": 460,
+          "n_rejections": 389,
+          "fallback": 3
+        },
+        {
+          "seed": 1002,
+          "best": 0.9997808863367494,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 241,
+          "fallback": 0
+        },
+        {
+          "seed": 1003,
+          "best": 0.9994601808888212,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 167,
+          "fallback": 0
+        },
+        {
+          "seed": 1004,
+          "best": 0.999253886419234,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 271,
+          "fallback": 0
+        },
+        {
+          "seed": 1005,
+          "best": 0.9977946714554768,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 369,
+          "fallback": 0
+        },
+        {
+          "seed": 1006,
+          "best": 0.9997811825091862,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 291,
+          "fallback": 0
+        },
+        {
+          "seed": 1007,
+          "best": 0.9995985338171479,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 310,
+          "fallback": 0
+        },
+        {
+          "seed": 1008,
+          "best": 0.9997583885128152,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 277,
+          "fallback": 0
+        },
+        {
+          "seed": 1009,
+          "best": 0.9988138166310981,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 332,
+          "fallback": 0
+        },
+        {
+          "seed": 1010,
+          "best": 0.9998012312342356,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 324,
+          "fallback": 3
+        },
+        {
+          "seed": 1011,
+          "best": 0.9991196744983278,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 232,
+          "fallback": 0
+        },
+        {
+          "seed": 1012,
+          "best": 0.9992508591355539,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 348,
+          "fallback": 2
+        },
+        {
+          "seed": 1013,
+          "best": 0.9987470746589473,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 274,
+          "fallback": 0
+        },
+        {
+          "seed": 1014,
+          "best": 0.9985381440091572,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 285,
           "fallback": 0
         }
       ],
@@ -123,33 +747,241 @@
           "best": 0.9998179387679794,
           "winner_region": "inf",
           "final_divergent": 0,
-          "n_rejections": 282,
+          "n_rejections": 248,
           "fallback": 0
         },
         {
           "seed": 1001,
-          "best": 0.999518993504722,
+          "best": 0.9990819618445936,
           "winner_region": "inf",
           "final_divergent": 0,
-          "n_rejections": 414,
+          "n_rejections": 320,
+          "fallback": 4
+        },
+        {
+          "seed": 1002,
+          "best": 0.9995982089129251,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 169,
+          "fallback": 0
+        },
+        {
+          "seed": 1003,
+          "best": 0.9994384764058428,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 212,
+          "fallback": 0
+        },
+        {
+          "seed": 1004,
+          "best": 0.9996738461082357,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 173,
+          "fallback": 0
+        },
+        {
+          "seed": 1005,
+          "best": 0.9985281353936821,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 236,
+          "fallback": 0
+        },
+        {
+          "seed": 1006,
+          "best": 0.9933196181885805,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 206,
+          "fallback": 0
+        },
+        {
+          "seed": 1007,
+          "best": 0.9976416258489674,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 223,
+          "fallback": 0
+        },
+        {
+          "seed": 1008,
+          "best": 0.9976008371000894,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 363,
           "fallback": 1
+        },
+        {
+          "seed": 1009,
+          "best": 0.9999471825066133,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 280,
+          "fallback": 0
+        },
+        {
+          "seed": 1010,
+          "best": 0.9992048521787795,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 256,
+          "fallback": 3
+        },
+        {
+          "seed": 1011,
+          "best": 0.9997961971945717,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 160,
+          "fallback": 0
+        },
+        {
+          "seed": 1012,
+          "best": 0.9991611927175492,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 334,
+          "fallback": 0
+        },
+        {
+          "seed": 1013,
+          "best": 0.999707024149575,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 335,
+          "fallback": 1
+        },
+        {
+          "seed": 1014,
+          "best": 0.9998781644496936,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 259,
+          "fallback": 0
         }
       ],
       "sdp": [
         {
           "seed": 1000,
-          "best": 0.9984095852975176,
-          "winner_region": "sdp_only",
+          "best": 0.9995157273415447,
+          "winner_region": "inf",
           "final_divergent": 0,
-          "n_rejections": 231,
+          "n_rejections": 145,
           "fallback": 0
         },
         {
           "seed": 1001,
-          "best": 0.9999590519759978,
+          "best": 0.9986080929986553,
           "winner_region": "inf",
           "final_divergent": 0,
-          "n_rejections": 273,
+          "n_rejections": 155,
+          "fallback": 0
+        },
+        {
+          "seed": 1002,
+          "best": 0.9953024572042514,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 135,
+          "fallback": 0
+        },
+        {
+          "seed": 1003,
+          "best": 0.9999205269870924,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 165,
+          "fallback": 0
+        },
+        {
+          "seed": 1004,
+          "best": 0.9994074019369641,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 176,
+          "fallback": 0
+        },
+        {
+          "seed": 1005,
+          "best": 0.9982906179450619,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 128,
+          "fallback": 0
+        },
+        {
+          "seed": 1006,
+          "best": 0.9990947279722584,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 163,
+          "fallback": 0
+        },
+        {
+          "seed": 1007,
+          "best": 0.9997464071074033,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 207,
+          "fallback": 0
+        },
+        {
+          "seed": 1008,
+          "best": 0.9999732017501278,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 188,
+          "fallback": 0
+        },
+        {
+          "seed": 1009,
+          "best": 0.9987960817137291,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 228,
+          "fallback": 0
+        },
+        {
+          "seed": 1010,
+          "best": 0.9991681585888166,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 184,
+          "fallback": 1
+        },
+        {
+          "seed": 1011,
+          "best": 0.9995654556684603,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 93,
+          "fallback": 0
+        },
+        {
+          "seed": 1012,
+          "best": 0.999149919232752,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 223,
+          "fallback": 0
+        },
+        {
+          "seed": 1013,
+          "best": 0.9993434699404771,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 187,
+          "fallback": 0
+        },
+        {
+          "seed": 1014,
+          "best": 0.9998120244235682,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 125,
           "fallback": 0
         }
       ]
@@ -171,23 +1003,231 @@
           "final_divergent": 1,
           "n_rejections": 0,
           "fallback": 0
+        },
+        {
+          "seed": 1002,
+          "best": 0.9933977486210054,
+          "winner_region": "non_certified",
+          "final_divergent": 0,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1003,
+          "best": 0.9972224307208152,
+          "winner_region": "sdp_only",
+          "final_divergent": 0,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1004,
+          "best": 0.9852510917710332,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1005,
+          "best": 0.9818390837801225,
+          "winner_region": "non_certified",
+          "final_divergent": 1,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1006,
+          "best": 0.9919012783572415,
+          "winner_region": "non_certified",
+          "final_divergent": 1,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1007,
+          "best": 0.9946604127609929,
+          "winner_region": "sdp_only",
+          "final_divergent": 0,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1008,
+          "best": 0.9956522622825837,
+          "winner_region": "sdp_only",
+          "final_divergent": 2,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1009,
+          "best": 0.995619502415742,
+          "winner_region": "non_certified",
+          "final_divergent": 0,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1010,
+          "best": 0.984560251897851,
+          "winner_region": "non_certified",
+          "final_divergent": 0,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1011,
+          "best": 0.9916290706429763,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1012,
+          "best": 0.9986056219534438,
+          "winner_region": "non_certified",
+          "final_divergent": 1,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1013,
+          "best": 0.9871777297074543,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 0,
+          "fallback": 0
+        },
+        {
+          "seed": 1014,
+          "best": 0.99834187907623,
+          "winner_region": "sdp_only",
+          "final_divergent": 1,
+          "n_rejections": 0,
+          "fallback": 0
         }
       ],
       "inf_norm": [
         {
           "seed": 1000,
-          "best": 0.9687602050196528,
+          "best": 0.9639157278533228,
           "winner_region": "inf",
           "final_divergent": 0,
-          "n_rejections": 228,
+          "n_rejections": 198,
           "fallback": 0
         },
         {
           "seed": 1001,
-          "best": 0.9743634339938902,
+          "best": 0.9683517561849608,
           "winner_region": "inf",
           "final_divergent": 0,
-          "n_rejections": 657,
+          "n_rejections": 431,
+          "fallback": 5
+        },
+        {
+          "seed": 1002,
+          "best": 0.9531327692070416,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 184,
+          "fallback": 0
+        },
+        {
+          "seed": 1003,
+          "best": 0.9601166518057997,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 133,
+          "fallback": 0
+        },
+        {
+          "seed": 1004,
+          "best": 0.9684107628142956,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 227,
+          "fallback": 0
+        },
+        {
+          "seed": 1005,
+          "best": 0.9567657046984291,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 305,
+          "fallback": 1
+        },
+        {
+          "seed": 1006,
+          "best": 0.9614026426872077,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 199,
+          "fallback": 0
+        },
+        {
+          "seed": 1007,
+          "best": 0.9388046358748243,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 324,
+          "fallback": 0
+        },
+        {
+          "seed": 1008,
+          "best": 0.968938214586296,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 347,
+          "fallback": 0
+        },
+        {
+          "seed": 1009,
+          "best": 0.9686036497092643,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 213,
+          "fallback": 0
+        },
+        {
+          "seed": 1010,
+          "best": 0.967897860056456,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 329,
+          "fallback": 3
+        },
+        {
+          "seed": 1011,
+          "best": 0.9743054454918705,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 174,
+          "fallback": 0
+        },
+        {
+          "seed": 1012,
+          "best": 0.9547788019648906,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 268,
+          "fallback": 0
+        },
+        {
+          "seed": 1013,
+          "best": 0.9634228514631307,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 293,
+          "fallback": 0
+        },
+        {
+          "seed": 1014,
+          "best": 0.9692736617324876,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 226,
           "fallback": 0
         }
       ],
@@ -197,33 +1237,241 @@
           "best": 0.9900906305522963,
           "winner_region": "two_norm_only",
           "final_divergent": 0,
-          "n_rejections": 167,
+          "n_rejections": 139,
           "fallback": 0
         },
         {
           "seed": 1001,
-          "best": 0.990100217732988,
+          "best": 0.9906729078238727,
           "winner_region": "two_norm_only",
           "final_divergent": 0,
-          "n_rejections": 407,
+          "n_rejections": 351,
+          "fallback": 4
+        },
+        {
+          "seed": 1002,
+          "best": 0.9868837601855385,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 165,
+          "fallback": 0
+        },
+        {
+          "seed": 1003,
+          "best": 0.973131243224809,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 164,
+          "fallback": 0
+        },
+        {
+          "seed": 1004,
+          "best": 0.9748996914088583,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 188,
+          "fallback": 0
+        },
+        {
+          "seed": 1005,
+          "best": 0.9940438355149379,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 228,
+          "fallback": 0
+        },
+        {
+          "seed": 1006,
+          "best": 0.9914098999397065,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 132,
+          "fallback": 0
+        },
+        {
+          "seed": 1007,
+          "best": 0.9822162571212163,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 274,
+          "fallback": 0
+        },
+        {
+          "seed": 1008,
+          "best": 0.9911655538377091,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 279,
           "fallback": 1
+        },
+        {
+          "seed": 1009,
+          "best": 0.9812970130646506,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 253,
+          "fallback": 0
+        },
+        {
+          "seed": 1010,
+          "best": 0.99207084688045,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 271,
+          "fallback": 3
+        },
+        {
+          "seed": 1011,
+          "best": 0.9806835913026998,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 123,
+          "fallback": 0
+        },
+        {
+          "seed": 1012,
+          "best": 0.9817709891953924,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 202,
+          "fallback": 0
+        },
+        {
+          "seed": 1013,
+          "best": 0.9940044074067813,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 255,
+          "fallback": 1
+        },
+        {
+          "seed": 1014,
+          "best": 0.9826923983371737,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 162,
+          "fallback": 0
         }
       ],
       "sdp": [
         {
           "seed": 1000,
-          "best": 0.9885193324064312,
-          "winner_region": "sdp_only",
+          "best": 0.9844936507397342,
+          "winner_region": "two_norm_only",
           "final_divergent": 0,
-          "n_rejections": 141,
+          "n_rejections": 87,
           "fallback": 0
         },
         {
           "seed": 1001,
-          "best": 0.9850749304424851,
+          "best": 0.9755900061325201,
           "winner_region": "two_norm_only",
           "final_divergent": 0,
-          "n_rejections": 245,
+          "n_rejections": 247,
+          "fallback": 0
+        },
+        {
+          "seed": 1002,
+          "best": 0.9864689998792454,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 73,
+          "fallback": 0
+        },
+        {
+          "seed": 1003,
+          "best": 0.9900955544925971,
+          "winner_region": "sdp_only",
+          "final_divergent": 0,
+          "n_rejections": 97,
+          "fallback": 0
+        },
+        {
+          "seed": 1004,
+          "best": 0.9907982425684672,
+          "winner_region": "sdp_only",
+          "final_divergent": 0,
+          "n_rejections": 163,
+          "fallback": 0
+        },
+        {
+          "seed": 1005,
+          "best": 0.9802509564519822,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 151,
+          "fallback": 0
+        },
+        {
+          "seed": 1006,
+          "best": 0.9616282056976565,
+          "winner_region": "inf",
+          "final_divergent": 0,
+          "n_rejections": 97,
+          "fallback": 0
+        },
+        {
+          "seed": 1007,
+          "best": 0.9833028208672926,
+          "winner_region": "sdp_only",
+          "final_divergent": 0,
+          "n_rejections": 162,
+          "fallback": 0
+        },
+        {
+          "seed": 1008,
+          "best": 0.9914367170990457,
+          "winner_region": "sdp_only",
+          "final_divergent": 0,
+          "n_rejections": 220,
+          "fallback": 0
+        },
+        {
+          "seed": 1009,
+          "best": 0.9864777161321707,
+          "winner_region": "sdp_only",
+          "final_divergent": 0,
+          "n_rejections": 158,
+          "fallback": 0
+        },
+        {
+          "seed": 1010,
+          "best": 0.9961269843299674,
+          "winner_region": "sdp_only",
+          "final_divergent": 0,
+          "n_rejections": 161,
+          "fallback": 1
+        },
+        {
+          "seed": 1011,
+          "best": 0.9840123419547938,
+          "winner_region": "sdp_only",
+          "final_divergent": 0,
+          "n_rejections": 132,
+          "fallback": 0
+        },
+        {
+          "seed": 1012,
+          "best": 0.9917783647251522,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 128,
+          "fallback": 0
+        },
+        {
+          "seed": 1013,
+          "best": 0.9967255190685717,
+          "winner_region": "sdp_only",
+          "final_divergent": 0,
+          "n_rejections": 154,
+          "fallback": 0
+        },
+        {
+          "seed": 1014,
+          "best": 0.9910348630235168,
+          "winner_region": "two_norm_only",
+          "final_divergent": 0,
+          "n_rejections": 116,
           "fallback": 0
         }
       ]
@@ -232,15 +1480,15 @@
   "verdicts": {
     "G2_load_bearing": {
       "rotation": {
-        "ungated_divergent_frac": 0.20833333333333334,
+        "ungated_divergent_frac": 0.19722222222222222,
         "gated_total_divergent": {
-          "inf_norm": 0,
+          "inf_norm": 1,
           "two_norm": 0,
           "sdp": 0
         }
       },
       "benign": {
-        "ungated_divergent_frac": 0.14583333333333334,
+        "ungated_divergent_frac": 0.16666666666666666,
         "gated_total_divergent": {
           "inf_norm": 0,
           "two_norm": 0,
@@ -248,7 +1496,7 @@
         }
       },
       "nonnormal": {
-        "ungated_divergent_frac": 0.020833333333333332,
+        "ungated_divergent_frac": 0.019444444444444445,
         "gated_total_divergent": {
           "inf_norm": 0,
           "two_norm": 0,
@@ -257,234 +1505,234 @@
       }
     },
     "G1_soundness_total_divergent": {
-      "inf_norm": 0,
+      "inf_norm": 1,
       "two_norm": 0,
       "sdp": 0
     },
     "payoff": {
       "rotation": {
         "sdp_vs_inf": {
-          "n": 2,
-          "mean_delta": 0.478299275672014,
-          "median_delta": 0.478299275672014,
-          "n_pos": 2,
+          "n": 15,
+          "mean_delta": 0.44838400500387365,
+          "median_delta": 0.4648301351447507,
+          "n_pos": 15,
           "n_neg": 0,
           "paired_sign_delta": 1.0,
-          "wilcoxon_p": 0.25,
+          "wilcoxon_p": 3.0517578125e-05,
           "alternative": "greater"
         },
         "two_vs_inf": {
-          "n": 2,
-          "mean_delta": 0.4506425167237633,
-          "median_delta": 0.4506425167237633,
-          "n_pos": 2,
+          "n": 15,
+          "mean_delta": 0.35594635215969533,
+          "median_delta": 0.3607334634262874,
+          "n_pos": 15,
           "n_neg": 0,
           "paired_sign_delta": 1.0,
-          "wilcoxon_p": 0.25,
+          "wilcoxon_p": 3.0517578125e-05,
           "alternative": "greater"
         },
         "sdp_vs_two": {
-          "n": 2,
-          "mean_delta": 0.027656758948250704,
-          "median_delta": 0.027656758948250704,
-          "n_pos": 2,
-          "n_neg": 0,
-          "paired_sign_delta": 1.0,
-          "wilcoxon_p": 0.25,
+          "n": 15,
+          "mean_delta": 0.09243765284417824,
+          "median_delta": 0.10025069270235587,
+          "n_pos": 11,
+          "n_neg": 4,
+          "paired_sign_delta": 0.4666666666666667,
+          "wilcoxon_p": 0.00213623046875,
           "alternative": "greater"
         },
         "none_vs_sdp": {
-          "n": 2,
-          "mean_delta": 0.07054397688580066,
-          "median_delta": 0.07054397688580066,
-          "n_pos": 2,
-          "n_neg": 0,
-          "paired_sign_delta": 1.0,
-          "wilcoxon_p": 0.25,
+          "n": 15,
+          "mean_delta": 0.06891511668389594,
+          "median_delta": 0.06595787183440704,
+          "n_pos": 11,
+          "n_neg": 4,
+          "paired_sign_delta": 0.4666666666666667,
+          "wilcoxon_p": 0.007537841796875,
           "alternative": "greater"
         },
         "mean_best": {
-          "none": 0.9641209298593374,
-          "inf_norm": 0.4152776773015227,
-          "two_norm": 0.8659201940252861,
-          "sdp": 0.8935769529735367
+          "none": 0.9283026557312487,
+          "inf_norm": 0.411003534043479,
+          "two_norm": 0.7669498862031745,
+          "sdp": 0.8593875390473528
         },
         "winner_regions": {
           "none": {
             "inf": 0,
             "two_norm_only": 0,
             "sdp_only": 0,
-            "non_certified": 2
+            "non_certified": 15
           },
           "inf_norm": {
-            "inf": 2,
+            "inf": 13,
             "two_norm_only": 0,
             "sdp_only": 0,
-            "non_certified": 0
+            "non_certified": 2
           },
           "two_norm": {
             "inf": 0,
-            "two_norm_only": 2,
+            "two_norm_only": 15,
             "sdp_only": 0,
             "non_certified": 0
           },
           "sdp": {
             "inf": 0,
-            "two_norm_only": 0,
-            "sdp_only": 2,
+            "two_norm_only": 3,
+            "sdp_only": 12,
             "non_certified": 0
           }
         }
       },
       "benign": {
         "sdp_vs_inf": {
-          "n": 2,
-          "mean_delta": -0.00019169780997030372,
-          "median_delta": -0.00019169780997030372,
-          "n_pos": 0,
-          "n_neg": 2,
-          "paired_sign_delta": -1.0,
-          "wilcoxon_p": 0.5,
+          "n": 15,
+          "mean_delta": -0.00018310887728245628,
+          "median_delta": 0.0001535155177301295,
+          "n_pos": 9,
+          "n_neg": 6,
+          "paired_sign_delta": 0.2,
+          "wilcoxon_p": 0.7197265625,
           "alternative": "two-sided"
         },
         "two_vs_inf": {
-          "n": 2,
-          "mean_delta": 0.0002924496896227202,
-          "median_delta": 0.0002924496896227202,
-          "n_pos": 1,
-          "n_neg": 1,
-          "paired_sign_delta": 0.0,
-          "wilcoxon_p": 1.0,
+          "n": 15,
+          "mean_delta": -0.00040304281351473127,
+          "median_delta": -2.170448297833527e-05,
+          "n_pos": 7,
+          "n_neg": 8,
+          "paired_sign_delta": -0.06666666666666667,
+          "wilcoxon_p": 0.97796630859375,
           "alternative": "two-sided"
         },
         "sdp_vs_two": {
-          "n": 2,
-          "mean_delta": -0.00048414749959302394,
-          "median_delta": -0.00048414749959302394,
-          "n_pos": 1,
-          "n_neg": 1,
-          "paired_sign_delta": 0.0,
-          "wilcoxon_p": 1.0,
+          "n": 15,
+          "mean_delta": 0.00021993393623227498,
+          "median_delta": -0.00023074152611135545,
+          "n_pos": 4,
+          "n_neg": 11,
+          "paired_sign_delta": -0.4666666666666667,
+          "wilcoxon_p": 0.5994873046875,
           "alternative": "two-sided"
         },
         "none_vs_sdp": {
-          "n": 2,
-          "mean_delta": -0.00018191800798494917,
-          "median_delta": -0.00018191800798494917,
-          "n_pos": 1,
-          "n_neg": 1,
-          "paired_sign_delta": 0.0,
-          "wilcoxon_p": 0.75,
+          "n": 15,
+          "mean_delta": -0.00024481810632697907,
+          "median_delta": -0.00013541244328363344,
+          "n_pos": 7,
+          "n_neg": 8,
+          "paired_sign_delta": -0.06666666666666667,
+          "wilcoxon_p": 0.6806640625,
           "alternative": "greater"
         },
         "mean_best": {
-          "none": 0.9990024006287728,
-          "inf_norm": 0.999376016446728,
-          "two_norm": 0.9996684661363506,
-          "sdp": 0.9991843186367577
+          "none": 0.9988014666144172,
+          "inf_norm": 0.9992293935980265,
+          "two_norm": 0.998826350784512,
+          "sdp": 0.9990462847207441
         },
         "winner_regions": {
           "none": {
-            "inf": 2,
+            "inf": 8,
             "two_norm_only": 0,
-            "sdp_only": 0,
-            "non_certified": 0
+            "sdp_only": 3,
+            "non_certified": 4
           },
           "inf_norm": {
-            "inf": 2,
+            "inf": 15,
             "two_norm_only": 0,
             "sdp_only": 0,
             "non_certified": 0
           },
           "two_norm": {
-            "inf": 2,
+            "inf": 15,
             "two_norm_only": 0,
             "sdp_only": 0,
             "non_certified": 0
           },
           "sdp": {
-            "inf": 1,
+            "inf": 15,
             "two_norm_only": 0,
-            "sdp_only": 1,
+            "sdp_only": 0,
             "non_certified": 0
           }
         }
       },
       "nonnormal": {
         "sdp_vs_inf": {
-          "n": 2,
-          "mean_delta": 0.015235311917686623,
-          "median_delta": 0.015235311917686623,
-          "n_pos": 2,
+          "n": 15,
+          "mean_delta": 0.023473320468829086,
+          "median_delta": 0.022498502512749652,
+          "n_pos": 15,
           "n_neg": 0,
           "paired_sign_delta": 1.0,
-          "wilcoxon_p": 0.25,
+          "wilcoxon_p": 3.0517578125e-05,
           "alternative": "greater"
         },
         "two_vs_inf": {
-          "n": 2,
-          "mean_delta": 0.018533604635870615,
-          "median_delta": 0.018533604635870615,
-          "n_pos": 2,
+          "n": 15,
+          "mean_delta": 0.023260792644387674,
+          "median_delta": 0.024172986823994047,
+          "n_pos": 15,
           "n_neg": 0,
           "paired_sign_delta": 1.0,
-          "wilcoxon_p": 0.25,
+          "wilcoxon_p": 3.0517578125e-05,
           "alternative": "greater"
         },
         "sdp_vs_two": {
-          "n": 2,
-          "mean_delta": -0.0032982927181839927,
-          "median_delta": -0.0032982927181839927,
-          "n_pos": 0,
-          "n_neg": 2,
-          "paired_sign_delta": -1.0,
-          "wilcoxon_p": 1.0,
+          "n": 15,
+          "mean_delta": 0.00021252782444141082,
+          "median_delta": 0.002721111661790343,
+          "n_pos": 10,
+          "n_neg": 5,
+          "paired_sign_delta": 0.3333333333333333,
+          "wilcoxon_p": 0.262237548828125,
           "alternative": "greater"
         },
         "none_vs_sdp": {
-          "n": 2,
-          "mean_delta": 0.005144676208394039,
-          "median_delta": 0.005144676208394039,
-          "n_pos": 2,
-          "n_neg": 0,
-          "paired_sign_delta": 1.0,
-          "wilcoxon_p": 0.25,
+          "n": 15,
+          "mean_delta": 0.005968069072698845,
+          "median_delta": 0.006928748741759971,
+          "n_pos": 12,
+          "n_neg": 3,
+          "paired_sign_delta": 0.6,
+          "wilcoxon_p": 0.0318603515625,
           "alternative": "greater"
         },
         "mean_best": {
-          "none": 0.9919418076328521,
-          "inf_norm": 0.9715618195067715,
-          "two_norm": 0.9900954241426421,
-          "sdp": 0.9867971314244581
+          "none": 0.9919827986168797,
+          "inf_norm": 0.9625414090753517,
+          "two_norm": 0.9858022017197395,
+          "sdp": 0.9860147295441808
         },
         "winner_regions": {
           "none": {
             "inf": 0,
-            "two_norm_only": 0,
-            "sdp_only": 1,
-            "non_certified": 1
+            "two_norm_only": 3,
+            "sdp_only": 5,
+            "non_certified": 7
           },
           "inf_norm": {
-            "inf": 2,
+            "inf": 15,
             "two_norm_only": 0,
             "sdp_only": 0,
             "non_certified": 0
           },
           "two_norm": {
             "inf": 0,
-            "two_norm_only": 2,
+            "two_norm_only": 15,
             "sdp_only": 0,
             "non_certified": 0
           },
           "sdp": {
-            "inf": 0,
-            "two_norm_only": 1,
-            "sdp_only": 1,
+            "inf": 1,
+            "two_norm_only": 6,
+            "sdp_only": 8,
             "non_certified": 0
           }
         }
       }
     }
   },
-  "elapsed_s": 234.8
+  "elapsed_s": 726.6
 }

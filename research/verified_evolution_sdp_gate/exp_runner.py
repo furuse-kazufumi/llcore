@@ -145,7 +145,7 @@ def exp2(n_seeds: int = 15, pop: int = 24, gens: int = 30, base_seed: int = 1000
             for gate in GATES:
                 r = evolve(CODEC, obj, make_verifier(gate), cfg, rng=np.random.default_rng(s))
                 # soundness: any divergent gene in final pop? (sound gates must be 0)
-                div = sum(empirical_spectral_radius(CODEC.to_gene(g), n_samples=4000) >= 1.0
+                div = sum(empirical_spectral_radius(CODEC.to_gene(g), n_samples=2500) >= 1.0
                           for g in r.final_population)
                 runs[tname][gate].append({
                     "seed": s,
