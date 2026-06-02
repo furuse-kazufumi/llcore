@@ -135,7 +135,7 @@ def exp1(n_random: int = 8000, n_ga_visited: int = 4000, seed: int = 1) -> dict:
 
 def exp2(n_seeds: int = 15, pop: int = 24, gens: int = 30, base_seed: int = 1000) -> dict:
     t0 = time.time()
-    cfg = EvolveConfig(pop_size=pop, n_generations=gens, resample_cap=40)
+    cfg = EvolveConfig(pop_size=pop, n_generations=gens, resample_cap=18)
     seeds = [base_seed + i for i in range(n_seeds)]
     # runs[task][gate] = list over seeds of dict(best, winner_region, admit_div_frac, rej, fb)
     runs: dict = {t: {g: [] for g in GATES} for t in OBJECTIVES}
