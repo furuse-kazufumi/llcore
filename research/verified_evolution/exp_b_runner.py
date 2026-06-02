@@ -268,30 +268,13 @@ def analyze(out: dict) -> dict:
                 "total_rejections": sum(r["n_rejections"] for r in recs),
             }
 
-    # B2 state_norm ungated rate via long-sequence blow-up over none final pops
-    for task_name, cell in out["cells"].items():
-        for gate in ("state_norm",):
-            ung_viol = 0
-            ung_total = 0
-            for r in cell["gates"]["none"]:
-                for g in r["best_gene"]:  # placeholder; real check below
-                    pass
-            # full check: rebuild genes from none final pops requires genes; we stored emp_L only.
-            # We instead report the structural fact measured directly in run_all via final_pop_violations
-            # for state_norm gated; ungated state_norm we compute here from stored genes is not available,
-            # so we mark it measured-as-zero-by-construction and note it in B4.
-
-    # B4 regime map
+    # B4 regime map (load classification from MEASURED ungated violation rate)
     for task_name in out["cells"]:
         for gate in ("state_norm", "contraction"):
             b1 = analysis["B1"][f"{task_name}/{gate}"]
             b2 = analysis["B2"][f"{task_name}/{gate}"]
             rate = b2["ungated_violation_rate"]
-            if gate == "contraction":
-                load = "load-bearing" if (rate is not None and rate > 0.05) else "no-op"
-            else:
-                # state_norm: gate admits whole clip box -> no-op by construction (see B2 note)
-                load = "no-op (admits whole clip box)"
+            load = "load-bearing" if (rate is not None and rate > 0.05) else "no-op"
             analysis["B4"][f"{task_name}/{gate}"] = {
                 "load": load, "cost": b1["verdict"].split(" ")[0],
                 "ungated_violation_rate": rate,

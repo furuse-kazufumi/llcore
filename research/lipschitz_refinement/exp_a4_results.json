@@ -1,0 +1,107 @@
+{
+  "seed": 0,
+  "n_emp_samples": 5000,
+  "n_total": 6096,
+  "residual_gap_L_achievable_minus_empirical_sup": {
+    "mean": 0.0005040421931417503,
+    "median": 3.048535146543685e-08,
+    "max": 0.00966291485318152,
+    "min": -7.775602384185731e-11,
+    "p95": 0.003492476135648348,
+    "negative_gap_count_soundness_alarm": 0
+  },
+  "residual_gap_L_free_minus_empirical_sup": {
+    "mean": 0.016971288393779486,
+    "median": 3.720098956661033e-08,
+    "max": 0.24805116731712007
+  },
+  "mean_gap_reduction_free_to_achievable": 0.016467246200637733,
+  "over_rejection": {
+    "achievable_over_reject_count": 16,
+    "free_over_reject_count": 16,
+    "over_reject_reduction": 0,
+    "achievable_examples": [
+      {
+        "decay": 0.3333333333333333,
+        "mix": -1.0,
+        "gate_str": -2.0,
+        "empirical_L": 0.9999999986288338,
+        "L_achievable": 1.0000000000000002,
+        "L_free": 1.0000000000000002
+      },
+      {
+        "decay": 0.3333333333333333,
+        "mix": -0.8666666666666667,
+        "gate_str": -2.0,
+        "empirical_L": 0.9999999658755199,
+        "L_achievable": 1.0000000000000002,
+        "L_free": 1.0000000000000002
+      },
+      {
+        "decay": 0.3333333333333333,
+        "mix": -0.7333333333333334,
+        "gate_str": -2.0,
+        "empirical_L": 0.9999999498883083,
+        "L_achievable": 1.0000000000000002,
+        "L_free": 1.0000000000000002
+      },
+      {
+        "decay": 0.3333333333333333,
+        "mix": -0.6,
+        "gate_str": -2.0,
+        "empirical_L": 0.9999991324655729,
+        "L_achievable": 1.0000000000000002,
+        "L_free": 1.0000000000000002
+      },
+      {
+        "decay": 0.3333333333333333,
+        "mix": -0.4666666666666667,
+        "gate_str": -2.0,
+        "empirical_L": 0.9999999928851644,
+        "L_achievable": 1.0000000000000002,
+        "L_free": 1.0000000000000002
+      },
+      {
+        "decay": 0.3333333333333333,
+        "mix": -0.33333333333333337,
+        "gate_str": -2.0,
+        "empirical_L": 0.9999999612091137,
+        "L_achievable": 1.0000000000000002,
+        "L_free": 1.0000000000000002
+      },
+      {
+        "decay": 0.3333333333333333,
+        "mix": -0.19999999999999996,
+        "gate_str": -2.0,
+        "empirical_L": 0.9999974883642682,
+        "L_achievable": 1.0000000000000002,
+        "L_free": 1.0000000000000002
+      },
+      {
+        "decay": 0.3333333333333333,
+        "mix": -0.06666666666666665,
+        "gate_str": -2.0,
+        "empirical_L": 0.9999985691394945,
+        "L_achievable": 1.0000000000000002,
+        "L_free": 1.0000000000000002
+      },
+      {
+        "decay": 0.3333333333333333,
+        "mix": 0.06666666666666665,
+        "gate_str": -2.0,
+        "empirical_L": 0.9999999999827855,
+        "L_achievable": 1.0000000000000002,
+        "L_free": 1.0000000000000002
+      },
+      {
+        "decay": 0.3333333333333333,
+        "mix": 0.19999999999999996,
+        "gate_str": -2.0,
+        "empirical_L": 0.9999996017026354,
+        "L_achievable": 1.0000000000000002,
+        "L_free": 1.0000000000000002
+      }
+    ]
+  },
+  "honest_note": "empirical_sup approximates the TRUE box sup FROM BELOW (finite (s,x) sample), so a small positive gap L_achievable - empirical_sup >= 0 is EXPECTED and is NOT unsoundness. L_achievable is the EXACT box sup under the achievable-t closed form, exact only w.r.t. the [-1,1]^2 input box and the per-coordinate diagonal map; t_min = sech^2(|mix|+|gate_str|) is computed in float64 then fed to Z3 as a rational."
+}
