@@ -155,7 +155,8 @@ def _make_child(pop: list[np.ndarray], fits: np.ndarray, codec: GeneCodec,
 def evolve(codec: GeneCodec, objective: Objective, verifier: VerifierBackend,
            cfg: EvolveConfig | None = None, *,
            rng: np.random.Generator | None = None,
-           initial_genotypes: list[np.ndarray] | None = None) -> EvolveResult:
+           initial_genotypes: list[np.ndarray] | None = None,
+           gate_initial: bool = False) -> EvolveResult:
     """Run verified evolution. Returns an :class:`EvolveResult`.
 
     The verifier is inserted at **child admission** (fail-closed): a child whose
