@@ -77,9 +77,27 @@ n=2 結合写像 `s'=decay⊙s+(1−decay)⊙tanh(Ws+Vx)` の ∞-norm contracti
 **capstone 確定**: scalar (A/B) + coupled (C) の contraction 不変量は全て閉形式 → **Z3/SMT は本クラスで decorative**。
 solver が真に効くのは **非閉形式不変量 (spectral radius / Lyapunov 安定性)** = **SDP** territory であって SMT ではない。
 
+## Track D 着地 (2026-06-02) — SDP/Lyapunov ソルバが初めて閉形式を超える = arc 完成
+
+Track C の C3 が取りこぼした rho<1 gene を、より厳密な certifier で救えるかを 3270 gene で検証
+(`spectral_lyapunov_contraction/D_VERDICT.md`, cvxpy 1.9.1 install 済、red-team が 500k brute-force で独立再検証)。
+- **D1 soundness PASS** (全 4 gate, false admit 0; 2-norm 599 admit / SDP 855 admit)。
+- **D2**: **2-norm-頂点 certifier** (numpy SVD・solver 不要、∥J∥_2 が凸→box sup は頂点) が ∞-norm の rho<1 取りこぼし 850 のうち **180 (21%)** 回収。
+- **D3 = ★ソルバが初めて勝つ**: **SDP common-Lyapunov が 2-norm の reject する 254 gene を追加 certify** (855 vs 599 = **+43%**)。P-weighted 収縮はどの固定誘導ノルムも捕えられず、**非自明な P を要する = 真のソルバ領域**。`two_beats_sdp=0` (P=I 常に feasible → SDP ⊇ 2-norm)。A/B/C で Z3 が decorative だったのと対照的。
+- **D4 residual**: rho<1 の **33% (448/1363)** はどの certifier も未 certify (JSR / 非二次 Lyapunov 要)。certifier は**相補的・非入れ子** (∞-norm が SDP の見逃す 62 件を捕捉; union=917 vs ∞-norm 単独 513)。
+- honest: D1 gate 誤定義 (SDP は P-weighted ノルムで収縮、∥J∥_2 でない) を self-check が検出→修正; SDP homogeneous 不良設定で出た「異常に良い 1280」を真の 855 に訂正 ([[feedback_benchmark_honest_disclosure]] 機能)。cvxpy は run 中 pip install (env 元々無し)、2-norm 結果は solver-free で立つ。
+
+### ★ verification pillar arc 完成 (A→B→C→D) の確定結論
+
+> **llcore の contraction verifier に正しい道具は Z3/SMT ではなく SDP/LMI (Lyapunov) である。**
+- A/B (scalar) + C (coupled ∞-norm): contraction 不変量は全て**閉形式**に還元 → **Z3/SMT は decorative** (ソルバ無価値)。
+- D: **SDP/Lyapunov ソルバは genuinely 閉形式を超える** (+43%、固定ノルムで捕えられない P-weighted 収縮)。
+- ∴ llcore の「Z3-gated」旗印は **honest に再scope**: Z3 は正しいが load-bearing でない。**verifier backend を SDP/Lyapunov (cvxpy/SCS) に置くのが正道** ([[project_llcore_init_2026_05_29]] Stage 3b の verifier backend plugin = SDP backend)。
+- Track B の load-bearing (進化ゲートが非contraction drift 排除) と接続: **「SDP-Lyapunov ゲートを進化ループに組み込む」が次の統合 (Verified×Evolvable の正しい実装)**。
+
 ## 次のアクション候補 (CPU)
 
-1. ✅ **DONE (Track C)**: coupled ∞-norm 検証 → 「coupling は効くが Z3 は依然不要」。→ **次 = Track D: SDP/Lyapunov contraction certifier** (rho<1 を cvxpy/SCS or Lyapunov P-matrix 探索で証明、C3 が取りこぼした 850 gene を certify)。**solver が初めて閉形式を超える領域 = verifier 投資の真の正当化テスト**。CPU 可 (SDP は CPU)。falsifiable: SDP が strictly more を sound に certify するか。
+1. ✅ **DONE: Track C (coupled ∞-norm) + Track D (SDP/Lyapunov)**。→ **次の CPU 候補**: (i) **③ arc を pyribs/qdpy で baseline 比較** (自作 MAP-Elites が strawman でない証明=査読対策, OSS positioning で pyribs=最重要 baseline 確認済) / (ii) Track B を N≥100 reseed で cost-regime 決着 + task-family 横断 / (iii) D4 の 33% residual に JSR (joint spectral radius) lower-bound or 非二次 Lyapunov / (iv) **SDP-Lyapunov ゲートを minimal GA に組込む** (Track B + D の統合)。
 2. **Track B を N≥100 seed で再走** (cost-regime の underpowered を解消、または null を確定)。
 3. **load-bearing ゲートを task-family 横断で検証** (現在 CopyTask 2 variant のみ)。
 
