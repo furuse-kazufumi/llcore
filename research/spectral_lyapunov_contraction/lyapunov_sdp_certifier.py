@@ -101,13 +101,16 @@ def certify_common_lyapunov(gene: CoupledGene, t_domain: str = "tmin1",
 
     P = cp.Variable((2, 2), symmetric=True)
     I2 = np.eye(2)
-    constraints = [P >> margin * I2]
+    # The LMI system is HOMOGENEOUS in P (scale-invariant), so a bare feasibility problem is
+    # ill-posed: the conic solver treats the strict `>> margin*I` as `>=` and can return the
+    # trivial P=0 (which our eigenvalue re-check would then reject) or report spurious infeasible
+    # when paired with an upper cap. Fix the scale with `P >> I` (forces PD AND normalizes), and
+    # minimize trace(P) to pull P toward the smallest valid Lyapunov matrix. This is well-posed.
+    constraints = [P >> I2]
     for J in Js:
         # P - J^T P J >> margin I  (discrete Lyapunov decrease at this vertex)
         constraints.append(P - J.T @ P @ J >> margin * I2)
-    # Feasibility problem (minimize 0); normalize-ish by bounding P to keep it well-posed.
-    constraints.append(P << 1e6 * I2)
-    prob = cp.Problem(cp.Minimize(0), constraints)
+    prob = cp.Problem(cp.Minimize(cp.trace(P)), constraints)
 
     try:
         prob.solve(solver=solver) if solver else prob.solve()

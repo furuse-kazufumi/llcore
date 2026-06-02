@@ -1,0 +1,75 @@
+{
+  "meta": {
+    "fresh_seed": 20260602,
+    "n_emp": 40000,
+    "tol": 1e-06,
+    "n_genes": 3270,
+    "n_grid": 270,
+    "cvxpy_available": true,
+    "wall_seconds": 399.8
+  },
+  "attack_A_soundness": {
+    "free01": {
+      "two_norm": {
+        "n_admit": 598,
+        "n_false_admit": 0,
+        "worst_emp_2norm": 0.9999363047499404,
+        "worst_emp_rho": 0.9990348530063033,
+        "false_examples": []
+      },
+      "sdp": {
+        "n_admit": 834,
+        "n_false_admit": 0,
+        "worst_emp_rho": 0.9997241211961931,
+        "worst_emp_pnorm_gain": 0.9999999874427322,
+        "n_P_reverify_fail": 0,
+        "P_reverify_fail_examples": [],
+        "false_examples": []
+      }
+    },
+    "tmin1": {
+      "two_norm": {
+        "n_admit": 599,
+        "n_false_admit": 0,
+        "worst_emp_2norm": 0.9999363047499404,
+        "worst_emp_rho": 0.9990348530063033,
+        "false_examples": []
+      },
+      "sdp": {
+        "n_admit": 855,
+        "n_false_admit": 0,
+        "worst_emp_rho": 1.0,
+        "worst_emp_pnorm_gain": 1.0000000000000002,
+        "n_P_reverify_fail": 0,
+        "P_reverify_fail_examples": [],
+        "false_examples": []
+      }
+    }
+  },
+  "attack_B_vertex_convexity": {
+    "n_genes_tested": 670,
+    "worst_excess": 0.0,
+    "n_with_positive_excess_gt_1e-9": 0,
+    "worst_gene": {
+      "index": 0,
+      "decay": [
+        0.2,
+        0.2
+      ],
+      "W": [
+        [
+          -0.5,
+          -1.5
+        ],
+        [
+          -1.5,
+          -0.5
+        ]
+      ],
+      "vertex_sup": 1.4000000000000001,
+      "interior_max": 1.4000000000000001,
+      "excess": 0.0
+    }
+  },
+  "attack_C_sdp_P": {}
+}
