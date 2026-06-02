@@ -103,9 +103,28 @@ inf-gated rotation tops out at 0.41 (≈ region max 0.38); sdp at 0.86 (≈ 0.90
 - **G5 HONEST NULL — PASS.** On benign, sdp vs inf is a null (Δ=−0.000, p=0.72): no
   generic SDP/admission-size advantage. The G4 effect is task-structural.
 
-## 6. Adversarial red-team (Lenses A–D)
+## 6. Adversarial red-team (Lenses A–D) — all PASS / survive
 
-<!-- FILL from redteam_*.json + the admitted-child soundness check -->
+- **Lens A — circular / admission-size artifact: REFUTED (good).** With a gene-independent
+  RANDOM fitness, sdp vs inf is a null (psd=−0.40, Δ=−0.0005, **p=0.91**) — SDP gets *no*
+  edge from merely admitting more genes. So the G4 payoff is **fitness-structural**, not an
+  artifact of the larger admission set.
+- **Lens B — independent soundness: PASS.** 60 sdp/two_norm winners (rotation+nonnormal)
+  re-checked with an independent 50k-sample oracle (different seed) + long-horizon
+  separation: **0 divergent**. The richest sound gates never yield a divergent winner.
+- **Lens C — power / seed robustness: PASS.** G4 (sdp ≫ inf on rotation) holds across **3
+  independent base-seed families** (Δ=0.46/0.46/0.44, each **p=3.1e-5**), all surviving
+  **Bonferroni** (α=0.0167). Not seed-cherry-picked.
+- **Lens D — mechanism attribution: CONFIRMED.** sdp winners live in the inf-REJECTED
+  regions — rotation: **12 sdp_only + 3 two_norm_only / 0 inf**; nonnormal: 8 sdp_only +
+  6 two_norm_only + 1 inf. inf winners stay in `inf` (+2 ungated init-elites). The payoff
+  comes precisely from the extra reach the better verifier unlocks.
+
+The supplementary admitted-child check confirmed the §5 G1 caveat: with `gate_initial=True`
+the inf-gated rotation final populations carry **0** divergent genes (end-to-end sound),
+proving the single default-run divergent was an ungated initial elite, not a gate false-admit.
+
+## 7. Honest disclosure / deviations
 
 ## 7. Honest disclosure / deviations
 
