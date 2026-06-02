@@ -188,16 +188,23 @@ def main():
         "sdp_tmin1_admit": (count_admit("sdp_tmin1_admit") if CVXPY_AVAILABLE else None),
     }
 
-    # ===== D1 soundness: every 2-norm (and SDP) admit is empirically non-expansive =====
-    def d1_for(cert_prefix: str, dom: str) -> dict:
-        key = f"{cert_prefix}_{dom}_admit"
+    # ===== D1 soundness: every admit is empirically non-expansive in the RIGHT metric =====
+    # IMPORTANT (honest correction, frozen in the verdict): the soundness ORACLE must match what
+    # each certifier actually proves.
+    #   * 2-norm-vertex certifies ||J||_2 < 1  => oracle: empirical ||J||_2 <= 1 AND rho <= 1.
+    #   * SDP-Lyapunov certifies contraction in the P-WEIGHTED norm (=> rho < 1), and does NOT bound
+    #     the identity ||J||_2. So its correct oracle is empirical rho <= 1 AND empirical P-norm
+    #     gain <= 1 (computed with the certified P). Using ||J||_2 <= 1 here would be the WRONG test
+    #     (it would flag genuinely-Lyapunov-contractive genes whose identity 2-norm exceeds 1).
+    def d1_two(dom: str) -> dict:
+        key = f"two_{dom}_admit"
         admitted = [r for r in records if r.get(key) is True]
         false_admits = [
             r for r in admitted
             if (r["emp_2norm"] > 1.0 + SOUND_TOL) or (r["emp_spectral_radius"] > 1.0 + SOUND_TOL)
         ]
         return {
-            "certifier": cert_prefix, "domain": dom,
+            "certifier": "two_norm_vertex", "domain": dom, "oracle": "emp_2norm<=1 AND emp_rho<=1",
             "n_admitted": len(admitted),
             "n_false_admits": len(false_admits),
             "worst_admitted_emp_2norm": max((r["emp_2norm"] for r in admitted), default=0.0),
@@ -210,13 +217,47 @@ def main():
             "passed": len(false_admits) == 0,
         }
 
+    def d1_sdp(dom: str) -> dict:
+        key = f"sdp_{dom}_admit"
+        admitted = [r for r in records if r.get(key) is True]
+        false_admits = []
+        worst_pnorm = 0.0
+        for r in admitted:
+            rho_bad = r["emp_spectral_radius"] > 1.0 + SOUND_TOL
+            P = r.get(f"sdp_{dom}_P")
+            pnorm_gain = None
+            pnorm_bad = False
+            if P is not None:
+                pnorm_gain = emp_pnorm_sup_fast(
+                    np.array(r["decay"]), np.array(r["W"]), np.array(P),
+                    n_samples=EMP_N, seed=EMP_SEED)
+                worst_pnorm = max(worst_pnorm, pnorm_gain)
+                pnorm_bad = pnorm_gain > 1.0 + SOUND_TOL
+            if rho_bad or pnorm_bad:
+                false_admits.append({
+                    "index": r["index"], "decay": r["decay"], "W": r["W"],
+                    "emp_2norm": r["emp_2norm"], "emp_rho": r["emp_spectral_radius"],
+                    "emp_pnorm_gain": pnorm_gain,
+                })
+        return {
+            "certifier": "sdp_lyapunov", "domain": dom,
+            "oracle": "emp_rho<=1 AND emp_P_norm_gain<=1 (P-weighted; identity ||J||_2 NOT required)",
+            "n_admitted": len(admitted),
+            "n_false_admits": len(false_admits),
+            "worst_admitted_emp_rho": max((r["emp_spectral_radius"] for r in admitted), default=0.0),
+            "worst_admitted_emp_pnorm_gain": worst_pnorm,
+            "worst_admitted_emp_2norm_for_reference": max((r["emp_2norm"] for r in admitted), default=0.0),
+            "false_admit_examples": false_admits[:10],
+            "passed": len(false_admits) == 0,
+        }
+
     d1 = {
-        "two_free01": d1_for("two", "free01"),
-        "two_tmin1": d1_for("two", "tmin1"),
+        "two_free01": d1_two("free01"),
+        "two_tmin1": d1_two("tmin1"),
     }
     if CVXPY_AVAILABLE:
-        d1["sdp_free01"] = d1_for("sdp", "free01")
-        d1["sdp_tmin1"] = d1_for("sdp", "tmin1")
+        d1["sdp_free01"] = d1_sdp("free01")
+        d1["sdp_tmin1"] = d1_sdp("tmin1")
     d1["vertex_soundness_selfcheck_max_excess"] = float(selfcheck_max_excess)
     d1["passed"] = all(v["passed"] for k, v in d1.items() if isinstance(v, dict))
 
