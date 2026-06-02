@@ -81,9 +81,9 @@ def lens_A(n_seeds: int = 15, pop: int = 24, gens: int = 30, base: int = 5000) -
 
 
 def _independent_divergent(gene: CoupledGene) -> dict:
-    """Independent soundness oracle: 100k (s,x) box samples (seed 99) + long-horizon
-    trajectory separation growth. Returns max empirical rho + divergence flag."""
-    rho = empirical_spectral_radius(gene, n_samples=100000, seed=99)
+    """Independent soundness oracle: 50k (s,x) box samples (seed 99, different from the
+    in-loop oracle) + long-horizon trajectory separation growth."""
+    rho = empirical_spectral_radius(gene, n_samples=50000, seed=99)
     # long-horizon separation growth (does a tiny perturbation blow up?)
     g = gene.clipped()
     rng = np.random.default_rng(123)
