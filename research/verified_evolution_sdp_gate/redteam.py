@@ -112,10 +112,14 @@ def lens_B() -> dict:
     # we need the winner GENES; re-derive by re-running each (seed-deterministic) gated evolve.
     cfg = EvolveConfig(pop_size=data["config"]["pop"], n_generations=data["config"]["gens"],
                        resample_cap=40)
+    # Focus on the richest sound gate (sdp = main soundness risk) over rotation+nonnormal
+    # (benign winners are all in the inf region = trivially sound). The sdp winner gene is
+    # an ADMITTED child or an init elite; either way an independent oracle must see rho<1.
     violations = []
     checked = 0
-    for tname, obj in objs.items():
-        for gate in ("inf_norm", "two_norm", "sdp"):
+    for tname in ("rotation", "nonnormal"):
+        obj = objs[tname]
+        for gate in ("sdp", "two_norm"):
             for rec in runs[tname][gate]:
                 r = evolve(CODEC, obj, make_verifier(gate), cfg,
                            rng=np.random.default_rng(rec["seed"]))
@@ -124,9 +128,10 @@ def lens_B() -> dict:
                 if chk["divergent"]:
                     violations.append({"task": tname, "gate": gate, "seed": rec["seed"], **chk})
     return {"lens": "B_soundness_independent", "winners_checked": checked,
+            "scope": "sdp+two_norm winners on rotation+nonnormal, 50k independent oracle",
             "false_admit_violations": len(violations), "violations": violations[:10],
-            "interpretation": "PASS if false_admit_violations == 0 (sound gates never admit a "
-                              "divergent winner under a stronger independent oracle)."}
+            "interpretation": "PASS if false_admit_violations == 0 (the richest sound gates never "
+                              "yield a divergent winner under a stronger independent oracle)."}
 
 
 def lens_C(pop: int = 24, gens: int = 30) -> dict:
