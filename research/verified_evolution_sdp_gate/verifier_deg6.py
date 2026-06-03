@@ -18,12 +18,13 @@ hence a valid degree-6 Lyapunov certificate of contraction of the original map. 
 NEVER trusts the solver blindly: P's eigenvalues and the decrease-LMI eigenvalues are
 re-checked independently, and ρ(J_v)<1 is a necessary pre-screen at every vertex.
 
-HONEST, NON-OBVIOUS NOTE (measured, not assumed — see DEG6_VERDICT.md §complementarity):
-in the *lifted full-space* form the degree-6 and degree-4 certificates are **NOT nested** —
-each certifies genes the other cannot. The sound admission set is therefore the **union**
-(sdp ∪ deg4 ∪ deg6), which ``make_deg6_verifier_n2`` returns. This is because the full-space
-decrease condition is imposed on all of the lifted space, not only the Veronese variety, so a
-higher degree does not dominate a lower one as it would for the exact SOS conditions.
+SOLVER NOTE (retraction — see DEG6_VERDICT.md): an earlier draft reported the degree-4/6 lifted
+certificates were *non-nested* (complementary). That was a **cvxpy SCS solver artifact** — SCS
+(the default first-order solver) returns FALSE NEGATIVES near the feasibility boundary, fabricating
+a fake complementarity. Under the accurate interior-point solver CLARABEL (now pinned via
+``_SOLVER``) the lifted ladder is **NESTED** (deg4 ⊆ deg6) and the common quadratic SDP already
+certifies ~95% of contracting genes; degree-4/6 add only a tiny residual. ``make_deg6_verifier_n2``
+returns the union (sdp ∪ deg4 ∪ deg6) for completeness, but with an accurate solver deg6 dominates.
 
 This is a NEW VerifierBackend plug-in for the skeleton — only the backend changes; ``evolve()``
 and the codecs are untouched. cvxpy required (degrades to None/False if absent: fail-closed).
