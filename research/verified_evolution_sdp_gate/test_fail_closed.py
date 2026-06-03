@@ -174,6 +174,19 @@ def test_lyapunov_certifier_explicit_solver_still_honoured(monkeypatch):
     assert r.solver_status != "clarabel_unavailable_fail_closed"
 
 
+def test_lyapunov_certifier_falsy_solver_string_fail_closed():
+    """REGRESSION (pair-review F1, 2026-06-04): a FALSY but non-None solver value (e.g. ``solver=""``)
+    must NOT slip past the ``solver is None`` guard and fall through to cvxpy's bare default (SCS).
+    The certifier now fail-closes on any falsy resolved solver. CLARABEL present here; the empty
+    string is the adversarial input."""
+    import lyapunov_sdp_certifier as lyap
+    r = lyap.certify_common_lyapunov(SDP_ONLY_GENE, t_domain="tmin1", solver="")
+    assert r.available is False
+    assert r.certified is None
+    assert r.solver_status == "no_accurate_solver_fail_closed"
+    assert r.P is None
+
+
 def test_src_sdp_backend_fail_closed(monkeypatch):
     """src SdpLyapunovBackend: available must be False unless cvxpy AND CLARABEL both present, and
     the genuine SDP solve must never run under SCS (an SDP-only gene is refused)."""
