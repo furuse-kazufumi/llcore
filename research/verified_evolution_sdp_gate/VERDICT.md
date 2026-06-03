@@ -61,6 +61,19 @@ frontier is therefore monotone but unfinished:
 SDP's unique gain over the 2-norm is small on rotation (0.90 vs 0.89; the thin SDP-only
 shell, consistent with Track D). The large win is **inf → two_norm**.
 
+*Correction (Codex #8):* the per-region max in the original `exp1_results.json` was NOT
+filtered to empirically-contracting genes (a code bug, now fixed), so the `non_certified`
+0.99 entry can include genuinely **expansive** genes. The certified regions (inf 0.38 /
+two 0.89 / sdp 0.90) are by definition contracting, so those numbers stand. For
+`non_certified`, the *contracting-filtered* ceiling is the honest one: the top-50-
+*contracting* analysis (39/50 in `non_certified`) confirms high-fitness contracting genes
+do populate the D4 residual, and a 3000-gene re-check shows its contracting max sits just
+below the raw max (0.571 vs 0.595 on that pool) — i.e., a modest fraction of high-fitness
+`non_certified` genes are divergent, but the residual genuinely holds high-fitness
+*contracting* dynamics that all current sound gates miss. The frontier conclusion (a
+stronger verifier would unlock them) stands; the exact 0.99 figure should be read as the
+raw region max, not a certified-contracting ceiling.
+
 ## 4. exp2 — gated evolution (G0–G5)   [n=15 seeds, pop=24, gens=25]
 
 Mean best-fitness per gate (4 gates × 3 tasks × 15 paired seeds):
