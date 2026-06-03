@@ -40,10 +40,16 @@ try:
     CVXPY_AVAILABLE = True
     _CVXPY_VERSION = getattr(cp, "__version__", "unknown")
     _CVXPY_IMPORT_ERROR = None
+    # FAIL-SAFE default solver. cvxpy's bare default is SCS (first-order), which FALSE-NEGATIVES
+    # near the SDP feasibility boundary (the 2026-06-03 audit artifact). Default to the accurate
+    # CLARABEL so any caller that forgets ``solver=`` cannot silently regress to SCS. A caller may
+    # still override explicitly. See memory feedback_cvxpy_pin_accurate_solver.
+    _DEFAULT_SOLVER = "CLARABEL" if "CLARABEL" in cp.installed_solvers() else None
 except Exception as exc:  # pragma: no cover - environment dependent
     CVXPY_AVAILABLE = False
     _CVXPY_VERSION = None
     _CVXPY_IMPORT_ERROR = repr(exc)
+    _DEFAULT_SOLVER = None
 
 
 def _box_vertices(t_lo: np.ndarray) -> list[np.ndarray]:
