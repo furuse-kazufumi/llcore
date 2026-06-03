@@ -1,3 +1,10 @@
+> ⚠️ **CORRECTION (2026-06-03 audit, `research/AUDIT_SCS_CLARABEL_2026-06-03.md`):** the "D4 residual
+> 172, recovered 57 (33%)" below was measured with cvxpy's **SCS** default, which false-negatives near
+> the SDP feasibility boundary and **inflated the residual ~5.5×**. Under the accurate **CLARABEL**
+> solver: **D4 residual = 31, recovered by deg4 = 4 (12.9%)**. The "33% recovery" is largely an SCS
+> artifact; the true degree-4 contribution is marginal (the quadratic SDP already certifies ~95%).
+> Soundness unaffected (0 unsound). Read with the audit.
+
 # VERDICT — degree-4 (non-quadratic) Lyapunov VerifierBackend (2026-06-03)
 
 > Roadmap item #2 (skeleton extension): add a richer `VerifierBackend` that reaches the
