@@ -78,7 +78,7 @@ def certify_deg4(vertex_jacobians: list[np.ndarray], margin: float = 1e-7) -> bo
     I = np.eye(m)
     cons = [P >> I] + [P - L.T @ P @ L >> margin * I for L in lifts]
     try:
-        cp.Problem(cp.Minimize(cp.trace(P)), cons).solve()
+        cp.Problem(cp.Minimize(cp.trace(P)), cons).solve(solver=_SOLVER)
     except Exception:
         return False
     if P.value is None:
