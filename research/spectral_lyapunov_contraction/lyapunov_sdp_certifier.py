@@ -137,7 +137,17 @@ def certify_common_lyapunov(gene: CoupledGene, t_domain: str = "tmin1",
 
     try:
         _eff_solver = solver if solver is not None else _DEFAULT_SOLVER  # fail-safe to CLARABEL
-        prob.solve(solver=_eff_solver) if _eff_solver else prob.solve()
+        if not _eff_solver:
+            # FAIL-CLOSED: a FALSY solver value (e.g. an empty-string ``solver=""`` from a caller,
+            # which slips past the ``solver is None`` guard above, or _DEFAULT_SOLVER=None when
+            # CLARABEL is absent) must NEVER fall through to cvxpy's bare default (SCS, the
+            # artifact-prone first-order solver that false-negatives near the feasibility boundary).
+            # Refuse rather than run the bare ``prob.solve()``. An explicit accurate solver is the
+            # only way to run the SDP. See memory feedback_cvxpy_pin_accurate_solver.
+            return LyapResult(available=False, certified=None, domain=t_domain,
+                              solver_status="no_accurate_solver_fail_closed",
+                              P=None, min_eig_margin=None)
+        prob.solve(solver=_eff_solver)
     except Exception as exc:  # solver hiccup -> report, do not crash the sweep
         return LyapResult(available=True, certified=None, domain=t_domain,
                           solver_status=f"solver_error:{type(exc).__name__}", P=None,
