@@ -253,16 +253,18 @@ def main(n_thin: int = 60):
 
     # Rump-OR ⊇ float-OR (coverage at the gate level), and OR ⊇ each single-solver Rump.
     rump_or_set = {i for i, r in enumerate(records) if r["or_gate"]}
-    float_or_set = {i for i, r in enumerate(records) if r["float_or_gate"]}
+    # Gate-level apples-to-apples float-OR: any solver whose P passes the SAME-matrix float test.
+    float_or_same_set = {i for i, r in enumerate(records)
+                         if any(r["solvers"][sv]["float_recheck_same"] for sv in ("CLARABEL", "SCS"))}
     single_solver_rump_union = {
         i for i, r in enumerate(records)
         if r["solvers"]["CLARABEL"]["rump_recheck"] or r["solvers"]["SCS"]["rump_recheck"]
     }
 
-    # Global "float-only false positive" count across BOTH solvers, in the spec's sense:
-    # certificates float accepts but Rump cannot, that are GENUINE coverage losses (comfortable
-    # margin) -- i.e. Rump under-certifying a comfortably-PD matrix. (Sound rejections of
-    # at/below-zero LMIs are NOT counted; those are correct.)
+    # Global "float-only false positive" count (spec sense): certificates the APPLES-TO-APPLES
+    # float test (same matrices) accepts but Rump cannot, that are GENUINE coverage losses
+    # (comfortable margin >=1e-6) -- i.e. Rump under-certifying a comfortably-PD matrix. Sound
+    # rejections of at/below-floor LMIs are NOT counted; those are correct.
     float_only_false_positives = sum(agg[sv]["n_genuine_coverage_losses"] for sv in ("CLARABEL", "SCS"))
 
     out = {
