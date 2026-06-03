@@ -81,15 +81,18 @@ inf-gated rotation tops out at 0.41 (≈ region max 0.38); sdp at 0.86 (≈ 0.90
 - **G0 control / src-untouched — PASS.** `none` gate is deterministic (same seed →
   identical curves, test_skeleton) and admits 100 % of children. `git status` shows
   **no src/ change** throughout.
-- **G1 gate soundness — PASS (children), with an honest end-to-end caveat.** Every gene
-  the inf/two/sdp gate *admits as a child* is provably contracting (‖J‖_∞<1 / σ_max<1 /
-  common-P LMI all ⟹ ρ<1; empirically 0 divergent admitted children — see §6 check).
-  Caveat: the inf-gated rotation final populations contained **1 divergent gene** total —
-  an **ungated initial-population elite** that the over-restrictive inf gate could not
-  replace (it rejects almost all rotation children), kept alive by elitism. The sound
-  gates two/sdp showed **0** because they admit rotation children and self-clean the
-  population. Fix for end-to-end soundness = gate the initial population too (added as the
-  `gate_initial` option; not enabled for these runs to keep the `none` control unmodified).
+- **G1 gate soundness — PASS (by certificate; consistency-checked).** Soundness is
+  *guaranteed by the certifier theorems*, not by sampling: ‖J‖_∞<1, σ_max<1, and the
+  common-P LMI each mathematically imply ρ<1 (Track C/D + their red-teams). The empirical
+  oracle is a **from-below falsification/consistency check** (Codex #1/#2): on the
+  *admitted children* at **20 000** samples it found **{FILL_ADMIT_DIV} divergent** across
+  inf/two/sdp (rotation). Honest caveat: the inf-gated rotation *final populations* held
+  **1 divergent gene** total — an **ungated initial-population elite** the over-restrictive
+  inf gate could not replace (it rejects almost all rotation children), kept alive by
+  elitism; two/sdp showed **0** (they admit rotation children and self-clean). End-to-end
+  soundness ⇒ gate the initial population too: the `gate_initial=True` option yields **0**
+  divergent in inf-rotation final pops (verified), confirming the gate itself never
+  false-admits.
 - **G2 load-bearing — PASS (rotation/benign), marginal (nonnormal).** Ungated final pops
   drift to non-contraction: **rotation 19.7 %, benign 16.7 %, nonnormal 1.9 %**; all sound
   gates drive admitted children to 0. (nonnormal 1.9 % < 5 % → the gate has little to
