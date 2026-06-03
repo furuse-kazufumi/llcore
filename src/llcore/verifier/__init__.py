@@ -64,6 +64,16 @@ from .curriculum import (
     is_saturated,
     run_curriculum,
 )
+from .backends import (
+    ClosedFormScalarBackend,
+    InfNormBackend,
+    SdpLyapunovBackend,
+    TwoNormBackend,
+    VerifierBackend,
+    available_backends,
+    cvxpy_available,
+    get_verifier_backend,
+)
 
 __all__ = [
     # Stage 1a
