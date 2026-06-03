@@ -96,9 +96,19 @@ winner-attribution, not the margin, drives it).
 **DISCLOSED DEVIATION (adversarial review):** the *pre-registered* G-B2 = strict-gate(**residual_reach**,
 Wilcoxon p<0.05 ∧ |psd|≥0.147 ∧ **n=15**). `verify_deg4_payoff.py` is the **rotation** positive-control
 task, a 0.02 margin (not Wilcoxon), **n=12** — a conservative proxy, NOT the pre-registered test. The
-actual `exp_deg6_capability.py` (residual_reach, n=15, CLARABEL) is **[RUNNING — to be filled]**; until
-then the capability claim is "NULL on the rotation positive-control at n=2 (conservative proxy)", not
-"pre-registered G-B2 confirmed".
+actual `exp_deg6_capability.py` (residual_reach, n=15, CLARABEL) is now **RUN (2026-06-03, elapsed
+1308 s; `exp_deg6_capability_results.json`)**: the **positive control G-B1 PASSES** (rotation L1_two vs
+L0_inf: Δ+0.336, paired_sign_delta=1.0, Wilcoxon p=3.05e-5 — the harness detects a real payoff, so the
+test is powered), while **G-B2 is NULL** — neither higher-degree rung beats the SDP gate on the
+residual_reach target: **L4_deg6 vs L2_sdp Δ+0.020, psd=0.33, p=0.138 (fail); L3_deg4 vs L2_sdp Δ+0.008,
+psd=0.13, p=0.265 (fail)** (strict gate = p<0.05 ∧ |psd|≥0.147 ∧ n≥15). On residual_reach the inf/2-norm
+gates cannot reach the target at all (L0_inf=0.066, L1_two=0.059) while the **SDP gate already reaches
+R²≈0.92** of it (L2_sdp=0.916), and deg4/deg6 add no significant capability (0.924 / 0.936). The
+capability NULL above SDP is therefore confirmed by the **pre-registered G-B2 with a validated positive
+control**, not merely the conservative rotation proxy. *Honest nuance:* residual_reach is a reachability
+proxy — the exact optimum is quad-rejected by construction, yet SDP-gated evolution approximates its
+free response to ≈0.92 R² because near-optimal quad-admissible genes track the target; the +0.02 deg6
+edge is within GA variance (psd 0.33, not significant).
 
 ## 6. The DIMENSION-threshold claim — RETRACTED
 
