@@ -80,6 +80,12 @@ def run(dims=(2, 3, 4), scan=1600, time_cap_per_n=200.0, seed=99) -> dict:
             tr, decay_ratio = _transient_and_decay(g, n, rng)
             if decay_ratio >= 0.6:        # not behaviourally contracting -> skip
                 continue
+            # SOUNDNESS GATE (added after adversarial review): the decay_ratio proxy admitted
+            # locally-EXPANSIVE genes (empirical_rho>=1) whose large transient is a tanh-saturation
+            # artifact — they are the 'switched-expansive, correctly rejected' class no verifier of
+            # any degree should certify. Exclude them so T_residual cannot be defined by one.
+            if empirical_rho(g, n_samples=4000) >= 1.0:
+                continue
             quad = cert_inf(g) or cert_two(g) or cert_sdp(g)
             if quad:
                 n_quad += 1
