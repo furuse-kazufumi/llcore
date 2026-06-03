@@ -25,12 +25,19 @@ import numpy as np
 
 try:
     import cvxpy as cp
+    # FAIL-CLOSED solver selection. cvxpy's SCS default gives FALSE NEGATIVES near the feasibility
+    # boundary (the cause of the spurious deg4/deg6 complementarity), but the deeper hazard is a
+    # silent regression: a CLARABEL-ABSENT environment would fall back to ``solver=None`` == cvxpy
+    # default == SCS, the exact artifact-prone solver. So we do NOT fall back. If CLARABEL is
+    # installed we pin it; if it is NOT, ``_SOLVER`` is left None as a sentinel and ``_CLARABEL_OK``
+    # is False, and every certifier below REFUSES to certify (returns False) rather than running
+    # under SCS. INVARIANT: when CLARABEL is present (this env) behaviour is byte-for-byte unchanged.
+    _CLARABEL_OK = "CLARABEL" in cp.installed_solvers()
     _CVXPY = True
-    # Pin an accurate interior-point solver — cvxpy's SCS default gives FALSE NEGATIVES near the
-    # feasibility boundary (the cause of the spurious deg4/deg6 complementarity). CLARABEL or None.
-    _SOLVER = cp.CLARABEL if "CLARABEL" in cp.installed_solvers() else None
+    _SOLVER = cp.CLARABEL if _CLARABEL_OK else None
 except Exception:  # pragma: no cover
     _CVXPY = False
+    _CLARABEL_OK = False
     _SOLVER = None
 
 
