@@ -32,11 +32,17 @@ import numpy as np
 
 try:
     import cvxpy as cp
+    # FAIL-CLOSED solver selection — SCS (cvxpy default) false-negatives near the feasibility
+    # boundary. A CLARABEL-absent environment must NOT silently fall back to ``solver=None`` ==
+    # cvxpy default == SCS. We therefore do NOT fall back: if CLARABEL is missing, ``_CLARABEL_OK``
+    # is False and ``cert_sdp``'s genuine SDP solve path REFUSES (returns False). The cert_two fast
+    # path stays valid (solver-independent vertex SVD).
+    _CLARABEL_OK = "CLARABEL" in cp.installed_solvers()
     _CVXPY = True
-    # Pin an accurate solver — SCS (cvxpy default) false-negatives near the feasibility boundary.
-    _SOLVER = cp.CLARABEL if "CLARABEL" in cp.installed_solvers() else None
+    _SOLVER = cp.CLARABEL if _CLARABEL_OK else None
 except Exception:  # pragma: no cover
     _CVXPY = False
+    _CLARABEL_OK = False
     _SOLVER = None
 
 
