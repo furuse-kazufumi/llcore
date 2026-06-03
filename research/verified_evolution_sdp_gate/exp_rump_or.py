@@ -195,30 +195,43 @@ def main(n_thin: int = 60):
     # Per-solver: float-certified set vs Rump-certified set.
     agg = {}
     for sv in ("CLARABEL", "SCS"):
+        # NO-MARGIN float set (certifier-internal test; checks a DIFFERENT matrix than Rump).
         float_set = {i for i, r in enumerate(records) if r["solvers"][sv]["float_recheck"]}
+        # APPLES-TO-APPLES float set: float test on the SAME margin-subtracted matrices Rump verifies.
+        float_same_set = {i for i, r in enumerate(records) if r["solvers"][sv]["float_recheck_same"]}
         rump_set = {i for i, r in enumerate(records) if r["solvers"][sv]["rump_recheck"]}
-        # float-only = float accepts but Rump rejects, for THIS solver's certificate.
+        # float-only (no-margin) = certifier-internal accepts but Rump rejects.
         float_only = float_set - rump_set
-        # Of those, how many are GENUINE coverage losses (the certificate's vertex LMIs are
-        # actually PD with a comfortable margin) vs SOUND rejections (a vertex LMI is at/below 0)?
+        # float_same-only = the APPLES-TO-APPLES coverage gap (same matrices: float accepts, Rump not).
+        float_same_only = float_same_set - rump_set
+        # Of the apples-to-apples gap, how many are GENUINE coverage losses (the verified LMI is
+        # comfortably PD, >=1e-6, yet Rump's conservative bound lost it) vs sub-1e-6 near-boundary
+        # (which the spec PERMITS Rump to under-certify)?
         genuine_losses = []
+        for i in float_same_only:
+            verts = _vertex_jacobians(_gene_of(records[i]), t_domain=T_DOMAIN)
+            P = _P_of(records[i], sv)
+            min_lmi = _min_decrease_lmi(P, verts)  # true min eig of min(P, P - J^T P J - margin*I)
+            if min_lmi >= 1e-6:
+                genuine_losses.append({"index": i, "min_decrease_lmi": min_lmi})
+        # diagnostic: of the no-margin float-only, how many had a genuinely-negative decrease LMI
+        # (a SOUND Rump rejection of a non-PD margin matrix the no-margin float test waved through)?
+        sound_rejections_nomargin = 0
         for i in float_only:
             verts = _vertex_jacobians(_gene_of(records[i]), t_domain=T_DOMAIN)
             P = _P_of(records[i], sv)
-            min_lmi = _min_decrease_lmi(P, verts)  # true min eig of (P - J^T P J - margin*I)
-            # comfortable margin threshold: if the decrease LMI is comfortably PD (>=1e-6) yet
-            # Rump rejected, THAT is a genuine coverage loss (a false-positive-of-float would be
-            # the opposite: float accepts a non-PD => but float uses >0 so it cannot; we record
-            # the sound-rejection vs loss split honestly).
-            if min_lmi >= 1e-6:
-                genuine_losses.append({"index": i, "min_decrease_lmi": min_lmi})
+            if _min_decrease_lmi(P, verts) < 0.0:
+                sound_rejections_nomargin += 1
         agg[sv] = {
-            "n_float_certified": len(float_set),
+            "n_float_certified_nomargin": len(float_set),
+            "n_float_certified_same_matrix": len(float_same_set),
             "n_rump_certified": len(rump_set),
-            "rump_superset_of_float": rump_set >= float_set,
-            "n_float_only": len(float_only),
+            "rump_superset_of_float_same_matrix": rump_set >= float_same_set,
+            "n_float_same_only_gap": len(float_same_only),
             "n_genuine_coverage_losses": len(genuine_losses),
             "genuine_coverage_losses": genuine_losses,
+            "n_nomargin_float_only": len(float_only),
+            "n_nomargin_sound_rump_rejections": sound_rejections_nomargin,
         }
 
     # CLARABEL recovers over SCS: CLARABEL Rump-certifies but SCS reports infeasible (no P).
