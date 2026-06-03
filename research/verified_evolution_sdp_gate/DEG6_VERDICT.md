@@ -1,206 +1,149 @@
-# VERDICT — degree-6 Lyapunov & the two frontiers of certificate strength (2026-06-03)
+# VERDICT — verifier-ladder coverage, the SCS-artifact correction, and degree-8/JSR (2026-06-03)
 
-> Roadmap **#5** (skeleton extension). Goal (user): *"CPU で llcore の進化に効果がありそうな要素を
-> 追加検証する"* + *"良すぎる数値は疑い、手戻りしないよう細かく検証する"*. Discipline:
-> `research/verified_evolution_sdp_gate/`, **src untouched**, pre-registration first
-> (`DEG6_PREREGISTRATION.md`), seeds fixed, honest disclosure, adversarial red-team.
-> **Headline: the COVERAGE frontier of the verifier ladder keeps advancing with degree (and the
-> rungs are complementary, non-nested, all sound), but the CAPABILITY frontier — the fitness
-> evolution can reach — SATURATES at SDP on the n=2 substrate. The two frontiers decouple above
-> SDP.** A surprising "deg4 unlocks more fitness" signal turned out to be GA noise — caught by
-> careful verification (the user's caution was correct).
+> Roadmap **#5 + #6**. Goal (user): *"CPU で llcore の進化に効く要素を追加検証"* + *"良すぎる数値は
+> 疑い、手戻りしないよう細かく検証"*. Discipline: `research/`, **src untouched**, pre-registration first,
+> honest disclosure, adversarial red-team + a parallel multi-agent skeptic review.
+>
+> **HEADLINE (after a major self-correction the user's caution forced):** An earlier draft reported a
+> *non-nested "complementary" degree-4/6 ladder* and an *89% finite-degree-gap residual*. **Both were
+> cvxpy SCS-solver artifacts.** Under the accurate CLARABEL solver the truth is cleaner and humbler:
+> **a common quadratic Lyapunov (SDP) certifies ~95% (286/300) of contracting evolved dynamics; the
+> ladder is NESTED; degree-4/6/8 add only a tiny near-boundary residual.** The arc thesis "the right
+> verifier is SDP/Lyapunov" is **STRENGTHENED**; the dramatic "degree unlocks much more" story is
+> retracted. Soundness was never at risk (the artifact was false *negatives*).
 
-## 1. What was built (new VerifierBackend rung + verification battery)
+## 0. The solver-artifact correction (the most important finding)
 
-`verifier_deg6.py` — a **degree-6 homogeneous Lyapunov** certificate V(z)=m₃(z)ᵀ P m₃(z) over the
-degree-3 monomial (Veronese order-3) vector, via a common-P LMI on the **symmetric 3rd Kronecker
-power** J^[3] of each t-box vertex Jacobian (Parrilo–Jadbabaie SOS hierarchy, k=3). One generic
-`sym_power(A, degree)` (brute-force-verified vs the monomial transform for n=2,3,4, degree=2,3, max
-error ~1e-16; reproduces `verifier_deg4.sym2_power` exactly). The certifier never trusts the
-solver: P≻0 and every decrease-LMI ≻0 are re-checked by independent eigendecomposition, with a
-ρ(J_v)<1 vertex pre-screen. **Only the backend is new** — `evolvable_core.evolve()` and the codecs
-are untouched; `make_deg6_verifier_n2()` is a drop-in `VerifierBackend` (sdp ∪ deg4 ∪ deg6).
-`test_deg6.py`: **13 tests pass** (sym-power correctness, soundness, residual recovery, both
-complementarity directions, union⊇sdp). Whole repo regression: **255 → 268 tests, 0 regressions.**
+cvxpy's `.solve()` with no solver argument defaults to **SCS** (first-order ADMM — the "Solution may
+be inaccurate" warnings). For these feasibility-**boundary** SDPs, SCS returns **FALSE NEGATIVES**:
+it fails to find a Lyapunov certificate that exists. The independent eigen re-check guards *soundness*
+(it rejects bad certificates) but **cannot recover a certificate SCS never found** — so SCS
+fabricated apparent structure. Verified first-party (`verify_solver_artifact.py`, cvxpy 1.9.1):
 
-## 2. The COVERAGE frontier advances + the ladder is NON-NESTED (EXP-A, 300 contracting genes)
-
-| cumulative gate | inf | +2-norm | +sdp | +deg4 | +deg6 |
-|---|---|---|---|---|---|
-| certified (of 300 empirically-contracting) | 88 | 137 | 193 | 234 | **247** |
-| % | 29 % | 46 % | 64 % | 78 % | **82 %** |
-
-- **G-A1 (coverage advances) — PASS.** The deg-union certifies **+54 genes over the quadratic
-  class** (sdp 193 → deg6 247); degree-6 adds **+13 beyond sdp∪deg4**.
-- **G-A2 (ladder non-nested) — PASS, and NON-OBVIOUS.** In the *lifted full-space* form the
-  degree-4 and degree-6 certificates are **complementary**: **deg4∖deg6 = 23** and **deg6∖deg4 =
-  13**, both non-empty. So "higher degree = strict superset" is FALSE here — the sound admission
-  set is the **union**. (Mechanism: the full-space decrease is imposed on all of the lifted space,
-  not only the Veronese variety, so a higher degree does not dominate a lower one.) This is a
-  genuine methodological finding, reproduced by two seeded test searches.
-- **G-A3 (soundness) — PASS.** 0 unsound among deg-certified genes at the EXP-A check (20k) — and
-  see §3 for the far stronger JSR test.
-
-## 3. Certifier soundness — verified by the STRONGEST practical oracle (JSR), not just pointwise ρ
-
-A skeptic's foundational concern: the lifted LMI imposes Lyapunov decrease only at the t-box
-**vertices** {J_v}; the nonlinear map's mean Jacobian J̄(s)=∫₀¹J(τs)dτ is a **convex-hull** point,
-and for degree≥2 the lift A^[k] is **non-convex** in A, so vertex feasibility does NOT directly
-imply hull-decrease of *this* V (unlike the quadratic k=1 case, which is saved by matrix
-convexity). Soundness instead follows via the **JSR convex-hull theorem**: a common vertex
-Lyapunov ⇒ JSR{J_v}<1 ⇒ JSR{conv J_v}<1 ⇒ the nonlinear map contracts. A *necessary consequence*
-is therefore that **every certified gene has JSR{J_v}<1**.
-
-`verify_certifier_jsr_soundness.py` checks exactly this (JSR lower bound = max over length-≤6
-vertex products of ρ(∏)^{1/k}):
-
-| | value |
-|---|---|
-| deg4/deg6-certified genes tested | 54 |
-| max JSR_lb among certified | **0.9974** (< 1) |
-| mean JSR_lb among certified | 0.869 |
-| **certified genes with JSR_lb ≥ 1 (would be a soundness bug)** | **0** |
-
-**CERTIFIER SOUND.** No certified gene has an expanding product — strictly stronger than the
-pointwise-ρ oracle (which can miss switched expansion). The max 0.9974 confirms the deg4/deg6
-rungs reach genuinely *near-boundary* contractions the quadratic class cannot.
-
-## 4. The CAPABILITY frontier SATURATES at SDP (n=2) — honest-null CONFIRMED, after catching a trap
-
-This is where "good numbers" had to be distrusted (the user's directive). Three measurements:
-
-1. **2-seed gated-GA smoke (MISLEADING):** L3=sdp∪deg4 reached rotation R²=**0.9765** vs L2=sdp
-   **0.8881** → looked like a deg4 capability payoff.
-2. **Random-sample region ceilings (ALSO MISLEADING, opposite bias):** deg4-region max 0.605 < sdp
-   0.72 → looked like a clear null — but random sampling is **density-biased** (it under-samples
-   small regions; even the sdp ceiling read 0.72 vs the true ~0.98).
-3. **Region-constrained OPTIMISATION + winner attribution + 50k soundness (DECISIVE,
-   `verify_deg4_payoff.py`, 12 seeds):**
-
-| gate | max reach | mean | best-gene region | ρ@50k | sound |
-|---|---|---|---|---|---|
-| L2 = sdp | 0.9795 | 0.874 | **sdp_only** | 0.932 | ✓ |
-| L3 = sdp∪deg4 | 0.9954 | 0.865 | **sdp_only** | 0.935 | ✓ |
-| L4 = sdp∪deg4∪deg6 | 0.9674 | 0.907 | deg4_only | 0.921 | ✓ |
-
-**Verdict: NO sound deg4/deg6 capability payoff on rotation.** The rotation optimum is **SDP-
-certifiable** (L2 and L3 winners both live in `sdp_only`, ρ<1, at ~0.98–0.99). The +0.0159 of L3
-over L2 is **GA variance, not a deg4 effect** — L3's winner is an sdp-region gene, so the gain came
-from finding a better *sdp* gene, not a residual one. **L4 (0.9674) < L3 (0.9954) despite admitting
-a superset** is a clean demonstration that single-run GA-reach is noisy — which is exactly why the
-2-seed smoke's 0.9765 was a seed-luck artifact, and why region attribution (not raw reach) is the
-honest measure. The deg4/deg6 regions top out *below* the sdp ceiling on this task.
-
-→ **The capability frontier saturates at SDP for n=2: degree-4/6 add provable COVERAGE but no new
-reachable CAPABILITY.** This is the pre-registered honest-null (G-B2 NULL), now properly verified.
-(Positive control G-B1: the inf→2-norm payoff reproduces — L0 caps far below L1+, the known arc
-result; full ladder reach confirms inf is the only real bottleneck.)
-
-## 5. JSR attribution of the irreducible residual (honest accounting)
-
-Of the 53 genes that are pointwise-contracting but **even degree-6 cannot certify**:
-
-| | count | % |
-|---|---|---|
-| **finite-degree-gap candidate** (JSR_lb<1, deg6 fails ⇒ a degree-8+/exact-JSR rung would reach) | **47** | 89 % |
-| **switched-expansive, correctly rejected** (JSR_lb≥1 ⇒ a vertex product expands; pointwise-ρ<1 was misleading) | 6 | 11 % |
-
-Robust from max_len 5 → 6 (unchanged). So the coverage frontier has **genuine remaining headroom**
-(89 % of the residual is a finite-degree gap, not a fundamental wall), and the 11 % the ladder
-refuses are genes it *should* refuse (the cheap pointwise oracle would have wrongly passed them).
-
-## 6. The capability gap is DIMENSION-GATED (EXP-C, coupled_nd n=2,3,4) — forward-looking
-
-Why does capability saturate at SDP at n=2? Because the residual's achievable **transient
-amplification** is weak at n=2, so SDP-certifiable genes approximate residual targets. Mechanism
-hypothesis: non-normal transient amplification grows with dimension. Measured (max behavioural
-transient of residual vs quad-certified contracting genes):
-
-| n | T_residual | T_quad | **gap** | quad genes found |
+| on the 54 SCS-"deg-certified" residual genes | deg4∖deg6 | deg6∖deg4 | both | "complementary"? |
 |---|---|---|---|---|
-| 2 | 2.76 | 2.37 | **+0.39** | 387 |
-| 3 | 4.15 | 1.81 | **+2.33** | 64 |
-| 4 | 3.57 | 1.54 | **+2.03** | **6 (under-powered)** |
+| **SCS** (default) | 23 | 13 | 18 | YES (the artifact) |
+| **CLARABEL** (accurate) | **0** | **0** | **54** | **NO → nested** |
 
-The gap **jumps ~5× from n=2 to n≥3** — a clear dimension threshold. **Honest caveats:** the strict
-monotone gate (G-C) **FAILS** (n=4 +2.03 < n=3 +2.33), but n=4 found only **6 quad-certified
-contracting genes** in the scan budget (severe under-power), so the n=4 dip is most plausibly
-sampling, not a real reversal; T_quad shrinking with n (2.37→1.81→1.54) is the robust signal (the
-quadratic class covers ever less as n grows). **Reading:** the deg-rung *capability* payoff is
-**dimension-gated** — negligible at n=2, substantial at n≥3 — so it should **return in high-dim /
-full-LLM regimes**, structurally motivating the GPU bet (echoing the ③-arc BG9 insight that
-selection needs high dimension). *Not yet a proven monotone law — n=4 needs a larger-budget rerun.*
+And CLARABEL certifies **42–43 of the 53 SCS-"uncertified" residual** genes (SCS false negatives).
+**Fix:** pin `solver=CLARABEL` in `verifier_deg4`, `verifier_deg6`, and `coupled_components._sdp_certifies`.
+**Lesson (memory `feedback_cvxpy_pin_accurate_solver`):** never trust cvxpy's SCS default for a
+feasibility-boundary SDP; the margin sweep (red-team lens4) is *blind* to this — only a solver swap
+is decisive. The adversarial multi-agent review caught it before the verdict was published.
 
-## 7. Pre-registered gates — verdicts
+## 1. What was built
 
-- **G-A1 coverage advances — PASS** (L4−L2 = +54 ≥ 5).
-- **G-A2 ladder non-nested — PASS** (deg4∖deg6 = 23, deg6∖deg4 = 13, both > 0).
-- **G-A3 soundness — PASS** (0 unsound; JSR test 0 certified genes with JSR_lb≥1).
-- **G-B1 harness valid (positive control) — PASS** (inf is the bottleneck; L1+ ≫ L0, the arc result).
-- **G-B2 capability payoff — NULL (pre-registered honest-null CONFIRMED).** No sound deg4/deg6
-  payoff over sdp on rotation; the rotation optimum is sdp-certifiable.
-- **G-C dimension monotone — FAIL (strict), THRESHOLD supported.** Gap jumps at n≥3 but is not
-  strictly monotone (n=4 under-powered); reported honestly, not as a proven law.
+`verifier_deg6.py` — degree-6 Lyapunov via the symmetric 3rd Kronecker power (general
+`sym_power(A,d)`, brute-force-verified n=2,3,4, d=2,3,4; reproduces `sym2_power` exactly). Drop-in
+`VerifierBackend`, `evolve()`/codecs untouched. `verifier_jsr.py` — JSR bracket `[jsr_lb (Gripenberg),
+γ*_d (SOS upper bound via bisection)]`. Plus the verification battery: `verify_solver_artifact.py`,
+`verify_certifier_jsr_soundness.py`, `verify_region_ceiling.py`, `verify_deg4_payoff.py`,
+`exp_deg6_ladder/jsr_bracket/deg8_ladder/dimension.py`, `redteam_deg6.py`. `test_deg6.py` 13 tests
+(rewritten for the nested ladder + a deterministic residual fixture).
 
-## 8. Adversarial red-team — `redteam_deg6.py` ALL_PASS (4 lenses)
+## 2. The COVERAGE frontier (CLARABEL — honest)
 
-- **Lens 1 — soundness @50k: PASS.** All **54** deg4/deg6-certified genes empirically contracting at
-  50 000 samples — **0 unsound**. (Corroborated by the stronger JSR test §3: 0 certified genes with
-  jsr_lb≥1.)
-- **Lens 2 — admission-size artifact: REFUTED (good).** Under a gene-keyed RANDOM fitness, the gate
-  ladder is tied (L0..L4 reach ≈0.997–0.999) and L4-vs-L2 fails the strict gate (psd=0.25, p=0.156,
-  strict_pass=false) — a stronger gate gets **no** systematic edge from merely admitting more genes,
-  so the (null) capability result is not an admission artifact.
-- **Lens 3 — circularity: PASS.** The residual-reach reference is `non_certified` (quad-rejected),
-  chosen by a gate-independent search — non-circular by construction.
-- **Lens 4 — numerical robustness: PASS.** The deg4/deg6 **complementarity survives every SDP margin**
-  1e-6/1e-7/1e-8: deg4∖deg6 and deg6∖deg4 both stay non-empty (counts shift — 9/11, 9/9, 11/7 — as
-  borderline genes flip, but non-nesting is robust, **not** a solver-tolerance artifact).
+300 empirically-contracting genes (seed 2024), cumulative certified:
 
-A parallel multi-lens adversarial Workflow (`_review_workflow.js`, 6 skeptics → confirm → completeness
-critic) ran independently; its consolidated assessment is folded into §9 where it changed wording.
+| | inf | +2-norm | +sdp | +deg4 | +deg6 | +deg8 | exact-JSR tail |
+|---|---|---|---|---|---|---|---|
+| certified | 88 | 137 | **286** | 289 | 290 | ~292–294 | 2 near-boundary remain |
+| % of 300 | 29 | 46 | **95** | 96.3 | 96.7 | ~98 | — |
 
-## 9. Honest disclosure / the two-frontier thesis
+- **The common quadratic SDP is the workhorse: 286/300 (95%).** (SCS had said 193/64%.)
+- deg4 adds +3, deg6 adds +1, **degree-8 adds +2–4** (closes finite-gap residual genes deg4/6 miss).
+- Of the 14 the quadratic SDP can't certify: **4** have a higher-degree Lyapunov (deg4/6/8), **6** are
+  **switched-expansive** (JSR≥1 — pointwise-ρ<1 but a vertex product expands; correctly refused), and
+  ~**2–4** are near-boundary finite-gap (jsr_lb 0.98–0.99) needing exact-JSR.
+- **G-A1 (advance ≥+5 over sdp): FAIL** (+4) — honest: degree-4/6 barely advance under an accurate
+  solver. **G-A2 (non-nested): RETRACTED** — deg4 ⊆ deg6 (the 23/13 split was SCS). **G-A3 (sound):
+  PASS** (0 unsound).
 
-- **Two distinct frontiers of certificate strength, which DECOUPLE above SDP.** *Coverage* (what a
-  verifier can prove) keeps climbing with degree — and the degree-4/6 rungs are **complementary**,
-  so the ladder is a *union*, not a chain. *Capability* (what evolution can reach) saturates at SDP
-  on n=2 because the rotation optimum is already SDP-certifiable. Conflating the two is the trap
-  that produced both the "0.98 deg4 payoff" (GA luck) and the "0.605 null" (sampling bias). The
-  honest, verified statement: **above SDP, a stronger verifier buys provable coverage and soundness
-  headroom, not new reachable fitness — at n=2. The capability payoff is dimension-gated.**
-- **Two measurement traps caught (kept as lessons, [[feedback_benchmark_honest_disclosure]]):**
-  (a) single/2-seed GA-reach is high-variance (L4<L3 with a superset gate proves it) → use region
-  attribution + many seeds; (b) random-sample region ceilings are density-biased → use region-
-  constrained optimisation. Both biased the answer in *opposite* directions; only the decisive
-  method (optimise-within-region + attribute winner + 50k soundness) is trustworthy.
-- **Solver "Solution may be inaccurate" warnings are benign:** the certifier's independent eigen
-  re-check (P≻0 and every decrease-LMI ≻0), not the solver status, is the sound authority — and the
-  JSR test (§3) corroborates 0 unsound certified genes.
-- **EXP-C n=4 under-power** (6 quad genes) and **JSR_lb finite truncation** (max_len 6) are
-  disclosed; the dimension claim is a *threshold*, not a proven monotone law.
-- **Push:** none (llcore remote not created — exposure avoidance). Local commits only.
+## 3. Certifier soundness — confirmed by the JSR oracle (unaffected by the solver bug)
 
-## 10. Bottom line
+The artifact was false *negatives*; soundness (false-positive freedom) was never at risk and is
+independently confirmed. Every deg4/deg6-certified gene must have JSR{vertices}<1 (common vertex
+Lyapunov ⇒ JSR<1 ⇒ convex-hull theorem ⇒ the nonlinear map contracts). `verify_certifier_jsr_soundness.py`:
+**4 certified genes, max JSR_lb 0.966, 0 with JSR_lb≥1** → **CERTIFIER SOUND**. (The skeptic confirmed
+a constructed switched-expansive pair — each vertex ρ=0.95<1 but JSR=1.57 — is correctly REJECTED by
+the LMI itself, not just the ρ pre-screen.) Soundness conclusion survives the whole correction.
 
-A concrete **degree-6 Lyapunov VerifierBackend** plugs into the unchanged skeleton and is **sound
-by the JSR oracle**. It sharpens the arc's "stronger verifier ⇒ more reachable safe fitness" into a
-**two-frontier** picture: the **coverage** frontier keeps advancing (inf→2norm→sdp→deg4→deg6, the
-top rungs complementary/non-nested, 82 % of contracting genes certified, 89 % of the rest a finite-
-degree gap), while the **capability** frontier **saturates at SDP** on the n=2 substrate — degree-4/6
-add provable coverage and soundness headroom but no new evolved capability, because the task optimum
-is already SDP-certifiable. Crucially, the capability gap is **dimension-gated** (jumps 5× at n≥3),
-so the higher-degree rungs are predicted to become capability-load-bearing as the core scales toward
-full-LLM dimensionality — a falsifiable, GPU-motivating hypothesis. The headline "deg4 unlocks more
-fitness" was a GA-noise artifact, caught by region-attributed optimisation — the discipline working.
+## 4. degree-8 / JSR-exact (Roadmap #6 — user-chosen coverage thrust)
 
-**Next (each a plug-in):** (1) degree-8 / exact-JSR `VerifierBackend` to reach the 89 % finite-gap
-residual; (2) a larger-budget EXP-C (n=4,5,6) to test whether the capability gap is monotone in
-dimension (the GPU go/no-go signal); (3) promote the deg4/deg6 union into the `src/` verifier
-backend plugin (Stage 3b is already there for sdp); (4) a high-dim Objective whose optimum is
-*provably* in the deg-residual, to test capability payoff where dimension makes it non-trivial.
+On the 10-gene true residual: `exp_deg8_ladder.py` → degree-8 certifies **4** (deg8_only=4, neither=6,
+0 unsound); `exp_jsr_bracket.py` → γ*_8<1 closes **2 of the 4 finite-gap**, mean bracket width 0.009,
+near-boundary tail = **2** genes (jsr_lb 0.9915, 0.9787). **Honest findings:**
+- **degree-8 is the genuine top rung** — it certifies finite-gap genes the quadratic SDP, deg4, and
+  deg6 cannot, soundly. (G-8A PASS, G-8C sound.)
+- **The lifted SOS family is NON-MONOTONE** (`verifier_jsr` smoke: γ* *rose* deg2→deg8 0.767→0.780 on
+  a near-normal gene; `higher_degree_worse_count`>0). The full-space LMI's conservativeness grows with
+  the lift, so the tightest bound is `γ*_min = min_d γ*_d` (the lifted union). This — not a monotone
+  hierarchy — is why deg4/deg8 each catch a different slice. **"Climbing the lifted SOS ladder
+  monotonically reaches exact-JSR" is FALSE.**
+- **exact-JSR closes the tail only via proper SOS-on-variety or branch-and-bound** (NP-hard); the 2
+  near-boundary genes (jsr_lb→0.99) stay open at finite CPU lift degree. The coverage frontier
+  **asymptotes to the JSR=1 boundary** rather than closing — an honest, clean limit.
 
-Artifacts: `verifier_deg6.py` · `test_deg6.py` (13) · `exp_deg6_ladder.py` · `exp_deg6_capability.py`
-· `exp_deg6_dimension.py` · `jsr_bracket.py` · `verify_region_ceiling.py` · `verify_deg4_payoff.py`
-· `verify_certifier_jsr_soundness.py` · `redteam_deg6.py` · `DEG6_PREREGISTRATION.md` · result JSONs.
-src/ untouched; push deferred (exposure avoidance).
+## 5. The CAPABILITY frontier — NULL at n=2 (robust), with a pre-registration deviation disclosed
+
+`verify_deg4_payoff.py` (region-constrained optimisation + winner attribution + 50k soundness, 12
+seeds): L2_sdp max 0.9795 (winner **sdp_only**, sound), L3_deg4 0.9954 (winner **sdp_only**, sound),
+L4_deg6 0.9674 (winner deg4_only). The rotation optimum is **SDP-certifiable**, so degree-4/6 give **no
+capability payoff**; the +0.0159 is GA variance (winner is sdp_only, not residual), and L4<L3 with a
+superset gate confirms GA-reach noise. NULL — robust (two opposite-biased measurements both land NULL;
+winner-attribution, not the margin, drives it).
+
+**DISCLOSED DEVIATION (adversarial review):** the *pre-registered* G-B2 = strict-gate(**residual_reach**,
+Wilcoxon p<0.05 ∧ |psd|≥0.147 ∧ **n=15**). `verify_deg4_payoff.py` is the **rotation** positive-control
+task, a 0.02 margin (not Wilcoxon), **n=12** — a conservative proxy, NOT the pre-registered test. The
+actual `exp_deg6_capability.py` (residual_reach, n=15, CLARABEL) is **[RUNNING — to be filled]**; until
+then the capability claim is "NULL on the rotation positive-control at n=2 (conservative proxy)", not
+"pre-registered G-B2 confirmed".
+
+## 6. The DIMENSION-threshold claim — RETRACTED
+
+The earlier "+0.4→+2.0 gap jumps at n≥3 ⇒ higher-degree verifiers become load-bearing as the core
+scales" is **retracted**, for two reasons the adversarial review established:
+1. **Premise moot:** under CLARABEL the higher-degree rungs add almost nothing even at n=2 (§2), so
+   there is barely any deg-rung capability for dimension to "gate."
+2. **Proxy unsound:** the `decay_ratio<0.6` gate never re-checked ρ; ~49–58% of the n=4 "residual
+   contracting" genes were empirically EXPANSIVE (empirical_ρ≥1, a tanh-saturation artifact at fixed
+   ‖s0‖), and the `T_residual_max` gene itself had ρ≈1.8 — exactly the "switched-expansive, correctly
+   rejected" class. Plus 5–27× residual/quad pool-size asymmetry inflated the max-vs-max gap.
+
+`exp_deg6_dimension.py` was fixed (empirical_ρ<1 soundness gate) and **re-run [RUNNING — to be filled]**;
+the only defensible cross-n signal is T_quad shrinkage (the quadratic class covers less of higher-dim
+space), itself partly a max-over-shrinking-sample effect. No dimension-gated capability claim stands.
+
+## 7. Adversarial verification (what caught what)
+
+- **`redteam_deg6.py` ALL_PASS (4 lenses)** — but lens4's SCS-only margin sweep was **structurally
+  blind** to the artifact (it reported "complement robust" — confirming, not catching, the bug). Margin
+  sweeps cannot detect a solver false-negative; only a solver swap can.
+- **Parallel multi-agent skeptic review (`_review_workflow.js`, 11 agents)** — caught all three of:
+  the SCS complementarity artifact (HIGH), the unsound dimension proxy (HIGH), the G-B2 pre-reg
+  deviation (HIGH); confirmed certifier soundness and the capability NULL survive. This is the review
+  that forced the correction — the discipline working.
+
+## 8. Honest bottom line
+
+After correcting the solver artifact: **with an accurate solver, a common quadratic Lyapunov (SDP)
+certifies ~95% of the contracting evolved-dynamics on the n=2 substrate; degree-4/6/8 SOS close nearly
+all the rest, leaving a ~2-gene near-boundary tail for exact-JSR; 6 pointwise-contracting genes are
+correctly refused as switched-expansive.** This *strengthens* the arc's core claim — the right verifier
+backend is SDP/Lyapunov, and it is nearly *complete* on CPU — while *retracting* the (artifactual)
+complementarity, the inflated residual, and the dimension-gated-capability narrative. The verified CPU
+evolution skeleton, the certifier's soundness, and the capability NULL all survive. **The single most
+valuable deliverable may be the cautionary methodology: a reproducible demonstration that the default
+SOS/SDP solver fabricates false structure near the feasibility boundary, and that adversarial
+multi-perspective review (not margin sweeps) is what catches it.**
+
+**Next:** (1) finish the two running confirmations (real G-B2 at n=15; ρ-gated EXP-C). (2) proper
+SOS-on-variety or branch-and-bound JSR for the 2 near-boundary genes (the only way to truly close the
+frontier). (3) audit the *earlier* arc verdicts (#2 deg4 "33% recovery", Track C/D coverage counts) for
+the same SCS contamination — pin CLARABEL and re-measure. (4) the src SDP backend (`src/llcore/verifier/
+backends.py`) should also pin an accurate solver before any production use.
+
+Artifacts: `verifier_deg6.py` · `verifier_jsr.py` · `verify_solver_artifact.py` · `test_deg6.py` (13) ·
+`exp_deg6_ladder/jsr_bracket/deg8_ladder/dimension.py` · `verify_*` · `redteam_deg6.py` · result JSONs ·
+`DEG6_PREREGISTRATION.md` · `DEG8_JSR_PREREGISTRATION.md`. src/ untouched; push deferred (exposure avoidance).
