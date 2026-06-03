@@ -37,16 +37,20 @@ import numpy as np
 
 try:
     import cvxpy as cp
+    # FAIL-CLOSED solver selection. cvxpy's default for these feasibility-boundary SDPs is SCS
+    # (first-order ADMM), which produces FALSE NEGATIVES near the feasibility boundary — it fails to
+    # find a certificate that exists. That fabricated an apparent deg4/deg6 "complementarity" (an
+    # SCS artifact; under CLARABEL the lifted ladder is NESTED). The independent eigen re-check
+    # guards soundness but cannot recover a missed certificate, so the solver default — not the
+    # re-check — is the fix. CRITICAL: a CLARABEL-absent environment must NOT silently fall back to
+    # ``solver=None`` == cvxpy default == SCS. We therefore do NOT fall back: if CLARABEL is missing,
+    # ``_CLARABEL_OK`` is False and every certify_* below REFUSES to certify (returns False).
+    _CLARABEL_OK = "CLARABEL" in cp.installed_solvers()
     _CVXPY = True
-    # Pin an ACCURATE interior-point solver. cvxpy's default for these feasibility-boundary SDPs
-    # is SCS (first-order ADMM), which produces FALSE NEGATIVES near the feasibility boundary —
-    # it fails to find a certificate that exists. That fabricated an apparent deg4/deg6
-    # "complementarity" (an SCS artifact; under CLARABEL the lifted ladder is NESTED). The
-    # independent eigen re-check guards soundness but cannot recover a missed certificate, so the
-    # solver default — not the re-check — is the fix. Fail-closed if CLARABEL is unavailable.
-    _SOLVER = cp.CLARABEL if "CLARABEL" in cp.installed_solvers() else None
+    _SOLVER = cp.CLARABEL if _CLARABEL_OK else None
 except Exception:  # pragma: no cover
     _CVXPY = False
+    _CLARABEL_OK = False
     _SOLVER = None
 
 # reuse the n=2 vertex construction + the degree-4 certifier (additive, DRY).
