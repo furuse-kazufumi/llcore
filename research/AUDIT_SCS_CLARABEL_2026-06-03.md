@@ -39,8 +39,11 @@ with fail-closed fallback. Tests after: src 255 + research deg 19 + skeleton/nd/
 | | non_certified (contracting) | 6806 | **5455 (only 301 contr.)** | residual deflated |
 | | top-50 rotation genes in residual | 39 | **23** | "even SDP over-conservative" reduced |
 
-Soundness in every audit: **0 false admits** (Track D D1 PASS worst pnorm-gain ≤1.0; deg4/deg6
-unsound 0; JSR oracle 0 genes with jsr_lb≥1).
+Soundness in every audit: **0 *observed* false admits** (Track D D1 PASS worst pnorm-gain ≤1.0;
+deg4/deg6 unsound 0; JSR oracle 0 genes with jsr_lb≥1). NB (pair-review F2): the JSR oracle is a
+one-sided lower-bound check over products to length 6 — `0 genes with jsr_lb≥1` is *necessary but not
+sufficient* for soundness; the guarantee itself is the certifier theorem + independent eigen re-check,
+not the oracle.
 
 ## The two-directional contamination pattern
 
