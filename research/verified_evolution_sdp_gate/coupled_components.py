@@ -238,7 +238,7 @@ def _sdp_certifies(gene: CoupledGene) -> bool:
     for J in _vertex_jacobians(gene):
         if float(np.max(np.abs(np.linalg.eigvals(J)))) >= 1.0:
             return False
-    r = certify_common_lyapunov(gene, t_domain="tmin1")
+    r = certify_common_lyapunov(gene, t_domain="tmin1", solver=_SDP_SOLVER)
     return r.certified is True
 
 

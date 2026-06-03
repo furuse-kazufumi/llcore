@@ -1,0 +1,71 @@
+{
+  "sym_power_deg4_correct": true,
+  "n_deg6_residual": 10,
+  "finite_gap_in_residual": 4,
+  "deg6_recovers_of_residual": 0,
+  "deg8_recovers_of_residual": 4,
+  "complementarity": {
+    "deg6_only": 0,
+    "deg8_only": 4,
+    "both": 0,
+    "neither": 6
+  },
+  "deg8_unsound_certs": 0,
+  "expansive_certified_by_deg8": 0,
+  "G_8A_deg8_advances": true,
+  "G_8B_non_nested": false,
+  "G_8C_soundness": true,
+  "per_gene": [
+    {
+      "jsr_lb": 0.9787,
+      "deg6": false,
+      "deg8": true
+    },
+    {
+      "jsr_lb": 0.9915,
+      "deg6": false,
+      "deg8": true
+    },
+    {
+      "jsr_lb": 1.0001,
+      "deg6": false,
+      "deg8": false
+    },
+    {
+      "jsr_lb": 1.0272,
+      "deg6": false,
+      "deg8": false
+    },
+    {
+      "jsr_lb": 1.0012,
+      "deg6": false,
+      "deg8": false
+    },
+    {
+      "jsr_lb": 0.9757,
+      "deg6": false,
+      "deg8": true
+    },
+    {
+      "jsr_lb": 1.0571,
+      "deg6": false,
+      "deg8": false
+    },
+    {
+      "jsr_lb": 1.0054,
+      "deg6": false,
+      "deg8": false
+    },
+    {
+      "jsr_lb": 1.022,
+      "deg6": false,
+      "deg8": false
+    },
+    {
+      "jsr_lb": 0.9852,
+      "deg6": false,
+      "deg8": true
+    }
+  ],
+  "elapsed_s": 1.7
+}
