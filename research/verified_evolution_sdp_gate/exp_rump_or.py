@@ -152,8 +152,8 @@ def analyse_gene(gene):
     }
     installed = set(cp.installed_solvers())
     for sv in ("CLARABEL", "SCS"):
-        d = {"installed": sv in installed, "status": None,
-             "has_P": False, "float_recheck": False, "rump_recheck": False}
+        d = {"installed": sv in installed, "status": None, "has_P": False,
+             "float_recheck": False, "float_recheck_same": False, "rump_recheck": False}
         if sv in installed:
             r = certify_common_lyapunov(gene, t_domain=T_DOMAIN, margin=MARGIN, solver=sv)
             d["status"] = r.solver_status
@@ -161,7 +161,8 @@ def analyse_gene(gene):
             if r.P is not None:
                 d["has_P"] = True
                 P = np.asarray(r.P, dtype=np.float64)
-                d["float_recheck"] = bool(_float_recheck(P, verts))
+                d["float_recheck"] = bool(_float_recheck(P, verts))               # no-margin (certifier-internal)
+                d["float_recheck_same"] = bool(_float_recheck_same_matrix(P, verts))  # apples-to-apples
                 d["rump_recheck"] = bool(rump_verify_certificate(P, verts, margin=MARGIN))
         rec["solvers"][sv] = d
     rec["or_gate"] = bool(or_certifies_lyapunov(gene, t_domain=T_DOMAIN, margin=MARGIN))
