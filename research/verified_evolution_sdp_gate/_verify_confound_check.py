@@ -112,7 +112,7 @@ def main():
     # Focus on n=4 for the soundness confound (C2).
     n = 4
     residual, n_quad, T_res, T_quad, argmax = pools[n]
-    print(f"\n=== n=4 proxy-soundness (C2) — applying empirical_rho oracle to {residual} residual genes ===",
+    print(f"\n=== n=4 proxy-soundness (C2): applying empirical_rho oracle to residual genes ===",
           flush=True)
     residual_list, n_quad4, T_res4, T_quad4, argmax4 = reproduce_n(4)
 
