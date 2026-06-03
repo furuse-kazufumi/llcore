@@ -80,6 +80,24 @@ def _float_recheck(P: np.ndarray, verts, margin: float = MARGIN) -> bool:
     return True
 
 
+def _float_recheck_same_matrix(P: np.ndarray, verts, margin: float = MARGIN,
+                               floor: float = 1e-9) -> bool:
+    """APPLES-TO-APPLES float baseline: the SAME matrices Rump verifies (``P`` and every
+    ``P - J^T P J - margin*I``) accepted by the float test ``eigvalsh_min > floor`` (floor=1e-9,
+    the arc's near-singular float floor). This is the correct baseline for the coverage invariant
+    'Rump-certified superset of float-certified' (I3/P1): both tests judge the IDENTICAL matrices.
+    """
+    P = 0.5 * (np.asarray(P, dtype=np.float64) + np.asarray(P, dtype=np.float64).T)
+    if float(np.min(np.linalg.eigvalsh(P))) <= floor:
+        return False
+    for J in verts:
+        M = P - J.T @ P @ J - margin * np.eye(P.shape[0])
+        M = 0.5 * (M + M.T)
+        if float(np.min(np.linalg.eigvalsh(M))) <= floor:
+            return False
+    return True
+
+
 def _is_sdp_only(gene) -> bool:
     """sdp_only candidate: neither inf-norm nor 2-norm certifies (so the certificate, if any,
     is a genuine SDP one — the thin-shell of interest)."""
