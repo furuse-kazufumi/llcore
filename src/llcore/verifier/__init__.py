@@ -115,4 +115,13 @@ __all__ = [
     "initial_population",
     "is_saturated",
     "run_curriculum",
+    # Stage 3b verifier backend plugins
+    "VerifierBackend",
+    "ClosedFormScalarBackend",
+    "InfNormBackend",
+    "TwoNormBackend",
+    "SdpLyapunovBackend",
+    "get_verifier_backend",
+    "available_backends",
+    "cvxpy_available",
 ]
