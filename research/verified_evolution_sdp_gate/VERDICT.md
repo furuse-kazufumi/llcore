@@ -85,8 +85,8 @@ inf-gated rotation tops out at 0.41 (≈ region max 0.38); sdp at 0.86 (≈ 0.90
   *guaranteed by the certifier theorems*, not by sampling: ‖J‖_∞<1, σ_max<1, and the
   common-P LMI each mathematically imply ρ<1 (Track C/D + their red-teams). The empirical
   oracle is a **from-below falsification/consistency check** (Codex #1/#2): on the
-  *admitted children* at **20 000** samples it found **{FILL_ADMIT_DIV} divergent** across
-  inf/two/sdp (rotation). Honest caveat: the inf-gated rotation *final populations* held
+  *admitted children* at **20 000** samples it found **0 divergent** across inf/two/sdp
+  (150 unique children/gate, rotation). Honest caveat: the inf-gated rotation *final populations* held
   **1 divergent gene** total — an **ungated initial-population elite** the over-restrictive
   inf gate could not replace (it rejects almost all rotation children), kept alive by
   elitism; two/sdp showed **0** (they admit rotation children and self-clean). End-to-end
