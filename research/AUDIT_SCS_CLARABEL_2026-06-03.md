@@ -28,7 +28,9 @@ with fail-closed fallback. Tests after: src 255 + research deg 19 + skeleton/nd/
 | | SDP beats 2-norm (ρ<1) | 254 (+43%) | **692** | SDP advantage UNDERSTATED 2.7× |
 | | two-beats-sdp | (some) | **0** | SDP is a true superset of 2-norm |
 | | D4 residual | (inflated) | **72 (5.3%)** | residual deflated under accurate solver |
-| **Track B exp1** (10175 genes) | sdp admits / region ceilings | 3369 / non_cert 0.99 | **[RUNNING]** | expect same: sdp ↑, residual ↓ |
+| **Track B exp1** (10175 genes) | sdp_only / sdp total | 817 / 3369 | **2168 / 4720 (94% of 5021 contr.)** | SDP undercounted (same pattern) |
+| | non_certified (contracting) | 6806 | **5455 (only 301 contr.)** | residual deflated |
+| | top-50 rotation genes in residual | 39 | **23** | "even SDP over-conservative" reduced |
 
 Soundness in every audit: **0 false admits** (Track D D1 PASS worst pnorm-gain ≤1.0; deg4/deg6
 unsound 0; JSR oracle 0 genes with jsr_lb≥1).
