@@ -251,6 +251,26 @@ def main(n_thin: int = 60):
     or_admitted = [r for r in records if r["or_gate"]]
     or_unsound = [r for r in or_admitted if r["jsr_lb"] >= 1.0 - JSR_TOL]
 
+    # OR-VALUE breakdown: of the OR-admitted genes, how many were saved by EXACTLY ONE solver's
+    # Rump-passing certificate (= the OR is load-bearing) vs both solvers passing (redundant)?
+    from collections import Counter
+    rump_pair = Counter()
+    feasibility_disagreements = 0
+    for r in records:
+        cp_ok = r["solvers"]["CLARABEL"]["rump_recheck"]
+        ss_ok = r["solvers"]["SCS"]["rump_recheck"]
+        rump_pair[(cp_ok, ss_ok)] += 1
+        if r["solvers"]["CLARABEL"]["has_P"] != r["solvers"]["SCS"]["has_P"]:
+            feasibility_disagreements += 1
+    or_value = {
+        "n_both_solvers_rump_pass": rump_pair[(True, True)],
+        "n_only_clarabel_rump_pass": rump_pair[(True, False)],
+        "n_only_scs_rump_pass": rump_pair[(False, True)],
+        "n_neither_rump_pass": rump_pair[(False, False)],
+        "n_saved_by_exactly_one_solver": rump_pair[(True, False)] + rump_pair[(False, True)],
+        "solver_feasibility_disagreements": feasibility_disagreements,
+    }
+
     # Rump-OR ⊇ float-OR (coverage at the gate level), and OR ⊇ each single-solver Rump.
     rump_or_set = {i for i, r in enumerate(records) if r["or_gate"]}
     # Gate-level apples-to-apples float-OR: any solver whose P passes the SAME-matrix float test.
