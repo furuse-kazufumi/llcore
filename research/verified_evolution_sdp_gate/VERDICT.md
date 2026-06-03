@@ -109,13 +109,20 @@ inf-gated rotation tops out at 0.41 (≈ region max 0.38); sdp at 0.86 (≈ 0.90
 
 ## 6. Adversarial red-team (Lenses A–D) — all PASS / survive
 
-- **Lens A — circular / admission-size artifact: REFUTED (good).** With a gene-independent
-  RANDOM fitness, sdp vs inf is a null (psd=−0.40, Δ=−0.0005, **p=0.91**) — SDP gets *no*
-  edge from merely admitting more genes. So the G4 payoff is **fitness-structural**, not an
-  artifact of the larger admission set.
-- **Lens B — independent soundness: PASS.** 60 sdp/two_norm winners (rotation+nonnormal)
-  re-checked with an independent 50k-sample oracle (different seed) + long-horizon
-  separation: **0 divergent**. The richest sound gates never yield a divergent winner.
+- **Lens A — admission-size artifact: REFUTED (good).** With a fitness UNCORRELATED with
+  dynamics (a per-gene pseudo-random score), sdp vs inf is a null (psd=−0.40, Δ=−0.0005,
+  **p=0.91**) — SDP gets *no* edge from merely admitting more genes. So the G4 payoff is
+  **fitness-structural**, not an artifact of the larger admission set. *Caveat (Codex #5):*
+  the control is gene-KEYED random (a fixed random value per gene), not the prereg's pure
+  per-evaluation noise; the numeric-tuple key hash is deterministic across processes
+  (verified), so Lens A is reproducible. A pure-noise variant is left as a stronger future
+  control.
+- **Lens B — independent soundness: PASS (reduced scope).** sdp+two_norm winners on
+  rotation+nonnormal (60 winners) re-checked with an independent 50k-sample oracle
+  (different seed) + long-horizon separation: **0 divergent**. *Deviation (Codex #3):* the
+  prereg asked for every admitted winner at 100k + dense edge search; this run covers the
+  two richest sound gates (the main soundness risk) at 50k. The soundness *guarantee* does
+  not rest on this sampling anyway — see G1 / §7.
 - **Lens C — power / seed robustness: PASS.** G4 (sdp ≫ inf on rotation) holds across **3
   independent base-seed families** (Δ=0.46/0.46/0.44, each **p=3.1e-5**), all surviving
   **Bonferroni** (α=0.0167). Not seed-cherry-picked.
