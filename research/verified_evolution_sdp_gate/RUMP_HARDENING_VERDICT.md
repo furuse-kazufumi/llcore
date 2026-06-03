@@ -31,10 +31,23 @@ min_dec = min eig(P - JᵀPJ)     > 0      # decrease LMI strictly PD, NO margin
 The Rump recheck here verifies the **identical** matrices — `P` and every `P - JᵀPJ` — at the SAME
 (zero) margin, via `rump_verify_certificate(P, verts, margin=0.0)`. Subtracting `margin·I` would
 test a strictly HARDER condition and could spuriously SHRINK the admit set — the exact failure the
-spec warns against. Because `verified_pd` is a sound lower bound on `λ_min` that dominates the float
-`eigvalsh` test on identical matrices (already proven), the Rump recheck on the SAME matrices is a
-**superset-or-equal** of the float recheck: admit set **preserved-or-grown, never shrunk**, and
-sound (no false positives).
+spec warns against.
+
+> ⚠️ **CORRECTION (pair-review F3, 2026-06-04 — the direction was inverted):** an earlier draft argued
+> the admit set is "preserved-or-grown, never shrunk" because `verified_pd` *dominates* the float
+> test. That reasoning is **backwards**. `verified_pd` returns a **sound LOWER bound** on `λ_min`
+> (≤ the float-computed `λ_min`), so on the SAME matrix it is the **STRICTER** test: `{Rump-accepted}
+> ⊆ {float-accepted}` per-`P`. In principle the Rump recheck could therefore *reject* a barely-PD `P`
+> the float test accepts. The observed **286 == 286 (0 lost)** is **EMPIRICAL**, not a domination
+> theorem — explained by a large headroom: the SDP constraint enforces a `margin = 1e-7` decrease
+> while `verified_pd`'s Cholesky backward-error bound is `~n·u·maxdiag ≈ 1e-15`, so every admitted
+> `P` clears the verified-PD test by **~8 orders of magnitude** (confirmed numerically: 4000
+> barely-PD matrices with `λ_min ∈ [1e-9,1e-5]`, 0 Rump rejections, 0 unsound lower bounds). The
+> OR-of-{CLARABEL,SCS} adds a second solver's `P` as a fallback chance. **Soundness (no false
+> positives) is unaffected** — that part of `verified_pd` is correct and proven. Net: the hardening
+> strengthens the *basis of trust* (a machine-checked PD proof across two solvers) and no shrinkage
+> is observed on this pool at this margin, but "never shrunk" is an **empirical** statement here, not
+> a guaranteed invariant.
 
 ## Comparison result — EXP-A 300-contracting-gene pool
 
