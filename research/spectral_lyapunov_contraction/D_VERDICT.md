@@ -1,3 +1,11 @@
+> ⚠️ **CORRECTION (2026-06-03 audit, `research/AUDIT_SCS_CLARABEL_2026-06-03.md`):** the numbers below
+> were produced with cvxpy's **SCS** default, which false-negatives near the SDP feasibility boundary
+> and **under-certified the SDP**. Re-run under the accurate **CLARABEL** solver: SDP certifies
+> **1291/1363 (~95%)** of contracting genes (not ~855), it beats the 2-norm by **+692** (not +254), and
+> the "**~33% residual** caught by no certifier" shrinks to **~5% (72/1363)**. The conclusion "the SDP
+> solver earns its keep" is **STRENGTHENED** (its advantage was *understated*); only the residual
+> magnitude is corrected. Soundness unaffected (D1 still PASS, 0 false admits). Read with the audit.
+
 # Track D VERDICT — Tighter matrix contraction certificates: does the SOLVER (SDP) earn its keep? (2026-06-02)
 
 **結論 (honest)**: **YES — here the solver finally earns its keep.** Unlike Tracks A/B/C (where Z3/SMT
