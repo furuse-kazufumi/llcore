@@ -143,6 +143,11 @@ def cert_sdp(g: CoupledNDGene, max_input_abs: float = 1.0, margin: float = 1e-7)
         return True
     if not _CVXPY:
         return False
+    # FAIL-CLOSED: the genuine SDP solve must run under CLARABEL; refuse if it is not installed
+    # rather than silently solving under SCS (solver=None == cvxpy default == SCS). The cert_two
+    # fast path above already handled the solver-independent certificate.
+    if not _CLARABEL_OK:
+        return False
     gc = g.clipped()
     n = gc.n
     verts = _box_vertices(t_min_per_coord(gc, max_input_abs))
