@@ -34,15 +34,21 @@ from exp_runner import paired_compare
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 DIMS = (2, 3, 4)
-GATES = ("none", "inf_norm", "two_norm", "sdp")
+# Main scaling run uses the CHEAP sound gates (no cvxpy): the headline question is whether
+# the conservative ∞-norm's evolutionary cost grows with dimension, recovered by a better
+# (2-norm) sound verifier. The SDP gate (cvxpy, 2^n vertices) is checked separately/small —
+# its unique gain over 2-norm is the thin shell already established at n=2.
+GATES = ("none", "inf_norm", "two_norm")
 REGIONS = ("inf", "two_norm_only", "sdp_only", "non_certified")
 
 
-def run(n_seeds: int = 10, pop: int = 40, gens: int = 50, base: int = 4000) -> dict:
+def run(n_seeds: int = 10, pop: int = 40, gens: int = 50, base: int = 4000,
+        gates: tuple = GATES, dims: tuple = DIMS, tag: str = "") -> dict:
     t0 = time.time()
     cfg = EvolveConfig(pop_size=pop, n_generations=gens, resample_cap=18)
-    out = {"config": {"n_seeds": n_seeds, "pop": pop, "gens": gens}, "by_dim": {}}
-    for n in DIMS:
+    out = {"config": {"n_seeds": n_seeds, "pop": pop, "gens": gens, "gates": list(gates)},
+           "by_dim": {}}
+    for n in dims:
         codec = CoupledNDGeneCodec(n)
         obj = RotationNDObjective(n)
         per_gate = {g: [] for g in GATES}
