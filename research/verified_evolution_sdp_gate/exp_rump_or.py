@@ -301,9 +301,11 @@ def main(n_thin: int = 60):
 
     summary = {k: v for k, v in out.items() if k not in ("records", "per_solver")}
     summary["per_solver_summary"] = {
-        sv: {k: agg[sv][k] for k in ("n_float_certified", "n_rump_certified",
-                                     "rump_superset_of_float", "n_float_only",
-                                     "n_genuine_coverage_losses")}
+        sv: {k: agg[sv][k] for k in (
+            "n_float_certified_same_matrix", "n_rump_certified",
+            "rump_superset_of_float_same_matrix", "n_float_same_only_gap",
+            "n_genuine_coverage_losses", "n_nomargin_float_only",
+            "n_nomargin_sound_rump_rejections")}
         for sv in ("CLARABEL", "SCS")
     }
     print(json.dumps(summary, indent=2), flush=True)
