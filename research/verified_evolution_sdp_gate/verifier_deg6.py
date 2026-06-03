@@ -37,8 +37,16 @@ import numpy as np
 try:
     import cvxpy as cp
     _CVXPY = True
+    # Pin an ACCURATE interior-point solver. cvxpy's default for these feasibility-boundary SDPs
+    # is SCS (first-order ADMM), which produces FALSE NEGATIVES near the feasibility boundary —
+    # it fails to find a certificate that exists. That fabricated an apparent deg4/deg6
+    # "complementarity" (an SCS artifact; under CLARABEL the lifted ladder is NESTED). The
+    # independent eigen re-check guards soundness but cannot recover a missed certificate, so the
+    # solver default — not the re-check — is the fix. Fail-closed if CLARABEL is unavailable.
+    _SOLVER = cp.CLARABEL if "CLARABEL" in cp.installed_solvers() else None
 except Exception:  # pragma: no cover
     _CVXPY = False
+    _SOLVER = None
 
 # reuse the n=2 vertex construction + the degree-4 certifier (additive, DRY).
 from verifier_deg4 import _vertices_n2, cert_deg4_n2
