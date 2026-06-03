@@ -8,31 +8,37 @@
     "n_committed": 14,
     "n_records": 74,
     "scanned": 297,
-    "elapsed_s": 70.7
+    "elapsed_s": 47.4
   },
   "per_solver": {
     "CLARABEL": {
-      "n_float_certified": 60,
+      "n_float_certified_nomargin": 60,
+      "n_float_certified_same_matrix": 2,
       "n_rump_certified": 5,
-      "rump_superset_of_float": false,
-      "n_float_only": 55,
+      "rump_superset_of_float_same_matrix": true,
+      "n_float_same_only_gap": 0,
       "n_genuine_coverage_losses": 0,
-      "genuine_coverage_losses": []
+      "genuine_coverage_losses": [],
+      "n_nomargin_float_only": 55,
+      "n_nomargin_sound_rump_rejections": 55
     },
     "SCS": {
-      "n_float_certified": 16,
+      "n_float_certified_nomargin": 16,
+      "n_float_certified_same_matrix": 15,
       "n_rump_certified": 15,
-      "rump_superset_of_float": false,
-      "n_float_only": 1,
+      "rump_superset_of_float_same_matrix": true,
+      "n_float_same_only_gap": 0,
       "n_genuine_coverage_losses": 0,
-      "genuine_coverage_losses": []
+      "genuine_coverage_losses": [],
+      "n_nomargin_float_only": 1,
+      "n_nomargin_sound_rump_rejections": 1
     }
   },
-  "rump_superset_of_float_each_solver": false,
+  "rump_superset_of_float_each_solver": true,
   "float_only_false_positives": 0,
-  "rump_or_superset_of_float_or": false,
+  "rump_or_superset_of_float_or": true,
   "or_superset_of_single_solver_rump": true,
-  "n_float_or_certified": 60,
+  "n_float_or_certified_same_matrix": 17,
   "n_rump_or_certified": 19,
   "clarabel_recovers_over_scs": 0,
   "scs_recovers_over_clarabel": 0,
@@ -59,6 +65,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -67,12 +74,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -93,6 +101,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -101,12 +110,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -127,6 +137,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -135,12 +146,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -161,6 +173,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -169,12 +182,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -195,6 +209,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -203,12 +218,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -229,6 +245,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -237,12 +254,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -263,6 +281,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -271,12 +290,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -297,6 +317,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -305,12 +326,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -331,6 +353,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -339,12 +362,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -365,6 +389,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -373,6 +398,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": true,
           "rump_recheck": true,
           "certifier_certified": true
         }
@@ -399,6 +425,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -407,12 +434,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -433,6 +461,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": true,
           "certifier_certified": true
         },
@@ -441,12 +470,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": true,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -467,6 +497,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -475,12 +506,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -501,6 +533,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -509,12 +542,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -535,6 +569,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -543,6 +578,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": true,
           "rump_recheck": true,
           "certifier_certified": true
         }
@@ -569,6 +605,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -577,12 +614,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -603,6 +641,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -611,12 +650,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -637,6 +677,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -645,6 +686,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": true,
           "rump_recheck": true,
           "certifier_certified": true
         }
@@ -671,6 +713,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -679,6 +722,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": true,
           "rump_recheck": true,
           "certifier_certified": true
         }
@@ -705,6 +749,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -713,6 +758,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": true,
           "rump_recheck": true,
           "certifier_certified": true
         }
@@ -739,6 +785,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -747,6 +794,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": true,
           "rump_recheck": true,
           "certifier_certified": true
         }
@@ -773,6 +821,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -781,12 +830,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -807,6 +857,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -815,12 +866,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -841,6 +893,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -849,12 +902,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -875,6 +929,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -883,12 +938,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -909,6 +965,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -917,6 +974,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": true,
           "rump_recheck": true,
           "certifier_certified": true
         }
@@ -943,6 +1001,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -951,6 +1010,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": true,
           "rump_recheck": true,
           "certifier_certified": true
         }
@@ -977,6 +1037,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -985,12 +1046,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -1011,6 +1073,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -1019,6 +1082,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": true,
           "rump_recheck": true,
           "certifier_certified": true
         }
@@ -1045,6 +1109,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": true,
           "rump_recheck": true,
           "certifier_certified": true
         },
@@ -1053,6 +1118,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
@@ -1079,6 +1145,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -1087,12 +1154,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -1113,6 +1181,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -1121,12 +1190,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -1147,6 +1217,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -1155,6 +1226,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": true,
           "rump_recheck": true,
           "certifier_certified": true
         }
@@ -1181,6 +1253,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -1189,12 +1262,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -1215,6 +1289,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -1223,12 +1298,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -1249,6 +1325,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -1257,12 +1334,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -1283,6 +1361,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -1291,12 +1370,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -1317,6 +1397,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -1325,12 +1406,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -1351,6 +1433,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -1359,12 +1442,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -1385,6 +1469,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -1393,12 +1478,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -1419,6 +1505,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -1427,12 +1514,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -1453,6 +1541,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -1461,12 +1550,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -1487,6 +1577,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -1495,12 +1586,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -1521,6 +1613,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": true,
           "certifier_certified": true
         },
@@ -1529,12 +1622,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": true,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -1555,6 +1649,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -1563,12 +1658,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -1589,6 +1685,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -1597,12 +1694,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -1623,6 +1721,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": true,
           "rump_recheck": true,
           "certifier_certified": true
         },
@@ -1631,6 +1730,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
@@ -1657,6 +1757,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -1665,12 +1766,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -1691,6 +1793,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -1699,12 +1802,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -1725,6 +1829,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -1733,6 +1838,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": true,
           "rump_recheck": true,
           "certifier_certified": true
         }
@@ -1759,6 +1865,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -1767,12 +1874,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -1793,6 +1901,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -1801,6 +1910,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": true,
           "rump_recheck": true,
           "certifier_certified": true
         }
@@ -1827,6 +1937,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -1835,12 +1946,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -1861,6 +1973,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": true,
           "certifier_certified": true
         },
@@ -1869,6 +1982,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": true,
           "rump_recheck": true,
           "certifier_certified": true
         }
@@ -1895,6 +2009,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -1903,12 +2018,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -1929,6 +2045,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -1937,12 +2054,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -1963,6 +2081,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -1971,6 +2090,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": true,
           "rump_recheck": true,
           "certifier_certified": true
         }
@@ -1997,6 +2117,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -2005,12 +2126,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -2031,6 +2153,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -2039,12 +2162,13 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
       },
       "or_gate": false,
-      "float_or_gate": true,
+      "float_or_gate": false,
       "source": "thin_shell_scan"
     },
     {
@@ -2065,6 +2189,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": true
         },
@@ -2073,6 +2198,7 @@
           "status": "optimal",
           "has_P": true,
           "float_recheck": true,
+          "float_recheck_same": true,
           "rump_recheck": true,
           "certifier_certified": true
         }
@@ -2099,6 +2225,7 @@
           "status": "infeasible",
           "has_P": false,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         },
@@ -2107,6 +2234,7 @@
           "status": "infeasible",
           "has_P": false,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
@@ -2133,6 +2261,7 @@
           "status": "infeasible",
           "has_P": false,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         },
@@ -2141,6 +2270,7 @@
           "status": "infeasible",
           "has_P": false,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
@@ -2167,6 +2297,7 @@
           "status": "infeasible",
           "has_P": false,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         },
@@ -2175,6 +2306,7 @@
           "status": "infeasible",
           "has_P": false,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
@@ -2201,6 +2333,7 @@
           "status": "infeasible",
           "has_P": false,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         },
@@ -2209,6 +2342,7 @@
           "status": "infeasible",
           "has_P": false,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
@@ -2235,6 +2369,7 @@
           "status": "infeasible",
           "has_P": false,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         },
@@ -2243,6 +2378,7 @@
           "status": "infeasible",
           "has_P": false,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
@@ -2269,6 +2405,7 @@
           "status": "infeasible",
           "has_P": false,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         },
@@ -2277,6 +2414,7 @@
           "status": "infeasible",
           "has_P": false,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
@@ -2303,6 +2441,7 @@
           "status": "infeasible",
           "has_P": false,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         },
@@ -2311,6 +2450,7 @@
           "status": "infeasible",
           "has_P": false,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
@@ -2337,6 +2477,7 @@
           "status": "infeasible",
           "has_P": false,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         },
@@ -2345,6 +2486,7 @@
           "status": "infeasible",
           "has_P": false,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
@@ -2371,6 +2513,7 @@
           "status": "infeasible",
           "has_P": false,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         },
@@ -2379,6 +2522,7 @@
           "status": "infeasible",
           "has_P": false,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
@@ -2405,6 +2549,7 @@
           "status": "infeasible",
           "has_P": false,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         },
@@ -2413,6 +2558,7 @@
           "status": "infeasible",
           "has_P": false,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
@@ -2439,6 +2585,7 @@
           "status": "infeasible",
           "has_P": false,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         },
@@ -2447,6 +2594,7 @@
           "status": "infeasible",
           "has_P": false,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
@@ -2473,6 +2621,7 @@
           "status": "infeasible",
           "has_P": false,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         },
@@ -2481,6 +2630,7 @@
           "status": "infeasible",
           "has_P": false,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
@@ -2507,6 +2657,7 @@
           "status": "infeasible",
           "has_P": false,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         },
@@ -2515,6 +2666,7 @@
           "status": "infeasible",
           "has_P": false,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }
@@ -2541,6 +2693,7 @@
           "status": "infeasible",
           "has_P": false,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         },
@@ -2549,6 +2702,7 @@
           "status": "infeasible",
           "has_P": false,
           "float_recheck": false,
+          "float_recheck_same": false,
           "rump_recheck": false,
           "certifier_certified": false
         }

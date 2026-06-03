@@ -1,3 +1,16 @@
+> ⚠️ **SOLVER NOTE (2026-06-03 audit, `research/AUDIT_SCS_CLARABEL_2026-06-03.md`):** this verdict's
+> **headline is UNAFFECTED by the SCS→CLARABEL correction.** The §2 scaling table (none / inf_norm /
+> two_norm at n=2,3,4; the ∞-norm ceilings 0.491 / 0.459 / 0.343 and the two−inf payoff) is produced by
+> `exp_nd.py`, whose sweep uses only the `none` / `inf_norm` / `two_norm` gates — **the SDP/cvxpy gate is
+> deliberately excluded** (§2 already states this). Those two certifiers are **closed-form and
+> solver-independent**: `cert_inf` is the numpy closed-form `infnorm_sup`, and `cert_two` is
+> `np.linalg.svd` over the 2ⁿ box vertices. Neither touches cvxpy or SCS, so SCS false-negatives cannot
+> have biased the headline; the inf-vs-two-norm dimensional payoff stands exactly as measured. For
+> completeness the `coupled_nd.cert_sdp` path (used only by the `classify_region` winner labels and the
+> n=2 SDP shell, never the headline table) is now **CLARABEL-pinned** (`coupled_nd.py`
+> `_SOLVER = cp.CLARABEL if "CLARABEL" in cp.installed_solvers() else None`), matching the rest of the
+> audited codebase. Soundness unaffected (G1 still 0 divergent admitted). Read with the audit.
+
 # VERDICT — richer GeneCodec (n-dim) + dimension scaling (2026-06-03)
 
 > Roadmap item #1 (skeleton extension): add an n-dimensional `GeneCodec` and matching
