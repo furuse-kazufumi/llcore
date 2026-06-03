@@ -33,8 +33,11 @@ import numpy as np
 try:
     import cvxpy as cp
     _CVXPY = True
+    # Pin an accurate solver — SCS (cvxpy default) false-negatives near the feasibility boundary.
+    _SOLVER = cp.CLARABEL if "CLARABEL" in cp.installed_solvers() else None
 except Exception:  # pragma: no cover
     _CVXPY = False
+    _SOLVER = None
 
 
 # --------------------------------------------------------------------------- #
