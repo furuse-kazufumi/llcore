@@ -61,6 +61,19 @@ contracting set, and does a JSR bracket close the residual?** Two instruments:
    sdp∪deg4∪deg6 (strict residual).
 4. **Complementarity artifact** — re-check G-8B genes at margins 1e-6..1e-8 (borderline flips).
 
+## Design note (post-gates, from the `verifier_jsr` smoke — disclosed, gates unchanged)
+
+The smoke revealed the LIFTED full-space SOS family is **NON-MONOTONE in degree**: γ* can *increase*
+deg2→deg8 (0.767→0.780 on a near-normal gene), because the full-space LMI imposes the decrease on
+the whole lifted space (not only the Veronese variety), and that conservativeness grows with the
+lift dimension. So **G-tight (bracket shrinks monotonically with d) is EXPECTED TO FAIL** — and that
+*is* the JSR-bound face of the deg4/deg6 complementarity. The tightest valid upper bound from this
+family is therefore **γ*_min = min_d γ*_d**, and the lifted-union coverage is {γ*_min < 1} (this is
+what `exp_jsr_bracket.py` reports). A genuinely monotone bound converging to exact-JSR needs a
+**proper SOS-on-variety program** (SOS multipliers for the Veronese ideal) or **branch-and-bound JSR**
+(NP-hard) — scoped as the rigorous next step, not claimed here. Gates above are unchanged; G-tight is
+reported as the (committed) honest negative.
+
 ## Deliverables
 
 `verifier_jsr.py` (γ*_d bisection bracket; degree-8 via `certify_degN(·,4)`), `exp_deg8_ladder.py`
