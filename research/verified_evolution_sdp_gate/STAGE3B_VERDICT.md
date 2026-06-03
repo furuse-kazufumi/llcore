@@ -1,3 +1,15 @@
+> ⚠️ **SOLVER NOTE (2026-06-03 audit, `research/AUDIT_SCS_CLARABEL_2026-06-03.md`):** the production
+> `SdpLyapunovBackend` in `src/llcore/verifier/backends.py` originally solved the common-P LMI with
+> cvxpy's **SCS** default, which false-negatives near the SDP feasibility boundary (under-certifies the
+> contraction region). It is now pinned to **CLARABEL** (accurate interior-point;
+> `_SDP_SOLVER = "CLARABEL" if "CLARABEL" in cp.installed_solvers() else None`, fail-closed to `None` if
+> absent). The production suite still passes (**255 tests** = the prior 248 + 7 `test_backends.py`; the
+> audit also re-counts these as "backends 7"), so the change is purely additive with **0 regression**.
+> **Soundness is unaffected** — the SCS artifact was false *negatives*, and the backend's independent
+> eigenvalue re-check of the solver's P already guards against false admits regardless of solver. The
+> only effect of the pin is that the production verifier now admits the contractions SCS used to miss.
+> Read with the audit.
+
 # VERDICT — Stage 3b: verifier backend plugin promoted to src/ (2026-06-03)
 
 > Roadmap item #3: promote the arc's conclusion ("the right contraction verifier is
