@@ -160,7 +160,7 @@ def main():
             rec[f"two_{dom}_admit"] = r2.certified
             rec[f"two_{dom}_sup"] = r2.sup_2norm
             if CVXPY_AVAILABLE:
-                rL = certify_common_lyapunov(g, t_domain=dom)
+                rL = certify_common_lyapunov(g, t_domain=dom, solver=_SOLVER)
                 rec[f"sdp_{dom}_admit"] = rL.certified
                 rec[f"sdp_{dom}_status"] = rL.solver_status
                 rec[f"sdp_{dom}_P"] = rL.P  # for the P-norm soundness oracle (None if not certified)
