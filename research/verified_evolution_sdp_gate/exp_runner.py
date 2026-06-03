@@ -93,19 +93,25 @@ def exp1(n_random: int = 8000, n_ga_visited: int = 4000, seed: int = 1) -> dict:
     regions = [classify_region(gn) for gn in genes]
     emp_rho = [empirical_spectral_radius(gn, n_samples=2000) for gn in genes]
 
-    result = {"n_pool": len(pool), "region_counts": {r: regions.count(r) for r in REGIONS}}
+    contracting = np.array([emp_rho[i] < 1.0 for i in range(len(genes))])  # emp (from-below) oracle
+    result = {"n_pool": len(pool), "region_counts": {r: regions.count(r) for r in REGIONS},
+              "n_empirically_contracting": int(contracting.sum())}
     for tname, obj in OBJECTIVES.items():
         fits = np.array([obj.fitness(gn) for gn in genes])
-        # per-region fitness stats (contracting genes only: emp_rho<1)
+        # per-region fitness stats. report BOTH the raw region max and the max restricted to
+        # EMPIRICALLY-CONTRACTING genes (Codex #8: 'non_certified' includes genuinely expansive
+        # genes, so the contracting-filtered max is the honest frontier ceiling).
         per_region = {}
         for reg in REGIONS:
             mask = np.array([(regions[i] == reg) for i in range(len(genes))])
+            cmask = mask & contracting
             if mask.sum() > 0:
-                per_region[reg] = {"count": int(mask.sum()),
-                                   "max_fitness": float(fits[mask].max()),
-                                   "mean_fitness": float(fits[mask].mean())}
-        # region membership of the top-K fittest CONTRACTING genes
-        contracting = np.array([emp_rho[i] < 1.0 for i in range(len(genes))])
+                per_region[reg] = {
+                    "count": int(mask.sum()),
+                    "max_fitness_raw": float(fits[mask].max()),
+                    "n_contracting": int(cmask.sum()),
+                    "max_fitness_contracting": (float(fits[cmask].max()) if cmask.sum() else None),
+                }
         idx_sorted = np.argsort(-fits)
         topk_regions = []
         for i in idx_sorted:
