@@ -1,10 +1,11 @@
 # SPDX-License-Identifier: Apache-2.0
 """TDD for the degree-6 (non-quadratic) Lyapunov VerifierBackend (verifier_deg6.py).
 
-Covers: symmetric-3rd-power correctness, soundness (cert ⇒ empirically contracting), residual
-recovery (deg6 certifies genes the quadratic class rejects), the NON-OBVIOUS complementarity
-(deg6∖deg4 and deg4∖deg6 both non-empty ⇒ the lifted ladder is non-nested), and that the union
-backend is a superset of sdp.
+NOTE (post adversarial review): the certifiers are pinned to the accurate CLARABEL solver.
+cvxpy's SCS default produced FALSE NEGATIVES near the feasibility boundary, which fabricated an
+apparent deg4/deg6 "complementarity". Under CLARABEL the lifted ladder is NESTED (deg4 ⊆ deg6),
+the quadratic SDP already certifies ~95% of contracting genes, and the D4 residual is tiny. These
+tests assert the SOUND, NESTED behaviour with a deterministic residual-gene fixture.
 
 Run: py -3.11 -m pytest test_deg6.py -q
 """
@@ -24,6 +25,15 @@ def _quad(g) -> bool:
     return _inf_certifies(g) or _two_certifies(g) or _sdp_certifies(g)
 
 
+# A deterministic D4-RESIDUAL gene (from the CLARABEL EXP-A residual pool): quadratic-class REJECTED
+# but degree-4/6 certified, empirically contracting (rho≈0.88). Used as a stable fixture instead of
+# a flaky random search (the residual is rare under an accurate solver).
+_RESIDUAL_GENE = CoupledGene.make(
+    decay=[0.585387227007845, 0.42030016089787947],
+    W=[[-0.3862125356196242, 1.7757712667750045],
+       [-1.807150485416289, -0.6957048379417996]])
+
+
 @pytest.mark.parametrize("n", [2, 3, 4])
 @pytest.mark.parametrize("degree", [2, 3])
 def test_sym_power_correct(n, degree):
@@ -39,7 +49,6 @@ def test_sym_power_correct(n, degree):
 
 
 def test_sym_power_degree2_matches_deg4_sym2():
-    """The general sym_power(.,2) reproduces verifier_deg4.sym2_power exactly."""
     rng = np.random.default_rng(0)
     for _ in range(20):
         A = rng.standard_normal((2, 2))
@@ -65,47 +74,24 @@ def test_deg6_sound_on_random_sample():
     assert checked > 0
 
 
-def test_deg6_recovers_a_residual_gene():
-    """deg6 certifies at least one genuinely-contracting gene the quadratic class rejects."""
+def test_deg6_recovers_the_residual_fixture():
+    """The fixture is a genuine D4-residual gene: quad-REJECTED, deg6-certified, contracting."""
+    assert _quad(_RESIDUAL_GENE) is False            # no quadratic-class certificate
+    assert cert_deg6_n2(_RESIDUAL_GENE) is True       # but the degree-6 Lyapunov certifies it
+    assert empirical_spectral_radius(_RESIDUAL_GENE, n_samples=6000) < 1.0  # genuinely contracting
+
+
+def test_ladder_nested_deg4_subset_deg6():
+    """Under the accurate solver the lifted ladder is NESTED: a deg4-certified gene is deg6-certified
+    (the prior 'complementarity' was an SCS false-negative artifact, now retracted)."""
+    assert cert_deg4_n2(_RESIDUAL_GENE) is True
+    assert cert_deg6_n2(_RESIDUAL_GENE) is True
+    # spot-check nesting on a random sample: no gene is deg4-certified yet deg6-rejected.
     rng = np.random.default_rng(20260603)
-    found = False
-    for _ in range(400):
+    for _ in range(150):
         g = CoupledGene.make(decay=rng.uniform(0, 1, 2), W=rng.uniform(-2, 2, (2, 2)))
-        if not _quad(g) and cert_deg6_n2(g):
-            assert empirical_spectral_radius(g, n_samples=6000) < 1.0
-            found = True
-            break
-    assert found, "deg6 recovered no residual gene in the sample"
-
-
-def test_complementarity_deg6_not_deg4():
-    """NON-OBVIOUS: a gene deg6 certifies but deg4 does NOT (lifted ladder is non-nested)."""
-    rng = np.random.default_rng(20260603)
-    found = False
-    for _ in range(700):
-        g = CoupledGene.make(decay=rng.uniform(0, 1, 2), W=rng.uniform(-2, 2, (2, 2)))
-        if _quad(g):
-            continue
-        if cert_deg6_n2(g) and not cert_deg4_n2(g):
-            assert empirical_spectral_radius(g, n_samples=6000) < 1.0
-            found = True
-            break
-    assert found, "no deg6∖deg4 gene found (expected the ladder to be non-nested)"
-
-
-def test_complementarity_deg4_not_deg6():
-    """NON-OBVIOUS (the surprising direction): a gene deg4 certifies but deg6 does NOT."""
-    rng = np.random.default_rng(20260603)
-    found = False
-    for _ in range(700):
-        g = CoupledGene.make(decay=rng.uniform(0, 1, 2), W=rng.uniform(-2, 2, (2, 2)))
-        if _quad(g):
-            continue
-        if cert_deg4_n2(g) and not cert_deg6_n2(g):
-            assert empirical_spectral_radius(g, n_samples=6000) < 1.0
-            found = True
-            break
-    assert found, "no deg4∖deg6 gene found (expected the ladder to be non-nested)"
+        if cert_deg4_n2(g):
+            assert cert_deg6_n2(g) is True, "deg4-certified gene must be deg6-certified (nested)"
 
 
 def test_union_backend_superset_of_sdp():
