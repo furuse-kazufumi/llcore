@@ -41,14 +41,19 @@ from lyapunov_sdp_certifier import (  # noqa: E402
     certify_common_lyapunov,
 )
 
-# Pin an accurate interior-point solver for the SDP. cvxpy's SCS default produces FALSE NEGATIVES
-# near the feasibility boundary (it under-certifies, fabricating a too-small certified region and
-# an inflated "residual"). CLARABEL if available, else cvxpy default. (Soundness is guarded by
-# certify_common_lyapunov's own independent eigen re-check; this only fixes completeness.)
+# FAIL-CLOSED solver selection for the SDP. cvxpy's SCS default produces FALSE NEGATIVES near the
+# feasibility boundary (it under-certifies, fabricating a too-small certified region and an inflated
+# "residual"). The deeper hazard is a SILENT regression: a CLARABEL-absent environment would fall
+# back to ``_SDP_SOLVER = None`` == cvxpy default == SCS, the artifact-prone solver. So we do NOT
+# fall back. If CLARABEL is installed we pin it; if not, ``_CLARABEL_OK`` is False and the genuine
+# SDP solve path in ``_sdp_certifies`` REFUSES (returns False) rather than running under SCS. The
+# inf-/2-norm fast paths remain valid (they are solver-independent closed-form certificates).
 try:
     import cvxpy as _cp  # noqa: E402
-    _SDP_SOLVER = "CLARABEL" if "CLARABEL" in _cp.installed_solvers() else None
+    _CLARABEL_OK = "CLARABEL" in _cp.installed_solvers()
+    _SDP_SOLVER = "CLARABEL" if _CLARABEL_OK else None
 except Exception:  # pragma: no cover
+    _CLARABEL_OK = False
     _SDP_SOLVER = None
 
 # Genotype layout: [decay0, decay1, W00, W01, W10, W11].
