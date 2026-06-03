@@ -96,12 +96,16 @@ inf-gated rotation tops out at 0.41 (≈ region max 0.38); sdp at 0.86 (≈ 0.90
   exclude there; reported honestly, not a no-op elsewhere.)
 - **G3 permissiveness ordering — PASS.** |sdp|=3369 > |two|=2552 > |inf|=1860 over the
   exp1 pool (SDP admits 1.8× more, all sound).
-- **G4 PRACTICAL PAYOFF — PASS (strong).** On rotation, sdp ≫ inf
+- **G4 PRACTICAL PAYOFF — PASS (strong, on the non-circular rotation task).** sdp ≫ inf
   (Δ=+0.448, one-sided Wilcoxon **p=3.1e-5**, psd=1.00) and two ≫ inf (p=3.1e-5);
-  the advantage is **attributed** to winners in the inf-rejected region (15/15 sdp
-  winners are two_norm_only/sdp_only). nonnormal also PASS (p=3.1e-5, small Δ=0.023).
+  **attributed** to winners in the inf-rejected region (15/15 sdp winners
+  two_norm_only/sdp_only). The headline p=3.1e-5 **survives Bonferroni** over all ~9
+  gate/task comparisons (α=0.05/9=5.6e-3) and psd=1.00 is complete separation (post-hoc
+  power ≈ 1). The `nonnormal` task also shows sdp>inf (p=3.1e-5, Δ=0.023) but is
+  **circular by construction** (optimum SDP-only by design) → counted as a *reachability
+  demonstration*, NOT independent payoff evidence (Codex #7).
 - **G5 HONEST NULL — PASS.** On benign, sdp vs inf is a null (Δ=−0.000, p=0.72): no
-  generic SDP/admission-size advantage. The G4 effect is task-structural.
+  generic SDP/admission-size advantage. The G4 effect is task-structural (Lens A confirms).
 
 ## 6. Adversarial red-team (Lenses A–D) — all PASS / survive
 
