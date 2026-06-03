@@ -141,6 +141,23 @@ proving the single default-run divergent was an ungated initial elite, not a gat
   pop=24, gens=25, **n=15** for CPU tractability (cvxpy per-call canonicalisation is the
   bottleneck). n=15 still satisfies the G4 strict-gate threshold (n≥15). The gates are
   structural (soundness / region-ceiling / null) and seed-robust, not config-sensitive.
+- **Soundness rests on the certifier THEOREMS, not the empirical oracle (Codex #1/#2).**
+  ‖J‖_∞<1, σ_max<1, and the common-P LMI each *mathematically imply* ρ<1 (Track C/D, with
+  their own red-teams). `empirical_spectral_radius` is a **from-below** sampler: ρ<1
+  observed only means *no violation found* — it can falsify but not certify soundness. So
+  the oracle is used as a **consistency / bug check** (it found 0 divergent admitted
+  children at 20k — see §6), and the guarantee itself is the certificate. The default-run
+  G1 measurement using the *final population* @2500 was weaker than the prereg's
+  *admitted-children* @≥20k; the proper admitted-child check is reported in §6.
+- **Multiplicity / power (Codex #6):** exp2 produces several gate/task comparisons; the
+  headline rotation p=3.1e-5 ≪ Bonferroni α (0.05/9=5.6e-3), and Lens C confirms across 3
+  seed families. psd=1.00 (complete separation) ⇒ post-hoc power ≈ 1 for the observed
+  effect. No achieved-power simulation was run (deviation from prereg Lens C wording).
+- **Thin SDP-only shell (Codex #9):** the sdp_only genes sit very near the quadratic-
+  stability boundary (common-P min-eigenvalue margins ~1e-7, not a solver artifact — same
+  with CLARABEL). The Track-D certifier independently re-checks the LMI eigenvalues (not
+  solver-blind), but near-boundary numerical robustness is a real caveat; it is *why* SDP's
+  unique gain over the 2-norm is small/fragile, and it does not affect the inf→2norm bulk.
 - **Fitness ceiling caught & fixed**: the first fitness (exp(−MSE)) saturated at ~0.997
   for most genes (the ③/llive ceiling trap); replaced with **R²** (project-standard,
   headroom) before any verdict — disclosed per [[feedback_benchmark_honest_disclosure]].
