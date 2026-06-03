@@ -40,15 +40,23 @@ try:
     CVXPY_AVAILABLE = True
     _CVXPY_VERSION = getattr(cp, "__version__", "unknown")
     _CVXPY_IMPORT_ERROR = None
-    # FAIL-SAFE default solver. cvxpy's bare default is SCS (first-order), which FALSE-NEGATIVES
-    # near the SDP feasibility boundary (the 2026-06-03 audit artifact). Default to the accurate
-    # CLARABEL so any caller that forgets ``solver=`` cannot silently regress to SCS. A caller may
-    # still override explicitly. See memory feedback_cvxpy_pin_accurate_solver.
-    _DEFAULT_SOLVER = "CLARABEL" if "CLARABEL" in cp.installed_solvers() else None
+    # FAIL-CLOSED default solver. cvxpy's bare default is SCS (first-order), which FALSE-NEGATIVES
+    # near the SDP feasibility boundary (the 2026-06-03 audit artifact). We pin the accurate
+    # CLARABEL as the default. CRITICALLY, if CLARABEL is NOT installed we do NOT fall back to
+    # ``_DEFAULT_SOLVER = None`` (== cvxpy default == SCS): that would silently regress to the
+    # artifact-prone solver. Instead ``_CLARABEL_OK`` is False, and when a caller does NOT pass an
+    # explicit ``solver=`` the function REFUSES (returns available=False / certified=None) rather
+    # than running under SCS. A caller may STILL pass ``solver="SCS"`` EXPLICITLY (the PART-2
+    # OR-of-{CLARABEL,SCS} gate does this, then re-verifies the result with the Rump verified-PD
+    # test) — an explicit choice is the caller's responsibility and is honoured. See memory
+    # feedback_cvxpy_pin_accurate_solver.
+    _CLARABEL_OK = "CLARABEL" in cp.installed_solvers()
+    _DEFAULT_SOLVER = "CLARABEL" if _CLARABEL_OK else None
 except Exception as exc:  # pragma: no cover - environment dependent
     CVXPY_AVAILABLE = False
     _CVXPY_VERSION = None
     _CVXPY_IMPORT_ERROR = repr(exc)
+    _CLARABEL_OK = False
     _DEFAULT_SOLVER = None
 
 
