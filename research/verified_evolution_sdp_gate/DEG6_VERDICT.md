@@ -121,7 +121,7 @@ scales" is **retracted**, for two reasons the adversarial review established:
    ‖s0‖), and the `T_residual_max` gene itself had ρ≈1.8 — exactly the "switched-expansive, correctly
    rejected" class. Plus 5–27× residual/quad pool-size asymmetry inflated the max-vs-max gap.
 
-`exp_deg6_dimension.py` was fixed (empirical_ρ<1 soundness gate) and **re-run [RUNNING — to be filled]**;
+`exp_deg6_dimension.py` was fixed (empirical_ρ<1 soundness gate) and **re-run (2026-06-03, ρ-gated, CLARABEL — `exp_deg6_dimension_results.json`): noisy / not robust across runs** — the canonical 1600-scan run gives T_residual 2.755 / 4.145 / 3.569 and T_quad 2.365 / 1.813 / 1.535 (n=2/3/4) ⇒ gap +0.39 / +2.33 / +2.03, **non-monotone** (`G_C_gap_monotone_increasing`=false, `T_residual_monotone_increasing`=false); a CPU-time-capped re-run flipped to an *accidentally*-monotone profile (gap +0.12 / +0.30 / +1.13) purely from truncated scan coverage — the cross-run flip is itself evidence the residual-vs-quad gap is a **sampling artifact, not a dimension law**;
 the only defensible cross-n signal is T_quad shrinkage (the quadratic class covers less of higher-dim
 space), itself partly a max-over-shrinking-sample effect. No dimension-gated capability claim stands.
 
