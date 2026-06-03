@@ -4,7 +4,14 @@
 > cvxpy's **SCS** default (first-order) returns **false negatives** near the SDP feasibility boundary
 > (memory `feedback_cvxpy_pin_accurate_solver`), fabricating false structure. This audit pins
 > **CLARABEL** across every SDP certifier and re-runs the arc's coverage experiments. Soundness was
-> never at risk (the artifact is false *negatives*); the eigen re-check + JSR oracle confirm it.
+> never at risk *in direction* (the artifact is false *negatives*), and we observe **0 false admits**;
+> but read the soundness claim precisely (pair-review F2, 2026-06-04): admission rests on the
+> certifier **theorems** (quadratic: vertex-LMI ⇒ hull stability by convexity; deg≥2: the lifted SOS
+> sufficient condition) plus an **independent float eigen re-check** of the solver's `P`. The JSR
+> product oracle is a **one-sided, finite-length (≤6) falsification check** — `jsr_lb≥1` would prove
+> an unsound admit, and we find **0** such genes; that is strong *evidence* of soundness, NOT an
+> end-to-end machine-checked proof at float precision. The additive Rump verified-PD gate is the only
+> component that supplies such a proof, and it is not the default. See `PAIRREVIEW_audit_rump_2026-06-04.md`.
 
 ## Solver pinned (whole codebase, additive)
 
