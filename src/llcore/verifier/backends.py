@@ -182,15 +182,23 @@ class SdpLyapunovBackend:
     """Coupled-gene common quadratic Lyapunov (LMI) contraction via cvxpy (optional [sdp]).
 
     Certifies a P ≻ 0 with P − J_vᵀ P J_v ≻ 0 at every t-box vertex ⇒ P-weighted contraction
-    ⇒ ρ(J)<1 over the box. Strictly richer than any fixed induced norm. Fail-closed when cvxpy
-    is unavailable. Fast-path: 2-norm ⇒ True (P=I); pre-screen ρ(J_v)<1 (necessary). The
-    solver's P is re-verified by an independent eigenvalue check (never solver-blind)."""
+    ⇒ ρ(J)<1 over the box. Strictly richer than any fixed induced norm.
+
+    FAIL-CLOSED: ``available`` is True only when cvxpy AND CLARABEL are BOTH present. cvxpy's SCS
+    default false-negatives near the feasibility boundary (the arc's pinned-away artifact); a
+    CLARABEL-absent environment must NEVER silently run the SDP under SCS. The genuine SDP solve
+    path is therefore guarded by ``_CLARABEL_AVAILABLE`` and refuses (returns False) when CLARABEL
+    is missing. The 2-norm fast-path (P=I) is solver-independent and stays valid regardless.
+    Pre-screen ρ(J_v)<1 (necessary). The solver's P is re-verified by an independent eigenvalue
+    check (never solver-blind)."""
 
     name = "sdp_lyapunov"
 
     @property
     def available(self) -> bool:
-        return _CVXPY_AVAILABLE
+        # Fail-closed: require BOTH cvxpy and CLARABEL. Without CLARABEL the SDP would otherwise run
+        # under SCS (the artifact-prone solver), so this backend declares itself unavailable.
+        return _CVXPY_AVAILABLE and _CLARABEL_AVAILABLE
 
     def certifies(self, gene: Any, max_input_abs: float = 1.0, margin: float = 1e-7) -> bool:
         try:
@@ -199,10 +207,13 @@ class SdpLyapunovBackend:
             t_lo = _t_min(decay, W, V, max_input_abs)
             verts = _box_vertices(t_lo)
             Js = [_jac_at_t(decay, W, v) for v in verts]
-            # 2-norm fast path (P=I) — also makes the backend usable without cvxpy for that subset.
+            # 2-norm fast path (P=I) — solver-independent sound certificate; usable even without
+            # cvxpy/CLARABEL for that subset.
             if all(float(np.linalg.svd(J, compute_uv=False)[0]) < 1.0 for J in Js):
                 return True
-            if not _CVXPY_AVAILABLE:
+            # FAIL-CLOSED: the genuine SDP solve must run under CLARABEL. Refuse if cvxpy is absent
+            # OR CLARABEL is not installed — never fall through to cvxpy's SCS default.
+            if not _CVXPY_AVAILABLE or not _CLARABEL_AVAILABLE:
                 return False
             for J in Js:  # necessary condition for the LMI
                 if float(np.max(np.abs(np.linalg.eigvals(J)))) >= 1.0:
