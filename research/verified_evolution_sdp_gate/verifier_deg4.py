@@ -26,8 +26,12 @@ import numpy as np
 try:
     import cvxpy as cp
     _CVXPY = True
+    # Pin an accurate interior-point solver — cvxpy's SCS default gives FALSE NEGATIVES near the
+    # feasibility boundary (the cause of the spurious deg4/deg6 complementarity). CLARABEL or None.
+    _SOLVER = cp.CLARABEL if "CLARABEL" in cp.installed_solvers() else None
 except Exception:  # pragma: no cover
     _CVXPY = False
+    _SOLVER = None
 
 
 def _mono_basis(n: int) -> list[tuple[int, int]]:
