@@ -138,9 +138,12 @@ def cert_deg6_n2(gene) -> bool:
 def make_deg6_verifier_n2():
     """VerifierBackend (n=2): admit if quadratic SDP OR degree-4 OR degree-6 certifies.
 
-    The union is the correct sound set because the lifted degree-4 / degree-6 certificates are
-    complementary (non-nested) — see module docstring + DEG6_VERDICT.md. Memoised on the
-    rounded genotype; fail-closed (cvxpy-absent ⇒ deg* ⇒ False)."""
+    The union is the correct sound set because each lifted certificate is independently sound (a
+    valid Lyapunov certificate). NOTE (2026-06-03 retraction — see module docstring + DEG6_VERDICT.md):
+    under the accurate CLARABEL solver the ladder is NESTED (deg4 ⊆ deg6), so the union reduces to the
+    common quadratic SDP plus degree-6's tiny near-boundary residual; the earlier "complementary
+    (non-nested)" claim was an SCS solver artifact. Memoised on the rounded genotype; fail-closed
+    (cvxpy-absent ⇒ deg* ⇒ False)."""
     from coupled_components import _sdp_certifies
     cache: dict = {}
 
