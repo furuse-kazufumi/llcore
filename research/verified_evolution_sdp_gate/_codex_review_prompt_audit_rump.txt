@@ -1,0 +1,46 @@
+You are doing an ADVERSARIAL read-only pair-review for a CPU verified-evolution research arc.
+Be a hostile skeptic. Your job is to find claim-vs-implementation gaps, unsound reasoning,
+over-claims, and solver/numerical artifacts. Do NOT be agreeable. Verify against the actual code.
+
+CONTEXT: An earlier bug was found: cvxpy's default SCS solver returns FALSE NEGATIVES near the
+SDP feasibility boundary, which fabricated false "degree-ladder/complementarity" findings. The fix
+pinned CLARABEL across all SDP certifiers and re-audited the arc. A second hardening added a
+Rump-verified-PD + OR-of-{CLARABEL,SCS} gate. We need an adversarial review of BOTH before publishing.
+
+REVIEW THESE FILES (all under research/verified_evolution_sdp_gate/ unless noted):
+- AUDIT (../AUDIT_SCS_CLARABEL_2026-06-03.md) — the CLARABEL re-audit and its corrected numbers.
+- RUMP_HARDENING_VERDICT.md, rump_hardened_verifier.py, rump_pd.py, exp_rump_hardening_compare.py
+- DEG6_VERDICT.md, verifier_deg4.py, verifier_deg6.py, verifier_jsr.py, exp_deg6_ladder.py
+- verify_certifier_jsr_soundness.py (+ ..._results.json), verify_solver_artifact.py
+- ../spectral_lyapunov_contraction/lyapunov_sdp_certifier.py
+- coupled_components.py (_sdp_certifies, _inf_certifies, _two_certifies)
+- src/llcore/verifier/backends.py (production SdpLyapunov backend)
+
+SCRUTINIZE THESE HEADLINE CLAIMS (try to REFUTE each; cite file:line evidence):
+1. COMPLETENESS: "every cvxpy .solve() is pinned to an accurate solver; no reachable SCS default."
+   Is there ANY code path (incl. fallbacks, empty-string solver, missing CLARABEL) that runs the
+   bare SCS default? Flag lyapunov_sdp_certifier.py ~line 140 specifically.
+2. SOUNDNESS BOTH DIRECTIONS: fixing SCS false-NEGATIVES must not introduce CLARABEL false-POSITIVES.
+   The certifiers re-check P and P-JᵀPJ with float eigvalsh and (for deg≥2) a JSR product oracle.
+   Are there CLARABEL "Solution may be inaccurate" solves whose certificate could be a false admit?
+   Does the independent recheck actually run and gate the verdict (not the solver's status)?
+3. DEGREE-LADDER RETRACTION: "under CLARABEL the deg4/6 ladder is nested (deg4∖deg6=0), residual
+   53→10, complementarity was an SCS artifact, degree adds only +4 over quadratic SDP." Is the
+   retraction itself correct and not over-corrected? Check verify_solver_artifact.py + the SCS-era
+   snapshot vs live result.
+4. RUMP+OR: "admit count 286==286 (delta 0), admit set preserved-or-grown never shrunk, extras
+   sound by JSR." Is the SDP+Rump branch non-vacuously exercised (not all admits via inf/2-norm
+   fast path)? Is the preserve-or-grow invariant actually justified by verified_pd >= float-eigvalsh?
+5. RUMP verified_pd SOUNDNESS: rump_pd.verified_pd claims "no false positives" via a Cholesky
+   backward-error bound. Audit the derivation: the gamma_{n+1} factor, the maxdiag envelope
+   (uses max_i M_ii vs the shifted A's diagonal), symmetrization. Can you construct a non-PD M
+   that verified_pd would accept? If not, say why it is sound.
+6. JSR ORACLE: verify_certifier_jsr_soundness.py uses a Gripenberg-style product lower bound to
+   max_len=6. Is "0 certified genes with jsr_lb>=1" a real soundness guarantee or could it miss
+   an expansive product at length>6?
+
+OUTPUT FORMAT: a numbered list of findings. For each: severity (blocker/high/med/low),
+the claim it challenges, file:line evidence, and whether it OVERTURNS a headline or only refines
+a secondary claim. End with a one-line verdict: does any finding overturn the central thesis
+("the right contraction verifier is SDP/Lyapunov, ~95% complete on CPU, soundness intact")?
+Keep it concise and evidence-anchored. Do not invent files; if a file is missing, say so.

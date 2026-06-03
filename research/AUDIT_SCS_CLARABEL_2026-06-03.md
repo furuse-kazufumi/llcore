@@ -65,6 +65,31 @@ sub-narratives were SCS artifacts.
 - **STAGE3B_VERDICT.md / src backends.py** — the production SDP backend used SCS; now pinned to
   CLARABEL (255 + 7 tests still pass). Production verifier is now accurate. *Add note.*
 
+## Reproducibility — the keystone is now permanently runnable (2026-06-03 fix)
+
+The SCS→CLARABEL solver-swap keystone (DEG6_VERDICT.md §0) is once again reproducible from a fixed
+fixture, after an audit found the demonstration had silently broken: the later CLARABEL ladder run
+**overwrote** `verified_evolution_sdp_gate/exp_deg6_residual_genes.json` (SCS-era 54 deg_certified /
+53 residual_uncert → post-correction 4 / 10), destroying the battery `verify_solver_artifact.py`
+depended on. Fix:
+
+- **Immutable snapshot** `exp_deg6_residual_genes_scs_era.json` — the SCS-era battery (deg_certified
+  = 54, residual_uncert = 53) restored verbatim from git commit `cd400ef` and treated as a fixed
+  regression fixture.
+- **`verify_solver_artifact.py`** now reads that snapshot (not the overwritten live file) and
+  reproduces §0 first-party: **SCS** deg4_only=23 / deg6_only=13 / both=18 (complementarity = the
+  artifact), **CLARABEL** 0 / 0 / 54 (nested), and CLARABEL recovers **42–43 of the 53** SCS false
+  negatives.
+- **`verified_evolution_sdp_gate/test_solver_swap_regression.py`** — a standing, deterministic,
+  sub-minute pytest guard on the same snapshot asserting (a) the CLARABEL ladder is nested
+  (deg4_only == 0), (b) the SCS vs CLARABEL admit sets diverge (the solver-swap detector still
+  fires), and (c) every CLARABEL-certified gene passes the JSR soundness oracle (jsr_lb < 1). This
+  permanently fail-closes if the certifiers ever silently revert to the SCS default.
+- The pre-correction `redteam_deg6_results.json` (still reporting the retracted
+  `complement_both_pos = true` / `n_deg_certified = 54`) is annotated as superseded by
+  `redteam_deg6_results.STALE.md`; the canonical nested result is `exp_deg6_ladder_results.json`
+  (deg4∖deg6 = 0).
+
 ## Honest bottom line of the audit
 
 The verified-evolution arc's **central claim is intact and stronger** ("the right contraction verifier
