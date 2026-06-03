@@ -148,7 +148,7 @@ valuable deliverable may be the cautionary methodology: a reproducible demonstra
 SOS/SDP solver fabricates false structure near the feasibility boundary, and that adversarial
 multi-perspective review (not margin sweeps) is what catches it.**
 
-**Next:** (1) finish the two running confirmations (real G-B2 at n=15; ρ-gated EXP-C). (2) proper
+**Next:** (1) ✓ DONE (2026-06-03) — real G-B2 (n=15, §5: positive control G-B1 passes p=3e-5, capability NULL confirmed) and ρ-gated EXP-C (§6: no dimension-gated claim, gap is sampling noise) both completed. (2) proper
 SOS-on-variety or branch-and-bound JSR for the 2 near-boundary genes (the only way to truly close the
 frontier). (3) audit the *earlier* arc verdicts (#2 deg4 "33% recovery", Track C/D coverage counts) for
 the same SCS contamination — pin CLARABEL and re-measure. (4) the src SDP backend (`src/llcore/verifier/
