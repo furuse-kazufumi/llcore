@@ -40,13 +40,18 @@ try:
     import cvxpy as _cp
 
     _CVXPY_AVAILABLE = True
-    # Pin an accurate interior-point solver. cvxpy's default (SCS, first-order) returns FALSE
-    # NEGATIVES near the SDP feasibility boundary — it fails to find a Lyapunov certificate that
-    # exists, under-certifying the contraction region. The independent eigen re-check below guards
-    # soundness (false positives) but cannot recover a missed certificate. CLARABEL if present.
-    _SDP_SOLVER = "CLARABEL" if "CLARABEL" in _cp.installed_solvers() else None
+    # FAIL-CLOSED solver selection. cvxpy's default (SCS, first-order) returns FALSE NEGATIVES near
+    # the SDP feasibility boundary — it fails to find a Lyapunov certificate that exists,
+    # under-certifying the contraction region. The independent eigen re-check below guards soundness
+    # (false positives) but cannot recover a missed certificate. CRITICAL: a CLARABEL-absent
+    # environment must NOT silently fall back to ``_SDP_SOLVER = None`` == cvxpy default == SCS.
+    # We therefore track CLARABEL presence separately: ``SdpLyapunovBackend.available`` is False
+    # unless cvxpy AND CLARABEL are BOTH present, and the SDP solve path is never reached under SCS.
+    _CLARABEL_AVAILABLE = "CLARABEL" in _cp.installed_solvers()
+    _SDP_SOLVER = "CLARABEL" if _CLARABEL_AVAILABLE else None
 except Exception:  # pragma: no cover - environment dependent
     _CVXPY_AVAILABLE = False
+    _CLARABEL_AVAILABLE = False
     _SDP_SOLVER = None
 
 
