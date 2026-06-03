@@ -75,10 +75,20 @@ def _gene(rec):
 
 print("cvxpy", cp.__version__, "installed solvers:", [s for s in ("SCS", "CLARABEL") if s in cp.installed_solvers()])
 
-with open(os.path.join(_HERE, "exp_deg6_residual_genes.json"), encoding="utf-8") as f:
+# Read the IMMUTABLE SCS-era snapshot, NOT the live exp_deg6_residual_genes.json (which was
+# overwritten by the later CLARABEL ladder run -> only 4 deg_certified / 10 residual_uncert remain
+# there now). The snapshot preserves the original SCS-era battery (54 SCS-"deg-certified" residual
+# genes + 53 SCS-"uncertified" residual genes) so this solver-swap keystone stays reproducible.
+# Restored verbatim from git cd400ef:research/verified_evolution_sdp_gate/exp_deg6_residual_genes.json.
+_SNAPSHOT = os.path.join(_HERE, "exp_deg6_residual_genes_scs_era.json")
+with open(_SNAPSHOT, encoding="utf-8") as f:
     data = json.load(f)
-deg = data["deg_certified"]        # 54: SCS-certified residual
-uncert = data["residual_uncert"]   # 53: SCS-uncertified residual
+deg = data["deg_certified"]        # 54 genes SCS labelled "deg-certified" (its inflated residual)
+uncert = data["residual_uncert"]   # 53 genes SCS could not certify (its false negatives)
+assert len(deg) == 54 and len(uncert) == 53, (
+    f"SCS-era snapshot must be 54/53, got {len(deg)}/{len(uncert)} — fixture corrupted?"
+)
+print(f"snapshot: {os.path.basename(_SNAPSHOT)}  deg_certified={len(deg)}  residual_uncert={len(uncert)}")
 
 for solver_name, solver in (("SCS", cp.SCS), ("CLARABEL", cp.CLARABEL)):
     d4o = d6o = both = neither = 0
