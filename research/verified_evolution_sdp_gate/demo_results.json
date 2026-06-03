@@ -4,82 +4,82 @@
   "verifier": "sdp_lyapunov (fail-closed, arc-correct backend)",
   "seed": 20260603,
   "evolution_realized": {
-    "best_fitness_gen0": 0.99685,
-    "best_fitness_final": 0.99815,
-    "improvement": 0.0013,
+    "best_fitness_gen0": 0.58626,
+    "best_fitness_final": 0.91469,
+    "improvement": 0.32843,
     "improved": true
   },
   "verifier_load_bearing": {
     "sdp_gate_admitted_divergent_frac": 0.0,
-    "ungated_admitted_divergent_frac": 0.1716,
-    "sdp_rejections": 664,
+    "ungated_admitted_divergent_frac": 0.1871,
+    "sdp_rejections": 721,
     "sdp_fallbacks": 0,
     "interpretation": "SDP-gated evolution admitted 0 divergent genes (dynamics never broke); ungated evolution drifted into divergent dynamics."
   },
   "evolved_core": {
     "decay": [
-      0.2869,
-      0.6264
+      0.4492,
+      0.6274
     ],
     "W": [
       [
-        0.8349,
-        -0.5935
+        0.511,
+        -0.9149
       ],
       [
-        1.4675,
-        0.017
+        1.5423,
+        0.2329
       ]
     ],
     "jacobian_abs_eigs_at_origin": [
-      0.889,
-      0.889
+      0.9008,
+      0.9008
     ],
     "spectral_radius_lt_1": true,
-    "region_class": "sdp_only",
-    "empirical_spectral_radius": 0.889
+    "region_class": "two_norm_only",
+    "empirical_spectral_radius": 0.9008
   },
   "best_fitness_curve": [
-    0.99685,
-    0.99685,
-    0.99685,
-    0.99685,
-    0.99685,
-    0.99685,
-    0.99685,
-    0.99685,
-    0.99815,
-    0.99815,
-    0.99815,
-    0.99815,
-    0.99815,
-    0.99815,
-    0.99815,
-    0.99815,
-    0.99815,
-    0.99815,
-    0.99815,
-    0.99815,
-    0.99815,
-    0.99815,
-    0.99815,
-    0.99815,
-    0.99815,
-    0.99815,
-    0.99815,
-    0.99815,
-    0.99815,
-    0.99815,
-    0.99815,
-    0.99815,
-    0.99815,
-    0.99815,
-    0.99815,
-    0.99815,
-    0.99815,
-    0.99815,
-    0.99815,
-    0.99815,
-    0.99815
+    0.58626,
+    0.66647,
+    0.66647,
+    0.66647,
+    0.71358,
+    0.71358,
+    0.71358,
+    0.71358,
+    0.71358,
+    0.71358,
+    0.71358,
+    0.71358,
+    0.71358,
+    0.72313,
+    0.91469,
+    0.91469,
+    0.91469,
+    0.91469,
+    0.91469,
+    0.91469,
+    0.91469,
+    0.91469,
+    0.91469,
+    0.91469,
+    0.91469,
+    0.91469,
+    0.91469,
+    0.91469,
+    0.91469,
+    0.91469,
+    0.91469,
+    0.91469,
+    0.91469,
+    0.91469,
+    0.91469,
+    0.91469,
+    0.91469,
+    0.91469,
+    0.91469,
+    0.91469,
+    0.91469
   ]
 }

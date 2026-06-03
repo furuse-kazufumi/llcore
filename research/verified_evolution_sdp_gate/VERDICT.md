@@ -144,4 +144,36 @@ proving the single default-run divergent was an ungated initial elite, not a gat
 
 ## 8. Bottom line
 
-<!-- FILL after stats -->
+**A working, verified, extensible CPU mechanism for evolving an AI dynamics core is
+realized** (the user's "進化の実現"). Evolution climbs; the SDP-Lyapunov verifier keeps
+every admitted gene provably contracting (and, with `gate_initial=True`, the whole
+population end-to-end). The skeleton's three plug-points (GeneCodec / Objective /
+VerifierBackend) make "adding an evolution direction" and "feature extension" one-object
+changes — the骨組み the user asked for.
+
+**Scientific result (all gates + 4 red-team lenses survive):** *a better contraction
+verifier monotonically unlocks more evolutionary fitness at no soundness cost.* The
+conservative ∞-norm gate severely over-restricts evolution on coupled/rotational dynamics
+(rotation fitness capped at ~0.41), and the SDP/2-norm gate recovers it to ~0.86–0.90
+(G4, p=3.1e-5, robust across seed families, **not** an admission-size artifact, attributed
+to the inf-rejected region), while a benign task shows no difference (G5 null). The big
+win is **inf → 2-norm** (capturing rotational contractions the ∞-norm over-rejects); SDP's
+unique gain over 2-norm is real but thin (the SDP-only shell). And even SDP is
+over-conservative: the highest-fitness *contracting* dynamics sit in the Track-D **D4
+residual** (ρ<1 but no quadratic/norm certificate), so the verifier-fitness frontier
+continues to **JSR / non-quadratic Lyapunov** as the next backend.
+
+**This validates the llcore arc thesis operationally**: the right verifier backend is
+SDP/Lyapunov (not Z3/SMT), and putting it *inside* the evolutionary loop is the correct,
+load-bearing implementation of "Verified × Evolvable" — on CPU.
+
+**Next (skeleton extensions, each a plug-in):** (1) richer `GeneCodec`s — n≥3 coupled,
+multi-kernel union, learning-rule genes; (2) a JSR / non-quadratic-Lyapunov
+`VerifierBackend` to reach the D4 residual; (3) promote the SDP gate into a `src/`
+`verifier backend plugin` (Stage 3b) once a codec stabilises; (4) more `Objective`s
+(memory/oscillation/control tasks) as evolution directions.
+
+Artifacts: `evolvable_core.py` (skeleton) · `coupled_components.py` · `test_skeleton.py`
+(12 PASS) · `demo_evolve.py` · `exp_runner.py` (exp1/exp2) · `redteam.py` (A–D) ·
+`PREREGISTRATION.md` · `README.md` · results JSONs. src/ untouched; push deferred
+(llcore remote not created — exposure avoidance).
