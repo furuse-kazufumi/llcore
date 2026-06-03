@@ -304,9 +304,10 @@ def main(n_thin: int = 60):
         "or_superset_of_single_solver_rump": rump_or_set >= single_solver_rump_union,
         "n_float_or_certified_same_matrix": len(float_or_same_set),
         "n_rump_or_certified": len(rump_or_set),
-        # P2: standing artifact-class measure.
+        # P2: standing artifact-class measure (feasibility-level recovery) + OR-value breakdown.
         "clarabel_recovers_over_scs": clarabel_recovers_over_scs,
         "scs_recovers_over_clarabel": scs_recovers_over_clarabel,
+        "or_value_breakdown": or_value,
         # OR-gate soundness.
         "n_or_admitted": len(or_admitted),
         "n_or_unsound_jsr_ge_1": len(or_unsound),

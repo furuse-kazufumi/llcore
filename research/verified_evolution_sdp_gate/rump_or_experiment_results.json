@@ -8,7 +8,7 @@
     "n_committed": 14,
     "n_records": 74,
     "scanned": 297,
-    "elapsed_s": 47.4
+    "elapsed_s": 28.7
   },
   "per_solver": {
     "CLARABEL": {
@@ -42,6 +42,14 @@
   "n_rump_or_certified": 19,
   "clarabel_recovers_over_scs": 0,
   "scs_recovers_over_clarabel": 0,
+  "or_value_breakdown": {
+    "n_both_solvers_rump_pass": 1,
+    "n_only_clarabel_rump_pass": 4,
+    "n_only_scs_rump_pass": 14,
+    "n_neither_rump_pass": 55,
+    "n_saved_by_exactly_one_solver": 18,
+    "solver_feasibility_disagreements": 0
+  },
   "n_or_admitted": 19,
   "n_or_unsound_jsr_ge_1": 0,
   "or_gate_sound": true,
