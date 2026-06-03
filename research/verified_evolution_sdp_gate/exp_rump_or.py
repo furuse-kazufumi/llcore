@@ -166,8 +166,8 @@ def analyse_gene(gene):
                 d["rump_recheck"] = bool(rump_verify_certificate(P, verts, margin=MARGIN))
         rec["solvers"][sv] = d
     rec["or_gate"] = bool(or_certifies_lyapunov(gene, t_domain=T_DOMAIN, margin=MARGIN))
-    # Float-OR: any solver whose P passes the FLOAT recheck.
-    rec["float_or_gate"] = any(rec["solvers"][sv]["float_recheck"] for sv in ("CLARABEL", "SCS"))
+    # Float-OR (apples-to-apples): any solver whose P passes the SAME-matrix float recheck.
+    rec["float_or_gate"] = any(rec["solvers"][sv]["float_recheck_same"] for sv in ("CLARABEL", "SCS"))
     return rec
 
 
