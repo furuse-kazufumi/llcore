@@ -119,7 +119,8 @@ def certify_common_lyapunov(gene: CoupledGene, t_domain: str = "tmin1",
     prob = cp.Problem(cp.Minimize(cp.trace(P)), constraints)
 
     try:
-        prob.solve(solver=solver) if solver else prob.solve()
+        _eff_solver = solver if solver is not None else _DEFAULT_SOLVER  # fail-safe to CLARABEL
+        prob.solve(solver=_eff_solver) if _eff_solver else prob.solve()
     except Exception as exc:  # solver hiccup -> report, do not crash the sweep
         return LyapResult(available=True, certified=None, domain=t_domain,
                           solver_status=f"solver_error:{type(exc).__name__}", P=None,
