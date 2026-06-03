@@ -239,6 +239,12 @@ def _sdp_certifies(gene: CoupledGene) -> bool:
         return True
     if not CVXPY_AVAILABLE:
         return False
+    # FAIL-CLOSED: the genuine SDP solve must run under CLARABEL. If CLARABEL is not installed we
+    # REFUSE rather than silently solving under SCS (solver=None == cvxpy default == SCS), which
+    # false-negatives near the feasibility boundary. The inf-/2-norm fast paths above already
+    # handled every solver-independent certificate, so this only declines the genuine-SDP residual.
+    if not _CLARABEL_OK:
+        return False
     # necessary condition for common quadratic stability: rho<1 at every vertex.
     for J in _vertex_jacobians(gene):
         if float(np.max(np.abs(np.linalg.eigvals(J)))) >= 1.0:
