@@ -49,6 +49,15 @@ from lyapunov_sdp_certifier import (  # noqa: E402
     CVXPY_AVAILABLE, availability_report, certify_common_lyapunov,
 )
 
+# AUDIT (2026-06-03): the original Track D run used cvxpy's SCS default, which under-certifies the
+# SDP near the feasibility boundary (false negatives). Pin CLARABEL to re-measure D3 (SDP vs 2-norm)
+# honestly. See memory feedback_cvxpy_pin_accurate_solver.
+try:
+    import cvxpy as _cp  # noqa: E402
+    _SOLVER = "CLARABEL" if CVXPY_AVAILABLE and "CLARABEL" in _cp.installed_solvers() else None
+except Exception:  # pragma: no cover
+    _SOLVER = None
+
 TOL = 1e-9
 SOUND_TOL = 1e-6          # from-below SVD float slack for the D1 soundness gate
 EMP_SEED = 777            # SAME as Track C red-team
