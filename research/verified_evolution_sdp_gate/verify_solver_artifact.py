@@ -7,6 +7,16 @@ solver-instability artifact — under the accurate CLARABEL solver the ladder is
 
 Also: does CLARABEL recover residual_uncert genes that SCS (default) failed to certify (false
 negatives)? If yes, the SCS coverage numbers UNDER-count.
+
+FIXTURE NOTE (2026-06-03 audit fix): this keystone demonstration reads the IMMUTABLE SCS-era
+snapshot ``exp_deg6_residual_genes_scs_era.json`` (deg_certified=54, residual_uncert=53), NOT the
+live ``exp_deg6_residual_genes.json``. The live file was OVERWRITTEN by the later CLARABEL ladder
+run (it now holds the post-correction 4 deg_certified / 10 residual_uncert pool), which silently
+destroyed the SCS-era battery this demonstration depends on. The snapshot was restored verbatim
+from git commit ``cd400ef`` and is treated as a fixed regression fixture so the solver-swap keystone
+in DEG6_VERDICT.md §0 stays PERMANENTLY reproducible. See also
+``test_solver_swap_regression.py`` (the standing pytest guard) and
+``AUDIT_SCS_CLARABEL_2026-06-03.md`` (Reproducibility note).
 """
 from __future__ import annotations
 
