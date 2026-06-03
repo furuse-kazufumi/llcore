@@ -93,8 +93,11 @@ def certify_degN(vertex_jacobians: list[np.ndarray], degree: int, margin: float 
     Sound: if feasible, V(z)=m(z)ᵀ P m(z) is a valid Lyapunov ⇒ the map contracts over the box.
     Independent eigenvalue re-check of P AND of every decrease-LMI (never solver-blind).
     Necessary pre-screen: ρ(J_v)<1 at every vertex.
+
+    FAIL-CLOSED: if cvxpy is absent OR CLARABEL is not installed, REFUSE to certify (return False)
+    rather than silently solving under SCS (the artifact-prone first-order solver).
     """
-    if not _CVXPY:
+    if not _CVXPY or not _CLARABEL_OK:
         return False
     for J in vertex_jacobians:
         if float(np.max(np.abs(np.linalg.eigvals(J)))) >= 1.0:
