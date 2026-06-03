@@ -75,9 +75,17 @@ genes. **The most valuable transferable outcome is the methodology lesson** (`fe
 accurate_solver`): pin an accurate SDP solver, never trust SCS near the feasibility boundary, and use
 adversarial multi-perspective review + solver-swap (not margin sweeps) to catch it.
 
-**Pending:** Track B exp1 (10175-gene region ceilings, the §3 figure) — RUNNING; will confirm the sdp↑
-/ residual↓ correction at scale. Track B exp2 (G4 evolution payoff) — the inf→sdp payoff strengthens
-under CLARABEL (sdp certifies more); the capability NULL above SDP is unaffected (DEG6_VERDICT §5).
+**Track B exp1 — DONE (confirms the pattern at scale):** sdp_only 817→2168, sdp certifies **94%** of
+the 5021 contracting genes (4720), non_certified deflated to 5455 (only **301 contracting**), top-50
+rotation-in-residual 39→23. *Honest nuance:* exp1's residual is ~6% (301/5021) vs EXP-A's ~3% (10/300)
+— pool-dependent (exp1's 10175 includes a grid + heavier non-normal sampling). The 23 top-50 rotation
+genes in the residual do NOT resurrect a capability payoff: `verify_deg4_payoff.py` decisively showed
+the sdp gate's *optimisation* ceiling reaches the rotation optimum (0.98, sdp_only winner) while the
+deg regions top out below it (random-sample region max 0.90 under-estimates; gated optimisation is the
+right measure). So the capability NULL above SDP stands; the residual is a near-boundary/expansive tail.
+
+**Track B exp2 (G4 evolution payoff) — not re-run:** the inf→sdp payoff only strengthens under CLARABEL
+(sdp certifies more), and the capability NULL above SDP is settled by DEG6_VERDICT §5. Low value to re-run.
 
 Artifacts: `exp_deg6_ladder_results.json`, `exp_deg4_results.json`, `exp_d_results.json`,
 `verify_solver_artifact.py`, this audit. src backends.py + 5 research certifiers pinned. push deferred.
