@@ -149,7 +149,7 @@ def cert_sdp(g: CoupledNDGene, max_input_abs: float = 1.0, margin: float = 1e-7)
     cons = [P >> I] + [P - J.T @ P @ J >> margin * I for J in Js]
     prob = cp.Problem(cp.Minimize(cp.trace(P)), cons)
     try:
-        prob.solve()
+        prob.solve(solver=_SOLVER)
     except Exception:
         return False
     if prob.status not in ("optimal", "optimal_inaccurate") or P.value is None:
