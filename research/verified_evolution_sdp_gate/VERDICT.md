@@ -76,6 +76,12 @@ winner in an inf-REJECTED region); **inf_norm → 13 inf + 2 non_certified**. (n
 sdp → 8 sdp_only + 6 two_norm_only + 1 inf.) The GA realises the exp1 region ceilings:
 inf-gated rotation tops out at 0.41 (≈ region max 0.38); sdp at 0.86 (≈ 0.90).
 
+**Fallback transparency (Codex #4):** inf-gated rotation *rejects* heavily (≈373
+rejections/run) but falls back only **≈0.5×/run** — resampling almost always finds an
+inf-admissible child. So inf is **not fallback-flooded**; it genuinely searches its (inf)
+region and hits the 0.38 ceiling — the payoff is the region ceiling, not a fallback
+artifact. The inf mean 0.41 (slightly above 0.38) is lifted by the 2 ungated init-elites.
+
 ## 5. Pre-registered gates — verdicts
 
 - **G0 control / src-untouched — PASS.** `none` gate is deterministic (same seed →
