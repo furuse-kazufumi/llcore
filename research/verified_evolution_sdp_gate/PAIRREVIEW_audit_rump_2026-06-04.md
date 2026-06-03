@@ -108,7 +108,22 @@ honest caveats.
 
 ## Adversarial multi-agent Workflow — corroboration
 
-> _(appended after the Workflow completed; see below.)_
+6 skeptics (each REFUTE one claim via independent recomputation; 564k tokens, 160 tool-uses, 45 min).
+**Outcome: every Codex finding and disposition corroborated; no new thesis-overturning finding.**
+
+| skeptic | claim | verdict | independent evidence |
+|---|---|---|---|
+| S1 | no reachable SCS default | **partially_refuted (low)** = Codex F1 | **reproduced** `solver=""` → bare `prob.solve()` → `solver_stats.solver_name=='SCS'`; traced all callers — none pass `""`/`0` (footgun latent, now fixed). Inaccuracy warnings are CLARABEL (SCS emitted 0), each followed by the independent eigen recheck. |
+| S2 | no CLARABEL false positives | **upheld (none)** | 300-pool 286 admits (149 SDP-only) + 791 boundary SDP solves → **0 false admits, 0 eigen-recheck disagreements**, worst jsr_lb 0.9999<1 (stable at product length 8). |
+| S3 | ladder retraction correct, not over-corrected | **upheld (none)** | reproduced SCS 23/13/18 vs CLARABEL 0/0/54 nested; SCS-era snapshot SHA-256 == git `cd400ef` (not overwritten); over-correction probe refuted (54 certified all jsr_lb<1; the 23 SCS-deg4_only all genuinely contracting); Track-D 1291/1363, 0 false positives. |
+| S4 | Rump+OR 286==286, non-vacuous | **upheld (none)** | recomputed 286==286, 0 lost; **137 fast-path + 149 SDP+Rump branch** (rump recheck ran 298×); 610 actual certificate matrices: float-PD ⊆ rump-PD (0 lost). **Independently flagged the same F3 wording inversion** ("a sound LOWER bound is ≤ λ_min, not ≥") — confirms the correction. OR: CLARABEL 149 vs SCS 56 (93 disagreements), but CLARABEL alone covers the count → doc's "OR = robustness not coverage" caveat is accurate. |
+| S5 | verified_pd no false positives | **upheld (none)** | ~7M adversarial matrices (300k + 3M lemma + 300k + 200k + 1.5M + 2M) → **0 false positives, 0 unsound lower bounds**; empirical ‖E‖₂ ≤ 0.59× the bound (40% headroom); γ_{n+1}/envelope/maxdiag/symmetrization derivation audited sound. |
+| S6 | suite green + JSR framing honest | **upheld (none)** | src 255/0-skip, research 312+2skip (the 2 are z3-fallback, z3 confirmed installed); **0 xfail/xpass** (grep + `-rxX`, `--strict-markers`); JSR oracle re-run byte-matches; framing correct (`VERDICT.md:175-180` "falsify but not certify"). Minor: `DEG6_VERDICT.md:67`'s inline "→ CERTIFIER SOUND" arrow is loosely worded (not dishonest given context) → **tightened** in this pass for F2 consistency. |
+
+Note: a *concurrent* full-suite run (launched alongside this 6-agent Workflow) showed 1 failure —
+`gnn/test_gnn.py::test_verify_latency_under_threshold` (a wall-clock `mean<10ms` assertion). It is a
+**CPU-contention flake**: it passed in the earlier isolated run (312 passed) and again in isolation
+after the Workflow finished (`1 passed in 0.66s`). Not a regression; unrelated to the edited files.
 
 ## Net result
 
