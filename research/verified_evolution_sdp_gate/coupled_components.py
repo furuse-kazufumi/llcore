@@ -41,6 +41,16 @@ from lyapunov_sdp_certifier import (  # noqa: E402
     certify_common_lyapunov,
 )
 
+# Pin an accurate interior-point solver for the SDP. cvxpy's SCS default produces FALSE NEGATIVES
+# near the feasibility boundary (it under-certifies, fabricating a too-small certified region and
+# an inflated "residual"). CLARABEL if available, else cvxpy default. (Soundness is guarded by
+# certify_common_lyapunov's own independent eigen re-check; this only fixes completeness.)
+try:
+    import cvxpy as _cp  # noqa: E402
+    _SDP_SOLVER = "CLARABEL" if "CLARABEL" in _cp.installed_solvers() else None
+except Exception:  # pragma: no cover
+    _SDP_SOLVER = None
+
 # Genotype layout: [decay0, decay1, W00, W01, W10, W11].
 _BOX_LO = np.array([0.0, 0.0, -2.0, -2.0, -2.0, -2.0])
 _BOX_HI = np.array([1.0, 1.0, 2.0, 2.0, 2.0, 2.0])
