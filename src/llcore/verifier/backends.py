@@ -205,7 +205,7 @@ class SdpLyapunovBackend:
             P = _cp.Variable((n, n), symmetric=True)
             I = np.eye(n)
             cons = [P >> I] + [P - J.T @ P @ J >> margin * I for J in Js]
-            _cp.Problem(_cp.Minimize(_cp.trace(P)), cons).solve()
+            _cp.Problem(_cp.Minimize(_cp.trace(P)), cons).solve(solver=_SDP_SOLVER)
             if P.value is None:
                 return False
             Pv = 0.5 * (P.value + P.value.T)
