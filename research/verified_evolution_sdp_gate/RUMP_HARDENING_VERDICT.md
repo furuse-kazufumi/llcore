@@ -91,7 +91,15 @@ for a human judgement call; the recommendation is simply: promotion is safe when
 
 - Result is on the n=2 coupled substrate, the seed=2024 EXP-A pool (300 genes), margin=1e-7,
   t_domain=`tmin1`, with CLARABEL **and** SCS both installed (cvxpy 1.9.1). A different pool / seed
-  / dimension / solver set could in principle surface a non-zero (sound, by the invariant) delta.
+  / dimension / solver set could in principle surface a non-zero delta in EITHER direction (a sound
+  *extra*, checked by the JSR oracle; or a *loss* if a barely-PD `P` fails the stricter Rump recheck —
+  see the F3 correction above).
+- **The SDP+Rump branch is non-vacuously exercised** (pair-review F5): on this same seed=2024 pool the
+  ladder is inf=88 + two_only=49 = **137 fast-path** admits, so the remaining **149 of 286** admits
+  require the genuine SDP solve + Rump recheck (`exp_deg6_ladder_results.json` `counts.sdp_only=149`).
+  The 286==286 equality therefore reflects agreement on a real SDP-branch workload, not an all-fast-path
+  artifact. (The compare script does not itself instrument the branch split; this is read off the
+  same-seed ladder.)
 - "All extra admits sound" is **vacuously** true here (0 extras). The JSR oracle (max product
   length 6, Gripenberg lower bound) was wired and would flag any `jsr_lb ≥ 1` extra as unsound; it
   was simply never exercised because there were no extras.
