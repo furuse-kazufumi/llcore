@@ -1,0 +1,32 @@
+{
+  "seed": 2024,
+  "scanned": 786,
+  "n_contracting": 300,
+  "counts": {
+    "inf": 88,
+    "two_only": 49,
+    "sdp_only": 56,
+    "deg4_only": 23,
+    "deg6_only": 13,
+    "deg4_and_deg6": 18,
+    "residual_uncert": 53
+  },
+  "cumulative": {
+    "L0_inf": 88,
+    "L1_two": 137,
+    "L2_sdp": 193,
+    "L3_deg4": 234,
+    "L4_deg6": 247
+  },
+  "complementarity": {
+    "deg4_minus_deg6": 23,
+    "deg6_minus_deg4": 13
+  },
+  "deg6_beyond_deg4": 13,
+  "deg_union_beyond_sdp": 54,
+  "n_unsound_deg_certs": 0,
+  "G_A1_coverage_advances": true,
+  "G_A2_ladder_non_nested": true,
+  "G_A3_soundness": true,
+  "elapsed_s": 408.8
+}

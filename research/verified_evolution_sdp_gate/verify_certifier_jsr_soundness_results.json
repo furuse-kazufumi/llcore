@@ -1,0 +1,16 @@
+{
+  "max_len": 6,
+  "n_certified_genes": 54,
+  "certified_jsr_lb_max": 0.9974,
+  "certified_jsr_lb_mean": 0.8693,
+  "n_certified_with_jsr_ge_1": 0,
+  "CERTIFIER_SOUND_by_JSR": true,
+  "unsound_examples": [],
+  "uncertified_refresh": {
+    "n_uncertified": 53,
+    "switched_expansive_correct_reject": 6,
+    "finite_degree_gap_candidate": 47,
+    "frac_finite_gap": 0.887
+  },
+  "elapsed_s": 64.5
+}

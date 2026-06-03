@@ -1,0 +1,63 @@
+{
+  "dims": [
+    2,
+    3,
+    4
+  ],
+  "per_n": {
+    "2": {
+      "dim": 6,
+      "scanned": 1600,
+      "n_residual_contracting": 321,
+      "n_quad_contracting": 387,
+      "T_residual_max": 2.755,
+      "T_quad_max": 2.365,
+      "gap": 0.39,
+      "residual_example": {
+        "transient": 2.755,
+        "decay_ratio": 0.117
+      },
+      "elapsed_s": 42.1
+    },
+    "3": {
+      "dim": 12,
+      "scanned": 1600,
+      "n_residual_contracting": 301,
+      "n_quad_contracting": 64,
+      "T_residual_max": 4.145,
+      "T_quad_max": 1.813,
+      "gap": 2.333,
+      "residual_example": {
+        "transient": 4.145,
+        "decay_ratio": 0.551
+      },
+      "elapsed_s": 90.0
+    },
+    "4": {
+      "dim": 20,
+      "scanned": 1600,
+      "n_residual_contracting": 162,
+      "n_quad_contracting": 6,
+      "T_residual_max": 3.569,
+      "T_quad_max": 1.535,
+      "gap": 2.034,
+      "residual_example": {
+        "transient": 3.569,
+        "decay_ratio": 0.0
+      },
+      "elapsed_s": 154.2
+    }
+  },
+  "T_residual_by_n": [
+    2.755,
+    4.145,
+    3.569
+  ],
+  "gap_by_n": [
+    0.39,
+    2.333,
+    2.034
+  ],
+  "G_C_gap_monotone_increasing": false,
+  "T_residual_monotone_increasing": false
+}
