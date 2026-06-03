@@ -73,8 +73,12 @@ def certify_deg4(vertex_jacobians: list[np.ndarray], margin: float = 1e-7) -> bo
 
     Sound: if feasible, V(z)=m(z)^T P m(z) is a valid Lyapunov ⇒ the map contracts over the box.
     Independent eigenvalue re-check of P (never solver-blind). Necessary pre-screen: ρ(J_v)<1.
+
+    FAIL-CLOSED: if cvxpy is absent OR CLARABEL is not installed, REFUSE to certify (return False)
+    rather than silently solving under SCS (which false-negatives near the feasibility boundary and
+    is the artifact-prone solver the arc pinned away from).
     """
-    if not _CVXPY:
+    if not _CVXPY or not _CLARABEL_OK:
         return False
     for J in vertex_jacobians:
         if float(np.max(np.abs(np.linalg.eigvals(J)))) >= 1.0:
