@@ -39,7 +39,7 @@ for _d in ("coupled_z3_contraction", "spectral_lyapunov_contraction"):
         sys.path.insert(0, _p)
 
 from coupled_nd import (  # noqa: E402
-    CoupledNDGene, step, cert_inf, cert_two, cert_sdp,
+    CoupledNDGene, step, cert_inf, cert_two, cert_sdp, empirical_rho,
 )
 
 
