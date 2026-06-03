@@ -100,6 +100,15 @@ def certify_common_lyapunov(gene: CoupledGene, t_domain: str = "tmin1",
         return LyapResult(available=False, certified=None, domain=t_domain,
                           solver_status="cvxpy_unavailable", P=None, min_eig_margin=None)
 
+    # FAIL-CLOSED: if the caller did not pick a solver AND CLARABEL is not installed, REFUSE rather
+    # than letting the solve fall through to cvxpy's SCS default (the artifact-prone first-order
+    # solver). An EXPLICIT ``solver=`` from the caller is always honoured (e.g. the OR-of-solvers
+    # gate that deliberately probes SCS and then Rump-re-verifies the result).
+    if solver is None and not _CLARABEL_OK:
+        return LyapResult(available=False, certified=None, domain=t_domain,
+                          solver_status="clarabel_unavailable_fail_closed",
+                          P=None, min_eig_margin=None)
+
     import cvxpy as cp
 
     g = gene.clipped()
