@@ -1,3 +1,12 @@
+> ⚠️ **CORRECTION (2026-06-03 audit, `research/AUDIT_SCS_CLARABEL_2026-06-03.md`):** the SDP coverage
+> numbers below (e.g. "sdp admits 3369", Track D "+254 / +43%", §3 "39/50 top contracting genes in the
+> D4 residual / even SDP over-conservative") used cvxpy's **SCS** default, which false-negatives near
+> the feasibility boundary. Under **CLARABEL**: SDP certifies **~95%** of contracting genes (Track D
+> 1291/1363; it beats 2-norm by **+692**, not +254 — the SDP advantage was *understated*), and the D4
+> residual is only **~3–5%** (the "even SDP over-conservative / 39-of-50-in-residual" framing is largely
+> an SCS artifact). **The core conclusion (the right verifier is SDP/Lyapunov) is strengthened**; only
+> the "rich beyond-SDP residual" magnitudes are corrected. Soundness unaffected (G1/D1 still PASS).
+
 # VERDICT — SDP-Lyapunov-gated coupled evolution (Track B + D integration)
 
 > Goal (user, 2026-06-03): 「llcore 研究の続き。CPU 環境下で AI 進化の仕組みを実現する。」

@@ -3,37 +3,42 @@
   "region_counts": {
     "inf": 1860,
     "two_norm_only": 692,
-    "sdp_only": 817,
-    "non_certified": 6806
+    "sdp_only": 2168,
+    "non_certified": 5455
   },
+  "n_empirically_contracting": 5021,
   "rotation": {
     "per_region_fitness": {
       "inf": {
         "count": 1860,
-        "max_fitness": 0.3804642842572862,
-        "mean_fitness": -0.3174881834718695
+        "max_fitness_raw": 0.3804642842572862,
+        "n_contracting": 1860,
+        "max_fitness_contracting": 0.3804642842572862
       },
       "two_norm_only": {
         "count": 692,
-        "max_fitness": 0.8904162969388557,
-        "mean_fitness": -0.2586628427000413
+        "max_fitness_raw": 0.8904162969388557,
+        "n_contracting": 692,
+        "max_fitness_contracting": 0.8904162969388557
       },
       "sdp_only": {
-        "count": 817,
-        "max_fitness": 0.9009908290390933,
-        "mean_fitness": -0.48287046719382604
+        "count": 2168,
+        "max_fitness_raw": 0.9009908290390933,
+        "n_contracting": 2168,
+        "max_fitness_contracting": 0.9009908290390933
       },
       "non_certified": {
-        "count": 6806,
-        "max_fitness": 0.9937478694349685,
-        "mean_fitness": -14.829688839172226
+        "count": 5455,
+        "max_fitness_raw": 0.9937478694349685,
+        "n_contracting": 301,
+        "max_fitness_contracting": 0.9937478694349685
       }
     },
     "top50_contracting_region_counts": {
       "inf": 0,
       "two_norm_only": 4,
-      "sdp_only": 7,
-      "non_certified": 39
+      "sdp_only": 23,
+      "non_certified": 23
     },
     "best_overall_region": "non_certified",
     "best_overall_fitness": 0.9937478694349685
@@ -42,30 +47,34 @@
     "per_region_fitness": {
       "inf": {
         "count": 1860,
-        "max_fitness": 0.9996363878844848,
-        "mean_fitness": -0.31920880474743524
+        "max_fitness_raw": 0.9996363878844848,
+        "n_contracting": 1860,
+        "max_fitness_contracting": 0.9996363878844848
       },
       "two_norm_only": {
         "count": 692,
-        "max_fitness": 0.9864813803298509,
-        "mean_fitness": -0.5570683497520802
+        "max_fitness_raw": 0.9864813803298509,
+        "n_contracting": 692,
+        "max_fitness_contracting": 0.9864813803298509
       },
       "sdp_only": {
-        "count": 817,
-        "max_fitness": 0.9993505984229152,
-        "mean_fitness": -1.495492634119307
+        "count": 2168,
+        "max_fitness_raw": 0.9993505984229152,
+        "n_contracting": 2168,
+        "max_fitness_contracting": 0.9993505984229152
       },
       "non_certified": {
-        "count": 6806,
-        "max_fitness": 0.9974666531162185,
-        "mean_fitness": -30.100537221590635
+        "count": 5455,
+        "max_fitness_raw": 0.9974666531162185,
+        "n_contracting": 301,
+        "max_fitness_contracting": 0.9502876415880697
       }
     },
     "top50_contracting_region_counts": {
       "inf": 35,
       "two_norm_only": 2,
-      "sdp_only": 5,
-      "non_certified": 8
+      "sdp_only": 13,
+      "non_certified": 0
     },
     "best_overall_region": "inf",
     "best_overall_fitness": 0.9996363878844848
@@ -74,33 +83,37 @@
     "per_region_fitness": {
       "inf": {
         "count": 1860,
-        "max_fitness": 0.9649413007627939,
-        "mean_fitness": -0.4283869723766687
+        "max_fitness_raw": 0.9649413007627939,
+        "n_contracting": 1860,
+        "max_fitness_contracting": 0.9649413007627939
       },
       "two_norm_only": {
         "count": 692,
-        "max_fitness": 0.9903409522582445,
-        "mean_fitness": -0.4210075430567641
+        "max_fitness_raw": 0.9903409522582445,
+        "n_contracting": 692,
+        "max_fitness_contracting": 0.9903409522582445
       },
       "sdp_only": {
-        "count": 817,
-        "max_fitness": 0.9812256042809401,
-        "mean_fitness": -1.3163161859030073
+        "count": 2168,
+        "max_fitness_raw": 0.9904975989029023,
+        "n_contracting": 2168,
+        "max_fitness_contracting": 0.9904975989029023
       },
       "non_certified": {
-        "count": 6806,
-        "max_fitness": 0.9904975989029023,
-        "mean_fitness": -23.058184511721045
+        "count": 5455,
+        "max_fitness_raw": 0.82144224128071,
+        "n_contracting": 301,
+        "max_fitness_contracting": 0.82144224128071
       }
     },
     "top50_contracting_region_counts": {
       "inf": 8,
       "two_norm_only": 21,
-      "sdp_only": 9,
-      "non_certified": 12
+      "sdp_only": 21,
+      "non_certified": 0
     },
-    "best_overall_region": "non_certified",
+    "best_overall_region": "sdp_only",
     "best_overall_fitness": 0.9904975989029023
   },
-  "elapsed_s": 1460.5
+  "elapsed_s": 925.2
 }
