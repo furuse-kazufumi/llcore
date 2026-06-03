@@ -1,0 +1,12 @@
+{
+  "n_samples": 1200,
+  "n_inf": 160,
+  "n_two_only": 65,
+  "n_sdp_only": 74,
+  "n_empirically_contracting": 471,
+  "d4_residual_count": 172,
+  "d4_residual_recovered_by_deg4": 57,
+  "d4_residual_recovery_rate": 0.3313953488372093,
+  "deg4_extra_over_quadratic": 57,
+  "deg4_unsound_certs": 0
+}
