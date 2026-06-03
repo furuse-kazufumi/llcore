@@ -276,13 +276,13 @@ def main(n_thin: int = 60):
             "elapsed_s": round(time.time() - t0, 1),
         },
         "per_solver": agg,
-        # P1: coverage / no float-only false positives.
-        "rump_superset_of_float_each_solver": all(agg[sv]["rump_superset_of_float"]
+        # P1: coverage / no float-only false positives (apples-to-apples: SAME matrices).
+        "rump_superset_of_float_each_solver": all(agg[sv]["rump_superset_of_float_same_matrix"]
                                                   for sv in ("CLARABEL", "SCS")),
         "float_only_false_positives": float_only_false_positives,
-        "rump_or_superset_of_float_or": rump_or_set >= float_or_set,
+        "rump_or_superset_of_float_or": rump_or_set >= float_or_same_set,
         "or_superset_of_single_solver_rump": rump_or_set >= single_solver_rump_union,
-        "n_float_or_certified": len(float_or_set),
+        "n_float_or_certified_same_matrix": len(float_or_same_set),
         "n_rump_or_certified": len(rump_or_set),
         # P2: standing artifact-class measure.
         "clarabel_recovers_over_scs": clarabel_recovers_over_scs,
