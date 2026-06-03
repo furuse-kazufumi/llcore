@@ -64,7 +64,9 @@ is decisive. The adversarial multi-agent review caught it before the verdict was
 The artifact was false *negatives*; soundness (false-positive freedom) was never at risk and is
 independently confirmed. Every deg4/deg6-certified gene must have JSR{vertices}<1 (common vertex
 Lyapunov ⇒ JSR<1 ⇒ convex-hull theorem ⇒ the nonlinear map contracts). `verify_certifier_jsr_soundness.py`:
-**4 certified genes, max JSR_lb 0.966, 0 with JSR_lb≥1** → **CERTIFIER SOUND**. (The skeptic confirmed
+**4 certified genes, max JSR_lb 0.966, 0 with JSR_lb≥1** → **0 observed unsound certificates** (the
+guarantee is the certifier theorem above; this finite-length ≤6 JSR oracle can only *falsify*
+soundness, not prove it — pair-review F2). (The skeptic confirmed
 a constructed switched-expansive pair — each vertex ρ=0.95<1 but JSR=1.57 — is correctly REJECTED by
 the LMI itself, not just the ρ pre-screen.) Soundness conclusion survives the whole correction.
 
