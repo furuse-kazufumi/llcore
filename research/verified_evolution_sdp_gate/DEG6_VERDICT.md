@@ -142,10 +142,23 @@ selection needs high dimension). *Not yet a proven monotone law — n=4 needs a 
 - **G-C dimension monotone — FAIL (strict), THRESHOLD supported.** Gap jumps at n≥3 but is not
   strictly monotone (n=4 under-powered); reported honestly, not as a proven law.
 
-## 8. Adversarial red-team — (pending `redteam_deg6.py`: 50k soundness on all deg-certified,
-admission-size-artifact under random fitness, circularity of the residual reference, numerical
-margin 1e-6..1e-8 robustness of the complementarity) + a parallel multi-lens skeptic review
-(`_review_workflow.js`). [To be filled on completion.]
+## 8. Adversarial red-team — `redteam_deg6.py` ALL_PASS (4 lenses)
+
+- **Lens 1 — soundness @50k: PASS.** All **54** deg4/deg6-certified genes empirically contracting at
+  50 000 samples — **0 unsound**. (Corroborated by the stronger JSR test §3: 0 certified genes with
+  jsr_lb≥1.)
+- **Lens 2 — admission-size artifact: REFUTED (good).** Under a gene-keyed RANDOM fitness, the gate
+  ladder is tied (L0..L4 reach ≈0.997–0.999) and L4-vs-L2 fails the strict gate (psd=0.25, p=0.156,
+  strict_pass=false) — a stronger gate gets **no** systematic edge from merely admitting more genes,
+  so the (null) capability result is not an admission artifact.
+- **Lens 3 — circularity: PASS.** The residual-reach reference is `non_certified` (quad-rejected),
+  chosen by a gate-independent search — non-circular by construction.
+- **Lens 4 — numerical robustness: PASS.** The deg4/deg6 **complementarity survives every SDP margin**
+  1e-6/1e-7/1e-8: deg4∖deg6 and deg6∖deg4 both stay non-empty (counts shift — 9/11, 9/9, 11/7 — as
+  borderline genes flip, but non-nesting is robust, **not** a solver-tolerance artifact).
+
+A parallel multi-lens adversarial Workflow (`_review_workflow.js`, 6 skeptics → confirm → completeness
+critic) ran independently; its consolidated assessment is folded into §9 where it changed wording.
 
 ## 9. Honest disclosure / the two-frontier thesis
 
