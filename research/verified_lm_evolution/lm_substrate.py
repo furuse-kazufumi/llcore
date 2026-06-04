@@ -271,7 +271,10 @@ class LMTask:
     emb: ByteEmbedding
     ids: np.ndarray                 # full corpus byte ids
     train_frac: float = 0.8
-    alpha: float = 1e-2
+    alpha: float = 1e-2             # ridge alpha (reference readout only)
+    l2: float = 1e-3                # logistic readout L2
+    readout_steps: int = 150        # logistic readout GD steps
+    lr: float = 0.5                 # logistic readout GD lr
     name: str = "byte_lm"
     # cached split
     _emb_seq: np.ndarray = field(default=None, repr=False)
