@@ -140,7 +140,8 @@ arc exp1 の LM 版: region ceiling が GA luck でなく機構であること�
 
 ## 6. 実行パラメータ (CPU tractability, 確定)
 
-- n=32, vocab=256, corpus = llcore research/*.md + src/**/*.py の byte 連結 (上限 ~200KB, 決定論 sort)。
+- n=8 (Stage-0; vertex 証明器 tractable), vocab=256, corpus = llcore research/*.md + src/**/*.py の
+  byte 連結 (上限 ~16-32KB, 決定論 sort)。n=32+ は vertex-free 証明器確立後の R-LLM-1。
 - train/held-out = 80/20 時間順 split。ridge α = 1e-2 (Lens F で掃引)。
 - gene pool (landscape) = 2000–4000 random gene。
 - gated evolution: pop=24, gens=20, n_seeds=15 paired (CRN)。CPU で重ければ pop/gens を下げ honest に記す。
