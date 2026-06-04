@@ -1,0 +1,41 @@
+{
+  "corpus_bytes": 8192,
+  "n": 8,
+  "n_genes": 60,
+  "unigram_ce": 3.5571141337739918,
+  "summary": {
+    "inf": {
+      "n": 26,
+      "best_ce": 3.4395105015073884,
+      "best_ce_contracting": 3.4395105015073884,
+      "median_ce": 3.526333148110867,
+      "pct_expansive": 0.0
+    },
+    "two_norm_only": {
+      "n": 9,
+      "best_ce": 3.455131696322418,
+      "best_ce_contracting": 3.455131696322418,
+      "median_ce": 3.5292262354944044,
+      "pct_expansive": 0.0
+    },
+    "sdp_only": {
+      "n": 12,
+      "best_ce": 3.4784021895438793,
+      "best_ce_contracting": 3.4784021895438793,
+      "median_ce": 3.522011055517668,
+      "pct_expansive": 0.0
+    },
+    "non_certified": {
+      "n": 13,
+      "best_ce": 3.4818191336943,
+      "best_ce_contracting": 3.509739813322374,
+      "median_ce": 3.54744274989665,
+      "pct_expansive": 53.84615384615385
+    }
+  },
+  "rows": [
+    {
+      "region": "inf",
+      "ce": 3.49203,
+      "emp_rho": 0.84493,
+      "contracting": 
