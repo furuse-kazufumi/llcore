@@ -94,3 +94,42 @@ R3: opportunistic (after R2a/R4) — verifier-generality probe on a richer codec
 **Rationale**: prioritise CPU/$0, bounded, falsifiable, paper-strengthening improvements (R1→R4/R2a→R-repro);
 gate the unbounded/paid ones (R2b/GPU). Every step pre-registered, CLARABEL-pinned, 0-unsound-checked,
 pair-reviewed. Re-plan after each verdict (results steer the next step — `feedback_self_made_freely_revisable`).
+
+---
+
+## UPDATE 2026-06-04 (post R1 + R2a) — re-plan from results
+
+**R1 result = DEGRADES (committed):** quadratic-SDP completeness over the inf/2-norm frontier is **n=2-
+specific**: 92% (n=2) → 79.5% (n=3) → **48% (n=4)**; residual 8%→52%; induced norms collapse to ~0 at n=4.
+**Soundness GENERALISES** (0 unsound at every n, independently re-verified). Folded into the paper (§3.6 +
+abstract scope + §7 limitations).
+
+**R2a result = FUNDAMENTAL, not a degree artifact (committed):** lifted higher-degree SOS (deg4/6/8) recovers
+only **22% (n=3) / 29% (n=4)** of the grown residual; deg8 ≈ flat over deg6. **~63% of the still-residual is
+switched-expansive** (jsr_lb≥1) = beyond ANY common-Lyapunov / box-switched SOS at any degree. **Key insight:
+at higher dimension the binding constraint shifts from the Lyapunov certificate CLASS to the t-box REACHABLE-
+SET over-approximation** (the box hull contains expansive corners the nonlinear map never visits).
+
+**NEW candidate — R-reach (newly INDICATED next; directly attacks the R1/R2a bottleneck):** replace the
+independent-per-coordinate achievable-t **box** with a TIGHTER **sound** reachable-set over-approximation
+(the t_i are coupled through the shared input/state, so the achievable (t_1..t_n) is lower-dimensional than
+the box) so the certifier need not prove contraction over box-corners the map never reaches — recovering the
+switched-expansive "false residual" at higher n.
+- ⚠️ **CRITICAL soundness subtlety (do NOT auto-run a naive version):** every candidate gene already CONTRACTS
+  (ρ<1) — so the empirical ρ / JSR oracle is **VACUOUS** as a soundness check here (it passes regardless of
+  whether the certificate is valid). A tighter reachable set that is NOT a *provable* over-approximation would
+  "recover" genes with a logically INVALID proof that the standard oracle cannot catch. **R-reach requires a
+  THEOREM-LEVEL soundness argument** that the tighter set contains the true reachable Jacobian set — not just
+  an empirical pass. Design + pre-register the soundness argument FIRST; the measurement is only meaningful
+  once that holds. This is exactly the honest-disclosure trap to avoid.
+
+**Re-sequenced plan:**
+```
+R1(done: degrade) → R2a(done: fundamental, box is the bottleneck) → choose next:
+  • R-reach (highest-value for high-dim completeness, but soundness-subtle → design+prove FIRST, do not auto-run)
+  • R4 (cross-arch breadth — lower-risk, strong paper extension)        ← safer parallel option
+  → R-repro (paper submission gate)
+R2b(exact-JSR) / GPU(BG10): user-gated, offer only.
+```
+Recommendation: present R-reach (with the soundness-proof-first requirement) and R4 as the two next options;
+R-reach is higher-value but needs a sound tighter-reachability argument before any measurement is trustworthy.
