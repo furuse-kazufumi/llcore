@@ -304,7 +304,8 @@ class LMTask:
         if not np.all(np.isfinite(S)):
             return float("inf")
         S_tr, S_ho = S[: self._split], S[self._split :]
-        R = fit_ridge_readout(S_tr, self._train_next, alpha=self.alpha)
+        R = fit_logistic_readout(S_tr, self._train_next, l2=self.l2,
+                                 n_steps=self.readout_steps, lr=self.lr)
         logits_ho = _augment(S_ho) @ R
         return cross_entropy(logits_ho, self._heldout_next)
 
