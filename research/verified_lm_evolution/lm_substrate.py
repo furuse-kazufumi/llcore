@@ -328,6 +328,7 @@ __all__ = [
     "classify_region",
     "cross_entropy",
     "empirical_contraction",
+    "fit_logistic_readout",
     "fit_ridge_readout",
     "hidden_stability",
     "load_corpus",
