@@ -1,0 +1,20 @@
+{
+  "3": {
+    "residual_in": 41,
+    "recovered": 9,
+    "still_residual": 32,
+    "switched_expansive_jsr_ge1": 20,
+    "finite_gap_jsr_lt1": 12,
+    "max_gap_jsr_lb": 0.9981,
+    "min_expansive_jsr_lb": 1.0009
+  },
+  "4": {
+    "residual_in": 104,
+    "recovered": 30,
+    "still_residual": 74,
+    "switched_expansive_jsr_ge1": 47,
+    "finite_gap_jsr_lt1": 27,
+    "max_gap_jsr_lb": 0.9996,
+    "min_expansive_jsr_lb": 1.0009
+  }
+}

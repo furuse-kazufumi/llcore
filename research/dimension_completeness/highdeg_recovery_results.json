@@ -1,0 +1,885 @@
+{
+  "experiment": "R2a_highdeg_recovery",
+  "prereg": "PREREGISTRATION_R2a.md",
+  "r1_source": "dim_completeness_residual_genes.json",
+  "config": {
+    "degrees": [
+      4,
+      6,
+      8
+    ],
+    "sound_samples": 20000,
+    "jsr_max_len_per_n": {
+      "2": 6,
+      "3": 4,
+      "4": 3
+    },
+    "deg_to_sym_order": {
+      "4": 2,
+      "6": 3,
+      "8": 4
+    }
+  },
+  "clarabel_confirmed": true,
+  "solver": "CLARABEL",
+  "installed_solvers": [
+    "CLARABEL",
+    "SCS",
+    "SCIPY",
+    "HIGHS",
+    "OSQP"
+  ],
+  "lift_math_sanity": {
+    "max_err": 7.105427357601002e-14,
+    "ok": true,
+    "per": [
+      {
+        "n": 3,
+        "degree_lift": 4,
+        "sym_order": 2,
+        "lift_dim": 6,
+        "max_err": 4.440892098500626e-16
+      },
+      {
+        "n": 3,
+        "degree_lift": 6,
+        "sym_order": 3,
+        "lift_dim": 10,
+        "max_err": 3.552713678800501e-15
+      },
+      {
+        "n": 3,
+        "degree_lift": 8,
+        "sym_order": 4,
+        "lift_dim": 15,
+        "max_err": 1.1102230246251565e-15
+      },
+      {
+        "n": 4,
+        "degree_lift": 4,
+        "sym_order": 2,
+        "lift_dim": 10,
+        "max_err": 2.6645352591003757e-15
+      },
+      {
+        "n": 4,
+        "degree_lift": 6,
+        "sym_order": 3,
+        "lift_dim": 20,
+        "max_err": 8.659739592076221e-15
+      },
+      {
+        "n": 4,
+        "degree_lift": 8,
+        "sym_order": 4,
+        "lift_dim": 35,
+        "max_err": 7.105427357601002e-14
+      }
+    ]
+  },
+  "lift_math_ok": true,
+  "per_n": [
+    {
+      "n": 3,
+      "residual_in": 41,
+      "jsr_max_len": 4,
+      "n_box_vertices": 8,
+      "deg_new_recoveries": {
+        "4": 7,
+        "6": 2,
+        "8": 0
+      },
+      "cum_recovered_by_deg": {
+        "4": 7,
+        "6": 9,
+        "8": 9
+      },
+      "deg4_rec": 7,
+      "deg6_rec": 9,
+      "deg8_rec": 9,
+      "cum_recovered": 9,
+      "still_residual": 32,
+      "recovery_frac": 0.2195,
+      "unsound": 0,
+      "max_rho_over_recovered": 0.995107,
+      "max_jsr_lb_over_recovered": 0.99672,
+      "elapsed_s": 24.9,
+      "still_switched_expansive_jsr_ge1": 20,
+      "still_finite_gap_jsr_lt1": 12
+    },
+    {
+      "n": 4,
+      "residual_in": 104,
+      "jsr_max_len": 3,
+      "n_box_vertices": 16,
+      "deg_new_recoveries": {
+        "4": 17,
+        "6": 11,
+        "8": 2
+      },
+      "cum_recovered_by_deg": {
+        "4": 17,
+        "6": 28,
+        "8": 30
+      },
+      "deg4_rec": 17,
+      "deg6_rec": 28,
+      "deg8_rec": 30,
+      "cum_recovered": 30,
+      "still_residual": 74,
+      "recovery_frac": 0.2885,
+      "unsound": 0,
+      "max_rho_over_recovered": 0.997385,
+      "max_jsr_lb_over_recovered": 0.998796,
+      "elapsed_s": 2232.9,
+      "still_switched_expansive_jsr_ge1": 47,
+      "still_finite_gap_jsr_lt1": 27
+    }
+  ],
+  "per_n_detail": [
+    {
+      "n": 3,
+      "residual_in": 41,
+      "jsr_max_len": 4,
+      "n_box_vertices": 8,
+      "deg_new_recoveries": {
+        "4": 7,
+        "6": 2,
+        "8": 0
+      },
+      "cum_recovered_by_deg": {
+        "4": 7,
+        "6": 9,
+        "8": 9
+      },
+      "deg4_rec": 7,
+      "deg6_rec": 9,
+      "deg8_rec": 9,
+      "cum_recovered": 9,
+      "still_residual": 32,
+      "recovery_frac": 0.2195,
+      "unsound": 0,
+      "max_rho_over_recovered": 0.995107,
+      "max_jsr_lb_over_recovered": 0.99672,
+      "unsound_examples": [],
+      "elapsed_s": 24.9,
+      "per_gene": [
+        {
+          "idx": 0,
+          "recovered_degree": null
+        },
+        {
+          "idx": 1,
+          "recovered_degree": null
+        },
+        {
+          "idx": 2,
+          "recovered_degree": 6,
+          "rho_hi": 0.986562,
+          "jsr_lb": 0.986579
+        },
+        {
+          "idx": 3,
+          "recovered_degree": null
+        },
+        {
+          "idx": 4,
+          "recovered_degree": null
+        },
+        {
+          "idx": 5,
+          "recovered_degree": null
+        },
+        {
+          "idx": 6,
+          "recovered_degree": null
+        },
+        {
+          "idx": 7,
+          "recovered_degree": null
+        },
+        {
+          "idx": 8,
+          "recovered_degree": null
+        },
+        {
+          "idx": 9,
+          "recovered_degree": null
+        },
+        {
+          "idx": 10,
+          "recovered_degree": 6,
+          "rho_hi": 0.945164,
+          "jsr_lb": 0.9455
+        },
+        {
+          "idx": 11,
+          "recovered_degree": null
+        },
+        {
+          "idx": 12,
+          "recovered_degree": null
+        },
+        {
+          "idx": 13,
+          "recovered_degree": null
+        },
+        {
+          "idx": 14,
+          "recovered_degree": null
+        },
+        {
+          "idx": 15,
+          "recovered_degree": null
+        },
+        {
+          "idx": 16,
+          "recovered_degree": null
+        },
+        {
+          "idx": 17,
+          "recovered_degree": 4,
+          "rho_hi": 0.939892,
+          "jsr_lb": 0.940718
+        },
+        {
+          "idx": 18,
+          "recovered_degree": null
+        },
+        {
+          "idx": 19,
+          "recovered_degree": null
+        },
+        {
+          "idx": 20,
+          "recovered_degree": null
+        },
+        {
+          "idx": 21,
+          "recovered_degree": null
+        },
+        {
+          "idx": 22,
+          "recovered_degree": null
+        },
+        {
+          "idx": 23,
+          "recovered_degree": 4,
+          "rho_hi": 0.893736,
+          "jsr_lb": 0.983481
+        },
+        {
+          "idx": 24,
+          "recovered_degree": null
+        },
+        {
+          "idx": 25,
+          "recovered_degree": null
+        },
+        {
+          "idx": 26,
+          "recovered_degree": 4,
+          "rho_hi": 0.911489,
+          "jsr_lb": 0.943631
+        },
+        {
+          "idx": 27,
+          "recovered_degree": 4,
+          "rho_hi": 0.925057,
+          "jsr_lb": 0.995818
+        },
+        {
+          "idx": 28,
+          "recovered_degree": 4,
+          "rho_hi": 0.925233,
+          "jsr_lb": 0.959556
+        },
+        {
+          "idx": 29,
+          "recovered_degree": null
+        },
+        {
+          "idx": 30,
+          "recovered_degree": 4,
+          "rho_hi": 0.980554,
+          "jsr_lb": 0.980558
+        },
+        {
+          "idx": 31,
+          "recovered_degree": null
+        },
+        {
+          "idx": 32,
+          "recovered_degree": null
+        },
+        {
+          "idx": 33,
+          "recovered_degree": null
+        },
+        {
+          "idx": 34,
+          "recovered_degree": null
+        },
+        {
+          "idx": 35,
+          "recovered_degree": null
+        },
+        {
+          "idx": 36,
+          "recovered_degree": null
+        },
+        {
+          "idx": 37,
+          "recovered_degree": null
+        },
+        {
+          "idx": 38,
+          "recovered_degree": null
+        },
+        {
+          "idx": 39,
+          "recovered_degree": null
+        },
+        {
+          "idx": 40,
+          "recovered_degree": 4,
+          "rho_hi": 0.995107,
+          "jsr_lb": 0.99672
+        }
+      ]
+    },
+    {
+      "n": 4,
+      "residual_in": 104,
+      "jsr_max_len": 3,
+      "n_box_vertices": 16,
+      "deg_new_recoveries": {
+        "4": 17,
+        "6": 11,
+        "8": 2
+      },
+      "cum_recovered_by_deg": {
+        "4": 17,
+        "6": 28,
+        "8": 30
+      },
+      "deg4_rec": 17,
+      "deg6_rec": 28,
+      "deg8_rec": 30,
+      "cum_recovered": 30,
+      "still_residual": 74,
+      "recovery_frac": 0.2885,
+      "unsound": 0,
+      "max_rho_over_recovered": 0.997385,
+      "max_jsr_lb_over_recovered": 0.998796,
+      "unsound_examples": [],
+      "elapsed_s": 2232.9,
+      "per_gene": [
+        {
+          "idx": 0,
+          "recovered_degree": null
+        },
+        {
+          "idx": 1,
+          "recovered_degree": null
+        },
+        {
+          "idx": 2,
+          "recovered_degree": null
+        },
+        {
+          "idx": 3,
+          "recovered_degree": 6,
+          "rho_hi": 0.924861,
+          "jsr_lb": 0.934908
+        },
+        {
+          "idx": 4,
+          "recovered_degree": 4,
+          "rho_hi": 0.99218,
+          "jsr_lb": 0.993983
+        },
+        {
+          "idx": 5,
+          "recovered_degree": null
+        },
+        {
+          "idx": 6,
+          "recovered_degree": 6,
+          "rho_hi": 0.967681,
+          "jsr_lb": 0.977901
+        },
+        {
+          "idx": 7,
+          "recovered_degree": 4,
+          "rho_hi": 0.986931,
+          "jsr_lb": 0.989115
+        },
+        {
+          "idx": 8,
+          "recovered_degree": 6,
+          "rho_hi": 0.935511,
+          "jsr_lb": 0.947589
+        },
+        {
+          "idx": 9,
+          "recovered_degree": null
+        },
+        {
+          "idx": 10,
+          "recovered_degree": null
+        },
+        {
+          "idx": 11,
+          "recovered_degree": null
+        },
+        {
+          "idx": 12,
+          "recovered_degree": null
+        },
+        {
+          "idx": 13,
+          "recovered_degree": 6,
+          "rho_hi": 0.980265,
+          "jsr_lb": 0.990895
+        },
+        {
+          "idx": 14,
+          "recovered_degree": null
+        },
+        {
+          "idx": 15,
+          "recovered_degree": null
+        },
+        {
+          "idx": 16,
+          "recovered_degree": null
+        },
+        {
+          "idx": 17,
+          "recovered_degree": null
+        },
+        {
+          "idx": 18,
+          "recovered_degree": null
+        },
+        {
+          "idx": 19,
+          "recovered_degree": null
+        },
+        {
+          "idx": 20,
+          "recovered_degree": null
+        },
+        {
+          "idx": 21,
+          "recovered_degree": null
+        },
+        {
+          "idx": 22,
+          "recovered_degree": 6,
+          "rho_hi": 0.941928,
+          "jsr_lb": 0.955468
+        },
+        {
+          "idx": 23,
+          "recovered_degree": 4,
+          "rho_hi": 0.81461,
+          "jsr_lb": 0.822483
+        },
+        {
+          "idx": 24,
+          "recovered_degree": 8,
+          "rho_hi": 0.987726,
+          "jsr_lb": 0.994581
+        },
+        {
+          "idx": 25,
+          "recovered_degree": null
+        },
+        {
+          "idx": 26,
+          "recovered_degree": null
+        },
+        {
+          "idx": 27,
+          "recovered_degree": null
+        },
+        {
+          "idx": 28,
+          "recovered_degree": null
+        },
+        {
+          "idx": 29,
+          "recovered_degree": null
+        },
+        {
+          "idx": 30,
+          "recovered_degree": null
+        },
+        {
+          "idx": 31,
+          "recovered_degree": 4,
+          "rho_hi": 0.954663,
+          "jsr_lb": 0.954829
+        },
+        {
+          "idx": 32,
+          "recovered_degree": 4,
+          "rho_hi": 0.968456,
+          "jsr_lb": 0.970804
+        },
+        {
+          "idx": 33,
+          "recovered_degree": null
+        },
+        {
+          "idx": 34,
+          "recovered_degree": null
+        },
+        {
+          "idx": 35,
+          "recovered_degree": null
+        },
+        {
+          "idx": 36,
+          "recovered_degree": null
+        },
+        {
+          "idx": 37,
+          "recovered_degree": null
+        },
+        {
+          "idx": 38,
+          "recovered_degree": 8,
+          "rho_hi": 0.981742,
+          "jsr_lb": 0.981815
+        },
+        {
+          "idx": 39,
+          "recovered_degree": null
+        },
+        {
+          "idx": 40,
+          "recovered_degree": null
+        },
+        {
+          "idx": 41,
+          "recovered_degree": null
+        },
+        {
+          "idx": 42,
+          "recovered_degree": null
+        },
+        {
+          "idx": 43,
+          "recovered_degree": 4,
+          "rho_hi": 0.938852,
+          "jsr_lb": 0.939015
+        },
+        {
+          "idx": 44,
+          "recovered_degree": 6,
+          "rho_hi": 0.88838,
+          "jsr_lb": 0.889509
+        },
+        {
+          "idx": 45,
+          "recovered_degree": null
+        },
+        {
+          "idx": 46,
+          "recovered_degree": 4,
+          "rho_hi": 0.929702,
+          "jsr_lb": 0.934113
+        },
+        {
+          "idx": 47,
+          "recovered_degree": 4,
+          "rho_hi": 0.972198,
+          "jsr_lb": 0.979446
+        },
+        {
+          "idx": 48,
+          "recovered_degree": null
+        },
+        {
+          "idx": 49,
+          "recovered_degree": null
+        },
+        {
+          "idx": 50,
+          "recovered_degree": null
+        },
+        {
+          "idx": 51,
+          "recovered_degree": null
+        },
+        {
+          "idx": 52,
+          "recovered_degree": 4,
+          "rho_hi": 0.928944,
+          "jsr_lb": 0.931493
+        },
+        {
+          "idx": 53,
+          "recovered_degree": 4,
+          "rho_hi": 0.994324,
+          "jsr_lb": 0.996921
+        },
+        {
+          "idx": 54,
+          "recovered_degree": 4,
+          "rho_hi": 0.961011,
+          "jsr_lb": 0.96545
+        },
+        {
+          "idx": 55,
+          "recovered_degree": null
+        },
+        {
+          "idx": 56,
+          "recovered_degree": null
+        },
+        {
+          "idx": 57,
+          "recovered_degree": 4,
+          "rho_hi": 0.883498,
+          "jsr_lb": 0.887841
+        },
+        {
+          "idx": 58,
+          "recovered_degree": 6,
+          "rho_hi": 0.973325,
+          "jsr_lb": 0.974374
+        },
+        {
+          "idx": 59,
+          "recovered_degree": null
+        },
+        {
+          "idx": 60,
+          "recovered_degree": null
+        },
+        {
+          "idx": 61,
+          "recovered_degree": null
+        },
+        {
+          "idx": 62,
+          "recovered_degree": null
+        },
+        {
+          "idx": 63,
+          "recovered_degree": null
+        },
+        {
+          "idx": 64,
+          "recovered_degree": null
+        },
+        {
+          "idx": 65,
+          "recovered_degree": null
+        },
+        {
+          "idx": 66,
+          "recovered_degree": null
+        },
+        {
+          "idx": 67,
+          "recovered_degree": null
+        },
+        {
+          "idx": 68,
+          "recovered_degree": null
+        },
+        {
+          "idx": 69,
+          "recovered_degree": null
+        },
+        {
+          "idx": 70,
+          "recovered_degree": 6,
+          "rho_hi": 0.90922,
+          "jsr_lb": 0.996881
+        },
+        {
+          "idx": 71,
+          "recovered_degree": 6,
+          "rho_hi": 0.97698,
+          "jsr_lb": 0.97706
+        },
+        {
+          "idx": 72,
+          "recovered_degree": null
+        },
+        {
+          "idx": 73,
+          "recovered_degree": null
+        },
+        {
+          "idx": 74,
+          "recovered_degree": null
+        },
+        {
+          "idx": 75,
+          "recovered_degree": null
+        },
+        {
+          "idx": 76,
+          "recovered_degree": null
+        },
+        {
+          "idx": 77,
+          "recovered_degree": null
+        },
+        {
+          "idx": 78,
+          "recovered_degree": null
+        },
+        {
+          "idx": 79,
+          "recovered_degree": null
+        },
+        {
+          "idx": 80,
+          "recovered_degree": 4,
+          "rho_hi": 0.967316,
+          "jsr_lb": 0.967316
+        },
+        {
+          "idx": 81,
+          "recovered_degree": null
+        },
+        {
+          "idx": 82,
+          "recovered_degree": null
+        },
+        {
+          "idx": 83,
+          "recovered_degree": 6,
+          "rho_hi": 0.903828,
+          "jsr_lb": 0.915087
+        },
+        {
+          "idx": 84,
+          "recovered_degree": null
+        },
+        {
+          "idx": 85,
+          "recovered_degree": 6,
+          "rho_hi": 0.991244,
+          "jsr_lb": 0.991339
+        },
+        {
+          "idx": 86,
+          "recovered_degree": null
+        },
+        {
+          "idx": 87,
+          "recovered_degree": 4,
+          "rho_hi": 0.997385,
+          "jsr_lb": 0.998796
+        },
+        {
+          "idx": 88,
+          "recovered_degree": null
+        },
+        {
+          "idx": 89,
+          "recovered_degree": null
+        },
+        {
+          "idx": 90,
+          "recovered_degree": null
+        },
+        {
+          "idx": 91,
+          "recovered_degree": 4,
+          "rho_hi": 0.921172,
+          "jsr_lb": 0.928375
+        },
+        {
+          "idx": 92,
+          "recovered_degree": 4,
+          "rho_hi": 0.936386,
+          "jsr_lb": 0.938114
+        },
+        {
+          "idx": 93,
+          "recovered_degree": 4,
+          "rho_hi": 0.911913,
+          "jsr_lb": 0.920209
+        },
+        {
+          "idx": 94,
+          "recovered_degree": null
+        },
+        {
+          "idx": 95,
+          "recovered_degree": null
+        },
+        {
+          "idx": 96,
+          "recovered_degree": null
+        },
+        {
+          "idx": 97,
+          "recovered_degree": null
+        },
+        {
+          "idx": 98,
+          "recovered_degree": null
+        },
+        {
+          "idx": 99,
+          "recovered_degree": null
+        },
+        {
+          "idx": 100,
+          "recovered_degree": null
+        },
+        {
+          "idx": 101,
+          "recovered_degree": null
+        },
+        {
+          "idx": 102,
+          "recovered_degree": null
+        },
+        {
+          "idx": 103,
+          "recovered_degree": null
+        }
+      ]
+    }
+  ],
+  "gates": {
+    "RG_recover_n3_frac": 0.2195,
+    "RG_recover_n4_frac": 0.2885,
+    "RG_sound_zero_unsound": true,
+    "RG_verdict": "partial"
+  },
+  "verdict": "partial",
+  "elapsed_s": 2257.9,
+  "still_residual_attribution": {
+    "3": {
+      "residual_in": 41,
+      "recovered": 9,
+      "still_residual": 32,
+      "switched_expansive_jsr_ge1": 20,
+      "finite_gap_jsr_lt1": 12,
+      "max_gap_jsr_lb": 0.9981,
+      "min_expansive_jsr_lb": 1.0009
+    },
+    "4": {
+      "residual_in": 104,
+      "recovered": 30,
+      "still_residual": 74,
+      "switched_expansive_jsr_ge1": 47,
+      "finite_gap_jsr_lt1": 27,
+      "max_gap_jsr_lb": 0.9996,
+      "min_expansive_jsr_lb": 1.0009
+    }
+  }
+}
