@@ -70,10 +70,10 @@ Counting cumulatively how many of the 300 contracting genes each rung certifies:
 | inf-norm | closed-form ‖J‖_∞ < 1 over the box | 88 | 88 | 29.3 |
 | + 2-norm | vertex σ_max(J) < 1 | +49 | 137 | 45.7 |
 | **+ quadratic SDP** | **common-P Lyapunov LMI** | **+149** | **286** | **95.3** |
-| + degree-4 SOS | lifted SOS (degree 4) | +0 | 286 | 95.3 |
-| + degree-6 SOS | lifted SOS (degree 6) | +1 | 287 | 95.7 |
+| + degree-4 SOS | lifted SOS (degree 4) | +3 | 289 | 96.3 |
+| + degree-6 SOS | lifted SOS (degree 6) | +1 | 290 | 96.7 |
 
-The headline is the **quadratic SDP rung: +149 genes, lifting cumulative coverage from 45.7% to 95.3%** — by far the single largest jump on the ladder. (Note that the per-rung counts and the cumulative column describe the same data from two angles: the ladder's own bookkeeping records inf = 88, two-only = 49, sdp-only = 149, deg6-only = 1, deg4-and-deg6 = 3, residual = 10; the SOS rungs are reported here as the additional coverage *beyond the quadratic SDP*, which is +3 at degree-4-or-6 combined and +1 uniquely at degree-6, with the degree-4 rung adding nothing *on top of the SDP and degree-6* because degree-4 is nested in degree-6 — see §3.4 and §5.)
+The headline is the **quadratic SDP rung: +149 genes, lifting cumulative coverage from 45.7% to 95.3%** — by far the single largest jump on the ladder. The SOS rungs above it are read top-to-bottom as a *cumulative* ladder: degree-4 certifies the 3 genes that lie in both the degree-4 and degree-6 SOS cones (cumulative 289), and degree-6 adds the 1 gene that only its cone certifies (cumulative 290), for a degree-≤6 residual of 10 (300 − 290). One footnote keeps the bookkeeping honest: degree-4 is *nested* in degree-6 here (degree-4 minus degree-6 = 0), so degree-4 has no admit unique to it; the +3 attributed to the degree-4 rung is the degree-4 SOS cone's increment over the SDP, which degree-6 also achieves. The ladder's own per-set counts are inf = 88, two-only = 49, sdp-only = 149, deg4-and-deg6 = 3, deg6-only = 1, residual = 10, so the SOS family adds 3 + 1 = **+4 over the SDP**, reaching cumulative 290 (see §3.4 and §5).
 
 ### 3.2 The non-identity-P geometry is what does the work
 
