@@ -24,7 +24,7 @@ from lm_substrate import (
 
 
 def main() -> None:
-    n = 32
+    n = 8
     data = load_corpus(max_bytes=16384)
     ids = to_ids(data)
     emb = ByteEmbedding.make(n=n, seed=0)
