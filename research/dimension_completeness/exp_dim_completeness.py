@@ -142,7 +142,7 @@ def run_one_n(n: int, *, n_target: int, seed: int, screen_samples: int,
         decay = rng.uniform(0.0, 1.0, n)
         W = rng.uniform(-2.0, 2.0, (n, n))
         g = CoupledNDGene.make(decay=decay, W=W)
-        if empirical_rho(g, n_samples=screen_samples, seed=0) >= 1.0:
+        if empirical_rho_fast(g, n_samples=screen_samples, seed=0) >= 1.0:
             continue  # not in the empirically-contracting pool
         pool += 1
 
