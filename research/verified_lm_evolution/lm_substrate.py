@@ -196,8 +196,10 @@ def _augment(S: np.ndarray) -> np.ndarray:
 
 
 def fit_ridge_readout(S_train: np.ndarray, y_next_train: np.ndarray, *, alpha: float = 1e-2) -> np.ndarray:
-    """Closed-form ridge of next-token one-hot on (augmented) hidden states.
+    """Closed-form ridge of next-token one-hot on (augmented) hidden states (MSE, NOT CE-calibrated).
 
+    Kept for reference / fast pre-screen only. ``softmax(ridge_logits)`` collapses to ~uniform
+    (ridge outputs ~1/VOCAB scale), so it is NOT used for the LM fitness — see fit_logistic_readout.
     Returns R_aug : (n+1, VOCAB).  logits = _augment(S) @ R_aug.
     """
     F = _augment(S_train)                       # (T, n+1)
@@ -207,6 +209,34 @@ def fit_ridge_readout(S_train: np.ndarray, y_next_train: np.ndarray, *, alpha: f
     A = F.T @ F + alpha * np.eye(d)
     B = F.T @ Y
     return np.linalg.solve(A, B)                # (n+1, VOCAB)
+
+
+def fit_logistic_readout(S_train: np.ndarray, y_next_train: np.ndarray, *,
+                         l2: float = 1e-3, n_steps: int = 150, lr: float = 0.5) -> np.ndarray:
+    """Multinomial-logistic (softmax) readout fit by deterministic momentum GD.
+
+    This is the CE-proper readout (ridge-to-one-hot collapses under softmax). Init = zeros (so
+    deterministic, no RNG). With the bias column, the zero-feature limit recovers the unigram, so
+    the held-out CE is a fair 'does reservoir memory help over no-context' test (L0).
+
+    Returns R_aug : (n+1, VOCAB).  logits = _augment(S) @ R_aug.
+    """
+    F = _augment(S_train)                       # (T, n+1)
+    T, d = F.shape
+    R = np.zeros((d, VOCAB), dtype=np.float64)
+    vel = np.zeros_like(R)
+    idx = np.arange(T)
+    FT = F.T
+    for _ in range(n_steps):
+        logits = F @ R
+        logits -= logits.max(axis=1, keepdims=True)
+        P = np.exp(logits)
+        P /= P.sum(axis=1, keepdims=True)
+        P[idx, y_next_train] -= 1.0             # P - Y
+        grad = FT @ P / T + l2 * R
+        vel = 0.9 * vel - lr * grad
+        R = R + vel
+    return R
 
 
 def cross_entropy(logits: np.ndarray, y_true: np.ndarray) -> float:
