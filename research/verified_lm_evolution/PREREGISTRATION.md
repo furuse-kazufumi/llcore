@@ -44,7 +44,14 @@ fitness = exp(-held_out_CE)  ∈ (0,1]          # per-byte likelihood (headroom 
 - **E (embedding) と R (readout) = 「感覚器」**。E は fixed seeded random (全 gene 共有 = 公平比較;
   ESN/reservoir computing 流儀, arc Step 6 と連続)。R は gene ごとに ridge 回帰で one-hot target に
   closed-form fit → held-out で真の softmax CE を評価 (Step 2 ridge_readout パターンの LM 版)。
-- **n (reservoir 次元)** = 32 (PoC)。vocab = 256 (byte)。context = 全 sequence を逐次 (truncated)。
+- **n (reservoir 次元)** = **8 (PoC)**。vocab = 256 (byte)。context = 全 sequence を逐次。
+  ⚠️ **n の上限 (grounding で発覚した honest 制約):** arc の `cert_two`/`cert_sdp` は t-box の **2^n 頂点を
+  列挙**する (n=2,3,4 で実証された範囲)。LM 次元 n=32 では 2³² 頂点で**実行不能**。閉形式の `cert_inf`
+  のみ O(n²) で scalable。ゆえに **Stage R-LLM-0 は arc が実証済みの小 n=8 (2⁸=256 頂点で全証明器が
+  tractable) に限定**し frontier を検証する。**「頂点列挙を避ける vertex-free な sound 2-norm/SDP 証明器で
+  n=32+ の実用 LM 次元へ」は明示的な次段 R-LLM-1** に分離 (robust-LMI を急ぎで作ると unsound リスク =
+  R-reach の罠ゆえ、soundness 証明を先に確立してから着手)。dimension thread R1 の「SDP completeness は
+  次元劣化」に加え、本 thread は**計算量の壁 (頂点列挙の指数性)** も frontier の次元限界であることを示す。
 - **corpus**: llcore の research/*.md + src/*.py を byte 連結 (self-contained, offline, 決定論的)。
   train/held-out を時間順 split (held-out = 末尾 20%、leakage 無し)。
 
