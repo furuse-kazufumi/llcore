@@ -133,3 +133,35 @@ R2b(exact-JSR) / GPU(BG10): user-gated, offer only.
 ```
 Recommendation: present R-reach (with the soundness-proof-first requirement) and R4 as the two next options;
 R-reach is higher-value but needs a sound tighter-reachability argument before any measurement is trustworthy.
+
+---
+
+## UPDATE 2026-06-04 (post R-reach) — DIMENSION THREAD COMPLETE
+
+**R-reach result = REFUTED / NO-GO (design-only, no measurement; committed d302045):** the tighter-reachable-set
+hypothesis is both unsound as proposed AND, more deeply, futile: the tightest possible sound convex relaxation —
+the EXACT reachable convex hull (391 verts / 1.5M samples) of the canonical n=3 switched-expansive gene — is
+itself expansive (JSR_lb ≈ 1.18 ≥ 1 vs ρ ≈ 0.97). So NO common-Lyapunov / convex certificate of any degree
+certifies these genes even over the exact reachable set; they contract via a path-dependent / non-convex
+mechanism. **The t-box is essentially the RIGHT relaxation for a common-Lyapunov/SOS certifier.** Folded into the
+paper (new §3.7 + §7 + §5.5 methodology). META-WIN: design-first + proof-level adversarial scrutiny refuted a
+plausible (3-lemma) soundness argument BEFORE measurement — the empirical oracle is vacuous here (all candidates
+contract), so it could not have caught the would-be-fabricated "recoveries." This validated the no-auto-run call.
+
+**DIMENSION THREAD (R1 → R2a → R-reach) is now COMPLETE and fully characterized:**
+- SDP/Lyapunov is the right verifier and ~95% complete at n=2; completeness DEGRADES with dimension (→48% at n=4).
+- The degradation is NOT a too-low-SOS-degree artifact (R2a) and NOT a box-looseness artifact (R-reach) — it is
+  convex-fundamental: the high-dim switched-expansive contracting tail is beyond ANY sound convex reachable-set
+  relaxation under a common-Lyapunov certifier. Soundness generalises (0 unsound at every n throughout).
+- Recovering that tail needs NP-hard exact-JSR or a non-quadratic / trajectory (path-dependent) certificate — a
+  fundamentally different certificate class, not a tweak. (R2b exact-JSR remains user-gated; even it would
+  classify these as worst-case-switching-expansive, i.e. "contracting but not robustly so.")
+
+**Next thread (dimension done):**
+```
+R4  (cross-arch breadth: does verified×evolvable / contraction-gating generalise to SNN/Neural-ODE/GNN, and is
+     the right verifier still Lyapunov-type there?) — strong paper extension, CPU/$0, reuses research/other_archs.
+R-repro (paper submission gate: clean repro scripts, fixed-seed harness, figures, bib first-source verification)
+     — highest leverage IF shipping the paper is the priority.
+```
+Both are CPU/$0, bounded, falsifiable. R2b(exact-JSR) / GPU(BG10) remain user-gated (offer only).
