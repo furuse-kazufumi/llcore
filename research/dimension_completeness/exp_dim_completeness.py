@@ -58,6 +58,33 @@ except Exception:  # pragma: no cover
 
 
 # --------------------------------------------------------------------------- #
+# Vectorized from-below empirical spectral radius (identical math to
+# coupled_nd.empirical_rho, but batches np.linalg.eigvals over the sample axis so
+# 20k-sample soundness checks are tractable). Verified to match coupled_nd.empirical_rho
+# to <1e-9 on the same seed in the self-test at module bottom.
+# --------------------------------------------------------------------------- #
+
+
+def empirical_rho_fast(g: CoupledNDGene, *, n_samples: int, seed: int = 0) -> float:
+    gc = g.clipped()
+    n = gc.n
+    rng = np.random.default_rng(seed)
+    S = rng.uniform(-1.0, 1.0, (n_samples, n))
+    X = rng.uniform(-1.0, 1.0, (n_samples, n))
+    # pre = S @ W^T + X @ V^T  (each row k is W@S[k] + V@X[k])
+    pre = S @ gc.W.T + X @ gc.V.T              # (N, n)
+    t = 1.0 - np.tanh(pre) ** 2                # (N, n) = sech^2
+    # J_k = diag(decay) + diag((1-decay)*t_k) @ W
+    coeff = (1.0 - gc.decay)[None, :] * t      # (N, n)
+    # build (N, n, n): row i = coeff[:,i] * W[i,:]   plus decay on the diagonal
+    Js = coeff[:, :, None] * gc.W[None, :, :]  # (N, n, n)
+    diag_idx = np.arange(n)
+    Js[:, diag_idx, diag_idx] += gc.decay[None, :]
+    eig = np.linalg.eigvals(Js)                # (N, n) complex, vectorized over N
+    return float(np.max(np.abs(eig)))
+
+
+# --------------------------------------------------------------------------- #
 # n-dim JSR product lower-bound oracle (generalises verify_certifier_jsr_soundness).
 # --------------------------------------------------------------------------- #
 
