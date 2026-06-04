@@ -103,6 +103,24 @@ The ladder is not an end in itself; it matters because a *more complete sound ve
 
 This is the practical reason the verifier choice matters: a *stronger* sound verifier unlocks more reachable fitness at no soundness cost, up to the SDP rung — beyond which (the higher-degree SOS rungs) the capability gain is a measured null on this substrate, not a continued climb. The SDP/Lyapunov gate is implemented as a production, pluggable, **fail-closed** backend in the framework's source tree (Stage 3b): it refuses to certify if CLARABEL is absent rather than silently falling back to the artifact-prone solver. The full test suite passes (255 source tests plus 313 research tests), CPU-only, at zero marginal cost, fully on-premise.
 
+### 3.6 The completeness is n = 2-specific: a dimension study
+
+The ladder above, and the ~95% figure, are an n = 2 result. Honest disclosure demands we ask whether the *completeness* generalises to higher coupled dimension, and the pre-registered answer is that it does not — while *soundness* does. Two further experiments (pre-registered, CLARABEL-pinned, adversarially-verified, 0 unsound admits at every n) characterize this.
+
+**The quadratic-SDP completeness degrades with dimension.** On matched pools of 200 empirically-contracting genes per dimension (each gene verified contracting at high sample count from the same seeded stream, so every miss is conservatism, not a divergent gene), the inf → 2-norm → quadratic-SDP coverage frontier behaves as follows:
+
+| n | pool (contracting) | + inf-norm | + 2-norm (cum) | + quadratic SDP (cum) | SDP % | residual (contracting, uncertified) | residual % |
+|---|---|---|---|---|---|---|---|
+| 2 | 200 | 70 | 97 | 184 | 92.0 | 16 | 8.0 |
+| 3 | 200 | 6 | 21 | 159 | 79.5 | 41 | 20.5 |
+| 4 | 200 | 0 | 0 | 96 | 48.0 | 104 | 52.0 |
+
+The SDP-completeness drops 44 points from n = 2 (92.0%) to n = 4 (48.0%), and the contracting-but-uncertified residual grows 8% → 20.5% → 52%. The cheap induced norms collapse first: the inf-norm certifies 70 genes at n = 2, 6 at n = 3, and 0 at n = 4, so at n = 4 every contracting gene needs the full SDP and even then the SDP misses more than half. (The n = 2 row uses this study's own 200-gene pool and seed, distinct from the 300-gene pool of §3.1; both land at ~92–95% SDP coverage, consistent within the pool-dependent spread of §3.3.)
+
+**Higher-degree SOS does not fix the degradation.** Lifting the dimension-grown residual through degree-4/6/8 SOS recovers only **22%** (9/41) of the n = 3 residual and **29%** (30/104) of the n = 4 residual, with degree-8 adding ≈0 over degree-6 (a flat top: +0 of the 41 at n = 3, +2 of the 104 at n = 4). An n-dim JSR product lower bound over the 2ⁿ vertex Jacobians attributes the still-residual: **~63%** of it is *switched-expansive* (jsr_lb ≥ 1 — 20 of 32 at n = 3, 47 of 74 at n = 4), meaning a product of the conservative t-box vertex Jacobians genuinely expands. Such genes are **fundamentally beyond any common-Lyapunov / box-switched SOS certificate at any degree** — they are empirically contracting only because the nonlinear map never visits the box's expansive corner, so the t-box reachable-set over-approximation, not the SOS degree, is what they exceed.
+
+**The bottleneck shifts with dimension.** The one-sentence insight is that at higher dimension the binding constraint moves from the Lyapunov *certificate class* (which higher-degree SOS could in principle widen) to the reachable-set *over-approximation*: the conservative t-box admits expansive switched products that no Lyapunov function of any degree can dismiss. Closing the residual therefore needs a tighter (non-box) reachable-set bound or exact joint-spectral-radius computation (NP-hard), not a higher SOS rung. Throughout — across every n, every degree, and both experiments — we observe **0 unsound admits**: the certifier rejects more and more genuinely-contracting dynamics as the coordinates couple (a growing *false-negative* rate), but never admits a divergent gene. Soundness generalises with dimension; completeness does not.
+
 ---
 
 ## 4. SMT is Decorative; SDP is Load-Bearing
