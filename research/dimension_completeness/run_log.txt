@@ -1,0 +1,56 @@
+CLARABEL confirmed: _CLARABEL_OK=True, _SOLVER=CLARABEL, installed=['CLARABEL', 'SCS', 'SCIPY', 'HIGHS', 'OSQP']
+  n=2 pool=200/200 scanned=555 inf=70 two_cum=97 sdp_cum=184 (92.0%) residual=16 two_beats_sdp=0 unsound=0 maxrho=1.0 maxjsr=1.0 (115.4s)
+  n=3 pool=200/200 scanned=1377 inf=6 two_cum=21 sdp_cum=159 (79.5%) residual=41 two_beats_sdp=0 unsound=0 maxrho=0.9994 maxjsr=0.9998 (115.6s)
+D:\projects\llcore\research\verified_evolution_sdp_gate\coupled_nd.py:163: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
+  prob.solve(solver=_SOLVER)
+  n=4 pool=200/200 scanned=4876 inf=0 two_cum=0 sdp_cum=96 (48.0%) residual=104 two_beats_sdp=0 unsound=0 maxrho=0.9998 maxjsr=0.9998 (276.1s)
+{
+  "experiment": "R1_dimension_completeness",
+  "prereg": "PREREGISTRATION_R1.md",
+  "config": {
+    "n_target": 200,
+    "seed": 4242,
+    "dims": [
+      2,
+      3,
+      4
+    ],
+    "screen_samples": 4000,
+    "sound_samples": 20000,
+    "jsr_max_len_per_n": {
+      "2": 6,
+      "3": 4,
+      "4": 3
+    }
+  },
+  "clarabel_confirmed": true,
+  "solver": "CLARABEL",
+  "installed_solvers": [
+    "CLARABEL",
+    "SCS",
+    "SCIPY",
+    "HIGHS",
+    "OSQP"
+  ],
+  "sdp_pct_by_n": {
+    "2": 92.0,
+    "3": 79.5,
+    "4": 48.0
+  },
+  "residual_pct_by_n": {
+    "2": 8.0,
+    "3": 20.5,
+    "4": 52.0
+  },
+  "sdp_completeness_drop_n2_to_n4": 0.44,
+  "gates": {
+    "G1_completeness_ge_0.80_all_n": false,
+    "G2_two_beats_sdp_zero_all_n": true,
+    "G3_zero_unsound_all_n": true,
+    "G4_verdict": "degrades"
+  },
+  "generalises": "degrades",
+  "elapsed_s": 507.2
+}
+
+exp_dim_completeness -> D:\projects\llcore\research\dimension_completeness\dim_completeness_results.json (507.2s)

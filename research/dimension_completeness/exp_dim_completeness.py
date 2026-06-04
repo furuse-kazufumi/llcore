@@ -167,7 +167,7 @@ def run_one_n(n: int, *, n_target: int, seed: int, screen_samples: int,
         # INDEPENDENT soundness check for every SDP-certified gene (inf/two/sdp all imply
         # a quadratic certificate; sdp is the union). cert_inf/cert_two => cert_sdp True.
         if is_inf or is_two or is_sdp:
-            rho_hi = empirical_rho(g, n_samples=sound_samples, seed=0)
+            rho_hi = empirical_rho_fast(g, n_samples=sound_samples, seed=0)
             j = jsr_lb(_vertices_nd(g), max_len=maxlen)
             max_rho_sound = max(max_rho_sound, rho_hi)
             max_jsr_certified = max(max_jsr_certified, j)
