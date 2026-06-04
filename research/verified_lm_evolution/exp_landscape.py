@@ -83,10 +83,10 @@ def main() -> None:
         reg = classify_region(g)
         ce = task.held_out_ce(g)
         rho = empirical_contraction(g, task._emb_seq, stride=11)
-        contracting = bool(rho < 1.0) and np.isfinite(ce)
+        contracting = bool(rho < 1.0 and np.isfinite(ce))
         regions[reg].append((ce, contracting, rho))
-        rows.append({"region": reg, "ce": None if not np.isfinite(ce) else round(ce, 5),
-                     "emp_rho": round(rho, 5), "contracting": contracting})
+        rows.append({"region": reg, "ce": None if not np.isfinite(ce) else round(float(ce), 5),
+                     "emp_rho": round(float(rho), 5), "contracting": contracting})
         if (i + 1) % 50 == 0:
             print(f"  {i+1}/{n_genes}  ({time.time()-t0:.0f}s)", flush=True)
 
