@@ -341,10 +341,7 @@ def main():
         out["grad"][gate], out["evo"][gate] = [], []
         for seed in seeds:
             g = train_grad(gate, seed, cfg, data); out["grad"][gate].append(g)
-            # EVO reuses a fresh GRAD-trained wrapper as the base (wrapper frozen, core evolved)
-            base = GatedRecurrentLM(vocab, cfg["n"], cfg["layers"], cfg["d"]).to(DEVICE)
-            _warm = train_grad(gate, seed, cfg, data)  # warm wrapper under same gate (returns metrics; base re-trained below)
-            # rebuild base by a short grad-train then freeze wrapper
+            # EVO: short grad-train of the wrapper under the same gate, freeze it, then evolve the core
             base = _build_warm_base(gate, seed, cfg, data, vocab)
             e = evolve_core(gate, seed, cfg, data, base); out["evo"][gate].append(e)
             print(f"  gate={gate:4s} seed={seed} GRAD ce={g['ce']:.4f} reject={g['reject_rate']:.2f} "
