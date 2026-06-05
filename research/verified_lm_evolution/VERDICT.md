@@ -47,17 +47,26 @@ strictly later than train). **L0 holds.**
 
 ## 2. L1 / L2 — soundness on the real substrate (PASS)
 
-- **L1 (soundness holds):** all three *certified* regions (inf / two_norm / sdp) are **0.0%**
-  empirically-expansive on the real byte-LM — the certifier admits no expansive gene.
+- **Soundness is a theorem, the 0% is a consistency check (Codex #14).** The certificate's soundness
+  comes from the certifier *proof* (Lemmas 1–3 + cert_inf/two/sdp theorems, `PREREGISTRATION.md §2`).
+  The empirical figures below are a *from-below consistency check* that the certifier admitted nothing
+  *observably* expansive — they corroborate, they do not constitute, soundness.
+- **L1 (consistency holds):** all three *certified* regions (inf / two_norm / sdp) are **0.0%**
+  empirically-expansive on the real byte-LM — no admitted gene was observed expansive.
 - **L2 (oracle non-vacuous / gate load-bearing):** `non_certified` is **78.9%** expansive — the gate
-  excludes a large genuinely-expansive population, so certification does real work.
-- **Non-circular (verified by code):** `classify_region` is a pure function of the Jacobian box
-  `(decay, W) → t_min_per_coord → infnorm/SVD/SDP-LMI`; it never reads the reservoir states, readout,
-  corpus, or CE. `held_out_ce` never calls any certifier. Region label and fitness share only the raw
-  gene.
+  excludes a large genuinely-expansive population, so certification does real work (the oracle can and
+  does falsify).
+- **Non-circular but NOT statistically independent (Codex #1).** `classify_region` is **outcome-blind /
+  non-leaky**: a pure function of the Jacobian box `(decay,W) → t_min_per_coord → infnorm/SVD/SDP-LMI`,
+  never reading reservoir states, readout, corpus, or CE; and `held_out_ce` never calls any certifier.
+  So the label is not computed *from* the outcome (no leakage/circularity). It is **not** statistically
+  independent of CE — both are downstream of the same sampled `(decay,W)` — which is exactly why the
+  region carries fitness signal.
 - **Readout controlled:** byte-for-byte identical readout (zero-init, fixed `readout_steps`/`lr`/`l2`,
   fixed shared embedding + split) for every gene — the CE ordering reflects core dynamics, not readout
-  capacity. The ρ-confound (edge-of-chaos) is ruled out: `corr(CE, emp_rho) = +0.145` (wrong sign).
+  capacity. A linear edge-of-chaos (ρ) confound is **weakly** disfavoured: `corr(CE, emp_rho) = +0.145`
+  (wrong sign for "higher ρ → lower CE"); this is weak negative evidence against a *linear, pooled*
+  confound only, not a full refutation (Codex #9).
 
 ## 3. L3 — the verifier-perplexity frontier (mechanism PASS; reachability IN PROGRESS)
 
