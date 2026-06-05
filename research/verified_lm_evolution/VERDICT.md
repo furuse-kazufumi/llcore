@@ -110,14 +110,22 @@ better genes)? Gated evolution (`exp_gated.py`, gates none/inf/two/sdp, CRN-pair
 | none (ungated) | 0.030422 | 3.4926 | non_certified | +0.00189, 10/10 |
 
 **The pre-registered L3 gate PASSES decisively.** Both sound relaxations beat the conservative inf gate
-in **10/10 seeds** (`frac_a_gt_b = 1.0`) → one-sided sign/Wilcoxon p ≈ 2⁻¹⁰ ≈ 0.001, past Bonferroni
-(0.05/2). Mechanism is clean: each gate's best gene lands **exactly in its own certifier region**
-(inf→inf, two→two_norm_only, sdp→sdp_only, none→non_certified). inf-gated evolution is **pinned at
-unigram fitness (0.0285288, identical to ~8 sig figs across all 10 seeds)** — the over-conservative gate
-yields *zero* improvement over no-context — while the sound sdp gate recovers ~66% of the *ungated*
-improvement (sdp CE 3.514 vs none 3.493 vs unigram 3.557), staying inside the sound `sdp_only` region.
-So **a stronger sound verifier lets evolution REACH lower real-LM perplexity; the conservative gate
-forfeits it entirely** — admissibility upgraded to reachability.
+in **10/10 seeds** (`frac_a_gt_b = 1.0`) → exact one-sided sign **and** Wilcoxon signed-rank p = 1/2¹⁰ =
+0.000977 (Codex #2), past Bonferroni for the 2 pre-registered sound comparisons (0.05/2 = 0.025) — and
+even at 3 comparisons including ungated `none` (0.05/3 = 0.0167). Mechanism is clean: each gate's best
+gene lands **exactly in its own certifier region** (inf→inf, two→two_norm_only, sdp→sdp_only,
+none→non_certified). **inf-gated *search* collapsed to the unigram solution** — identical fitness
+0.02852885423306474 across all 10 different seeds (= `exp(−unigram_CE)` to 8 sig figs), i.e. zero
+improvement over no-context — while the sound sdp gate recovers ~66% of the *ungated* improvement (sdp
+CE 3.514 vs none 3.493 vs unigram 3.557), staying inside the sound `sdp_only` region. So **a stronger
+sound verifier lets evolution REACH lower real-LM perplexity; the conservative gate's search forfeits it
+entirely** — admissibility upgraded to reachability.
+
+*Disclosure (Codex #11/#12):* "search collapsed to unigram" is a statement about the **EA outcome**, not
+a proof that the inf region's ceiling *is* unigram. The exact-identical inf fitness across 10 seeds means
+inf-gated EA is effectively deterministic — either the inf feasible set near the init is tiny, or the
+zero-readout (unigram-equivalent) is a degenerate basin no admitted mutation escapes. The 8192 B
+landscape (below) probes whether inf genes better than unigram even exist on this corpus.
 
 **Honest open question (ceiling vs navigability):** inf is pinned at *exactly* unigram. Two readings —
 (A) the inf region's ceiling ≈ unigram on this 8192 B corpus, or (B) the inf gate is so tight that
