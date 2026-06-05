@@ -375,13 +375,19 @@ def evolve_core(gate, seed, cfg, data, base):
 # =================================================================== #
 def main():
     smoke = (RUN_MODE == "smoke")
-    cfg = dict(n=8, layers=1, d=64, T=(48 if smoke else 64), B=16, lr=3e-3,
-               grad_steps=40 if smoke else 1500, evo_gens=20 if smoke else 400,
-               sigma=0.12, eval_batches=3 if smoke else 16,
-               max_chars=10000 if smoke else 300000,
-               cert_every=(8 if smoke else 1))  # smoke: check gate every 8 steps (fast); full: every step (sound)
-    gates = ["none", "inf", "sdp"] if smoke else ["none", "inf", "two", "sdp"]
-    seeds = [SEED0] if smoke else [SEED0 + i for i in range(8)]
+    confirm = (RUN_MODE == "confirm")   # CPU-tractable statistical confirmation (no GPU needed)
+    if smoke:
+        cfg = dict(n=8, layers=1, d=64, T=48, B=16, lr=3e-3, grad_steps=40, evo_gens=20,
+                   sigma=0.12, eval_batches=3, max_chars=10000, cert_every=8)
+        gates = ["none", "inf", "sdp"]; seeds = [SEED0]
+    elif confirm:
+        cfg = dict(n=8, layers=1, d=64, T=64, B=16, lr=3e-3, grad_steps=120, evo_gens=60,
+                   sigma=0.12, eval_batches=4, max_chars=40000, cert_every=4)
+        gates = ["none", "inf", "two", "sdp"]; seeds = [SEED0 + i for i in range(6)]
+    else:  # full (GPU scale)
+        cfg = dict(n=8, layers=1, d=64, T=64, B=16, lr=3e-3, grad_steps=1500, evo_gens=400,
+                   sigma=0.12, eval_batches=16, max_chars=300000, cert_every=1)
+        gates = ["none", "inf", "two", "sdp"]; seeds = [SEED0 + i for i in range(8)]
     results_path = f"result_{RUN_MODE}{'_null' if RUN_NULL else ''}.json"
 
     cert_selftest(cfg["n"])
