@@ -75,9 +75,19 @@ strictly later than train). **L0 holds.**
 The conservative **inf region is distributionally excluded from the low-perplexity tail**: **0 of its
 346 contracting genes** reach CE < 4.82, versus 8–25% for the less-conservative sound regions. inf is
 the *largest* certified shell (346 > sdp 189) yet has the *worst* ceiling — the opposite of a
-more-tickets sampling artifact. Subsampling inf down to sdp's N never reaches sdp's best (P=0.0000);
-Mann-Whitney puts the whole inf shell stochastically worse than two_norm (p=0.008) and sdp (p=0.007).
-**A sound relaxation (two_norm / sdp, both 0% expansive) admits genes ~0.04–0.085 nats better than inf.**
+more-tickets sampling artifact. Subsampling inf down to sdp's N never reaches sdp's best (**0 of 20,000
+resamples, P < 5e-5** — not literally zero, Codex #7); Mann-Whitney puts the whole inf shell
+**distributionally** worse than two_norm (p=0.008) and sdp (p=0.007), so the inf-vs-relaxed effect is
+not merely an order statistic. **A sound relaxation (two_norm / sdp, both 0% empirically-expansive)
+*admits access to* genes ~0.04–0.085 nats better than inf's best.**
+
+**Read this as search-space expansion, not certifier "improvement" (Codex #8/#16).** The relaxed regions
+are *different parameter subsets* `(decay,W)` that happen to contain better-for-this-task dynamics and
+*require a stronger certificate to prove sound*. The honest mechanism is: **relaxing inf→sound-relaxed
+certification expands the admissible (provably-contracting) search space to include lower-CE genes** —
+not that the certifier itself improves modeling. The *magnitude* gap (4.8377→4.7525) is a best-found /
+existential frontier figure (median gaps are small, ~0.005–0.008); the load-bearing distributional
+claim is the inf-vs-{two,sdp} shift (MW p<0.01).
 
 **Honest narrowing (red-team, 2 dissents forced this):** the strict 4-rung monotone ladder
 `inf > two > sdp > non` does **not** survive. The two_norm-vs-sdp inner rung is sampling noise:
