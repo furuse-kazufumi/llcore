@@ -18,12 +18,15 @@ landscape + the null control, §3c) is EVOLVABILITY, not language learning: (a) 
 genes 0.118 nats better than unigram, yet inf-gated evolution collapses to unigram — the looser sound
 gate wins because its feasible set is more *navigable*, not because it admits a better ceiling
 (same-corpus ceilings are ~equal; the 12288 B "inf-worst-ceiling" ladder is not corpus-robust); and
-(b) the honest-null control does NOT tie — the relaxed-vs-inf advantage persists at ~84% magnitude on a
-shuffled corpus (10/10 null seeds, sign p=0.000977), so it is largely a STRUCTURE-INDEPENDENT
-optimization effect, not clean evidence that
-the verifier helps learn real language. The verified-evolution core genuinely runs as a tiny byte-LM
-(L0/L1/L2 hold); the L3 "payoff" is best called evolvability, not learning. NOT claimed: the strict
-4-rung ladder (sampling noise), the two-vs-sdp order, or "a better verifier unlocks real LM learning".**
+(b) the honest-null control does NOT tie — the relaxed-vs-inf gap *persists fully* on a shuffled corpus
+(10/10 null seeds, sign p=0.000977; in held-out CE — the natural learning scale — the null gap is if
+anything ~107% of the real gap, not smaller), so the gate-gap is essentially a STRUCTURE-INDEPENDENT
+optimization effect, NOT evidence that the verifier helps learn real language. The *only* genuinely
+structure-dependent signal is the unigram-crossing: the sound gates beat the no-context unigram baseline
+in the real run (10/10) but never on the null. The verified-evolution core genuinely runs as a tiny
+byte-LM (L0/L1/L2 hold); the L3 "payoff" is best called evolvability, not learning. NOT claimed: the
+strict 4-rung ladder (sampling noise), the two-vs-sdp order, "a better verifier unlocks real LM learning",
+or a structure-dependent *gate-gap residual* (the real−null gap difference is not significant, §3c-ii).**
 
 This *reverses* the underpowered 40/60-gene smoke (which had `inf` winning by luck of a thin shell);
 the pre-registered 900-gene landscape, with every region well-sampled, shows the opposite and correct
