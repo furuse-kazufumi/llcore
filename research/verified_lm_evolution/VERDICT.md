@@ -131,16 +131,41 @@ inf-gated EA is effectively deterministic — either the inf feasible set near t
 zero-readout (unigram-equivalent) is a degenerate basin no admitted mutation escapes. The 8192 B
 landscape (below) probes whether inf genes better than unigram even exist on this corpus.
 
-**Honest open question (ceiling vs navigability):** inf is pinned at *exactly* unigram. Two readings —
-(A) the inf region's ceiling ≈ unigram on this 8192 B corpus, or (B) the inf gate is so tight that
-evolution cannot navigate it (an evolvability handicap). The 12288 B landscape (§3a) shows inf *does*
-contain better-than-unigram genes there, but it is a **different corpus**, so it cannot settle (A) vs
-(B) for the gated 8192 B run. An 8192 B landscape (matching the gated corpus) is running to resolve
-this. Either way the payoff holds (sound relaxation reaches lower CE under evolution); only the
-*mechanism* (ceiling vs navigability) is open. `<<8192B landscape result + ceiling-vs-navigability verdict>>`
+### 3c. ⚠️ Honest reframing — the mechanism is NAVIGABILITY, and the null does NOT tie
 
-- **HONEST-NULL CONTROL (pre-reg gate L3-null, RUNNING `bz2a7xod7`):** `--null` shuffles the corpus →
-  sequential structure destroyed → all gates must tie (p>0.1). **Load-bearing falsifier.** `<<null tie result>>`
+Two follow-up runs (`run_l3b.ps1`) substantially **temper** the headline. This is the
+`feedback_benchmark_honest_disclosure` discipline working: a clean positive result, scrutinized,
+turns out to be largely an optimization artifact.
+
+**(i) Same-corpus 8192 B landscape (500 genes) → mechanism = NAVIGABILITY, not ceiling.** On the *gated*
+corpus the inf region's best contracting CE is **3.4395 — 0.118 nats BELOW unigram (3.5571)**: the inf
+region **contains genes far better than unigram**, yet inf-gated *evolution* collapsed to unigram (3.557,
+§3b). So inf's pinning is **(B) an evolvability/navigability failure** (the gate is too tight for the EA
+to reach the good inf genes random sampling finds), **not (A) a low region ceiling.** Worse for the
+ceiling story: on 8192 B the three sound ceilings are **~equal** (inf 3.4395 ≈ two 3.4294 ≈ sdp 3.4413),
+so the clean monotone "inf-worst-ceiling" ladder of the 12288 B landscape (§3a) is **NOT corpus-robust**.
+→ The robust effect is **gated reachability via navigability** (a looser sound gate gives evolution room
+to move), not a region-ceiling difference.
+
+**(ii) Honest-null control (shuffled corpus) does NOT tie (pre-reg gate L3-null — FAILS the clean form).**
+Pre-reg predicted all gates tie when sequential structure is destroyed (memory useless). Instead the
+**gate ordering persists**: null (3 seeds, unigram 3.6486) gives inf 0.0223 (worst) < two 0.0228 < sdp
+0.0232 < none 0.0260 (≈ unigram). The relaxed-vs-inf advantage **survives shuffling at ~70% magnitude**
+(sdp−inf: real +0.00125 vs null +0.0009). → **The bulk of the relaxed-gate advantage is
+structure-INDEPENDENT** — an optimization/regularization effect of how the contraction constraint
+interacts with the fixed readout fit, **NOT** clean evidence that the verifier helps the LM learn real
+language. The *structure-dependent* residual is real but small: in the real run the sound gates **beat**
+unigram (learning happens), whereas in the null only ungated `none` reaches unigram and the gated runs
+sit *below* it. `<<null: finalize at ~8 seeds (accumulating, bz2a7xod7)>>`
+
+**Corrected conclusion.** What survives: **under evolution, relaxing the over-conservative inf gate to a
+sound relaxation lets evolution reach lower held-out CE (robust, 10/10 real seeds, p=0.000977), because
+the looser sound feasible set is more *navigable*** — the inf gate traps evolution at unigram even though
+the inf region contains good genes. What does **not** survive: the strong "arc signature holds on real LM
+loss = a better verifier unlocks real language learning" reading. The effect is **largely a
+structure-independent evolvability/optimization phenomenon** (null doesn't tie; same-corpus ceilings are
+equal), with only a small genuine real-structure component. The verified-evolution core *runs* as a real
+byte-LM (L0/L1/L2 hold), but the L3 "payoff" is best described as **evolvability, not learning.**
 
 ---
 
