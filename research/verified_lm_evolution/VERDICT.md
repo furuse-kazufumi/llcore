@@ -152,16 +152,27 @@ so the clean monotone "inf-worst-ceiling" ladder of the 12288 B landscape (§3a)
 → The robust effect is **gated reachability via navigability** (a looser sound gate gives evolution room
 to move), not a region-ceiling difference.
 
-**(ii) Honest-null control (shuffled corpus) does NOT tie (pre-reg gate L3-null — FAILS the clean form).**
-Pre-reg predicted all gates tie when sequential structure is destroyed (memory useless). Instead the
-**gate ordering persists**: null (3 seeds, unigram 3.6486) gives inf 0.0223 (worst) < two 0.0228 < sdp
-0.0232 < none 0.0260 (≈ unigram). The relaxed-vs-inf advantage **survives shuffling at ~70% magnitude**
-(sdp−inf: real +0.00125 vs null +0.0009). → **The bulk of the relaxed-gate advantage is
+**(ii) Honest-null control (shuffled corpus) does NOT tie (pre-reg gate L3-null — FAILS the clean form;
+FINAL, 10 paired seeds).** Pre-reg predicted all gates tie when sequential structure is destroyed (memory
+useless). Instead the **gate ordering persists**: null (10 paired seeds of 15 requested — checkpoint stop
+at equal-N with the real run; unigram 3.6486, fitness 0.02603) gives mean fitness inf 0.02233 (worst) <
+two 0.02295 < sdp 0.02338 < none 0.02595 (just below unigram). Both sound relaxations beat inf in
+**10/10 null seeds** (`frac_a_gt_b = 1.0`, sign p = 0.000977 — the same significance as the real run).
+The relaxed-vs-inf advantage **survives shuffling at ~84% magnitude** (sdp−inf: real +0.00125 vs null
++0.00105; two−inf: real +0.00075 vs null +0.00063). inf-gated search collapses to a seed-identical
+fitness on the null too (0.022326… across all 10 seeds — the same deterministic-basin phenomenon as §3b),
+but on the structureless corpus this basin sits **below** unigram (CE 3.802 vs 3.649): with no structure
+to exploit, the admitted reservoir features actively hurt the held-out fit, and every gated mean sits
+below unigram while only ungated `none` reaches it. Winners land exactly in their own certifier regions
+on the null as well (inf→inf, two→two_norm_only, sdp→sdp_only, none→non_certified) — the **geometry of
+the feasible sets, not the language, drives the ordering**. → **The bulk of the relaxed-gate advantage is
 structure-INDEPENDENT** — an optimization/regularization effect of how the contraction constraint
 interacts with the fixed readout fit, **NOT** clean evidence that the verifier helps the LM learn real
 language. The *structure-dependent* residual is real but small: in the real run the sound gates **beat**
-unigram (learning happens), whereas in the null only ungated `none` reaches unigram and the gated runs
-sit *below* it. `<<null: finalize at ~8 seeds (accumulating, bz2a7xod7)>>`
+unigram (learning happens); in the null they do not. Cross-ref: the navigability thread
+(`../verifier_navigability_gpu/NAVIGABILITY_GPU_VERDICT.md`) closes the loop from the other side — the
+inf trap is an EA(random-mutation)-specific artifact that gradient training avoids entirely, so for
+gradient-trained substrates the verifier should be chosen on soundness/coverage alone.
 
 **Corrected conclusion.** What survives: **under evolution, relaxing the over-conservative inf gate to a
 sound relaxation lets evolution reach lower held-out CE (robust, 10/10 real seeds, p=0.000977), because
