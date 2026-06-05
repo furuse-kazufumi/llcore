@@ -110,14 +110,71 @@ def fig_admit_coverage(v2: dict) -> str:
                 "Certifier admit coverage vs the exact 2-norm certifier")
 
 
+def fig_l3_gate_gap(real: dict, null: dict) -> str:
+    """The honest-disclosure headline: mean held-out CE per gate, real vs null (shuffled) corpus.
+
+    Real: sound gates (two/sdp) beat the unigram baseline (learning). Null: every gate sits BELOW
+    unigram and the gate ORDERING PERSISTS (the relaxed-vs-inf gap does NOT tie) -> the gate-gap is
+    structure-independent (evolvability), not language learning.
+    """
+    gates = [("inf_norm", "inf"), ("two_norm", "two"), ("sdp", "sdp"), ("none", "none")]
+    W, H = 760, 380
+    x0, y_base = 90, 300
+    col_w, grp_gap, bar_w = 150, 26, 46
+    # CE axis: pick a window around both unigrams
+    rce = real["summary"]; nce = null["summary"]
+    ru, nu = real["unigram_ce"], null["unigram_ce"]
+    all_ce = [rce[g]["mean_ce"] for g, _ in gates] + [nce[g]["mean_ce"] for g, _ in gates] + [ru, nu]
+    lo, hi = min(all_ce) - 0.02, max(all_ce) + 0.02
+    span = hi - lo
+
+    def yy(ce: float) -> float:
+        return y_base - (y_base - 60) * (ce - lo) / span
+
+    rows = [f'<text x="40" y="{y_base+24}" font-size="12" fill="#333">CE</text>']
+    # y-axis gridlines at unigram refs
+    for u, lab, col in ((ru, f"real unigram {ru:.3f}", "#c0504d"), (nu, f"null unigram {nu:.3f}", "#4f81bd")):
+        rows.append(f'<line x1="{x0}" y1="{yy(u):.1f}" x2="{W-30}" y2="{yy(u):.1f}" '
+                    f'stroke="{col}" stroke-dasharray="5 4" stroke-width="1"/>')
+        rows.append(f'<text x="{W-30}" y="{yy(u)-4:.1f}" text-anchor="end" font-size="10.5" '
+                    f'fill="{col}">{_esc(lab)}</text>')
+    x = x0 + 30
+    for g, short in gates:
+        rb, nb = rce[g]["mean_ce"], nce[g]["mean_ce"]
+        # real bar (red) then null bar (blue), grown downward from top of CE window
+        rows.append(f'<rect x="{x}" y="{yy(rb):.1f}" width="{bar_w}" height="{y_base-yy(rb):.1f}" fill="#c0504d"/>')
+        rows.append(f'<text x="{x+bar_w/2:.1f}" y="{yy(rb)-5:.1f}" text-anchor="middle" font-size="10" '
+                    f'fill="#c0504d">{rb:.3f}</text>')
+        rows.append(f'<rect x="{x+bar_w+6}" y="{yy(nb):.1f}" width="{bar_w}" height="{y_base-yy(nb):.1f}" fill="#4f81bd"/>')
+        rows.append(f'<text x="{x+bar_w+6+bar_w/2:.1f}" y="{yy(nb)-5:.1f}" text-anchor="middle" font-size="10" '
+                    f'fill="#4f81bd">{nb:.3f}</text>')
+        rows.append(f'<text x="{x+bar_w+3:.1f}" y="{y_base+18}" text-anchor="middle" font-size="12.5" '
+                    f'fill="#333">{_esc(short)}</text>')
+        x += col_w
+    rows.append(f'<rect x="{x0+30}" y="40" width="12" height="12" fill="#c0504d"/>'
+                f'<text x="{x0+46}" y="50" font-size="11" fill="#333">real corpus</text>')
+    rows.append(f'<rect x="{x0+140}" y="40" width="12" height="12" fill="#4f81bd"/>'
+                f'<text x="{x0+156}" y="50" font-size="11" fill="#333">null (shuffled) corpus</text>')
+    note = (f'<text x="{x0}" y="{H-14}" font-size="11" fill="#666">'
+            f'lower CE = better. Gate ordering inf&gt;two&gt;sdp persists on the null '
+            f'(gap ~107% of real on the CE scale) =&gt; evolvability, not language learning.</text>')
+    return _svg(W, H, "\n".join(rows) + "\n" + note,
+                "L3 honest disclosure: gate-gap persists on the null corpus")
+
+
 def main():
     with open(os.path.join(_CR, "poc_l2lite_results.json"), encoding="utf-8") as fh:
         poc1 = json.load(fh)
     with open(os.path.join(_CR, "poc_l2lite_v2_results.json"), encoding="utf-8") as fh:
         v2 = json.load(fh)
+    with open(os.path.join(_LM, "exp_gated_real10_results.json"), encoding="utf-8") as fh:
+        real = json.load(fh)
+    with open(os.path.join(_LM, "exp_gated_null_results.json"), encoding="utf-8") as fh:
+        null = json.load(fh)
     figs = {
         "fig_cost_speedup.svg": fig_cost_speedup(poc1["cost"]),
         "fig_admit_coverage.svg": fig_admit_coverage(v2),
+        "fig_l3_gate_gap.svg": fig_l3_gate_gap(real, null),
     }
     for name, svg in figs.items():
         path = os.path.join(_HERE, name)
