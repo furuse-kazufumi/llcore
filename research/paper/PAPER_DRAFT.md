@@ -1091,6 +1091,51 @@ Figure: roadmap dependency — L1 low-rank W → L3 model-order reduction → L2
 
 ---
 
+## Related work (positioning)
+
+We position this work against three established lines, located via a local cross-domain research
+corpus (titles given verbatim; no author/year is fabricated). The contribution is the *combination*
+none of them makes: a sound contraction verifier placed **inside an evolutionary loop on a real LM**,
+together with an honest analysis of *when* the verifier helps (navigability, not learning) and *how
+cheaply* it can be made to scale.
+
+- **Certified stability / contraction of neural & nonlinear systems.** A substantial literature
+  certifies stability or robustness of learned systems — e.g. *"Certifying Lyapunov Stability of
+  Black-Box Nonlinear Systems"*, *"A Common Lyapunov Matrix Approach to the Exponential Stability…"*,
+  *"Certified Set Convergence for Piecewise Affine Systems via …"*, *"Certifiable Reachability Learning
+  Using a New Lipschitz Cont(inuity)…"*, and the 1-Lipschitz / certified-robustness line (*"1-Lipschitz
+  Layers Compared: Memory, Speed and Certifiable Robustness"*, *"Asymmetric Certified Robustness via
+  Feature-Convex Neural Networks"*). These certify a *given/trained* model. We instead use the
+  certifier as a **fail-closed admission gate during evolution** (it shapes which dynamics are even
+  reachable), and we quantify the resulting *navigability* cost — a question that does not arise when
+  the model is fixed. Our `cert_inf/two/sdp` ladder and the vertex-free `B2 = σ(|M|+R)` bound (§7) sit
+  in this line, with the twist that the certifier is in the optimization loop.
+
+- **Reservoir computing / echo-state networks.** Our substrate is a reservoir/ESN byte-LM (fixed
+  recurrence, trained readout): cf. *"Deep Residual Echo State Networks…"*, *"Centrality-Based Pruning
+  for Efficient Echo State Networks"*, *"A mathematical framework for time-delay reservoir computing"*,
+  *"Adaptive Reservoir Computing for Multi-Scenario Chaotic Systems"*. Prior ESN work studies fixed or
+  pruned reservoirs; we **evolve** the reservoir recurrence under a contraction certificate and read
+  out a real next-byte LM loss, making the echo-state property a *certified* rather than assumed
+  property.
+
+- **Neuroevolution & quality-diversity.** The evolutionary side connects to NEAT-style neuroevolution
+  and QD/novelty search — *"A Study of Fitness Landscapes for Neuroevolution"*, *"A NEAT Approach to
+  Evolving Neural-Network-based…"*, and quality-diversity / novelty-search methods. The arc's earlier
+  MAP-Elites framing lives here. Our addition is a **soundness oracle inside the loop** that can
+  distinguish *good-simple* (low-rank, still beats unigram) from *degenerate-simple* (unigram collapse)
+  dynamics — and the finding that the verifier's reachability payoff is EA-specific and vanishes (in
+  final CE) under gradient (§6).
+
+- **Adjacent concepts (named, not corpus-cited here):** cost-/hardware-aware neural architecture search
+  and Pareto multi-objective search (the L4 cost-as-selection idea, §8); balanced truncation / Hankel
+  model-order reduction and joint spectral radius / SOS-Lyapunov verification (the L3-MOR and R-LLM-1
+  roadmap, §3, §7); active inference (the homeostasis framing). These motivate the roadmap but are not
+  load-bearing for the measured results.
+
+*(Provenance: prior-art titles surfaced from the local RAD research corpus — `dynamical_systems`,
+`formal_methods`, `neural_network`, `evolutionary_computation` collections — and quoted by title only.)*
+
 ## References (concepts invoked in the text)
 
 The following are the prior *concepts* this paper builds on. They are listed as a concept index, without author/year attributions, to avoid fabricating citations; each names an established body of work the reader can locate by name.
