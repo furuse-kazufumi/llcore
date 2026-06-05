@@ -865,7 +865,10 @@ misses, leaving it strictly more conservative than inf overall (poc_l2lite_resul
 PoC-2 (same n=8, 3000 genes, seed 20260606) tested B2 and reversed that pessimism
 (poc_l2lite_v2_results.json). The full admit comparison against the `cert_two` yardstick of 1310:
 
-> Figure: Admit-set coverage by certifier, n=8 / 3000 genes (data: poc_l2lite_v2_results.json)
+![Certifier admit coverage vs the exact 2-norm certifier](../paper_assets/fig_admit_coverage.svg)
+
+*Figure: Admit-set coverage by certifier, n=8 / 3000 genes (rendered:
+`research/paper_assets/fig_admit_coverage.svg`; data: poc_l2lite_v2_results.json).*
 
 | certifier | admits | % of exact `cert_two` (1310) |
 |---|---|---|
