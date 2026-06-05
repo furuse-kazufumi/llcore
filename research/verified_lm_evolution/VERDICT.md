@@ -127,9 +127,10 @@ in **10/10 seeds** (`frac_a_gt_b = 1.0`) → exact one-sided sign **and** Wilcox
 0.000977 (Codex #2), past Bonferroni for the 2 pre-registered sound comparisons (0.05/2 = 0.025) — and
 even at 3 comparisons including ungated `none` (0.05/3 = 0.0167). Mechanism is clean: each gate's best
 gene lands **exactly in its own certifier region** (inf→inf, two→two_norm_only, sdp→sdp_only,
-none→non_certified). **inf-gated *search* collapsed to the unigram solution** — identical fitness
-0.02852885423306474 across all 10 different seeds (= `exp(−unigram_CE)` to 8 sig figs), i.e. zero
-improvement over no-context — while the sound sdp gate recovers ~66% of the *ungated* improvement (sdp
+none→non_certified). **inf-gated *search* collapsed to ≈ the unigram solution** — identical fitness
+0.0285288542 across all 10 different seeds, matching `exp(−unigram_CE)=0.0285210139` to ~3 sig figs
+(inf CE 3.55684 vs unigram 3.55711 — a negligible 0.0003-nat edge, i.e. effectively no-context) —
+while the sound sdp gate recovers ~66% of the *ungated* improvement (sdp
 CE 3.514 vs none 3.493 vs unigram 3.557), staying inside the sound `sdp_only` region. So **a stronger
 sound verifier lets evolution REACH lower real-LM perplexity; the conservative gate's search forfeits it
 entirely** — admissibility upgraded to reachability.
