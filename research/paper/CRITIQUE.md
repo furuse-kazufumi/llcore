@@ -24,6 +24,11 @@ primary result files.
 **Status:** first draft. §6 spot-check **done** (2026-06-06): the BG10 numbers (unigram 3.2512, GRAD
 ~2.485, null 3.309) are correctly attributed to NAVIGABILITY_GPU_VERDICT.md and NOT conflated with the
 L3 reservoir numbers (unigram 3.5571); added an explicit honest caveat that the EVO trap is masked in CE
-by the gradient-warm wrapper and shows only in admit-rate (connecting §6 to the pure-EVO §5). Remaining
-(future passes): render the remaining conceptual figure placeholders; add a related-work pass; the
-EN/ZH/KO multilingual versions for any public derivative. **Push deferred (no llcore remote).**
+by the gradient-warm wrapper and shows only in admit-rate (connecting §6 to the pure-EVO §5).
+Related-work pass **done** (2026-06-06): added "Related work (positioning)" grounded in real RAD-corpus
+prior-art titles (dynamical_systems / formal_methods / neural_network / evolutionary_computation), quoted
+by title only, positioning the novelty as the certifier-in-evolution-loop-on-real-LM combination.
+Codex pair-review **done** (2026-06-06, `research/CODEX_PAIRREVIEW_2026_06_06.md`): 3 MAJOR scope/wording
+refinements adopted (BG10 "free in final CE" scoping; PoC-1 conservative-by-construction vs consistency-
+check). Remaining (future passes): render the remaining conceptual figure placeholders; EN/ZH/KO
+multilingual versions for any public derivative. **Push deferred (no llcore remote).**
