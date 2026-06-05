@@ -77,7 +77,7 @@ strictly later than train). **L0 holds.**
   (wrong sign for "higher ρ → lower CE"); this is weak negative evidence against a *linear, pooled*
   confound only, not a full refutation (Codex #9).
 
-## 3. L3 — the verifier-perplexity frontier (mechanism PASS; reachability IN PROGRESS)
+## 3. L3 — the verifier-perplexity frontier (mechanism PASS; reachability PASS; honest scope = evolvability)
 
 ### 3a. Mechanism / region-ceiling (landscape, COMPLETE — survives red-team)
 
