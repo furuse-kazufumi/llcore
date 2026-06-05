@@ -36,7 +36,6 @@ if _SDP_GATE not in sys.path:
 
 from coupled_nd import (  # noqa: E402
     CoupledNDGene,
-    CoupledNDGeneCodec,
     _jac_at_t,
     cert_inf,
     cert_two,
@@ -44,6 +43,20 @@ from coupled_nd import (  # noqa: E402
 )
 
 MAX_INPUT_ABS = 1.0
+
+
+def sample_gene(rng, n: int) -> CoupledNDGene:
+    """Region-populating sampler matching exp_landscape.sample_gene (generalized to any n).
+
+    Uniform-box sampling (codec.random) puts ~100% of genes in non_certified (W up to ±2 ⇒ huge
+    spectral radius), making any tightness comparison vacuous. This sampler — decay biased high +
+    small Gaussian W scaled by 1/sqrt(n) — populates all four certifier regions, exactly as the
+    landscape experiments do, so L2-lite's admit set can be compared against a real contracting pool.
+    """
+    decay = rng.uniform(rng.uniform(0.0, 0.5), 1.0, size=n)
+    w_scale = rng.choice([0.15, 0.3, 0.6, 1.0, 1.5]) / np.sqrt(n)
+    W = np.clip(rng.standard_normal((n, n)) * w_scale, -2.0, 2.0)
+    return CoupledNDGene.make(decay=decay, W=W)
 
 
 def l2lite_bound(g: CoupledNDGene, max_input_abs: float = MAX_INPUT_ABS) -> float:
