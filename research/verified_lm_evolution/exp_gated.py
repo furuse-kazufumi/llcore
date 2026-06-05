@@ -72,7 +72,34 @@ def main() -> None:
 
     results: dict[str, list[float]] = {g: [] for g in GATES}
     region_of_winner: dict[str, list[str]] = {g: [] for g in GATES}
+    fname = "exp_gated_null_results.json" if null else "exp_gated_results.json"
     t0 = time.time()
+
+    def _paired(a, b, n_done):
+        # one-sided: better gate >= inf. CRN-paired across gates (same seed).
+        da = np.array(results[a][:n_done]) - np.array(results[b][:n_done])
+        return {"mean_delta": float(da.mean()), "frac_a_gt_b": float(np.mean(da > 0)),
+                "deltas": da.round(5).tolist()}
+
+    def _build_out(n_done):
+        summ = {}
+        for g in GATES:
+            arr = np.array(results[g][:n_done])
+            summ[g] = {"fits": list(results[g][:n_done]), "mean_fit": float(arr.mean()),
+                       "mean_ce": float(-np.log(np.clip(arr, 1e-12, None)).mean()),
+                       "best_fit": float(arr.max()), "winner_regions": list(region_of_winner[g][:n_done])}
+        for g in ("two_norm", "sdp"):
+            summ[f"{g}_vs_inf"] = _paired(g, "inf_norm", n_done)
+        return {"null": null, "corpus_bytes": int(len(task.ids)), "n": N,
+                "n_seeds_requested": n_seeds, "n_seeds_done": n_done,
+                "unigram_ce": uni, "config": cfg.__dict__, "summary": summ,
+                "elapsed_s": round(time.time() - t0, 1)}
+
+    def _checkpoint(n_done):
+        # incremental write: a partial-but-valid JSON survives an early stop (kill-safe).
+        with open(fname, "w", encoding="utf-8") as f:
+            json.dump(_build_out(n_done), f, indent=2)
+
     for seed in range(n_seeds):
         for gate in GATES:
             rng = np.random.default_rng(1000 + seed)  # CRN: same seed across gates
@@ -81,36 +108,18 @@ def main() -> None:
             region_of_winner[gate].append(L.classify_region(res.best_gene))
         print(f"  seed {seed}: " + " ".join(f"{g}={results[g][-1]:.4f}" for g in GATES)
               + f"  ({time.time()-t0:.0f}s)", flush=True)
+        _checkpoint(seed + 1)  # partial JSON saved after every seed
 
+    final = _build_out(n_seeds)
     print(f"\n{'gate':10s} {'mean_fit':>9s} {'mean_CE':>8s} {'best_fit':>9s}")
-    summ = {}
     for g in GATES:
-        arr = np.array(results[g])
-        mean_fit = float(arr.mean())
-        mean_ce = float(-np.log(np.clip(arr, 1e-12, None)).mean())
-        print(f"{g:10s} {mean_fit:9.4f} {mean_ce:8.4f} {float(arr.max()):9.4f}")
-        summ[g] = {"fits": results[g], "mean_fit": mean_fit,
-                   "winner_regions": region_of_winner[g]}
-
-    # paired sdp/two vs inf (one-sided: better gate >= inf)
-    def paired(a, b):
-        da = np.array(results[a]) - np.array(results[b])
-        psd = float(np.mean(da > 0))  # fraction a>b
-        return {"mean_delta": float(da.mean()), "frac_a_gt_b": psd, "deltas": da.round(5).tolist()}
-
+        s = final["summary"][g]
+        print(f"{g:10s} {s['mean_fit']:9.4f} {s['mean_ce']:8.4f} {s['best_fit']:9.4f}")
     print("\n--- L3 payoff (paired, vs inf_norm; positive delta = better gate lowers perplexity) ---")
     for g in ("two_norm", "sdp"):
-        p = paired(g, "inf_norm")
+        p = final["summary"][f"{g}_vs_inf"]
         print(f"  {g} vs inf_norm: mean_delta_fit={p['mean_delta']:+.4f}  frac({g}>inf)={p['frac_a_gt_b']:.2f}")
-        summ[f"{g}_vs_inf"] = p
-
-    out = {"null": null, "corpus_bytes": int(len(task.ids)), "n": N, "n_seeds": n_seeds,
-           "unigram_ce": uni, "config": cfg.__dict__, "summary": summ,
-           "elapsed_s": round(time.time() - t0, 1)}
-    fname = "exp_gated_null_results.json" if null else "exp_gated_results.json"
-    with open(fname, "w", encoding="utf-8") as f:
-        json.dump(out, f, indent=2)
-    print(f"\nsaved {fname}  ({out['elapsed_s']}s)")
+    print(f"\nsaved {fname}  ({final['elapsed_s']}s)")
 
 
 if __name__ == "__main__":
