@@ -225,5 +225,7 @@ softened to weak/linear (#9, §2). Independently verified each against the raw n
 - n=8 (the certifiers enumerate 2^n t-box vertices; n=32 is infeasible). Scaling to n=32+ needs the
   **vertex-free sound certifier R-LLM-1** (algorithmic, soundness-first). See
   `CPU_MEMORY_EFFICIENCY_PLAN.md §3`.
-- **Next:** (1) finish gated paired run + null control (3b) → promote or retract the reachability clause;
-  (2) Codex pair-review; (3) commit (research/ isolated, src/ untouched, push 未).
+- **Next:** (1) ✅ gated paired run (10/10) + null control (10/10) complete → reachability promoted,
+  scope narrowed to evolvability (§3c); (2) Codex pair-review of §3c + the navigability verdict
+  (`../verifier_navigability_gpu/NAVIGABILITY_GPU_VERDICT.md`); (3) commit (research/ isolated,
+  src/ untouched, push 未); (4) Kaggle GPU cross-check of BG10 (external, `bg10_kaggle.py`, pending).
