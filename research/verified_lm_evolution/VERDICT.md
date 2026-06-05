@@ -10,15 +10,18 @@
 
 ## 0. One-line result (honest, narrowed by red-team)
 
-**On a real n=8 byte-level language model, relaxing the contraction certifier from inf-norm to a
-less-conservative BUT STILL SOUND certificate (two_norm / sdp) expands the admissible
-provably-contracting search space to include genes with strictly lower held-out perplexity — confirmed
-in both random search (landscape) and 10-seed gated evolution (p=0.000977). The arc's signature payoff
-holds on real LM loss, not just the synthetic rotation task. The load-bearing effect is the
-*inf-vs-sound-relaxed* gap (best-found ~0.04–0.085 nats; distributional MW p<0.01), all admitted genes
-0% empirically-expansive. NOT claimed: the finer two_norm-vs-sdp ordering (sampling noise), that the
-certifier itself "improves modeling" (it is search-space expansion), or that the inf region cannot beat
-unigram on the gated corpus (its EA search merely collapsed to unigram — open, see §3b).**
+**On a real n=8 byte-level language model, under evolution, relaxing the over-conservative inf-norm
+contraction gate to a sound relaxation (two_norm / sdp) lets evolution reach strictly lower held-out CE
+than inf — robustly (10/10 gated seeds, p=0.000977). BUT the honest mechanism (resolved by a same-corpus
+landscape + the null control, §3c) is EVOLVABILITY, not language learning: (a) the inf region *contains*
+genes 0.118 nats better than unigram, yet inf-gated evolution collapses to unigram — the looser sound
+gate wins because its feasible set is more *navigable*, not because it admits a better ceiling
+(same-corpus ceilings are ~equal; the 12288 B "inf-worst-ceiling" ladder is not corpus-robust); and
+(b) the honest-null control does NOT tie — the relaxed-vs-inf advantage persists at ~70% magnitude on a
+shuffled corpus, so it is largely a STRUCTURE-INDEPENDENT optimization effect, not clean evidence that
+the verifier helps learn real language. The verified-evolution core genuinely runs as a tiny byte-LM
+(L0/L1/L2 hold); the L3 "payoff" is best called evolvability, not learning. NOT claimed: the strict
+4-rung ladder (sampling noise), the two-vs-sdp order, or "a better verifier unlocks real LM learning".**
 
 This *reverses* the underpowered 40/60-gene smoke (which had `inf` winning by luck of a thin shell);
 the pre-registered 900-gene landscape, with every region well-sampled, shows the opposite and correct
