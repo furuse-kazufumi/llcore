@@ -169,6 +169,38 @@ fitness). Caveat: n=8, 400 genes from the random landscape pool; a larger pool o
 winners would tighten this, but the best-gene-in-B2 result is already decisive against a perplexity
 payoff. This closes the cost-reduction thread's open question: **scale n with `inf ∪ B2`, skip the SDP.**
 
+## PoC-2.6 result (does the cheap coverage hold as n grows? 2026-06-06) — `poc_scale.py` / `poc_scale_results.json`
+
+Tests the implicit "scale n with inf ∪ B2" claim beyond n=8. Coverage of the exact `cert_two` reach,
+measured at n=8/12/16 (cert_two = 2^n vertices, feasible only up to ~n=16):
+
+| n | exact `cert_two` | `cert_inf` % | `B2` % | `inf ∪ B2` % | soundness violations | cert_two cost |
+|---|---|---|---|---|---|---|
+| 8 | 1360 | 80.5 | 78.5 | **87.2** | 0 | 13.9 s / 3000 genes |
+| 12 | 472 | 64.0 | 69.3 | **77.3** | 0 | 199 s / 1200 genes |
+| 16 | 70 | 60.0 | 57.1 | **60.0** | 0 | 510 s / 200 genes |
+
+**Honest finding: the cheap coverage DEGRADES with dimension.** B2 drops 78.5 → 69.3 → 57.1 %; inf∪B2
+drops 87.2 → 77.3 → 60.0 %. By n=16, **B2 is *more* conservative than `cert_inf`** (57.1 < 60.0) and
+**`inf ∪ B2` = `inf`** (every B2 admit is already an inf admit — B2 adds nothing over the cheap ∞-norm).
+So the n=8 "inf∪B2 beats inf, reaches 87%" advantage **erodes toward inf and vanishes by n=16.**
+**Soundness holds at every n (0 violations)** and the cost win *grows* (12,520× at n=16, §PoC-1).
+
+**Refined conclusion (supersedes the optimistic "skip the SDP").** `inf ∪ B2` is **sound and cheap at
+all n, and the cost win grows** — but its *coverage* of the true contraction set **erodes toward (and
+below) `cert_inf` as n grows**, i.e. the cheap bound becomes increasingly **over-conservative** at
+scale, which would re-introduce the inf-style navigability trap. So:
+- For **small n** (≤ ~10): `inf ∪ B2` is an excellent cheap, sound, high-coverage gate — use it.
+- For the **target n=32** real-LM dimension: the cheap bound is likely too conservative (extrapolating
+  the 87→77→60 % trend), so the genuine **robust-LMI / SDP (R-LLM-1) regains motivation *for coverage*
+  at scale** — orthogonal to PoC-2.5's finding (no LM-perplexity payoff *at n=8*). The two are
+  consistent: at n=8 the missed tail carries no better LM dynamics; whether the *larger* missed set at
+  n=32 does is **unmeasured** (cert_two is infeasible at n=32 — the very wall this thread is about).
+- **Open (the honest gap):** coverage at n=32 cannot be measured with cert_two as ground truth; it needs
+  either the vertex-free SDP itself (to *be* the higher-coverage sound certifier) or an empirical-
+  contraction proxy. So the thread ends **not** with "skip the SDP forever," but with: cheap bound wins
+  at small n; SDP's value at scale is a measured-open question, re-opened by this degradation.
+
 ## Relation to existing plan
 R-LLM-1 = "vertex-free sound certifier for n=32+" is already the named next step
 (`../verified_lm_evolution/VERDICT.md §5`, `CPU_MEMORY_EFFICIENCY_PLAN.md §3`). This sketch refines it
