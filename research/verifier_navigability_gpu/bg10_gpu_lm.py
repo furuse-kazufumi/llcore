@@ -194,41 +194,22 @@ class GatedRecurrentLM(nn.Module):
 
     def forward(self, idx):                      # idx (B,T)
         h = self.emb(idx)                        # (B,T,d)
-        B, T, d = h.shape
         for li in range(self.layers):
             decay, W = self.core(li)             # (n,), (n,n)
-            xc = torch.tanh(self.U[li](h))       # (B,T,n), |.|<1 ⇒ sound input
-            s = torch.zeros(B, self.n, device=h.device)
-            outs = []
-            for t in range(T):
-                s = decay * s + (1 - decay) * torch.tanh(xc[:, t] @ W.T + s @ W.T * 0 + xc[:, t] * 0 + (s @ W.T))
-                outs.append(s)
-            # NOTE: recurrence = decay*s + (1-decay)*tanh(W s + x_core); written explicitly below
-            S = torch.stack(outs, 1)             # (B,T,n)
-            h = self.norm[li](h + self.P[li](S))
+            xc = torch.tanh(self.U[li](h))       # (B,T,n), |.|<1 ⇒ sound input bound
+            S = _recur(decay, W, xc)             # (B,T,n) = s_t = decay*s + (1-decay)*tanh(W s + xc_t)
+            h = self.norm[li](h + self.P[li](S)) # residual + norm
         return self.readout(h)                   # (B,T,vocab)
 
 
 def _recur(decay, W, xc):
-    """Clean sequential core: s_t = decay*s + (1-decay)*tanh(W s + xc_t).  xc (B,T,n)."""
+    """Sequential verified core: s_t = decay*s + (1-decay)*tanh(W s + xc_t).  xc (B,T,n)."""
     B, T, n = xc.shape
     s = torch.zeros(B, n, device=xc.device); outs = []
     for t in range(T):
         s = decay * s + (1 - decay) * torch.tanh(s @ W.T + xc[:, t])
         outs.append(s)
     return torch.stack(outs, 1)
-
-
-# monkey-patch forward to use the clean recurrence (avoids the messy inline above)
-def _forward(self, idx):
-    h = self.emb(idx); B, T, d = h.shape
-    for li in range(self.layers):
-        decay, W = self.core(li)
-        xc = torch.tanh(self.U[li](h))
-        S = _recur(decay, W, xc)
-        h = self.norm[li](h + self.P[li](S))
-    return self.readout(h)
-GatedRecurrentLM.forward = _forward
 
 
 # =================================================================== #
