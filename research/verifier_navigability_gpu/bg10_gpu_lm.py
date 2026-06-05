@@ -327,15 +327,17 @@ def _build_warm_base(gate, seed, cfg, data, vocab):
             with torch.no_grad(): m.raw_W[li].mul_(0.5)
     opt = torch.optim.Adam(m.parameters(), lr=cfg["lr"])
     prev = [(m.raw_decay[li].detach().clone(), m.raw_W[li].detach().clone()) for li in range(cfg["layers"])]
-    for _ in range(cfg["grad_steps"] // 2):
+    ce_every = cfg.get("cert_every", 1); ws = cfg["grad_steps"] // 2
+    for it in range(ws):
         x, y = batches(tr, T, cfg["B"], rng); opt.zero_grad()
         loss = F.cross_entropy(m(x).reshape(-1, vocab), y.reshape(-1)); loss.backward(); opt.step()
-        for li in range(cfg["layers"]):
-            d_, W_ = m.core_np(li)
-            if not gate_pass(gate, d_, W_):
-                with torch.no_grad(): m.raw_decay[li].copy_(prev[li][0]); m.raw_W[li].copy_(prev[li][1])
-            else:
-                prev[li] = (m.raw_decay[li].detach().clone(), m.raw_W[li].detach().clone())
+        if gate != "none" and ((it + 1) % ce_every == 0 or it == ws - 1):
+            for li in range(cfg["layers"]):
+                d_, W_ = m.core_np(li)
+                if not gate_pass(gate, d_, W_):
+                    with torch.no_grad(): m.raw_decay[li].copy_(prev[li][0]); m.raw_W[li].copy_(prev[li][1])
+                else:
+                    prev[li] = (m.raw_decay[li].detach().clone(), m.raw_W[li].detach().clone())
     for p in [m.emb.weight, m.readout.weight, m.readout.bias]:
         p.requires_grad_(False)
     return m
