@@ -1,57 +1,63 @@
 # SPDX-License-Identifier: Apache-2.0
-"""BG10 — GPU stage A: navigability + gradient-vs-evolution on a REAL gradient-trained recurrent LM.
-
-SELF-CONTAINED, paste-into-one-cell (Colab/Kaggle). Inlines the llcore arc certifiers verbatim
-(soundness-critical — do NOT re-derive), builds a small gradient-trained gated-recurrent char LM whose
-per-layer state-mixing core is the *evolvable + contraction-verified* CoupledNDGene, and answers:
-
-  Q-NAV   : does EVOLUTION of the core get trapped by the conservative inf gate (gap > sdp)?
-  Q-GRAD  : does GRADIENT (projected) escape the trap random mutation falls into?
-  Q-PAYOFF: sound (sdp) vs inf vs none on real held-out CE — and does the --null (shuffled corpus) tie?
-
-Pre-registration: PREREGISTRATION_BG10.md. research/ isolated; src/ untouched.
-
-============================ HOW TO RUN (free GPU, $0) ============================
-Kaggle (recommended, 30 GPU-h/week, background): New Notebook -> Accelerator: GPU T4 -> paste this whole
-file into one cell -> set MODE below -> Run All. Or Colab: Runtime -> T4 GPU -> paste -> run.
-
-    MODE = "smoke"     # S2 validation, ~minutes, $0   (then change to "full" for S4)
-    NULL = False       # set True to run the shuffled-corpus null control
-
-The cell auto-installs cvxpy+clarabel (for the sdp gate) and downloads tiny-shakespeare. It writes
-bg10_results_<mode>.json and prints a summary. Share that JSON back for analysis.
-=================================================================================
-"""
+# BG10 - GPU stage A: navigability + gradient-vs-evolution on a REAL gradient-trained recurrent LM.
+#
+# SELF-CONTAINED single cell for Google Colab / Kaggle. No other files needed (the llcore arc
+# certifiers cert_inf/cert_two/cert_sdp are INLINED VERBATIM and self-tested at startup; verified to
+# match the originals 200/200). Builds a small gradient-trained gated-recurrent char LM whose per-layer
+# state-mixing core is the evolvable + contraction-verified CoupledNDGene, and answers:
+#   Q-NAV   : does EVOLUTION of the core get trapped by the conservative inf gate (gap > sdp)?
+#   Q-GRAD  : does GRADIENT (projected) escape the trap random mutation falls into?
+#   Q-PAYOFF: sound (sdp) vs inf vs none on held-out CE; does RUN_NULL (shuffled corpus) tie?
+#
+# ============================ HOW TO RUN (free GPU, $0) ============================
+# Colab: Runtime > Change runtime type > GPU (T4). Paste this whole file into ONE cell. Run.
+# Kaggle: New Notebook > Settings/Accelerator > GPU T4. Paste into one cell. Run All.
+# Edit the two toggles below if needed; defaults run the cheap smoke. Resumable (re-run continues).
+# Output: result_<mode>[_null].json in the working dir (download from the Files panel).
+# =================================================================================
 from __future__ import annotations
+
+# ===================== USER TOGGLES (edit only these) ===================== #
+RUN_MODE = "smoke"   # "smoke" (~minutes, $0 validation) | "full" (S4 full run)
+RUN_NULL = False     # True = shuffled-corpus null control (gates should tie if effect is real LM)
+# ========================================================================== #
 
 import itertools
 import json
 import os
 import sys
 import time
+import datetime
+import traceback
 import urllib.request
 
 import numpy as np
 
-# ----- config (smoke vs full) ------------------------------------------------ #
-MODE = os.environ.get("BG10_MODE", "smoke")          # "smoke" | "full"
-NULL = os.environ.get("BG10_NULL", "0") == "1"        # shuffle corpus (null control)
 SEED0 = 1234
+_T_START = time.time()
+def _log(phase, msg):
+    print(f"[{time.time()-_T_START:6.1f}s][{phase}] {msg}", flush=True)
+def _now():
+    return datetime.datetime.now().isoformat(timespec="seconds")
 
-# ----- optional deps: torch (required), cvxpy+clarabel (sdp gate; degrades) --- #
+_log("setup", f"BG10 starting | RUN_MODE={RUN_MODE} RUN_NULL={RUN_NULL}")
+
+# ----- deps: torch (required), cvxpy+clarabel (sdp gate; auto-install) ----- #
 try:
     import torch
     import torch.nn as nn
     import torch.nn.functional as F
-except Exception as e:  # pragma: no cover
-    print("torch is required (Colab/Kaggle GPU runtime has it). Error:", e); raise
+    _log("deps", f"torch {torch.__version__} ok")
+except Exception as e:
+    print("[deps][FATAL] torch missing. On Colab/Kaggle pick a GPU runtime (it ships torch).", e)
+    raise
 
 try:
     import cvxpy as cp
     _CLARABEL_OK = "CLARABEL" in cp.installed_solvers()
     _CVXPY, _SOLVER = True, (cp.CLARABEL if _CLARABEL_OK else None)
 except Exception:
-    # cvxpy+CLARABEL are needed for the sdp gate in BOTH smoke and full → always try to install.
+    _log("deps", "cvxpy missing -> installing cvxpy clarabel (needed for the sdp gate) ...")
     _CVXPY = _CLARABEL_OK = False; _SOLVER = None
     os.system(f"{sys.executable} -m pip install -q cvxpy clarabel")
     try:
@@ -60,8 +66,15 @@ except Exception:
         _CVXPY, _SOLVER = True, (cp.CLARABEL if _CLARABEL_OK else None)
     except Exception:
         pass
+_log("deps", f"cvxpy={_CVXPY} clarabel={_CLARABEL_OK} (sdp gate {'enabled' if _CVXPY and _CLARABEL_OK else 'DEGRADED -> behaves like two_norm'})")
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+if DEVICE == "cuda":
+    _log("setup", f"GPU: {torch.cuda.get_device_name(0)}")
+    try: os.system("nvidia-smi -L")
+    except Exception: pass
+else:
+    _log("setup", "WARNING: no CUDA -> running on CPU (slow). On Colab/Kaggle enable the GPU accelerator.")
 
 
 # =================================================================== #
@@ -73,7 +86,7 @@ def _clip(decay, W):
 
 def t_min_per_coord(decay, W, max_input_abs=1.0):
     decay, W = _clip(decay, W)
-    M = np.abs(W).sum(axis=1) + max_input_abs * 1.0  # V=I ⇒ |V|.sum(axis=1)=1
+    M = np.abs(W).sum(axis=1) + max_input_abs * 1.0  # V=I => |V|.sum(axis=1)=1
     return 1.0 - np.tanh(M) ** 2
 
 def _jac_at_t(decay, W, t):
@@ -147,6 +160,29 @@ def empirical_rho(decay, W, n_samples=2000, seed=0):
         mx = max(mx, float(np.max(np.abs(np.linalg.eigvals(J)))))
     return mx
 
+def classify_region_np(decay, W):
+    if cert_inf(decay, W): return "inf"
+    if cert_two(decay, W): return "two_norm_only"
+    if cert_sdp(decay, W): return "sdp_only"
+    return "non_certified"
+
+
+# =================================================================== #
+# Cert SELF-TEST (verification phase): confirm the inlined certifiers behave soundly on THIS machine.
+#   contracting gene (decay~0.9, W=0)  -> cert_inf True,  empirical_rho < 1
+#   expansive   gene (decay=0,  W=2I)  -> all certs False, empirical_rho >= 1
+# =================================================================== #
+def cert_selftest(n=8):
+    dc, Wc = np.full(n, 0.9), np.zeros((n, n))
+    de, We = np.zeros(n), 2.0 * np.eye(n)
+    contr_ok = cert_inf(dc, Wc) and (empirical_rho(dc, Wc) < 1.0)
+    exp_rej = (not cert_inf(de, We)) and (not cert_two(de, We)) and (not cert_sdp(de, We)) and (empirical_rho(de, We) >= 1.0)
+    _log("verify", f"cert self-test: contracting_admitted={contr_ok}  expansive_rejected={exp_rej}  "
+                   f"(rho_contr={empirical_rho(dc, Wc):.3f}, rho_exp={empirical_rho(de, We):.3f})")
+    if not (contr_ok and exp_rej):
+        _log("verify", "WARNING: cert self-test unexpected -> soundness assumptions may be off on this machine.")
+    return bool(contr_ok and exp_rej)
+
 
 # =================================================================== #
 # Corpus (tiny-shakespeare, char-level; self-contained download).
@@ -154,18 +190,20 @@ def empirical_rho(decay, W, n_samples=2000, seed=0):
 _TS_URL = "https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt"
 def load_corpus(max_chars):
     try:
-        txt = urllib.request.urlopen(_TS_URL, timeout=20).read().decode("utf-8", "ignore")
-    except Exception:
-        txt = ("To be, or not to be, that is the question. " * 4000)  # offline fallback
+        txt = urllib.request.urlopen(_TS_URL, timeout=30).read().decode("utf-8", "ignore")
+        _log("corpus", f"downloaded tiny-shakespeare ({len(txt)} chars), using {min(len(txt), max_chars)}")
+    except Exception as e:
+        txt = ("To be, or not to be, that is the question. " * 4000)
+        _log("corpus", f"download FAILED ({e}); using offline fallback text")
     return txt[:max_chars]
 
 
 # =================================================================== #
 # Model: small gradient-trained gated-recurrent LM with verified cores.
-#   x_core = tanh(U·emb)               (|x_core|<1 ⇒ sound input bound, max_input_abs=1)
-#   s_t = decay⊙s + (1-decay)⊙tanh(W s + x_core)     (core = CoupledNDGene; decay,W = verified)
-#   layer out = P·s (+ residual + norm); readout: linear → vocab CE.
-# embedding/U/P/readout = gradient-trained "wrapper"; cores = decay,W (gradient or evolved).
+#   x_core = tanh(U.emb)   (|x_core|<1 => sound input bound, max_input_abs=1)
+#   s_t = decay*s + (1-decay)*tanh(W s + x_core)   (core = CoupledNDGene; decay,W = verified)
+#   layer out = P.s (+ residual + norm); readout: linear -> vocab CE.
+# embedding/U/P/readout = gradient-trained wrapper; cores = decay,W (gradient or evolved).
 # =================================================================== #
 class GatedRecurrentLM(nn.Module):
     def __init__(self, vocab, n, layers, d):
@@ -175,7 +213,6 @@ class GatedRecurrentLM(nn.Module):
         self.U = nn.ModuleList([nn.Linear(d, n) for _ in range(layers)])
         self.P = nn.ModuleList([nn.Linear(n, d) for _ in range(layers)])
         self.norm = nn.ModuleList([nn.LayerNorm(d) for _ in range(layers)])
-        # cores: decay∈[0,1] via sigmoid(raw_decay); W∈[-2,2] via 2*tanh(raw_W)
         self.raw_decay = nn.ParameterList([nn.Parameter(torch.randn(n) * 0.5 + 1.0) for _ in range(layers)])
         self.raw_W = nn.ParameterList([nn.Parameter(torch.randn(n, n) * (0.3 / n ** 0.5)) for _ in range(layers)])
         self.readout = nn.Linear(d, vocab)
@@ -192,18 +229,17 @@ class GatedRecurrentLM(nn.Module):
             self.raw_decay[li].copy_(torch.tensor(np.log(decay / (1 - decay)), dtype=torch.float32, device=DEVICE))
             self.raw_W[li].copy_(torch.atanh(torch.tensor(W / 2.0, dtype=torch.float32, device=DEVICE)))
 
-    def forward(self, idx):                      # idx (B,T)
-        h = self.emb(idx)                        # (B,T,d)
+    def forward(self, idx):
+        h = self.emb(idx)
         for li in range(self.layers):
-            decay, W = self.core(li)             # (n,), (n,n)
-            xc = torch.tanh(self.U[li](h))       # (B,T,n), |.|<1 ⇒ sound input bound
-            S = _recur(decay, W, xc)             # (B,T,n) = s_t = decay*s + (1-decay)*tanh(W s + xc_t)
-            h = self.norm[li](h + self.P[li](S)) # residual + norm
-        return self.readout(h)                   # (B,T,vocab)
+            decay, W = self.core(li)
+            xc = torch.tanh(self.U[li](h))
+            S = _recur(decay, W, xc)
+            h = self.norm[li](h + self.P[li](S))
+        return self.readout(h)
 
 
 def _recur(decay, W, xc):
-    """Sequential verified core: s_t = decay*s + (1-decay)*tanh(W s + xc_t).  xc (B,T,n)."""
     B, T, n = xc.shape
     s = torch.zeros(B, n, device=xc.device); outs = []
     for t in range(T):
@@ -221,7 +257,8 @@ def make_data(max_chars, T, null):
     stoi = {c: i for i, c in enumerate(chars)}
     ids = np.array([stoi[c] for c in txt], dtype=np.int64)
     if null:
-        np.random.default_rng(999).shuffle(ids)          # destroy sequential structure
+        np.random.default_rng(999).shuffle(ids)
+        _log("corpus", "NULL control: corpus shuffled (sequential structure destroyed)")
     cut = int(len(ids) * 0.9)
     return ids[:cut], ids[cut:], vocab, T
 
@@ -245,15 +282,12 @@ def unigram_ce(tr, va, vocab):
 
 
 # =================================================================== #
-# Regimes.
+# Regimes (GRAD = projected gradient on the core; EVO = gated random mutation of the core).
 # =================================================================== #
 def train_grad(gate, seed, cfg, data):
-    """Projected gradient: train whole model; after each step, REJECT core moves that leave the gate's
-    feasible set (sound projected GD). wrapper trains freely. Returns held-out CE + soundness/admit stats."""
     tr, va, vocab, T = data
     torch.manual_seed(seed); np.random.seed(seed); rng = np.random.default_rng(seed)
     m = GatedRecurrentLM(vocab, cfg["n"], cfg["layers"], cfg["d"]).to(DEVICE)
-    # ensure initial cores are feasible for the gate (resample raw_W until pass, else zero W)
     for li in range(cfg["layers"]):
         for _ in range(50):
             d_, W_ = m.core_np(li)
@@ -266,7 +300,6 @@ def train_grad(gate, seed, cfg, data):
         x, y = batches(tr, T, cfg["B"], rng)
         opt.zero_grad(); logits = m(x)
         loss = F.cross_entropy(logits.reshape(-1, vocab), y.reshape(-1)); loss.backward(); opt.step()
-        # project: reject infeasible core moves (keep wrapper update)
         for li in range(cfg["layers"]):
             d_, W_ = m.core_np(li)
             if not gate_pass(gate, d_, W_):
@@ -280,89 +313,7 @@ def train_grad(gate, seed, cfg, data):
     return {"ce": ce, "reject_rate": rejects / max(1, steps * cfg["layers"]), "max_emp_rho": rho,
             "winner_region": classify_region_np(*m.core_np(0))}
 
-def evolve_core(gate, seed, cfg, data, base):
-    """Freeze the wrapper (from a base GRAD-trained model), EVOLVE the cores by gated random mutation.
-    Tests navigability: can mutation reach good cores inside the gate? Returns held-out CE + admit rate."""
-    tr, va, vocab, T = data
-    rng = np.random.default_rng(seed + 100)
-    m = base
-    def core_fit(cores):
-        for li, (d_, W_) in enumerate(cores): m.set_core_np(li, d_, W_)
-        return -eval_ce(m, va, T, cfg["B"], cfg["eval_batches"], np.random.default_rng(seed + 7))
-    # init feasible cores
-    cur = []
-    for li in range(cfg["layers"]):
-        d0, W0 = m.core_np(li)
-        if not gate_pass(gate, d0, W0): d0, W0 = np.full(cfg["n"], 0.7), np.zeros((cfg["n"], cfg["n"]))
-        cur.append((d0, W0))
-    best_fit = core_fit(cur); admit = 0; tries = 0
-    for g in range(cfg["evo_gens"]):
-        cand = []
-        for (d_, W_) in cur:
-            nd = np.clip(d_ + rng.normal(0, cfg["sigma"], d_.shape), 0, 1)
-            nW = np.clip(W_ + rng.normal(0, cfg["sigma"], W_.shape), -2, 2)
-            cand.append((nd, nW))
-        tries += 1
-        if all(gate_pass(gate, d_, W_) for (d_, W_) in cand):
-            admit += 1; f = core_fit(cand)
-            if f > best_fit: best_fit, cur = f, cand
-    for li, (d_, W_) in enumerate(cur): m.set_core_np(li, d_, W_)
-    return {"ce": -best_fit, "admit_rate": admit / max(1, tries),
-            "winner_region": classify_region_np(*cur[0])}
-
-def classify_region_np(decay, W):
-    if cert_inf(decay, W): return "inf"
-    if cert_two(decay, W): return "two_norm_only"
-    if cert_sdp(decay, W): return "sdp_only"
-    return "non_certified"
-
-
-# =================================================================== #
-# Main.
-# =================================================================== #
-def main():
-    smoke = (MODE == "smoke")
-    cfg = dict(n=8, layers=1, d=64, T=64, B=16, lr=3e-3,
-               grad_steps=120 if smoke else 1500, evo_gens=60 if smoke else 400,
-               sigma=0.12, eval_batches=4 if smoke else 16,
-               max_chars=20000 if smoke else 300000)
-    gates = ["none", "inf", "sdp"] if smoke else ["none", "inf", "two", "sdp"]
-    seeds = [SEED0] if smoke else [SEED0 + i for i in range(8)]
-    data = make_data(cfg["max_chars"], cfg["T"], NULL)
-    tr, va, vocab, T = data
-    uni = unigram_ce(tr, va, vocab)
-    print(f"BG10 {MODE} NULL={NULL} device={DEVICE} vocab={vocab} sdp_ok={_CVXPY and _CLARABEL_OK} "
-          f"unigram_CE={uni:.4f}", flush=True)
-
-    out = {"mode": MODE, "null": NULL, "device": DEVICE, "cfg": cfg, "vocab": vocab,
-           "unigram_ce": uni, "sdp_available": bool(_CVXPY and _CLARABEL_OK), "grad": {}, "evo": {}}
-    t0 = time.time()
-    for gate in gates:
-        out["grad"][gate], out["evo"][gate] = [], []
-        for seed in seeds:
-            g = train_grad(gate, seed, cfg, data); out["grad"][gate].append(g)
-            # EVO: short grad-train of the wrapper under the same gate, freeze it, then evolve the core
-            base = _build_warm_base(gate, seed, cfg, data, vocab)
-            e = evolve_core(gate, seed, cfg, data, base); out["evo"][gate].append(e)
-            print(f"  gate={gate:4s} seed={seed} GRAD ce={g['ce']:.4f} reject={g['reject_rate']:.2f} "
-                  f"rho={g['max_emp_rho']:.3f} | EVO ce={e['ce']:.4f} admit={e['admit_rate']:.2f} "
-                  f"({time.time()-t0:.0f}s)", flush=True)
-        # checkpoint per gate
-        json.dump(out, open(f"bg10_results_{MODE}{'_null' if NULL else ''}.json", "w"), indent=2)
-
-    # summary
-    print("\n=== summary (held-out CE; lower=better; unigram=%.4f) ===" % uni)
-    for reg in ("grad", "evo"):
-        print(f"[{reg}]")
-        for gate in gates:
-            ces = [r["ce"] for r in out[reg][gate]]
-            print(f"  {gate:5s} mean_CE={np.mean(ces):.4f}  best={np.min(ces):.4f}")
-    json.dump(out, open(f"bg10_results_{MODE}{'_null' if NULL else ''}.json", "w"), indent=2)
-    print(f"\nsaved bg10_results_{MODE}{'_null' if NULL else ''}.json ({time.time()-t0:.0f}s)")
-
-
 def _build_warm_base(gate, seed, cfg, data, vocab):
-    """Short grad-train of the full model under the gate, then return it (wrapper used frozen by EVO)."""
     tr, va, _, T = data
     torch.manual_seed(seed + 5); rng = np.random.default_rng(seed + 5)
     m = GatedRecurrentLM(vocab, cfg["n"], cfg["layers"], cfg["d"]).to(DEVICE)
@@ -385,6 +336,118 @@ def _build_warm_base(gate, seed, cfg, data, vocab):
     for p in [m.emb.weight, m.readout.weight, m.readout.bias]:
         p.requires_grad_(False)
     return m
+
+def evolve_core(gate, seed, cfg, data, base):
+    tr, va, vocab, T = data
+    rng = np.random.default_rng(seed + 100)
+    m = base
+    def core_fit(cores):
+        for li, (d_, W_) in enumerate(cores): m.set_core_np(li, d_, W_)
+        return -eval_ce(m, va, T, cfg["B"], cfg["eval_batches"], np.random.default_rng(seed + 7))
+    cur = []
+    for li in range(cfg["layers"]):
+        d0, W0 = m.core_np(li)
+        if not gate_pass(gate, d0, W0): d0, W0 = np.full(cfg["n"], 0.7), np.zeros((cfg["n"], cfg["n"]))
+        cur.append((d0, W0))
+    best_fit = core_fit(cur); admit = 0; tries = 0
+    for g in range(cfg["evo_gens"]):
+        cand = []
+        for (d_, W_) in cur:
+            nd = np.clip(d_ + rng.normal(0, cfg["sigma"], d_.shape), 0, 1)
+            nW = np.clip(W_ + rng.normal(0, cfg["sigma"], W_.shape), -2, 2)
+            cand.append((nd, nW))
+        tries += 1
+        if all(gate_pass(gate, d_, W_) for (d_, W_) in cand):
+            admit += 1; f = core_fit(cand)
+            if f > best_fit: best_fit, cur = f, cand
+    for li, (d_, W_) in enumerate(cur): m.set_core_np(li, d_, W_)
+    return {"ce": -best_fit, "admit_rate": admit / max(1, tries),
+            "winner_region": classify_region_np(*cur[0])}
+
+
+# =================================================================== #
+# Main (checkpoint + resume + rich JSON + try/except per cell-run).
+# =================================================================== #
+def main():
+    smoke = (RUN_MODE == "smoke")
+    cfg = dict(n=8, layers=1, d=64, T=64, B=16, lr=3e-3,
+               grad_steps=120 if smoke else 1500, evo_gens=60 if smoke else 400,
+               sigma=0.12, eval_batches=4 if smoke else 16,
+               max_chars=20000 if smoke else 300000)
+    gates = ["none", "inf", "sdp"] if smoke else ["none", "inf", "two", "sdp"]
+    seeds = [SEED0] if smoke else [SEED0 + i for i in range(8)]
+    results_path = f"result_{RUN_MODE}{'_null' if RUN_NULL else ''}.json"
+
+    cert_selftest(cfg["n"])
+    data = make_data(cfg["max_chars"], cfg["T"], RUN_NULL)
+    tr, va, vocab, T = data
+    uni = unigram_ce(tr, va, vocab)
+    _log("run", f"vocab={vocab} unigram_CE={uni:.4f} gates={gates} seeds={len(seeds)} sdp={_CVXPY and _CLARABEL_OK}")
+
+    # resume: load any completed (gate,seed) records from a prior run
+    out = {"meta": {"mode": RUN_MODE, "null": RUN_NULL, "device": DEVICE,
+                    "gpu": (torch.cuda.get_device_name(0) if DEVICE == "cuda" else "cpu"),
+                    "cfg": cfg, "vocab": vocab, "unigram_ce": uni,
+                    "sdp_available": bool(_CVXPY and _CLARABEL_OK),
+                    "start_time": _now(), "end_time": None, "status": "running", "error": None},
+           "records": []}
+    done = set()
+    if os.path.exists(results_path):
+        try:
+            prior = json.load(open(results_path))
+            out["records"] = prior.get("records", [])
+            done = {(r["gate"], r["seed"]) for r in out["records"] if r.get("status") == "ok"}
+            if done: _log("run", f"resume: {len(done)} (gate,seed) records already complete -> skipping them")
+        except Exception:
+            pass
+
+    def save():
+        json.dump(out, open(results_path, "w"), indent=2)
+
+    try:
+        for gate in gates:
+            for seed in seeds:
+                if (gate, seed) in done:
+                    continue
+                rec = {"mode": RUN_MODE, "null": RUN_NULL, "gate": gate, "seed": seed, "device": DEVICE,
+                       "start_time": _now(), "end_time": None, "status": "running",
+                       "metrics": {}, "cert_result": {}, "checkpoint_path": results_path, "error": None}
+                try:
+                    g = train_grad(gate, seed, cfg, data)
+                    base = _build_warm_base(gate, seed, cfg, data, vocab)
+                    e = evolve_core(gate, seed, cfg, data, base)
+                    rec["metrics"] = {"grad_ce": g["ce"], "grad_reject_rate": g["reject_rate"],
+                                      "evo_ce": e["ce"], "evo_admit_rate": e["admit_rate"]}
+                    rec["cert_result"] = {"grad_max_emp_rho": g["max_emp_rho"],
+                                          "grad_winner_region": g["winner_region"],
+                                          "evo_winner_region": e["winner_region"],
+                                          "grad_sound": bool(g["max_emp_rho"] < 1.0 or gate == "none")}
+                    rec["status"] = "ok"
+                    _log("run", f"gate={gate:4s} seed={seed} GRAD ce={g['ce']:.4f} rej={g['reject_rate']:.2f} "
+                                f"rho={g['max_emp_rho']:.3f} | EVO ce={e['ce']:.4f} admit={e['admit_rate']:.2f}")
+                except Exception as ex:
+                    rec["status"] = "error"; rec["error"] = f"{type(ex).__name__}: {ex}"
+                    _log("run", f"gate={gate} seed={seed} ERROR: {rec['error']}")
+                rec["end_time"] = _now()
+                out["records"].append(rec); save()   # checkpoint after every (gate,seed)
+        out["meta"]["status"] = "done"
+    except Exception as ex:
+        out["meta"]["status"] = "fatal"; out["meta"]["error"] = "".join(traceback.format_exception_only(type(ex), ex)).strip()
+        _log("run", f"FATAL: {out['meta']['error']}")
+    finally:
+        out["meta"]["end_time"] = _now(); save()
+
+    # human-readable summary
+    print("\n[saved] " + results_path)
+    print(f"=== summary (held-out CE; lower=better; unigram={uni:.4f}; status={out['meta']['status']}) ===")
+    ok = [r for r in out["records"] if r["status"] == "ok"]
+    for reg, key in (("GRAD", "grad_ce"), ("EVO", "evo_ce")):
+        print(f"[{reg}]")
+        for gate in gates:
+            ces = [r["metrics"][key] for r in ok if r["gate"] == gate and key in r["metrics"]]
+            if ces:
+                print(f"  {gate:5s} mean_CE={np.mean(ces):.4f} best={np.min(ces):.4f} (n={len(ces)})")
+    print(f"[done] {len(ok)}/{len(out['records'])} records ok in {time.time()-_T_START:.0f}s -> download {results_path}")
 
 
 if __name__ == "__main__":
