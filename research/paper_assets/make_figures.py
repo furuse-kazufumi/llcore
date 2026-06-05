@@ -18,6 +18,7 @@ import os
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _CR = os.path.normpath(os.path.join(_HERE, "..", "verifier_cost_reduction"))
+_LM = os.path.normpath(os.path.join(_HERE, "..", "verified_lm_evolution"))
 
 
 def _esc(s: str) -> str:
