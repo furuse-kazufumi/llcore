@@ -85,7 +85,8 @@ strictly later than train). **L0 holds.**
 ### 3a. Mechanism / region-ceiling (landscape, COMPLETE — survives red-team)
 
 The conservative **inf region is distributionally excluded from the low-perplexity tail**: **0 of its
-346 contracting genes** reach CE < 4.82, versus 8–25% for the less-conservative sound regions. inf is
+346 contracting genes** reach CE < 4.82, versus **8–11% for the sound relaxed regions** (two_norm 8.0%,
+sdp 10.6%); the 25% figure belongs to the **unsound** non_certified region, not a sound one. inf is
 the *largest* certified shell (346 > sdp 189) yet has the *worst* ceiling — the opposite of a
 more-tickets sampling artifact. Subsampling inf down to sdp's N never reaches sdp's best (**0 of 20,000
 resamples, P < 5e-5** — not literally zero, Codex #7); Mann-Whitney puts the whole inf shell
