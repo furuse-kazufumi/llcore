@@ -688,6 +688,13 @@ seeds and — crucially — is *also present in the null* (`NAVIGABILITY_GPU_VER
 which means it is a property of the *geometry of the feasible set* (how rarely a random
 mutation lands inside it), not of the task being learned.
 
+*Honest caveat (`NAVIGABILITY_GPU_VERDICT.md` Honest limits).* Here EVO evolves the core *on top of*
+a gradient-warm-trained, then frozen, wrapper, so the `inf` trap shows up cleanly in the **admit rate**
+but is **masked in the final CE** — the wrapper carries most of the loss, which is why the EVO CE column
+above is ~equal across gates despite `inf` being trapped. A pure-EVO setup (no gradient wrapper), as in
+the L3 `lm_substrate` run of §5, shows the CE separation instead. The *gradient-escapes* finding (G3,
+below) is unaffected by this and stands on its own.
+
 **(G3) Q-GRAD — gradient escapes the trap.** GRAD reaches mean CE ≈ 2.485 for *every* gate
 (`inf ≈ none ≈ two ≈ sdp` within noise: 2.4886 / 2.4858 / 2.4865 / 2.4842), all well below the
 EVO band of ≈ 2.616 (`NAVIGABILITY_GPU_VERDICT.md` §Evidence). Gradient finds feasible descent
