@@ -3,6 +3,11 @@
 # Sequential so each run gets full CPU; logs + JSON results land in this dir.
 $ErrorActionPreference = 'Continue'
 $env:PYTHONUTF8 = '1'
+# BLAS thread cap: avoids OpenBLAS oversubscription on tiny GEMMs (T x9 @ 9x256).
+# Correctness-preserving (float64 + certifier margins untouched; SHA-256-stable output).
+# Landscape (readout-dominated) clearly benefits; gated (cert-heavy) net effect to be measured.
+$env:OPENBLAS_NUM_THREADS = '1'
+$env:OMP_NUM_THREADS = '1'
 Set-Location -Path $PSScriptRoot
 $py = 'py'
 $args311 = '-3.11'
