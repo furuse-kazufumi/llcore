@@ -66,5 +66,38 @@ which gradient sidesteps.
 - Optional confirmation: Kaggle full (8 seeds, GPU forward, larger config) — expected to reproduce; not
   required for the conclusion.
 
+## GPU full cross-check (Kaggle Tesla T4, 8 seeds × 4 gates, 2026-06-06) — CONFIRMED
+
+Independent reproduction on GPU with a stronger config (grad_steps 400, evo_gens 150, d=64, T=64,
+cert_every=3; `result_full.json` / `result_full_null.json`, pulled via `kaggle kernels output`). Absolute
+CE differs from the CPU run (better config ⇒ lower CE; unigram 3.354 vs CPU 3.251, GRAD ~2.20 vs ~2.485),
+but **every gate-level conclusion reproduces**:
+
+| | gate | GRAD CE | GRAD reject | EVO CE | **EVO admit** | gated sound-viol |
+|---|---|---|---|---|---|---|
+| **REAL** (unigram 3.3542) | none | 2.204 | 0.000 | 2.287 | 1.000 | 0 |
+| | inf | 2.237 | 0.270 | 2.304 | **0.007 (trapped)** | 0 |
+| | two | 2.222 | 0.185 | 2.293 | 0.087 | 0 |
+| | sdp | 2.205 | 0.028 | 2.286 | 0.736 | 0 |
+| **NULL** (unigram 3.3021) | none | 3.316 | 0.000 | 3.314 | 1.000 | 0 |
+| | inf | 3.317 | 0.172 | 3.317 | **0.002** | 0 |
+| | two | 3.317 | 0.165 | 3.316 | 0.085 | 0 |
+| | sdp | 3.317 | 0.157 | 3.315 | 0.343 | 0 |
+
+- **G2 Q-NAV reproduced**: EVO admit-rate monotone in gate strictness (inf ~0.7% → none 100%), present
+  in BOTH real and null (structure-independent geometry).
+- **G3 Q-GRAD reproduced**: GRAD reaches the same final CE across all gates (2.20–2.24, all ≪ unigram
+  3.354), i.e. gate-indifferent in final loss — though GRAD reject is gate-dependent (inf 0.27) and it
+  still converges (the Codex-noted nuance, confirmed at scale).
+- **EVO CE masked reproduced**: EVO CE is gate-insensitive (~2.29), so the trap shows in admit-rate, not
+  final CE (gradient-warm wrapper), exactly as the CPU run / honest-caveat predicted.
+- **G4 null ties reproduced**: on the shuffled corpus all gates' GRAD & EVO CE collapse to ~unigram.
+- **Soundness reproduced**: 0 violations on gated cores (real + null); ungated `none` is non-vacuous.
+
+**Net: the 8-seed GPU full run independently confirms the 6-seed CPU BG10 conclusion on every pre-reg
+gate.** (Honest: absolute CE values are config-specific, not identical; the *qualitative* conclusion and
+the gate ordering are.)
+
 ## Pre-reg gates
-G1 soundness PASS · G2 Q-NAV PASS (admit monotone) · **G3 Q-GRAD PASS (gradient escapes)** · G4 null ties PASS.
+G1 soundness PASS · G2 Q-NAV PASS (admit monotone) · **G3 Q-GRAD PASS (gradient escapes)** · G4 null ties
+PASS. **GPU full cross-check (Kaggle T4, 8 seeds): all four reproduced (2026-06-06).**
