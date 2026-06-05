@@ -955,9 +955,12 @@ that substrate bound every claim in this paper.
   live batch contended for the same box, so it is directional and not yet re-confirmed at full scale
   (CPU_MEMORY_EFFICIENCY_PLAN.md §5, §6). No GPU result is claimed here.
 
-Figure: certifier cost vs state dimension n (closed-form cert_inf vs 2^n cert_two/cert_sdp, with the
-n≈16 memory wall and n=32 infeasibility) (data: research/verifier_cost_reduction/SKETCH.md,
-research/verified_lm_evolution/CPU_MEMORY_EFFICIENCY_PLAN.md §1).
+![Verifier cost: vertex-free L2-lite vs exact 2^n enumeration](../paper_assets/fig_cost_speedup.svg)
+
+*Figure: measured per-gene certifier cost, vertex-free L2-lite (2 SVDs) vs exact 2^n cert_two, at
+n=8/12/16 (60×/980×/12,520× speedup) (rendered: `research/paper_assets/fig_cost_speedup.svg`; data:
+poc_l2lite_results.json). The closed-form cert_inf is O(n²); cert_two/cert_sdp enumerate 2^n vertices,
+giving the n≈16 memory wall and n=32 infeasibility (CPU_MEMORY_EFFICIENCY_PLAN.md §1).*
 
 ### 8.2 Honest-disclosure box
 
