@@ -162,6 +162,46 @@ def fig_l3_gate_gap(real: dict, null: dict) -> str:
                 "L3 honest disclosure: gate-gap persists on the null corpus")
 
 
+def fig_coverage_vs_n(scale: dict) -> str:
+    """Grouped bars: cert_inf / B2 / inf∪B2 coverage (% of exact cert_two) at n=8/12/16 — the honest
+    degradation of the cheap vertex-free bound as the state dimension grows."""
+    rows_d = scale["results"]
+    ns = [r["n"] for r in rows_d]
+    series = [("cert_inf", "inf", "#9bbb59"), ("B2 = σ(|M|+R)", "b2", "#4f81bd"),
+              ("inf ∪ B2", "inf_or_b2", "#8064a2")]
+    W, H = 720, 360
+    x0, y_base = 70, 290
+    grp_w, bar_w, bar_gap = 190, 50, 8
+    plot_h = y_base - 60
+    rows = [f'<text x="35" y="{y_base+22}" font-size="12" fill="#333">%</text>']
+    # y grid 0..100
+    for yv in (0, 25, 50, 75, 100):
+        y = y_base - plot_h * yv / 100.0
+        rows.append(f'<line x1="{x0}" y1="{y:.1f}" x2="{W-20}" y2="{y:.1f}" stroke="#eee" stroke-width="1"/>')
+        rows.append(f'<text x="{x0-8}" y="{y+4:.1f}" text-anchor="end" font-size="10" fill="#999">{yv}</text>')
+    x = x0 + 20
+    for r in rows_d:
+        for j, (_, key, color) in enumerate(series):
+            p = r["pct_of_exact_two"][key]
+            bh = plot_h * p / 100.0
+            bx = x + j * (bar_w + bar_gap)
+            rows.append(f'<rect x="{bx}" y="{y_base-bh:.1f}" width="{bar_w}" height="{bh:.1f}" fill="{color}"/>')
+            rows.append(f'<text x="{bx+bar_w/2:.1f}" y="{y_base-bh-4:.1f}" text-anchor="middle" font-size="10" fill="{color}">{p:.0f}</text>')
+        rows.append(f'<text x="{x+1.5*(bar_w+bar_gap):.1f}" y="{y_base+18}" text-anchor="middle" font-size="12.5" fill="#333">n={r["n"]} (2^n={r["vertices_2pow_n"]})</text>')
+        x += grp_w
+    # legend
+    lx = x0 + 20
+    for name, key, color in series:
+        rows.append(f'<rect x="{lx}" y="40" width="12" height="12" fill="{color}"/>'
+                    f'<text x="{lx+16}" y="50" font-size="11" fill="#333">{_esc(name)}</text>')
+        lx += 150
+    note = (f'<text x="{x0}" y="{H-12}" font-size="11" fill="#666">'
+            f'coverage of the exact 2^n cert_two reach; all 0 soundness violations. '
+            f'inf∪B2 erodes 87→77→60% and meets inf by n=16.</text>')
+    return _svg(W, H, "\n".join(rows) + "\n" + note,
+                "Cheap vertex-free coverage degrades with state dimension n")
+
+
 def main():
     with open(os.path.join(_CR, "poc_l2lite_results.json"), encoding="utf-8") as fh:
         poc1 = json.load(fh)
