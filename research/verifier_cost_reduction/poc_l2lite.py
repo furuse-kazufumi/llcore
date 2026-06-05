@@ -113,8 +113,7 @@ def run_cost(ns_genes: dict, seed: int) -> dict:
     out = {}
     rng = np.random.default_rng(seed + 777)
     for n, ng in ns_genes.items():
-        codec = CoupledNDGeneCodec(n)
-        genes = [codec.to_gene(codec.random(rng)) for _ in range(ng)]
+        genes = [sample_gene(rng, n) for _ in range(ng)]
         t0 = time.perf_counter()
         for g in genes:
             cert_two(g, MAX_INPUT_ABS)
