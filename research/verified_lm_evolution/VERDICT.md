@@ -117,7 +117,7 @@ better genes)? Gated evolution (`exp_gated.py`, gates none/inf/two/sdp, CRN-pair
 
 | gate | mean fitness | mean CE | winner region (all 10 seeds) | vs inf (paired) |
 |---|---|---|---|---|
-| inf_norm | 0.028529 | 3.5568 | inf | — (= unigram exactly) |
+| inf_norm | 0.028529 | 3.5568 | inf | — (≈ unigram, within 0.0003 nats) |
 | two_norm | 0.029277 | 3.5310 | two_norm_only | **+0.00075, 10/10** |
 | sdp | 0.029780 | 3.5140 | sdp_only | **+0.00125, 10/10** |
 | none (ungated) | 0.030422 | 3.4926 | non_certified | +0.00189, 10/10 |
