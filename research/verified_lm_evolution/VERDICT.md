@@ -10,11 +10,15 @@
 
 ## 0. One-line result (honest, narrowed by red-team)
 
-**On a real n=8 byte-level language model, a less-conservative BUT STILL SOUND contraction certifier
-admits genes with strictly lower held-out perplexity than the conservative inf-norm gate — the arc's
-signature payoff holds on real LM loss, not just on the synthetic rotation task. The load-bearing
-effect is the *inf-vs-sound-relaxed* gap (~0.04–0.085 nats, 0% empirically-expansive); the finer
-two_norm-vs-sdp ordering is within sampling noise and is NOT claimed.**
+**On a real n=8 byte-level language model, relaxing the contraction certifier from inf-norm to a
+less-conservative BUT STILL SOUND certificate (two_norm / sdp) expands the admissible
+provably-contracting search space to include genes with strictly lower held-out perplexity — confirmed
+in both random search (landscape) and 10-seed gated evolution (p=0.000977). The arc's signature payoff
+holds on real LM loss, not just the synthetic rotation task. The load-bearing effect is the
+*inf-vs-sound-relaxed* gap (best-found ~0.04–0.085 nats; distributional MW p<0.01), all admitted genes
+0% empirically-expansive. NOT claimed: the finer two_norm-vs-sdp ordering (sampling noise), that the
+certifier itself "improves modeling" (it is search-space expansion), or that the inf region cannot beat
+unigram on the gated corpus (its EA search merely collapsed to unigram — open, see §3b).**
 
 This *reverses* the underpowered 40/60-gene smoke (which had `inf` winning by luck of a thin shell);
 the pre-registered 900-gene landscape, with every region well-sampled, shows the opposite and correct
