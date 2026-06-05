@@ -1,0 +1,28 @@
+{
+  "corpus_bytes": 8192,
+  "n": 8,
+  "unigram_ce": 3.5571,
+  "genes_seen": 902,
+  "cert_two_admitted_scored": 400,
+  "b2_admitted": {
+    "n": 309,
+    "best_ce": 3.4467,
+    "median_ce": 3.5279,
+    "mean_ce": 3.5257,
+    "frac_below_unigram": 0.822
+  },
+  "b2_rejected_tail": {
+    "n": 91,
+    "best_ce": 3.4487,
+    "median_ce": 3.5265,
+    "mean_ce": 3.5226,
+    "frac_below_unigram": 0.857
+  },
+  "decision": {
+    "tail_best_lower": false,
+    "tail_median_lower": true,
+    "sdp_motivated": true,
+    "note": "SDP (PoC-3) motivated: the B2-missed tail reaches lower LM perplexity"
+  },
+  "elapsed_s": 1579.2
+}
