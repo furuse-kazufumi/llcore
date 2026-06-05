@@ -88,6 +88,31 @@ FullSense thesis made literal: *evolution toward verifiability* — organisms se
 fit but to be cheap-to-prove-safe. Design-first + Pareto framing; honest disclosure that adding a
 cost objective changes what "best" means. User-gated like L1–L3.
 
+## PoC-1 result (L2-lite, n=8/12/16, 2026-06-06) — `poc_l2lite.py` / `poc_l2lite_results.json`
+
+Minimal first rung run. **Cost = decisive win; tightness = the cheap bound is too loose.** Honest
+verdict: the naive interval midpoint+radius 2-norm bound is **sound but more conservative than even
+`cert_inf`**, so it is NOT a drop-in — the cost payoff needs a *structure-aware* tighter bound or the
+real robust-LMI.
+
+| metric | result |
+|---|---|
+| **soundness** (3000 genes, region-populating sampler) | **0 violations** — L2-lite never admitted a gene `cert_two` rejects (387 actual admits, non-vacuous). Conservative-by-construction confirmed. |
+| **cost speedup** vs exact `2^n` `cert_two` | **60× (n=8) → 980× (n=12) → 12,520× (n=16)**; L2-lite ≈ constant ~0.0002 s/gene (2 SVDs), `cert_two` = 0.006→0.082→2.76 s/gene. The `2^n` wall is broken. |
+| **tightness** | L2-lite admits only **29.5%** of the exact `two_norm` region; rejects **700 of `cert_inf`'s 1072** admits, gaining only **15** inf misses → **strictly more conservative than inf overall**. |
+
+**Why the cheap bound is loose (and the fix direction):** `σ(J) ≤ σ(M) + σ(R)` treats the t-box as
+`n²` *independent* entry-intervals, but the real perturbation is `Δ = diag((1−decay)(t−t_mid))·W`,
+parameterized by only the **n** values `t_i` (row `i` scales as one shared `t_i`). The naive bound
+gives each entry its own worst case → over-inflated radius. A tighter vertex-free certificate must
+exploit this **n-parameterized (low-rank-ish) structure** of the perturbation — which is exactly the
+bridge to L1/L3 (low rank / reduced dimension) and to the genuine **robust-LMI / SDP = R-LLM-1**.
+
+**Conclusion (PoC-first, spec kept small):** vertex-free 2-norm *is* enormously cheaper and provably
+sound, but the *naive* interval split is too conservative to use as the gate (it would worsen the
+navigability trap). Next rung = a structure/correlation-aware sound bound (or the SDP robust-LMI),
+measured the same way (soundness-consistency + tightness vs exact + cost). Not auto-run; user-gated.
+
 ## Relation to existing plan
 R-LLM-1 = "vertex-free sound certifier for n=32+" is already the named next step
 (`../verified_lm_evolution/VERDICT.md §5`, `CPU_MEMORY_EFFICIENCY_PLAN.md §3`). This sketch refines it
