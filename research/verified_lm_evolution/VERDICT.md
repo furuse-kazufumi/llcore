@@ -198,10 +198,12 @@ alone.
 sound relaxation lets evolution reach lower held-out CE (robust, 10/10 real seeds, p=0.000977), because
 the looser sound feasible set is more *navigable*** — the inf gate traps evolution at unigram even though
 the inf region contains good genes. What does **not** survive: the strong "arc signature holds on real LM
-loss = a better verifier unlocks real language learning" reading. The effect is **largely a
-structure-independent evolvability/optimization phenomenon** (null doesn't tie; same-corpus ceilings are
-equal), with only a small genuine real-structure component. The verified-evolution core *runs* as a real
-byte-LM (L0/L1/L2 hold), but the L3 "payoff" is best described as **evolvability, not learning.**
+loss = a better verifier unlocks real language learning" reading. The gate-gap is an **essentially
+structure-independent evolvability/optimization phenomenon** (null doesn't tie — the gap is ~107% of real
+on the CE scale; same-corpus ceilings are equal); the only structure-dependent component is the
+unigram-crossing (sound gates beat no-context in the real run, never on the null), and there is no
+significant structure-dependent gate-gap residual. The verified-evolution core *runs* as a real byte-LM
+(L0/L1/L2 hold), but the L3 "payoff" is best described as **evolvability, not learning.**
 
 ---
 
