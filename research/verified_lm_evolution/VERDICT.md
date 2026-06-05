@@ -1,7 +1,8 @@
 # R-LLM-0 L3 VERDICT — Verified evolution INSIDE a CPU-real tiny byte-LM
 
 > **Status (2026-06-05): landscape mechanism COMPLETE + adversarially red-teamed; gated-evolution
-> reachability + honest-null control IN PROGRESS (`run_gated.ps1`, NT=1, incremental checkpoint).**
+> reachability CONFIRMED (10 paired seeds, pre-reg gate L3 PASS, frac=10/10); honest-null control +
+> same-corpus (8192B) ceiling-vs-navigability check IN PROGRESS (`run_l3b.ps1`, NT=1, checkpointed).**
 > Pre-registration: `PREREGISTRATION.md`. Substrate: `lm_substrate.py`. Certifiers (reused, unchanged):
 > `../verified_evolution_sdp_gate/coupled_nd.py`. research/ isolated, src/ untouched, push 未.
 
