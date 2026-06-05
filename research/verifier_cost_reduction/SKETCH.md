@@ -108,10 +108,37 @@ gives each entry its own worst case → over-inflated radius. A tighter vertex-f
 exploit this **n-parameterized (low-rank-ish) structure** of the perturbation — which is exactly the
 bridge to L1/L3 (low rank / reduced dimension) and to the genuine **robust-LMI / SDP = R-LLM-1**.
 
-**Conclusion (PoC-first, spec kept small):** vertex-free 2-norm *is* enormously cheaper and provably
-sound, but the *naive* interval split is too conservative to use as the gate (it would worsen the
-navigability trap). Next rung = a structure/correlation-aware sound bound (or the SDP robust-LMI),
-measured the same way (soundness-consistency + tightness vs exact + cost). Not auto-run; user-gated.
+**Conclusion (PoC-first, spec kept small) — SUPERSEDED by PoC-2 below.** PoC-1 showed vertex-free
+2-norm is enormously cheaper + provably sound, but its headline ("the *naive* interval split is more
+conservative than inf") turned out to be specific to the bad bound B1. PoC-2 finds the right cheap
+bound and reverses the pessimism.
+
+## PoC-2 result (cheap vertex-free bounds, n=8, 2026-06-06) — `poc_l2lite_v2.py` / `poc_l2lite_v2_results.json`
+
+Tested two more O(n³) sound bounds and their union, to decide whether *any* cheap (non-SDP)
+vertex-free certificate is useful. **Yes — the abs-domination bound recovers ~78% of the exact 2^n
+reach at 1 SVD.** (3000 genes, region-populating sampler, all bounds 0 soundness violations.)
+
+| certifier | cost | admits | % of exact `cert_two` (1310) | note |
+|---|---|---|---|---|
+| `cert_inf` (inf-norm) | O(n²) | 1072 | 81.8% | but **inf ⊄ two**: 75 of these are NOT 2-norm-contracting (different norm) |
+| `cert_two` (exact, 2^n) | O(2ⁿ·n³) | 1310 | 100% (yardstick) | the gold-standard 2-norm reach |
+| **B1** = σ(M)+σ(R) | 2 SVD | 387 | 29.5% | PoC-1's naive triangle split — poor; B1 ⊆ B2 |
+| **B2** = σ(\|M\|+R) | **1 SVD** | **1017** | **77.6%** | abs-domination (\|J\|≤\|M\|+R, σ monotone under nonneg domination) — the right cheap 2-norm bound |
+| **inf ∪ B2** | O(n²)+1 SVD | **1142** | 87.2% | a cheap vertex-free sound GATE that **beats inf alone** (1142>1072) |
+
+**Honest verdict (reverses PoC-1's pessimism):** a cheap vertex-free *sound* certifier **is** viable —
+`B2 = σ(|M|+R)` recovers **77.6%** of the exact 2^n cert_two reach with a **single SVD** (≈12,000× cheaper
+at n=16, PoC-1 cost table), 0 soundness violations; and `cert_inf ∪ B2` exceeds inf's own coverage.
+PoC-1's "naive vertex-free 2-norm is worse than inf" was an artifact of the bad bound B1 (triangle
+split), not of vertex-free 2-norm certification per se.
+
+**Residual + next rung.** ~22% of cert_two's 2-norm reach (and the genes only an LMI can certify) is
+still missed by B2. Whether that tail is worth the genuine **robust-LMI / SDP (R-LLM-1, PoC-3)** depends
+on whether those hard-to-certify genes carry the navigable low-perplexity dynamics — measure that
+(CE of the B2-missed-but-cert_two-admitted genes) before building the SDP. The scaling win is already
+in hand: `inf ∪ B2` is a poly-cost, vertex-free, sound gate covering ~87% of the 2^n certifier, so
+n>8 is reachable on CPU without the 2^n wall. Not auto-run beyond this; PoC-3 user-gated.
 
 ## Relation to existing plan
 R-LLM-1 = "vertex-free sound certifier for n=32+" is already the named next step
