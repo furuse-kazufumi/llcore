@@ -901,12 +901,27 @@ row shares one `t_i`), so the naive split over-inflates the radius (SKETCH.md).
 
 ### 7.5 Scope, residual, and open questions
 
-The scaling win is in hand: `inf ∪ B2` is a poly-cost, vertex-free, sound gate covering ~87% of the
-`2^n` certifier, so `n>8` is reachable on CPU without the `2^n` wall (SKETCH.md). But ~22% of
-`cert_two`'s 2-norm reach is still missed by B2 (the 1310 − 1017 genes), and SKETCH.md states that
-remaining tail — together with the genes only an LMI can certify — is the territory of the genuine
-robust-LMI / SDP route (R-LLM-1, designated PoC-3), which remains user-gated and is not auto-run
-(SKETCH.md).
+The cost win is unambiguous and *grows* with n (12,520× at n=16); soundness holds at every n (0
+violations). But two follow-up measurements temper the optimistic "scaling win in hand" reading:
+
+**(a) Coverage degrades with dimension (PoC-2.6, `poc_scale_results.json`).** The ~87% `inf ∪ B2`
+coverage is an n=8 figure. Measured at n=8/12/16, `inf ∪ B2` falls **87.2 → 77.3 → 60.0 %** and B2 falls
+**78.5 → 69.3 → 57.1 %**; by n=16, B2 is *more conservative than* `cert_inf` (57.1 < 60.0) and
+`inf ∪ B2` = `inf` (B2 adds nothing). So the cheap bound's advantage over the ∞-norm **erodes toward inf
+and vanishes by n=16** — at scale the cheap vertex-free bound becomes increasingly over-conservative,
+which would re-introduce the ∞-style navigability trap. The honest scaling statement is therefore:
+`inf ∪ B2` is **sound and cheap at all n** (and the cost win grows), an excellent gate **at small n**
+(≤ ~10), but its *coverage* erodes with n.
+
+**(b) The missed tail carries no LM payoff at n=8, but the missed set grows (PoC-2.5,
+`poc_tail_ce_results.json`).** We measured the held-out CE of the B2-missed-but-`cert_two`-admitted
+genes at n=8: the **best gene is in B2's set** (3.4467 < tail 3.4487) and the tail's median/mean edge is
+~0.001–0.003 nats — noise against the 0.4–0.5-nat L0 signal. So **the genuine robust-LMI / SDP (R-LLM-1,
+PoC-3) is *not* motivated by LM perplexity at n=8** — the cheap bound already captures the best dynamics.
+But (a) shows the missed set *grows* with n, so whether the SDP's higher coverage matters at the target
+n=32 is **unmeasured** — and `cert_two` is itself infeasible at n=32 (the very wall), so it cannot serve
+as ground truth there. The SDP's value at scale is thus a genuinely open, measurement-blocked question,
+re-opened by the coverage degradation; it remains user-gated and is not auto-run.
 
 We deliberately do not over-claim here. First, the headline numbers come from a single
 configuration: n=8, 3000 genes, one seed (20260606), `max_input_abs = 1.0`, and a specific
