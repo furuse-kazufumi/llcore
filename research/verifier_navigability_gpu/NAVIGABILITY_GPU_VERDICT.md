@@ -2,7 +2,8 @@
 
 > **Status (2026-06-05): CONFIRMED on CPU, 6 seeds × 4 gates, real + null** (`result_confirm.json`,
 > `result_confirm_null.json`; smoke `bg10_results_smoke.json`). GPU NOT needed — the model is tiny and the
-> bottleneck is the CPU certifier, not the LM forward. Kaggle full (8-seed GPU) is an optional cross-check.
+> bottleneck is the CPU certifier, not the LM forward. **Kaggle full (8-seed GPU, Tesla T4) CONFIRMED
+> 2026-06-06 — reproduces every gate; see "GPU full cross-check" below (`result_full.json` / `result_full_null.json`).**
 > Certs inlined verbatim and self-tested (200/200 parity with `coupled_nd.py`; runtime self-test PASS).
 
 ## One-line result
