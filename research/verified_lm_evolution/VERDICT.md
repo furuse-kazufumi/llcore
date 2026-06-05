@@ -159,9 +159,20 @@ this. Either way the payoff holds (sound relaxation reaches lower CE under evolu
 
 **Bottom line (red-team):** a real, sound, mechanistically-explained payoff exists — the sound
 relaxation beats the conservative gate on real LM loss with zero expansive admissions — but it is a
-**single ~0.04–0.085-nat inf-vs-sound-relaxed gap on one tiny n=8 byte-LM**, not a strictly-monotone
-multi-rung law, and (until 3b completes) a **region-ceiling/admissibility** result rather than a proven
-**reachability ("unlocks")** result.
+**single inf-vs-sound-relaxed effect on one tiny n=8 byte-LM** (best-found gap ~0.04–0.085 nats;
+distributional MW p<0.01), **not** a strictly-monotone multi-rung law. With §3b's 10 paired seeds it is
+now both an **admissibility** (landscape) and a **reachability** (gated evolution, p=0.000977) result;
+the honest-null falsifier is the last open gate.
+
+## 4.5 Codex pair-review (gpt-5.4, read-only) — `CODEX_PAIRREVIEW_L3.md`
+
+16 findings, **none overturn the result**: one terminology BLOCKER ("independent" → "outcome-blind /
+non-leaky", #1, fixed in §2) and a set of scoping/disclosure refinements all folded in above —
+search-space-expansion framing (#8/#16, §0/§3a), best-found-vs-distributional split (#5, §3a), exact
+p=0.000977 + Bonferroni-3 (#2/#3, §3b), "P<5e-5" not "0.0000" (#7, §3a), "EA search collapsed to unigram"
+not "region pinned" (#11/#12, §3b), 0%-expansive = consistency-check-not-proof (#14, §2), ρ-confound
+softened to weak/linear (#9, §2). Independently verified each against the raw numbers before adopting
+([[feedback_external_ai_verify]]).
 
 ---
 

@@ -1,0 +1,98 @@
+{
+  "null": true,
+  "corpus_bytes": 8192,
+  "n": 8,
+  "n_seeds_requested": 15,
+  "n_seeds_done": 3,
+  "unigram_ce": 3.648582574302425,
+  "config": {
+    "pop_size": 12,
+    "n_generations": 10,
+    "tournament_k": 3,
+    "crossover_rate": 0.5,
+    "mutation_sigma": 0.15,
+    "elitism": 1,
+    "resample_cap": 40
+  },
+  "summary": {
+    "none": {
+      "fits": [
+        0.025966497588807272,
+        0.02594032142765759,
+        0.025934986326661625
+      ],
+      "mean_fit": 0.025947268447708827,
+      "mean_ce": 3.6516890778350386,
+      "best_fit": 0.025966497588807272,
+      "winner_regions": [
+        "non_certified",
+        "non_certified",
+        "non_certified"
+      ]
+    },
+    "inf_norm": {
+      "fits": [
+        0.022326007177625416,
+        0.022326007177625416,
+        0.022326007177625416
+      ],
+      "mean_fit": 0.022326007177625413,
+      "mean_ce": 3.802003038897871,
+      "best_fit": 0.022326007177625416,
+      "winner_regions": [
+        "inf",
+        "inf",
+        "inf"
+      ]
+    },
+    "two_norm": {
+      "fits": [
+        0.022830982346867285,
+        0.02317289010106196,
+        0.02273765701159441
+      ],
+      "mean_fit": 0.02291384315317455,
+      "mean_ce": 3.776047278017739,
+      "best_fit": 0.02317289010106196,
+      "winner_regions": [
+        "two_norm_only",
+        "two_norm_only",
+        "two_norm_only"
+      ]
+    },
+    "sdp": {
+      "fits": [
+        0.02337584951011194,
+        0.023130057752966733,
+        0.023166100889870502
+      ],
+      "mean_fit": 0.023224002717649725,
+      "mean_ce": 3.762579801681022,
+      "best_fit": 0.02337584951011194,
+      "winner_regions": [
+        "sdp_only",
+        "sdp_only",
+        "sdp_only"
+      ]
+    },
+    "two_norm_vs_inf": {
+      "mean_delta": 0.0005878359755491352,
+      "frac_a_gt_b": 1.0,
+      "deltas": [
+        0.0005,
+        0.00085,
+        0.00041
+      ]
+    },
+    "sdp_vs_inf": {
+      "mean_delta": 0.0008979955400243086,
+      "frac_a_gt_b": 1.0,
+      "deltas": [
+        0.00105,
+        0.0008,
+        0.00084
+      ]
+    }
+  },
+  "elapsed_s": 3048.8
+}
