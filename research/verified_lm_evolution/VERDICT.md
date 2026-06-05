@@ -32,9 +32,9 @@ ordering. (Lesson logged: do not read a frontier off an underpowered pool — [[
 **Two complementary pieces of evidence agree:** (i) the **landscape** (random sampling) shows the sound
 relaxed regions *contain* lower-CE genes than inf (region-ceiling / admissibility); (ii) **gated
 evolution** (10 paired seeds, §3b) shows evolution *under* a sound relaxed gate actually *reaches* lower
-CE while the inf gate is pinned at unigram (reachability, pre-reg L3 PASS, 10/10). Still open: the
-ceiling-vs-navigability mechanism for inf's pinning (being resolved by an 8192 B landscape), and the
-honest-null control (running).
+CE while the inf gate is pinned at unigram (reachability, pre-reg L3 PASS, 10/10). Both follow-ups have
+now closed: the 8192 B same-corpus landscape resolves inf's pinning as a navigability failure (§3c-i),
+and the honest-null control does NOT tie (§3c-ii).
 
 ---
 
