@@ -583,9 +583,12 @@ evidence that the verifier helps the LM learn real language. The **one genuinely
 signal** is the *unigram-crossing*: in the real run the sound gates **beat** the no-context unigram
 baseline (learning happens, 10/10), whereas on the null no gate does (VERDICT.md §3c-ii).
 
-Figure: real-run vs null-run gate ordering (mean held-out CE per gate, with each run's unigram baseline),
+![L3 honest-disclosure: gate-gap persists on the null corpus](../paper_assets/fig_l3_gate_gap.svg)
+
+*Figure: real-run vs null-run gate ordering (mean held-out CE per gate, with each run's unigram baseline),
 showing the gap persists under shuffling and only the real run crosses below unigram
-(data: exp_gated_real10_results.json, exp_gated_null_results.json).
+(rendered: `research/paper_assets/fig_l3_gate_gap.svg`; data: exp_gated_real10_results.json,
+exp_gated_null_results.json).*
 
 ### 5.5 What survives, what does not
 
