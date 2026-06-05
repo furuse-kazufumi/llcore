@@ -211,10 +211,13 @@ def main():
         real = json.load(fh)
     with open(os.path.join(_LM, "exp_gated_null_results.json"), encoding="utf-8") as fh:
         null = json.load(fh)
+    with open(os.path.join(_CR, "poc_scale_results.json"), encoding="utf-8") as fh:
+        scale = json.load(fh)
     figs = {
         "fig_cost_speedup.svg": fig_cost_speedup(poc1["cost"]),
         "fig_admit_coverage.svg": fig_admit_coverage(v2),
         "fig_l3_gate_gap.svg": fig_l3_gate_gap(real, null),
+        "fig_coverage_vs_n.svg": fig_coverage_vs_n(scale),
     }
     for name, svg in figs.items():
         path = os.path.join(_HERE, name)
