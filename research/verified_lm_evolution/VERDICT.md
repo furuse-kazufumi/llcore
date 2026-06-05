@@ -43,8 +43,9 @@ and the honest-null control does NOT tie (§3c-ii).
 
 ## 1. L0 — the tiny reservoir LM actually functions (PASS)
 
-Landscape corpus 12288 B, `unigram_CE = 5.2399`. Every certifier region's best held-out CE beats the
-Laplace-smoothed byte-unigram baseline by **0.40–0.57 nats**:
+Landscape corpus 12288 B, `unigram_CE = 5.2399`. Every certifier region's best *contracting* held-out CE
+beats the Laplace-smoothed byte-unigram baseline by **0.40–0.53 nats** (0.57 if the unsound non_certified
+region's raw best, which includes expansive genes, is counted):
 
 | region | n | best contracting CE | beats unigram by | % empirically expansive |
 |---|---|---|---|---|
