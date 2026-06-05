@@ -208,26 +208,31 @@ significant structure-dependent gate-gap residual. The verified-evolution core *
 
 ---
 
-## 4. Red-team summary (8 adversarial lenses; 6 pass, 2 force narrowing)
+## 4. Red-team summary (10 adversarial lenses incl. 2nd-round numeric/scale audit; 5 pass, 5 force narrowing)
 
 | lens | survives | note |
 |---|---|---|
-| L0-sanity | ✓ high | LM beats unigram 0.40–0.57 nats; baseline not a strawman; no leakage |
-| sampling-lottery | ✓ high | inf bigger (346) yet worse ceiling; equal-N subsample ladder invariant; 0/346 below sdp best |
-| inf-gated-broken-vs-ceiling | ✓ med | landscape (random-sampled) confirms inf's higher ceiling is a region-fact, not an evolvability artifact |
+| L0-sanity | ✓ high | LM beats unigram 0.40–0.53 nats (contracting); baseline not a strawman; no leakage |
+| sampling-lottery | ✓ high | inf bigger (346) yet worse 12288 B ceiling; equal-N subsample ladder invariant; 0/346 below sdp best |
 | circularity | ✓ high | region label and CE share only the raw gene; ρ-confound wrong sign |
 | readout-confound | ✓ high | identical readout for all genes/regions |
 | soundness-L1L2 | ✓ high | certified 0% expansive, non_certified 78.9% |
 | **monotone-by-chance** | ✗ high | two-vs-sdp rung is noise (median reversal, MW≈0.5, CI overlap) → drop strict ladder |
-| **regime-scope-overclaim** | ✗ high | scope to the single sound inf-vs-relaxed gap on this n=8 byte-LM; drop "gated concurs" until run completes |
+| **inf-gated-broken-vs-ceiling** | ✗ high | 8192 B same-corpus landscape **reverses** this: inf region *contains* genes 0.118 below unigram, ceilings ~equal across sound regions → inf's pinning is navigability, not a corpus-robust region-ceiling fact (§3c-i) |
+| **ceiling-not-corpus-robust** | ✗ high | the 12288 B inf-worst-ceiling ladder does not replicate on 8192 B (§3c-i); region-ceiling claim is corpus-specific |
+| **gate-gap-structure-independent** | ✗ high | null does NOT tie; the gate-gap is ~107% of real on the CE scale and the real−null residual is non-significant → gap is an optimization artifact, not language learning (§3c-ii) |
+| **inf=unigram-exactly** | ✗ med | inf-gated fitness matches exp(−unigram_CE) only to ~3 sig figs and is ~0.0003 nats *better*; "= unigram exactly / zero improvement" overstated → "≈ unigram / effectively no-context" (§3b) |
 
-**Bottom line (red-team):** a real, sound, mechanistically-explained payoff exists — the sound
-relaxation beats the conservative gate on real LM loss with zero expansive admissions — but it is a
-**single inf-vs-sound-relaxed effect on one tiny n=8 byte-LM** (best-found gap ~0.04–0.085 nats;
-distributional MW p<0.01), **not** a strictly-monotone multi-rung law. With §3b's 10 paired seeds it is
-now both an **admissibility** (landscape) and a **reachability** (gated evolution, p=0.000977) result;
-the honest-null falsifier has run and does **NOT** tie (§3c-ii) — final scope: a largely
-structure-independent **evolvability** payoff with a small genuine real-structure residual.
+**Bottom line (red-team, 2nd round):** the verified-evolution core genuinely runs as a tiny n=8 byte-LM
+(L0/L1/L2 hold, sound, 0% expansive admissions), and **under evolution a sound relaxation reaches lower
+held-out CE than the conservative inf gate — robustly (10/10 real seeds, p=0.000977)**. But the honest
+scope is **evolvability/navigability, not language learning**: the inf region *contains* good genes the
+inf-gated EA cannot reach (navigability, §3c-i), same-corpus ceilings are ~equal, and the gate-gap is
+**essentially structure-independent** (the null does not tie — ~107% of the real gap on the CE scale —
+and the real−null residual is non-significant, §3c-ii). The single structure-dependent signal is the
+unigram-crossing (sound gates beat no-context in the real run, never on the null). **Not** claimed: a
+strict monotone multi-rung ladder, the two-vs-sdp order, a corpus-robust region-ceiling, a
+structure-dependent gate-gap residual, or "a better verifier unlocks real LM learning."
 
 ## 4.5 Codex pair-review (gpt-5.4, read-only) — `CODEX_PAIRREVIEW_L3.md`
 
