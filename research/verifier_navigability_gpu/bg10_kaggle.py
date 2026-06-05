@@ -463,4 +463,10 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # Kaggle "Save & Run All": run FULL real + null back-to-back, unattended. Resumable
+    # (re-running continues from result_full*.json). Both write to the working dir.
+    for _null in (False, True):
+        globals()["RUN_MODE"] = "full"; globals()["RUN_NULL"] = _null
+        print(f"\n########## FULL  RUN_NULL={_null} ##########", flush=True)
+        main()
+    print("\n########## ALL DONE: result_full.json + result_full_null.json ##########", flush=True)
