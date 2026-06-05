@@ -51,15 +51,15 @@ try:
     _CLARABEL_OK = "CLARABEL" in cp.installed_solvers()
     _CVXPY, _SOLVER = True, (cp.CLARABEL if _CLARABEL_OK else None)
 except Exception:
+    # cvxpy+CLARABEL are needed for the sdp gate in BOTH smoke and full → always try to install.
     _CVXPY = _CLARABEL_OK = False; _SOLVER = None
-    if MODE == "full":
-        os.system(f"{sys.executable} -m pip install -q cvxpy clarabel")
-        try:
-            import cvxpy as cp
-            _CLARABEL_OK = "CLARABEL" in cp.installed_solvers()
-            _CVXPY, _SOLVER = True, (cp.CLARABEL if _CLARABEL_OK else None)
-        except Exception:
-            pass
+    os.system(f"{sys.executable} -m pip install -q cvxpy clarabel")
+    try:
+        import cvxpy as cp
+        _CLARABEL_OK = "CLARABEL" in cp.installed_solvers()
+        _CVXPY, _SOLVER = True, (cp.CLARABEL if _CLARABEL_OK else None)
+    except Exception:
+        pass
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
