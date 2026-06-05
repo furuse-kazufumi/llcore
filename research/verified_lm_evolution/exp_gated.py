@@ -12,11 +12,31 @@ Run: py -3.11 exp_gated.py [seeds] [--null]
 """
 from __future__ import annotations
 
+import io
 import json
 import sys
 import time
 
 import numpy as np
+
+
+def _ensure_utf8_stdout() -> None:
+    """Reconfigure stdout/stderr to UTF-8 for safe printing on cp932 consoles."""
+    for stream_name in ("stdout", "stderr"):
+        stream = getattr(sys, stream_name, None)
+        if stream is None:
+            continue
+        reconf = getattr(stream, "reconfigure", None)
+        if callable(reconf):
+            try:
+                reconf(encoding="utf-8")
+            except (ValueError, OSError):
+                pass
+        elif hasattr(stream, "buffer"):
+            setattr(sys, stream_name, io.TextIOWrapper(stream.buffer, encoding="utf-8"))
+
+
+_ensure_utf8_stdout()
 
 # evolvable_core lives in the sibling sdp_gate dir (added to sys.path by lm_substrate import)
 import lm_substrate as L
