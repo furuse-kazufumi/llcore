@@ -296,18 +296,21 @@ def train_grad(gate, seed, cfg, data):
     opt = torch.optim.Adam(m.parameters(), lr=cfg["lr"])
     rejects = 0; steps = cfg["grad_steps"]
     prev = [(m.raw_decay[li].detach().clone(), m.raw_W[li].detach().clone()) for li in range(cfg["layers"])]
+    ce_every = cfg.get("cert_every", 1)
     for it in range(steps):
         x, y = batches(tr, T, cfg["B"], rng)
         opt.zero_grad(); logits = m(x)
         loss = F.cross_entropy(logits.reshape(-1, vocab), y.reshape(-1)); loss.backward(); opt.step()
-        for li in range(cfg["layers"]):
-            d_, W_ = m.core_np(li)
-            if not gate_pass(gate, d_, W_):
-                with torch.no_grad():
-                    m.raw_decay[li].copy_(prev[li][0]); m.raw_W[li].copy_(prev[li][1])
-                rejects += 1
-            else:
-                prev[li] = (m.raw_decay[li].detach().clone(), m.raw_W[li].detach().clone())
+        # project: reject infeasible core moves (every ce_every steps; none-gate needs no check)
+        if gate != "none" and ((it + 1) % ce_every == 0 or it == steps - 1):
+            for li in range(cfg["layers"]):
+                d_, W_ = m.core_np(li)
+                if not gate_pass(gate, d_, W_):
+                    with torch.no_grad():
+                        m.raw_decay[li].copy_(prev[li][0]); m.raw_W[li].copy_(prev[li][1])
+                    rejects += 1
+                else:
+                    prev[li] = (m.raw_decay[li].detach().clone(), m.raw_W[li].detach().clone())
     ce = eval_ce(m, va, T, cfg["B"], cfg["eval_batches"], np.random.default_rng(seed + 7))
     rho = max(empirical_rho(*m.core_np(li)) for li in range(cfg["layers"]))
     return {"ce": ce, "reject_rate": rejects / max(1, steps * cfg["layers"]), "max_emp_rho": rho,
