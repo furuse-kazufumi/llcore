@@ -79,14 +79,13 @@ def cert_l2lite(g: CoupledNDGene, max_input_abs: float = MAX_INPUT_ABS) -> bool:
 
 def run_soundness_tightness(n: int, n_genes: int, seed: int) -> dict:
     """n=8 feasible exact two_norm: compare L2-lite vs exact cert_two and cert_inf on a gene pool."""
-    codec = CoupledNDGeneCodec(n)
     rng = np.random.default_rng(seed)
     n_two = n_inf = n_l2 = 0
     l2_admit_two_reject = 0      # MUST be 0 (soundness consistency; violation = bug)
     l2_admit_inf_reject = 0      # L2-lite genes that inf rejects (= what L2-lite gains over inf)
     inf_admit_l2_reject = 0      # inf genes L2-lite rejects (should be ~0 if L2-lite >= inf coverage)
     for _ in range(n_genes):
-        g = codec.to_gene(codec.random(rng))
+        g = sample_gene(rng, n)
         is_inf = cert_inf(g, MAX_INPUT_ABS)
         is_two = cert_two(g, MAX_INPUT_ABS)
         is_l2 = cert_l2lite(g, MAX_INPUT_ABS)
