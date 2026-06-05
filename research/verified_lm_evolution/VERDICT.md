@@ -203,7 +203,8 @@ relaxation beats the conservative gate on real LM loss with zero expansive admis
 **single inf-vs-sound-relaxed effect on one tiny n=8 byte-LM** (best-found gap ~0.04–0.085 nats;
 distributional MW p<0.01), **not** a strictly-monotone multi-rung law. With §3b's 10 paired seeds it is
 now both an **admissibility** (landscape) and a **reachability** (gated evolution, p=0.000977) result;
-the honest-null falsifier is the last open gate.
+the honest-null falsifier has run and does **NOT** tie (§3c-ii) — final scope: a largely
+structure-independent **evolvability** payoff with a small genuine real-structure residual.
 
 ## 4.5 Codex pair-review (gpt-5.4, read-only) — `CODEX_PAIRREVIEW_L3.md`
 
