@@ -140,6 +140,35 @@ on whether those hard-to-certify genes carry the navigable low-perplexity dynami
 in hand: `inf ∪ B2` is a poly-cost, vertex-free, sound gate covering ~87% of the 2^n certifier, so
 n>8 is reachable on CPU without the 2^n wall. Not auto-run beyond this; PoC-3 user-gated.
 
+## PoC-2.5 result (does B2's missed tail carry navigable dynamics? 2026-06-06) — `poc_tail_ce.py` / `poc_tail_ce_results.json`
+
+The go/no-go for whether the genuine robust-LMI / SDP (PoC-3) is worth building. Scored the real
+held-out byte-LM CE of 400 `cert_two`-admitted genes (8192 B corpus, n=8), split into B2-admitted vs
+the B2-missed tail.
+
+| group | n | best CE | median CE | mean CE | frac < unigram |
+|---|---|---|---|---|---|
+| B2-admitted | 309 | **3.4467** | 3.5279 | 3.5257 | 82.2% |
+| B2-missed tail | 91 | 3.4487 | 3.5265 | 3.5226 | 85.7% |
+| (unigram baseline) | — | 3.5571 | — | — | — |
+
+**Honest verdict: SDP (PoC-3) is NOT motivated by LM perplexity** — read the magnitudes, not the
+script's boolean. The script's `decision.sdp_motivated=true` fired only on a hair-trigger 1e-4 median
+threshold (tail median 3.5265 vs admitted 3.5279, a **0.0014-nat** difference). But (a) the single
+**best** gene is in B2's set, not the tail (3.4467 < 3.4487) — the lowest-perplexity dynamics is
+captured by the cheap bound; and (b) the median/mean tail edge is **~0.001–0.003 nats**, i.e. noise
+against the **0.4–0.5-nat** L0 signal. So the ~22% of cert_two's reach that B2 misses carries **no
+meaningfully better LM dynamics**. ([[feedback_benchmark_honest_disclosure]]: the automated flag
+over-claimed; the magnitudes refute it.)
+
+**Conclusion for the thread.** For the real-LM objective, the cheap vertex-free `B2` / `inf ∪ B2`
+(1 SVD, 77.6% / 87.2% coverage, 0 soundness violations, up to 12,520× faster) is **sufficient** — the
+expensive robust-LMI SDP would not buy meaningfully lower perplexity, so **PoC-3 is a NO-GO for the LM
+goal** (it would still be the right tool if the goal were maximal *certification coverage* per se, not LM
+fitness). Caveat: n=8, 400 genes from the random landscape pool; a larger pool or the gated-evolution
+winners would tighten this, but the best-gene-in-B2 result is already decisive against a perplexity
+payoff. This closes the cost-reduction thread's open question: **scale n with `inf ∪ B2`, skip the SDP.**
+
 ## Relation to existing plan
 R-LLM-1 = "vertex-free sound certifier for n=32+" is already the named next step
 (`../verified_lm_evolution/VERDICT.md §5`, `CPU_MEMORY_EFFICIENCY_PLAN.md §3`). This sketch refines it
