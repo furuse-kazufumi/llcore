@@ -97,7 +97,7 @@ real robust-LMI.
 
 | metric | result |
 |---|---|
-| **soundness** (3000 genes, region-populating sampler) | **0 violations** — L2-lite never admitted a gene `cert_two` rejects (387 actual admits, non-vacuous). Conservative-by-construction confirmed. |
+| **soundness** (3000 genes, region-populating sampler) | **0 violations** — L2-lite never admitted a gene `cert_two` rejects (387 actual admits, non-vacuous). The bound is *provably* an upper bound (conservative by construction, §"Bound" above); the run's 0 observed violations is a **from-below consistency check** of that argument on the sampled pool, **not** a machine-checked proof (Codex pair-review 2026-06-06). |
 | **cost speedup** vs exact `2^n` `cert_two` | **60× (n=8) → 980× (n=12) → 12,520× (n=16)**; L2-lite ≈ constant ~0.0002 s/gene (2 SVDs), `cert_two` = 0.006→0.082→2.76 s/gene. The `2^n` wall is broken. |
 | **tightness** | L2-lite admits only **29.5%** of the exact `two_norm` region; rejects **700 of `cert_inf`'s 1072** admits, gaining only **15** inf misses → **strictly more conservative than inf overall**. |
 
