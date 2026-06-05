@@ -69,20 +69,39 @@ best-of-N simulation predicts sdp's lower min purely from its larger N (189 vs 1
 **inf ≪ {two_norm, sdp}** (both sound), with two_norm and sdp mutually indistinguishable, and
 non_certified excluded as unsound. **Not** a strictly-monotone multi-rung law.
 
-### 3b. Reachability under evolution (gated, IN PROGRESS)
+### 3b. Reachability under evolution (gated, 10 paired seeds — PRE-REG GATE L3 PASSES)
 
-Does evolution *under* a looser sound gate actually *reach* that lower-CE ceiling (vs the region merely
-*containing* it)? Gated evolution (`exp_gated.py`, CRN-paired seeds, gates none/inf/two/sdp). First 3
-seeds of the (now superseded) batch: inf pinned at fitness 0.0285 = exp(−unigram), while none/two/sdp
-sit higher — directionally consistent with inf-dominated, but **not yet statistically established**
-(paired one-sided Wilcoxon over the planned seeds not yet computable). Rerunning under NT=1 with
-incremental checkpointing.
+Does evolution *under* a looser sound gate actually *reach* lower CE (vs the region merely *containing*
+better genes)? Gated evolution (`exp_gated.py`, gates none/inf/two/sdp, CRN-paired, pop12/gens10,
+8192 B corpus, `unigram_CE=3.5571`). **10 paired seeds** (`exp_gated_real10_results.json`):
 
-- **DECISIVE TEST (pre-reg gate L3):** paired one-sided Wilcoxon, `sdp/two ≫ inf`, p<0.05 (Bonferroni).
-- **HONEST-NULL CONTROL (pre-reg gate L3-null):** `--null` shuffles the corpus → sequential structure
-  destroyed → all gates must tie (p>0.1). **This is the load-bearing falsifier and MUST run.**
+| gate | mean fitness | mean CE | winner region (all 10 seeds) | vs inf (paired) |
+|---|---|---|---|---|
+| inf_norm | 0.028529 | 3.5568 | inf | — (= unigram exactly) |
+| two_norm | 0.029277 | 3.5310 | two_norm_only | **+0.00075, 10/10** |
+| sdp | 0.029780 | 3.5140 | sdp_only | **+0.00125, 10/10** |
+| none (ungated) | 0.030422 | 3.4926 | non_certified | +0.00189, 10/10 |
 
-`<<gated numbers + Wilcoxon + null tie to be filled from run_gated.ps1 (bizke51lx)>>`
+**The pre-registered L3 gate PASSES decisively.** Both sound relaxations beat the conservative inf gate
+in **10/10 seeds** (`frac_a_gt_b = 1.0`) → one-sided sign/Wilcoxon p ≈ 2⁻¹⁰ ≈ 0.001, past Bonferroni
+(0.05/2). Mechanism is clean: each gate's best gene lands **exactly in its own certifier region**
+(inf→inf, two→two_norm_only, sdp→sdp_only, none→non_certified). inf-gated evolution is **pinned at
+unigram fitness (0.0285288, identical to ~8 sig figs across all 10 seeds)** — the over-conservative gate
+yields *zero* improvement over no-context — while the sound sdp gate recovers ~66% of the *ungated*
+improvement (sdp CE 3.514 vs none 3.493 vs unigram 3.557), staying inside the sound `sdp_only` region.
+So **a stronger sound verifier lets evolution REACH lower real-LM perplexity; the conservative gate
+forfeits it entirely** — admissibility upgraded to reachability.
+
+**Honest open question (ceiling vs navigability):** inf is pinned at *exactly* unigram. Two readings —
+(A) the inf region's ceiling ≈ unigram on this 8192 B corpus, or (B) the inf gate is so tight that
+evolution cannot navigate it (an evolvability handicap). The 12288 B landscape (§3a) shows inf *does*
+contain better-than-unigram genes there, but it is a **different corpus**, so it cannot settle (A) vs
+(B) for the gated 8192 B run. An 8192 B landscape (matching the gated corpus) is running to resolve
+this. Either way the payoff holds (sound relaxation reaches lower CE under evolution); only the
+*mechanism* (ceiling vs navigability) is open. `<<8192B landscape result + ceiling-vs-navigability verdict>>`
+
+- **HONEST-NULL CONTROL (pre-reg gate L3-null, RUNNING `bz2a7xod7`):** `--null` shuffles the corpus →
+  sequential structure destroyed → all gates must tie (p>0.1). **Load-bearing falsifier.** `<<null tie result>>`
 
 ---
 
