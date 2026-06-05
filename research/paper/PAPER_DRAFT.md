@@ -913,6 +913,12 @@ which would re-introduce the ∞-style navigability trap. The honest scaling sta
 `inf ∪ B2` is **sound and cheap at all n** (and the cost win grows), an excellent gate **at small n**
 (≤ ~10), but its *coverage* erodes with n.
 
+![Cheap vertex-free coverage degrades with state dimension n](../paper_assets/fig_coverage_vs_n.svg)
+
+*Figure: certifier coverage (% of the exact `2^n` `cert_two` reach) at n=8/12/16 — `inf ∪ B2` erodes
+87→77→60% and converges to `cert_inf` by n=16, while soundness stays 0 violations (rendered:
+`research/paper_assets/fig_coverage_vs_n.svg`; data: poc_scale_results.json).*
+
 **(b) The missed tail carries no LM payoff at n=8, but the missed set grows (PoC-2.5,
 `poc_tail_ce_results.json`).** We measured the held-out CE of the B2-missed-but-`cert_two`-admitted
 genes at n=8: the **best gene is in B2's set** (3.4467 < tail 3.4487) and the tail's median/mean edge is
