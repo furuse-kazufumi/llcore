@@ -7,9 +7,22 @@
 
 ## One-line result
 **The navigability penalty of an over-conservative-but-sound verifier is REAL for evolution (random
-mutation) but VANISHES under gradient. "Which verifier" matters for evolutionary search; for a
-gradient-trained LM the contraction gate is essentially FREE.** The L3 "a looser sound verifier unlocks
-lower perplexity" effect is an evolution/random-search artifact (navigability), which gradient sidesteps.
+mutation) but VANISHES IN FINAL CE under gradient. "Which verifier" matters for evolutionary search;
+for a gradient-trained LM the contraction gate is essentially free *in held-out CE*.** The L3 "a looser
+sound verifier unlocks lower perplexity" effect is an evolution/random-search artifact (navigability),
+which gradient sidesteps.
+
+> **Scope / honesty (Codex pair-review 2026-06-06, adopted).** Two precisions on the above: (1) the EVO
+> trap shown here is in the **child-admit rate** (inf ~1% vs none 100%), **not** in the final EVO CE —
+> the gated EVO mean CE is nearly tied and non-monotone across gates (`inf 2.6138 ≈ two 2.6167 ≈ sdp
+> 2.6179 ≈ none 2.6198`; `inf` is even fractionally best), because the gradient-warm-trained frozen
+> wrapper carries most of the loss (see Honest limits). The clean CE separation lives in the pure-EVO L3
+> `lm_substrate` run, not here. (2) "free under gradient" means **free in final CE**, not zero
+> interaction: GRAD's per-step reject rate IS gate-dependent (`none 0.000 / sdp 0.0125 / two 0.0667 /
+> inf 0.1514`) — gradient bumps the gate ~15% of steps at `inf` yet still converges to the same CE. (3)
+> This is one tiny n=8, 1-layer, 6-seed CPU setup; "pick the verifier on soundness/coverage, not
+> navigability" is the practical reading **for gradient-trained LMs at this scale on final CE**, not a
+> proven law for all gradient-trained LMs.
 
 ## Evidence (6 seeds, real corpus, unigram_CE=3.2512)
 | gate | GRAD mean CE | EVO mean CE | **EVO admit rate** | GRAD reject |
