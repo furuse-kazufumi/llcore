@@ -1081,9 +1081,11 @@ not as a completed result.
    slightly-loose bound is an unsound admit, so soundness must be proven at theorem level *before*
    measuring — the "R-reach trap" (SKETCH.md status header; CPU_MEMORY_EFFICIENCY_PLAN.md §3, §7). The
    cheap-PoC progress so far is `inf ∪ B2` covering ~87.2% of cert_two at poly cost with 0 soundness
-   violations (SKETCH.md PoC-2); the genuine robust-LMI/SDP rung (PoC-3) is user-gated and pending
-   measurement of whether the missed ~22% tail carries navigable low-perplexity dynamics (SKETCH.md
-   PoC-2).
+   violations *at n=8* (SKETCH.md PoC-2) — but that coverage **degrades with dimension** (87→77→60% at
+   n=8/12/16, meeting cert_inf by n=16; PoC-2.6), so the cheap bound becomes over-conservative at scale.
+   The missed tail carries no LM-perplexity payoff *at n=8* (PoC-2.5), but the missed set grows with n, so
+   the genuine robust-LMI/SDP rung (PoC-3) — user-gated — *regains motivation for coverage at the target
+   n=32*, where `cert_two` is itself infeasible (the measurement is blocked by the very wall).
 2. **GPU stage B: a true gradient-trained Transformer.** Move from the reservoir LM to a
    gradient-trained Transformer on GPU (VERDICT.md §5, PREREGISTRATION.md §1). The navigability
    cross-check indicates the inf trap is an EA(random-mutation)-specific artifact that gradient
