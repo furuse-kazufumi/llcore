@@ -20,6 +20,13 @@ This *reverses* the underpowered 40/60-gene smoke (which had `inf` winning by lu
 the pre-registered 900-gene landscape, with every region well-sampled, shows the opposite and correct
 ordering. (Lesson logged: do not read a frontier off an underpowered pool — [[feedback_benchmark_honest_disclosure]].)
 
+**Two complementary pieces of evidence agree:** (i) the **landscape** (random sampling) shows the sound
+relaxed regions *contain* lower-CE genes than inf (region-ceiling / admissibility); (ii) **gated
+evolution** (10 paired seeds, §3b) shows evolution *under* a sound relaxed gate actually *reaches* lower
+CE while the inf gate is pinned at unigram (reachability, pre-reg L3 PASS, 10/10). Still open: the
+ceiling-vs-navigability mechanism for inf's pinning (being resolved by an 8192 B landscape), and the
+honest-null control (running).
+
 ---
 
 ## 1. L0 — the tiny reservoir LM actually functions (PASS)

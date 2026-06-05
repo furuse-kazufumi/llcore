@@ -1,0 +1,56 @@
+You are doing an adversarial pair-review (read-only) of a research claim. All numbers are given inline
+below — do NOT read files. Your job: find statistical errors, overclaims, or logic gaps. Be skeptical;
+this is a POSITIVE result so scrutinize hard. Reply with a numbered list of findings (BLOCKER / claim-
+narrowing / disclosure / OK), each with the specific number or logic at issue.
+
+CONTEXT. A "CoupledNDGene" recurrent core (decay vector + W matrix, n=8) is wired into a real tiny
+byte-level language model: byte -> tanh embedding (|e|<1) -> recurrence s'=decay*s+(1-decay)*tanh(Ws+e)
+-> per-gene ridge/logistic readout -> held-out cross-entropy (CE, nats). A contraction CERTIFIER labels
+each gene by its TIGHTEST sound certificate over the Jacobian t-box: cert_inf (closed-form inf-norm) <
+cert_two (2-norm, enumerates 2^n vertices) < cert_sdp (SDP/Lyapunov, CLARABEL). Regions are nested-
+exclusive: "inf" (passes inf), "two_norm_only" (passes 2-norm not inf), "sdp_only" (passes SDP not
+2-norm/inf), "non_certified" (none). The certifier reads ONLY (decay,W); it never reads the reservoir
+states, readout, corpus, or CE (so region label and CE are independent — claimed non-circular).
+
+CLAIM UNDER REVIEW (already narrowed by an internal red-team):
+"On a real n=8 byte-LM, a less-conservative BUT STILL SOUND contraction certifier (two_norm/sdp, both
+0% empirically-expansive) admits genes with strictly lower held-out CE than the conservative inf gate.
+Load-bearing effect = the inf-vs-sound-relaxed gap (~0.04-0.085 nats); the finer two_norm-vs-sdp
+ordering is NOT claimed (sampling noise). Gated evolution confirms reachability (sound gate reaches
+lower CE; inf gate pinned at unigram)."
+
+EVIDENCE 1 -- LANDSCAPE (random gene pool, 12288-byte corpus, unigram_CE=5.2399, 900 genes):
+ region          n     best_contracting_CE   median_CE   %empirically_expansive
+ inf            346    4.8377                4.8848      0.0
+ two_norm_only  100    4.7954                4.8766      0.0
+ sdp_only       189    4.7525                4.8793      0.0
+ non_certified  265    4.7052 (raw 4.6684)   4.8915      78.9
+ - best-CE ladder is monotone (inf>two>sdp>non, all 4 deltas positive ~0.042-0.047).
+ - BUT medians are NOT monotone (two 4.8766 < sdp 4.8793); Mann-Whitney two-vs-sdp p~=0.5.
+ - inf is the BIGGEST certified region (346) yet has the WORST best-CE; subsampling inf to n=189 never
+   reaches sdp's 4.7525 (P=0.0000). corr(CE, empirical_rho) = +0.145 (wrong sign for an edge-of-chaos
+   confound).
+
+EVIDENCE 2 -- GATED EVOLUTION (8192-byte corpus, unigram_CE=3.5571, pop12/gens10, 10 CRN-paired seeds,
+fitness = exp(-held_out_CE), higher better):
+ gate       mean_fitness  mean_CE   winner_region (all 10 seeds)   paired vs inf
+ inf_norm   0.028529      3.5568    inf                            (= unigram fitness exactly)
+ two_norm   0.029277      3.5310    two_norm_only                  mean_delta +0.00075, frac(two>inf)=1.0 (10/10)
+ sdp        0.029780      3.5140    sdp_only                       mean_delta +0.00125, frac(sdp>inf)=1.0 (10/10)
+ none       0.030422      3.4926    non_certified                  +0.00189, 10/10
+ - inf_norm fitness = 0.02852885423306474 IDENTICAL across all 10 different seeds.
+ - I claim: frac=1.0 over 10 paired seeds => one-sided sign/Wilcoxon p ~= 2^-10 ~= 0.001 < Bonferroni 0.025.
+
+QUESTIONS:
+1. Is "frac=1.0 over 10 paired seeds => p~=0.001 one-sided" statistically correct (sign test vs Wilcoxon
+   signed-rank with n=10)? State the exact smallest achievable p for each test at n=10.
+2. Given landscape medians reverse two-vs-sdp and MW p~=0.5, is dropping the strict 4-rung ladder and
+   claiming only "inf << {two,sdp}" the right call? Is there any way the inf-vs-relaxed gap itself is a
+   sampling/expressivity artifact rather than a certifier effect?
+3. inf is pinned at EXACTLY unigram fitness across 10 seeds. Does that argue (A) inf region ceiling ~=
+   unigram on the 8192B corpus, or (B) inf gate too restrictive for evolution to navigate? What single
+   experiment cleanly distinguishes (A) vs (B)? (We are running an 8192B landscape to check if the inf
+   region CONTAINS better-than-unigram genes.)
+4. The null control (shuffle corpus -> all gates should tie) has NOT been run yet. Is the positive claim
+   premature without it? How load-bearing is the null?
+5. Any remaining overclaim, statistical slip, or non-disclosed confound?
