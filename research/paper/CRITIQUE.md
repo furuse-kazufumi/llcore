@@ -21,7 +21,9 @@ primary result files.
 **Also applied:** wired the three CPU/SVG figures (`../paper_assets/fig_cost_speedup.svg`,
 `fig_admit_coverage.svg`, `fig_l3_gate_gap.svg`) into their matching captions.
 
-**Status:** first draft. Remaining (future passes): tighten §6 to keep the BG10 gradient-wrapper numbers
-(unigram 3.2512, GRAD ~2.485) distinct from the L3 reservoir numbers (unigram 3.5571) — the abstract/
-contributions are already careful, but a §6 spot-check is advisable before any external sharing; render
-the remaining conceptual figure placeholders; add a related-work pass. **Push deferred (no llcore remote).**
+**Status:** first draft. §6 spot-check **done** (2026-06-06): the BG10 numbers (unigram 3.2512, GRAD
+~2.485, null 3.309) are correctly attributed to NAVIGABILITY_GPU_VERDICT.md and NOT conflated with the
+L3 reservoir numbers (unigram 3.5571); added an explicit honest caveat that the EVO trap is masked in CE
+by the gradient-warm wrapper and shows only in admit-rate (connecting §6 to the pure-EVO §5). Remaining
+(future passes): render the remaining conceptual figure placeholders; add a related-work pass; the
+EN/ZH/KO multilingual versions for any public derivative. **Push deferred (no llcore remote).**
