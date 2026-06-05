@@ -56,10 +56,11 @@ def bound_b2(g) -> float:
 
 def run(n: int, n_genes: int, seed: int) -> dict:
     rng = np.random.default_rng(seed)
-    cnt = {"inf": 0, "two_exact": 0, "b1": 0, "b2": 0, "bmin": 0}
+    cnt = {"inf": 0, "two_exact": 0, "b1": 0, "b2": 0, "bmin": 0, "inf_or_b2": 0}
     viol = {"b1": 0, "b2": 0, "bmin": 0}          # admit but cert_two rejects -> MUST be 0
     gain_over_inf = {"b1": 0, "b2": 0, "bmin": 0}  # admit but inf rejects
     loss_vs_inf = {"b1": 0, "b2": 0, "bmin": 0}    # inf admits but bound rejects
+    inf_admit_two_reject = 0   # is cert_inf ⊆ cert_two on this pool? (inf is a different norm)
     for _ in range(n_genes):
         g = sample_gene(rng, n)
         is_inf = cert_inf(g, MAX_INPUT_ABS)
@@ -69,6 +70,9 @@ def run(n: int, n_genes: int, seed: int) -> dict:
         bmin = b1 or b2
         cnt["inf"] += is_inf; cnt["two_exact"] += is_two
         cnt["b1"] += b1; cnt["b2"] += b2; cnt["bmin"] += bmin
+        cnt["inf_or_b2"] += (is_inf or b2)
+        if is_inf and not is_two:
+            inf_admit_two_reject += 1
         for key, ok in (("b1", b1), ("b2", b2), ("bmin", bmin)):
             if ok and not is_two:
                 viol[key] += 1
@@ -76,12 +80,15 @@ def run(n: int, n_genes: int, seed: int) -> dict:
                 gain_over_inf[key] += 1
             if is_inf and not ok:
                 loss_vs_inf[key] += 1
-    pct = {k: (round(100.0 * cnt[k] / cnt["two_exact"], 2) if cnt["two_exact"] else None)
-           for k in ("inf", "b1", "b2", "bmin")}
+    # "reachable" yardstick = union of all sound certs available cheaply (inf ∪ exact-two-as-ceiling)
+    denom = cnt["two_exact"]
+    pct = {k: (round(100.0 * cnt[k] / denom, 2) if denom else None)
+           for k in ("inf", "b1", "b2", "bmin", "inf_or_b2")}
     return {"n": n, "n_genes": n_genes, "seed": seed, "admit_counts": cnt,
             "pct_of_exact_two": pct, "soundness_violations": viol,
+            "inf_admit_two_reject": inf_admit_two_reject,
             "gain_over_inf": gain_over_inf, "loss_vs_inf": loss_vs_inf,
-            "beats_inf_coverage": {k: cnt[k] > cnt["inf"] for k in ("b1", "b2", "bmin")}}
+            "beats_inf_coverage": {k: cnt[k] > cnt["inf"] for k in ("b1", "b2", "bmin", "inf_or_b2")}}
 
 
 def main():

@@ -7,19 +7,22 @@
     "two_exact": 1310,
     "b1": 387,
     "b2": 1017,
-    "bmin": 1017
+    "bmin": 1017,
+    "inf_or_b2": 1142
   },
   "pct_of_exact_two": {
     "inf": 81.83,
     "b1": 29.54,
     "b2": 77.63,
-    "bmin": 77.63
+    "bmin": 77.63,
+    "inf_or_b2": 87.18
   },
   "soundness_violations": {
     "b1": 0,
     "b2": 0,
     "bmin": 0
   },
+  "inf_admit_two_reject": 75,
   "gain_over_inf": {
     "b1": 15,
     "b2": 70,
@@ -33,6 +36,7 @@
   "beats_inf_coverage": {
     "b1": false,
     "b2": false,
-    "bmin": false
+    "bmin": false,
+    "inf_or_b2": true
   }
 }
