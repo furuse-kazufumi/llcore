@@ -932,12 +932,13 @@ whether the ~22% tail that B2 misses carries the navigable, low-perplexity dynam
 losing those genes actually costs the evolutionary search anything useful — is **not yet measured**.
 SKETCH.md is explicit that the cross-entropy of the B2-missed-but-`cert_two`-admitted genes must be
 measured before building the SDP, because that is what decides whether the SDP tail is worth its cost
-(SKETCH.md). Until that measurement exists, the claim is bounded to: a single-SVD vertex-free sound
-certifier recovers most of the exact `2^n` certifier's admit set at orders-of-magnitude lower cost,
-with the navigability of the missed tail an open question. Consistent with the L4 framing, this is a
-statement about *verifiability cost*, not about language-learning capability; the soundness oracle
-gates which dynamics are admissible, it does not by itself demonstrate that the admitted dynamics
-learn language.
+(SKETCH.md). With those measurements now in hand (PoC-2.5/2.6 above), the bounded claim is: a
+single-SVD vertex-free sound certifier recovers **most of the exact `2^n` admit set at small n** (87% at
+n=8) at orders-of-magnitude lower cost and zero soundness violations, with coverage **degrading toward
+the ∞-norm as n grows** and the SDP's value at the target dimension an open, measurement-blocked
+question. Consistent with the L4 framing, this is a statement about *verifiability cost*, not about
+language-learning capability; the soundness oracle gates which dynamics are admissible, it does not by
+itself demonstrate that the admitted dynamics learn language.
 
 ---
 
