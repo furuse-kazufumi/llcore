@@ -51,7 +51,7 @@ Laplace-smoothed byte-unigram baseline by **0.40–0.57 nats**:
 | inf | 346 | 4.8377 | 0.4022 | 0.0 |
 | two_norm_only | 100 | 4.7954 | 0.4445 | 0.0 |
 | sdp_only | 189 | 4.7525 | 0.4874 | 0.0 |
-| non_certified | 265 | 4.7052 (raw 4.6684) | 0.5715 | **78.9** |
+| non_certified | 265 | 4.7052 (raw 4.6684) | 0.5347 (raw 0.5715) | **78.9** |
 
 Baseline is not a strawman: the logistic readout's zero-feature limit *exactly* recovers the unigram
 (zero-init + bias column), so any gain is genuine sequential signal. No temporal leakage (held-out is
