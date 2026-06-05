@@ -53,6 +53,41 @@ If L2-lite is sound AND not as conservative as inf, it is the cheapest real prog
 and unlocks n>8 without GPU. If it collapses to inf-like conservatism, the lesson is that vertex-free
 2-norm is insufficient and the SDP/SOS route (true R-LLM-1) is required — also a clean result.
 
+## L4 — cost as an internal SELECTION PRESSURE (not just external engineering)
+
+(User insight, 2026-06-06: "reducing cost is itself a valid direction of evolution — in nature
+simpler structures sometimes survive.") Instead of engineering cost down *around* the EA, fold a
+**structural-cost term into fitness** and let evolution prefer cheap-to-verify genes by itself:
+multi-objective `(maximize held-out likelihood, minimize structural cost)` where structural cost =
+rank(W) / sparsity / active state-dimension.
+
+**Biological precedent (real):** reductive evolution / genome streamlining (Prochlorococcus,
+Pelagibacter/SAR11 = smallest free-living genomes, selected for economy & replication speed),
+minimal symbiont genomes (Buchnera, Mycoplasma), loss of unused costly traits (cave-fish eyes,
+flightless birds) under "use it or lose it" / relaxed selection. **TRIZ:** this is the law of
+increasing Ideality (= function / cost) + Trimming — same function at less cost is the central
+direction of system evolution. **ML:** hardware-aware NAS (latency/FLOPs in the objective),
+L1/weight-decay, MDL / Bayesian Occam, NSGA-II accuracy-vs-complexity Pareto fronts.
+
+**CRITICAL caveat — two kinds of "cheap", only one is good (llcore's own L3 result bites here):**
+- ✅ **good cheap = structural simplicity** (low rank / sparse W / small active dim): genuinely
+  cheaper to certify AND more navigable. Reward this.
+- ❌ **bad cheap #1 = certifier conservatism**: `cert_inf` is the cheapest certifier (O(n²)) but
+  §3b/§3c show it traps evolution at unigram. A naive "cheap-to-verify = good" reward would push the
+  EA straight INTO the inf trap. The cost term must target *structural* cost, never "use the cheap
+  conservative certifier".
+- ❌ **bad cheap #2 = degenerate behavior**: the unigram collapse itself is "a too-simple structure
+  that survives because it is safe/cheap but useless" — the obligate-parasite failure mode. So
+  scalarizing "cheap = good" is dangerous; use a **Pareto (CE vs structural cost)** front, not a
+  weighted sum.
+
+**Why llcore is uniquely equipped:** most evolutionary systems cannot tell "good simple" (low-rank,
+still beats unigram) from "degenerate simple" (unigram, learns nothing). llcore has a **soundness
+oracle** that distinguishes them — so it can study cost-pressured evolution honestly. This is the
+FullSense thesis made literal: *evolution toward verifiability* — organisms selected not just to be
+fit but to be cheap-to-prove-safe. Design-first + Pareto framing; honest disclosure that adding a
+cost objective changes what "best" means. User-gated like L1–L3.
+
 ## Relation to existing plan
 R-LLM-1 = "vertex-free sound certifier for n=32+" is already the named next step
 (`../verified_lm_evolution/VERDICT.md §5`, `CPU_MEMORY_EFFICIENCY_PLAN.md §3`). This sketch refines it
