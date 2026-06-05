@@ -1,0 +1,40 @@
+{
+  "soundness_tightness": {
+    "n": 8,
+    "n_genes": 3000,
+    "seed": 20260606,
+    "admit_counts": {
+      "inf": 0,
+      "l2lite": 0,
+      "two_exact": 0
+    },
+    "soundness_violations_l2_admit_two_reject": 0,
+    "l2_captures_of_exact_two_pct": null,
+    "l2_gain_over_inf_genes": 0,
+    "inf_admit_l2_reject": 0
+  },
+  "cost": {
+    "8": {
+      "n_genes": 300,
+      "vertices_2pow_n": 256,
+      "sec_per_gene_two_exact": 0.000614,
+      "sec_per_gene_l2lite": 6.6e-05,
+      "speedup_x": 9.2
+    },
+    "12": {
+      "n_genes": 60,
+      "vertices_2pow_n": 4096,
+      "sec_per_gene_two_exact": 0.01061,
+      "sec_per_gene_l2lite": 8.8e-05,
+      "speedup_x": 120.6
+    },
+    "16": {
+      "n_genes": 8,
+      "vertices_2pow_n": 65536,
+      "sec_per_gene_two_exact": 0.193866,
+      "sec_per_gene_l2lite": 0.000115,
+      "speedup_x": 1690.2
+    }
+  },
+  "max_input_abs": 1.0
+}
