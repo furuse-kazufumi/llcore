@@ -4,3 +4,4 @@ D:\projects\llcore\research\verified_evolution_sdp_gate\coupled_nd.py:163: UserW
   seed 0: none=0.0303 inf_norm=0.0285 two_norm=0.0290 sdp=0.0291  (1934s)
   seed 1: none=0.0308 inf_norm=0.0285 two_norm=0.0296 sdp=0.0295  (3669s)
   seed 2: none=0.0304 inf_norm=0.0285 two_norm=0.0293 sdp=0.0300  (5704s)
+  seed 3: none=0.0302 inf_norm=0.0285 two_norm=0.0295 sdp=0.0298  (8970s)
