@@ -370,10 +370,11 @@ def evolve_core(gate, seed, cfg, data, base):
 # =================================================================== #
 def main():
     smoke = (RUN_MODE == "smoke")
-    cfg = dict(n=8, layers=1, d=64, T=64, B=16, lr=3e-3,
-               grad_steps=120 if smoke else 1500, evo_gens=60 if smoke else 400,
-               sigma=0.12, eval_batches=4 if smoke else 16,
-               max_chars=20000 if smoke else 300000)
+    cfg = dict(n=8, layers=1, d=64, T=(48 if smoke else 64), B=16, lr=3e-3,
+               grad_steps=40 if smoke else 1500, evo_gens=20 if smoke else 400,
+               sigma=0.12, eval_batches=3 if smoke else 16,
+               max_chars=10000 if smoke else 300000,
+               cert_every=(8 if smoke else 1))  # smoke: check gate every 8 steps (fast); full: every step (sound)
     gates = ["none", "inf", "sdp"] if smoke else ["none", "inf", "two", "sdp"]
     seeds = [SEED0] if smoke else [SEED0 + i for i in range(8)]
     results_path = f"result_{RUN_MODE}{'_null' if RUN_NULL else ''}.json"
