@@ -136,6 +136,27 @@ is never solver-blind (`coupled_nd.py`, end of `cert_sdp`). A behaviour-preservi
 rejects any vertex with `ρ(J_v) ≥ 1` (a necessary condition for LMI feasibility) before invoking
 the solver (`coupled_nd.py`, `cert_sdp` pre-screen; `VERDICT.md`, §7).
 
+**No SMT solver in the gate — and why that is a feature, stated honestly.** The project's working name
+("Z3-gated evolution") and an early framing described an SMT (Z3) verifier; the gate this paper actually
+runs uses **no SMT solver at all**. The contraction conditions it checks decompose into closed-form
+arithmetic: `cert_inf` is an `O(n²)` closed-form ∞-norm supremum (each row's absolute-sum is V-shaped in
+`t_i`, so the box maximum is attained at an endpoint and the quantifier over the box collapses to a
+per-row 1-D evaluation), `cert_two` is a finite set of `2^n` SVDs, and `cert_sdp` is a convex LMI solved
+by an interior-point SDP solver (CLARABEL), not a satisfiability solver. We verified this was not a
+missed opportunity but a property of the problem: a dedicated coupled-map Z3 contraction track found the
+SMT certificate **byte-for-identical to the closed-form ∞-norm certifier — 0/3270 disagreements (and
+0/8000 under near-boundary stress)** — i.e. on this class of contraction invariant **Z3 is decorative**,
+because the box quantifier is a row-wise 1-D convex maximization that needs no solver (Track-C verdict,
+`research/coupled_z3_contraction/C_VERDICT.md`, R3/R4). We therefore drop the SMT banner and describe the
+gate as what it is — a **sound contraction certifier ladder** (closed-form ∞-norm → vertex SVD →
+SDP-Lyapunov). This is a strength of the design, not a retreat: the certified property was deliberately
+narrowed to a contraction condition simple enough that a *sound* gate runs without a solver in its
+load-bearing path, sidestepping the solver-dependence and incompleteness that an SMT formulation would
+introduce. The genuine solver value re-enters only for the non-closed-form invariants — the spectral /
+2-norm / Lyapunov gap, where the ∞-norm certifier is conservative (it over-rejects 850/3270 true
+`ρ<1` contractions on the Track-C pool, median ∞-norm−ρ gap 0.477) — which is exactly the SDP-Lyapunov
+rung (`cert_sdp`) and the future vertex-free robust-LMI direction of §8, *not* an SMT decision procedure.
+
 **Scalability ceiling (honest, load-bearing).** The two stronger certifiers enumerate the `2^n`
 box vertices, which is tractable only for small `n` (demonstrated for `n = 2, 3, 4` in the
 module's `__main__`, and used at `n = 8` so that `2^8 = 256` vertices remain enumerable —
