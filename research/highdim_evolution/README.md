@@ -114,7 +114,8 @@ d=96, grad_steps=400, evo_gens=150; unigram CE 3.3542 (real) / 3.3021 (null).
    question (stage-B): is the cost lost expressivity or optimization *friction* (gate rejects ~25 % of
    steps)? Hint for friction: the single sound none-seed (n=8, ρ 0.95) got the *best* CE in its group.
 4. **EVO's expansive payoff is non-monotone and collapses at n=256**: EVO ce (none − inf) =
-   −0.015 / −0.038 / −0.037 / −0.020 / **+0.043**. Mild expansiveness helps mutation up to n=128;
+   −0.013 / −0.035 / −0.040 / −0.019 / **+0.042** (deepest at n=64; values recomputed exactly from
+   the JSONs in the paper-integration verification pass). Mild expansiveness helps mutation up to n=128;
    at n=256 (ρ ≈ 1.6–2.1) unrestricted EVO loses to the frozen gated base. Gradient exploits the
    expansive region in a controlled way; random mutation drowns in it at scale.
 5. **`cert_inf` stays totally restrictive for EVO (admit 0.000 at every n)** — gated EVO ≡ warm base.
