@@ -1134,7 +1134,7 @@ cheaply* it can be made to scale.
   Feature-Convex Neural Networks"*). These certify a *given/trained* model. We instead use the
   certifier as a **fail-closed admission gate during evolution** (it shapes which dynamics are even
   reachable), and we quantify the resulting *navigability* cost — a question that does not arise when
-  the model is fixed. Our `cert_inf/two/sdp` ladder and the vertex-free `B2 = σ(|M|+R)` bound (§7) sit
+  the model is fixed. Our `cert_inf/two/sdp` ladder and the vertex-free `B2 = σ(|M|+R)` bound (§8) sit
   in this line, with the twist that the certifier is in the optimization loop.
 
 - **Reservoir computing / echo-state networks.** Our substrate is a reservoir/ESN byte-LM (fixed
