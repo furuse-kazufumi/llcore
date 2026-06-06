@@ -445,6 +445,13 @@ def evolve(
           (Z3 |s|<=1 gate)。
         - ``"contraction"`` → ``verify_lipschitz_contraction(child).contraction is True``
           を満たす子のみ admit (Z3 L<1 gate; fail-closed)。
+        - ``"trajectory_tube"`` (Phase 2a) → ``tracking_tube(child, w_bar=w_bar,
+          r_max=r_max).admits`` を満たす子のみ admit (L<1 ∧ tube 有限 ∧
+          r=G·w̄/(1−L)≤r_max; fail-closed)。``w_bar`` 必須。
+
+          honest 注記 (設計 doc §4.3 訂正 1): trajectory_tube の L は achievable-t
+          box 上の **閉形式 numpy 比較**であり、``"contraction"`` の free-t Z3 unsat
+          証明とは別の L 定義 (non-comparable)。
 
         gated mode では reject された子を ``resample_cap`` 回まで再生成 (fail-closed)、
         cap 到達で known-safe fallback gene を採用する。集計は :class:`GateStats` として
@@ -453,6 +460,11 @@ def evolve(
         現行ゲート検証器が scalar gene を前提とするため)。
     resample_cap : int
         gated mode で 1 子あたり許す resample 回数の上限。cap 到達で fallback。
+    w_bar : float | None
+        ``gate_mode="trajectory_tube"`` の外乱上界 ‖d‖∞≤w̄ (≥0)。他 mode では未使用。
+        trajectory_tube で None → fail-loud。
+    r_max : float | None
+        ``gate_mode="trajectory_tube"`` の tube 半径許容上限。None なら上限なし。
 
     Returns
     -------
