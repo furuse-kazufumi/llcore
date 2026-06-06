@@ -33,6 +33,36 @@ high n)? (3) the only SOUND gate that SCALES is `cert_inf` (O(n²)); 2-norm/SDP 
 This connects the cost-reduction thread (PoC-2.6: cheap coverage degrades with n) and the navigability
 thread (BG10) at scale.
 
+## RESULTS — feasibility run (v2, Kaggle T4, 113 s, 12/12 ok, 2026-06-06)
+
+`result_hd1_feasibility.json` (n ∈ {8,32,64} × {none,inf} × 2 seeds; unigram CE 3.2512; d=64, T=64,
+grad_steps=150, evo_gens=80):
+
+|  n | gate | GRAD ce | GRAD ρ | EVO ce | EVO ρ | EVO admit | EVO sound (per seed) |
+|---:|------|--------:|-------:|-------:|------:|----------:|----------------------|
+|  8 | none | 2.4518 | 0.896 | 2.5886 | 0.959 | 1.000 | 1/2 unsound (ρ: 0.92, 1.00) |
+|  8 | inf  | 2.4575 | 0.845 | 2.5800 | 0.821 | 0.006 | 2/2 sound |
+| 32 | none | 2.4146 | 0.920 | 2.5607 | 1.013 | 1.000 | 1/2 unsound (0.95, 1.08) |
+| 32 | inf  | 2.4257 | 0.861 | 2.5401 | 0.908 | 0.000 | 2/2 sound |
+| 64 | none | 2.3973 | 0.943 | 2.5801 | 1.218 | 1.000 | **2/2 unsound (1.04, 1.39)** |
+| 64 | inf  | 2.4046 | 0.886 | 2.5127 | 0.873 | 0.000 | 2/2 sound |
+
+**Answers to the three questions (feasibility-level, 2 seeds — full run still pending):**
+1. **YES — unrestricted evolution drifts expansive, monotonically with n.** Mean EVO ρ: 0.959 → 1.013 →
+   1.218; unsound seeds 1/2 → 1/2 → **2/2 at n=64**. The echo-state property is lost by default at scale
+   (consistent with a measure/volume argument: the contracting region's volume fraction shrinks with n —
+   same geometry as PoC-2.6's coverage degradation).
+2. **NO — going expansive does not pay; it costs, and the cost grows with n.** EVO ce (none − inf):
+   +0.009 → +0.021 → **+0.067**. The gate is a HELP at scale, not a handicap (L2 "gate load-bearing"
+   confirmed at high n, in the strong form: even the freeze the gate imposes beats unrestricted drift).
+3. **The cheap sound gate (`cert_inf`) becomes totally restrictive at scale** — admit 0.006 → 0.000 →
+   0.000 (EVO is trapped at the gradient-warm base) — **yet that freeze is CE-protective**: gated EVO has
+   the best EVO ce at every n. "Infinitely restrictive but free protection."
+   Honest caveat: with admit ≈ 0, "gated EVO" ≈ frozen warm base; the comparison is really
+   *unrestricted-EVO endpoint vs. base*, i.e. unrestricted evolution at high n is worse than not evolving.
+4. GRAD stays sound at all n (ρ 0.845–0.943, reject_rate 0.0) and beats EVO everywhere — reconfirms the
+   navigability verdict (gradient avoids the trap unaided) at 8× the dimension.
+
 ## Local CPU smoke (tiny, NOT conclusive)
 n=8, d=32, grad_steps=8, evo_gens=8, 3000-char corpus, unigram_CE 3.132:
 - `none`: GRAD ce 3.818 ρ 0.923 | **EVO ce 4.051 ρ 1.025** (drifted *expansive*, admit 1.0)
