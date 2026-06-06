@@ -175,11 +175,6 @@ def run_all() -> dict:
                             g, w_bar=W_BAR, seq_len=256, dim=STATE_DIM, n_seeds=64
                         )
                         holds = bool(cc.tube_holds)
-                        p1_checked_local = 1
-                        if not holds:
-                            nonlocal_violation = 1
-                        else:
-                            nonlocal_violation = 0
                         p1_recs.append({
                             "gene": [g.decay, g.mix, g.gate_str],
                             "certified_tube": cc.certified_tube,

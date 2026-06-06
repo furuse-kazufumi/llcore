@@ -1,0 +1,2302 @@
+{
+  "config": {
+    "GA_KW": {
+      "pop_size": 20,
+      "n_generations": 20,
+      "tournament_k": 3,
+      "mutation_sigma": 0.15,
+      "crossover_rate": 0.5,
+      "elitism": 1,
+      "resample_cap": 50
+    },
+    "GA_SEEDS": [
+      1000,
+      1001,
+      1002
+    ],
+    "ARMS": [
+      "none",
+      "contraction",
+      "trajectory_tube"
+    ],
+    "DELAYS": [
+      0,
+      4,
+      8
+    ],
+    "TRAIN_N_TRIALS": 5,
+    "TEST_N_TRIALS": 20,
+    "W_BAR": 0.1,
+    "R_MAX": 0.05,
+    "STATE_DIM": 8,
+    "readout_seed": 1001,
+    "p1_n_seeds": 64
+  },
+  "cells": {
+    "copy_d0": {
+      "baseline_mse": 0.4045723499573678,
+      "delay": 0,
+      "arms": {
+        "none": [
+          {
+            "seed": 1000,
+            "best_gene": [
+              0.42091805927109144,
+              0.1967329892553788,
+              -0.40856644882515575
+            ],
+            "train_best_fitness": 0.5117469026953627,
+            "test_best_fitness": 0.115210831922215,
+            "final_pop_size": 20
+          },
+          {
+            "seed": 1001,
+            "best_gene": [
+              0.0,
+              0.024773752831406468,
+              -0.7709328359116746
+            ],
+            "train_best_fitness": 0.45982041515231187,
+            "test_best_fitness": 0.2085402775168709,
+            "final_pop_size": 20
+          },
+          {
+            "seed": 1002,
+            "best_gene": [
+              0.3473553520385829,
+              0.12717555951177917,
+              -0.13080417036580094
+            ],
+            "train_best_fitness": 0.4637641754913312,
+            "test_best_fitness": 0.18061301289536916,
+            "final_pop_size": 20
+          }
+        ],
+        "contraction": [
+          {
+            "seed": 1000,
+            "best_gene": [
+              0.32794149480246776,
+              0.2995114929184298,
+              -0.9808487054613056
+            ],
+            "train_best_fitness": 0.4987998596774079,
+            "test_best_fitness": 0.12016721059195892,
+            "final_pop_size": 20,
+            "n_rejections": 24,
+            "n_resamples": 24,
+            "fallback_count": 0,
+            "n_children_generated": 380
+          },
+          {
+            "seed": 1001,
+            "best_gene": [
+              0.5430822994260949,
+              -0.38164682011979356,
+              -0.8830621267674353
+            ],
+            "train_best_fitness": 0.44669346473468,
+            "test_best_fitness": 0.21075311003277006,
+            "final_pop_size": 20,
+            "n_rejections": 16,
+            "n_resamples": 16,
+            "fallback_count": 0,
+            "n_children_generated": 380
+          },
+          {
+            "seed": 1002,
+            "best_gene": [
+              0.6244062688241545,
+              0.06147086843677337,
+              -1.8807074814564446
+            ],
+            "train_best_fitness": 0.5616103952995593,
+            "test_best_fitness": 0.17743263194058798,
+            "final_pop_size": 20,
+            "n_rejections": 23,
+            "n_resamples": 23,
+            "fallback_count": 0,
+            "n_children_generated": 380
+          }
+        ],
+        "trajectory_tube": [
+          {
+            "seed": 1000,
+            "best_gene": [
+              0.7339761887138802,
+              -0.3182081382700474,
+              -1.413690516022024
+            ],
+            "train_best_fitness": 0.49721182505976624,
+            "test_best_fitness": 0.13238386671940755,
+            "final_pop_size": 20,
+            "n_rejections": 84,
+            "n_resamples": 84,
+            "fallback_count": 0,
+            "n_children_generated": 380,
+            "p1_cross_check": [
+              {
+                "gene": [
+                  0.7339761887138802,
+                  -0.3182081382700474,
+                  -1.413690516022024
+                ],
+                "certified_tube": 0.02727965980820654,
+                "empirical_max_err_steady": 0.01224770457590342,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.43295729134275296,
+                  -0.348359208121932,
+                  -1.8078891335731262
+                ],
+                "certified_tube": 0.048438250932127065,
+                "empirical_max_err_steady": 0.04068772207709259,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.7856928030804384,
+                  -0.15236410236544323,
+                  -1.740203455883027
+                ],
+                "certified_tube": 0.013236268154004673,
+                "empirical_max_err_steady": 0.005154213725110296,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.7250103791810932,
+                  -0.12824997078720124,
+                  -1.4425516013215536
+                ],
+                "certified_tube": 0.010434287284938488,
+                "empirical_max_err_steady": 0.005016591289776363,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.4656976403053761,
+                  -0.196623170199907,
+                  -1.4423620313382992
+                ],
+                "certified_tube": 0.016357805415324483,
+                "empirical_max_err_steady": 0.014548912877270859,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.7596024978389408,
+                  -0.11735631531544322,
+                  -1.9789457276339617
+                ],
+                "certified_tube": 0.010515326848638049,
+                "empirical_max_err_steady": 0.0038114260456928346,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.831094519104547,
+                  -0.2027331886954141,
+                  -1.2430073937233495
+                ],
+                "certified_tube": 0.01624898409933314,
+                "empirical_max_err_steady": 0.00755867656779281,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.738592730877389,
+                  -0.46353926717862115,
+                  -1.3451484898762522
+                ],
+                "certified_tube": 0.0407676429284621,
+                "empirical_max_err_steady": 0.018082329173623096,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.3672128471676014,
+                  -0.412206909055052,
+                  -1.2077922989552032
+                ],
+                "certified_tube": 0.04326141281232051,
+                "empirical_max_err_steady": 0.040760163770754115,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.8417399229729134,
+                  -0.3165364737022519,
+                  -0.7585837783463252
+                ],
+                "certified_tube": 0.024662107912038142,
+                "empirical_max_err_steady": 0.013466992889904456,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.5067800659359678,
+                  0.10083519239033953,
+                  -1.6967134407855706
+                ],
+                "certified_tube": 0.008570585487313239,
+                "empirical_max_err_steady": 0.007121353275065518,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.6240054542536326,
+                  -0.1473305874777021,
+                  -0.6055029138962673
+                ],
+                "certified_tube": 0.010833650518710946,
+                "empirical_max_err_steady": 0.008538986082457636,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.6718296250589562,
+                  -0.23897149526421313,
+                  -1.5112422967670003
+                ],
+                "certified_tube": 0.0203913044858845,
+                "empirical_max_err_steady": 0.009303198180683786,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.5619188951964518,
+                  -0.4687368692620327,
+                  -1.2661353912172075
+                ],
+                "certified_tube": 0.040821460568631465,
+                "empirical_max_err_steady": 0.020625307713896285,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.5329193985251166,
+                  -0.503881528024013,
+                  -1.313402702245419
+                ],
+                "certified_tube": 0.04452704849435634,
+                "empirical_max_err_steady": 0.0252199860810166,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.2840422878991177,
+                  -0.2363208266763828,
+                  -1.2717719117503898
+                ],
+                "certified_tube": 0.045299163445820086,
+                "empirical_max_err_steady": 0.0369530068152565,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.9565596129524092,
+                  -0.40453269787980095,
+                  -1.857099873914349
+                ],
+                "certified_tube": 0.03749484040433483,
+                "empirical_max_err_steady": 0.008626124799625087,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.8642661298667318,
+                  -0.29665552640908116,
+                  -1.534630988633675
+                ],
+                "certified_tube": 0.02580135782355067,
+                "empirical_max_err_steady": 0.009417685121243857,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.4283063348818475,
+                  -0.1688583781009399,
+                  -1.5057156387614332
+                ],
+                "certified_tube": 0.017010672067916704,
+                "empirical_max_err_steady": 0.01591788875096555,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.5268468573678036,
+                  -0.4060095049821601,
+                  -1.5594295474579885
+                ],
+                "certified_tube": 0.03632360919861428,
+                "empirical_max_err_steady": 0.023651807420681646,
+                "tube_holds": true
+              }
+            ],
+            "p1_n_checked": 20,
+            "p1_n_violations": 0
+          },
+          {
+            "seed": 1001,
+            "best_gene": [
+              0.06857452552665023,
+              -0.26946071193674975,
+              0.283009267197186
+            ],
+            "train_best_fitness": 0.47273864992212894,
+            "test_best_fitness": 0.21240238555843796,
+            "final_pop_size": 20,
+            "n_rejections": 69,
+            "n_resamples": 69,
+            "fallback_count": 0,
+            "n_children_generated": 380,
+            "p1_cross_check": [
+              {
+                "gene": [
+                  0.06857452552665023,
+                  -0.26946071193674975,
+                  0.283009267197186
+                ],
+                "certified_tube": 0.0375821750001414,
+                "empirical_max_err_steady": 0.03525955814902171,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.32593163563157446,
+                  -0.06461441532598546,
+                  0.379913123379966
+                ],
+                "certified_tube": 0.010420219772781732,
+                "empirical_max_err_steady": 0.009000497414961166,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.11985190343272246,
+                  -0.11204493912299882,
+                  0.06739930982208743
+                ],
+                "certified_tube": 0.012014245786331552,
+                "empirical_max_err_steady": 0.011789076509173192,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.28125255714498054,
+                  0.1318896923602763,
+                  0.06452063945450337
+                ],
+                "certified_tube": 0.014098621297573985,
+                "empirical_max_err_steady": 0.013394567122702157,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.05325613922083662,
+                  -0.24362315094685763,
+                  0.34903347903964044
+                ],
+                "certified_tube": 0.0374248357023714,
+                "empirical_max_err_steady": 0.034535499963598434,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.4482909174612736,
+                  0.06529255774020973,
+                  0.1952662229828178
+                ],
+                "certified_tube": 0.008113559987779118,
+                "empirical_max_err_steady": 0.007105729245868567,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.38322250934971347,
+                  0.37545433347690027,
+                  0.2364469122451207
+                ],
+                "certified_tube": 0.04917200120044974,
+                "empirical_max_err_steady": 0.041792868700272656,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.0,
+                  -0.23076263836886063,
+                  0.2564544336179488
+                ],
+                "certified_tube": 0.031035440032506276,
+                "empirical_max_err_steady": 0.029806111718170297,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.8347870131864218,
+                  -0.01702894694734928,
+                  0.2557753876341593
+                ],
+                "certified_tube": 0.0022881461677564494,
+                "empirical_max_err_steady": 0.0014538077255627242,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.6933672027042916,
+                  -0.02195622722315629,
+                  -0.22007795129211252
+                ],
+                "certified_tube": 0.0018180607116126575,
+                "empirical_max_err_steady": 0.0015164676190543925,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.2666328228908147,
+                  0.2429786942329156,
+                  0.2928380012205136
+                ],
+                "certified_tube": 0.03435969334498748,
+                "empirical_max_err_steady": 0.0303426608541746,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.08638515503675454,
+                  -0.2827076456874399,
+                  -0.11194153063341167
+                ],
+                "certified_tube": 0.02624553433496283,
+                "empirical_max_err_steady": 0.02613162460959393,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.14184329664700912,
+                  0.0836413040353933,
+                  0.284374043442183
+                ],
+                "certified_tube": 0.01168785218994998,
+                "empirical_max_err_steady": 0.010922464212371863,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.8243447500398414,
+                  0.3518839070259869,
+                  -0.5405834557835841
+                ],
+                "certified_tube": 0.02779344596197834,
+                "empirical_max_err_steady": 0.01688729555073433,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.0,
+                  -0.3395962445135539,
+                  0.11447863065624006
+                ],
+                "certified_tube": 0.03834986441549356,
+                "empirical_max_err_steady": 0.03755350435765478,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.9111720474704493,
+                  -0.30515022873331843,
+                  0.14858366725930344
+                ],
+                "certified_tube": 0.035840307144572196,
+                "empirical_max_err_steady": 0.016988487680861183,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.38644606123255243,
+                  0.30812795445884344,
+                  0.3541659117905441
+                ],
+                "certified_tube": 0.04771007911847971,
+                "empirical_max_err_steady": 0.03853364301376605,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.7132792839265274,
+                  -0.06950764649358926,
+                  -0.35048933667383897
+                ],
+                "certified_tube": 0.005366270605713574,
+                "empirical_max_err_steady": 0.004369324954775159,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.0,
+                  -0.143078083427098,
+                  0.4836619775534673
+                ],
+                "certified_tube": 0.02771015830853593,
+                "empirical_max_err_steady": 0.024645232578176596,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.0,
+                  -0.08808255240471183,
+                  0.031786972132506086
+                ],
+                "certified_tube": 0.00909743515832618,
+                "empirical_max_err_steady": 0.009072073155718098,
+                "tube_holds": true
+              }
+            ],
+            "p1_n_checked": 20,
+            "p1_n_violations": 0
+          },
+          {
+            "seed": 1002,
+            "best_gene": [
+              0.7301837007842763,
+              0.0847337845997867,
+              0.3879257022452645
+            ],
+            "train_best_fitness": 0.46606161652025496,
+            "test_best_fitness": 0.1743785214476619,
+            "final_pop_size": 20,
+            "n_rejections": 49,
+            "n_resamples": 49,
+            "fallback_count": 0,
+            "n_children_generated": 380,
+            "p1_cross_check": [
+              {
+                "gene": [
+                  0.7301837007842763,
+                  0.0847337845997867,
+                  0.3879257022452645
+                ],
+                "certified_tube": 0.013843708992619783,
+                "empirical_max_err_steady": 0.009662546729600457,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.08002829591275007,
+                  0.20716103180755197,
+                  -0.1870194372039184
+                ],
+                "certified_tube": 0.02098980030888073,
+                "empirical_max_err_steady": 0.02084704443916698,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.4863525842783554,
+                  0.18693188284156745,
+                  -0.1495003970931279
+                ],
+                "certified_tube": 0.01648751382235527,
+                "empirical_max_err_steady": 0.014908166244935517,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.6520679242552062,
+                  0.01013286133743685,
+                  0.4752270736151475
+                ],
+                "certified_tube": 0.0019309039830316475,
+                "empirical_max_err_steady": 0.0013884181144065161,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.8356058043008825,
+                  -0.14529987207748568,
+                  -0.20014030257013757
+                ],
+                "certified_tube": 0.012334069408295019,
+                "empirical_max_err_steady": 0.008773313727471657,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.6350759287482681,
+                  0.20623450382678918,
+                  0.3136471721036139
+                ],
+                "certified_tube": 0.030047884330699222,
+                "empirical_max_err_steady": 0.022214755888054723,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.47332467382755095,
+                  0.286400986552728,
+                  0.3452858962715633
+                ],
+                "certified_tube": 0.04374443515448108,
+                "empirical_max_err_steady": 0.03427434102587909,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.5803593297967542,
+                  0.2545449125343303,
+                  0.17879493990596806
+                ],
+                "certified_tube": 0.03099651048243465,
+                "empirical_max_err_steady": 0.02469583282408154,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.7977514355821436,
+                  0.08335922370797207,
+                  0.369824541526613
+                ],
+                "certified_tube": 0.013227938756915653,
+                "empirical_max_err_steady": 0.008489081811454014,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.6838738050334656,
+                  0.08203907739143974,
+                  -0.2157740864614427
+                ],
+                "certified_tube": 0.006849639915257167,
+                "empirical_max_err_steady": 0.005712401815072592,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.9698525672760833,
+                  0.038591983389261175,
+                  -0.27093603911884045
+                ],
+                "certified_tube": 0.0030959019978228147,
+                "empirical_max_err_steady": 0.0009548025903450977,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.8553817345355288,
+                  0.17067547565697816,
+                  -0.22413753813259654
+                ],
+                "certified_tube": 0.01431200387690689,
+                "empirical_max_err_steady": 0.009840529487299798,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.6881952026802063,
+                  -0.10594587443547224,
+                  0.1341875562426704
+                ],
+                "certified_tube": 0.012236584863079976,
+                "empirical_max_err_steady": 0.009295592663598182,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.4616694748025696,
+                  0.06875982129037472,
+                  -0.4132800801067479
+                ],
+                "certified_tube": 0.00516843819342249,
+                "empirical_max_err_steady": 0.0047548893480873836,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.06499530692747213,
+                  -0.028741294057042843,
+                  -0.1171319927608313
+                ],
+                "certified_tube": 0.0028125494678572405,
+                "empirical_max_err_steady": 0.002804311041682498,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.7498884108246818,
+                  0.05141970968037338,
+                  0.1924360845325057
+                ],
+                "certified_tube": 0.006367261921380774,
+                "empirical_max_err_steady": 0.004667384226883387,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.8585762077791591,
+                  0.1763865040523868,
+                  0.3816503899404094
+                ],
+                "certified_tube": 0.028525368364894485,
+                "empirical_max_err_steady": 0.015103950639261524,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.640464225639257,
+                  -0.1339938531390203,
+                  0.13915924181446937
+                ],
+                "certified_tube": 0.015565463398997378,
+                "empirical_max_err_steady": 0.01227761734129168,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.2848253198900629,
+                  -0.1217066470170591,
+                  0.07192621812069991
+                ],
+                "certified_tube": 0.013113897773365564,
+                "empirical_max_err_steady": 0.012430283582830708,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.452389611392463,
+                  0.3646801729599848,
+                  0.1791946657847949
+                ],
+                "certified_tube": 0.04442955689471312,
+                "empirical_max_err_steady": 0.037435201912971686,
+                "tube_holds": true
+              }
+            ],
+            "p1_n_checked": 20,
+            "p1_n_violations": 0
+          }
+        ]
+      }
+    },
+    "copy_d4": {
+      "baseline_mse": 0.39448163027767236,
+      "delay": 4,
+      "arms": {
+        "none": [
+          {
+            "seed": 1000,
+            "best_gene": [
+              0.9270482631344963,
+              -0.2751831293200606,
+              -0.6744024075750292
+            ],
+            "train_best_fitness": 0.46698201253049704,
+            "test_best_fitness": 0.21118693662719473,
+            "final_pop_size": 20
+          },
+          {
+            "seed": 1001,
+            "best_gene": [
+              0.8506411406903194,
+              -0.1124912517413505,
+              -0.30136274834128
+            ],
+            "train_best_fitness": 0.45557757469985827,
+            "test_best_fitness": 0.2265327733543097,
+            "final_pop_size": 20
+          },
+          {
+            "seed": 1002,
+            "best_gene": [
+              0.09495723416992605,
+              -0.12349298895862798,
+              -0.4520572562563205
+            ],
+            "train_best_fitness": 0.469477165379112,
+            "test_best_fitness": 0.16717878359635616,
+            "final_pop_size": 20
+          }
+        ],
+        "contraction": [
+          {
+            "seed": 1000,
+            "best_gene": [
+              0.5826682298339769,
+              0.11526495284340288,
+              0.4066606862902916
+            ],
+            "train_best_fitness": 0.5645070771794309,
+            "test_best_fitness": 0.21116315877610087,
+            "final_pop_size": 20,
+            "n_rejections": 15,
+            "n_resamples": 15,
+            "fallback_count": 0,
+            "n_children_generated": 380
+          },
+          {
+            "seed": 1001,
+            "best_gene": [
+              0.6352758955833999,
+              -0.5796977394349638,
+              -0.859962634276795
+            ],
+            "train_best_fitness": 0.4335987115298251,
+            "test_best_fitness": 0.21524545083628036,
+            "final_pop_size": 20,
+            "n_rejections": 16,
+            "n_resamples": 16,
+            "fallback_count": 0,
+            "n_children_generated": 380
+          },
+          {
+            "seed": 1002,
+            "best_gene": [
+              0.7838395166526995,
+              -0.6380023161940201,
+              -1.2538382545906104
+            ],
+            "train_best_fitness": 0.49008774248153164,
+            "test_best_fitness": 0.17082515891860955,
+            "final_pop_size": 20,
+            "n_rejections": 49,
+            "n_resamples": 49,
+            "fallback_count": 0,
+            "n_children_generated": 380
+          }
+        ],
+        "trajectory_tube": [
+          {
+            "seed": 1000,
+            "best_gene": [
+              0.5523959515812551,
+              -0.011143758342962135,
+              -1.9749784452120773
+            ],
+            "train_best_fitness": 0.4938040132504543,
+            "test_best_fitness": 0.21233591459399498,
+            "final_pop_size": 20,
+            "n_rejections": 67,
+            "n_resamples": 67,
+            "fallback_count": 0,
+            "n_children_generated": 380,
+            "p1_cross_check": [
+              {
+                "gene": [
+                  0.5523959515812551,
+                  -0.011143758342962135,
+                  -1.9749784452120773
+                ],
+                "certified_tube": 0.0009746876750551478,
+                "empirical_max_err_steady": 0.0007173055642996943,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.385505189803012,
+                  0.13380961505435646,
+                  -1.890272918794578
+                ],
+                "certified_tube": 0.03671718883935368,
+                "empirical_max_err_steady": 0.024762586247205995,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.30718563644730423,
+                  0.28976249814453586,
+                  -0.5389325587403837
+                ],
+                "certified_tube": 0.022464033172457185,
+                "empirical_max_err_steady": 0.021327771931149434,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.0,
+                  -0.03241541861960279,
+                  -0.3529121214270909
+                ],
+                "certified_tube": 0.005009430665134992,
+                "empirical_max_err_steady": 0.004786786377004717,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.593824922752992,
+                  0.1531765538774731,
+                  -1.8078896638492274
+                ],
+                "certified_tube": 0.013464046799714623,
+                "empirical_max_err_steady": 0.007151066321199681,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.47231366779520195,
+                  0.10328809674601286,
+                  -1.8704480754631114
+                ],
+                "certified_tube": 0.011230845258315992,
+                "empirical_max_err_steady": 0.010147481178012048,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.7121663825102224,
+                  -0.18100817337299221,
+                  -1.8435757219402276
+                ],
+                "certified_tube": 0.016100847159874854,
+                "empirical_max_err_steady": 0.0062382613799051995,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.6756865751029589,
+                  0.05507699922537512,
+                  -2.0
+                ],
+                "certified_tube": 0.004886873635685184,
+                "empirical_max_err_steady": 0.0018331706263612184,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.5324049852942648,
+                  -0.38707335017512035,
+                  -2.0
+                ],
+                "certified_tube": 0.03629599504932111,
+                "empirical_max_err_steady": 0.028493310915512462,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.545796710543589,
+                  0.08371553438231825,
+                  -1.6811754029994248
+                ],
+                "certified_tube": 0.007058385900257839,
+                "empirical_max_err_steady": 0.0047557312586680835,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.49306051588316163,
+                  0.11330894143777717,
+                  -0.06895895184089523
+                ],
+                "certified_tube": 0.010622203798651059,
+                "empirical_max_err_steady": 0.009632928590892577,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.6693346893654905,
+                  -0.04014492850608912,
+                  -1.7280272112029469
+                ],
+                "certified_tube": 0.00337338637822332,
+                "empirical_max_err_steady": 0.001465580470235952,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.38035901831924696,
+                  0.24249452297089322,
+                  -1.5627686530462095
+                ],
+                "certified_tube": 0.03647045193269181,
+                "empirical_max_err_steady": 0.03101435999027941,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.1946312124415505,
+                  -0.04478043031137896,
+                  -0.2370549163744124
+                ],
+                "certified_tube": 0.0036729976862811932,
+                "empirical_max_err_steady": 0.003617296543751738,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.2797237032445298,
+                  -0.011679910645477742,
+                  -1.603170965238488
+                ],
+                "certified_tube": 0.006730336364225787,
+                "empirical_max_err_steady": 0.004081075190787918,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.6720160196548677,
+                  -0.44112440563111815,
+                  -1.829643206111366
+                ],
+                "certified_tube": 0.04098305258426069,
+                "empirical_max_err_steady": 0.015367671599385554,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.41941522577960993,
+                  -0.005558198476367196,
+                  -1.8081053873847375
+                ],
+                "certified_tube": 0.0008729734417532001,
+                "empirical_max_err_steady": 0.0007506504742224103,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.4202694958794961,
+                  -0.05147730473245615,
+                  -1.634518161860867
+                ],
+                "certified_tube": 0.006313439685174411,
+                "empirical_max_err_steady": 0.005667200852609662,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.9530525773002096,
+                  0.08758702012439393,
+                  -1.9323152389991702
+                ],
+                "certified_tube": 0.007741632294233881,
+                "empirical_max_err_steady": 0.0019768548039254463,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.9210799890471073,
+                  0.01947863965763869,
+                  -1.7792343745491124
+                ],
+                "certified_tube": 0.0016441775174521158,
+                "empirical_max_err_steady": 0.0005218153368941793,
+                "tube_holds": true
+              }
+            ],
+            "p1_n_checked": 20,
+            "p1_n_violations": 0
+          },
+          {
+            "seed": 1001,
+            "best_gene": [
+              0.35082694506954715,
+              -0.09747735922505525,
+              -0.11291902337865242
+            ],
+            "train_best_fitness": 0.5476585235871548,
+            "test_best_fitness": 0.22642568296937124,
+            "final_pop_size": 20,
+            "n_rejections": 46,
+            "n_resamples": 46,
+            "fallback_count": 0,
+            "n_children_generated": 380,
+            "p1_cross_check": [
+              {
+                "gene": [
+                  0.35082694506954715,
+                  -0.09747735922505525,
+                  -0.11291902337865242
+                ],
+                "certified_tube": 0.008797084496492325,
+                "empirical_max_err_steady": 0.008462314399900653,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.48446859147305515,
+                  -0.1525720587919661,
+                  0.45054551886646754
+                ],
+                "certified_tube": 0.027767916002287903,
+                "empirical_max_err_steady": 0.02108006125258899,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.8452533836262599,
+                  0.02203303674223929,
+                  0.08605759533389284
+                ],
+                "certified_tube": 0.00241076862499762,
+                "empirical_max_err_steady": 0.0016134241915227495,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.5335662316168454,
+                  -0.24504211029104894,
+                  0.2969369502785194
+                ],
+                "certified_tube": 0.03485350430350773,
+                "empirical_max_err_steady": 0.02732333042755654,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.6448497118643661,
+                  -0.37527513877914004,
+                  0.058627005995211284
+                ],
+                "certified_tube": 0.039864659510004063,
+                "empirical_max_err_steady": 0.03063163228003496,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.8194582651842284,
+                  -0.017248645640180395,
+                  0.8334902434303875
+                ],
+                "certified_tube": 0.010358939917715441,
+                "empirical_max_err_steady": 0.002825555642994056,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.35846044150172984,
+                  -0.13236107825319376,
+                  -0.16676466092548364
+                ],
+                "certified_tube": 0.011482797681265288,
+                "empirical_max_err_steady": 0.010992101283236029,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.3005971321860573,
+                  -0.018420121916115695,
+                  0.34240224011577414
+                ],
+                "certified_tube": 0.0028011229720975132,
+                "empirical_max_err_steady": 0.002476810851953363,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.7234363280943249,
+                  -0.41999082288641454,
+                  -0.5408220894554789
+                ],
+                "certified_tube": 0.033844491075993986,
+                "empirical_max_err_steady": 0.02268851746678896,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.4273355698123233,
+                  -0.17046911449058533,
+                  0.38152471580033537
+                ],
+                "certified_tube": 0.02756280143210252,
+                "empirical_max_err_steady": 0.02244561186822601,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.6056289533197409,
+                  -0.17831511390558508,
+                  -0.051128561422465066
+                ],
+                "certified_tube": 0.017006222337187238,
+                "empirical_max_err_steady": 0.014458076129076111,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.5554204683067031,
+                  -0.37615126136764104,
+                  -0.20403719731284375
+                ],
+                "certified_tube": 0.03275810563301264,
+                "empirical_max_err_steady": 0.027809019204332756,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.46754574847480657,
+                  -0.22897517769512885,
+                  0.07509111375394446
+                ],
+                "certified_tube": 0.02475651181431228,
+                "empirical_max_err_steady": 0.021732981254688886,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.33526996206689813,
+                  -0.2601541405312376,
+                  -0.1916947289807358
+                ],
+                "certified_tube": 0.022478874986782398,
+                "empirical_max_err_steady": 0.021134664585402654,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.7938679458007848,
+                  -0.2233471100838192,
+                  0.21964402957922224
+                ],
+                "certified_tube": 0.02862118296645922,
+                "empirical_max_err_steady": 0.019390809009838333,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.8646168831558977,
+                  0.22001775292721376,
+                  0.16705530503205204
+                ],
+                "certified_tube": 0.026414449153275437,
+                "empirical_max_err_steady": 0.015795639374833387,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.43451844330005446,
+                  -0.08812110772945415,
+                  -0.0999743451604427
+                ],
+                "certified_tube": 0.00803644112379927,
+                "empirical_max_err_steady": 0.0075334486954097835,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.5592992333454941,
+                  -0.04431471873853077,
+                  0.19252572278855512
+                ],
+                "certified_tube": 0.005488065686942809,
+                "empirical_max_err_steady": 0.004557067777051376,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.7092309186040953,
+                  -0.019401556607064305,
+                  0.17555937228843377
+                ],
+                "certified_tube": 0.0023532994317514416,
+                "empirical_max_err_steady": 0.0017744067335018349,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.7150593041568575,
+                  -0.11093976912422582,
+                  0.6411254877439312
+                ],
+                "certified_tube": 0.030913248318138176,
+                "empirical_max_err_steady": 0.017876189150309987,
+                "tube_holds": true
+              }
+            ],
+            "p1_n_checked": 20,
+            "p1_n_violations": 0
+          },
+          {
+            "seed": 1002,
+            "best_gene": [
+              0.7641914571309067,
+              -0.007245539796471662,
+              0.005173315528437578
+            ],
+            "train_best_fitness": 0.4821809349660988,
+            "test_best_fitness": 0.1731284410958394,
+            "final_pop_size": 20,
+            "n_rejections": 73,
+            "n_resamples": 73,
+            "fallback_count": 0,
+            "n_children_generated": 380,
+            "p1_cross_check": [
+              {
+                "gene": [
+                  0.7641914571309067,
+                  -0.007245539796471662,
+                  0.005173315528437578
+                ],
+                "certified_tube": 0.0007283218182190588,
+                "empirical_max_err_steady": 0.0005476792887216292,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.828281458023265,
+                  0.102740987966113,
+                  -1.0693904871937148
+                ],
+                "certified_tube": 0.007657995301942152,
+                "empirical_max_err_steady": 0.004112710007510057,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.7864780824842253,
+                  0.1798878923440911,
+                  -0.018038898344790777
+                ],
+                "certified_tube": 0.01768200157877038,
+                "empirical_max_err_steady": 0.012940034937755945,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.8270833813311058,
+                  0.030220527637234373,
+                  -0.1654408389632958
+                ],
+                "certified_tube": 0.002606868729841886,
+                "empirical_max_err_steady": 0.0019021738304626674,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.9107332233049704,
+                  -0.05489659496241667,
+                  0.3351557242394642
+                ],
+                "certified_tube": 0.008257060632675032,
+                "empirical_max_err_steady": 0.003500402302699321,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.8168221205070265,
+                  -0.2669980293045349,
+                  -0.9877605489778672
+                ],
+                "certified_tube": 0.020945065469297277,
+                "empirical_max_err_steady": 0.011009266796296227,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.7276555231533846,
+                  -0.4830496010547832,
+                  -0.13693635318259675
+                ],
+                "certified_tube": 0.04410024462806036,
+                "empirical_max_err_steady": 0.031413129901398995,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.5518890384927104,
+                  -0.31923551928749894,
+                  -0.7822622800752312
+                ],
+                "certified_tube": 0.024934111226068686,
+                "empirical_max_err_steady": 0.017306904304361312,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.8409232186482425,
+                  0.0037863371416039515,
+                  -0.649401111495433
+                ],
+                "certified_tube": 0.00026374977381317627,
+                "empirical_max_err_steady": 0.0001750056116466243,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.5622565264077268,
+                  -0.38393450548645164,
+                  0.1326165159246277
+                ],
+                "certified_tube": 0.04426352501923926,
+                "empirical_max_err_steady": 0.03519910695331631,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.918126474559936,
+                  -0.2209648508236268,
+                  -0.9374078400619066
+                ],
+                "certified_tube": 0.016915162734614755,
+                "empirical_max_err_steady": 0.007796526762393511,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.543386417421807,
+                  0.1997041876513011,
+                  0.009720172898449774
+                ],
+                "certified_tube": 0.020166440049154112,
+                "empirical_max_err_steady": 0.017424780982253682,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.8785922399745174,
+                  0.1999381553969417,
+                  -0.6186308910304801
+                ],
+                "certified_tube": 0.014950216464173138,
+                "empirical_max_err_steady": 0.008904396045347755,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.9077016262800028,
+                  -0.07004310329000618,
+                  -0.463548657433297
+                ],
+                "certified_tube": 0.005176482900114712,
+                "empirical_max_err_steady": 0.0031470940313542035,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.7475119335063702,
+                  0.2054147224820711,
+                  0.2611184922007376
+                ],
+                "certified_tube": 0.02780076647118873,
+                "empirical_max_err_steady": 0.019576076720167132,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.5334854531714481,
+                  -0.21236541062887326,
+                  0.1283858159942573
+                ],
+                "certified_tube": 0.02436461160520468,
+                "empirical_max_err_steady": 0.020482635466126345,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.8824287733244134,
+                  -0.25788202422780027,
+                  0.19193729308128912
+                ],
+                "certified_tube": 0.03191361536917735,
+                "empirical_max_err_steady": 0.01741041038083794,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.8081442972210632,
+                  0.028690814650877347,
+                  -0.4874541943748574
+                ],
+                "certified_tube": 0.0020826630679424162,
+                "empirical_max_err_steady": 0.0014908974298584177,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.5573924130022003,
+                  -0.2147286675595646,
+                  -0.04646239954594915
+                ],
+                "certified_tube": 0.02057908662929577,
+                "empirical_max_err_steady": 0.01777588081021869,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.4788126450890192,
+                  -0.054359709524284136,
+                  -0.010685924818672171
+                ],
+                "certified_tube": 0.0053787366729186065,
+                "empirical_max_err_steady": 0.0048787736434763584,
+                "tube_holds": true
+              }
+            ],
+            "p1_n_checked": 20,
+            "p1_n_violations": 0
+          }
+        ]
+      }
+    },
+    "copy_d8": {
+      "baseline_mse": 0.37006042254377614,
+      "delay": 8,
+      "arms": {
+        "none": [
+          {
+            "seed": 1000,
+            "best_gene": [
+              0.9091511173148651,
+              -0.12525365160662155,
+              -1.6039388050905687
+            ],
+            "train_best_fitness": 0.4483932904876986,
+            "test_best_fitness": 0.1689137347193472,
+            "final_pop_size": 20
+          },
+          {
+            "seed": 1001,
+            "best_gene": [
+              0.08695737311910012,
+              -0.4578551719741,
+              -0.3995768120757339
+            ],
+            "train_best_fitness": 0.4369367942728147,
+            "test_best_fitness": 0.18021856666363686,
+            "final_pop_size": 20
+          },
+          {
+            "seed": 1002,
+            "best_gene": [
+              0.8228626627192661,
+              -0.11134051989854644,
+              0.6103775002388097
+            ],
+            "train_best_fitness": 0.4801233408657891,
+            "test_best_fitness": 0.2005709127050573,
+            "final_pop_size": 20
+          }
+        ],
+        "contraction": [
+          {
+            "seed": 1000,
+            "best_gene": [
+              0.5033960119864688,
+              0.13256585352790792,
+              -1.3166871732620429
+            ],
+            "train_best_fitness": 0.46162060483071077,
+            "test_best_fitness": 0.1678224006742439,
+            "final_pop_size": 20,
+            "n_rejections": 38,
+            "n_resamples": 38,
+            "fallback_count": 0,
+            "n_children_generated": 380
+          },
+          {
+            "seed": 1001,
+            "best_gene": [
+              0.08695737311910012,
+              -0.4578551719741,
+              -0.3995768120757339
+            ],
+            "train_best_fitness": 0.4369367942728147,
+            "test_best_fitness": 0.18021856666363686,
+            "final_pop_size": 20,
+            "n_rejections": 19,
+            "n_resamples": 19,
+            "fallback_count": 0,
+            "n_children_generated": 380
+          },
+          {
+            "seed": 1002,
+            "best_gene": [
+              0.8324327939294196,
+              0.46505393579816146,
+              -1.0336360778021547
+            ],
+            "train_best_fitness": 0.4359046874740553,
+            "test_best_fitness": 0.2007775066226928,
+            "final_pop_size": 20,
+            "n_rejections": 43,
+            "n_resamples": 43,
+            "fallback_count": 0,
+            "n_children_generated": 380
+          }
+        ],
+        "trajectory_tube": [
+          {
+            "seed": 1000,
+            "best_gene": [
+              0.7443556073619906,
+              0.3994027867431169,
+              -0.18759269167309225
+            ],
+            "train_best_fitness": 0.43939784106859464,
+            "test_best_fitness": 0.15070649710137407,
+            "final_pop_size": 20,
+            "n_rejections": 96,
+            "n_resamples": 96,
+            "fallback_count": 0,
+            "n_children_generated": 380,
+            "p1_cross_check": [
+              {
+                "gene": [
+                  0.7443556073619906,
+                  0.3994027867431169,
+                  -0.18759269167309225
+                ],
+                "certified_tube": 0.03517888457185608,
+                "empirical_max_err_steady": 0.025258853552953903,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.7593557194540065,
+                  0.487120392747526,
+                  -0.07749958916744087
+                ],
+                "certified_tube": 0.04607509936268604,
+                "empirical_max_err_steady": 0.031868369046854514,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.7065434542355665,
+                  0.521654500644785,
+                  -0.1256258493209458
+                ],
+                "certified_tube": 0.048086136887570546,
+                "empirical_max_err_steady": 0.034556885076319876,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.7630701371872832,
+                  0.2270627021772095,
+                  -0.09934142441398802
+                ],
+                "certified_tube": 0.020841644138355694,
+                "empirical_max_err_steady": 0.015411461922510798,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.6412122249933166,
+                  0.17626512734865513,
+                  -0.9145326845906239
+                ],
+                "certified_tube": 0.01321955385770428,
+                "empirical_max_err_steady": 0.008779537149101388,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.8535535897368552,
+                  0.22979127683056033,
+                  -0.30629710340135236
+                ],
+                "certified_tube": 0.018640560188463825,
+                "empirical_max_err_steady": 0.012525969818411677,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.9448592611582559,
+                  0.16127376392855056,
+                  -0.6824148934783183
+                ],
+                "certified_tube": 0.011861633835173335,
+                "empirical_max_err_steady": 0.005284712681830658,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.5650208304303201,
+                  0.23898766637023328,
+                  -0.3947433833705089
+                ],
+                "certified_tube": 0.0188078653947721,
+                "empirical_max_err_steady": 0.01576984297420577,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.7213447517955895,
+                  0.1547843216693167,
+                  0.2526591458206501
+                ],
+                "certified_tube": 0.020711342194624744,
+                "empirical_max_err_steady": 0.015060731143281186,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.9755998387458398,
+                  0.25444111548581994,
+                  -0.05313612106004342
+                ],
+                "certified_tube": 0.024269235680991624,
+                "empirical_max_err_steady": 0.006009203550770805,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.7858761675591438,
+                  -0.045179474458138365,
+                  -0.5231220196132403
+                ],
+                "certified_tube": 0.003262395852836908,
+                "empirical_max_err_steady": 0.0023995875187755884,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.6218715034895554,
+                  -0.009460612573789079,
+                  -0.14142198525789335
+                ],
+                "certified_tube": 0.0008311536975916932,
+                "empirical_max_err_steady": 0.0007232858646083152,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.856380239598327,
+                  0.17878044773786883,
+                  -0.7201054127934208
+                ],
+                "certified_tube": 0.013231316215584203,
+                "empirical_max_err_steady": 0.007790369498634223,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.7631607607547048,
+                  0.37149316765961476,
+                  -0.6441572311559074
+                ],
+                "certified_tube": 0.02938726461568495,
+                "empirical_max_err_steady": 0.018429593715098794,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.542217415948298,
+                  0.15950943253621225,
+                  -0.016706292286318904
+                ],
+                "certified_tube": 0.015696687030934225,
+                "empirical_max_err_steady": 0.013734259713178237,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.9235948962347693,
+                  0.5203017762963931,
+                  -0.5288424254968026
+                ],
+                "certified_tube": 0.043147132899138525,
+                "empirical_max_err_steady": 0.01928219516243719,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.7873453609683934,
+                  -0.08998557442473042,
+                  -0.7035027737213714
+                ],
+                "certified_tube": 0.006442711812850601,
+                "empirical_max_err_steady": 0.004401675174069367,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.8805674303877047,
+                  -0.18891829937640017,
+                  -0.4895758897753521
+                ],
+                "certified_tube": 0.014324551754123838,
+                "empirical_max_err_steady": 0.008954472263602561,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.45520048384987233,
+                  0.35123816303338773,
+                  -0.1678291899659499
+                ],
+                "certified_tube": 0.031092752700431974,
+                "empirical_max_err_steady": 0.027740605454455454,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.5077957194761196,
+                  -0.10921122188278404,
+                  0.1349474341854319
+                ],
+                "certified_tube": 0.012624807578016532,
+                "empirical_max_err_steady": 0.010912805890589114,
+                "tube_holds": true
+              }
+            ],
+            "p1_n_checked": 20,
+            "p1_n_violations": 0
+          },
+          {
+            "seed": 1001,
+            "best_gene": [
+              0.3119852021679681,
+              -0.33736263472647826,
+              -0.3063912663202527
+            ],
+            "train_best_fitness": 0.46106832187191243,
+            "test_best_fitness": 0.24887548520336206,
+            "final_pop_size": 20,
+            "n_rejections": 94,
+            "n_resamples": 94,
+            "fallback_count": 0,
+            "n_children_generated": 380,
+            "p1_cross_check": [
+              {
+                "gene": [
+                  0.3119852021679681,
+                  -0.33736263472647826,
+                  -0.3063912663202527
+                ],
+                "certified_tube": 0.02793353547614453,
+                "empirical_max_err_steady": 0.025346640283300963,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.7637685454472147,
+                  -0.1557714387609213,
+                  -1.0528123568243695
+                ],
+                "certified_tube": 0.01183171393496025,
+                "empirical_max_err_steady": 0.006732257039181136,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.3871763722689582,
+                  -0.47398903222881195,
+                  -0.7103349271206583
+                ],
+                "certified_tube": 0.03877568798573769,
+                "empirical_max_err_steady": 0.030258854795079587,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.4908266534618754,
+                  -0.21682193181075196,
+                  -0.7599148398683248
+                ],
+                "certified_tube": 0.016295293362321703,
+                "empirical_max_err_steady": 0.012139517288952892,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.28092979255598644,
+                  -0.4354732094136306,
+                  -0.5030084960756386
+                ],
+                "certified_tube": 0.03535768087534369,
+                "empirical_max_err_steady": 0.03370030429928819,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.5536309417721628,
+                  0.20647457012898196,
+                  0.34607467494588395
+                ],
+                "certified_tube": 0.0315746404395479,
+                "empirical_max_err_steady": 0.02401569649759107,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.4487838537406251,
+                  -0.46810976668949345,
+                  -1.199911028792182
+                ],
+                "certified_tube": 0.04038116559039556,
+                "empirical_max_err_steady": 0.03182283522725313,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.338896345655781,
+                  -0.389055176383896,
+                  -1.102451241355862
+                ],
+                "certified_tube": 0.04216061361620808,
+                "empirical_max_err_steady": 0.03982032979048634,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.27271742459874493,
+                  -0.27022260988589974,
+                  -0.38938748785856536
+                ],
+                "certified_tube": 0.02145896786008177,
+                "empirical_max_err_steady": 0.019781012724791637,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.24165901851253027,
+                  -0.3210943937507439,
+                  -0.03691410906477385
+                ],
+                "certified_tube": 0.031096936239071088,
+                "empirical_max_err_steady": 0.029736399870172694,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.39004531732733877,
+                  -0.3857356117307154,
+                  -0.9451917852079502
+                ],
+                "certified_tube": 0.031344361530634905,
+                "empirical_max_err_steady": 0.028233756050859943,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.1964139817938663,
+                  -0.10648339991031891,
+                  0.00927172826588421
+                ],
+                "certified_tube": 0.01074799245649226,
+                "empirical_max_err_steady": 0.010512861843919329,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.1731973163901068,
+                  -0.08274833396192602,
+                  -0.4585615092922718
+                ],
+                "certified_tube": 0.008616070073417288,
+                "empirical_max_err_steady": 0.00846506715934156,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.30757018603312214,
+                  -0.28086019185166095,
+                  -0.22242319891704931
+                ],
+                "certified_tube": 0.02391535533888605,
+                "empirical_max_err_steady": 0.022367840922024082,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.6800980969481137,
+                  -0.387392671506432,
+                  -0.11771602392490346
+                ],
+                "certified_tube": 0.0354709872226662,
+                "empirical_max_err_steady": 0.027286964578082384,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.6518985312402871,
+                  -0.38172986914058066,
+                  -1.1598436640332555
+                ],
+                "certified_tube": 0.03196164776925467,
+                "empirical_max_err_steady": 0.01684646968712665,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.40366560325578527,
+                  -0.25066664580294806,
+                  -0.3233303468405501
+                ],
+                "certified_tube": 0.020272660073761994,
+                "empirical_max_err_steady": 0.018353521105564756,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.5236138780573951,
+                  -0.41475953974207513,
+                  -0.19107266986076513
+                ],
+                "certified_tube": 0.03653912571289522,
+                "empirical_max_err_steady": 0.03131737531074001,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.47497895575992705,
+                  -0.39463313555088314,
+                  -1.2631481210643107
+                ],
+                "certified_tube": 0.03370499568508026,
+                "empirical_max_err_steady": 0.024859461069693365,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.2974951285694563,
+                  -0.31391137583050166,
+                  0.04659356645328799
+                ],
+                "certified_tube": 0.03292524203583756,
+                "empirical_max_err_steady": 0.03078446692254158,
+                "tube_holds": true
+              }
+            ],
+            "p1_n_checked": 20,
+            "p1_n_violations": 0
+          },
+          {
+            "seed": 1002,
+            "best_gene": [
+              0.4079109500242585,
+              0.09346306831604675,
+              -0.2751884267575438
+            ],
+            "train_best_fitness": 0.5166521527821774,
+            "test_best_fitness": 0.2013312867287144,
+            "final_pop_size": 20,
+            "n_rejections": 62,
+            "n_resamples": 62,
+            "fallback_count": 0,
+            "n_children_generated": 380,
+            "p1_cross_check": [
+              {
+                "gene": [
+                  0.4079109500242585,
+                  0.09346306831604675,
+                  -0.2751884267575438
+                ],
+                "certified_tube": 0.007531670804925809,
+                "empirical_max_err_steady": 0.007137615681628587,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.5289687188526108,
+                  0.27622510214929974,
+                  -0.498627674140932
+                ],
+                "certified_tube": 0.021443976685011856,
+                "empirical_max_err_steady": 0.017516666574412976,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.16089982817582393,
+                  0.0865439274539723,
+                  -0.3078815871209987
+                ],
+                "certified_tube": 0.00804592705618097,
+                "empirical_max_err_steady": 0.007994528025718704,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.4534738311898291,
+                  0.2253747250917617,
+                  -0.7317430815169105
+                ],
+                "certified_tube": 0.016973575902955822,
+                "empirical_max_err_steady": 0.012891615794732919,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.6329480845309938,
+                  0.21934303035104075,
+                  -0.07106723026876222
+                ],
+                "certified_tube": 0.02058795139443014,
+                "empirical_max_err_steady": 0.017118510913222,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.743108927174975,
+                  -0.019443379079648777,
+                  -0.2339980143790717
+                ],
+                "certified_tube": 0.0015942570928151214,
+                "empirical_max_err_steady": 0.0012635854457674232,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.7666908004080928,
+                  -0.3937853624070202,
+                  -0.3407933169116729
+                ],
+                "certified_tube": 0.03261689312744099,
+                "empirical_max_err_steady": 0.0224080026952667,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.0,
+                  -0.23733266585036467,
+                  -0.2904772661063028
+                ],
+                "certified_tube": 0.033449621063998576,
+                "empirical_max_err_steady": 0.032245196737712076,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.0,
+                  -0.09034474141236774,
+                  -0.20860671525467422
+                ],
+                "certified_tube": 0.011415909529917369,
+                "empirical_max_err_steady": 0.011228908179461955,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.7104952383761454,
+                  0.16483984954079162,
+                  -0.5817801017571713
+                ],
+                "certified_tube": 0.012223281216163496,
+                "empirical_max_err_steady": 0.00912198780306979,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.6131281055533965,
+                  -0.12059254070570978,
+                  -0.06573500224078427
+                ],
+                "certified_tube": 0.011339164738082316,
+                "empirical_max_err_steady": 0.00970836476014781,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.3878384642340453,
+                  -0.3743736481978366,
+                  -0.33043608492533194
+                ],
+                "certified_tube": 0.03097781051976673,
+                "empirical_max_err_steady": 0.02702758526791306,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.12387772107079326,
+                  -0.40469494428536607,
+                  -0.1268830162619419
+                ],
+                "certified_tube": 0.036896395977971334,
+                "empirical_max_err_steady": 0.03580780625492997,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.2605530562285704,
+                  -0.05049787995051848,
+                  -0.32378428026639816
+                ],
+                "certified_tube": 0.00393792018612203,
+                "empirical_max_err_steady": 0.0038071367197447647,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.2488611575903866,
+                  0.07642180833293502,
+                  -0.46374628589851685
+                ],
+                "certified_tube": 0.00637444784135669,
+                "empirical_max_err_steady": 0.006332994878417878,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.1059884217216639,
+                  0.07516740779250929,
+                  -0.2505492465815925
+                ],
+                "certified_tube": 0.00761915559634961,
+                "empirical_max_err_steady": 0.007560775879340892,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.5563212771551278,
+                  0.023999877728459493,
+                  -0.3328886404200203
+                ],
+                "certified_tube": 0.0018549261352438962,
+                "empirical_max_err_steady": 0.0016814520516741528,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.0,
+                  0.0933042639466871,
+                  -0.48406696807781263
+                ],
+                "certified_tube": 0.01808456876642843,
+                "empirical_max_err_steady": 0.016604688529539453,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.8553340511542329,
+                  -0.0680990473372289,
+                  -0.38035910977365706
+                ],
+                "certified_tube": 0.005186277834511565,
+                "empirical_max_err_steady": 0.0036080075614209305,
+                "tube_holds": true
+              },
+              {
+                "gene": [
+                  0.1782091118024856,
+                  0.05005291647526705,
+                  -0.1290968147839679
+                ],
+                "certified_tube": 0.004448987702331345,
+                "empirical_max_err_steady": 0.0044151611696459925,
+                "tube_holds": true
+              }
+            ],
+            "p1_n_checked": 20,
+            "p1_n_violations": 0
+          }
+        ]
+      }
+    }
+  },
+  "falsifiable": {
+    "P1_total_checked": 180,
+    "P1_total_violations": 0,
+    "P1_pass": true,
+    "P2_total_tube_rejections": 640,
+    "P2_pass": true,
+    "P2_witness": {
+      "gene": [
+        0.5,
+        1.0,
+        0.0
+      ],
+      "z3_contraction": true,
+      "z3_L_upper_bound": 0.5,
+      "tube_L_state_closed_form": 0.5,
+      "same_L_definition": true,
+      "G_input": 0.5,
+      "tube_radius": 0.1,
+      "r_max": 0.05,
+      "tube_admits": false,
+      "witness_holds": true
+    }
+  },
+  "wall_seconds": 230.33
+}
