@@ -291,7 +291,7 @@ def desc_b2(genome, shard8):
     v = np.tanh(z @ _B2_PROJ)
     return (float((v[0] + 1) / 2), float((v[1] + 1) / 2))
 
-def bin_of(desc, bins=8):
+def bin_of(desc, bins=12):   # Step4-faithful grid (12x12; 8x8 was too coarse for the ratchet)
     return (min(bins - 1, max(0, int(desc[0] * bins))), min(bins - 1, max(0, int(desc[1] * bins))))
 
 
