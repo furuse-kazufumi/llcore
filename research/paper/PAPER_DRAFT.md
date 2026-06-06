@@ -26,7 +26,7 @@ llcore claims a verified "Transformer core," but in its shipped `src/` it runs o
 
 - **Limitations, reproducibility, and roadmap (§9).** The CPU runs are deterministic; n = 8 is a hard limit of the vertex-enumerating certifier (memory wall near n ≈ 16, infeasible at n = 32). We provide an authoritative reproduction table and the roadmap (vertex-free certifier R-LLM-1, gradient-trained GPU stage, multimodal, cost-as-selection L4).
 
-The remainder of the paper follows these contributions in order: the substrate and certifiers (§2), soundness rigor and limits (§3), the reservoir byte-LM (§4), the L3 frontier (§5), the gradient cross-check (§6), vertex-free certification (§7), and limitations/roadmap (§8).
+The remainder of the paper follows these contributions in order: the substrate and certifiers (§2), soundness rigor and limits (§3), the reservoir byte-LM (§4), the L3 frontier (§5), the gradient cross-check (§6), the GPU scale-up and real-Transformer test (§7), vertex-free certification (§8), and limitations/roadmap (§9).
 
 ---
 
