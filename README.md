@@ -52,7 +52,7 @@ llcore が成熟し、その設計が llive にも価値があると判明した
 
 ## 確定独自軸 (事前調査 2026-05-28 完了, Agent A-D + RAD 14 分野)
 
-1. **ChangeOp 列 → Z3 事前 gate (online)** → commit pipeline (CDGP は事後フィードバック、方向逆)
+1. **ChangeOp 列 → sound contraction certifier の事前 gate (online, prove-then-reject)** → commit pipeline (CDGP は事後フィードバック、方向逆)。ゲートは閉形式 ∞-norm + 頂点 SVD + SDP-Lyapunov の certifier ladder であり SMT ソルバ不使用 (Track-C 確認)
 2. **学習則 (FF/EP/PCN/Hebb) を gene として混在進化** (先行未発見)
 3. **factor_hook (認知状態 → SSM Δ)** (実装した先行未発見)
 4. **persona-indexed specialist 集団 × verifier** (NAS は単一最良、進化集団 × verifier は完全独自)
