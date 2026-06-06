@@ -161,19 +161,25 @@ class StageBLM(nn.Module):
         self.pos = nn.Parameter(torch.zeros(T, d))
         self.blocks = nn.ModuleList([WindowedBlock(d, cfg["heads"], cfg["w_att"], T)
                                      for _ in range(cfg["blocks"])])
-        if hybrid:
+        self.ln_f = nn.LayerNorm(d)
+        self.readout = nn.Linear(d, vocab)
+        if hybrid:  # built LAST so core params never perturb the shared trunk's RNG stream
+                    # (red-team B-G1 fix: pure & hybrid now share bit-identical emb/blocks/readout init)
             self.U = nn.Linear(d, n); self.P = nn.Linear(n, d)
             self.raw_decay = nn.Parameter(torch.randn(n) * 0.5 + 1.0)
             self.raw_W = nn.Parameter(torch.randn(n, n) * (0.3 / n ** 0.5))
-        self.ln_f = nn.LayerNorm(d)
-        self.readout = nn.Linear(d, vocab)
-    def core(self): return torch.sigmoid(self.raw_decay), 2.0 * torch.tanh(self.raw_W)
+    def core(self):
+        # strict decay in (1e-6, 1-1e-6): float32 sigmoid saturates to EXACTLY 1.0 (red-team
+        # soundness fix) which would empty the certified region (gamma=0 infeasible at decay=1).
+        d = torch.sigmoid(self.raw_decay) * (1.0 - 2e-6) + 1e-6
+        return d, 2.0 * torch.tanh(self.raw_W)
     def core_np(self):
         d, W = self.core(); return d.detach().cpu().numpy(), W.detach().cpu().numpy()
     def set_core_np(self, decay, W):
         with torch.no_grad():
             decay = np.clip(decay, 1e-6, 1 - 1e-6); W = np.clip(W, -2 + 1e-6, 2 - 1e-6)
-            self.raw_decay.copy_(torch.tensor(np.log(decay / (1 - decay)), dtype=torch.float32, device=DEVICE))
+            p = np.clip((decay - 1e-6) / (1.0 - 2e-6), 1e-9, 1 - 1e-9)   # invert the affine (float64)
+            self.raw_decay.copy_(torch.tensor(np.log(p / (1 - p)), dtype=torch.float32, device=DEVICE))
             self.raw_W.copy_(torch.atanh(torch.tensor(W / 2.0, dtype=torch.float32, device=DEVICE)))
     def forward(self, idx):
         B, T = idx.shape
