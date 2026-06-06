@@ -1336,7 +1336,7 @@ All runs are deterministic and CPU-only; the certifier path is float64, full sto
 Figure: reproduction-script dependency graph (substrate → certifiers → landscape/gated/null drivers →
 result JSON → verdict) (data: research/verified_lm_evolution/VERDICT.md, research/verifier_cost_reduction/SKETCH.md).
 
-### 9.4 The verified-evolution roadmap
+### 10.4 The verified-evolution roadmap
 
 The limitations in §9.1 define the roadmap. Each item is named in the primary sources as the next step,
 not as a completed result (item 2, GPU stage B, is now complete — §7).
