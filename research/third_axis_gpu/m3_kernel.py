@@ -439,10 +439,10 @@ def main():
                 # M5 GRAD only on real
                 if control == "real" and ("real", "M5", "", seed) not in done:
                     try:
-                        fbest, bg, steps = run_m5_grad(rf, m, E, seed, cfg)
+                        ce5, bg, steps = run_m5_grad(rf, m, E, seed, cfg)
                         record(control, "M5", "", seed,
-                               {"best_fitness": fbest * -1 if False else -fbest * -1,  # keep sign explicit below
-                                "best_ce": fbest, "grad_steps": steps,
+                               {"best_fitness": -ce5,           # fitness = -CE (same sign as M1-M4 real)
+                                "best_ce": ce5, "grad_steps": steps,
                                 "cert_inf": cert_inf(*bg),
                                 "emp_rho": empirical_rho(*bg, n_samples=200, seed=seed + 98)})
                         _log("run", f"seed={seed} real  M5      ce={fbest:.4f} (steps={steps})")
