@@ -1522,6 +1522,29 @@ search.
   contraction over a low-dimensional Jacobian box is exactly what keeps a *sound* gate tractable here.
   (Cited as a concept; no verified arXiv id assigned.)
 
+*Sound gates on weight updates (corner iii on parameters — but not contraction, and not a memory core).*
+
+- **The Scrivens 2026 pair** — *Information-Theoretic Limits of Safety Verification for Self-Improving
+  Systems* (arXiv:2603.28650) and its empirical companion *Classification-Verification Dichotomy for AI
+  Safety Gates* (arXiv:2604.00072) — is, after our second-round audit, the nearest occupant of corner
+  (iii) on weights: it proves an impossibility theorem for classifier-based safety gates on
+  self-modifying systems, exhibits a constructive escape (a Lipschitz-ball verifier: accept `θ` iff
+  `‖θ − θ₀‖ < r = m/L`, sound in the fail-closed sense that every accepted `θ` is safe), and
+  *implements* that prove-then-reject rule over parameter updates in a self-improvement loop. The
+  certified property, however, is distance-to-a-safety-oracle-boundary in parameter space — not a
+  contraction certificate over the dynamics' Jacobian — and the gated object is a generic model with a
+  safety oracle, not a recurrent/Transformer memory core, so corners (i)–(ii) stay open. We cite it as
+  the strongest evidence that *prove-then-reject on weight updates* is becoming a recognized pattern,
+  which sharpens rather than breaks the distinction: our gate certifies a *dynamical* property of the
+  updated memory core.
+- **Runtime-assurance work is starting to gate adaptation itself**: an adaptive, provably-correct
+  Simplex architecture (STTT 2025) certifies-and-extends the recoverable region at runtime via
+  proof-on-demand reachability before adopting the advanced controller, and *Safe Parameter Update of
+  Nonlinear Adaptive Controllers* (RA-L 2026) modulates the parameter-update law itself through a
+  RaCLF+CBF quadratic program. The former gates controller *adoption* (not per-update kernel
+  properties); the latter is projection semantics (minimally-invasive perturbation of the update, the
+  same design axis as LID) on a control plant.
+
 *Verified / governed memory evolution (corner ii, the memory core — but not a sound contraction proof, and mostly unimplemented).*
 
 - **Governing Evolving Memory in LLM Agents — Stability and Safety Governed Memory (SSGM,
