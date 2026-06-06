@@ -22,7 +22,7 @@ from __future__ import annotations
 RUN_MODE = "feasibility"   # "smoke" (local CPU) | "feasibility" (preview) | "full" (verdict)
 # ======================================================== #
 
-import json, os, sys, time, datetime, traceback, urllib.request
+import json, os, sys, time, datetime, traceback, urllib.request, zlib
 import numpy as np
 
 SEED0 = 1234
