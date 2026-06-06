@@ -1173,8 +1173,8 @@ arm with mean Δ = +0.0152, p = 0.0056, positive in 16/20 seeds. The effect surv
 robustness slices (median +0.0054; trimmed mean dropping both extremes +0.0107; removing the single
 largest delta +0.0112 — all positive), so it is not the pilot's one-outlier story again, though the
 distribution is right-skewed (a few seeds gain a lot, most gain a little) and we report it as such.
-The exploratory deltas line up as a dose–response in the memory horizon: delay 0 shows nothing
-(−0.0002, p ≈ 0.96), delay 4 a positive but non-significant trend (+0.0098, p ≈ 0.10), delay 8 the
+The exploratory deltas line up as a dose–response in the memory horizon: delay 0 shows no detectable
+effect (−0.0002, p ≈ 0.96), delay 4 a positive but non-significant trend (+0.0098, p ≈ 0.10), delay 8 the
 confirmed effect — consistent with the tube being a *memory-retention* guarantee rather than a generic
 fitness booster. Mechanistically the result is the navigability story again: the tube arm rejected
 ~3× more children than the contraction arm (2,224 vs 741 on delay 8) with **zero fallbacks** (the GA
