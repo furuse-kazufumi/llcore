@@ -1203,7 +1203,7 @@ This section states what our results do *not* show, makes the runs reproducible,
 roadmap that follows from the limitations. We hold the red-teamed verdict's scope unchanged: the L3
 "payoff" is **evolvability, not language learning** (VERDICT.md §0).
 
-### 9.1 Limitations of scope
+### 10.1 Limitations of scope
 
 The verified-evolution core was demonstrated on a deliberately small substrate, and the boundaries of
 that substrate bound every claim in this paper.
