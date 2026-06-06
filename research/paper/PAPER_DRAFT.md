@@ -1611,6 +1611,47 @@ search.
   certifier ladder (§10.4, R-LLM-1) — its existence strengthens the *tooling*, while the gate location
   (post-hoc verification of given networks) remains distinct.
 
+*Stability analyses of memory-core internal dynamics (corner ii's neighborhood — analysis, by-construction, or monitoring; never a prove-then-reject gate).*
+
+The internal-state stability of memory cores is a mature, active field, and we concede that up front
+rather than let it be raised against us: our novelty claim is not that such analyses exist but that
+none of them turns the analysis into a fail-closed admission gate inside the update loop. A
+four-lineage sweep (Hopfield/energy, attention-spectral, SSM, delta-rule/linear-RNN; every primary
+source confirmed) found the neighborhood densely occupied, always in one of three non-gate forms:
+
+- **Analysis / diagnosis (post-hoc).** Modern Hopfield networks come with global convergence and
+  energy-descent guarantees whose update rule *is* attention (Ramsauer et al., arXiv:2008.02217; the
+  energy-based dynamical-models survey of Montanari, Bullo, Krotov & Motter, arXiv:2604.05042; recent
+  capacity-optimality results, arXiv:2410.23126, and Hopfield-attention correspondences, NeurIPS 2025,
+  arXiv:2511.20698; dense-associative-memory energy variants, arXiv:2506.10801) — convergence here is
+  an emergent property of a fixed retrieval map, certified once, not re-proven per update. On the
+  spectral side, the exact operator norm of the softmax Jacobian has been derived
+  (arXiv:2602.18849) — and its own headline finding (the norm sits near 1 throughout training) is a
+  *diagnosis of non-contraction*, underscoring that analysis alone enforces nothing; Jacobian/Lyapunov
+  treatments of recurrent self-attention (NeurIPS 2025, arXiv:2505.19458) similarly *monitor* dynamics
+  at criticality. Lyapunov-stability analyses of Mamba (arXiv:2406.00209) and ISS/LMI regularity
+  results for selective SSMs (arXiv:2505.11602) prove properties of trained models post hoc.
+- **By-construction parameterizations.** The dominant SSM/linear-RNN practice *builds* `ρ < 1` (or
+  boundedness) into the parameterization so that unstable candidates are never representable:
+  LRU's stable exponential parameterization (ICML 2023, arXiv:2303.06349), StableSSM's
+  reparameterization against the curse of memory (ICML 2024, arXiv:2311.14495), oscillatory SSMs with
+  provable dissipation (LinOSS/D-LinOSS, ICLR 2025, arXiv:2410.03943, arXiv:2505.12171), perturbed
+  diagonalizations (ICLR 2024, arXiv:2310.01698), and the convex-constrained contracting implicit RNN
+  lineage (arXiv:1912.10402). xLSTM's exponential-gating stabilizer state (NeurIPS 2024,
+  arXiv:2405.04517) and RWKV-7's bounded-decay/clamped state evolution (arXiv:2503.14456) are the
+  same design at engineering scale. These answer a different question — *constrain the space* — and
+  llcore's own L3/§6 results quantify what that trades away; a rejection gate inspects arbitrary
+  updates instead.
+- **A terminology collision we defuse explicitly:** the "gates" of Gated DeltaNet (ICLR 2025,
+  arXiv:2412.06464), gated linear attention (ReGLA, arXiv:2502.01578; GatedFWA, arXiv:2512.07782),
+  and Titans' test-time memorization with forgetting/momentum (arXiv:2501.00663) are *learned
+  decay/forget gates* — scalar multipliers inside the update rule that softly stabilize the state —
+  not admission gates that prove a property of a candidate update and reject it on failure. Indeed
+  part of this lineage moves in the *opposite* direction from contraction, deliberately admitting
+  negative/non-contractive eigenvalues for expressivity (arXiv:2411.12537, DeltaProduct
+  arXiv:2502.10297). No system in this neighborhood certifies-then-rejects; that gate location is the
+  corner we occupy.
+
 *Output / action gating and post-hoc verification (a different gate location entirely).*
 
 - **Safeguarded AI (ARIA programme, 2024–2026)** is the most authoritative proof-gated-gatekeeper
