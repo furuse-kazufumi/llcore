@@ -319,6 +319,11 @@ def run_m3_ga(fit, n, E, warm, rng, sigma, pop=16):
             f, _ = fit(g); newF.append(f)
         used += pop; P, fits = newP, newF
         if max(fits) > best: best, bg = max(fits), P[int(np.argmax(fits))]
+    while used < E:   # partial final generation -> exact budget parity (red-team fix)
+        i, j = rng.integers(0, pop, 2)
+        parent = P[i] if fits[i] >= fits[j] else P[j]
+        g = mutate(parent, sigma, rng); f, _ = fit(g); used += 1
+        if f > best: best, bg = f, g
     return best, bg
 
 def run_m4_mapelites(fit, n, E, warm, rng, sigma, desc, need_b2):
