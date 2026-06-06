@@ -43,7 +43,6 @@ from typing import Any
 import numpy as np
 
 from .backends import (
-    InfNormBackend,
     _coupled_arrays,
     _infnorm_sup,
     _t_min,
