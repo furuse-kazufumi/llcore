@@ -473,10 +473,30 @@ def evolve(
     elif len(initial_pop) != pop_size:
         raise ValueError(f"initial_pop size {len(initial_pop)} != pop_size {pop_size}")
 
+    def _make_child(p: Population):
+        """tournament(+crossover)+mutate で子 gene を 1 個生成する.
+
+        RNG draw 順は ``"none"`` mode で旧 ``evolve()`` と完全一致:
+        tournament_select → rng.random() → [tournament_select + crossover] → mutate。
+        """
+        parent_a = tournament_select(p, tournament_k, rng)
+        if rng.random() < crossover_rate:
+            parent_b = tournament_select(p, tournament_k, rng)
+            child = _cx(parent_a.gene, parent_b.gene, rng)
+        else:
+            child = parent_a.gene
+        return _mut(child, rng)
+
     pop = evaluate_population(initial_pop, fitness_func, rng)
     generations: list[Population] = [pop]
     best_curve: list[float] = [pop.best.fitness]
     diversity_curve: list[float] = [_div(pop)]
+
+    # T1 Phase 1 (a): ゲート集計カウンタ (gate_mode="none" では全 0 のまま使用しない)。
+    n_rejections = 0
+    n_resamples = 0
+    fallback_count = 0
+    n_children = 0
 
     for _gen in range(n_generations):
         # elitism: 上位 N を子に「fitness ごと」持ち越し (再評価しない)
@@ -490,14 +510,32 @@ def evolve(
         # 残り (pop_size - elitism) を tournament + mutation/crossover で生成し新評価
         new_genes: list = []
         while len(new_genes) < pop_size - elitism:
-            parent_a = tournament_select(pop, tournament_k, rng)
-            if rng.random() < crossover_rate:
-                parent_b = tournament_select(pop, tournament_k, rng)
-                child = _cx(parent_a.gene, parent_b.gene, rng)
-            else:
-                child = parent_a.gene
-            child = _mut(child, rng)
-            new_genes.append(child)
+            child = _make_child(pop)
+            if gate_mode == "none":
+                # control: ゲートを呼ばず追加 draw も消費しない = 旧挙動 byte-identical。
+                new_genes.append(child)
+                continue
+            # gated: 子を証明 → 不合格は fail-closed resample → cap 到達で fallback。
+            if _gate_admits(child, gate_mode):
+                new_genes.append(child)
+                n_children += 1
+                continue
+            n_rejections += 1
+            admitted = False
+            for _ in range(resample_cap):
+                n_resamples += 1
+                child = _make_child(pop)
+                if _gate_admits(child, gate_mode):
+                    new_genes.append(child)
+                    n_children += 1
+                    admitted = True
+                    break
+                n_rejections += 1
+            if not admitted:
+                # cap 到達 → known-safe fallback (RNG draw を消費しない)。
+                new_genes.append(_FALLBACK_GENE)
+                n_children += 1
+                fallback_count += 1
 
         new_pop = evaluate_population(new_genes, fitness_func, rng)
         # elite (旧 fitness 維持) + 新個体 (新評価) を結合
@@ -506,8 +544,20 @@ def evolve(
         best_curve.append(pop.best.fitness)
         diversity_curve.append(_div(pop))
 
+    gate_stats = (
+        None
+        if gate_mode == "none"
+        else GateStats(
+            gate_mode=gate_mode,
+            n_rejections=n_rejections,
+            n_resamples=n_resamples,
+            fallback_count=fallback_count,
+            n_children_generated=n_children,
+        )
+    )
     return EvolutionResult(
         generations=tuple(generations),
         best_fitness_curve=tuple(best_curve),
         diversity_curve=tuple(diversity_curve),
+        gate_stats=gate_stats,
     )
