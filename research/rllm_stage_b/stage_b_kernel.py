@@ -13,10 +13,14 @@
 # CONDITIONS (core training regime; all else identical, CRN-paired):
 #   pure    - no core channel (is the memory channel load-bearing at all? B-G1)
 #   none    - core unconstrained (+ derived post-hoc projection metric, B-G4)
-#   project - after EVERY step, if cert_inf fails scale W by largest gamma in [0,1] (bisection) that
-#             certifies; deterministic, never reverts (constraint without rejection-friction)
+#   project - every cert_every steps (SAME cadence as reject; red-team fix), if cert_inf fails scale
+#             W by the largest certifying gamma (bisection); deterministic, never reverts
 #   reject  - HD-1-style: every cert_every steps, revert core (only) to last passing snapshot
 # B-Q2: friction vs expressivity = where does CE(project) land between CE(none) and CE(reject)?
+# Red-team fixes (3-lens adversarial review, 2026-06-06): strict decay reparam (float32 sigmoid
+# saturation could empty the certified region); shared-trunk-first init order (B-G1 CRN); matched
+# project/reject cadence; certified init for all hybrid conds; symmetric Adam-moment reset on
+# out-of-band core mutation; resume record dedup.
 from __future__ import annotations
 
 # ===================== USER TOGGLES ===================== #
