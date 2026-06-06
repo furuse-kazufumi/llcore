@@ -23,7 +23,7 @@ import numpy as np
 import pytest
 
 from llcore.state_update import StateUpdateGene, eval_step, run_sequence
-from llcore.verifier import tracking_tube, verify_lipschitz_contraction
+from llcore.verifier import tracking_tube
 
 
 def _load_disturbance_checker():
