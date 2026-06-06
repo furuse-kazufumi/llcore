@@ -108,5 +108,28 @@ n=256 extension only if the full run leaves session budget (reported as explorat
 - Behavior-descriptor dependence: ③ NEGATIVE under B1+B2 does not exclude some untested descriptor
   unlocking ③ — the claim is scoped to the two pre-registered descriptors (chosen for the BG9
   mechanism and functional-diversity rationale, not post-hoc).
-- The P+ corridor is in B1's behavior space; B2 has no synthetic positive control (disclosed: B2's
-  harness validity is inherited from B1's machinery, weaker).
+- The P+ corridor is in B1p's behavior space; B2 has no synthetic positive control (disclosed: B2's
+  harness validity is inherited from the shared MAP-E machinery, weaker — hence B2 = secondary only).
+
+## 7. Pre-run amendments (3-lens adversarial review, 2026-06-06 — ALL before any GPU run)
+
+Red-team (design / fairness / torch lenses; 2 blockers + 3 majors + minors) forced these changes,
+each verified by CPU simulation where applicable:
+1. **P+ corridor re-based onto a fixed 24-entry probe slice** (blocker: full-mean coordinate
+   CLT-frozen at n=64 ⇒ N/A guaranteed; reviewer simulated all methods stuck at 0.5 at E=6000).
+2. **B1 axis-2 re-based onto the probe slice** (blocker: `mean(|W| rowsum)/4` saturates in bin 7 for
+   100% of reachable genomes — archive collapsed to ~2-6 of 64 cells, structurally crippling M4).
+   New B1 = `(mean(decay), mean(|W_slice|)/2)`, both axes mutation-mobile (~0.015–0.025/step).
+3. **M2 = warm-restart RR** (major: cold random restarts are a liability — not the BG9 teleport —
+   on a warm-started real landscape; restart now re-perturbs the warm core at 3σ).
+4. **B1 primary / B2 secondary** (major: 1-of-2 descriptor PASS was an undisclosed 2× multiplicity).
+5. **B1p naming for P+** made explicit (major: silent text/code descriptor drift on the gating control).
+6. Minor fixes: GA partial-final-generation for exact budget parity; B2 empty-octile imputation
+   (CE=0 contamination) + std-adaptive scaling; M5 restores the shared model core afterward + grad
+   assert; smoke E=64; eval_batches=3 (text said 4); jitter floor 1e-4 for win adjudication.
+7. **L0 landscape suite added** (user request: "GPU が使えるなら landscape の拡張も"): per seed,
+   1,000 genomes (600 random + 100×4 warm-perturbed σ ∈ {0.03, 0.12, 0.5, 1.0}) → real CE + B1
+   coords. Descriptive (no gate): measures direct-sampling difficulty (fraction of random genomes
+   beating warm) and local smoothness (perturbation CE vs σ) — the BG9-style mechanism evidence for
+   whichever verdict the M-suite returns.
+8. **P+ CPU validation result (required by §3): recorded below after simulation.**
