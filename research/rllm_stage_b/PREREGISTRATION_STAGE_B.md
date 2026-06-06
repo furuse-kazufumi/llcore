@@ -44,12 +44,26 @@ are never certified. The verified property is the core's homeostasis, nothing mo
 **Conditions (core training regime; everything else identical, CRN-paired seeds):**
 1. `pure` — no core channel (B-Q1 baseline).
 2. `none` — core unconstrained. (+ derived metric: post-hoc projection of the final core, B-Q4.)
-3. `project` — after **every** optimizer step, if `cert_inf` fails, scale W by the largest γ∈[0,1]
-   (bisection) s.t. `infnorm_sup(decay, γW) < 1` — deterministic, never reverts, always-certified.
-   (γ=0 always feasible since decay=σ(·)<1.)
+3. `project` — every `cert_every=4` steps (**same cadence as `reject`** — red-team fix: cadence
+   asymmetry would confound the B-Q2 mechanism comparison), if `cert_inf` fails, scale W by the
+   largest γ∈[0,1] (bisection) s.t. `infnorm_sup(decay, γW) < 1` — deterministic, never reverts.
+   Certified at every check incl. the final step; between checks the core may transiently leave the
+   region (same exposure as `reject`). γ=0 feasibility is guaranteed by a strict decay
+   reparametrisation `decay = (1−2e-6)·σ(·)+1e-6` (red-team fix: float32 sigmoid saturates to exactly
+   1.0, which would empty the certified region); a defensive post-projection re-check falls back to a
+   trivially-certified core (decay=0.7, W=0) and is counted (`fallbacks`, expected 0).
 4. `reject` — HD-1 GRAD-gate: every `cert_every=4` steps, if `cert_inf` fails, revert core (only) to
-   last passing snapshot (kept at HD-1's cadence for cross-comparability; cadence asymmetry with
-   `project` is disclosed).
+   last passing snapshot.
+
+**Symmetry measures (red-team fixes, all disclosed):** shared trunk modules (emb/pos/blocks/ln_f/
+readout) are constructed BEFORE the core params so `pure` and hybrids share bit-identical trunk inits
+(pure-vs-hybrid differs ONLY in the extra channel + param count); ALL hybrid conditions get the same
+certified-init loop (W halved until cert passes) so `none`/`project`/`reject` start from the exact
+same core (caveat: stage-B `none` therefore starts certified, unlike HD-1's raw-init `none` — B-G3
+cross-study comparison carries this asymmetry); Adam moments of the core params are reset after any
+out-of-band mutation (projection or revert) in BOTH arms — stale momentum would otherwise re-push the
+core out of region and bias Δf upward (this also means stage-B `reject` is a *cleaner* revert than
+HD-1's, disclosed for cross-comparability).
 
 **Sweep:** n_core ∈ {64, 256} × 4 conditions × 4 seeds (full) = 32 runs; feasibility = n=64 × 2 seeds
 = 8 runs. d=128, T=160, B=24, Adam lr 3e-3, steps: 1200 (full) / 300 (feasibility), eval_batches=8,
