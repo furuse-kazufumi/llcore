@@ -144,9 +144,10 @@ def tracking_tube(
 ) -> TrackingTubeResult:
     """contraction-certified gene の追従 tube 半径を閉形式で報告する (read-only / 案 B).
 
-    既存 ∞-norm contraction ゲート (:class:`InfNormBackend`) で gene を検査し、PASS なら
-    ``L = sup‖J_s‖_∞ < 1`` と ``G = sup‖J_x‖_∞`` から tube 半径 ``r = G·w̄/(1−L)`` を返す。
-    REJECT (L≥1) なら ``tube_radius = +∞`` (= 追従保証なし)。
+    既存 ∞-norm contraction 基準 (``cert_inf`` / :class:`InfNormBackend` と同じ
+    ``L = sup‖J_s‖_∞ < 1``) で gene を検査し、PASS なら L と ``G = sup‖J_x‖_∞`` から
+    tube 半径 ``r = G·w̄/(1−L)`` を返す。REJECT (L≥1) なら ``tube_radius = +∞``
+    (= 追従保証なし)。
 
     soundness: tube 不等式 ``limsup_t ‖s_act−s_ref‖_∞ ≤ G·w̄/(1−L)`` は **定理**
     (Banach + Lipschitz 合成, 設計 doc §2)。ただし参照軌道 feasibility と「軌道の妥当性」
