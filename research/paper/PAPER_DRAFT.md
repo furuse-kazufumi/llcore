@@ -810,8 +810,8 @@ Four findings, each null-controlled:
    *stronger* (ρ → 2.61) with zero payoff — every cell sits at the unigram ceiling. Crossing ρ=1
    is the default geometry of an unconstrained walk at high n (the contracting region's volume
    fraction vanishes — the same geometry as the coverage decay of §8's PoC-2.6), not evidence that
-   prediction needs criticality. Real data in fact *anchors* the dynamics (real drift < null drift
-   at every n).
+   prediction needs criticality. Real data in fact *anchors* the dynamics at scale (real drift <
+   null drift at every n ≥ 32; at n=8 the two are equal within noise, 1.07 vs 1.06).
 3. **The gate's CE cost is real at full budget** (GRAD none beats inf by 0.03–0.12 nats, peaking at
    mid-n) — the feasibility run had shown "gate ≈ free", so the gate's price is itself
    budget-dependent, a warning against reading verifier costs off short runs.
