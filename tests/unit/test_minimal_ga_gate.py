@@ -222,7 +222,7 @@ def test_src_evolve_matches_research_gated_evolve(mode: str, seed: int) -> None:
 
 def test_gated_with_codec_raises() -> None:
     """[v] codec (coupled gene) + gated mode は未対応 → ValueError で fail-loud."""
-    from llcore.kernel.rwkv_codec import RWKVCodec  # type: ignore
+    from llcore.kernel import RWKVCodec
 
     with pytest.raises(ValueError, match="scalar StateUpdateGene"):
         evolve(
