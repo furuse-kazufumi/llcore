@@ -755,8 +755,10 @@ Within the bounds of what was actually measured (`NAVIGABILITY_GPU_VERDICT.md` �
   is roughly equal across gates (≈ 2.616) even though `inf` is admit-rate-trapped. A pure-EVO
   setup with no gradient wrapper would be expected to show CE separation (cf. the arc's L3
   `lm_substrate` run). The *gradient-escapes* finding (G3) is unaffected by this and is clean.
-- The 8-seed GPU full run (larger config) is an optional confirmation expected to reproduce;
-  it is not required for the conclusion.
+- The 8-seed GPU full run (larger config, Kaggle T4) has since completed and **reproduces all CPU
+  gate conclusions** — the optional confirmation landed as expected. Note also the budget caveat
+  found later by HD-1 (§7.2): "gradient escapes the trap" holds for the admit-rate trap, but at
+  larger budgets ungated gradient does not *stay* contractive.
 - We do not generalize beyond the measured range: this evidence speaks to a tiny verified-core
   recurrent LM under contraction gates, and we make no claim about larger models, other
   verifier families, or other optimizers than the two regimes tested
