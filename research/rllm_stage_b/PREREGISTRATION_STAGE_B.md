@@ -112,4 +112,10 @@ pooled across n_core.
 - BPTT through T=160 sequential core steps is the wall-clock bottleneck (Python loop over T) — sizes
   chosen for a single-session Kaggle run.
 - The feasibility→full budget sensitivity seen in HD-1 means feasibility numbers here are previews only;
-  conclusions are drawn from the full run.
+  conclusions are drawn from the full run. **No B-G1..B-G4 verdict is issued from a feasibility run**
+  (2 seeds cannot evaluate the ≥3/4 criteria).
+- Red-team (3-lens adversarial review, 2026-06-06, pre-run): 2 majors fixed in code (decay float32
+  saturation; trunk-init RNG divergence), 3 majors fixed in this pre-reg (cadence matching; B-G2
+  resolvability floor; per-n aggregation), minors (certified-init symmetry, Adam-state reset, resume
+  dedup) fixed; CRN pairing of batches/eval and the no-long-range-leak claim for `pure` were
+  independently verified by the reviewers.

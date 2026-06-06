@@ -1,0 +1,16 @@
+{
+  "id": "furusekazufumi/rllm-stage-b",
+  "title": "rllm-stage-b",
+  "code_file": "stage_b_kernel.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": "false",
+  "enable_gpu": "true",
+  "machine_shape": "NvidiaTeslaT4",
+  "enable_tpu": "false",
+  "enable_internet": "true",
+  "dataset_sources": [],
+  "competition_sources": [],
+  "kernel_sources": [],
+  "model_sources": []
+}
