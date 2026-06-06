@@ -242,14 +242,10 @@ def main() -> int:
     print(f"\nsaved -> {out_path}")
 
     # 健全性 assertion: contraction-certified な A/B/C で tube が必ず成立すること。
-    certified = [r for r in cases_results(results) if r["cert_inf"]]
+    certified = [r for r in results if r["cert_inf"]]
     all_hold = all(r["tube_holds"] for r in certified)
     print(f"\nASSERTION (all certified cases tube_holds): {all_hold}")
     return 0 if all_hold else 1
-
-
-def cases_results(results):
-    return results
 
 
 if __name__ == "__main__":
