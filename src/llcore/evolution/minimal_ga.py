@@ -397,11 +397,34 @@ def evolve(
 
         RWKV では ``evolve(codec=RWKVCodec())`` と ``evolve(codec=None)`` は byte-identical
         (operator が RNG ストリームまで一致する設計)。
+    gate_mode : GateMode
+        T1 Phase 1 (a): 子個体に課す証明ゲート (additive / 後方互換)。
+
+        - ``"none"`` (既定) → **無ゲート control**。ゲートを 1 度も呼ばず追加 RNG draw も
+          消費しないため、旧挙動と **byte-identical** (既存テスト全 green を保証)。
+        - ``"state_norm"`` → ``verify_gene_safe(child).ok`` を満たす子のみ admit
+          (Z3 |s|<=1 gate)。
+        - ``"contraction"`` → ``verify_lipschitz_contraction(child).contraction is True``
+          を満たす子のみ admit (Z3 L<1 gate; fail-closed)。
+
+        gated mode では reject された子を ``resample_cap`` 回まで再生成 (fail-closed)、
+        cap 到達で known-safe fallback gene を採用する。集計は :class:`GateStats` として
+        ``EvolutionResult.gate_stats`` に格納される。
+        **scalar StateUpdateGene 専用** (``codec`` 併用時は ``gate_mode="none"`` 必須;
+        現行ゲート検証器が scalar gene を前提とするため)。
+    resample_cap : int
+        gated mode で 1 子あたり許す resample 回数の上限。cap 到達で fallback。
 
     Returns
     -------
     EvolutionResult
         全世代のスナップショット + best_fitness_curve + diversity_curve。
+        gated mode では ``gate_stats`` に :class:`GateStats` が入る (それ以外は None)。
+
+    Raises
+    ------
+    ValueError
+        ``codec`` と gated ``gate_mode`` の併用 (未対応の組合せ; fail-loud)。
     """
     if rng is None:
         rng = np.random.default_rng()
@@ -409,6 +432,13 @@ def evolve(
         raise ValueError(f"elitism={elitism} must be <= pop_size={pop_size}")
     if tournament_k > pop_size:
         raise ValueError(f"tournament_k={tournament_k} must be <= pop_size={pop_size}")
+    if gate_mode != "none" and codec is not None:
+        # 現行の証明ゲートは scalar StateUpdateGene 前提 (coupled gene 用ゲートは
+        # tracking_tube / backends 側に別配線)。誤用を fail-loud で弾く。
+        raise ValueError(
+            "gated gate_mode is only supported for the scalar StateUpdateGene path "
+            "(codec=None); coupled-gene gating uses verifier backends instead"
+        )
 
     # S2: operator 選択 (codec=None は旧 RWKV パスを完全保存 = byte-identical)。
     if codec is None:
