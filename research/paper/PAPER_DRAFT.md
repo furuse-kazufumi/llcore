@@ -765,6 +765,122 @@ Within the bounds of what was actually measured (`NAVIGABILITY_GPU_VERDICT.md` �
 
 ---
 
+## 7. The gate under gradient training at scale (GPU): entropic drift and the price of homeostasis (HD-1 / Stage-B)
+
+§6 closed the navigability question at n=8 but left two larger ones open: what happens to the
+verified core at *dimensions the vertex certifiers cannot reach* when nothing constrains it, and
+what the gate costs inside a *real gradient-trained Transformer* rather than a reservoir wrapper.
+Two pre-registered GPU experiments (Kaggle T4, $0, self-contained checkpointed kernels, each with a
+shuffled-corpus null control) answer both. Only the scalable `cert_inf` (`O(n²)`) is ever called —
+the `2^n` certifiers are absent by design, so this section is also the first field test of the
+"choose the gate on soundness/coverage" recommendation of §6 at n ≫ 8.
+
+### 7.1 HD-1: unrestricted evolution and gradient at high dimension
+
+`hd1_highdim_evo.py` (`research/highdim_evolution/`) embeds the core in a 1-layer recurrent
+char-LM (input bounded by `tanh` so `cert_inf`'s `max_input_abs=1.0` box stays sound) and sweeps
+n ∈ {8, 32, 64, 128, 256} × gates {none, inf} × 4 seeds, for both GRAD (Adam, 400 steps, gate as
+revert-on-cert-failure) and EVO (gated random mutation on a gradient-warm frozen base, 150
+generations), at d=96, T=64, on tiny-shakespeare (real) and its shuffle (null). The substrate is
+tanh-bounded, so "unrestricted" never diverges numerically — what is at stake is precisely the
+**contraction / echo-state property** the certifier guarantees, not boundedness.
+
+### 7.2 HD-1 results: leaving the contractive region is the default — and it is entropic
+
+Full-run results (`result_hd1_full.json` / `result_hd1_full_null.json`, 40/40 + 40/40 ok):
+
+|  n | GRAD ρ (none, real) | GRAD unsound | EVO unsound | GRAD ce none−inf | GRAD ρ (none, null) |
+|---:|---:|:--:|:--:|---:|---:|
+|   8 | 1.07 | 3/4 | 0/4 | −0.03 | 1.06 |
+|  32 | 1.20 | 4/4 | 0/4 | −0.09 | 1.58 |
+|  64 | 1.22 | 4/4 | 2/4 | −0.12 | 1.89 |
+| 128 | 1.42 | 4/4 | 3/4 | −0.10 | 2.21 |
+| 256 | 1.95 | 4/4 | 4/4 | −0.04 | 2.61 |
+
+Four findings, each null-controlled:
+
+1. **Ungated gradient training itself leaves the contractive region** (19/20 real seeds, ρ growing
+   monotonically with n). A cheaper feasibility run (150 steps) had GRAD staying sound at every n —
+   a small-budget artifact, which retroactively scopes §6's "gradient escapes the trap": gradient
+   avoids the *EA admit-rate trap*, but given budget it does not *stay* contractive; it has no
+   reason to.
+2. **The drift is entropic, not structure-seeking.** On the shuffled null the same drift occurs
+   *stronger* (ρ → 2.61) with zero payoff — every cell sits at the unigram ceiling. Crossing ρ=1
+   is the default geometry of an unconstrained walk at high n (the contracting region's volume
+   fraction vanishes — the same geometry as the coverage decay of §8's PoC-2.6), not evidence that
+   prediction needs criticality. Real data in fact *anchors* the dynamics (real drift < null drift
+   at every n).
+3. **The gate's CE cost is real at full budget** (GRAD none beats inf by 0.03–0.12 nats, peaking at
+   mid-n) — the feasibility run had shown "gate ≈ free", so the gate's price is itself
+   budget-dependent, a warning against reading verifier costs off short runs.
+4. **EVO's expansive payoff is non-monotone and collapses at n=256** (ce none−inf: −0.015 → −0.038
+   → −0.037 → −0.020 → **+0.043**): random mutation exploits mild expansiveness but drowns in the
+   strongly-expansive region where gradient still profits — the navigability asymmetry of §6,
+   re-found at 32× the dimension from the opposite side.
+
+### 7.3 Stage-B: the verified core as the only long-range path in a real Transformer
+
+`stage_b_kernel.py` (`research/rllm_stage_b/`, pre-registered gates B-G1..B-G4 in
+`PREREGISTRATION_STAGE_B.md` *before* any GPU run) wires the core into a genuine softmax-attention
+Transformer trained end-to-end: 2 pre-LN blocks of 4-head **causal sliding-window attention**
+(w_att=8; stacked receptive field ≈ 15) over context T=160, so information beyond ~15 characters
+can flow **only** through the verified recurrent channel (`xc = tanh(U h)` keeps the certificate's
+input box sound). Four matched conditions isolate the gate's mechanism — `pure` (no channel),
+`none` (free channel), `project` (scale `W` back into the certified region by bisection),
+`reject` (revert-on-failure) — under matched intervention cadence, bit-identical trunk
+initialisation, shared certified core init, and symmetric Adam-moment resets; a 3-lens adversarial
+review fixed five majors pre-push (most notably: float32 `sigmoid` saturation can make `decay`
+exactly 1.0, silently *emptying* the certified region — the projection condition would then write
+an uncertified pure-integrator core; fixed by a strictly-bounded affine reparametrisation).
+
+### 7.4 Stage-B verdicts (n ∈ {64, 256} × 4 conds × 4 seeds, + full null; 72/72 ok)
+
+| gate | verdict | numbers (n=64 / n=256) |
+|---|---|---|
+| **B-G1** load-bearing memory | **PASS, 4/4 seeds at both n** | none−pure = −0.034 / −0.072 (grows with n); null edge ≈ 0 (−0.001, 2/4) ⇒ structure, not parameters |
+| **B-G2** cost decomposition | **expressivity-dominated at both n** | Δf(reject−none) = +0.028 / +0.058 (above the pre-registered resolvability floor); project−none = +0.022 / +0.060 ⇒ dp/Δf = 0.76 (borderline, disclosed) / ≥ 1.0 (unambiguous) |
+| **B-G2-null** | **gate cost ABSENT on null** | Δf = −0.003 / −0.004 ≈ 0 |
+| **B-G3** drift with attention | **4/4 ρ≥1 at both n** (magnitude tamer than HD-1: 1.11 / 1.28 vs 1.22 / 1.95) | null drifts harder (ρ → 2.19) with zero payoff |
+| **B-G4** post-hoc certification | **fails: 17–19× the training-time cost** | ce_pp−none = +0.378 / +1.117 vs project−none = +0.022 / +0.060; post-hoc γ ≈ 0.06 / 0.02 |
+
+Three of these change the picture qualitatively:
+
+- **The verified core carries real language information through end-to-end gradient training**
+  (B-G1) — the first such demonstration in this line; the reservoir results of §4 needed no
+  gradient through the core's surroundings, and §6's wrapper masked the channel's contribution.
+- **The gate's cost under gradient is structure-dependent** (B-G2-null): it is paid only where
+  real structure is being modelled, *in direct contrast* to the EA gate-gap of §5, which persisted
+  at ~107% on the null. Under random mutation the gate tax is an optimization artifact; under
+  gradient it is a genuine capability tax — and correspondingly, it is the *only* gate effect in
+  this paper that the null kills.
+- **"Train free, certify later" fails** (B-G4): the unconstrained core lands so deep outside the
+  certifiable region that projection must shrink `W` to 2–6% of its trained magnitude, destroying
+  what was learned. Verification must live inside the training loop.
+
+Bookkeeping: project/reject final cores certified 4/4 everywhere; the defensive fallback fired 0
+times; the null never dips below unigram (no selection-noise overfit); `pure`'s CE is identical
+across n (consistency: it has no n-dependence).
+
+### 7.5 Synthesis: a first regime map for the homeostasis–capability trade
+
+Combining HD-1 and Stage-B: (i) unconstrained optimization leaves the certified region *by
+default* — entropically, at every dimension, with or without attention; (ii) the verifier tax is
+real but modest, **expressivity-shaped** (not rejection friction), **structure-dependent** under
+gradient, and grows then saturates with n; (iii) a certified memory channel remains **net-positive**
+versus no memory even after paying the tax (gated CE 1.778–1.786 vs pure 1.792, though the gate
+claws back 64–83% of the unconstrained benefit); (iv) the tax is ~17–19× cheaper paid during
+training than after. For gradient-trained substrates the §6 recommendation therefore completes to:
+*choose the gate on soundness/coverage, put it inside the training loop, and budget for a measured,
+structure-dependent expressivity tax.*
+
+Honest limits: tiny models (~0.5 M params), char-level, one corpus family, 4 seeds (sign-consistency
+reporting, no p-value theater), `empirical_rho` is a from-below sampled estimator, and HD-1's own
+budget-sensitivity finding applies to this section's numbers too — they are a regime map at the
+budgets stated, not universals. Primary artifacts: `research/highdim_evolution/README.md` and
+`research/rllm_stage_b/README.md` (+ four result JSONs, feasibility previews included).
+
+---
+
 ## 8. Breaking the 2^n verifier wall: vertex-free sound certification
 
 The sound certifier that gates evolution is not bottlenecked by the genome size but by
