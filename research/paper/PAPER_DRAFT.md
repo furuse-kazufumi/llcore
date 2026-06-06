@@ -1322,6 +1322,139 @@ corpus (titles given verbatim; no author/year is fabricated).
 *(Provenance: prior-art titles surfaced from the local RAD research corpus — `dynamical_systems`,
 `formal_methods`, `neural_network`, `evolutionary_computation` collections — and quoted by title only.)*
 
+### The four-point intersection: nearest prior art, corner by corner
+
+The claim above is only defensible if each of the four corners has identifiable, recent prior art that
+nonetheless stops short of the intersection. An adversarial differentiation audit surfaced the
+following near-miss results; for each we state what it does and which corner it leaves un-met. Every
+arXiv identifier below was confirmed against its abstract before inclusion; candidates we could not
+verify were dropped. We make no claim that this list is exhaustive — it is the boundary of *our*
+search.
+
+*Proof-gated self-modification (corner iii, the gate pattern — but not on a memory core).*
+
+- **Autonomous Self-Satisficing Learning Gödel Machines (SS-GM, 2025)** require a proof-carrying
+  certificate (Lean 4 + proof-producing SMT) of a survival/homeostasis invariant *inside* the
+  self-modification loop before a progeny is installed — directly anticipating the *proof-gated
+  evolution* pattern. But the certified invariant is a generic survival predicate, not a contraction
+  bound, the gated object is a symbolic progeny algorithm rather than a Transformer memory core, and
+  the proof component is described as a replay stub rather than a running gated-evolution experiment.
+  (Primary source reached only via secondary summaries; cited as a concept, without an arXiv id, to
+  avoid attributing an unverified identifier.)
+- **A Family of Gödel Machine Implementations / Towards an Actual Gödel Machine Implementation**
+  (Steunebrink & Schmidhuber, 2011–2012) build a *running* VM whose self-rewrites are gated by a
+  symbolic theorem prover — so a proof-gated self-modifying implementation does exist. It uses
+  classical symbolic proof search (not an `ρ(J)<1` certificate) over self-referential symbolic code,
+  not a connectionist memory core; we cite it as the acknowledged ancestor of the gate *pattern*.
+- **Synthesis of Parametric Programs using Genetic Programming and Model Checking**
+  (Katz & Peled, arXiv:1402.6785, 2014) places a *sound* model-checking gate inside the GP generation
+  loop, rejecting individuals that violate a temporal-logic spec. The gate pattern (sound verifier
+  inside an evolutionary loop, reject on failure) is therefore pre-LLM and established; the verified
+  object is a classical concurrent program, not an evolving memory core, so we do not claim the
+  *pattern* as novel — only its application to a Transformer memory core's contraction.
+- **Formal Synthesis of Lyapunov Neural Networks** (arXiv:2003.08910) and the broader CEGIS+SMT
+  controller-synthesis line (Fossil, SEEV arXiv:2410.20326) close the loop between a numerical learner
+  and an SMT verifier that rejects candidates and returns counterexamples — the direct mechanistic
+  ancestor of our gate. The target throughout is a control-system certificate, not an LLM memory core;
+  we borrow the mechanism and disclose it.
+
+*Formal verification inside a self-improvement loop (corner iii — but verifying a generated artifact, not a memory update).*
+
+- **Propose, Solve, Verify (PSV-Verus, arXiv:2512.18160, 2025)** runs a sound SMT-backed verifier
+  (Verus) inside a self-play loop and admits only verified solutions into expert-iteration training —
+  so "sound formal gate inside a self-improvement loop that shapes the weights" already exists. The
+  verified property is *code correctness of generated solutions*, not a contraction property of the
+  evolving memory/weights, so it leaves corners (i)–(ii) open.
+- **AlphaVerus (arXiv:2412.06176, 2025)** bootstraps formally verified code generation, accumulating
+  only Verus-verified programs as few-shot context — a sound-verification-gated self-improvement loop.
+  The gated object is an example corpus, not a memory core, and the certified property is functional
+  correctness, not contraction.
+- **SEVerA: Verified Synthesis of Self-Evolving Agents (arXiv:2603.25111, 2026)** wraps each model call
+  in a rejection sampler with a Dafny/SMT-verified fallback (Formally Guarded Generative Models),
+  proving a first-order *output contract* sound for all inputs and parameters. The verification is a
+  pre-hoc, by-construction guarantee over an output contract, not a per-update prove-then-reject gate on
+  an evolving memory core's contraction.
+- **SGM: A Statistical Gödel Machine (2025)** gates recursive self-modification but *explicitly replaces*
+  formal proof with statistical confidence tests (e-values, Empirical Bernstein), arguing that proofs
+  are "unattainable in stochastic, high-dimensional settings." We treat this as a feasibility objection
+  rather than a prior art collision, and answer it directly: restricting the certified property to
+  contraction over a low-dimensional Jacobian box is exactly what keeps a *sound* gate tractable here.
+  (Cited as a concept; no verified arXiv id assigned.)
+
+*Verified / governed memory evolution (corner ii, the memory core — but not a sound contraction proof, and mostly unimplemented).*
+
+- **Governing Evolving Memory in LLM Agents — Stability and Safety Governed Memory (SSGM,
+  arXiv:2603.11768, 2026)** is the closest prior to corner (ii): it proposes a write-validation gate
+  that rejects a memory update contradicting protected core facts, on an LLM agent memory bank, inside
+  the evolution path — anticipating our *governing-evolving-memory* framing by name. **It must be cited
+  as the prior carrying this banner.** Its gate is NLI-based contradiction detection (not a sound
+  formal proof), its stability theorem is an `O(N·ε)` drift bound stated as a proof sketch, and it is
+  explicitly "a rigorous theoretical architecture" with no implementation or experiments — so corners
+  (i) and (iv) stay open. The window on the implementation-and-sound-proof gap is the one a follow-up
+  SSGM implementation would close, which is why we treat it as time-sensitive.
+- **STABLE: Gated Continual Learning for LLMs (arXiv:2510.16089, 2025)** gates candidate LoRA updates
+  to a real LLM against a stability budget (EM-drop / bits / KL thresholds), rescaling or rejecting
+  over-budget updates — a *running* update-rejection gate on a real Transformer. The gate is a numerical
+  threshold/budget heuristic, not a sound contraction proof, so it leaves corner (i) open while making
+  the broad "no one gates LLM updates" framing indefensible.
+- **Membrane: Self-Evolving Contrastive Safety Memory (arXiv:2606.05743, 2026)** and
+  **VerificAgent (arXiv:2506.02539, 2025)** gate memory writes by deterministic governance
+  (schema / duplicate / capacity validators) and by one-shot human fact-checking respectively — running
+  verified-memory systems, but gated by governance / human curation rather than a mathematical
+  soundness proof.
+- **Provably Safe Model Updates / Locally Invariant Domains (LID, arXiv:2512.01899, 2026)** certifies
+  each foundation-model update as `δ`-safe via abstract interpretation (orthotope/zonotope) and a
+  *project-then-accept* clamp — implemented, per-update, on model weights. It is projection (not
+  prove-then-reject), the certified property is an accuracy-preservation bound (not contraction), and
+  the LLM application is a frozen-embedding classification head, not a memory core. We contrast its
+  projection semantics against our rejection semantics explicitly.
+- **Certified Continual Learning for Neural Network Regression** (ISSTA 2024, arXiv:2407.06697)
+  re-establishes a reachability/robustness certificate each epoch via abstract interpretation, but
+  *preserves the property by construction* (certificate-guided data synthesis + interpolation clipping)
+  rather than rejecting failed updates, and targets small fully-connected nets, not a memory core.
+
+*Contraction / Lipschitz on neural cores (corners i–ii by construction — but not a prove-then-reject gate).*
+
+- **Training Transformers with Enforced Lipschitz Constants (arXiv:2507.13338, 2025)** enforces a
+  Lipschitz (hence contraction-adjacent) bound on a real Transformer *by construction* via a spectral
+  soft-cap weight projection — so "contraction-type property on a Transformer, implemented" exists. It
+  is structural enforcement, not a solver that proves each update and rejects on failure; we contrast
+  by-construction enforcement against prove-then-reject as a design axis.
+- **R2DN (arXiv:2504.01250, 2025)** directly parameterizes recurrent deep networks to be contracting and
+  Lipschitz *by construction*, with no per-update gate, on control / system-identification tasks. It is
+  the strongest "you don't need a gate, build it in" counter-design; we note it answers a *different*
+  question (fixed model) and trades expressivity for the guarantee, whereas a rejection gate inspects
+  arbitrary updates without a structural constraint.
+- **Variational Linear Attention: Stable Associative Memory for Long-Context Transformers
+  (arXiv:2605.11196, 2026)** proves in closed form that a Transformer associative-memory update Jacobian
+  has spectral norm 1 — a contraction-type property on a memory core — but again *by construction*
+  (normalization baked into the architecture), not a per-update verification gate.
+
+*Output / action gating and post-hoc verification (a different gate location entirely).*
+
+- **Safeguarded AI (ARIA programme, 2024–2026)** is the most authoritative proof-gated-gatekeeper
+  concept, but the gatekeeper certifies *actions/plans* against a formal world model before they reach
+  the world — an output/behaviour gate on cyber-physical control, not a weight/memory-update gate, and
+  at programme stage rather than a shipped implementation. We pre-empt the inevitable "how does this
+  differ from davidad's gatekeeper" question: the difference is the gated object (memory update vs.
+  action) and the target (Transformer core vs. world model).
+- **Emergent Formal Verification / substrate-guard (arXiv:2603.21149, 2026)** is a *running* Z3-based
+  system that soundly verifies AI *outputs* (generated code, tool calls, contracts) across six domains —
+  so a sound SMT gate on autonomous-AI behaviour is implemented. It is post-hoc observational monitoring
+  of outputs, not a per-update gate on an evolving memory core, so it narrows only the broad reading of a
+  "no SMT-gated autonomous AI" claim.
+- **Neural contraction / Lyapunov-barrier verification of control NNs** — Neural Contraction Metrics
+  (arXiv:2504.17102, 2025), CT-BaB (arXiv:2411.18235, 2024), and the CEGIS lineage above — is the body
+  of work whose *technique* we transplant. Throughout, the verified object is a control-system dynamics
+  model, never an LLM memory core; these results support, rather than break, the claim that the
+  memory-core application is the un-met corner.
+
+*(Audit provenance: the differentiation audit (44 candidates over 7 + 3 adversarial angles) returned
+0 results breaking the four-point intersection, 36 narrowing an over-broad claim, and 8 background; the
+narrows are the basis for the corner-by-corner table above. Known gaps in the audit, carried as honest
+limits: dedicated patent-database queries (USPTO/JPO/Google Patents) were not run, and the
+formal-methods-venue reverse lookup was single-round — so "did not find" is bounded by these.)*
+
 ## References (concepts invoked in the text)
 
 The following are the prior *concepts* this paper builds on. They are listed as a concept index, without author/year attributions, to avoid fabricating citations; each names an established body of work the reader can locate by name.
