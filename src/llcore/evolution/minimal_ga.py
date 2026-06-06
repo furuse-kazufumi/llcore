@@ -401,6 +401,8 @@ def evolve(
     codec: "GeneCodec | None" = None,
     gate_mode: GateMode = "none",
     resample_cap: int = 50,
+    w_bar: float | None = None,
+    r_max: float | None = None,
 ) -> EvolutionResult:
     """進化 main loop.
 
