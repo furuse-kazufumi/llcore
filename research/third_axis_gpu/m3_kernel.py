@@ -416,7 +416,8 @@ def main():
                                    else ["B1"] if method == "M4" else [""]))
                     for dname in descs:
                         if (control, method, dname, seed) in done: continue
-                        rng = np.random.default_rng(seed * 1000 + hash((control, method, dname)) % 9973)
+                        rng = np.random.default_rng(   # deterministic across processes (NOT python hash)
+                            seed * 1000 + zlib.crc32(f"{control}|{method}|{dname}".encode()) % 9973)
                         try:
                             if method == "M1": best, bg = run_m1_random(fit, n, E, warm_core, rng)
                             elif method == "M2": best, bg = run_m2_rr(fit, n, E, warm_core, rng, sigma)
