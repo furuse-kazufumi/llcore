@@ -445,7 +445,7 @@ def main():
                                 "best_ce": ce5, "grad_steps": steps,
                                 "cert_inf": cert_inf(*bg),
                                 "emp_rho": empirical_rho(*bg, n_samples=200, seed=seed + 98)})
-                        _log("run", f"seed={seed} real  M5      ce={fbest:.4f} (steps={steps})")
+                        _log("run", f"seed={seed} real  M5      ce={ce5:.4f} (steps={steps})")
                     except Exception as ex:
                         record(control, "M5", "", seed, {}, "error", f"{type(ex).__name__}: {ex}")
                         _log("run", f"seed={seed} real M5 ERROR: {ex}")
