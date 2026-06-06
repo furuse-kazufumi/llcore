@@ -8,7 +8,14 @@
 
 ## 何
 
-Transformer のコアアルゴリズム (state update / 学習則 / 認知駆動 Δ) に進化形態を与え、**Z3 verifier で破綻させずに** 異アルゴリズムへ進化させる研究フレームワーク。CPU 完結。
+Transformer のコアアルゴリズム (state update / 学習則 / 認知駆動 Δ) に進化形態を与え、**健全な contraction 証明器 (sound contraction certifier ladder) で破綻させずに** 異アルゴリズムへ進化させる研究フレームワーク。CPU 完結。
+
+> **看板の honest 訂正 (2026-06-06)**: 当初は「Z3 verifier」を看板にしていたが、論文本体 (`research/paper/PAPER_DRAFT.md`)
+> のゲートは **SMT ソルバを一切使わない**。実体は閉形式 ∞-norm (`O(n²)`) → 頂点 SVD (`cert_two`) → SDP-Lyapunov LMI
+> (CLARABEL) の **sound contraction certifier ladder**。別 track の検証 (`research/coupled_z3_contraction/C_VERDICT.md`)
+> で Z3 判定と閉形式 ∞-norm が **0/3270 件不一致 = Z3 は decorative** (各行 abs-sum の凸性で box 最大が端点に落ち、ソルバ不要)
+> と自己確認済み。これは後退ではなく設計上の長所 — 証明する性質を「ソルバ不要なほど単純な健全 contraction 条件」に絞った結果。
+> ソルバの真価は閉形式で書けない spectral/Lyapunov 不変量 (SDP rung + 将来の vertex-free robust-LMI) にあり、SMT 決定手続きではない。
 
 ## llive との関係 (戦略)
 
