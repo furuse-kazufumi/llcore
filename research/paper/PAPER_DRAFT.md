@@ -1522,7 +1522,9 @@ search.
   formal proof), its stability theorem is an `O(N·ε)` drift bound stated as a proof sketch, and it is
   explicitly "a rigorous theoretical architecture" with no implementation or experiments — so corners
   (i) and (iv) stay open. The window on the implementation-and-sound-proof gap is the one a follow-up
-  SSGM implementation would close, which is why we treat it as time-sensitive.
+  SSGM implementation would close, which is why we treat it as time-sensitive. §9 reports our
+  occupation of exactly this gap at PoC scale: a sound closed-form trajectory-tube guarantee, a
+  running fail-closed gate inside the evolution loop, and a pre-registered confirmatory experiment.
 - **STABLE: Gated Continual Learning for LLMs (arXiv:2510.16089, 2025)** gates candidate LoRA updates
   to a real LLM against a stability budget (EM-drop / bits / KL thresholds), rescaling or rejecting
   over-budget updates — a *running* update-rejection gate on a real Transformer. The gate is a numerical
