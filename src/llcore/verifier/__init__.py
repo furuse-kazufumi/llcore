@@ -74,6 +74,12 @@ from .backends import (
     cvxpy_available,
     get_verifier_backend,
 )
+from .tracking_tube import (
+    TrackingTubeResult,
+    input_gain_inf,
+    state_lipschitz_inf,
+    tracking_tube,
+)
 
 __all__ = [
     # Stage 1a
