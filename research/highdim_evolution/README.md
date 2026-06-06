@@ -63,6 +63,69 @@ grad_steps=150, evo_gens=80):
 4. GRAD stays sound at all n (ρ 0.845–0.943, reject_rate 0.0) and beats EVO everywhere — reconfirms the
    navigability verdict (gradient avoids the trap unaided) at 8× the dimension.
 
+## RESULTS — full run + null control (Kaggle T4, 2026-06-06) — **supersedes feasibility conclusions**
+
+`result_hd1_full.json` (real, 40/40 ok, 1076 s) + `result_hd1_full_null.json` (shuffled-corpus null,
+40/40 ok, 1144 s). Pushed as separate kernels `hd1-highdim-evo-full` / `-full-null` (parallel, repo
+toggles untouched; variants patched in temp dirs). n ∈ {8,32,64,128,256} × {none,inf} × 4 seeds;
+d=96, grad_steps=400, evo_gens=150; unigram CE 3.3542 (real) / 3.3021 (null).
+
+**REAL** (mean over 4 seeds; unsound = #seeds with ρ≥1):
+
+|  n | gate | GRAD ce | GRAD ρ | GRAD unsound | EVO ce | EVO ρ | EVO unsound |
+|---:|------|--------:|-------:|---:|-------:|------:|---:|
+|  8 | none | 2.18 | 1.07 | 3/4 | 2.26 | 0.90 | 0/4 |
+|  8 | inf  | 2.21 | 0.80 | 0/4 | 2.27 | 0.85 | 0/4 |
+| 32 | none | 2.07 | 1.20 | 4/4 | 2.18 | 0.97 | 0/4 |
+| 32 | inf  | 2.16 | 0.87 | 0/4 | 2.22 | 0.86 | 0/4 |
+| 64 | none | 2.01 | 1.22 | 4/4 | 2.15 | 0.98 | 2/4 |
+| 64 | inf  | 2.13 | 0.89 | 0/4 | 2.19 | 0.87 | 0/4 |
+|128 | none | 2.01 | 1.42 | 4/4 | 2.15 | 1.25 | 3/4 |
+|128 | inf  | 2.11 | 0.91 | 0/4 | 2.17 | 0.90 | 0/4 |
+|256 | none | 2.06 | 1.95 | 4/4 | 2.19 | 1.89 | 4/4 |
+|256 | inf  | 2.10 | 0.92 | 0/4 | 2.15 | 0.92 | 0/4 |
+
+**NULL** (shuffled corpus — no learnable sequential structure):
+
+|  n | gate | GRAD ce | GRAD ρ | GRAD unsound | EVO ce | EVO ρ | EVO unsound |
+|---:|------|--------:|-------:|---:|-------:|------:|---:|
+|  8 | none | 3.33 | 1.06 | 3/4 | 3.33 | 1.53 | 4/4 |
+| 32 | none | 3.32 | 1.58 | 4/4 | 3.33 | 1.67 | 4/4 |
+| 64 | none | 3.32 | 1.89 | 4/4 | 3.33 | 1.84 | 4/4 |
+|128 | none | 3.32 | 2.21 | 4/4 | 3.32 | 1.82 | 4/4 |
+|256 | none | 3.32 | 2.61 | 4/4 | 3.32 | 1.78 | 4/4 |
+| all| inf  | 3.32–3.33 | 0.81–0.92 | 0 | 3.32–3.33 | 0.87–0.92 | 0 |
+
+### Conclusions (full + null; supersede the feasibility section where they conflict)
+
+1. **Ungated GRADIENT training itself leaves the contractive region (19/20 real seeds unsound)** — ρ
+   grows with n (1.07 → 1.95). The feasibility "GRAD stays sound" was a small-budget artifact
+   (150 steps); at 400 steps gradient crosses ρ=1 at every n. The navigability verdict ("gradient
+   avoids the trap") holds for *EA-style traps*, not for staying contractive — gradient has no reason
+   to stay and doesn't.
+2. **The drift is ENTROPIC, not structure-seeking — the null kills the edge-of-chaos reading.** On
+   shuffled data the same (stronger: GRAD ρ → 2.61) drift occurs with ZERO CE payoff (all cells pinned
+   at unigram). Crossing ρ=1 is the default geometry of unconstrained walks at high n (the contractive
+   region's volume fraction vanishes — same geometry as PoC-2.6 coverage decay), not evidence that
+   prediction *needs* criticality. Real data actually *anchors* the dynamics (real drift < null drift
+   at every n).
+3. **The sound cheap gate costs real CE at full budget: GRAD none beats inf by 0.03–0.12 at every n**
+   (peak at n=64–128, shrinking at 256). "Gate ≈ free" from feasibility was budget-limited. Open
+   question (stage-B): is the cost lost expressivity or optimization *friction* (gate rejects ~25 % of
+   steps)? Hint for friction: the single sound none-seed (n=8, ρ 0.95) got the *best* CE in its group.
+4. **EVO's expansive payoff is non-monotone and collapses at n=256**: EVO ce (none − inf) =
+   −0.015 / −0.038 / −0.037 / −0.020 / **+0.043**. Mild expansiveness helps mutation up to n=128;
+   at n=256 (ρ ≈ 1.6–2.1) unrestricted EVO loses to the frozen gated base. Gradient exploits the
+   expansive region in a controlled way; random mutation drowns in it at scale.
+5. **`cert_inf` stays totally restrictive for EVO (admit 0.000 at every n)** — gated EVO ≡ warm base.
+   And EVO unsoundness on real data is cleanly monotone in n: 0/4 → 0/4 → 2/4 → 3/4 → 4/4.
+6. **Harness integrity (honest-disclosure check): PASS** — null CE never dips below unigram anywhere
+   (no selection-noise overfit), 80/80 runs ok, both kernels same scaffold.
+
+Caveats: 4 seeds; CE gaps are 0.02–0.12 nats on one corpus (tinyshakespeare) and one substrate
+(tanh reservoir + linear head); `empirical_rho` is a sampled estimator; feasibility↔full sign flip for
+EVO-gate shows conclusions here are budget-sensitive — treat as regime map, not universals.
+
 ## Local CPU smoke (tiny, NOT conclusive)
 n=8, d=32, grad_steps=8, evo_gens=8, 3000-char corpus, unigram_CE 3.132:
 - `none`: GRAD ce 3.818 ρ 0.923 | **EVO ce 4.051 ρ 1.025** (drifted *expansive*, admit 1.0)
