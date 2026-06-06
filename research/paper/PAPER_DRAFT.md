@@ -763,7 +763,7 @@ Within the bounds of what was actually measured (`NAVIGABILITY_GPU_VERDICT.md` �
 
 ---
 
-## 7. Breaking the 2^n verifier wall: vertex-free sound certification
+## 8. Breaking the 2^n verifier wall: vertex-free sound certification
 
 The sound certifier that gates evolution is not bottlenecked by the genome size but by
 its inner verification step. This section reports a design taxonomy for attacking that
@@ -773,7 +773,7 @@ the failure mode is not a slow experiment but a plausible-but-unsound bound that
 gene it should reject, so soundness is argued at the theorem level and then checked
 empirically as a falsifier, not as the proof (SKETCH.md).
 
-### 7.1 Where the cost actually is
+### 8.1 Where the cost actually is
 
 The evolvable genome is `(decay, W)` = `n + n²` reals (dense `CoupledNDGeneCodec`), but the
 binding runtime cost is the sound certifier's `2^n` t-box vertex enumeration, not the genome
@@ -791,7 +791,7 @@ size (SKETCH.md). Three certifier backends sit on a cost/conservatism trade-off:
 Critically, the `2^n` blow-up is on the **state dimension n**, not on the `n²` weights, which
 is what puts `n=32` out of reach (SKETCH.md).
 
-### 7.2 Four levers, classified by what they cut
+### 8.2 Four levers, classified by what they cut
 
 SKETCH.md organizes the attack into four levers, honest about which cost each one actually
 reduces and what soundness risk it carries:
@@ -837,7 +837,7 @@ that distinguishes "good simple" from "degenerate simple" — most evolutionary 
 > Figure: Four-lever taxonomy (L1 low-rank, L2 vertex-free, L3 MOR, L4 cost-as-selection) versus
 > what each cuts and its soundness risk (data: SKETCH.md, "Three levers" table + L4 section)
 
-### 7.3 The bound and its soundness argument
+### 8.3 The bound and its soundness argument
 
 The Jacobian over the achievable-`t` box is affine in `t`:
 `J(t) = diag(decay) + diag((1−decay)⊙t)·W` for `t ∈ [t_lo, 1]^n` (poc_l2lite.py). Writing
@@ -856,7 +856,7 @@ of the genes that contract over the box, i.e. of the `cert_two` admit set; there
 violation (admitting a gene `cert_two` rejects) is impossible unless there is a bug, and the
 PoC checks it empirically only as a falsifier (poc_l2lite.py, poc_l2lite_v2.py).
 
-### 7.4 PoC results: B1 too loose, B2 recovers the bulk
+### 8.4 PoC results: B1 too loose, B2 recovers the bulk
 
 PoC-1 (n=8, 3000 genes, seed 20260606, region-populating sampler) found the cost win is decisive
 and B1 is sound but too loose (poc_l2lite_results.json). Across 3000 genes B1 produced **0**
@@ -899,7 +899,7 @@ is that `σ(M)+σ(R)` treats the t-box as `n²` independent entry-intervals, whe
 perturbation `Δ = diag((1−decay)(t−t_mid))·W` is parameterized by only the **n** values `t_i` (each
 row shares one `t_i`), so the naive split over-inflates the radius (SKETCH.md).
 
-### 7.5 Scope, residual, and open questions
+### 8.5 Scope, residual, and open questions
 
 The cost win is unambiguous and *grows* with n (12,520× at n=16); soundness holds at every n (0
 violations). But two follow-up measurements temper the optimistic "scaling win in hand" reading:
@@ -948,13 +948,13 @@ itself demonstrate that the admitted dynamics learn language.
 
 ---
 
-## 8. Limitations, reproducibility, and the verified-evolution roadmap
+## 9. Limitations, reproducibility, and the verified-evolution roadmap
 
 This section states what our results do *not* show, makes the runs reproducible, and lays out the
 roadmap that follows from the limitations. We hold the red-teamed verdict's scope unchanged: the L3
 "payoff" is **evolvability, not language learning** (VERDICT.md §0).
 
-### 8.1 Limitations of scope
+### 9.1 Limitations of scope
 
 The verified-evolution core was demonstrated on a deliberately small substrate, and the boundaries of
 that substrate bound every claim in this paper.
@@ -991,7 +991,7 @@ n=8/12/16 (60×/980×/12,520× speedup) (rendered: `research/paper_assets/fig_co
 poc_l2lite_results.json). The closed-form cert_inf is O(n²); cert_two/cert_sdp enumerate 2^n vertices,
 giving the n≈16 memory wall and n=32 infeasibility (CPU_MEMORY_EFFICIENCY_PLAN.md §1).*
 
-### 8.2 Honest-disclosure box
+### 9.2 Honest-disclosure box
 
 > **What survives, stated at full strength and no stronger (VERDICT.md §0, §3c, §4).**
 >
@@ -1028,7 +1028,7 @@ giving the n≈16 memory wall and n=32 infeasibility (CPU_MEMORY_EFFICIENCY_PLAN
 > (the 12288 B inf-worst-ceiling ladder does not replicate on 8192 B — VERDICT.md §3c-i); a
 > structure-dependent gate-gap residual; or "a better verifier unlocks real LM learning."
 
-### 8.3 Reproducibility
+### 9.3 Reproducibility
 
 All runs are deterministic and CPU-only; the certifier path is float64, full stop
 (CPU_MEMORY_EFFICIENCY_PLAN.md §7).
@@ -1069,7 +1069,7 @@ All runs are deterministic and CPU-only; the certifier path is float64, full sto
 Figure: reproduction-script dependency graph (substrate → certifiers → landscape/gated/null drivers →
 result JSON → verdict) (data: research/verified_lm_evolution/VERDICT.md, research/verifier_cost_reduction/SKETCH.md).
 
-### 8.4 The verified-evolution roadmap
+### 9.4 The verified-evolution roadmap
 
 The limitations in §8.1 define the roadmap. Each item is named in the primary sources as the next step,
 not as a completed result.
