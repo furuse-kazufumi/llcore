@@ -24,7 +24,6 @@ import numpy as np
 import pytest
 
 from llcore.evolution import GateStats, evolve
-from llcore.kernel.protocol import GeneCodec  # noqa: F401  (型/誤用テスト用)
 from llcore.state_update import StateUpdateGene
 from llcore.verifier import verify_gene_safe, verify_lipschitz_contraction
 
