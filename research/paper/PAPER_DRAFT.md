@@ -24,7 +24,7 @@ llcore claims a verified "Transformer core," but in its shipped `src/` it runs o
 
 - **A vertex-free sound certifier breaks the `2^n` wall (§8).** A single-SVD abs-domination bound `B2 = σ(|M|+R)` recovers 77.6% of the exact `2^n` 2-norm reach at n=8, and `inf ∪ B2` reaches ~87.2%, at up to 12,520× lower cost (n = 16) with 0 soundness violations. The B2-missed tail carries **no LM-perplexity payoff at n=8** (the best gene is already in B2's set), so the robust-LMI SDP is not motivated at small n; but coverage **degrades with dimension** (`inf ∪ B2` 87→77→60% at n=8/12/16, converging to `cert_inf` by n=16), so the SDP's value at the target n=32 is an open, measurement-blocked question.
 
-- **Limitations, reproducibility, and roadmap (§8).** All runs are deterministic and CPU-only; n = 8 is a hard limit of the vertex-enumerating certifier (memory wall near n ≈ 16, infeasible at n = 32). We provide an authoritative reproduction table and the roadmap (vertex-free certifier R-LLM-1, gradient-trained GPU stage, multimodal, cost-as-selection L4).
+- **Limitations, reproducibility, and roadmap (§9).** The CPU runs are deterministic; n = 8 is a hard limit of the vertex-enumerating certifier (memory wall near n ≈ 16, infeasible at n = 32). We provide an authoritative reproduction table and the roadmap (vertex-free certifier R-LLM-1, gradient-trained GPU stage, multimodal, cost-as-selection L4).
 
 The remainder of the paper follows these contributions in order: the substrate and certifiers (§2), soundness rigor and limits (§3), the reservoir byte-LM (§4), the L3 frontier (§5), the gradient cross-check (§6), vertex-free certification (§7), and limitations/roadmap (§8).
 
