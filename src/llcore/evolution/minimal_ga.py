@@ -229,10 +229,18 @@ GateMode = str  # "none" | "state_norm" | "contraction" | "trajectory_tube"
 _FALLBACK_GENE = StateUpdateGene(decay=0.5, mix=0.0, gate_str=0.0)
 
 
-def _gate_admits(gene: StateUpdateGene, mode: GateMode) -> bool:
+def _gate_admits(
+    gene: StateUpdateGene,
+    mode: GateMode,
+    *,
+    w_bar: float | None = None,
+    r_max: float | None = None,
+) -> bool:
     """``gene`` が ``mode`` の証明ゲートに admit されるか (fail-closed).
 
-    research/verified_evolution/gated_evolve.py::_gate_admits と挙動一致。
+    research/verified_evolution/gated_evolve.py::_gate_admits と挙動一致
+    ("none"/"state_norm"/"contraction" の 3 mode)。Phase 2a で
+    ``"trajectory_tube"`` を additive 追加 (1 分岐)。
 
     Parameters
     ----------
@@ -243,6 +251,18 @@ def _gate_admits(gene: StateUpdateGene, mode: GateMode) -> bool:
         - ``"state_norm"``  — ``verify_gene_safe(gene).ok`` (Z3 |s|<=1 gate)。
         - ``"contraction"`` — ``verify_lipschitz_contraction(gene).contraction is True``
           (Z3 L<1 gate; fail-closed: hard True のみ admit)。
+        - ``"trajectory_tube"`` — Phase 2a。``tracking_tube(gene, w_bar=w_bar,
+          r_max=r_max).admits`` (L<1 ∧ tube 有限 ∧ r = G·w̄/(1−L) ≤ r_max)。
+          **honest 注記 (設計 doc §4.3 訂正 1)**: この gate の L は achievable-t box
+          上の閉形式 numpy 比較であり、``"contraction"`` の free-t Z3 unsat 証明とは
+          **別の L 定義** (non-comparable)。「Z3-exact contraction + tube」ではなく
+          「閉形式 (Banach 系) で導かれた tube 境界」である。
+    w_bar : float | None
+        ``"trajectory_tube"`` 用の外乱上界 (≥0)。他 mode では未使用。None かつ
+        trajectory_tube → fail-loud (黙って通さない)。
+    r_max : float | None
+        ``"trajectory_tube"`` 用の tube 半径許容上限。None なら上限なし
+        (tube 有限であれば admit)。
 
     Returns
     -------
@@ -252,7 +272,7 @@ def _gate_admits(gene: StateUpdateGene, mode: GateMode) -> bool:
     Raises
     ------
     ValueError
-        未知の ``mode`` (fail-loud: 黙って通さない)。
+        未知の ``mode`` (fail-loud)。trajectory_tube で w_bar 未指定 (fail-loud)。
     """
     if mode == "none":
         return True
@@ -268,6 +288,23 @@ def _gate_admits(gene: StateUpdateGene, mode: GateMode) -> bool:
         # fail-closed: Z3 unsat (certified) の hard True のみ admit。
         # None (z3 不在) / False (sat / timeout) はすべて reject 側。
         return verify_lipschitz_contraction(gene).contraction is True
+    if mode == "trajectory_tube":
+        # Phase 2a: trajectory-tube 含包ゲート (additive 1 分岐)。
+        # tracking_tube は read-only で contraction_ok ∧ tube 有限 ∧ tube≤r_max を
+        # 内部で AND する (fail-closed)。ここでは例外も握り潰して reject 扱いにする
+        # (設計 doc §2.1 / §4.3: admit=False / 例外 / tube=∞ / r>r_max は全て reject)。
+        if w_bar is None:
+            raise ValueError(
+                "gate_mode='trajectory_tube' requires w_bar (disturbance bound); "
+                "got None (fail-loud, do not admit silently)"
+            )
+        from llcore.verifier.tracking_tube import tracking_tube
+
+        try:
+            return bool(tracking_tube(gene, w_bar=w_bar, r_max=r_max).admits)
+        except Exception:
+            # tube 計算が例外 (想定外の gene 等) → fail-closed reject。
+            return False
     raise ValueError(f"unknown gate_mode {mode!r}")
 
 
