@@ -22,7 +22,8 @@ Transformer のコアアルゴリズム (state update / 学習則 / 認知駆動
 **llcore は llive 非依存の独立 project**。llive は参考実装 + 比較対象として扱う。
 
 - **必須**: numpy のみ
-- **optional [z3]**: Z3 SMT solver (Stage 1+)
+- **optional [z3]**: Z3 SMT solver — **本体ゲートでは非 load-bearing** (Track-C で閉形式 ∞-norm と 0/3270 一致 = decorative)。比較・別 track 用途のみ
+- **optional [sdp]**: CLARABEL (SDP-Lyapunov rung)。閉形式で書けない spectral/2-norm 不変量はここが load-bearing
 - **optional [llive]**: **比較実験用のみ**。llcore 自前の minimal 進化エンジンが本流。llive の lldarwin_v2 を「baseline 比較」「アイデア参照」として import するが、依存しない (ユーザー指示「llive の仕様が llcore の進化の妨げになるなら llcore 単体で仕上げる」)
 - **RAD コーパス** (`D:/docs/<domain>_corpus_v2/`, 48,800 docs) は **path-based で参照** → llive 依存なしで進化中個体に先行研究 hint を注入できる (`src/llcore/rad/`)
 
