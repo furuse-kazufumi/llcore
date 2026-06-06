@@ -223,35 +223,52 @@ class RealFitness:
         return ce, (shard_sum / shard_cnt if need_b2 else None)
 
 
+# ----- fixed low-dim probe slice (red-team blocker fix) ----- #
+# Behavior coordinates over the FULL 4096-entry mean are CLT-frozen at n=64 (per-mutation drift
+# sigma/n = 0.0019 -> corridor untraversable by ANY method, incl. MAP-E). All slice-based
+# coordinates below use a FIXED 24-entry probe (Step4's dimensionality: drift sigma/sqrt(24) =
+# 0.0245/step), making the corridor crossable by archive stepping-stones within E while remaining
+# measure-zero under direct sampling (init slice-mean std ~ 0.075/sqrt(24) = 0.015; peak at 0.8
+# is ~50 sigma of the SAMPLING distribution away -> still unreachable by teleport).
+SLICE_K = 24
+def _wslice(W):
+    return np.asarray(W).reshape(-1)[:SLICE_K]
+
+def corridor_b1(genome):
+    _, W = genome
+    return float(np.clip(np.mean(_wslice(W)) / 2.0 + 0.5, 0, 1))
+
+
 # ----- synthetic control fitnesses (no model; same genome space) ----- #
 def fitness_pplus(genome):
-    """Step4-transplant deceptive corridor on b1 = mean(W)/2 + 0.5 (CLT mass at 0.5)."""
-    _, W = genome
-    b1 = float(np.mean(W)) / 2.0 + 0.5
+    """Step4-transplant deceptive corridor on the slice coordinate (local mass at b1=0.5,
+    deceptive valley, global peak band at b1=0.9 <=> slice-mean = 0.8)."""
+    b1 = corridor_b1(genome)
     return max(0.5 - abs(b1 - 0.5), 5.0 * (1.0 - abs(b1 - 0.9)) - 4.0)
 
-_G0 = None
 def fitness_n0(genome, n):
     """Smooth strictly-concave; unimodal at (0.7, 0)."""
     d, W = genome
     return -float(np.mean((d - 0.7) ** 2) + np.mean(W ** 2))
 
 
-# ----- behavior descriptors ----- #
+# ----- behavior descriptors (all axes verified mutation-mobile; see pre-reg table) ----- #
 def desc_b1(genome, _shard=None):
     d, W = genome
-    return (float(np.mean(d)), float(np.clip(np.mean(np.abs(W).sum(axis=1)) / 4.0, 0, 1)))
+    return (float(np.mean(d)),                                   # drift ~0.015/step at n=64
+            float(np.clip(np.mean(np.abs(_wslice(W))) / 2.0, 0, 1)))   # probe coupling strength
 
 def desc_b1p(genome, _shard=None):
-    _, W = genome
-    return (float(np.clip(np.mean(W) / 2.0 + 0.5, 0, 1)), float(np.mean(genome[0])))
+    return (corridor_b1(genome), float(np.mean(genome[0])))     # corridor-aligned (P+ only)
 
 _B2_PROJ = None
 def desc_b2(genome, shard8):
     global _B2_PROJ
     if _B2_PROJ is None:
         _B2_PROJ = np.random.default_rng(777).normal(0, 1, (8, 2)) / np.sqrt(8)
-    v = np.tanh((shard8 - shard8.mean()) @ _B2_PROJ / 0.25)
+    c = shard8 - shard8.mean()
+    z = c / max(float(c.std()), 1e-3)                            # std-adaptive (red-team fix)
+    v = np.tanh(z @ _B2_PROJ)
     return (float((v[0] + 1) / 2), float((v[1] + 1) / 2))
 
 def bin_of(desc, bins=8):
