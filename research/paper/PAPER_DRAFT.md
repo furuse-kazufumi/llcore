@@ -1089,7 +1089,115 @@ itself demonstrate that the admitted dynamics learn language.
 
 ---
 
-## 9. Limitations, reproducibility, and the verified-evolution roadmap
+## 9. Verified memory evolution at PoC scale: the trajectory-tube gate
+
+The audit in the Related-work section identified *verified memory evolution* as the one corner of the
+four-point intersection where a prior (SSGM, arXiv:2603.11768) already carries the banner — as a
+theoretical architecture with a proof sketch and no implementation. This section reports the PoC that
+closes the param→memory-update gap on our side with a *sound, running* gate: a **trajectory-tube
+admission criterion** that upgrades the single-step contraction certificate into a guarantee about
+*realized state trajectories under bounded disturbance*, wired into the same prove-then-reject
+evolution loop as everything else in this paper. The scope is deliberately minimal (the scalar
+`StateUpdateGene` memory-update kernel, a fixed-readout copy task); the point is the *shape* of the
+guarantee and its falsifiable verification, not scale.
+
+### 9.1 From single-step contraction to a certified tube
+
+The single-step gate certifies `L < 1` for the state map. The tube gate certifies, in closed form,
+what that buys at the trajectory level: if the per-step state Lipschitz constant over the achievable
+input box is `L < 1` and the input gain is bounded by `G`, then for any disturbance sequence with
+`‖w_t‖∞ ≤ w̄`, the deviation between the disturbed and nominal state trajectories satisfies
+
+> `limsup_t ‖e_t‖∞ ≤ r := G·w̄ / (1 − L)`
+
+— a standard Banach/ISS-style composition argument, with the reference trajectory being the system's
+own undisturbed solution (so the bound is non-vacuous by construction, `ρ_feas = 0`). The gate then
+admits a child gene iff `L < 1` **and** `r ≤ r_max`: a child may be perfectly contractive and still be
+rejected because its certified disturbance tube is too wide to guarantee memory retention. We are
+explicit about what this is **not**: `L` and `G` are computed from closed-form endpoint quantities of
+the kernel parameters (the same achievable-box machinery as `cert_inf`), so the tube is a
+*parameter-derived* trajectory bound — no new solver query is made against realized trajectories, and
+the empirical disturbance runs below are a cross-check of the theorem, not part of the gate's
+soundness argument.
+
+The gate is wired into the shipped `evolve()` as an additive `gate_mode="trajectory_tube"` branch:
+`gate_mode="none"` remains byte-identical to the pre-existing behaviour (regression-tested:
+best-fitness and diversity curves match exactly; 312 tests green), the gate **rejects on any
+certifier exception** (fail-closed), and calling the tube mode without a disturbance bound fails loud
+(`ValueError`) rather than silently admitting.
+
+### 9.2 Choosing a binding `r_max` (and an unexpected simplification)
+
+On a sweep of 20,000 sampled kernels (`w̄ = 0.1`), 14,018 (70.1%) are contractive; their certified
+tube radii spread widely (p25 ≈ 0.030, p50 ≈ 0.063, p75 ≈ 0.100, max ≈ 636). We set `r_max = 0.05`,
+which admits 40.6% of the contractive kernels and rejects 8,327 of them — **strongly binding** in
+both directions, so the tube gate is neither a re-skin of the contraction gate (degenerate-equal) nor
+a never-binding decoration. The design review had warned that the free-`t` (SMT) and achievable-`t`
+(closed-form) Lipschitz definitions might disagree and contaminate the comparison; on the scalar
+kernel they provably coincide (verified on all 14,018 contractive samples and by a witness gene), so
+the two arms differ *only* in the tube criterion. This simplification is specific to the scalar
+kernel: for coupled gene spaces the box-mismatch warning returns, and the comparison would need a
+shared `L` definition.
+
+### 9.3 Falsifiable propositions: soundness, strictness, and the bridge
+
+Three pre-stated propositions, all of which could have failed visibly:
+
+- **P1 (tube soundness, empirical cross-check).** Every admitted gene from the gated arm's final
+  populations (180 genes) was driven with 64 independent disturbance seeds; the realized steady-state
+  deviation exceeded the certified tube in **0 of 180** cases. Non-contractive genes are scored
+  `tube = ∞` (never vacuously "inside").
+- **P2 (strict discriminating power).** In the gated arm the tube criterion rejected 640 children that
+  the contraction gate would have admitted; a constructive witness (`decay=0.5, mix=1.0, gate_str=0`,
+  identical `L = 0.5` under both definitions, `tube = 0.1 > r_max`) pins the rejection on the tube
+  radius, not on an `L` discrepancy. The tube gate is a strict subset of the contraction gate on this
+  kernel space.
+- **P3 (the bridge is not a fork).** The "named-slot memory write" used to frame the kernel as a
+  memory update is bit-for-bit identical to the shipped `eval_step` (3 genes × 20 state/input pairs,
+  and sequential application reproduces `run_sequence`), so the memory framing introduces no parallel
+  implementation that could drift.
+
+### 9.4 Does the tube buy memory fitness? A pre-registered decision
+
+The pilot (3 seeds) showed the gated arm best on all delays but with sign-inconsistent per-seed
+deltas — we flagged it as inconclusive rather than claiming a benefit. To settle it we **pre-registered
+the decision before seeing any data** (committed analysis script with the hypothesis, test, α, and
+seeds fixed): confirmatory hypothesis = paired test-fitness delta (tube − contraction) on the longest
+memory horizon (copy task, delay 8), sign-flip permutation test (two-sided, 10⁵ resamples), α = 0.05,
+20 fresh seeds; delay 0/4 reported as exploratory only.
+
+Result: **the confirmatory test passes** — on delay 8 the tube-gated arm beats the contraction-gated
+arm with mean Δ = +0.0152, p = 0.0056, positive in 16/20 seeds. The effect survives the standard
+robustness slices (median +0.0054; trimmed mean dropping both extremes +0.0107; removing the single
+largest delta +0.0112 — all positive), so it is not the pilot's one-outlier story again, though the
+distribution is right-skewed (a few seeds gain a lot, most gain a little) and we report it as such.
+The exploratory deltas line up as a dose–response in the memory horizon: delay 0 shows nothing
+(−0.0002, p ≈ 0.96), delay 4 a positive but non-significant trend (+0.0098, p ≈ 0.10), delay 8 the
+confirmed effect — consistent with the tube being a *memory-retention* guarantee rather than a generic
+fitness booster. Mechanistically the result is the navigability story again: the tube arm rejected
+~3× more children than the contraction arm (2,224 vs 741 on delay 8) with **zero fallbacks** (the GA
+always found admissible children), i.e. a strictly tighter sound gate steered the search into a
+better region rather than starving it.
+
+Scope honesty: the effect size is small (~+0.015 on a probe-based fitness), the fitness is a
+fixed-readout probe (not a gene-pure memory measure), the GA is small (pop 20 × 20 generations), and
+the claim is bounded to this scalar kernel and task family. We do not claim a general
+"verified gates improve fitness" law; we claim that *on the longest memory horizon tested, the
+certified-tube restriction did not cost fitness — it measurably helped, under a pre-registered test*.
+
+### 9.5 What this section adds to the intersection claim
+
+With this PoC the verified-memory-evolution corner moves from "named by a theoretical prior with no
+implementation" to "occupied at PoC scale with a sound closed-form trajectory guarantee, a running
+fail-closed gate, three falsifiable propositions (all passing, one with an empirical 0/180
+cross-check), and a pre-registered confirmatory fitness result". The remaining honest gaps — the
+parameter-derived (not trajectory-queried) bridge, the discrete-input approximation of the
+disturbance bound `w̄`, and the scalar-kernel scope — are listed in §10.1 alongside the paper's other
+limits.
+
+---
+
+## 10. Limitations, reproducibility, and the verified-evolution roadmap
 
 This section states what our results do *not* show, makes the runs reproducible, and lays out the
 roadmap that follows from the limitations. We hold the red-teamed verdict's scope unchanged: the L3
