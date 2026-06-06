@@ -315,7 +315,6 @@ def run_m4_mapelites(fit, n, E, warm, rng, sigma, desc, need_b2):
         f, g = place(sample_genome(n, rng))
         if f > best: best, bg = f, g
     used = 16
-    keys = None
     while used < E:
         ks = list(archive.keys())
         elite = archive[ks[rng.integers(0, len(ks))]][1]
