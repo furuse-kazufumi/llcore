@@ -107,8 +107,8 @@ d=96, grad_steps=400, evo_gens=150; unigram CE 3.3542 (real) / 3.3021 (null).
    shuffled data the same (stronger: GRAD ρ → 2.61) drift occurs with ZERO CE payoff (all cells pinned
    at unigram). Crossing ρ=1 is the default geometry of unconstrained walks at high n (the contractive
    region's volume fraction vanishes — same geometry as PoC-2.6 coverage decay), not evidence that
-   prediction *needs* criticality. Real data actually *anchors* the dynamics (real drift < null drift
-   at every n).
+   prediction *needs* criticality. Real data actually *anchors* the dynamics at scale (real drift <
+   null drift at every n ≥ 32; at n=8 equal within noise, 1.07 vs 1.06).
 3. **The sound cheap gate costs real CE at full budget: GRAD none beats inf by 0.03–0.12 at every n**
    (peak at n=64–128, shrinking at 256). "Gate ≈ free" from feasibility was budget-limited. Open
    question (stage-B): is the cost lost expressivity or optimization *friction* (gate rejects ~25 % of
