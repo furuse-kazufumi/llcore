@@ -1204,12 +1204,15 @@ not as a completed result (item 2, GPU stage B, is now complete — §7).
    The missed tail carries no LM-perplexity payoff *at n=8* (PoC-2.5), but the missed set grows with n, so
    the genuine robust-LMI/SDP rung (PoC-3) — user-gated — *regains motivation for coverage at the target
    n=32*, where `cert_two` is itself infeasible (the measurement is blocked by the very wall).
-2. **GPU stage B: a true gradient-trained Transformer.** Move from the reservoir LM to a
-   gradient-trained Transformer on GPU (VERDICT.md §5, PREREGISTRATION.md §1). The navigability
-   cross-check indicates the inf trap is an EA(random-mutation)-specific artifact that gradient
-   training avoids, so for gradient-trained substrates the verifier should be chosen on
-   soundness/coverage alone (VERDICT.md §3c-ii). Whether the verified-evolution effect even appears
-   under gradient training is therefore an explicit open question, not an assumed transfer.
+2. **GPU stage B: a true gradient-trained Transformer — COMPLETE (§7).** The open question is
+   answered: the verified core is load-bearing inside a real windowed-attention Transformer trained
+   end-to-end (B-G1, 4/4 seeds, benefit growing with core dimension), the gate's cost is
+   expressivity-shaped and structure-dependent (B-G2), drift past ρ=1 survives the presence of
+   attention (B-G3), and post-hoc certification fails at 17–19× the training-time cost (B-G4)
+   (`research/rllm_stage_b/README.md`, PREREGISTRATION_STAGE_B.md). The §6 recommendation
+   completes to: choose the gate on soundness/coverage, keep it inside the training loop, budget
+   for the measured tax. The remaining gradient-side step is selection on a real (small) LLM loss
+   landscape (the "③" question), which needs its own pre-registration.
 3. **Multimodal = sensory organs.** Multimodal extension is on the roadmap as a future direction; we
    note it here as a named next direction rather than a result (no multimodal figure is claimed in the
    primary sources).
