@@ -81,9 +81,15 @@ cert pass at end; reject/project intervention rates; param count; for `none` add
   FAIL ⇒ the hybrid premise is broken at this scale; report honestly, downstream gates still reported
   but flagged as resting on a non-load-bearing channel.
 - **B-G2 (decomposition; let Δf = CE(`reject`) − CE(`none`) ≥ 0 be the full gate cost):**
+  - **Resolvability floor (red-team fix):** the 3-way classification below is issued ONLY if
+    Δf ≥ 2 × (pooled per-seed std of the paired (`reject`−`none`) deltas at that n). Below the floor:
+    verdict = "gate cost not resolvable at this n" — per-seed paired deltas reported, no category.
   - *friction-dominated* if CE(`project`) − CE(`none`) < 0.25·Δf (project recovers ≥ 75 % of the cost)
   - *expressivity-dominated* if CE(`project`) − CE(`none`) > 0.75·Δf
   - *mixed* otherwise. (If Δf ≤ 0 at some n: gate-cost absent there; report sign per n.)
+  - **Aggregation (red-team fix):** classification is **per-n_core** (one verdict for n=64, one for
+    n=256); Δf-fraction classifications are never pooled across n. If the two n disagree, the headline
+    B-Q2 answer is "regime-dependent — both reported", with no single-verdict cherry-pick.
 - **B-G3 (drift):** fraction of `none` seeds with final core ρ ≥ 1, per n_core, vs HD-1's full-run
   fractions (4/4 at n=256). Prediction registered: attention absorbs modeling pressure ⇒ drift weaker
   than HD-1. (Either outcome informative.)
