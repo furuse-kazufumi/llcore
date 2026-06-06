@@ -200,7 +200,7 @@ class RealFitness:
         else:
             decay, W = grad_tensors
             import contextlib; ctx = contextlib.nullcontext()
-        tot, shard_sum, shard_cnt = 0.0, np.zeros(8), np.zeros(8) + 1e-9
+        tot, shard_sum, shard_cnt = 0.0, np.zeros(8), np.zeros(8)
         loss_acc = None
         with ctx:
             for h, xc, y, oc in zip(self.h, self.xc, self.y, self.oct):
