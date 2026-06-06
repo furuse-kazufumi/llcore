@@ -1,0 +1,585 @@
+{
+  "meta": {
+    "experiment": "R-LLM Stage-B verified core in gradient-trained Transformer",
+    "mode": "full",
+    "null": true,
+    "device": "cuda",
+    "gpu": "Tesla T4",
+    "NS": [
+      64,
+      256
+    ],
+    "conds": [
+      "pure",
+      "none",
+      "project",
+      "reject"
+    ],
+    "n_seeds": 4,
+    "base_cfg": {
+      "d": 128,
+      "T": 160,
+      "B": 24,
+      "heads": 4,
+      "w_att": 8,
+      "blocks": 2,
+      "lr": 0.003,
+      "grad_steps": 1200,
+      "eval_batches": 8,
+      "max_chars": 300000,
+      "cert_every": 4
+    },
+    "vocab": 62,
+    "unigram_ce": 3.3257011548254094,
+    "start_time": "2026-06-06T01:04:15",
+    "end_time": "2026-06-06T01:47:08",
+    "status": "done",
+    "error": null
+  },
+  "records": [
+    {
+      "n": 64,
+      "cond": "pure",
+      "seed": 1234,
+      "start_time": "2026-06-06T01:04:15",
+      "status": "ok",
+      "metrics": {
+        "ce": 3.3460421562194824,
+        "n_params": 433214
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:04:29"
+    },
+    {
+      "n": 64,
+      "cond": "pure",
+      "seed": 1235,
+      "start_time": "2026-06-06T01:04:29",
+      "status": "ok",
+      "metrics": {
+        "ce": 3.349593162536621,
+        "n_params": 433214
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:04:37"
+    },
+    {
+      "n": 64,
+      "cond": "pure",
+      "seed": 1236,
+      "start_time": "2026-06-06T01:04:37",
+      "status": "ok",
+      "metrics": {
+        "ce": 3.343793898820877,
+        "n_params": 433214
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:04:46"
+    },
+    {
+      "n": 64,
+      "cond": "pure",
+      "seed": 1237,
+      "start_time": "2026-06-06T01:04:46",
+      "status": "ok",
+      "metrics": {
+        "ce": 3.3689046800136566,
+        "n_params": 433214
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:04:54"
+    },
+    {
+      "n": 64,
+      "cond": "none",
+      "seed": 1234,
+      "start_time": "2026-06-06T01:04:54",
+      "status": "ok",
+      "metrics": {
+        "ce": 3.345769166946411,
+        "n_params": 453950,
+        "max_emp_rho": 1.1004583537000001,
+        "cert_pass_final": false,
+        "sound": false,
+        "postproject_gamma": 0.260605432972312,
+        "ce_postproject": 3.3468242287635803,
+        "rho_postproject": 0.902717693279085
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:06:29"
+    },
+    {
+      "n": 64,
+      "cond": "none",
+      "seed": 1235,
+      "start_time": "2026-06-06T01:06:29",
+      "status": "ok",
+      "metrics": {
+        "ce": 3.3498465716838837,
+        "n_params": 453950,
+        "max_emp_rho": 1.0950839159149286,
+        "cert_pass_final": false,
+        "sound": false,
+        "postproject_gamma": 0.28014189268557765,
+        "ce_postproject": 3.350011557340622,
+        "rho_postproject": 0.8929147440578878
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:08:02"
+    },
+    {
+      "n": 64,
+      "cond": "none",
+      "seed": 1236,
+      "start_time": "2026-06-06T01:08:02",
+      "status": "ok",
+      "metrics": {
+        "ce": 3.3475628793239594,
+        "n_params": 453950,
+        "max_emp_rho": 1.0984468470407514,
+        "cert_pass_final": false,
+        "sound": false,
+        "postproject_gamma": 0.23117828158198336,
+        "ce_postproject": 3.3483119010925293,
+        "rho_postproject": 0.9104045152958183
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:09:36"
+    },
+    {
+      "n": 64,
+      "cond": "none",
+      "seed": 1237,
+      "start_time": "2026-06-06T01:09:36",
+      "status": "ok",
+      "metrics": {
+        "ce": 3.361242711544037,
+        "n_params": 453950,
+        "max_emp_rho": 0.96612075200822,
+        "cert_pass_final": false,
+        "sound": true,
+        "postproject_gamma": 0.24600678292571046,
+        "ce_postproject": 3.361807197332382,
+        "rho_postproject": 0.8895370690103573
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:11:08"
+    },
+    {
+      "n": 64,
+      "cond": "project",
+      "seed": 1234,
+      "start_time": "2026-06-06T01:11:08",
+      "status": "ok",
+      "metrics": {
+        "ce": 3.347053200006485,
+        "n_params": 453950,
+        "max_emp_rho": 0.9445869190814499,
+        "cert_pass_final": true,
+        "sound": true,
+        "project_rate": 1.0,
+        "mean_gamma": 0.27818146398874444,
+        "fallbacks": 0
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:12:46"
+    },
+    {
+      "n": 64,
+      "cond": "project",
+      "seed": 1235,
+      "start_time": "2026-06-06T01:12:46",
+      "status": "ok",
+      "metrics": {
+        "ce": 3.3497154712677,
+        "n_params": 453950,
+        "max_emp_rho": 0.9197699374814098,
+        "cert_pass_final": true,
+        "sound": true,
+        "project_rate": 1.0,
+        "mean_gamma": 0.2768159886156756,
+        "fallbacks": 0
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:14:24"
+    },
+    {
+      "n": 64,
+      "cond": "project",
+      "seed": 1236,
+      "start_time": "2026-06-06T01:14:24",
+      "status": "ok",
+      "metrics": {
+        "ce": 3.3422938883304596,
+        "n_params": 453950,
+        "max_emp_rho": 0.9473346449347869,
+        "cert_pass_final": true,
+        "sound": true,
+        "project_rate": 1.0,
+        "mean_gamma": 0.2772116261572288,
+        "fallbacks": 0
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:16:02"
+    },
+    {
+      "n": 64,
+      "cond": "project",
+      "seed": 1237,
+      "start_time": "2026-06-06T01:16:02",
+      "status": "ok",
+      "metrics": {
+        "ce": 3.359025627374649,
+        "n_params": 453950,
+        "max_emp_rho": 0.9239817504890137,
+        "cert_pass_final": true,
+        "sound": true,
+        "project_rate": 1.0,
+        "mean_gamma": 0.27695765678573675,
+        "fallbacks": 0
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:17:39"
+    },
+    {
+      "n": 64,
+      "cond": "reject",
+      "seed": 1234,
+      "start_time": "2026-06-06T01:17:39",
+      "status": "ok",
+      "metrics": {
+        "ce": 3.3461214005947113,
+        "n_params": 453950,
+        "max_emp_rho": 0.8902096534659705,
+        "cert_pass_final": true,
+        "sound": true,
+        "reject_rate": 1.0
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:19:13"
+    },
+    {
+      "n": 64,
+      "cond": "reject",
+      "seed": 1235,
+      "start_time": "2026-06-06T01:19:13",
+      "status": "ok",
+      "metrics": {
+        "ce": 3.3463116586208344,
+        "n_params": 453950,
+        "max_emp_rho": 0.8968002053725764,
+        "cert_pass_final": true,
+        "sound": true,
+        "reject_rate": 1.0
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:20:46"
+    },
+    {
+      "n": 64,
+      "cond": "reject",
+      "seed": 1236,
+      "start_time": "2026-06-06T01:20:46",
+      "status": "ok",
+      "metrics": {
+        "ce": 3.33968648314476,
+        "n_params": 453950,
+        "max_emp_rho": 0.9122376377139025,
+        "cert_pass_final": true,
+        "sound": true,
+        "reject_rate": 1.0
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:22:20"
+    },
+    {
+      "n": 64,
+      "cond": "reject",
+      "seed": 1237,
+      "start_time": "2026-06-06T01:22:20",
+      "status": "ok",
+      "metrics": {
+        "ce": 3.3623886108398438,
+        "n_params": 453950,
+        "max_emp_rho": 0.9006112579276336,
+        "cert_pass_final": true,
+        "sound": true,
+        "reject_rate": 1.0
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:23:54"
+    },
+    {
+      "n": 256,
+      "cond": "pure",
+      "seed": 1234,
+      "start_time": "2026-06-06T01:23:54",
+      "status": "ok",
+      "metrics": {
+        "ce": 3.3460421562194824,
+        "n_params": 433214
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:24:03"
+    },
+    {
+      "n": 256,
+      "cond": "pure",
+      "seed": 1235,
+      "start_time": "2026-06-06T01:24:03",
+      "status": "ok",
+      "metrics": {
+        "ce": 3.349593162536621,
+        "n_params": 433214
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:24:13"
+    },
+    {
+      "n": 256,
+      "cond": "pure",
+      "seed": 1236,
+      "start_time": "2026-06-06T01:24:13",
+      "status": "ok",
+      "metrics": {
+        "ce": 3.343793898820877,
+        "n_params": 433214
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:24:22"
+    },
+    {
+      "n": 256,
+      "cond": "pure",
+      "seed": 1237,
+      "start_time": "2026-06-06T01:24:22",
+      "status": "ok",
+      "metrics": {
+        "ce": 3.3689046800136566,
+        "n_params": 433214
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:24:31"
+    },
+    {
+      "n": 256,
+      "cond": "none",
+      "seed": 1234,
+      "start_time": "2026-06-06T01:24:31",
+      "status": "ok",
+      "metrics": {
+        "ce": 3.3376438915729523,
+        "n_params": 564926,
+        "max_emp_rho": 2.1538022003774273,
+        "cert_pass_final": false,
+        "sound": false,
+        "postproject_gamma": 0.06431288220270016,
+        "ce_postproject": 3.3418533205986023,
+        "rho_postproject": 0.9281159607937988
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:26:26"
+    },
+    {
+      "n": 256,
+      "cond": "none",
+      "seed": 1235,
+      "start_time": "2026-06-06T01:26:26",
+      "status": "ok",
+      "metrics": {
+        "ce": 3.3508384823799133,
+        "n_params": 564926,
+        "max_emp_rho": 2.235524006603308,
+        "cert_pass_final": false,
+        "sound": false,
+        "postproject_gamma": 0.06769083511456847,
+        "ce_postproject": 3.3537295758724213,
+        "rho_postproject": 0.9297937110798729
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:28:22"
+    },
+    {
+      "n": 256,
+      "cond": "none",
+      "seed": 1236,
+      "start_time": "2026-06-06T01:28:22",
+      "status": "ok",
+      "metrics": {
+        "ce": 3.3412362337112427,
+        "n_params": 564926,
+        "max_emp_rho": 2.174227768316946,
+        "cert_pass_final": false,
+        "sound": false,
+        "postproject_gamma": 0.07802278530879357,
+        "ce_postproject": 3.3451939821243286,
+        "rho_postproject": 0.9286839783123721
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:30:18"
+    },
+    {
+      "n": 256,
+      "cond": "none",
+      "seed": 1237,
+      "start_time": "2026-06-06T01:30:18",
+      "status": "ok",
+      "metrics": {
+        "ce": 3.3586320281028748,
+        "n_params": 564926,
+        "max_emp_rho": 2.196087442830592,
+        "cert_pass_final": false,
+        "sound": false,
+        "postproject_gamma": 0.07798012873157859,
+        "ce_postproject": 3.364118218421936,
+        "rho_postproject": 0.9203884454631617
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:32:15"
+    },
+    {
+      "n": 256,
+      "cond": "project",
+      "seed": 1234,
+      "start_time": "2026-06-06T01:32:15",
+      "status": "ok",
+      "metrics": {
+        "ce": 3.3382411897182465,
+        "n_params": 564926,
+        "max_emp_rho": 0.979819692157232,
+        "cert_pass_final": true,
+        "sound": true,
+        "project_rate": 1.0,
+        "mean_gamma": 0.09060919759129289,
+        "fallbacks": 0
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:34:13"
+    },
+    {
+      "n": 256,
+      "cond": "project",
+      "seed": 1235,
+      "start_time": "2026-06-06T01:34:13",
+      "status": "ok",
+      "metrics": {
+        "ce": 3.3446604311466217,
+        "n_params": 564926,
+        "max_emp_rho": 0.9709408466237935,
+        "cert_pass_final": true,
+        "sound": true,
+        "project_rate": 1.0,
+        "mean_gamma": 0.09038177184183332,
+        "fallbacks": 0
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:36:12"
+    },
+    {
+      "n": 256,
+      "cond": "project",
+      "seed": 1236,
+      "start_time": "2026-06-06T01:36:12",
+      "status": "ok",
+      "metrics": {
+        "ce": 3.3341786861419678,
+        "n_params": 564926,
+        "max_emp_rho": 0.966429476418954,
+        "cert_pass_final": true,
+        "sound": true,
+        "project_rate": 1.0,
+        "mean_gamma": 0.09065111992940535,
+        "fallbacks": 0
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:38:10"
+    },
+    {
+      "n": 256,
+      "cond": "project",
+      "seed": 1237,
+      "start_time": "2026-06-06T01:38:10",
+      "status": "ok",
+      "metrics": {
+        "ce": 3.3549693524837494,
+        "n_params": 564926,
+        "max_emp_rho": 0.9812086683967177,
+        "cert_pass_final": true,
+        "sound": true,
+        "project_rate": 1.0,
+        "mean_gamma": 0.09037665675543992,
+        "fallbacks": 0
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:40:08"
+    },
+    {
+      "n": 256,
+      "cond": "reject",
+      "seed": 1234,
+      "start_time": "2026-06-06T01:40:08",
+      "status": "ok",
+      "metrics": {
+        "ce": 3.3361425399780273,
+        "n_params": 564926,
+        "max_emp_rho": 0.9280789109026398,
+        "cert_pass_final": true,
+        "sound": true,
+        "reject_rate": 1.0
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:41:53"
+    },
+    {
+      "n": 256,
+      "cond": "reject",
+      "seed": 1235,
+      "start_time": "2026-06-06T01:41:53",
+      "status": "ok",
+      "metrics": {
+        "ce": 3.3485692739486694,
+        "n_params": 564926,
+        "max_emp_rho": 0.9224894224257263,
+        "cert_pass_final": true,
+        "sound": true,
+        "reject_rate": 1.0
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:43:38"
+    },
+    {
+      "n": 256,
+      "cond": "reject",
+      "seed": 1236,
+      "start_time": "2026-06-06T01:43:38",
+      "status": "ok",
+      "metrics": {
+        "ce": 3.3345779180526733,
+        "n_params": 564926,
+        "max_emp_rho": 0.9353820583819887,
+        "cert_pass_final": true,
+        "sound": true,
+        "reject_rate": 1.0
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:45:24"
+    },
+    {
+      "n": 256,
+      "cond": "reject",
+      "seed": 1237,
+      "start_time": "2026-06-06T01:45:24",
+      "status": "ok",
+      "metrics": {
+        "ce": 3.3538710176944733,
+        "n_params": 564926,
+        "max_emp_rho": 0.9188272168744057,
+        "cert_pass_final": true,
+        "sound": true,
+        "reject_rate": 1.0
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:47:08"
+    }
+  ]
+}
