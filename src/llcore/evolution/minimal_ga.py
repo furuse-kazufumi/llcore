@@ -567,7 +567,7 @@ def evolve(
                 new_genes.append(child)
                 continue
             # gated: 子を証明 → 不合格は fail-closed resample → cap 到達で fallback。
-            if _gate_admits(child, gate_mode):
+            if _gate_admits(child, gate_mode, w_bar=w_bar, r_max=r_max):
                 new_genes.append(child)
                 n_children += 1
                 continue
@@ -576,7 +576,7 @@ def evolve(
             for _ in range(resample_cap):
                 n_resamples += 1
                 child = _make_child(pop)
-                if _gate_admits(child, gate_mode):
+                if _gate_admits(child, gate_mode, w_bar=w_bar, r_max=r_max):
                     new_genes.append(child)
                     n_children += 1
                     admitted = True
