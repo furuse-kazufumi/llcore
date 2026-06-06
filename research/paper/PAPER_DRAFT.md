@@ -1292,7 +1292,7 @@ giving the n≈16 memory wall and n=32 infeasibility (CPU_MEMORY_EFFICIENCY_PLAN
 > structure-dependent gate cost is §7's separate, null-controlled finding); or "a better verifier
 > unlocks real LM learning."
 
-### 9.3 Reproducibility
+### 10.3 Reproducibility
 
 All runs are deterministic and CPU-only; the certifier path is float64, full stop
 (CPU_MEMORY_EFFICIENCY_PLAN.md §7).
