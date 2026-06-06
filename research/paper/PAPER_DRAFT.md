@@ -1334,6 +1334,9 @@ All runs are deterministic and CPU-only; the certifier path is float64, full sto
   | HD-1 high-dim unrestricted (GPU) | `research/highdim_evolution/hd1_highdim_evo.py` → `result_hd1_feasibility.json`, `result_hd1_full.json`, `result_hd1_full_null.json` | GRAD none unsound 19/20, ρ 1.07→1.95; null ρ→2.61 at unigram ceiling; gate cost 0.03–0.12 | highdim_evolution/README.md (§7.2) |
   | Stage-B real Transformer (GPU) | `research/rllm_stage_b/stage_b_kernel.py` → `result_stageb_feasibility.json`, `result_stageb_full.json`, `result_stageb_full_null.json` | B-G1 PASS 4/4 (−0.034/−0.072); B-G2 expressivity (Δf +0.028/+0.058); B-G4 post-hoc 17–19× | rllm_stage_b/README.md + PREREGISTRATION_STAGE_B.md (§7.4) |
   | Stage-B pre-run red-team | 3-lens adversarial review (soundness / design / torch) | 5 majors fixed pre-push (float32 sigmoid saturation; RNG-stream confound; cadence; floor; per-n rule) | PREREGISTRATION_STAGE_B.md §4 |
+  | Trajectory-tube 3-arm pilot (§9) | `research/verified_memory_poc/run_3arm_ab.py` → `results_3arm.json` | P1 0/180 violations; P2 640 tube rejections + same-`L` witness; pilot (c) inconclusive at n=3 | verified_memory_poc/VERDICT.md §4–§6 |
+  | (c) decision, pre-registered (§9.4) | `research/verified_memory_poc/run_c_decision.py` → `results_c_decision.json` | d8 confirmatory: Δ = +0.0152, p = 0.0056 (16/20 positive); d4 +0.0098 n.s.; d0 ≈ 0; analysis script committed before results | verified_memory_poc/VERDICT.md §10 |
+  | Tube additive regression | `tests/unit/test_minimal_ga_gate.py`, `tests/unit/test_verified_memory_poc.py` | `gate_mode="none"` byte-identical; P3 named-slot ≡ eval_step bit-for-bit; 312 tests green | verified_memory_poc/VERDICT.md §1, §4 |
 
 Figure: reproduction-script dependency graph (substrate → certifiers → landscape/gated/null drivers →
 result JSON → verdict) (data: research/verified_lm_evolution/VERDICT.md, research/verifier_cost_reduction/SKETCH.md).
