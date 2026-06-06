@@ -815,10 +815,10 @@ Four findings, each null-controlled:
 3. **The gate's CE cost is real at full budget** (GRAD none beats inf by 0.03–0.12 nats, peaking at
    mid-n) — the feasibility run had shown "gate ≈ free", so the gate's price is itself
    budget-dependent, a warning against reading verifier costs off short runs.
-4. **EVO's expansive payoff is non-monotone and collapses at n=256** (ce none−inf: −0.015 → −0.038
-   → −0.037 → −0.020 → **+0.043**): random mutation exploits mild expansiveness but drowns in the
-   strongly-expansive region where gradient still profits — the navigability asymmetry of §6,
-   re-found at 32× the dimension from the opposite side.
+4. **EVO's expansive payoff is non-monotone and collapses at n=256** (ce none−inf: −0.013 → −0.035
+   → −0.040 → −0.019 → **+0.042**; deepest at n=64): random mutation exploits mild expansiveness
+   but drowns in the strongly-expansive region where gradient still profits — the navigability
+   asymmetry of §6, re-found at 32× the dimension from the opposite side.
 
 ### 7.3 Stage-B: the verified core as the only long-range path in a real Transformer
 
