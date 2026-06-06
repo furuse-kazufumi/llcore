@@ -159,6 +159,12 @@ def run_case(name: str, g: CoupledNDGene, *, T: int = 200, w_bar: float = 0.05,
         max_err_steady = max(max_err_steady, float(np.max(err[settle:])))
 
     inside = bool(max_err_steady <= tube + 1e-9)
+
+    # 過渡 vs 定常の比 (contraction なら誤差は減衰; 非 contraction なら過渡誤差が定常へ
+    # 残る/増幅する)。負例 D で「tube が無い = 追従誤差が tube に閉じ込められない」を
+    # 構造的に示すための補助指標。L>=1 では理論 tube=inf なので、誤差が小さくても
+    # *保証は無い* ことが要点 (tanh で状態自体は有界に留まるが、追従は保証されない)。
+    ratio_steady_to_input = max_err_steady / max(w_bar, 1e-12)
     return {
         "name": name, "n": n, "T": T, "w_bar": w_bar,
         "feasibility_residual": resid,
@@ -167,6 +173,7 @@ def run_case(name: str, g: CoupledNDGene, *, T: int = 200, w_bar: float = 0.05,
         "theoretical_tube_radius": tube,
         "empirical_max_err_steady": max_err_steady,
         "empirical_max_err_all": max_err_all,
+        "err_amplification_vs_input": ratio_steady_to_input,
         "tube_holds": inside,
         "slack": (tube - max_err_steady) if np.isfinite(tube) else float("inf"),
     }
