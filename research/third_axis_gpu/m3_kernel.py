@@ -253,12 +253,18 @@ def behavior20(genome):
 
 # ----- synthetic control fitnesses (no model; same genome space) ----- #
 def fitness_pplus(genome):
-    """Step4 exp2 deceptive_eval, faithfully transplanted (deterministic, noise dropped for CRN):
-    broad local optimum at behavior (0.3,0.3), narrow global at the (1,1) corner."""
+    """Step4 exp2 deceptive_eval base (noiseless), faithfully transplanted:
+    broad local optimum at behavior (0.3,0.3), narrow global at the (1,1) corner.
+    NOTE: the run-time fitness ADDS Step4's observation noise N(0, 0.01) (suite closure) — the
+    noise is load-bearing: on the flat stretch between basins the Gaussian tails are << 0.01, so
+    noise lets place-if-better churn neutrally and the archive random-walks outward (the ratchet).
+    Recorded bests are honest-rescored with THIS noiseless base (Step4's honest_n_trials analogue)."""
     b = np.array(behavior20(genome))
     local = 0.60 * np.exp(-np.sum((b - np.array([0.3, 0.3])) ** 2) / (2 * 0.18 ** 2))
     glob = 1.00 * np.exp(-np.sum((b - np.array([1.0, 1.0])) ** 2) / (2 * 0.07 ** 2))
     return float(max(local, glob))
+
+PPLUS_NOISE = 0.01   # Step4 exp2 _NOISE
 
 def fitness_n0(genome, n):
     """Smooth strictly-concave; unimodal at (0.7, 0)."""
