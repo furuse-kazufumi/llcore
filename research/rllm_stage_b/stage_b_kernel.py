@@ -207,7 +207,8 @@ def train_run(cond, seed, cfg, data):
     m = StageBLM(vocab, cfg, hybrid=(cond != "pure")).to(DEVICE)
     n_params = sum(p.numel() for p in m.parameters())
 
-    if cond in ("project", "reject"):                             # certified init (HD-1 pattern)
+    if cond != "pure":   # certified init for ALL hybrid conds -> none/project/reject share the
+                         # exact same starting core (red-team fix: isolates regime, not init scale)
         for _ in range(50):
             d_, W_ = m.core_np()
             if cert_inf(d_, W_): break
@@ -215,23 +216,39 @@ def train_run(cond, seed, cfg, data):
 
     opt = torch.optim.Adam(m.parameters(), lr=cfg["lr"])
     steps = cfg["grad_steps"]; ce_every = cfg.get("cert_every", 4)
-    rejects = checks = projections = 0; gammas = []
+    rejects = checks = projections = fallbacks = 0; gammas = []
     if cond == "reject":
         prev = (m.raw_decay.detach().clone(), m.raw_W.detach().clone())
+
+    def _reset_core_opt_state():
+        # symmetric Adam-moment reset after any out-of-band core mutation (red-team fix:
+        # stale momentum after revert/projection would otherwise bias the B-Q2 comparison)
+        for p in (m.raw_decay, m.raw_W):
+            st = opt.state.get(p)
+            if st:
+                if "exp_avg" in st: st["exp_avg"].zero_()
+                if "exp_avg_sq" in st: st["exp_avg_sq"].zero_()
 
     for it in range(steps):
         x, y = batches(tr, T, cfg["B"], rng); opt.zero_grad()
         loss = F.cross_entropy(m(x).reshape(-1, vocab), y.reshape(-1)); loss.backward(); opt.step()
-        if cond == "project":
-            d_, W_ = m.core_np()
+        # project & reject share the SAME cadence (red-team fix: cadence asymmetry would confound
+        # the B-Q2 mechanism comparison) — certified at every check incl. the final step.
+        if cond == "project" and ((it + 1) % ce_every == 0 or it == steps - 1):
+            checks += 1; d_, W_ = m.core_np()
             g = project_gamma(d_, W_)
             if g < 1.0:
                 projections += 1; gammas.append(g); m.set_core_np(d_, g * W_)
+                d2, W2 = m.core_np()
+                if not cert_inf(d2, W2):   # defensive; unreachable after the strict decay reparam
+                    fallbacks += 1
+                    m.set_core_np(np.full(cfg["n"], 0.7), np.zeros((cfg["n"], cfg["n"])))
+                _reset_core_opt_state()
         elif cond == "reject" and ((it + 1) % ce_every == 0 or it == steps - 1):
             checks += 1; d_, W_ = m.core_np()
             if not cert_inf(d_, W_):
                 with torch.no_grad(): m.raw_decay.copy_(prev[0]); m.raw_W.copy_(prev[1])
-                rejects += 1
+                rejects += 1; _reset_core_opt_state()
             else:
                 prev = (m.raw_decay.detach().clone(), m.raw_W.detach().clone())
 
