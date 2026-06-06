@@ -230,28 +230,35 @@ class RealFitness:
         return ce, shard8
 
 
-# ----- fixed low-dim probe slice (red-team blocker fix) ----- #
-# Behavior coordinates over the FULL 4096-entry mean are CLT-frozen at n=64 (per-mutation drift
-# sigma/n = 0.0019 -> corridor untraversable by ANY method, incl. MAP-E). All slice-based
-# coordinates below use a FIXED 24-entry probe (Step4's dimensionality: drift sigma/sqrt(24) =
-# 0.0245/step), making the corridor crossable by archive stepping-stones within E while remaining
-# measure-zero under direct sampling (init slice-mean std ~ 0.075/sqrt(24) = 0.015; peak at 0.8
-# is ~50 sigma of the SAMPLING distribution away -> still unreachable by teleport).
-SLICE_K = 24
-def _wslice(W):
-    return np.asarray(W).reshape(-1)[:SLICE_K]
+# ----- fixed low-dim probe slices + unit-window mapping (red-team blocker fix, take 2) ----- #
+# Two requirements verified by CPU simulation before any GPU run:
+#   (i) behavior axes must be MUTATION-MOBILE: per-step drift >= ~1/4 bin width. Full-4096-mean
+#       coordinates are CLT-frozen (drift sigma/64); even a /4-window 24-slice was too slow AND a
+#       sloped deceptive valley breaks MAP-E's within-bin ratchet (validated FAIL 0/4).
+#  (ii) the corridor must be Step4's PROVEN shape (exp2_highdim_deceptive.deceptive_eval): fitness =
+#       max(broad local Gaussian, narrow global corner Gaussian) — outside the local basin the
+#       GLOBAL tail supplies an outward within-bin gradient, which is what makes the archive ratchet
+#       work. A V-shaped valley (take 1) pulls elites back inward and kills the ratchet.
+# Unit window u = clip(w + 0.5, 0, 1): per-entry mutation noise 0.12 maps 1:1 (Step4's scale);
+# behavior = means over 10-entry halves (drift 0.038/step ~= bin/3.3); init behavior std ~0.047 so
+# the (1,1) corner is ~10.6 sigma of SAMPLING away (teleport-proof) yet stepping-stone-reachable.
+def _u20(W):
+    u = np.clip(np.asarray(W).reshape(-1)[:20] + 0.5, 0, 1)
+    return u
 
-def corridor_b1(genome):
-    _, W = genome
-    return float(np.clip(np.mean(_wslice(W)) / 2.0 + 0.5, 0, 1))
+def behavior20(genome):
+    u = _u20(genome[1])
+    return (float(np.mean(u[:10])), float(np.mean(u[10:])))
 
 
 # ----- synthetic control fitnesses (no model; same genome space) ----- #
 def fitness_pplus(genome):
-    """Step4-transplant deceptive corridor on the slice coordinate (local mass at b1=0.5,
-    deceptive valley, global peak band at b1=0.9 <=> slice-mean = 0.8)."""
-    b1 = corridor_b1(genome)
-    return max(0.5 - abs(b1 - 0.5), 5.0 * (1.0 - abs(b1 - 0.9)) - 4.0)
+    """Step4 exp2 deceptive_eval, faithfully transplanted (deterministic, noise dropped for CRN):
+    broad local optimum at behavior (0.3,0.3), narrow global at the (1,1) corner."""
+    b = np.array(behavior20(genome))
+    local = 0.60 * np.exp(-np.sum((b - np.array([0.3, 0.3])) ** 2) / (2 * 0.18 ** 2))
+    glob = 1.00 * np.exp(-np.sum((b - np.array([1.0, 1.0])) ** 2) / (2 * 0.07 ** 2))
+    return float(max(local, glob))
 
 def fitness_n0(genome, n):
     """Smooth strictly-concave; unimodal at (0.7, 0)."""
@@ -259,14 +266,14 @@ def fitness_n0(genome, n):
     return -float(np.mean((d - 0.7) ** 2) + np.mean(W ** 2))
 
 
-# ----- behavior descriptors (all axes verified mutation-mobile; see pre-reg table) ----- #
+# ----- behavior descriptors (axes mutation-mobile by construction; see pre-reg table) ----- #
 def desc_b1(genome, _shard=None):
     d, W = genome
-    return (float(np.mean(d)),                                   # drift ~0.015/step at n=64
-            float(np.clip(np.mean(np.abs(_wslice(W))) / 2.0, 0, 1)))   # probe coupling strength
+    return (float(np.clip(np.mean(d[:16]), 0, 1)),               # decay probe: drift 0.03/step
+            float(np.clip(np.mean(np.asarray(W).reshape(-1)[:10]) + 0.5, 0, 1)))  # drift 0.038/step
 
 def desc_b1p(genome, _shard=None):
-    return (corridor_b1(genome), float(np.mean(genome[0])))     # corridor-aligned (P+ only)
+    return behavior20(genome)                                    # corridor-aligned (P+ only)
 
 _B2_PROJ = None
 def desc_b2(genome, shard8):
