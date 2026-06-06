@@ -238,3 +238,124 @@ def test_unknown_gate_mode_raises() -> None:
     """[v] 未知 gate_mode は _gate_admits が fail-loud (ValueError)."""
     with pytest.raises(ValueError, match="unknown gate_mode"):
         evolve(_ff, rng=np.random.default_rng(1000), gate_mode="bogus", **_KW)
+
+
+# ---------------------------------------------------------------------------
+# (vi) Phase 2a: trajectory_tube gate (additive 1 分岐 + w_bar/r_max kwarg)
+#
+# 規律:
+# - additive 性: gate_mode="none" は w_bar/r_max を渡しても byte-identical を維持。
+# - fail-closed: tracking_tube が admit=False / 例外 / tube=∞ / r>r_max は全て reject。
+# - (P2) アンチ re-skin: contraction=True だが r>r_max の gene を reject できる。
+# ---------------------------------------------------------------------------
+
+
+def test_gate_none_byte_identical_with_wbar_rmax_kwargs() -> None:
+    """[vi-additive] gate_mode='none' は w_bar/r_max を渡しても旧挙動 byte-identical.
+
+    新 kwarg は gate-off パスに一切影響しない (additive の core 規律)。
+    """
+    base = evolve(_ff, rng=np.random.default_rng(1234), **_KW)
+    with_kw = evolve(
+        _ff,
+        rng=np.random.default_rng(1234),
+        gate_mode="none",
+        w_bar=0.1,
+        r_max=0.05,
+        **_KW,
+    )
+    assert base.best_fitness_curve == with_kw.best_fitness_curve
+    assert base.diversity_curve == with_kw.diversity_curve
+    assert with_kw.gate_stats is None
+
+
+def test_trajectory_tube_gate_runs_and_reports() -> None:
+    """[vi] trajectory_tube gate が配線されて GateStats を返す."""
+    r = evolve(
+        _ff,
+        rng=np.random.default_rng(1000),
+        gate_mode="trajectory_tube",
+        w_bar=0.1,
+        r_max=0.05,
+        **_KW,
+    )
+    assert isinstance(r.gate_stats, GateStats)
+    assert r.gate_stats.gate_mode == "trajectory_tube"
+
+
+def test_trajectory_tube_gate_admits_only_within_tube() -> None:
+    """[vi] admit された全 (非 elite) 子が tracking_tube(.admits) を満たす (fail-closed)."""
+    from llcore.verifier import tracking_tube
+
+    w_bar, r_max = 0.1, 0.05
+    r = evolve(
+        _ff,
+        rng=np.random.default_rng(1000),
+        gate_mode="trajectory_tube",
+        w_bar=w_bar,
+        r_max=r_max,
+        **_KW,
+    )
+    final = r.generations[-1]
+    sorted_inds = sorted(final.individuals, key=lambda ind: -ind.fitness)
+    children = sorted_inds[1:]  # elitism=1
+    for ind in children:
+        tt = tracking_tube(ind.gene, w_bar=w_bar, r_max=r_max)
+        assert tt.admits is True, f"admitted child outside tube: {ind.gene} tube={tt.tube_radius}"
+
+
+def test_trajectory_tube_rejects_contracting_but_loose_tube() -> None:
+    """[vi/P2] contraction=True だが r>r_max の gene を reject する (アンチ re-skin).
+
+    初期集団を「contracting (L<1) だが tube 半径が大きい」 gene で埋めると、
+    contraction gate なら全 admit だが trajectory_tube gate は r_max binding で reject する。
+    """
+    from llcore.verifier import tracking_tube, verify_lipschitz_contraction
+
+    w_bar, r_max = 0.1, 0.01
+    # decay=0.5, mix=1.0, gate_str=0.0:
+    #   L=|0.5+0.5·t·0|=0.5<1 (contracting), G=(1−0.5)·1.0=0.5,
+    #   tube = 0.5·0.1/(1−0.5)=0.1 > r_max=0.01 → contraction admit / tube reject。
+    loose = StateUpdateGene(decay=0.5, mix=1.0, gate_str=0.0)
+    assert verify_lipschitz_contraction(loose).contraction is True
+    tt = tracking_tube(loose, w_bar=w_bar, r_max=r_max)
+    assert tt.contraction_ok is True and tt.admits is False  # 前提確認
+
+    init = [loose for _ in range(10)]
+    r = evolve(
+        lambda g, rng: float(rng.uniform()),
+        rng=np.random.default_rng(7),
+        pop_size=10,
+        n_generations=5,
+        initial_pop=init,
+        gate_mode="trajectory_tube",
+        w_bar=w_bar,
+        r_max=r_max,
+        mutation_sigma=0.05,
+        resample_cap=50,
+    )
+    assert r.gate_stats is not None
+    assert r.gate_stats.n_rejections > 0, "trajectory_tube gate should reject loose-tube children"
+
+
+def test_trajectory_tube_fallback_gene_admitted() -> None:
+    """[vi] _FALLBACK_GENE (decay=0.5,mix=0,gate_str=0) は G=0 → tube=0 で trajectory_tube も通過."""
+    from llcore.evolution.minimal_ga import _FALLBACK_GENE
+    from llcore.verifier import tracking_tube
+
+    tt = tracking_tube(_FALLBACK_GENE, w_bar=0.1, r_max=0.05)
+    assert tt.G_input == pytest.approx(0.0, abs=1e-15)
+    assert tt.tube_radius == pytest.approx(0.0, abs=1e-15)
+    assert tt.admits is True
+
+
+def test_trajectory_tube_requires_wbar() -> None:
+    """[vi] trajectory_tube gate は w_bar 必須 (None なら fail-loud)."""
+    with pytest.raises(ValueError, match="w_bar"):
+        evolve(
+            _ff,
+            rng=np.random.default_rng(1000),
+            gate_mode="trajectory_tube",
+            r_max=0.05,
+            **_KW,
+        )
