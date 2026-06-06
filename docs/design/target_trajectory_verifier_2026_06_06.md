@@ -5,6 +5,8 @@
 **種別**: 設計 + フィジビリティ (additive 提案。`src/` 改変なし、`research/` 追加のみ)
 **PoC**: `research/target_trajectory_poc/poc_target_trajectory.py` (n=2,3 実行済み)
 
+**実装着地 (2026-06-06, additive)**: 案 B を `src/llcore/verifier/tracking_tube.py` に純 ADDITIVE 移植 (read-only レポータ `tracking_tube()` + `state_lipschitz_inf` / `input_gain_inf`)。PoC 結果 JSON の case A/B/C/D を golden 値としてテスト一致確認 (`tests/unit/test_tracking_tube.py`)。`certifies()` 等の既存 API は 1 文字も不変。あわせて T1 Phase 1 (a) として証明ゲートを出荷側 `src/llcore/evolution/minimal_ga.py::evolve()` に本配線 (`gate_mode` / `resample_cap` を additive 追加、既定 `"none"` は旧挙動 byte-identical、`research/verified_evolution/gated_evolve.py` と全モード挙動一致をテストで実証)。
+
 ---
 
 ## 0. 要旨 (3 行)
