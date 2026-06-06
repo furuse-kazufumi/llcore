@@ -130,4 +130,9 @@ __all__ = [
     "get_verifier_backend",
     "available_backends",
     "cvxpy_available",
+    # T1 Phase 1 (b) — tracking tube reporter (additive, read-only)
+    "TrackingTubeResult",
+    "tracking_tube",
+    "state_lipschitz_inf",
+    "input_gain_inf",
 ]
