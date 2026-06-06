@@ -335,11 +335,15 @@ class EvolutionResult:
         各世代の best fitness (進化進捗の主指標).
     diversity_curve : tuple[float, ...]
         各世代の gene_matrix 分散 (gene 多様性指標).
+    gate_stats : GateStats | None
+        T1 Phase 1 (a): 証明ゲート集計。``gate_mode="none"`` (既定) では ``None``
+        (additive; 既存呼び出しと後方互換)。gated mode 時のみ :class:`GateStats` が入る。
     """
 
     generations: tuple[Population, ...]
     best_fitness_curve: tuple[float, ...]
     diversity_curve: tuple[float, ...]
+    gate_stats: "GateStats | None" = field(default=None)
 
     @property
     def final_best(self) -> Individual:
