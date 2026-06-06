@@ -213,3 +213,40 @@ py -3.11 research/verified_memory_poc/run_3arm_ab.py
 P1 (soundness) と P2 (strict additive discriminating power) は demonstrable に確立。
 (c) (trajectory lift が memory horizon に効く) は n=3 では統計的に区別不能 = honest red flag として
 明示し、fitness benefit は主張しない。additive 性 (gate_mode="none" byte-identical) は回帰テストで担保。
+
+---
+
+## 10. (c) の決着 — n=20 事前登録 run (2026-06-07 追補)
+
+§6 (c) の INCONCLUSIVE を `run_c_decision.py` で決着させた。**結果取得前に判定基準を commit**
+(4722095: 主仮説 = copy_d8 confirmatory / sign-flip permutation 両側 / α=0.05 / seed 2000-2019 /
+d0・d4 は exploratory)。生結果 = `results_c_decision.json` (wall 266s)。
+
+### 結果: **H1 supported — (c) は棄却されない**
+
+| task | mean Δ (tube−contraction) | p (sign-flip) | 符号 | 役割 |
+|---|---|---|---|---|
+| copy_d0 | −0.0002 | 0.957 | +7/−11 | exploratory |
+| copy_d4 | +0.0098 | 0.104 | +10/−10 | exploratory |
+| copy_d8 | **+0.0152** | **0.0056** | **+16/−4** | **confirmatory** |
+
+delay 0 → 4 → 8 で単調に効果が立ち上がる dose-response パターン =
+「trajectory tube bound は memory horizon が長いほど効く」と整合。
+
+### 内訳を疑った結果 (honest discipline)
+
+- **outlier 駆動ではない**: d8 で top1 (+0.0905) を除いた mean +0.0112 / trimmed mean (両端 2 除外)
+  +0.0107 / median +0.0054 — いずれも正。pilot n=3 の「seed1001 単独駆動」とは質的に異なる。
+- **分布は右裾** (mean 0.0152 > median 0.0054): 効果は「多数 seed で小さい正 + 数 seed で大きい正」。
+  一様な +0.015 ではない、と書く。
+- **GA は壊れていない**: d8 で tube arm 2224 rejects vs contraction 741 (3 倍絞る) なのに
+  fallback 0 (全世代 admit 子を見つけられた)。絞った上で fitness が高い =
+  navigability (検問が良い領域へ誘導) の追加証拠。
+
+### 言ってよいこと (更新)
+
+- §7 の禁止事項 (e) を更新: **delay=8 では事前登録した confirmatory 検定で fitness 優位が
+  統計的に検出された** (n=20, p=0.0056)。ただし効果量は小さく (mean Δ≈+0.015)、
+  probe-based fitness / scalar gene / 小規模 GA (pop=20×gen=20) のスコープ内に限る。
+- d0/d4 は依然主張しない (exploratory, n.s.)。「memory を要しないタスクでは差が消える」は
+  むしろ仕様どおり (tube は memory 保持の保証であって万能の性能向上ではない)。
