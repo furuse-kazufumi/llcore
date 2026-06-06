@@ -362,6 +362,8 @@ def evolve(
     rng: np.random.Generator | None = None,
     initial_pop: list[StateUpdateGene] | None = None,
     codec: "GeneCodec | None" = None,
+    gate_mode: GateMode = "none",
+    resample_cap: int = 50,
 ) -> EvolutionResult:
     """進化 main loop.
 
