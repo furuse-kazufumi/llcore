@@ -1258,11 +1258,32 @@ Figure: roadmap dependency — L1 low-rank W → L3 model-order reduction → L2
 
 ## Related work (positioning)
 
+We position this work against three established lines located via a local cross-domain research
+corpus (titles given verbatim; no author/year is fabricated), and then — because the strongest
+objection is a near-miss prior-art collision rather than a technical one — against a set of
+recent results located by an explicit adversarial differentiation audit (60+ queries, 44 candidates,
+every cited arXiv identifier confirmed against its abstract; see §"The four-point intersection" below).
+
+**The novelty claim, scoped to a four-point intersection.** We do *not* claim that any single axis of
+this work is new — each one has prior art, and we name it. What we claim is the *simultaneous*
+satisfaction of four conditions, none of which the audit found jointly occupied by a prior result:
+
+> **(i)** a *sound* contraction certificate (closed-form ∞-norm / vertex SVD / SDP-Lyapunov, each
+> implying `ρ(J) < 1` over the reachable box), **(ii)** applied to the internal dynamics of a
+> **Transformer/recurrent memory core** (not a control plant and not a generated artifact),
+> **(iii)** used as a **prove-then-reject admission gate inside an evolution/update loop** (fail-closed:
+> a child that cannot be certified is *rejected*, as opposed to projected, regularized, or
+> structurally constrained), **(iv)** with a **running implementation and experiments**.
+
+We deliberately avoid any unconditional non-existence claim. Where earlier drafts said a combination
+"does not exist," we now say only that **our search did not find it** — specifically, an adversarial
+audit of 60+ queries and 44 candidates surfaced no prior result occupying all four corners at once,
+while it did surface a prior for *each corner individually*. The accompanying honest analysis of
+*when* the verifier helps (navigability, not learning; §5) and *how cheaply* it can be made to scale
+(§8) is the second half of the contribution.
+
 We position this work against three established lines, located via a local cross-domain research
-corpus (titles given verbatim; no author/year is fabricated). The contribution is the *combination*
-none of them makes: a sound contraction verifier placed **inside an evolutionary loop on a real LM**,
-together with an honest analysis of *when* the verifier helps (navigability, not learning) and *how
-cheaply* it can be made to scale.
+corpus (titles given verbatim; no author/year is fabricated).
 
 - **Certified stability / contraction of neural & nonlinear systems.** A substantial literature
   certifies stability or robustness of learned systems — e.g. *"Certifying Lyapunov Stability of
