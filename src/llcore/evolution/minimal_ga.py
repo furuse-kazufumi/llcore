@@ -220,7 +220,7 @@ FitnessFuncG = Callable[[GeneT, np.random.Generator], float]
 
 
 # 証明ゲートのモード文字列 ("none" は無ゲート control = 旧挙動 byte-identical)。
-GateMode = str  # "none" | "state_norm" | "contraction"
+GateMode = str  # "none" | "state_norm" | "contraction" | "trajectory_tube"
 
 # Known-safe fallback gene: decay=0.5, mix=0.0, gate_str=0.0.
 # 閉形式 Lipschitz 上界 = max(|0.5|, |0.5 + 0.5*0.0|) = 0.5 < 1 (state-direction
