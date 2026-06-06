@@ -507,6 +507,8 @@ def main():
                                 dfun = {"B1": desc_b1, "B1p": desc_b1p, "B2": desc_b2}[dname]
                                 best, bg, ncell = run_m4_mapelites(fit, n, E, warm_core, rng, sigma,
                                                                    dfun, need_b2=(dname == "B2"))
+                            if control == "pplus":               # honest noiseless rescore (Step4)
+                                best = fitness_pplus(bg)
                             pay = {"best_fitness": best,
                                    "best_ce": (-best if control == "real" else None),
                                    "cert_inf": cert_inf(*bg),
