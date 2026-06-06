@@ -483,7 +483,9 @@ def main():
             def fit_real(g, need_b2=False):
                 ce, shard = rf(g, need_b2=need_b2)
                 return -ce, shard
-            def fit_pp(g, need_b2=False): return fitness_pplus(g), None
+            noise_rng = np.random.default_rng(seed * 31337 + 17)
+            def fit_pp(g, need_b2=False):
+                return fitness_pplus(g) + float(noise_rng.normal(0, PPLUS_NOISE)), None
             def fit_n0(g, need_b2=False): return fitness_n0(g, n), None
 
             suites = [("real", fit_real), ("pplus", fit_pp), ("n0", fit_n0)]
