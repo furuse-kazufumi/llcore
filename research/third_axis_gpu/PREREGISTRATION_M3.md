@@ -74,9 +74,13 @@ core (CRN). One fitness evaluation = one budget unit; E is identical across M1�
 
 ## 4. Pre-registered verdict rules (3-value, arc convention)
 
-Primary comparison on REAL fitness (held-out CE), per descriptor, 4 seeds, paired:
-- **③ PASS** — MAP-E beats M1, M2, and M3 (mean and ≥3/4 seeds) for at least one pre-registered
-  descriptor, with P+ valid and N0 null. (Then: does it approach M5 GRAD? reported, not gated.)
+Primary comparison on REAL fitness (held-out CE), 4 seeds, paired:
+- **The PRIMARY verdict descriptor is B1** (it owns the P+ control; red-team fix for the 1-of-2
+  multiplicity that would have ~doubled the false-PASS rate). **B2 is secondary/exploratory** — a
+  B2-only win is reported as "exploratory positive, unvalidated descriptor", never as ③ PASS.
+- **③ PASS** — MAP-E(B1) beats M1, M2, and M3 (mean and ≥3/4 seeds), with P+ valid and N0 null,
+  and the winning margin above the measurement-jitter floor (1e-4 in fitness; GPU nondeterminism).
+  (Then: does it approach M5 GRAD? reported, not gated.)
 - **③ NEGATIVE (decisive)** — P+ valid, N0 null, but MAP-E fails to beat the direct-sampling
   baselines on the real landscape ⇒ "③ is not load-bearing on the real small-LLM core landscape" —
   closing the arc's last path with the same 3-stage evidence shape as BG9 (informative negative).
