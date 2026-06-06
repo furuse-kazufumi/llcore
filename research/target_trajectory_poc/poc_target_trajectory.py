@@ -195,10 +195,12 @@ def main() -> int:
     cases.append(("C_near_boundary_n2",
                   CoupledNDGene.make(decay=[0.4, 0.4], W=[[0.3, 0.2], [0.2, 0.3]])))
 
-    # Case D (n=2): NON-contracting control (大 W, 小 decay) — ゲート REJECT, tube 定義不能。
-    #   → 追従保証が出ないことを示す negative control (L>=1 で tube=inf)。
+    # Case D (n=2): NON-contracting control (小 decay, 中 W) — ゲート REJECT, tube 定義不能。
+    #   → 追従保証が出ないことを示す negative control (L>=1 で tube=inf)。誤差増幅を
+    #     見るため A/C より大きめの外乱 (w_bar=0.2) を後段で当てる。tanh で状態は有界に
+    #     残るが、追従誤差は入力比でずっと大きく増幅する (= tube に閉じ込められない)。
     cases.append(("D_noncontract_control_n2",
-                  CoupledNDGene.make(decay=[0.1, 0.1], W=[[1.8, 1.5], [1.5, 1.8]])))
+                  CoupledNDGene.make(decay=[0.15, 0.15], W=[[1.2, 0.6], [0.6, 1.2]])))
 
     results = []
     print(f"{'case':28s} {'cert_inf':8s} {'L':>7s} {'G':>7s} {'tube':>9s} "
