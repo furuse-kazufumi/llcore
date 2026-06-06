@@ -1380,6 +1380,13 @@ not as a completed result (item 2, GPU stage B, is now complete — §7).
    because its soundness oracle distinguishes "good simple" (still beats unigram) from "degenerate
    simple" (learns nothing) (SKETCH.md L4). This direction is design-first and user-gated like L1–L3
    (SKETCH.md L4).
+5. **From the scalar tube to a coupled-kernel memory gate.** §9 established the trajectory-tube gate on
+   the scalar memory-update kernel, where the free-`t` and achievable-`t` Lipschitz definitions provably
+   coincide. The next rungs are (a) the coupled gene space, where the box-mismatch problem returns and
+   the two gate arms need a shared `L` definition before any comparison is meaningful; (b) replacing the
+   probe-based copy-task fitness with a gene-pure memory measure; and (c) a disturbance model matched to
+   discrete inputs (the `w̄`-ball cross-check over-approximates the realizable perturbations). Each is
+   named as a next step, not a result.
 
 Figure: roadmap dependency — L1 low-rank W → L3 model-order reduction → L2 vertex-free certifier
 (R-LLM-1), composing toward n=32+, with L4 cost-pressure as an orthogonal multi-objective layer
