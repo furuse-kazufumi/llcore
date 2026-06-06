@@ -178,22 +178,27 @@ def tracking_tube(
     if w_bar < 0.0:
         raise ValueError(f"w_bar must be non-negative, got {w_bar!r}")
 
-    # 既存 ∞-norm ゲートで contraction を判定 (cert_inf 相当; fail-closed)。
-    contraction_ok = bool(InfNormBackend().certifies(gene, max_input_abs=max_input_abs))
     L = state_lipschitz_inf(gene, max_input_abs=max_input_abs)
     G = input_gain_inf(gene, max_input_abs=max_input_abs)
 
-    # tube 半径: L<1 でのみ有限 (幾何級数収束)。contraction_ok と L<1 は同値
-    # (InfNormBackend は L<1 を判定基準とするため) だが、数値境界の安全のため両条件で gate。
-    if contraction_ok and L < 1.0:
+    # contraction 判定 = ∞-norm contraction (cert_inf 相当): L = sup‖J_s‖_∞ < 1。
+    # これは :class:`InfNormBackend` / coupled ``cert_inf`` の判定基準そのもの。L を
+    # 正規化済みの (scalar も coupled も統一した) box 端点量から計算しているため、
+    # scalar / coupled 双方で整合する (InfNormBackend に raw gene を渡すと scalar の
+    # W 不在で fail-closed False になるため、ここでは L<1 を直接基準にする)。
+    contraction_ok = bool(L < 1.0)
+
+    # tube 半径: L<1 でのみ有限 (幾何級数収束)。それ以外は +∞ (= 追従保証なし)。
+    if contraction_ok:
         tube_radius = float(G * w_bar / (1.0 - L))
     else:
         tube_radius = float("inf")
 
+    tube_finite = bool(np.isfinite(tube_radius))
     if r_max is None:
-        admits = contraction_ok and np.isfinite(tube_radius)
+        admits = bool(contraction_ok and tube_finite)
     else:
-        admits = bool(contraction_ok and np.isfinite(tube_radius) and tube_radius <= r_max)
+        admits = bool(contraction_ok and tube_finite and tube_radius <= r_max)
 
     return TrackingTubeResult(
         contraction_ok=contraction_ok,
