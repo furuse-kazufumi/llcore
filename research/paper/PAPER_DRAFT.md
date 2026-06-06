@@ -1638,9 +1638,16 @@ search.
 
 *(Audit provenance: the differentiation audit (44 candidates over 7 + 3 adversarial angles) returned
 0 results breaking the four-point intersection, 36 narrowing an over-broad claim, and 8 background; the
-narrows are the basis for the corner-by-corner table above. Known gaps in the audit, carried as honest
-limits: dedicated patent-database queries (USPTO/JPO/Google Patents) were not run, and the
-formal-methods-venue reverse lookup was single-round — so "did not find" is bounded by these.)*
+narrows are the basis for the corner-by-corner table above. A second-round formal-methods-venue
+reverse lookup (4 parallel sweep angles over CAV/TACAS/FM/ATVA tool papers, FM-tooling on
+recurrent/Transformer certification, runtime-assurance update gating, and 2026 self-evolving-AI ×
+verification, with every cited primary source re-confirmed against its abstract) again returned **0
+breaks** and surfaced the additional narrows incorporated above (the Scrivens pair, CART, RNN-SDP,
+alpha-beta-CROWN's Jacobian bounding, SpectralGuard, and the adaptive-RTA line); it also found **no
+follow-up implementation of SSGM** as of the lookup date, so the implementation window on the
+verified-memory-evolution corner (§9) remains open. The remaining known gap, carried as an honest
+limit: dedicated patent-database queries (USPTO/JPO/Google Patents) were not run — so "did not find"
+is bounded by that.)*
 
 ## References (concepts invoked in the text)
 
