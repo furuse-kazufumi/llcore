@@ -1595,6 +1595,21 @@ search.
   (arXiv:2605.11196, 2026)** proves in closed form that a Transformer associative-memory update Jacobian
   has spectral norm 1 — a contraction-type property on a memory core — but again *by construction*
   (normalization baked into the architecture), not a per-update verification gate.
+- **CART (arXiv:2606.01495, 2026)** is the closest occupant of corner (ii) alone: a recurrent
+  Transformer whose LTI gating core's spectral radius is *measured* settling into [0.79, 0.83] < 1
+  during training — stability of a Transformer memory core's internal dynamics, but explicitly
+  *learned from data* (a sigmoid gate the optimizer happens to drive into the stable band), with no
+  certificate and no gate. The learned-vs-proven axis is exactly the one our gate occupies.
+- **RNN-SDP (arXiv:2509.17898, 2025)** computes a certified upper bound on an RNN's Lipschitz constant
+  via SDP convex relaxation — the same certificate *family* as our `cert_sdp` rung, applied to a
+  recurrent core — but as a post-hoc bound on a trained network (a global Lipschitz constant, not a
+  `ρ(J) < 1` contraction certificate), outside any training or evolution loop.
+- **alpha-beta-CROWN's Jacobian-operator bounding (Aug 2025 release; VNN-COMP 2025 Lyapunov benchmark,
+  arXiv:2512.19007)** brings a state-of-the-art sound NN verifier within reach of corner (i)'s proof
+  obligation (Lyapunov stability via bounded Jacobians of `tanh`/`sigmoid` graphs). We flag it both as
+  prior art for the certification machinery and as a candidate backend for our own vertex-free
+  certifier ladder (§10.4, R-LLM-1) — its existence strengthens the *tooling*, while the gate location
+  (post-hoc verification of given networks) remains distinct.
 
 *Output / action gating and post-hoc verification (a different gate location entirely).*
 
