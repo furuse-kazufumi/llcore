@@ -803,9 +803,9 @@ Four findings, each null-controlled:
 
 1. **Ungated gradient training itself leaves the contractive region** (19/20 real seeds, ρ growing
    monotonically with n). A cheaper feasibility run (150 steps) had GRAD staying sound at every n —
-   a small-budget artifact, which retroactively scopes §6's "gradient escapes the trap": gradient
-   avoids the *EA admit-rate trap*, but given budget it does not *stay* contractive; it has no
-   reason to.
+   a small-budget artifact (the feasibility sweep covers n ∈ {8, 32, 64}), which retroactively
+   scopes §6's "gradient escapes the trap": gradient avoids the *EA admit-rate trap*, but given
+   budget it does not *stay* contractive; it has no reason to.
 2. **The drift is entropic, not structure-seeking.** On the shuffled null the same drift occurs
    *stronger* (ρ → 2.61) with zero payoff — every cell sits at the unigram ceiling. Crossing ρ=1
    is the default geometry of an unconstrained walk at high n (the contracting region's volume
