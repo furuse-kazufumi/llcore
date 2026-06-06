@@ -1141,10 +1141,25 @@ giving the n≈16 memory wall and n=32 infeasibility (CPU_MEMORY_EFFICIENCY_PLAN
 >   PoC-2). The earlier PoC-1 pessimism ("naive vertex-free 2-norm is worse than inf") was an artifact
 >   of the bad triangle-split bound B1, not of vertex-free certification per se (SKETCH.md PoC-1 / PoC-2).
 >
+> - **The GPU results are a regime map, not universals.** HD-1's own budget finding — GRAD stays
+>   sound at 150 steps but leaves the region at 400; the gate looks free at small budget and costs
+>   0.03–0.12 nats at full — demonstrates that every gate-cost figure in §7 is conditional on the
+>   stated budget, dimension, and optimizer (`research/highdim_evolution/README.md`). Stage-B's
+>   B-G2 verdict at n=64 is borderline (dp/Δf = 0.76 vs the pre-registered 0.75 line) and is
+>   reported as such; n=256 is unambiguous (`research/rllm_stage_b/README.md`). The Stage-B `none`
+>   condition starts from a certified init (unlike HD-1's raw-init `none`), an asymmetry disclosed
+>   in the pre-registration's cross-study caveats.
+> - **Entropic drift ≠ "criticality is useless."** The null kills the *necessity* reading (drift
+>   happens with zero payoff on structureless data) and the real-data CE gain of the unconstrained
+>   core is genuine; what is refuted is only the inference "the drift itself is evidence that
+>   capability requires leaving the certified region."
+>
 > **Not claimed (VERDICT.md §0, §4):** a strict monotone multi-rung ladder; the two-vs-sdp ordering
 > (sampling noise: median reversal, MW ≈ 0.5 — VERDICT.md §3a); a corpus-robust region-ceiling
 > (the 12288 B inf-worst-ceiling ladder does not replicate on 8192 B — VERDICT.md §3c-i); a
-> structure-dependent gate-gap residual; or "a better verifier unlocks real LM learning."
+> structure-dependent gate-gap residual *in the EA setting* (the gradient setting's
+> structure-dependent gate cost is §7's separate, null-controlled finding); or "a better verifier
+> unlocks real LM learning."
 
 ### 9.3 Reproducibility
 
