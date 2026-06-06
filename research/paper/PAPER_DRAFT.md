@@ -1629,6 +1629,12 @@ search.
   of work whose *technique* we transplant. Throughout, the verified object is a control-system dynamics
   model, never an LLM memory core; these results support, rather than break, the claim that the
   memory-core application is the un-met corner.
+- **SpectralGuard (arXiv:2603.12414, 2026)** monitors the spectral radius of a state-space model's
+  discretized transition operator at inference time to detect memory-collapse attacks, with an
+  evasion-existence theorem showing output-only defenses are insufficient. It shares our premise — the
+  internal spectral dynamics of a memory core are the security-relevant surface — but is post-hoc
+  monitoring of a deployed model, not a sound admission gate on updates; we cite it as independent
+  motivation for guarding the internal dynamics rather than the outputs.
 
 *(Audit provenance: the differentiation audit (44 candidates over 7 + 3 adversarial angles) returned
 0 results breaking the four-point intersection, 36 narrowing an over-broad claim, and 8 background; the
