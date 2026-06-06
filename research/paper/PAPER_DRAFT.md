@@ -1197,7 +1197,10 @@ All runs are deterministic and CPU-only; the certifier path is float64, full sto
   | Navigability cross-check (other side) | `../verifier_navigability_gpu/NAVIGABILITY_GPU_VERDICT.md` | inf trap is EA-specific; gradient training avoids it | VERDICT.md §3c-ii |
   | Codex pair-review (read-only) | `CODEX_PAIRREVIEW_L3.md` | 16 findings, none overturn the result | VERDICT.md §4.5 |
   | Cost-reduction PoCs (CPU, $0) | `poc_l2lite.py` → `poc_l2lite_results.json`; `poc_l2lite_v2.py` → `poc_l2lite_v2_results.json` | PoC-1: 0 violations, 60×/980×/12,520× at n=8/12/16, B1 admits 29.5%; PoC-2: B2 77.6%, inf∪B2 87.2%, 0 violations | SKETCH.md PoC-1 / PoC-2 |
-  | Kaggle GPU cross-check (BG10) | `bg10_kaggle.py` | pending / external | VERDICT.md §5 |
+  | Kaggle GPU cross-check (BG10) | `bg10_kaggle.py` | complete: 8-seed T4 full run reproduces all CPU gate conclusions | NAVIGABILITY_GPU_VERDICT.md |
+  | HD-1 high-dim unrestricted (GPU) | `research/highdim_evolution/hd1_highdim_evo.py` → `result_hd1_feasibility.json`, `result_hd1_full.json`, `result_hd1_full_null.json` | GRAD none unsound 19/20, ρ 1.07→1.95; null ρ→2.61 at unigram ceiling; gate cost 0.03–0.12 | highdim_evolution/README.md (§7.2) |
+  | Stage-B real Transformer (GPU) | `research/rllm_stage_b/stage_b_kernel.py` → `result_stageb_feasibility.json`, `result_stageb_full.json`, `result_stageb_full_null.json` | B-G1 PASS 4/4 (−0.034/−0.072); B-G2 expressivity (Δf +0.028/+0.058); B-G4 post-hoc 17–19× | rllm_stage_b/README.md + PREREGISTRATION_STAGE_B.md (§7.4) |
+  | Stage-B pre-run red-team | 3-lens adversarial review (soundness / design / torch) | 5 majors fixed pre-push (float32 sigmoid saturation; RNG-stream confound; cadence; floor; per-n rule) | PREREGISTRATION_STAGE_B.md §4 |
 
 Figure: reproduction-script dependency graph (substrate → certifiers → landscape/gated/null drivers →
 result JSON → verdict) (data: research/verified_lm_evolution/VERDICT.md, research/verifier_cost_reduction/SKETCH.md).
