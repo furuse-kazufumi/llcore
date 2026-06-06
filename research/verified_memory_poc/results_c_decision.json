@@ -1,0 +1,1623 @@
+{
+  "preregistration": {
+    "confirmatory_task": "copy_d8",
+    "alpha": 0.05,
+    "test": "sign-flip permutation, two-sided",
+    "n_resamples": 100000,
+    "perm_rng_seed": 7,
+    "seeds": [
+      2000,
+      2001,
+      2002,
+      2003,
+      2004,
+      2005,
+      2006,
+      2007,
+      2008,
+      2009,
+      2010,
+      2011,
+      2012,
+      2013,
+      2014,
+      2015,
+      2016,
+      2017,
+      2018,
+      2019
+    ],
+    "arms": [
+      "contraction",
+      "trajectory_tube"
+    ],
+    "inherits_config_from": "run_3arm_ab.py (GA_KW/DELAYS/W_BAR/R_MAX/readout)"
+  },
+  "config": {
+    "GA_KW": {
+      "pop_size": 20,
+      "n_generations": 20,
+      "tournament_k": 3,
+      "mutation_sigma": 0.15,
+      "crossover_rate": 0.5,
+      "elitism": 1,
+      "resample_cap": 50
+    },
+    "DELAYS": [
+      0,
+      4,
+      8
+    ],
+    "TRAIN_N_TRIALS": 5,
+    "TEST_N_TRIALS": 20,
+    "STATE_DIM": 8,
+    "W_BAR": 0.1,
+    "R_MAX": 0.05
+  },
+  "cells": {
+    "copy_d0": {
+      "baseline_mse": 0.4045723499573678,
+      "delay": 0,
+      "arms": {
+        "contraction": [
+          {
+            "seed": 2000,
+            "best_gene": [
+              0.4518335626110226,
+              0.14921750043880735,
+              -1.0725444288568073
+            ],
+            "train_best_fitness": 0.4819847228064497,
+            "test_best_fitness": 0.12674337507391942,
+            "n_rejections": 63,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2001,
+            "best_gene": [
+              0.3057679093280796,
+              0.32896147128090225,
+              -1.2033415177888596
+            ],
+            "train_best_fitness": 0.45985772122015034,
+            "test_best_fitness": 0.19285863774569448,
+            "n_rejections": 58,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2002,
+            "best_gene": [
+              0.22306327457547015,
+              0.17433032901105097,
+              0.09400541895953271
+            ],
+            "train_best_fitness": 0.48198477316291266,
+            "test_best_fitness": 0.1765715534936924,
+            "n_rejections": 30,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2003,
+            "best_gene": [
+              0.9712011893716118,
+              0.25401023363650055,
+              0.42792398870013976
+            ],
+            "train_best_fitness": 0.4983681513204822,
+            "test_best_fitness": 0.20076738551581225,
+            "n_rejections": 95,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2004,
+            "best_gene": [
+              0.6497202140886913,
+              -0.22965217844138106,
+              0.8447842051415043
+            ],
+            "train_best_fitness": 0.554815715245926,
+            "test_best_fitness": 0.15932593473986995,
+            "n_rejections": 55,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2005,
+            "best_gene": [
+              0.8108357571149983,
+              -0.46334862422777623,
+              0.6955102348990259
+            ],
+            "train_best_fitness": 0.5086178290903647,
+            "test_best_fitness": 0.249641659726859,
+            "n_rejections": 29,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2006,
+            "best_gene": [
+              0.6884542753819696,
+              0.22030891569812694,
+              -1.5844910271657855
+            ],
+            "train_best_fitness": 0.511812508953525,
+            "test_best_fitness": 0.2072692567490813,
+            "n_rejections": 26,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2007,
+            "best_gene": [
+              0.9222150473979505,
+              0.7606273176668832,
+              0.25392011386989655
+            ],
+            "train_best_fitness": 0.5175306245047497,
+            "test_best_fitness": 0.20471084992837113,
+            "n_rejections": 82,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2008,
+            "best_gene": [
+              0.7103212006755402,
+              0.791869947790619,
+              -1.8348887056786711
+            ],
+            "train_best_fitness": 0.44266671185981543,
+            "test_best_fitness": 0.15695177907060012,
+            "n_rejections": 33,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2009,
+            "best_gene": [
+              0.4716697624812094,
+              0.347059565500319,
+              -1.2558009890674047
+            ],
+            "train_best_fitness": 0.4806465494378431,
+            "test_best_fitness": 0.224617523627008,
+            "n_rejections": 40,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2010,
+            "best_gene": [
+              0.35056309093094234,
+              0.17646477509346833,
+              -0.07100594656836808
+            ],
+            "train_best_fitness": 0.4486992430423246,
+            "test_best_fitness": 0.2636873850290019,
+            "n_rejections": 18,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2011,
+            "best_gene": [
+              0.7801813447452804,
+              0.26226813714275987,
+              -2.0
+            ],
+            "train_best_fitness": 0.48203309737274325,
+            "test_best_fitness": 0.22096739753925707,
+            "n_rejections": 72,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2012,
+            "best_gene": [
+              0.960196478183715,
+              0.06831487182844476,
+              -1.602881597638752
+            ],
+            "train_best_fitness": 0.5007715563473718,
+            "test_best_fitness": 0.24709010859736596,
+            "n_rejections": 76,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2013,
+            "best_gene": [
+              0.8521475163039615,
+              -0.025368903045279195,
+              0.10437280255116124
+            ],
+            "train_best_fitness": 0.5019785962688483,
+            "test_best_fitness": 0.33491539569080364,
+            "n_rejections": 37,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2014,
+            "best_gene": [
+              0.7485810722486079,
+              0.1245263696827199,
+              -0.44287869065303687
+            ],
+            "train_best_fitness": 0.47387649437312784,
+            "test_best_fitness": 0.2314876011398268,
+            "n_rejections": 35,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2015,
+            "best_gene": [
+              0.6625406646351577,
+              -0.5226881219771549,
+              -0.1432558084795077
+            ],
+            "train_best_fitness": 0.5223274559728242,
+            "test_best_fitness": 0.18463318938727447,
+            "n_rejections": 31,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2016,
+            "best_gene": [
+              0.6779728180796605,
+              0.2215246978361448,
+              -0.7276847612118389
+            ],
+            "train_best_fitness": 0.4919359675780918,
+            "test_best_fitness": 0.19307737403540556,
+            "n_rejections": 24,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2017,
+            "best_gene": [
+              0.39816728775704935,
+              0.18406059533355834,
+              0.0862402118265283
+            ],
+            "train_best_fitness": 0.5335556832893728,
+            "test_best_fitness": 0.21515005923466762,
+            "n_rejections": 8,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2018,
+            "best_gene": [
+              0.7214582618106162,
+              -0.49331383626193015,
+              -0.6415105645009231
+            ],
+            "train_best_fitness": 0.4517113289617317,
+            "test_best_fitness": 0.28219814178059827,
+            "n_rejections": 55,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2019,
+            "best_gene": [
+              0.6717119695922752,
+              0.052414901348267685,
+              -0.6602067227073531
+            ],
+            "train_best_fitness": 0.4859064337717798,
+            "test_best_fitness": 0.17691438051839212,
+            "n_rejections": 33,
+            "fallback_count": 0
+          }
+        ],
+        "trajectory_tube": [
+          {
+            "seed": 2000,
+            "best_gene": [
+              0.738222784954168,
+              -0.06862901573361807,
+              -0.2378531679672226
+            ],
+            "train_best_fitness": 0.47113453992014714,
+            "test_best_fitness": 0.1175819137874035,
+            "n_rejections": 58,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2001,
+            "best_gene": [
+              0.1359491003878773,
+              0.038096759518675166,
+              0.29933881522863603
+            ],
+            "train_best_fitness": 0.5295685375175445,
+            "test_best_fitness": 0.2395156716532046,
+            "n_rejections": 112,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2002,
+            "best_gene": [
+              0.8110657270651965,
+              -0.3525398901453996,
+              -1.737009047698395
+            ],
+            "train_best_fitness": 0.5289022694363539,
+            "test_best_fitness": 0.1846893042679299,
+            "n_rejections": 145,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2003,
+            "best_gene": [
+              0.875618491071428,
+              0.5142426267634872,
+              -0.5374915030375742
+            ],
+            "train_best_fitness": 0.5305959771559274,
+            "test_best_fitness": 0.189005363634055,
+            "n_rejections": 155,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2004,
+            "best_gene": [
+              0.5413887177870872,
+              -0.01663436353747784,
+              -0.5755881039778529
+            ],
+            "train_best_fitness": 0.4738491826844228,
+            "test_best_fitness": 0.15758009115722854,
+            "n_rejections": 81,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2005,
+            "best_gene": [
+              0.8132654700321394,
+              0.14546352594461628,
+              -1.6319925490825604
+            ],
+            "train_best_fitness": 0.5217682635999623,
+            "test_best_fitness": 0.2568720085885732,
+            "n_rejections": 146,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2006,
+            "best_gene": [
+              0.7580107763910771,
+              -0.3050425292094647,
+              0.179843141326527
+            ],
+            "train_best_fitness": 0.48075717809694557,
+            "test_best_fitness": 0.1824351952215973,
+            "n_rejections": 113,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2007,
+            "best_gene": [
+              0.9222150473979505,
+              0.7606273176668832,
+              0.25392011386989655
+            ],
+            "train_best_fitness": 0.5175306245047497,
+            "test_best_fitness": 0.20471084992837113,
+            "n_rejections": 250,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2008,
+            "best_gene": [
+              0.7230033515077022,
+              0.3066713033239379,
+              -0.9136542838322507
+            ],
+            "train_best_fitness": 0.5068967305757215,
+            "test_best_fitness": 0.16150302601205951,
+            "n_rejections": 112,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2009,
+            "best_gene": [
+              0.7403298450814648,
+              0.5746741675680377,
+              -0.8566868260716511
+            ],
+            "train_best_fitness": 0.49240655734115624,
+            "test_best_fitness": 0.22356440878878256,
+            "n_rejections": 200,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2010,
+            "best_gene": [
+              0.20812081187787967,
+              -0.047503559316536464,
+              0.06629377318442338
+            ],
+            "train_best_fitness": 0.4776845061949097,
+            "test_best_fitness": 0.2591428501421245,
+            "n_rejections": 106,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2011,
+            "best_gene": [
+              0.7181955997203737,
+              -0.1761273829507395,
+              -1.6870210397199368
+            ],
+            "train_best_fitness": 0.4807686403914869,
+            "test_best_fitness": 0.20636350525220135,
+            "n_rejections": 139,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2012,
+            "best_gene": [
+              0.41923004361937005,
+              0.1717326843437725,
+              0.5095992399893767
+            ],
+            "train_best_fitness": 0.5691007773204306,
+            "test_best_fitness": 0.2389842852215282,
+            "n_rejections": 135,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2013,
+            "best_gene": [
+              0.35834044817328264,
+              0.3485076800175305,
+              -0.9113704716549085
+            ],
+            "train_best_fitness": 0.540230301381933,
+            "test_best_fitness": 0.35629446247251984,
+            "n_rejections": 111,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2014,
+            "best_gene": [
+              0.6251749855025189,
+              -0.2828036883495154,
+              -1.0764914524789955
+            ],
+            "train_best_fitness": 0.5873494899465903,
+            "test_best_fitness": 0.20825584497062416,
+            "n_rejections": 59,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2015,
+            "best_gene": [
+              0.6625406646351577,
+              -0.5226881219771549,
+              -0.1432558084795077
+            ],
+            "train_best_fitness": 0.5223274559728242,
+            "test_best_fitness": 0.18463318938727447,
+            "n_rejections": 140,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2016,
+            "best_gene": [
+              0.8557219657958661,
+              0.3376610965944684,
+              -0.5761386448634849
+            ],
+            "train_best_fitness": 0.49398430618120004,
+            "test_best_fitness": 0.19170248176920207,
+            "n_rejections": 105,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2017,
+            "best_gene": [
+              0.18145708881082165,
+              -0.18036783255364155,
+              -0.27148821414129004
+            ],
+            "train_best_fitness": 0.44851352715568976,
+            "test_best_fitness": 0.20291235407091895,
+            "n_rejections": 69,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2018,
+            "best_gene": [
+              0.5889618902762203,
+              0.0859242839042284,
+              -0.7327467575083091
+            ],
+            "train_best_fitness": 0.5056614228876727,
+            "test_best_fitness": 0.2942730766354537,
+            "n_rejections": 110,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2019,
+            "best_gene": [
+              0.8291843247104465,
+              0.2879893291317689,
+              0.20486960709484592
+            ],
+            "train_best_fitness": 0.4894428060256509,
+            "test_best_fitness": 0.18534705509235327,
+            "n_rejections": 153,
+            "fallback_count": 0
+          }
+        ]
+      }
+    },
+    "copy_d4": {
+      "baseline_mse": 0.39448163027767236,
+      "delay": 4,
+      "arms": {
+        "contraction": [
+          {
+            "seed": 2000,
+            "best_gene": [
+              0.35814663796406926,
+              -0.2205611908284881,
+              -0.40444842486803406
+            ],
+            "train_best_fitness": 0.5234814777597446,
+            "test_best_fitness": 0.22379843702017616,
+            "n_rejections": 65,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2001,
+            "best_gene": [
+              0.3672773943664618,
+              -0.20002573898175574,
+              -0.5537709128889663
+            ],
+            "train_best_fitness": 0.4908034307273007,
+            "test_best_fitness": 0.13204150922165786,
+            "n_rejections": 36,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2002,
+            "best_gene": [
+              0.2080832217107279,
+              -0.07302635301513437,
+              0.4895532059697777
+            ],
+            "train_best_fitness": 0.4868776440234095,
+            "test_best_fitness": 0.2162112357846017,
+            "n_rejections": 21,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2003,
+            "best_gene": [
+              0.49415148638688966,
+              -0.07807161559866654,
+              -0.6115897733154347
+            ],
+            "train_best_fitness": 0.48482416311080045,
+            "test_best_fitness": 0.21437909496746005,
+            "n_rejections": 19,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2004,
+            "best_gene": [
+              0.5891272666938149,
+              0.5853613857783467,
+              0.7201734589630382
+            ],
+            "train_best_fitness": 0.5300567536903903,
+            "test_best_fitness": 0.1478147457713031,
+            "n_rejections": 20,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2005,
+            "best_gene": [
+              0.5632728282818487,
+              0.13216465064952107,
+              -0.0482115108532902
+            ],
+            "train_best_fitness": 0.43857075557168745,
+            "test_best_fitness": 0.2264282398175445,
+            "n_rejections": 21,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2006,
+            "best_gene": [
+              0.6452496060401701,
+              0.7443575679793419,
+              -0.8259602109456585
+            ],
+            "train_best_fitness": 0.5283112421909454,
+            "test_best_fitness": 0.17594359214338823,
+            "n_rejections": 47,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2007,
+            "best_gene": [
+              0.7938778267554728,
+              0.5080092754727301,
+              0.04501419929292985
+            ],
+            "train_best_fitness": 0.4421112671104083,
+            "test_best_fitness": 0.1704015420980643,
+            "n_rejections": 52,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2008,
+            "best_gene": [
+              0.9616288749622538,
+              0.49203318726261785,
+              -1.5976761167609468
+            ],
+            "train_best_fitness": 0.5077154796427633,
+            "test_best_fitness": 0.2011198724980528,
+            "n_rejections": 67,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2009,
+            "best_gene": [
+              0.2945325757893949,
+              0.32205540446088915,
+              -0.9446332180144242
+            ],
+            "train_best_fitness": 0.45876112717844403,
+            "test_best_fitness": 0.22600333742934456,
+            "n_rejections": 12,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2010,
+            "best_gene": [
+              0.7639523147663985,
+              0.45371671284314896,
+              0.10580603879581954
+            ],
+            "train_best_fitness": 0.44393392582704705,
+            "test_best_fitness": 0.12967755474042514,
+            "n_rejections": 56,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2011,
+            "best_gene": [
+              0.5632068195677125,
+              0.5745485186750534,
+              -1.0949222601811064
+            ],
+            "train_best_fitness": 0.503194973276713,
+            "test_best_fitness": 0.27242562255139935,
+            "n_rejections": 49,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2012,
+            "best_gene": [
+              0.4217998570075068,
+              0.6288584874636144,
+              -0.2411785598323219
+            ],
+            "train_best_fitness": 0.5196582594127108,
+            "test_best_fitness": 0.21967257728470324,
+            "n_rejections": 23,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2013,
+            "best_gene": [
+              0.6012088571774203,
+              -0.04274734268034336,
+              -0.24737844322052283
+            ],
+            "train_best_fitness": 0.5516816369958237,
+            "test_best_fitness": 0.1348440557144687,
+            "n_rejections": 32,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2014,
+            "best_gene": [
+              0.6638654769026454,
+              0.5317657809073364,
+              0.679241932058154
+            ],
+            "train_best_fitness": 0.4679603113390927,
+            "test_best_fitness": 0.31030486450267125,
+            "n_rejections": 45,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2015,
+            "best_gene": [
+              0.8261240046513274,
+              0.08978677463947957,
+              0.33005840991273205
+            ],
+            "train_best_fitness": 0.5141897183237129,
+            "test_best_fitness": 0.24510659847231242,
+            "n_rejections": 92,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2016,
+            "best_gene": [
+              0.457763752904896,
+              0.581897456733929,
+              0.16830242131008655
+            ],
+            "train_best_fitness": 0.4886312763173336,
+            "test_best_fitness": 0.08623226964156942,
+            "n_rejections": 17,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2017,
+            "best_gene": [
+              0.41654546643122464,
+              0.08821602243655478,
+              -0.3174737273651746
+            ],
+            "train_best_fitness": 0.493136942384173,
+            "test_best_fitness": 0.23537311370446634,
+            "n_rejections": 13,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2018,
+            "best_gene": [
+              0.4467119628802963,
+              0.7700321690401889,
+              -1.5702677290775786
+            ],
+            "train_best_fitness": 0.4566104687641143,
+            "test_best_fitness": 0.15326037304670065,
+            "n_rejections": 55,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2019,
+            "best_gene": [
+              0.6950532032102911,
+              0.05131981094107138,
+              -0.4742062586299072
+            ],
+            "train_best_fitness": 0.45548484360510333,
+            "test_best_fitness": 0.12398375267481432,
+            "n_rejections": 22,
+            "fallback_count": 0
+          }
+        ],
+        "trajectory_tube": [
+          {
+            "seed": 2000,
+            "best_gene": [
+              0.8628672572583964,
+              0.21632664520471792,
+              -2.0
+            ],
+            "train_best_fitness": 0.4248111243283651,
+            "test_best_fitness": 0.22171284527874047,
+            "n_rejections": 120,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2001,
+            "best_gene": [
+              0.898403320073264,
+              0.4024071277187754,
+              -0.5446283571024494
+            ],
+            "train_best_fitness": 0.47412646062530583,
+            "test_best_fitness": 0.12784748850822567,
+            "n_rejections": 74,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2002,
+            "best_gene": [
+              0.8287025391662046,
+              -0.029942934780540997,
+              -1.4402665769374303
+            ],
+            "train_best_fitness": 0.4638809049575336,
+            "test_best_fitness": 0.21518988873505465,
+            "n_rejections": 109,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2003,
+            "best_gene": [
+              0.30240652453561456,
+              -0.16739722950249905,
+              -0.21502602861079964
+            ],
+            "train_best_fitness": 0.4270618964265419,
+            "test_best_fitness": 0.18893436710936226,
+            "n_rejections": 105,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2004,
+            "best_gene": [
+              0.29948322946221456,
+              0.08942967921603132,
+              -1.2573693110176416
+            ],
+            "train_best_fitness": 0.5208520308481244,
+            "test_best_fitness": 0.19130154976641925,
+            "n_rejections": 154,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2005,
+            "best_gene": [
+              0.6369862750267814,
+              -0.186278833130405,
+              -0.48791032763416
+            ],
+            "train_best_fitness": 0.512926926362821,
+            "test_best_fitness": 0.22479902030425764,
+            "n_rejections": 115,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2006,
+            "best_gene": [
+              0.43658351031542586,
+              -0.24375712482088752,
+              -0.36603903385697734
+            ],
+            "train_best_fitness": 0.5891191346896166,
+            "test_best_fitness": 0.2289172784172587,
+            "n_rejections": 139,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2007,
+            "best_gene": [
+              0.6044294085684567,
+              -0.02585156536618577,
+              -1.3866954459255716
+            ],
+            "train_best_fitness": 0.5126925511426604,
+            "test_best_fitness": 0.2037150435795378,
+            "n_rejections": 122,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2008,
+            "best_gene": [
+              0.6257462791024042,
+              -0.2243229818720497,
+              -1.4192771443046925
+            ],
+            "train_best_fitness": 0.4536117055509906,
+            "test_best_fitness": 0.19122725330550075,
+            "n_rejections": 111,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2009,
+            "best_gene": [
+              0.7063430050699134,
+              -0.2695482661340275,
+              -2.0
+            ],
+            "train_best_fitness": 0.49986991901922534,
+            "test_best_fitness": 0.2199456774864749,
+            "n_rejections": 86,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2010,
+            "best_gene": [
+              0.6539780818128673,
+              0.2112334324565256,
+              -0.47899168479591553
+            ],
+            "train_best_fitness": 0.5066512109488438,
+            "test_best_fitness": 0.1337351995031343,
+            "n_rejections": 72,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2011,
+            "best_gene": [
+              0.24442002915224825,
+              -0.031071085469811088,
+              -0.1935766759300038
+            ],
+            "train_best_fitness": 0.45343278874321624,
+            "test_best_fitness": 0.2852238425998658,
+            "n_rejections": 120,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2012,
+            "best_gene": [
+              0.7316311723067799,
+              0.09554023194113886,
+              0.2840860645666539
+            ],
+            "train_best_fitness": 0.5275842474732443,
+            "test_best_fitness": 0.2551470776387518,
+            "n_rejections": 141,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2013,
+            "best_gene": [
+              0.85067390591823,
+              -0.4352771728356931,
+              -0.8628094757148248
+            ],
+            "train_best_fitness": 0.5005890943299927,
+            "test_best_fitness": 0.12388770820291088,
+            "n_rejections": 99,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2014,
+            "best_gene": [
+              0.4655991698655672,
+              0.02973182907077998,
+              -0.7555586309221963
+            ],
+            "train_best_fitness": 0.47037820350374576,
+            "test_best_fitness": 0.3238540387086015,
+            "n_rejections": 126,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2015,
+            "best_gene": [
+              0.995567181115562,
+              -0.18225503214503386,
+              -0.9183424869482922
+            ],
+            "train_best_fitness": 0.4861306733928791,
+            "test_best_fitness": 0.24097066606022274,
+            "n_rejections": 204,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2016,
+            "best_gene": [
+              0.3844288973710576,
+              -0.5046283230887693,
+              -0.03771567857449276
+            ],
+            "train_best_fitness": 0.5219532937738156,
+            "test_best_fitness": 0.06869004133449734,
+            "n_rejections": 174,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2017,
+            "best_gene": [
+              0.7075869783745385,
+              0.2330233061343156,
+              0.07738815757966686
+            ],
+            "train_best_fitness": 0.4313726934725345,
+            "test_best_fitness": 0.23632851588964549,
+            "n_rejections": 79,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2018,
+            "best_gene": [
+              0.28690324315675964,
+              -0.0718302654773251,
+              -1.5850401203923932
+            ],
+            "train_best_fitness": 0.49015295324174957,
+            "test_best_fitness": 0.22830280375462403,
+            "n_rejections": 213,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2019,
+            "best_gene": [
+              0.1404304920950192,
+              -0.11460752898326987,
+              -0.054258897463930374
+            ],
+            "train_best_fitness": 0.4396727840302848,
+            "test_best_fitness": 0.13170824873891998,
+            "n_rejections": 127,
+            "fallback_count": 0
+          }
+        ]
+      }
+    },
+    "copy_d8": {
+      "baseline_mse": 0.37006042254377614,
+      "delay": 8,
+      "arms": {
+        "contraction": [
+          {
+            "seed": 2000,
+            "best_gene": [
+              0.9374053819647917,
+              -0.08147112774226357,
+              -1.1185106029476106
+            ],
+            "train_best_fitness": 0.4388649509084079,
+            "test_best_fitness": 0.21355031587360157,
+            "n_rejections": 56,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2001,
+            "best_gene": [
+              0.7459934066368896,
+              -0.5679417157144595,
+              -1.5391414129127425
+            ],
+            "train_best_fitness": 0.41710372128324036,
+            "test_best_fitness": 0.2015769748614821,
+            "n_rejections": 38,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2002,
+            "best_gene": [
+              0.33690235172265226,
+              -0.3782802294221952,
+              0.17826500197996065
+            ],
+            "train_best_fitness": 0.49060745034963416,
+            "test_best_fitness": 0.2276745322733626,
+            "n_rejections": 27,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2003,
+            "best_gene": [
+              0.6597592560720784,
+              0.9928961764021665,
+              -1.3009387079968915
+            ],
+            "train_best_fitness": 0.40448460736803016,
+            "test_best_fitness": 0.15305039283673452,
+            "n_rejections": 66,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2004,
+            "best_gene": [
+              0.6372109121774524,
+              1.0,
+              -1.5447909628035974
+            ],
+            "train_best_fitness": 0.42940445162566016,
+            "test_best_fitness": 0.07368213370494417,
+            "n_rejections": 37,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2005,
+            "best_gene": [
+              0.7176182944158008,
+              0.10190107435274409,
+              -1.2832882384356523
+            ],
+            "train_best_fitness": 0.4799031110484144,
+            "test_best_fitness": 0.13496755385240122,
+            "n_rejections": 43,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2006,
+            "best_gene": [
+              0.2975724181589836,
+              -0.3435875080948246,
+              -1.792360983624783
+            ],
+            "train_best_fitness": 0.44830741322264567,
+            "test_best_fitness": 0.13913275287284682,
+            "n_rejections": 59,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2007,
+            "best_gene": [
+              0.6231991871597353,
+              -0.9598464130439373,
+              -0.4966150893322323
+            ],
+            "train_best_fitness": 0.4695943317409113,
+            "test_best_fitness": 0.05015095029107106,
+            "n_rejections": 36,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2008,
+            "best_gene": [
+              0.6294815540487368,
+              0.08534055287975348,
+              -1.3863762763130125
+            ],
+            "train_best_fitness": 0.4820922525657407,
+            "test_best_fitness": 0.20254564704013975,
+            "n_rejections": 40,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2009,
+            "best_gene": [
+              0.6431186258931803,
+              0.44318492208779275,
+              0.3675763383347148
+            ],
+            "train_best_fitness": 0.4017085046151271,
+            "test_best_fitness": 0.15481701230987327,
+            "n_rejections": 20,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2010,
+            "best_gene": [
+              0.4969055827769148,
+              -1.0,
+              -0.9410031879452679
+            ],
+            "train_best_fitness": 0.4100460625744592,
+            "test_best_fitness": 0.09884822122006862,
+            "n_rejections": 18,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2011,
+            "best_gene": [
+              0.8909373294850488,
+              0.8623661988143501,
+              -1.4922444792603395
+            ],
+            "train_best_fitness": 0.46690668822897374,
+            "test_best_fitness": 0.1476390078655924,
+            "n_rejections": 46,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2012,
+            "best_gene": [
+              0.49920685223327593,
+              -0.3473878385900144,
+              -0.4040314472077947
+            ],
+            "train_best_fitness": 0.4080111163462898,
+            "test_best_fitness": 0.10908942579082517,
+            "n_rejections": 21,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2013,
+            "best_gene": [
+              0.7402940663810207,
+              -0.04417214062189716,
+              -1.182059920441657
+            ],
+            "train_best_fitness": 0.3922547002788842,
+            "test_best_fitness": 0.1708041055057655,
+            "n_rejections": 59,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2014,
+            "best_gene": [
+              0.24480935661532996,
+              -0.08839843461362736,
+              -0.6075092674882874
+            ],
+            "train_best_fitness": 0.4332628905840245,
+            "test_best_fitness": 0.09534312090675756,
+            "n_rejections": 16,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2015,
+            "best_gene": [
+              0.9385237082388843,
+              0.6622252324516025,
+              -0.25593106700127544
+            ],
+            "train_best_fitness": 0.4529758113662174,
+            "test_best_fitness": 0.20720494494938496,
+            "n_rejections": 40,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2016,
+            "best_gene": [
+              0.48184996555700715,
+              0.23867293853676896,
+              0.015033211722723785
+            ],
+            "train_best_fitness": 0.37745415863638887,
+            "test_best_fitness": 0.22955986448769233,
+            "n_rejections": 20,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2017,
+            "best_gene": [
+              0.7820928277780127,
+              -0.3502189875581946,
+              -1.1349520136306395
+            ],
+            "train_best_fitness": 0.45939037733221977,
+            "test_best_fitness": 0.20785069004037182,
+            "n_rejections": 35,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2018,
+            "best_gene": [
+              0.5304221621913655,
+              0.04659677536365589,
+              -0.016417804427298732
+            ],
+            "train_best_fitness": 0.4182620504026023,
+            "test_best_fitness": 0.11900471680448037,
+            "n_rejections": 45,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2019,
+            "best_gene": [
+              0.9231681315307871,
+              -0.010074598343744245,
+              -0.32658786426863806
+            ],
+            "train_best_fitness": 0.4194139926151557,
+            "test_best_fitness": 0.049056196771068115,
+            "n_rejections": 19,
+            "fallback_count": 0
+          }
+        ],
+        "trajectory_tube": [
+          {
+            "seed": 2000,
+            "best_gene": [
+              0.5971553476034537,
+              0.3608622771611368,
+              -0.6727391993689192
+            ],
+            "train_best_fitness": 0.49870511190386074,
+            "test_best_fitness": 0.21548947649471817,
+            "n_rejections": 101,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2001,
+            "best_gene": [
+              0.0,
+              -0.09709481132999659,
+              -0.6579768765941229
+            ],
+            "train_best_fitness": 0.479379911127053,
+            "test_best_fitness": 0.19571035886234825,
+            "n_rejections": 80,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2002,
+            "best_gene": [
+              0.5204735201667862,
+              0.323559385282569,
+              -1.6682773246402687
+            ],
+            "train_best_fitness": 0.4842426632622347,
+            "test_best_fitness": 0.2879239360447976,
+            "n_rejections": 104,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2003,
+            "best_gene": [
+              0.7643585153349869,
+              0.18222442926082505,
+              -0.958018686777296
+            ],
+            "train_best_fitness": 0.47665882079347294,
+            "test_best_fitness": 0.16449149076392344,
+            "n_rejections": 136,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2004,
+            "best_gene": [
+              0.973771490793854,
+              -0.09724230110143961,
+              -0.9185567927485917
+            ],
+            "train_best_fitness": 0.4208420962953753,
+            "test_best_fitness": 0.11631727505421208,
+            "n_rejections": 99,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2005,
+            "best_gene": [
+              0.5390358746433963,
+              0.03517211690815056,
+              -0.37983156968139997
+            ],
+            "train_best_fitness": 0.4193254859415808,
+            "test_best_fitness": 0.13494520611129843,
+            "n_rejections": 103,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2006,
+            "best_gene": [
+              0.6058427703472686,
+              0.04188515714885491,
+              -1.6905759689215947
+            ],
+            "train_best_fitness": 0.4221600373871657,
+            "test_best_fitness": 0.15858662038473118,
+            "n_rejections": 143,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2007,
+            "best_gene": [
+              0.22540072006944167,
+              0.16855628099480008,
+              -0.919050993634505
+            ],
+            "train_best_fitness": 0.40973290645921023,
+            "test_best_fitness": 0.14068882194432003,
+            "n_rejections": 141,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2008,
+            "best_gene": [
+              0.7081846253908918,
+              0.16894222171203505,
+              -0.3965059583911872
+            ],
+            "train_best_fitness": 0.41064559805294804,
+            "test_best_fitness": 0.20278493681703597,
+            "n_rejections": 113,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2009,
+            "best_gene": [
+              0.29467427243705,
+              -0.02495924878918051,
+              0.6141434348875705
+            ],
+            "train_best_fitness": 0.48675316046284645,
+            "test_best_fitness": 0.190702600463503,
+            "n_rejections": 117,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2010,
+            "best_gene": [
+              0.8081623515622911,
+              0.4628036389467362,
+              -0.21243461267101998
+            ],
+            "train_best_fitness": 0.38558395293808234,
+            "test_best_fitness": 0.10772045396795953,
+            "n_rejections": 136,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2011,
+            "best_gene": [
+              0.38600969806186636,
+              -0.08812111358281516,
+              -0.6907133916996615
+            ],
+            "train_best_fitness": 0.4973370434519831,
+            "test_best_fitness": 0.13881835835472714,
+            "n_rejections": 118,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2012,
+            "best_gene": [
+              0.6453957338253784,
+              -0.07535015275367203,
+              -0.7408955156851801
+            ],
+            "train_best_fitness": 0.4443970596589589,
+            "test_best_fitness": 0.10973174585411574,
+            "n_rejections": 82,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2013,
+            "best_gene": [
+              0.7778711869225974,
+              0.12234929750425852,
+              -0.575771496126785
+            ],
+            "train_best_fitness": 0.4092749352320064,
+            "test_best_fitness": 0.1725071759448994,
+            "n_rejections": 116,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2014,
+            "best_gene": [
+              0.39543061357640275,
+              -0.1659279040740925,
+              -1.2214735413852682
+            ],
+            "train_best_fitness": 0.395326265285164,
+            "test_best_fitness": 0.09536828820210017,
+            "n_rejections": 53,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2015,
+            "best_gene": [
+              0.9231144155019376,
+              -0.2397485330960162,
+              -0.927156795324631
+            ],
+            "train_best_fitness": 0.4712223276487747,
+            "test_best_fitness": 0.2319671940825064,
+            "n_rejections": 189,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2016,
+            "best_gene": [
+              0.6091121949354178,
+              -0.05229991819799647,
+              -0.9189195079384488
+            ],
+            "train_best_fitness": 0.3806962462699281,
+            "test_best_fitness": 0.24163034773768746,
+            "n_rejections": 123,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2017,
+            "best_gene": [
+              0.7450279735653217,
+              0.104842264553905,
+              -1.1868747404206654
+            ],
+            "train_best_fitness": 0.44300623118610966,
+            "test_best_fitness": 0.22501020875010522,
+            "n_rejections": 77,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2018,
+            "best_gene": [
+              0.5138314145609864,
+              0.02233494673037667,
+              0.17830741359117144
+            ],
+            "train_best_fitness": 0.45152486877253095,
+            "test_best_fitness": 0.11945178997649504,
+            "n_rejections": 105,
+            "fallback_count": 0
+          },
+          {
+            "seed": 2019,
+            "best_gene": [
+              0.0,
+              -0.1052599823130883,
+              -0.042508914785426455
+            ],
+            "train_best_fitness": 0.44596920289494585,
+            "test_best_fitness": 0.039776970999487696,
+            "n_rejections": 88,
+            "fallback_count": 0
+          }
+        ]
+      }
+    }
+  },
+  "stats": {
+    "copy_d0": {
+      "mean_delta_tube_minus_contraction": -0.00021060252850478648,
+      "std_delta": 0.015932459782193886,
+      "n_positive": 7,
+      "n_negative": 11,
+      "p_signflip_two_sided": 0.956750432495675,
+      "deltas_per_seed": {
+        "2000": -0.009161461286515918,
+        "2001": 0.04665703390751011,
+        "2002": 0.008117750774237487,
+        "2003": -0.011762021881757234,
+        "2004": -0.0017458435826414043,
+        "2005": 0.00723034886171417,
+        "2006": -0.02483406152748402,
+        "2007": 0.0,
+        "2008": 0.0045512469414593915,
+        "2009": -0.0010531148382254274,
+        "2010": -0.004544534886877394,
+        "2011": -0.01460389228705572,
+        "2012": -0.008105823375837762,
+        "2013": 0.021379066781716194,
+        "2014": -0.023231756169202644,
+        "2015": 0.0,
+        "2016": -0.0013748922662034924,
+        "2017": -0.012237705163748669,
+        "2018": 0.012074934854855446,
+        "2019": 0.008432674573961157
+      },
+      "role": "exploratory"
+    },
+    "copy_d4": {
+      "mean_delta_tube_minus_contraction": 0.009820808291844093,
+      "std_delta": 0.02559283543700663,
+      "n_positive": 10,
+      "n_negative": 10,
+      "p_signflip_two_sided": 0.1039589604103959,
+      "deltas_per_seed": {
+        "2000": -0.0020855917414356884,
+        "2001": -0.004194020713432195,
+        "2002": -0.001021347049547039,
+        "2003": -0.025444727858097788,
+        "2004": 0.04348680399511615,
+        "2005": -0.0016292195132868725,
+        "2006": 0.052973686273870474,
+        "2007": 0.033313501481473495,
+        "2008": -0.009892619192552049,
+        "2009": -0.006057659942869664,
+        "2010": 0.004057644762709173,
+        "2011": 0.012798220048466424,
+        "2012": 0.03547450035404853,
+        "2013": -0.010956347511557815,
+        "2014": 0.01354917420593027,
+        "2015": -0.004135932412089677,
+        "2016": -0.017542228307072083,
+        "2017": 0.0009554021851791439,
+        "2018": 0.07504243070792338,
+        "2019": 0.007724496064105663
+      },
+      "role": "exploratory"
+    },
+    "copy_d8": {
+      "mean_delta_tube_minus_contraction": 0.0152037348276254,
+      "std_delta": 0.025294680169969653,
+      "n_positive": 16,
+      "n_negative": 4,
+      "p_signflip_two_sided": 0.0055699443005569945,
+      "deltas_per_seed": {
+        "2000": 0.001939160621116598,
+        "2001": -0.005866615999133851,
+        "2002": 0.060249403771435006,
+        "2003": 0.01144109792718892,
+        "2004": 0.04263514134926791,
+        "2005": -2.2347741102796137e-05,
+        "2006": 0.019453867511884354,
+        "2007": 0.09053787165324897,
+        "2008": 0.00023928977689621767,
+        "2009": 0.035885588153629744,
+        "2010": 0.00887223274789091,
+        "2011": -0.008820649510865253,
+        "2012": 0.000642320063290569,
+        "2013": 0.0017030704391338969,
+        "2014": 2.516729534260409e-05,
+        "2015": 0.024762249133121444,
+        "2016": 0.012070483249995129,
+        "2017": 0.017159518709733396,
+        "2018": 0.00044707317201467256,
+        "2019": -0.00927922577158042
+      },
+      "role": "confirmatory"
+    }
+  },
+  "verdict_c": "H1 supported: tube gate shows a statistically detectable fitness advantage on the longest memory horizon (d8)",
+  "wall_seconds": 265.54
+}
