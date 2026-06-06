@@ -57,6 +57,8 @@ __all__ = [
     "FalsificationResult",
     "FitnessFunc",
     "FitnessFuncG",
+    "GateMode",
+    "GateStats",
     "GeneT",
     "equal_budget",
     "evolution_vs_random",
