@@ -32,7 +32,9 @@ recurrent core as its **only long-range memory path**:
 
 **Model (StageBLM):** char-level LM. emb(d) + learned pos-emb → 2 × pre-LN Transformer blocks
 (4-head softmax attention with **causal sliding window w_att=8**, FFN 4d) → recurrent verified channel
-`xc=tanh(U h)`, `s_t = decay⊙s_{t-1} + (1−decay)⊙tanh(W s_{t-1} + xc_t)`, `h ← LN(h + P s)` → readout.
+`xc=tanh(U h)`, `s_t = decay⊙s_{t-1} + (1−decay)⊙tanh(W s_{t-1} + xc_t)`, adds into the residual
+stream `h ← h + P s`, then a **single final LayerNorm `ln_f`** → readout (i.e. `readout(LN(h + P s))`;
+`pure` shares the same `ln_f`, so the final LN is condition-symmetric).
 Context T=160 ≫ stacked receptive field (≈ 2·(8−1)+1 = 15), so **information beyond ~15 chars can flow
 ONLY through the core's state s** — the memory channel is load-bearing by construction.
 `pure` = identical minus the U/P/core channel (param counts recorded; not param-matched — disclosed).
