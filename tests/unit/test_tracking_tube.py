@@ -143,9 +143,8 @@ def test_scalar_noncontract_gene_infinite_tube() -> None:
     assert r.tube_radius == float("inf")
 
 
-def test_scalar_tube_consistent_with_infnorm_backend() -> None:
-    """[iii] tube の contraction_ok は InfNormBackend.certifies と整合 (同一判定)."""
-    backend = InfNormBackend()
+def test_scalar_contraction_ok_iff_L_lt_one() -> None:
+    """[iii] tube の contraction_ok は cert_inf 基準 L<1 と同値 (scalar gene)."""
     for g in [
         StateUpdateGene(0.9, 0.5, 0.0),
         StateUpdateGene(0.5, 0.5, 0.5),
@@ -153,12 +152,20 @@ def test_scalar_tube_consistent_with_infnorm_backend() -> None:
         StateUpdateGene(0.95, 0.3, 0.1),
     ]:
         r = tracking_tube(g, w_bar=0.05)
-        # InfNormBackend は scalar gene の W (= gate_str) を読めないため、
-        # ここでは tube reporter の contraction_ok 内部判定の整合のみを確認する。
-        # (reporter は InfNormBackend を scalar 持ち上げ gene に対し呼ぶ)
         assert isinstance(r.contraction_ok, bool)
-        # L<1 ⟺ contraction_ok。
         assert r.contraction_ok == (r.L_state < 1.0)
+
+
+def test_coupled_contraction_ok_matches_infnorm_backend() -> None:
+    """[iii] coupled gene では contraction_ok が InfNormBackend.certifies と一致.
+
+    coupled gene は ``W`` を持つため backend が正しく読める。tube reporter の
+    cert_inf 基準 (L<1) は InfNormBackend の判定基準と厳密同一であることを確認する。
+    """
+    backend = InfNormBackend()
+    for g in (_CASE_A, _CASE_B, _CASE_C, _CASE_D):
+        r = tracking_tube(g, w_bar=0.05)
+        assert r.contraction_ok == bool(backend.certifies(g))
 
 
 # ---------------------------------------------------------------------------
