@@ -304,7 +304,6 @@ def run_m3_ga(fit, n, E, warm, rng, sigma, pop=16):
 def run_m4_mapelites(fit, n, E, warm, rng, sigma, desc, need_b2):
     archive = {}   # bin -> (fitness, genome)
     def place(g):
-        nonlocal_best = None
         f, shard = fit(g, need_b2=need_b2) if need_b2 else fit(g)
         b = bin_of(desc(g, shard))
         if b not in archive or f > archive[b][0]: archive[b] = (f, g)
