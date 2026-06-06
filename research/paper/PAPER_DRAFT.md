@@ -1645,9 +1645,12 @@ verification, with every cited primary source re-confirmed against its abstract)
 breaks** and surfaced the additional narrows incorporated above (the Scrivens pair, CART, RNN-SDP,
 alpha-beta-CROWN's Jacobian bounding, SpectralGuard, and the adaptive-RTA line); it also found **no
 follow-up implementation of SSGM** as of the lookup date, so the implementation window on the
-verified-memory-evolution corner (§9) remains open. The remaining known gap, carried as an honest
-limit: dedicated patent-database queries (USPTO/JPO/Google Patents) were not run — so "did not find"
-is bounded by that.)*
+verified-memory-evolution corner (§9) remains open. A dedicated patent lookup (Google Patents +
+USPTO full text; 14 English + 3 Japanese queries; every threat candidate's independent claim 1
+fetched and scored on a five-axis rubric) likewise returned **0 breaks** — no patent simultaneously
+claims a sound-proof update gate on a memory core's dynamics inside an evolution loop. The remaining
+honest bound on "did not find": the patent lookup was web-search-mediated rather than run on a
+professional database (Derwent/PatBase/J-PlatPat), and no lookup can prove absence.)*
 
 ## References (concepts invoked in the text)
 
