@@ -285,13 +285,16 @@ def run_m1_random(fit, n, E, warm, rng):
     return best, bg
 
 def run_m2_rr(fit, n, E, warm, rng, sigma):
+    """Warm-restart RR (red-team fix): restart = re-perturb the WARM core (3*sigma) instead of a
+    cold random genome — on the real landscape a cold restart is a liability, not the BG9
+    teleport; warm-restart keeps M2 the fair strong direct-sampling baseline."""
     R = max(1, E // 10)
     best, bg = -1e18, None
     cur = warm; fcur, _ = fit(cur); used = 1
     if fcur > best: best, bg = fcur, cur
     while used < E:
         if used % R == 0:
-            cur = sample_genome(n, rng); fcur, _ = fit(cur); used += 1
+            cur = mutate(warm, 3.0 * sigma, rng); fcur, _ = fit(cur); used += 1
             if fcur > best: best, bg = fcur, cur
             continue
         cand = mutate(cur, sigma, rng); f, _ = fit(cand); used += 1
