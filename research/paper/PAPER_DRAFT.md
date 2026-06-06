@@ -1240,7 +1240,7 @@ n=8/12/16 (60×/980×/12,520× speedup) (rendered: `research/paper_assets/fig_co
 poc_l2lite_results.json). The closed-form cert_inf is O(n²); cert_two/cert_sdp enumerate 2^n vertices,
 giving the n≈16 memory wall and n=32 infeasibility (CPU_MEMORY_EFFICIENCY_PLAN.md §1).*
 
-### 9.2 Honest-disclosure box
+### 10.2 Honest-disclosure box
 
 > **What survives, stated at full strength and no stronger (VERDICT.md §0, §3c, §4).**
 >
