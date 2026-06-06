@@ -330,7 +330,10 @@ def main():
                     except Exception as ex:
                         rec["status"] = "error"; rec["error"] = f"{type(ex).__name__}: {ex}"
                         _log("run", f"n={n} cond={cond} seed={seed} ERROR: {rec['error']}")
-                    rec["end_time"] = _now(); out["records"].append(rec); save()
+                    rec["end_time"] = _now()
+                    out["records"] = [r for r in out["records"]                # dedup stale errors
+                                      if (r["n"], r["cond"], r["seed"]) != (n, cond, seed)]
+                    out["records"].append(rec); save()
         out["meta"]["status"] = "done"
     except Exception as ex:
         out["meta"]["status"] = "fatal"
