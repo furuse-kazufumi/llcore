@@ -1173,7 +1173,7 @@ The following are the prior *concepts* this paper builds on. They are listed as 
 - **Semidefinite programming (SDP) / linear matrix inequalities (LMI)** — the convex feasibility problem solved (CLARABEL vs SCS solver behaviour near the feasibility boundary).
 - **Sum-of-squares (SOS) programming and Kronecker-power lifting** — the higher-degree (deg-4/6/8) Lyapunov ladder of §3.3.
 - **Joint spectral radius (JSR)** — switched-system expansiveness; the Gripenberg-style lower bound / SOS upper bracket used as the soundness oracle.
-- **Robust LMI / interval-matrix 2-norm / μ-analysis** — vertex-free routes for certifying over a box of system matrices (the R-LLM-1 / L2 target in §7).
+- **Robust LMI / interval-matrix 2-norm / μ-analysis** — vertex-free routes for certifying over a box of system matrices (the R-LLM-1 / L2 target in §8).
 - **Verified positive-definiteness (Rump-style verified numerics)** — machine-checked floating-point lower bounds on `λ_min` used in §3.2.
 - **Balanced truncation / Hankel singular values (model-order reduction)** — the `2^n → 2^r` exponent-reduction route (L3 in §7); noted as not directly transferable from LTI error bounds to the nonlinear `tanh` dynamics.
 - **Matrix-perturbation / spectral-norm monotonicity under nonnegative entrywise domination** — the soundness argument for the single-SVD bounds B1/B2 in §7.3.
