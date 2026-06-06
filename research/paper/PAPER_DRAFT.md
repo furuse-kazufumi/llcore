@@ -1340,7 +1340,7 @@ result JSON → verdict) (data: research/verified_lm_evolution/VERDICT.md, resea
 
 ### 10.4 The verified-evolution roadmap
 
-The limitations in §9.1 define the roadmap. Each item is named in the primary sources as the next step,
+The limitations in §10.1 define the roadmap. Each item is named in the primary sources as the next step,
 not as a completed result (item 2, GPU stage B, is now complete — §7).
 
 1. **R-LLM-1: vertex-free sound certifier (the real fix for the `2^n` wall).** Replace the `2^n`
