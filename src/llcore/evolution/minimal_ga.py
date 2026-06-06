@@ -202,6 +202,100 @@ FitnessFunc = Callable[[StateUpdateGene, np.random.Generator], float]
 FitnessFuncG = Callable[[GeneT, np.random.Generator], float]
 
 
+# ---------------------------------------------------------------------------
+# T1 Phase 1 (a): 証明ゲートの本配線 (additive / 後方互換)
+#
+# research/verified_evolution/gated_evolve.py の検問規律 (fail-closed resample +
+# known-safe fallback) を src 品質で evolve() に移植する。``gate_mode="none"`` (既定)
+# では一切ゲートを呼ばず追加 RNG draw も消費しない = 旧挙動 byte-identical。gated mode
+# では子個体生成のたびに証明し、不合格は resample、cap 到達で known-safe fallback。
+#
+# 設計の互換性:
+# - evolve() の新引数 ``gate_mode`` / ``resample_cap`` はデフォルトで現行挙動を完全保存。
+# - EvolutionResult に optional ``gate_stats`` フィールド (default None) を additive 追加。
+#   既存の keyword 構築 (gated_evolve.py / minimal_ga.py) は無改変で動作する。
+# - gate は scalar StateUpdateGene を対象に verify_gene_safe / verify_lipschitz_contraction
+#   を呼ぶ。これらは内部で gene.clipped() を通すため codec パスとも整合する。
+# ---------------------------------------------------------------------------
+
+
+# 証明ゲートのモード文字列 ("none" は無ゲート control = 旧挙動 byte-identical)。
+GateMode = str  # "none" | "state_norm" | "contraction"
+
+# Known-safe fallback gene: decay=0.5, mix=0.0, gate_str=0.0.
+# 閉形式 Lipschitz 上界 = max(|0.5|, |0.5 + 0.5*0.0|) = 0.5 < 1 (state-direction
+# contraction)、かつ convex combination で |s|<=1 (state_norm)。gated_evolve.py の
+# FALLBACK_GENE と同一値 (両実装の挙動一致を保つため)。
+_FALLBACK_GENE = StateUpdateGene(decay=0.5, mix=0.0, gate_str=0.0)
+
+
+def _gate_admits(gene: StateUpdateGene, mode: GateMode) -> bool:
+    """``gene`` が ``mode`` の証明ゲートに admit されるか (fail-closed).
+
+    research/verified_evolution/gated_evolve.py::_gate_admits と挙動一致。
+
+    Parameters
+    ----------
+    gene : StateUpdateGene
+        検査対象 gene (検証器が内部で clipped() を通す)。
+    mode : GateMode
+        - ``"none"``        — 無条件 admit (ゲート無効; 旧挙動)。
+        - ``"state_norm"``  — ``verify_gene_safe(gene).ok`` (Z3 |s|<=1 gate)。
+        - ``"contraction"`` — ``verify_lipschitz_contraction(gene).contraction is True``
+          (Z3 L<1 gate; fail-closed: hard True のみ admit)。
+
+    Returns
+    -------
+    bool
+        admit するなら True。
+
+    Raises
+    ------
+    ValueError
+        未知の ``mode`` (fail-loud: 黙って通さない)。
+    """
+    if mode == "none":
+        return True
+    # 遅延 import (import cycle 回避 + gate 無効時のオーバーヘッドゼロ)。
+    from llcore.verifier.invariants import (
+        verify_gene_safe,
+        verify_lipschitz_contraction,
+    )
+
+    if mode == "state_norm":
+        return bool(verify_gene_safe(gene).ok)
+    if mode == "contraction":
+        # fail-closed: Z3 unsat (certified) の hard True のみ admit。
+        # None (z3 不在) / False (sat / timeout) はすべて reject 側。
+        return verify_lipschitz_contraction(gene).contraction is True
+    raise ValueError(f"unknown gate_mode {mode!r}")
+
+
+@dataclass(frozen=True)
+class GateStats:
+    """証明ゲートの集計 (gated mode 時のみ ``EvolutionResult.gate_stats`` に格納).
+
+    Attributes
+    ----------
+    gate_mode : GateMode
+        使用したゲートモード。
+    n_rejections : int
+        ゲートに reject された子の総数 (全 resample を跨いで計上)。
+    n_resamples : int
+        reject 後に再生成した resample 試行の総数。
+    fallback_count : int
+        resample cap に達して known-safe fallback gene を採用した回数。
+    n_children_generated : int
+        集団に admit された (非 elite) 子の総数。
+    """
+
+    gate_mode: GateMode
+    n_rejections: int
+    n_resamples: int
+    fallback_count: int
+    n_children_generated: int
+
+
 def evaluate_population(
     genes: list[StateUpdateGene],
     fitness_func: FitnessFunc,
