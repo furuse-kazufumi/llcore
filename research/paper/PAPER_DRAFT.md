@@ -1445,7 +1445,7 @@ corpus (titles given verbatim; no author/year is fabricated).
   final CE) under gradient (§6).
 
 - **Adjacent concepts (named, not corpus-cited here):** cost-/hardware-aware neural architecture search
-  and Pareto multi-objective search (the L4 cost-as-selection idea, §9); balanced truncation / Hankel
+  and Pareto multi-objective search (the L4 cost-as-selection idea, §10); balanced truncation / Hankel
   model-order reduction and joint spectral radius / SOS-Lyapunov verification (the L3-MOR and R-LLM-1
   roadmap, §3, §8); active inference (the homeostasis framing). These motivate the roadmap but are not
   load-bearing for the measured results.
