@@ -357,6 +357,7 @@ def run_m4_mapelites(fit, n, E, warm, rng, sigma, desc, need_b2):
 def run_m5_grad(rf, model, E, seed, cfg):
     steps = max(1, E // 3)
     torch.manual_seed(seed + 11)
+    snap = (model.raw_decay.detach().clone(), model.raw_W.detach().clone())   # restore after (hardening)
     for p in model.parameters(): p.requires_grad_(False)
     model.raw_decay.requires_grad_(True); model.raw_W.requires_grad_(True)
     opt = torch.optim.Adam([model.raw_decay, model.raw_W], lr=cfg["lr"])
@@ -364,9 +365,15 @@ def run_m5_grad(rf, model, E, seed, cfg):
         decay = torch.sigmoid(model.raw_decay) * (1.0 - 2e-6) + 1e-6
         W = 2.0 * torch.tanh(model.raw_W)
         ce, loss = rf(None, grad_tensors=(decay, W))
-        opt.zero_grad(); loss.backward(); opt.step()
+        opt.zero_grad(); loss.backward()
+        if it == 0:
+            assert model.raw_W.grad is not None, "M5: autograd graph broken (raw_W.grad is None)"
+        opt.step()
     d_np, W_np = model.core_np()
     f, _ = rf((d_np, W_np))
+    with torch.no_grad():   # leave shared model at the warm baseline (red-team hardening)
+        model.raw_decay.copy_(snap[0]); model.raw_W.copy_(snap[1])
+        model.raw_decay.requires_grad_(False); model.raw_W.requires_grad_(False)
     return f, (d_np, W_np), steps
 
 
