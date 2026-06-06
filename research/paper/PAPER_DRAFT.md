@@ -1686,7 +1686,12 @@ verification, with every cited primary source re-confirmed against its abstract)
 breaks** and surfaced the additional narrows incorporated above (the Scrivens pair, CART, RNN-SDP,
 alpha-beta-CROWN's Jacobian bounding, SpectralGuard, and the adaptive-RTA line); it also found **no
 follow-up implementation of SSGM** as of the lookup date, so the implementation window on the
-verified-memory-evolution corner (§9) remains open. A dedicated patent lookup (Google Patents +
+verified-memory-evolution corner (§9) remains open. A third sweep over the memory-core
+stability-analysis neighborhood (four lineages: Hopfield/energy, attention-spectral, SSM,
+delta-rule/linear-RNN; ~25 unique primary-confirmed candidates) likewise returned **0 breaks** — every
+candidate lands as analysis, by-construction parameterization, or monitoring, never a
+prove-then-reject admission gate; the representatives are incorporated in the stability-analyses
+group above. A dedicated patent lookup (Google Patents +
 USPTO full text; 14 English + 3 Japanese queries; every threat candidate's independent claim 1
 fetched and scored on a five-axis rubric) likewise returned **0 breaks** — no patent simultaneously
 claims a sound-proof update gate on a memory core's dynamics inside an evolution loop. The remaining
