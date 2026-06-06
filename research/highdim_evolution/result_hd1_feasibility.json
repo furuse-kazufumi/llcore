@@ -1,0 +1,268 @@
+{
+  "meta": {
+    "experiment": "HD-1 high-dim unrestricted evolution",
+    "mode": "feasibility",
+    "null": false,
+    "device": "cuda",
+    "gpu": "Tesla T4",
+    "NS": [
+      8,
+      32,
+      64
+    ],
+    "gates": [
+      "none",
+      "inf"
+    ],
+    "n_seeds": 2,
+    "base_cfg": {
+      "layers": 1,
+      "d": 64,
+      "T": 64,
+      "B": 16,
+      "lr": 0.003,
+      "grad_steps": 150,
+      "evo_gens": 80,
+      "sigma": 0.12,
+      "eval_batches": 4,
+      "max_chars": 40000,
+      "cert_every": 4
+    },
+    "vocab": 58,
+    "unigram_ce": 3.251218422591336,
+    "start_time": "2026-06-05T23:56:43",
+    "end_time": "2026-06-05T23:58:30",
+    "status": "done",
+    "error": null
+  },
+  "records": [
+    {
+      "n": 8,
+      "gate": "none",
+      "seed": 1234,
+      "start_time": "2026-06-05T23:56:43",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.4606423377990723,
+        "grad_reject_rate": 0.0,
+        "grad_max_emp_rho": 0.8774441037954239,
+        "evo_ce": 2.5948078632354736,
+        "evo_admit_rate": 1.0,
+        "evo_max_emp_rho": 0.9185617775482655,
+        "grad_sound": true,
+        "evo_sound": true
+      },
+      "error": null,
+      "end_time": "2026-06-05T23:56:58"
+    },
+    {
+      "n": 8,
+      "gate": "none",
+      "seed": 1235,
+      "start_time": "2026-06-05T23:56:58",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.4429338574409485,
+        "grad_reject_rate": 0.0,
+        "grad_max_emp_rho": 0.9148969897648171,
+        "evo_ce": 2.582465887069702,
+        "evo_admit_rate": 1.0,
+        "evo_max_emp_rho": 1.000015066227277,
+        "grad_sound": true,
+        "evo_sound": false
+      },
+      "error": null,
+      "end_time": "2026-06-05T23:57:07"
+    },
+    {
+      "n": 8,
+      "gate": "inf",
+      "seed": 1234,
+      "start_time": "2026-06-05T23:57:07",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.4625532031059265,
+        "grad_reject_rate": 0.22666666666666666,
+        "grad_max_emp_rho": 0.8615971327323536,
+        "evo_ce": 2.5875949263572693,
+        "evo_admit_rate": 0.0,
+        "evo_max_emp_rho": 0.8230937403725712,
+        "grad_sound": true,
+        "evo_sound": true
+      },
+      "error": null,
+      "end_time": "2026-06-05T23:57:14"
+    },
+    {
+      "n": 8,
+      "gate": "inf",
+      "seed": 1235,
+      "start_time": "2026-06-05T23:57:14",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.452437102794647,
+        "grad_reject_rate": 0.2,
+        "grad_max_emp_rho": 0.8291717792306545,
+        "evo_ce": 2.5723721385002136,
+        "evo_admit_rate": 0.0125,
+        "evo_max_emp_rho": 0.818115824632093,
+        "grad_sound": true,
+        "evo_sound": true
+      },
+      "error": null,
+      "end_time": "2026-06-05T23:57:21"
+    },
+    {
+      "n": 32,
+      "gate": "none",
+      "seed": 1234,
+      "start_time": "2026-06-05T23:57:21",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.4310250878334045,
+        "grad_reject_rate": 0.0,
+        "grad_max_emp_rho": 0.9344280945077171,
+        "evo_ce": 2.5598633885383606,
+        "evo_admit_rate": 1.0,
+        "evo_max_emp_rho": 0.9477313961865698,
+        "grad_sound": true,
+        "evo_sound": true
+      },
+      "error": null,
+      "end_time": "2026-06-05T23:57:30"
+    },
+    {
+      "n": 32,
+      "gate": "none",
+      "seed": 1235,
+      "start_time": "2026-06-05T23:57:30",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.3981396555900574,
+        "grad_reject_rate": 0.0,
+        "grad_max_emp_rho": 0.9046198404985841,
+        "evo_ce": 2.5615063905715942,
+        "evo_admit_rate": 1.0,
+        "evo_max_emp_rho": 1.0784495798375935,
+        "grad_sound": true,
+        "evo_sound": false
+      },
+      "error": null,
+      "end_time": "2026-06-05T23:57:39"
+    },
+    {
+      "n": 32,
+      "gate": "inf",
+      "seed": 1234,
+      "start_time": "2026-06-05T23:57:39",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.429883360862732,
+        "grad_reject_rate": 0.22,
+        "grad_max_emp_rho": 0.8784983397580907,
+        "evo_ce": 2.5502837896347046,
+        "evo_admit_rate": 0.0,
+        "evo_max_emp_rho": 0.9209816962826205,
+        "grad_sound": true,
+        "evo_sound": true
+      },
+      "error": null,
+      "end_time": "2026-06-05T23:57:46"
+    },
+    {
+      "n": 32,
+      "gate": "inf",
+      "seed": 1235,
+      "start_time": "2026-06-05T23:57:46",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.421481728553772,
+        "grad_reject_rate": 0.22666666666666666,
+        "grad_max_emp_rho": 0.8431634770904602,
+        "evo_ce": 2.529848098754883,
+        "evo_admit_rate": 0.0,
+        "evo_max_emp_rho": 0.8944714014933464,
+        "grad_sound": true,
+        "evo_sound": true
+      },
+      "error": null,
+      "end_time": "2026-06-05T23:57:54"
+    },
+    {
+      "n": 64,
+      "gate": "none",
+      "seed": 1234,
+      "start_time": "2026-06-05T23:57:54",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.4071953892707825,
+        "grad_reject_rate": 0.0,
+        "grad_max_emp_rho": 0.924277918461853,
+        "evo_ce": 2.579171657562256,
+        "evo_admit_rate": 1.0,
+        "evo_max_emp_rho": 1.041800928639463,
+        "grad_sound": true,
+        "evo_sound": false
+      },
+      "error": null,
+      "end_time": "2026-06-05T23:58:04"
+    },
+    {
+      "n": 64,
+      "gate": "none",
+      "seed": 1235,
+      "start_time": "2026-06-05T23:58:04",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.38734233379364,
+        "grad_reject_rate": 0.0,
+        "grad_max_emp_rho": 0.9615824792883347,
+        "evo_ce": 2.580987811088562,
+        "evo_admit_rate": 1.0,
+        "evo_max_emp_rho": 1.3936828801953507,
+        "grad_sound": true,
+        "evo_sound": false
+      },
+      "error": null,
+      "end_time": "2026-06-05T23:58:14"
+    },
+    {
+      "n": 64,
+      "gate": "inf",
+      "seed": 1234,
+      "start_time": "2026-06-05T23:58:14",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.4091026186943054,
+        "grad_reject_rate": 0.23333333333333334,
+        "grad_max_emp_rho": 0.8773584626394053,
+        "evo_ce": 2.5340583324432373,
+        "evo_admit_rate": 0.0,
+        "evo_max_emp_rho": 0.8742304783971087,
+        "grad_sound": true,
+        "evo_sound": true
+      },
+      "error": null,
+      "end_time": "2026-06-05T23:58:22"
+    },
+    {
+      "n": 64,
+      "gate": "inf",
+      "seed": 1235,
+      "start_time": "2026-06-05T23:58:22",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.400014281272888,
+        "grad_reject_rate": 0.24,
+        "grad_max_emp_rho": 0.8948280826467124,
+        "evo_ce": 2.4913389682769775,
+        "evo_admit_rate": 0.0,
+        "evo_max_emp_rho": 0.8720215246581602,
+        "grad_sound": true,
+        "evo_sound": true
+      },
+      "error": null,
+      "end_time": "2026-06-05T23:58:30"
+    }
+  ]
+}

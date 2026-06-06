@@ -1,7 +1,16 @@
 # HD-1 — High-dimension, unrestricted evolution of the verified core (GPU)
 
-> Status (2026-06-06): **kernel written + locally CPU-smoke-validated (`SMOKE_OK`); READY TO PUSH to
-> Kaggle GPU.** Not yet run at scale. User authorized GPU experiments (Kaggle T4, $0-ish) this session.
+> Status (2026-06-06): **PUSHED to Kaggle (user GO) — v2 running on T4.**
+> <https://www.kaggle.com/code/furusekazufumi/hd1-highdim-evo>
+> - v1 (08:52 JST): FAILED 0/12 — `enable_gpu` only ⇒ Kaggle assigned **P100 (sm_60)**, but Kaggle's
+>   torch 2.10.0+cu128 supports sm_70+ ⇒ `cudaErrorNoKernelImageForDevice` on every run. ~5 s, no quota lost.
+> - v2 (09:0x JST): re-pushed with **`"machine_shape": "NvidiaTeslaT4"`** in kernel-metadata.json
+>   (`enable_gpu` is DEPRECATED in CLI 2.2.1; machine_shape ∈ {NvidiaTeslaT4, NvidiaTeslaP100, Tpu1VmV38}).
+> - Auth gotcha: classic `kaggle.json` (username+key) is REJECTED for write ops by CLI 2.2.1 — the stored
+>   key is a new-style token; it works via `KAGGLE_API_TOKEN` env or `~/.kaggle/access_token` (now written).
+>   Also `PYTHONUTF8=1` required on cp932 consoles (em-dashes in the script break metadata read otherwise).
+> - `kernels status` returns 500 for this script kernel; use `kernels output` as the completion probe
+>   (it returns the latest *finished* version's output + log).
 
 ## Question (user, 2026-06-06)
 "What happens to evolution at **higher dimension, without restriction**?" — a regime CPU could not reach
