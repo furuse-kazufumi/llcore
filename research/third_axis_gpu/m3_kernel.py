@@ -220,7 +220,14 @@ class RealFitness:
         ce = tot / len(self.h)
         if grad_tensors is not None:
             return ce, loss_acc / len(self.h)
-        return ce, (shard_sum / shard_cnt if need_b2 else None)
+        if not need_b2:
+            return ce, None
+        present = shard_cnt > 0                                   # red-team fix: empty octile would
+        shard8 = np.zeros(8)                                      # read as CE=0 (dominating outlier)
+        shard8[present] = shard_sum[present] / shard_cnt[present]
+        if not present.all():
+            shard8[~present] = shard8[present].mean()             # impute cross-octile mean
+        return ce, shard8
 
 
 # ----- fixed low-dim probe slice (red-team blocker fix) ----- #
