@@ -260,8 +260,9 @@ def train_run(cond, seed, cfg, data):
         met["cert_pass_final"] = cert_inf(d_, W_)
         met["sound"] = bool(met["max_emp_rho"] < 1.0)
     if cond == "project":
-        met["project_rate"] = projections / max(1, steps)
+        met["project_rate"] = projections / max(1, checks)
         met["mean_gamma"] = float(np.mean(gammas)) if gammas else 1.0
+        met["fallbacks"] = fallbacks
     if cond == "reject":
         met["reject_rate"] = rejects / max(1, checks)
     if cond == "none":                                            # B-Q4: post-hoc projection price
