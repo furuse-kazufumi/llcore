@@ -394,15 +394,18 @@ def run_m5_grad(rf, model, E, seed, cfg):
 def main():
     if RUN_MODE == "smoke":
         cfg = dict(n=16, d=32, T=32, B=4, heads=2, w_att=4, blocks=2, lr=3e-3,
-                   warm_steps=8, eval_batches=2, max_chars=4000, E=64, sigma=0.12, landscape=24)
+                   warm_steps=8, eval_batches=2, max_chars=4000, E=64, E_synth=200,
+                   sigma=0.12, landscape=24)
         seeds = [SEED0]; descriptors = ["B1"]
     elif RUN_MODE == "feasibility":
         cfg = dict(n=64, d=128, T=160, B=24, heads=4, w_att=8, blocks=2, lr=3e-3,
-                   warm_steps=300, eval_batches=3, max_chars=100000, E=1504, sigma=0.12, landscape=300)
+                   warm_steps=300, eval_batches=3, max_chars=100000, E=1504, E_synth=20000,
+                   sigma=0.12, landscape=300)
         seeds = [SEED0 + i for i in range(2)]; descriptors = ["B1"]
     else:  # full
         cfg = dict(n=64, d=128, T=160, B=24, heads=4, w_att=8, blocks=2, lr=3e-3,
-                   warm_steps=300, eval_batches=3, max_chars=300000, E=6000, sigma=0.12, landscape=600)
+                   warm_steps=300, eval_batches=3, max_chars=300000, E=6000, E_synth=20000,
+                   sigma=0.12, landscape=600)
         seeds = [SEED0 + i for i in range(4)]; descriptors = ["B1", "B2"]
     rpath = "result_m3.json"
 
