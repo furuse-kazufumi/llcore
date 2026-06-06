@@ -438,6 +438,34 @@ def main():
 
             E, n, sigma = cfg["E"], cfg["n"], cfg["sigma"]
 
+            # --- L0 landscape map (user-requested GPU extension; descriptive, no gate) --- #
+            # 600 random + 100x4 warm-perturbed (sigma sweep) genomes -> real CE + B1 coords.
+            # Mechanism evidence for the verdict: direct-sampling difficulty (frac of random
+            # genomes beating warm), local smoothness (perturbation CE curve vs sigma).
+            if ("real", "L0", "", seed) not in done and cfg.get("landscape", 0) > 0:
+                t0 = time.time(); rngL = np.random.default_rng(seed * 1000 + 424242)
+                pts = []
+                plan = ([("random", None)] * cfg["landscape"]
+                        + [("perturb", s) for s in (0.03, 0.12, 0.5, 1.0)
+                           for _ in range(cfg["landscape"] // 6)])
+                for kind, s in plan:
+                    g = sample_genome(n, rngL) if kind == "random" else mutate(warm_core, s, rngL)
+                    ce, _ = rf(g)
+                    pts.append({"k": kind, "s": s, "ce": round(ce, 4),
+                                "b1": [round(x, 3) for x in desc_b1(g)]})
+                rnd = [p["ce"] for p in pts if p["k"] == "random"]
+                pay = {"warm_ce": f_warm, "n_points": len(pts),
+                       "frac_random_better_than_warm": float(np.mean([c < f_warm for c in rnd])),
+                       "random_ce_min": float(np.min(rnd)), "random_ce_median": float(np.median(rnd)),
+                       "perturb_ce_median": {str(s): float(np.median(
+                           [p["ce"] for p in pts if p["k"] == "perturb" and p["s"] == s]))
+                           for s in (0.03, 0.12, 0.5, 1.0)},
+                       "points": pts}
+                record("real", "L0", "", seed, pay)
+                _log("run", f"seed={seed} real  L0 landscape: rand_min={pay['random_ce_min']:.4f} "
+                            f"rand_med={pay['random_ce_median']:.4f} warm={f_warm:.4f} "
+                            f"frac_better={pay['frac_random_better_than_warm']:.3f} ({time.time()-t0:.0f}s)")
+
             def fit_real(g, need_b2=False):
                 ce, shard = rf(g, need_b2=need_b2)
                 return -ce, shard
