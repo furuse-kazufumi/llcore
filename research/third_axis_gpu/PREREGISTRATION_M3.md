@@ -55,12 +55,20 @@ core (CRN). One fitness evaluation = one budget unit; E is identical across M1�
 
 ## 3. Controls (validity gates — judged BEFORE the real verdict)
 
-- **P+ (positive control, Step4 transplant into core space):** synthetic deceptive-corridor fitness
-  on the SAME genome: `f = max(0.5 − |b₁|, 5·(1 − |b₁ − 0.9|) − 4)` where `b₁ = mean(W)/2 + 0.5`...
-  precisely: local optimum at b₁ ≈ 0.5 (CLT mass), global peak in a narrow band near b₁ = 0.9 whose
-  pull is invisible from the mass region (deceptive). **Harness validity requires MAP-Elites(B1) to
-  beat M1, M2, AND M3 on P+** (≥3/4 seeds). If P+ fails ⇒ verdict N/A (harness cannot detect ③ at
-  this dim/budget), real rows reported as exploratory only.
+- **P+ (positive control, Step4 transplant into core space — AMENDED pre-run after red-team):**
+  synthetic deceptive-corridor fitness on the SAME genome:
+  `f = max(0.5 − |b₁ − 0.5|, 5·(1 − |b₁ − 0.9|) − 4)` with **`b₁ = mean(W_slice)/2 + 0.5` over a
+  FIXED 24-entry probe slice** `W.flat[:24]` (red-team blocker fix: the original full-4096-mean
+  coordinate is CLT-frozen — per-mutation drift σ/4096^0.5 ≈ 0.0019 makes the corridor untraversable
+  by EVERY method incl. MAP-Elites, guaranteeing N/A; the 24-entry slice restores Step4's
+  dimensionality, drift σ/24^0.5 ≈ 0.0245/step, while the peak at slice-mean 0.8 stays ~50σ of the
+  *sampling* distribution away = still teleport-proof). Local optimum at b₁ ≈ 0.5 (sampling mass),
+  deceptive valley, global peak band at b₁ = 0.9. **P+ uses descriptor B1p = (b₁, mean(decay)) —
+  corridor-aligned by design, giving MAP-E its best shot (named explicitly here; the original text
+  said "B1" — text/code drift fixed)**. **Harness validity requires MAP-Elites(B1p) to beat M1, M2,
+  AND M3 on P+** (≥3/4 seeds). **Required pre-GPU: a CPU simulation of P+ at n=64/E=6000 must show
+  MAP-E crossing while M1/M2/M3 stall — recorded below before any GPU push.** If P+ fails ⇒ verdict
+  N/A, real rows exploratory only.
 - **N0 (negative control):** smooth strictly-concave fitness `f = −‖gene − gene₀‖²` (unimodal, no
   deception). All methods must converge similarly; a MAP-E "win" here ⇒ harness false-positive ⇒ N/A.
 
