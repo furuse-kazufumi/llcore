@@ -202,28 +202,36 @@ def main() -> int:
     cases.append(("D_noncontract_control_n2",
                   CoupledNDGene.make(decay=[0.15, 0.15], W=[[1.2, 0.6], [0.6, 1.2]])))
 
+    # case D だけ外乱を強める (誤差増幅を可視化)。
+    w_overrides = {"D_noncontract_control_n2": 0.2}
+
     results = []
     print(f"{'case':28s} {'cert_inf':8s} {'L':>7s} {'G':>7s} {'tube':>9s} "
-          f"{'emp_err':>9s} {'holds':>6s} {'feas_res':>9s}")
-    print("-" * 96)
+          f"{'emp_err':>9s} {'err/inp':>8s} {'holds':>6s} {'feas_res':>9s}")
+    print("-" * 104)
     for name, g in cases:
-        r = run_case(name, g)
+        r = run_case(name, g, w_bar=w_overrides.get(name, 0.05))
         results.append(r)
         tube_s = f"{r['theoretical_tube_radius']:.4f}" if np.isfinite(r['theoretical_tube_radius']) else "inf"
         print(f"{r['name']:28s} {str(r['cert_inf']):8s} {r['L_state_lipschitz']:7.4f} "
               f"{r['G_input_gain']:7.4f} {tube_s:>9s} {r['empirical_max_err_steady']:9.5f} "
+              f"{r['err_amplification_vs_input']:8.3f} "
               f"{str(r['tube_holds']):>6s} {r['feasibility_residual']:9.2e}")
 
     print("\n--- interpretation ---")
     for r in results:
         if r["cert_inf"] and np.isfinite(r["theoretical_tube_radius"]):
             verdict = ("TUBE HOLDS: contraction-certified gene + feasible reference "
-                       "=> tracking error inside theoretical tube"
+                       "=> tracking error inside theoretical tube "
+                       f"(err/input={r['err_amplification_vs_input']:.2f} < G/(1-L)="
+                       f"{r['G_input_gain']/(1-r['L_state_lipschitz']):.2f})"
                        if r["tube_holds"] else
                        "WARN: empirical error EXCEEDS tube (bug or unsound bound!)")
         else:
-            verdict = ("NEGATIVE CONTROL: gate REJECTS (no contraction) "
-                       "=> no tracking tube guaranteed (as expected)")
+            verdict = ("NEGATIVE CONTROL: gate REJECTS (no contraction, L>=1) "
+                       "=> NO tracking tube guaranteed. err amplifies to "
+                       f"{r['err_amplification_vs_input']:.1f}x the input disturbance "
+                       "(state stays bounded only by tanh, but tracking is NOT certified).")
         print(f"  {r['name']:28s}: {verdict}")
 
     # save

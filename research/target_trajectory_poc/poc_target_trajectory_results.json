@@ -12,6 +12,7 @@
     "theoretical_tube_radius": 0.0882352941176471,
     "empirical_max_err_steady": 0.025046162292325355,
     "empirical_max_err_all": 0.025046162292325355,
+    "err_amplification_vs_input": 0.500923245846507,
     "tube_holds": true,
     "slack": 0.06318913182532175
   },
@@ -28,6 +29,7 @@
     "theoretical_tube_radius": 0.11428571428571428,
     "empirical_max_err_steady": 0.03893273682897945,
     "empirical_max_err_all": 0.04113079429244426,
+    "err_amplification_vs_input": 0.778654736579589,
     "tube_holds": true,
     "slack": 0.07535297745673483
   },
@@ -44,6 +46,7 @@
     "theoretical_tube_radius": 0.10000000000000002,
     "empirical_max_err_steady": 0.05224849922839657,
     "empirical_max_err_all": 0.05224849922839657,
+    "err_amplification_vs_input": 1.0449699845679312,
     "tube_holds": true,
     "slack": 0.04775150077160345
   },
@@ -51,15 +54,16 @@
     "name": "D_noncontract_control_n2",
     "n": 2,
     "T": 200,
-    "w_bar": 0.05,
+    "w_bar": 0.2,
     "feasibility_residual": 0.0,
     "cert_inf": false,
     "cert_two": false,
-    "L_state_lipschitz": 3.0700000000000003,
-    "G_input_gain": 0.9,
+    "L_state_lipschitz": 1.68,
+    "G_input_gain": 0.85,
     "theoretical_tube_radius": Infinity,
-    "empirical_max_err_steady": 0.0017441784657356019,
-    "empirical_max_err_all": 0.08968138866695824,
+    "empirical_max_err_steady": 1.8669462650421957,
+    "empirical_max_err_all": 1.8669462650421957,
+    "err_amplification_vs_input": 9.334731325210978,
     "tube_holds": true,
     "slack": Infinity
   }
