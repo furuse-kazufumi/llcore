@@ -28,6 +28,8 @@ from .minimal_ga import (
     EvolutionResult,
     FitnessFunc,
     FitnessFuncG,
+    GateMode,
+    GateStats,
     GeneT,
     Individual,
     Population,
