@@ -71,7 +71,9 @@ def cert_inf(decay, W, max_input_abs=1.0):
 
 def project_gamma(decay, W):
     """Largest gamma in [0,1] s.t. cert_inf(decay, gamma*W) passes (bisection).
-    gamma=0 always passes: infnorm reduces to max_i decay_i < 1 (decay = sigmoid(.) < 1)."""
+    gamma=0 passes iff max_i decay_i < 1 — GUARANTEED by the strict affine decay reparam in
+    StageBLM.core() (decay <= 1-1e-6; red-team fix: float32 sigmoid saturates to exactly 1.0,
+    which would make every gamma infeasible). Caller still re-verifies defensively."""
     if cert_inf(decay, W): return 1.0
     lo, hi = 0.0, 1.0
     for _ in range(40):
