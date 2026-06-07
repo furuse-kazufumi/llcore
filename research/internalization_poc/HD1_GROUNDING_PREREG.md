@@ -144,8 +144,8 @@
 
 | 結果 | 解釈 (これ以上は主張しない) |
 |---|---|
-| H1 成立 | empirical 観察 (proxy 閾値回避) は gradient 基質で部分的な死回避を提供するが sound に届かない — toy の sound≫empirical の gradient 版を支持 |
-| H1 不成立 (OBSERVE≈NONE 以下) | **この proxy 設計の** empirical 回避は gradient 基質で死回避を提供しない。設計 §6 のとおり「OBSERVE の上限」ではなく 1 実装の実力 — empirical 一般の限界とは区別不能と明記 |
+| H1 成立 | **§3 のアーティファクト規律を通過した場合のみ**: empirical 観察 (proxy 閾値回避) は gradient 基質で部分的な死回避を提供するが sound に届かない — toy の sound≫empirical の gradient 版を支持。連続量不一致なら「窓計数上の低下」へ弱める |
+| H1 不成立 (OBSERVE≈NONE 以下) | **この proxy 設計の** empirical 回避は gradient 基質で死回避を提供しない。設計 §6 のとおり「OBSERVE の上限」ではなく 1 実装の実力 — empirical 一般の限界とは区別不能と明記。**加えて検出力 × 異質性の交絡により「非検出 ≠ 無効の証拠」を必ず併記** (§3 検出力自白) |
 | H1 で OBSERVE≈ENDO | 反証条項 (a)/(b) に従う (A6) |
 | H2 成立 | 死後修復は時間的退行 (rollback) より学習を保存する — REVIVE 価値の gradient 接地 |
 | H2 不成立 | repair の CE 優位は toy 固有 or 16 seeds で検出不能 — どちらか区別せず報告 |
