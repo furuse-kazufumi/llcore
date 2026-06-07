@@ -84,10 +84,20 @@
   - **成立条件**: 全 active n で方向一致 (median 差 < 0) **かつ** 各 active n の
     Holm 調整後 p < 0.05。indicator は契約死 + 実害死の co-primary 連言
     (実害は A3 の縮退条項に従う)。
-  - **ENDO 反証条項**: OBSERVE_P2 vs ENDO の窓死亡率が全 active n で Wilcoxon p > 0.05
-    かつ median 差 = 0 のとき (= empirical が sound に追いついた): A6 検査を実施し、
+  - **ENDO 反証条項** (敵対レビュー指摘で規則を decidable 化): 全 active n で
+    **mean_seed(OBSERVE_P2 窓死亡率) − mean_seed(ENDO 窓死亡率) ≤ δ = 1/80 (= 0.0125,
+    測定 1 点分; 両 arm 全 seed ゼロの退化ケースを含む)** のとき「empirical が sound に
+    追いついた」とみなす。※ Wilcoxon は全ゼロ対で p=NaN に退化し、median 差はスパース
+    離散カウントで実差を隠すため、この同等判定には使わない (レビュー blocker の反映)。
+    発動時は A6 検査を実施し、
     (a) Spearman ≥ 0.8 → 「proxy 設計の問題」として H1 判定を無効化 /
     (b) < 0.8 → **「sound ≫ empirical は EA 固有」へ正式格下げ** (設計 §6 前例に従う)。
+  - **H1 アーティファクト規律 (binding 解釈規則; α には影響しない)**: OBSERVE の回避は
+    測定点直前の縮小で「死亡測定点だけを消す」計数効果を持ちうる (二値カウントの脆弱性)。
+    よって H1 成立の解釈 (「部分的死回避を提供」) は、**連続量 2 指標 — 窓内 max rho_hat /
+    ρ 超過積分 Σ_t max(rho_t − 1, 0) — でも OBSERVE_P2 < NONE の方向一致 (記述的)** を
+    確認できた場合に限り採用する。不一致なら「二値計数アーティファクトの疑い」を明記し、
+    主張を「窓計数上の死亡率低下 (echo-state 保持の証拠ではない)」へ弱める。
 - **H2 — repair の学習保存**: 各 active n で **REVIVE の最終 CE < ENDO の最終 CE**
   (paired Wilcoxon, 両側)。成立条件は H1 と同形 (全 active n 方向一致 + 各 n Holm p<0.05)。
 - **多重性**: 仮説単位の代表 p = その仮説の (active n × active indicator) 検定群の **max p**
