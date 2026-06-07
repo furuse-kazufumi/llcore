@@ -8,11 +8,11 @@
 
 ## 1. llcore の核心 (3 文要約)
 
-llcore は **Transformer のコアアルゴリズム (state update / 学習則 / 認知駆動 Δ) に進化形態を与え、Z3 verifier で破綻させずに異アルゴリズムへ進化させる研究フレームワーク**。CPU 完結。**「同じ design pattern (gene 化 + Z3 invariant gate + 進化 + open-ended 機構) が複数アーキで成立するか」**を体系的に検証している。
+llcore は **Transformer のコアアルゴリズム (state update / 学習則 / 認知駆動 Δ) に進化形態を与え、健全な検証ゲートで破綻させずに異アルゴリズムへ進化させる研究フレームワーク**。CPU 完結。本線 paper のゲートは閉形式 sound contraction certifier ladder (README「看板の honest 訂正」参照)、Z3/SMT は他アーキ track の invariant 検査で使用。**「同じ design pattern (gene 化 + sound invariant gate + 進化 + open-ended 機構) が複数アーキで成立するか」**を体系的に検証している。
 
 ### 核心 4 要素
 1. **gene 化**: アーキ固有の core algorithm を低次元 (3-10 params) で表現
-2. **Z3 invariant**: state_norm / Lipschitz / firing rate / over-smoothing 等の安全 invariant を SMT で per-gene 検査
+2. **sound invariant gate**: state_norm / Lipschitz / firing rate / over-smoothing 等の安全 invariant を per-gene 検査 (本線は閉形式収縮 certifier、他アーキ track は Z3/SMT)
 3. **進化**: 自前 minimal GA (llive 非依存) で探索
 4. **open-ended 機構** (4 種): 適応難易度ゲート / 中立貯蔵庫 / MODES 計器 / MCC カリキュラム → 「進化に上限を設けない」
 
@@ -333,7 +333,7 @@ SNN-Izhikevich Stage 2.4A 反証的 test 内製化
 - 本 doc 完成後の Stage 2 全 PoC 統合 verdict 更新
 
 ### 長期 (paper phase)
-- **I** 横断 paper "Verified Evolvable Architectures: A Unified Z3-Gated Framework Beyond Transformers" (TMLR target)
+- **I** 横断 paper "Verified Evolvable Architectures: A Unified Soundly-Gated Framework Beyond Transformers" (TMLR target)
 - **J** llcore GitHub repo 作成 + push (現状 20 commits ローカル保持)
 - 各アーキ別 workshop submission
 
@@ -376,7 +376,7 @@ SNN-Izhikevich Stage 2.4A 反証的 test 内製化
 | **Z3 invariant** | SMT (Satisfiability Modulo Theories) で symbolic 検証する安全 invariant |
 | **per-gene verifier** | 各 gene を Z3 制約式に入れて検査 (Izhikevich Codex F1 で claim 降格、現状は assumed contract 下の box proof) |
 | **box 形式** | `X ∈ [-bound, bound]` で `|X| <= bound` を表現 (sound, abs encoding bug 不在) |
-| **same design pattern + partial stack reuse** | アーキ間で同じ pattern (Z3 gate + open-ended 機構) + AdaptiveFloorGate 直接 reuse / 他は型適応 (「same verifier stack」overclaim を撤回した正名化) |
+| **same design pattern + partial stack reuse** | アーキ間で同じ pattern (sound invariant gate + open-ended 機構) + AdaptiveFloorGate 直接 reuse / 他は型適応 (「same verifier stack」overclaim を撤回した正名化) |
 | **open-ended 4 機構** | 適応難易度ゲート / 中立貯蔵庫 / MODES 計器 / MCC カリキュラム |
 | **constructive proof** | Z3 が refractory respect + violation 仮説の矛盾で unsat を返す = 数学的に厳密な invariant 証明 |
 | **反証的 test** | 「現実装が overclaim だった」を PASS で assert する test (将来 claim 強化で FAIL → 改善検知トリガ) |

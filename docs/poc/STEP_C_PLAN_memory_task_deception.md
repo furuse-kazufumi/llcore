@@ -852,7 +852,7 @@ git commit -m "docs(step-c): verdict — 記憶タスクで③が立つか (両�
 
 - [ ] **Step 4: memory 更新**
 
-`project_llcore_init_2026_05_29.md` の進化健全性セクションに (c) の結論を追記し、`claude-projects.json` の fullsense `next_plan` を更新（③ の最終決着 or 次の軸へ）。
+(c) の結論を進捗記録へ反映し、③ の最終決着 or 次の軸へ進む。
 
 ---
 

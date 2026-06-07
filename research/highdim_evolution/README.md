@@ -135,7 +135,7 @@ Already previews the phenomenon (unrestricted EVO goes ρ>1; inf EVO is sound-bu
 seconds-long smoke; real signal needs the GPU feasibility/full run.
 
 ## How to run (Kaggle GPU T4, $0)
-1. Push as a kernel (kaggle CLI, token set up — see memory `reference_api_keys`):
+1. Push as a kernel (kaggle CLI, token set up (kaggle.json)):
    ```
    kaggle kernels init -p ./research/highdim_evolution
    # edit kernel-metadata.json: id "furusekazufumi/hd1-highdim-evo", code_file "hd1_highdim_evo.py",

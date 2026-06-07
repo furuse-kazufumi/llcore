@@ -17,7 +17,7 @@ import sys
 
 import numpy as np
 
-BASE = r"D:\projects\llcore\research"
+BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # research/
 sys.path.insert(0, os.path.join(BASE, "step_c_deceptiveness_measure"))
 sys.path.insert(0, os.path.join(BASE, "step_c_applicability"))
 

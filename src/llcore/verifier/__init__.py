@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Z3-based state update invariant verifier + Marabou bridge skeleton.
+"""State-update invariant verifier (sound contraction certifiers が主役 + optional Z3/SMT invariant 検査) + Marabou bridge skeleton.
 
 llcore の核独自軸:
-- Stage 1a: 進化ループ内 SMT online gate (PoC 1a 完了)
+- Stage 1a: 進化ループ内 sound online gate (PoC 1a 完了; Z3 invariant 検査は optional)
 - Stage 3a: Marabou Incremental NN Verification の **異構造拡張** refinement
   relation sound 拡張 + ChangeOp-MCC curriculum (PoC 3a)
 

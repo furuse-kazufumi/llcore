@@ -32,7 +32,7 @@ honest 留保:
   0.0 は raw R²<0 を潰した値で「raw=0 の信号皆無」とは識別不能** (Codex pair-review High finding
   2026-05-30)。信号の有無を診断するときは ``clip=False`` で raw R² の符号・spread を見ること。
 
-semver: 新規 module 追加のみ。既存シンボル不変 ([[feedback_implementation_status_record]])。
+semver: 新規 module 追加のみ。既存シンボル不変。
 """
 from __future__ import annotations
 
