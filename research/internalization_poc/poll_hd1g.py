@@ -32,13 +32,19 @@ def main():
             d = tempfile.mkdtemp(prefix="hd1g_poll_")
             try:
                 api.kernels_output(slug, path=d)
-                results = [f for f in os.listdir(d)
+                files = os.listdir(d)
+                results = [f for f in files
                            if f.startswith("result_hd1g") and f.endswith(".json")]
+                if not files:
+                    # 完了版がまだ無い間は API が空成功を返す (実測 2026-06-07) = 実行中
+                    print(f"[{time.time()-t0:7.0f}s] {slug}: running (no completed output)",
+                          flush=True)
+                    continue
                 if not results:
-                    # output が取得できたのに result json が無い = version が
-                    # 結果を書けずに終了 (早期クラッシュ濃厚) → log 末尾を出して異常終了
+                    # log 等はあるのに result json が無い = version が結果を書けずに
+                    # 終了 (早期クラッシュ濃厚) → log 末尾を出して異常終了
                     print(f"[{time.time()-t0:7.0f}s] {slug}: FINISHED WITHOUT RESULT "
-                          f"(early crash?) files={os.listdir(d)}", flush=True)
+                          f"(early crash?) files={files}", flush=True)
                     for f in os.listdir(d):
                         if f.endswith(".log"):
                             tail = open(os.path.join(d, f), encoding="utf-8",
