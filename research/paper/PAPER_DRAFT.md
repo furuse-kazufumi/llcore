@@ -1181,11 +1181,40 @@ fitness booster. Mechanistically the result is the navigability story again: the
 always found admissible children), i.e. a strictly tighter sound gate steered the search into a
 better region rather than starving it.
 
-Scope honesty: the effect size is small (~+0.015 on a probe-based fitness), the fitness is a
-fixed-readout probe (not a gene-pure memory measure), the GA is small (pop 20 × 20 generations), and
-the claim is bounded to this scalar kernel and task family. We do not claim a general
-"verified gates improve fitness" law; we claim that *on the longest memory horizon tested, the
-certified-tube restriction did not cost fitness — it measurably helped, under a pre-registered test*.
+**Independent replication and pooling.** A second pre-registered run — the zero-disturbance cell of
+the second-axis experiment below, an *identical* delay-8 / seq-len-32 setup with fresh seeds 3000–3019
+— reproduces the effect in direction and magnitude (Δ = +0.0116, median +0.0091, 13/20 positive) but
+at p = 0.093, borderline on its own. The original run's p = 0.0056 thus sat at the favourable end of
+seed variation; the honest single-run statement is "positive, small, near the n = 20 detection
+threshold." Pooling the two independent runs (n = 40) gives the strongest summary: mean Δ = +0.0134,
+median +0.0086, 29/40 positive, **p = 0.0021**, robust to trimming (+0.0108) and to dropping the
+single largest delta (p = 0.0045). We therefore report the delay-8 retention benefit as **real but
+small, evidenced at pooled n = 40 (p = 0.0021) with single-run significance seed-sensitive** — not as
+a lone p = 0.0056.
+
+**The dose–response is horizon-specific, not a generic invariant-load law (pre-registered second
+axis).** To test whether the gate's value scales with invariant load *in general*, we varied a
+mechanically independent axis — the task disturbance magnitude `w̄_task`, injected into the inputs
+while the gate's own `w̄` and `r_max` stay fixed (admission geometry unchanged, so no admit-rate
+confound). This moves the *numerator* `G·w̄` of the tube bound, whereas the delay axis moves the
+*denominator* `1/(1−L)`. Pre-registered (confirmatory `w̄_task` = 0.20, same test), the result is a
+clean **negative**: no dose–response (confirmatory p = 0.59; non-monotone across {0, 0.05, 0.10,
+0.20}; the gate binds throughout — tube ≈ 2,500 vs contraction ≈ 800 rejections, 0 fallbacks — so the
+null is not a degenerate gate). This is *consistent with* the reservoir reading of the bound: memory
+capacity diverges as `1/(1−ρ)`, a **denominator** phenomenon, so the gate's fitness value should track
+the retention margin (memory horizon), not the disturbance numerator — exactly what we observe.
+Mechanistically, in a memory task disturbance-rejection (tighter contraction, smaller `1/(1−L)`)
+trades off against retention (which needs `L` not too small), so disturbance load does not amplify the
+gate's value. The honest law is therefore narrowed accordingly.
+
+Scope honesty: the effect size is small (~+0.013 pooled, on a probe-based fitness), single-run
+significance is seed-sensitive, the fitness is a fixed-readout probe (not a gene-pure memory measure),
+the GA is small (pop 20 × 20 generations), and the claim is bounded to this scalar kernel and task
+family. We do **not** claim a general "verified gates improve fitness" law, nor even a general
+"value ∝ invariant load" law — the disturbance axis is a pre-registered negative. We claim only that
+*the certified-tube restriction helps in proportion to the memory horizon (the retention-margin
+demand): on the longest horizon tested it did not cost fitness — it measurably helped, at pooled
+n = 40 — while a disturbance-magnitude axis shows no such effect.*
 
 ### 9.5 What this section adds to the intersection claim
 
