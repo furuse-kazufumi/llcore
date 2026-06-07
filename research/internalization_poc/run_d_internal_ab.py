@@ -132,8 +132,7 @@ def _build_task(w_env: float) -> DisturbedCopyTask:
 
 def _ff_for(task):
     def _ff(gene: StateUpdateGene, rng: np.random.Generator) -> float:
-        return evaluate_gene(gene, task, _READOUT, rng, n_trials=GA_KW.get("train_n_trials", 5)
-                             if "train_n_trials" in GA_KW else 5)
+        return evaluate_gene(gene, task, _READOUT, rng, n_trials=TRAIN_N_TRIALS)
     return _ff
 
 
