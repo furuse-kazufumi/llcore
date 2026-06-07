@@ -1,0 +1,95 @@
+{
+ "config": {
+  "N": 16,
+  "d": 8,
+  "K": 4,
+  "lam": 1.5,
+  "A": 3.0,
+  "seed": 2026
+ },
+ "qubo": "min -Σf x + λΣs xx + A(Σx-K)²",
+ "results": {
+  "exact": {
+   "energy": 39.7228,
+   "gap_to_exact": 0.0,
+   "is_optimal": true,
+   "selected": [
+    8,
+    9,
+    11,
+    15
+   ],
+   "k_ok": true,
+   "total_fitness": 3.5722,
+   "mean_diversity": 0.5947
+  },
+  "sa_classical": {
+   "energy": 39.7228,
+   "gap_to_exact": 0.0,
+   "is_optimal": true,
+   "selected": [
+    8,
+    9,
+    11,
+    15
+   ],
+   "k_ok": true,
+   "total_fitness": 3.5722,
+   "mean_diversity": 0.5947
+  },
+  "diverse_greedy": {
+   "energy": 40.7682,
+   "gap_to_exact": 1.0454,
+   "is_optimal": false,
+   "selected": [
+    1,
+    8,
+    9,
+    11
+   ],
+   "k_ok": true,
+   "total_fitness": 3.7703,
+   "mean_diversity": 0.5256
+  },
+  "fitness_greedy": {
+   "energy": 40.7682,
+   "gap_to_exact": 1.0454,
+   "is_optimal": false,
+   "selected": [
+    1,
+    8,
+    9,
+    11
+   ],
+   "k_ok": true,
+   "total_fitness": 3.7703,
+   "mean_diversity": 0.5256
+  },
+  "random": {
+   "energy": 39.7228,
+   "gap_to_exact": 0.0,
+   "is_optimal": true,
+   "selected": [
+    8,
+    9,
+    11,
+    15
+   ],
+   "k_ok": true,
+   "total_fitness": 3.5722,
+   "mean_diversity": 0.5947
+  }
+ },
+ "cert_gate_demo": {
+  "unsound_high_fitness": [
+   1,
+   8
+  ],
+  "excluded_by_cert": [
+   1,
+   8
+  ],
+  "all_unsound_excluded": true,
+  "note": "cert penalty μ で unsound 高 fitness 個体を選択から排除 = llcore Z3 gate 接続点"
+ }
+}
