@@ -59,7 +59,7 @@ from run_3arm_ab import _ensure_utf8_stdout  # noqa: E402
 # ---- feasibility 設定 (設計 §5 step 2; 本走値は事前登録で別途固定) -------------
 NS = [8, 32]
 SEEDS = [2026 + i for i in range(4)]
-ARMS = ["NONE", "EXO_init", "ENDO", "REVIVE", "OBSERVE", "REVIVE_ABLATE"]
+ARMS = ["NONE", "EXO_init", "ENDO", "REVIVE", "OBSERVE", "REVIVE_ABLATE", "ENDO_NOSYNC"]
 OBSERVE_BETAS = [0.25, 0.5, 0.75]          # β 3 点 (OBSERVE のみ複数走行; 本走は 1 点固定)
 CFG = dict(layers=1, d=48, T=48, B=12, lr=3e-3, grad_steps=120, max_chars=16000)
 GATE_K = 4                                  # ENDO gate cadence (本走も固定)
