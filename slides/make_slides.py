@@ -98,6 +98,8 @@ def _box(slide, x, y, w, h, text, fill=ACCENT_LT, font=11, bold=False, color=DAR
 
 
 def _arrow(slide, x1, y1, x2, y2, color=GRAY, weight=2.25):
+    # Length / 2 等の演算は float 化し PowerPoint が XML を拒否する → 必ず int (EMU) に丸める
+    x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
     cn = slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, x1, y1, x2, y2)
     cn.line.color.rgb = color
     cn.line.width = Pt(weight)
