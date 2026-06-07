@@ -396,16 +396,23 @@ def test_g7_no_extinction_smoke(small_evolution_traces) -> None:
 
 
 def test_g8_verifier_latency_smoke(small_evolution_traces) -> None:
-    """[G8 smoke] verifier latency mean < 20 ms / call.
+    """[G8 smoke] verifier latency mean < 60 ms / call.
 
     smoke は 16 個体 × 10 世代 = ~200 verifier call で warm-up 不足のため
     本番 PoC (32 × 50, mean=6.07ms) より per-call が遅くなる (~10-15ms 観測).
     smoke の役割は trace 構造の sanity check で、production claim は PoC
-    スクリプト本走の数値 (verdict doc G8) に従う. **honest**: 20ms 閾値は
+    スクリプト本走の数値 (verdict doc G8) に従う. **honest**: 本閾値は
     "verifier 健在 + Z3 timeout / hang なし" を意味するに留め、
     "< 10ms" 主張は本走数値が根拠.
+
+    **閾値履歴 (env drift の honest 記録)**: 2026-05-28 作成時 20ms (観測
+    ~10-15ms)。2026-06-07 に idle CPU でも 28.17ms で fail → 切り分け実施:
+    z3 4.16.0 は 05-14 から不変 / invariants.py は additive のみ /
+    **14cdefe (作成時点) のコードでも mean=28.4ms ≈ 現行 29.7ms** = コード
+    起因でなく環境ドリフト (マシン状態) と確定。hang 検知の意図 (timeout
+    500ms ≫ 閾値) を保ち 60ms に変更。
     """
     spec, _ = small_evolution_traces
     arr = np.array(spec.verifier_latencies_ms)
     assert arr.size > 0
-    assert arr.mean() < 20.0, f"smoke verifier latency mean={arr.mean():.2f}ms"
+    assert arr.mean() < 60.0, f"smoke verifier latency mean={arr.mean():.2f}ms"
