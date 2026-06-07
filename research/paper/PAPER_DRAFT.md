@@ -1314,6 +1314,60 @@ internal dynamics, so that quadrant remains open at our PoC scale. Scope honesty
 single κ step, n = 20 seeds, and a kNN radius chosen once for OBSERVE — this is a mechanism PoC, not a
 scaled result.
 
+### 9.7 Grounding the hierarchy in gradient training: shared death history is the active ingredient (HD-1 grounding)
+
+§9.6 measured the supervision hierarchy on EA toy kernels. The obvious objection is that the
+substrate where the death phenomenon actually matters in this paper is *gradient training at scale* —
+§7 showed ungated gradient itself leaves the contractive region (ρ → 1.95 at n = 256). We therefore
+ran a pre-registered grounding experiment on the §7 substrate (`GatedRecurrentLM`, d = 96,
+400 gradient steps, tiny-shakespeare, Kaggle T4, n ∈ {64, 128, 256} × 16 seeds): a two-stage
+registration (CPU feasibility → binding preregistration committed *before* results, including the
+confirmatory analysis script; HD1_GROUNDING_PREREG.md, with a 4-lens adversarial review fixing
+the decidability of the equivalence clause, a power confession, a counting-artifact discipline,
+and a fail-fast corpus guard *before* commit).
+
+**Arms** (shared admissible initialisation; "init-only supervision" is then bit-identical to no
+supervision, so the EXO arm was dropped at registration): **NONE**; **ENDO** (cert_inf gate at
+cadence 4, Adam-state-synchronized rollback); **REVIVE** (no gate — an independent monitor detects
+contract death, then bisection-repairs `raw_W` into the admit set and resets the layer's Adam
+state; death is stepped on, as in §9.6); **OBSERVE** in two passes (proxy = a moving average of
+state-norm growth, threshold = the 10th percentile of death-event proxies; pass 1 sees only its own
+history, pass 2 starts from the pooled 16-seed death log of pass 1). Death is two-layer
+(contract: from-below empirical ρ ≥ 1; harm: a box-edge state-separation probe), with both an
+F-clause (NONE window death rate < 5% excludes the dimension) and a symmetric degeneracy clause for
+the harm indicator fixed in advance.
+
+**Pre-registered verdicts.** The F-clause was active at every dimension (NONE window contract-death
+rates 0.476 / 0.778 / 0.961 at n = 64/128/256); the harm probe never fired and was excluded per the
+degeneracy clause — H1 was decided on the contract indicator. **H1 PASS** (Holm p = 0.027):
+OBSERVE-with-shared-history reduces the window death rate against NONE at every dimension
+(0.216 / 0.646 / 0.745; per-n p = 0.0004 / 0.013 / 0.0019), and the pre-registered counting-artifact
+discipline passed — both continuous exposure metrics agree (window max-ρ, and the ρ-excess integral
+falling 72.6 → 19.0 at n = 256), so the avoidance genuinely reduces time spent expansive rather than
+erasing measurement points. The equivalence clause never fired: OBSERVE remains far from the sound
+gate (ENDO: 0 deaths at every dimension — a theorem consequence, not a finding; margins
++0.22 / +0.65 / +0.75 against δ = 0.0125). **H2 not supported** (Holm p = 0.058): REVIVE's final CE
+beats ENDO's directionally at every dimension (median Δ = −0.074 / −0.080 / −0.182) but n = 128
+misses the pre-registered conjunction (p = 0.0577), and we report exactly that — the direction
+uniformity and the n = 256 p = 9.2 × 10⁻⁵ are descriptive facts, not a confirmatory rescue.
+
+**The mechanism finding (exploratory).** Self-history-only avoidance is useless or harmful: pass 1
+death rates are 0.449 / 0.939 / 0.910 — *worse than unsupervised training* at n = 128. The entire
+empirical benefit comes from **sharing observed deaths across runs** (pass 2) — the gradient-substrate
+form of §9.6's vicarious selection, and it only works socially. The avoidance is also chronically,
+not acutely, effective at scale: the fraction of avoidance firings whose next measurement is
+death-free collapses from 76% (n = 64) to 3% (n = 128/256) — the β-shrink cannot keep up with drift
+locally, yet the integrated expansive exposure still falls. Grounding sanity: NONE's final
+high-precision ρ reaches 1.969 at n = 256, reproducing §7's ρ → 1.95 band under a different (shared
+admissible) initialisation, and the sound gate's CE cost (+0.076…+0.156) sits at the §7 band's edge.
+
+**At claimed strength.** The hierarchy **sound ≫ shared-empirical ≫ self-empirical ≈ none** is now
+measured in the substrate where the drift is real, with the sound gate's zero-death row being a
+theorem consequence and only the empirical rows being experimental. Scope honesty: one honest proxy
+design (this is not OBSERVE's upper bound), the harm layer was degenerate at every tested dimension,
+16 seeds, and per-dimension measurement budgets (48–200 ρ-samples per point) make death detection
+conservative near the boundary — identically across arms.
+
 ---
 
 ## 10. Limitations, reproducibility, and the verified-evolution roadmap
