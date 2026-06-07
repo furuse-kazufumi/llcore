@@ -19,6 +19,11 @@ from pathlib import Path
 import numpy as np
 import torch
 
+try:
+    sys.stdout.reconfigure(encoding="utf-8")   # cp932 console 対策 (既知パターン)
+except Exception:
+    pass
+
 _HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(_HERE.parents[0] / "highdim_evolution"))
 import hd1_highdim_evo as H  # noqa: E402  (numpy 正本)
