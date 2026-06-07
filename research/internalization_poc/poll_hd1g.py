@@ -32,19 +32,32 @@ def main():
             d = tempfile.mkdtemp(prefix="hd1g_poll_")
             try:
                 api.kernels_output(slug, path=d)
-                for f in os.listdir(d):
-                    if f.startswith("result_hd1g") and f.endswith(".json"):
-                        meta = json.load(open(os.path.join(d, f))).get("meta", {})
-                        st = meta.get("status")
-                        nrec = "?"
-                        try:
-                            nrec = len(json.load(open(os.path.join(d, f))).get("records", []))
-                        except Exception:
-                            pass
-                        print(f"[{time.time()-t0:7.0f}s] {slug}: status={st} records={nrec}", flush=True)
-                        if st in ("done", "error"):
-                            print(f"FINISHED {slug} status={st}")
-                            return 0
+                results = [f for f in os.listdir(d)
+                           if f.startswith("result_hd1g") and f.endswith(".json")]
+                if not results:
+                    # output が取得できたのに result json が無い = version が
+                    # 結果を書けずに終了 (早期クラッシュ濃厚) → log 末尾を出して異常終了
+                    print(f"[{time.time()-t0:7.0f}s] {slug}: FINISHED WITHOUT RESULT "
+                          f"(early crash?) files={os.listdir(d)}", flush=True)
+                    for f in os.listdir(d):
+                        if f.endswith(".log"):
+                            tail = open(os.path.join(d, f), encoding="utf-8",
+                                        errors="replace").read()[-2000:]
+                            print(f"--- {f} tail ---\n{tail}", flush=True)
+                    print(f"FINISHED {slug} status=no_result")
+                    return 1
+                for f in results:
+                    meta = json.load(open(os.path.join(d, f))).get("meta", {})
+                    st = meta.get("status")
+                    nrec = "?"
+                    try:
+                        nrec = len(json.load(open(os.path.join(d, f))).get("records", []))
+                    except Exception:
+                        pass
+                    print(f"[{time.time()-t0:7.0f}s] {slug}: status={st} records={nrec}", flush=True)
+                    if st in ("done", "error"):
+                        print(f"FINISHED {slug} status={st}")
+                        return 0
             except Exception as e:
                 print(f"[{time.time()-t0:7.0f}s] {slug}: not ready ({type(e).__name__})", flush=True)
             finally:
