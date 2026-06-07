@@ -297,15 +297,18 @@ def _soundness_violations(sub, V, n=5000, seed=0):
 
 def _run_arm(sub, arm, seed, V):
     rng = np.random.default_rng(seed)
-    dm = []   # OBSERVE 用社会的死記憶 (phase1→phase2 継続)
+    dm = []   # OBSERVE 用社会的死記憶 (全 phase 継続)
     genes1, curve1, pop1, deaths1 = _ga_phase(sub, arm, KAPPA_LOW, V, None, rng, G1, death_memory=dm)
     phase1_final = float(pop1.best.fitness)
-    genes2, curve2, pop2, deaths2 = _ga_phase(sub, arm, KAPPA_HIGH, V, genes1, rng, G2, death_memory=dm)
+    # 助走 (warm-up): κ_high で死を経験させ OBSERVE 学習/REVIVE 蓄積/shock 通過。deaths は数えない。
+    genes_wu, _, _, deaths_wu = _ga_phase(sub, arm, KAPPA_HIGH, V, genes1, rng, G2_WARMUP, death_memory=dm)
+    # 測定 (measure): 定常状態の deaths/記憶を正確な統計として測る。dm/集団/rng は warm-up から継続。
+    genes2, curve2, pop2, deaths2 = _ga_phase(sub, arm, KAPPA_HIGH, V, genes_wu, rng, G2_MEASURE, death_memory=dm)
     surv = _pop_survival_rate(sub, genes2, KAPPA_HIGH, V, seed)
     return {
-        "arm": arm, "seed": seed, "phase2_deaths": int(deaths2), "phase1_deaths": int(deaths1),
-        "phase1_final_fitness": phase1_final,
-        "phase2_gen0_fitness": float(curve2[0]),            # catastrophe 直後 = 記憶がどれだけ生き残ったか
+        "arm": arm, "seed": seed, "phase2_deaths": int(deaths2), "warmup_deaths": int(deaths_wu),
+        "phase1_deaths": int(deaths1), "phase1_final_fitness": phase1_final,
+        "phase2_gen0_fitness": float(curve2[0]),            # measure 期頭 = 記憶がどれだけ生き残ったか
         "phase2_final_best_fitness": float(pop2.best.fitness),
         # REVIVE の真価指標: 死を経験しても記憶が消えず集団に残るか (mean fitness + 多様性)。
         "phase2_pop_mean_fitness": float(pop2.fitness_array.mean()),
