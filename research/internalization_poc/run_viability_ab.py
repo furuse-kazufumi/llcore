@@ -9,38 +9,45 @@ R-endo (run_d_internal_ab) は有界 CopyTask で autonomy null だった。根�
 
 ## 設計 (環境依存の死 = #4)
 
-DisturbedCopy 的 memory タスク (delay=8) を各発散基質で評価。環境 = 外乱 w_env を mid-run でステップ:
+memory タスク (delay=8) を各発散基質で評価。環境 = 外乱 w_env を mid-run でステップ:
 phase1 (G1 世代) w_env=W_LOW → phase2 (G2 世代) w_env=W_HIGH。集団継続 + 同一 rng。
 
 **死** = 実測誤差包絡 (obs_gain 込み, max_t |s_disturbed−s_ref|∞) > 生存閾 V、または非有限/|state|>OVERFLOW。
-死んだ gene の fitness = 0 (memory score を得られない)。生存閾 V は環境非依存だが、誤差包絡が w_env に比例
-するため、**w_env↑ で死の境界が動く** = marginal-収縮 gene が W_HIGH で死ぬ。
+死んだ gene の fitness = 0。生存閾 V は環境非依存だが、誤差包絡が w_env に比例するため **w_env↑ で死の境界が
+動く** = marginal-収縮 gene が W_HIGH で死ぬ。
+
+### 指標の核心 (スモークで判明した重要点)
+死=0 fitness だと **selection 自体が死を回避する** (死んだ gene は子を残さない) ため、最終集団 survival は
+gate 有無に依らず ~1.0 = gate は最終状態には冗長。**内的 gate の真価は「死んで学ぶコスト」の回避** =
+評価 (rollout) 前に致命 gene を自己検証で弾く safe exploration。よって本丸指標 = **進化中に被った致命評価数
+(phase2_deaths)**。gate は ~100µs の閉形式判定で rollout なしに viability を予見し、致命試行を未然に防ぐ。
 
 **gate** (admit 条件) = 収縮 (L<1) ∧ 認証 tube `r=G·w̄/(1−L) ≤ V`。**soundness の帰結**: admit された gene の
 実測包絡 ≤ 認証 tube ≤ V → **死なない** (gerrymander でなく定理)。
-- **NONE**: gate なし。 **EXO_fixed**: gate w̄=W_LOW 固定 (設計時環境)。 **ENDO**: gate w̄=現 w_env (環境結合)。
+- **NONE**: gate なし (致命 gene も評価して死を被る)。 **EXO_fixed**: gate w̄=W_LOW 固定 (設計時環境; W_HIGH で
+  致命な gene を見逃す)。 **ENDO**: gate w̄=現 w_env (環境結合; W_HIGH-致命を予見して弾く)。
 
 phase1 は ENDO=EXO_fixed (同 w̄=W_LOW)。分岐は phase2 (W_HIGH) のみ = 効果を環境変化に isolate。
 
 ## honest 前提
 
 内的化 ≡ 環境結合適応 gating (ENDO ≡ 外部 adaptive gate; location shift 自体は無価値)。本 runner が問うのは
-「**適応的自己保存** (内的化が可能にする) が、固定 gate が死ぬ環境で生存・適応を生むか」。
-V は基質ごとに固定の pre-registered 定数 (死の境界が active = NONE が W_HIGH で死ぬ regime を smoke で確認済)。
-結果の頑健性は survival rate (V の正確値に依らず解釈可能) で担保。
+「**適応的自己保存** (内的化が可能にする) が、固定 gate が見逃す致命試行を予見・回避するか」。
+V は基質ごとに固定の pre-registered 定数。結果の頑健性は致命評価数 (V の正確値に依らず解釈可能) で担保。
 
 ## 事前登録 (PRE-REGISTRATION — 結果取得前に commit)
 
-各基質 (linear/softsat/highgain) 独立に、phase2 (W_HIGH) で ENDO vs EXO_fixed を paired 比較 (seeds 3000-3019, n=20):
-- **H_survival (本丸, confirmatory)**: ENDO の最終集団 survival rate > EXO_fixed。sign-flip permutation
-  (両側, 10^5 resamples, seed=13), α=0.05。「内的 gate が自己保存の仕事を持つ」の中核。
-- **H1 (fitness, confirmatory)**: ENDO の phase2 final best fitness ≥ EXO_fixed (死=0 を含む net fitness)。
+各基質 (linear/softsat/highgain) 独立に、phase2 (W_HIGH) で paired 比較 (seeds 3000-3019, n=20):
+- **H_deaths (本丸, confirmatory)**: ENDO の phase2 致命評価数 < EXO_fixed (= EXO−ENDO の paired delta > 0)。
+  sign-flip permutation (両側, 10^5 resamples, seed=13), α=0.05。「内的 gate が致命試行を予見回避する」中核。
+- **H1 (fitness, confirmatory)**: ENDO の phase2 final best fitness ≥ EXO_fixed。
 - **H2 (re-adaptation AUC, exploratory)**: ENDO phase2 AUC vs EXO_fixed。
-- **H3 (soundness, 必須)**: ENDO の最終集団 survival rate == 1.0 (admit gene は死なない = soundness 実証)。
-  < 1.0 が出れば認証/実装の破綻 (致命)。
-- 反証: (F1) H_survival で ENDO ≤ EXO → 自己保存に優位なし。 (F2) NONE が W_HIGH で死なない (死境界 inactive)
-  → 本基質は viability 非脅威で実験無効 (V 要再設計)。 (F3) ENDO survival < 1.0 → soundness 破綻。
-- 判定: H_survival p<0.05 ∧ ENDO>EXO ∧ H3 (ENDO surv=1.0) → **内的 gate の自己保存に固有価値あり** (基質別)。
+- **H3 (soundness, 必須)**: _admits(g, W_HIGH, V)=True の gene が実測で死なない (random 5000 で violations==0)。
+  > 0 が出れば認証/実装の破綻 (致命)。
+- 反証: (F1) H_deaths で ENDO ≥ EXO → 自己保存に優位なし (selection が死を処理し gate 冗長)。
+  (F2) NONE が phase2 で死を被らない (致命試行 ≈0) → 死境界 inactive で実験無効 (V 要再設計)。
+  (F3) soundness violations > 0 → 認証破綻。
+- 判定: H_deaths p<0.05 ∧ ENDO<EXO ∧ H3 (violations=0) ∧ F2 不発 → **内的 gate の自己保存に固有価値あり** (基質別)。
 
 実行::  py -3.11 research/internalization_poc/run_viability_ab.py
 出力::  research/internalization_poc/results_viability_ab.json
