@@ -9,7 +9,7 @@ API は 3 つの薄い関数:
 
 環境変数:
 
-- ``LLCORE_RAD_DIR`` — RAD 根ディレクトリ (default ``D:/docs``)
+- ``LLCORE_RAD_DIR`` — RAD 根ディレクトリ (default ``~/.llcore/rad``; 不在なら graceful degrade)
 
 honest 留保:
 - 大規模 corpus を grep するため I/O bound。検索は分野指定推奨。
