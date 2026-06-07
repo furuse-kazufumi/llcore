@@ -65,6 +65,7 @@ def _now(): return datetime.datetime.now().isoformat(timespec="seconds")
 BINDING = {
     "violating_target_infnorm": 1.95,   # NONE drift 終端 ρ_hp≈1.969 帯に合わせた違反 init
     "admit_threshold": 1.0,             # cert_inf 境界 (infnorm_sup<1)
+    "pullback_margin": 0.05,            # pull-back の押し先 = 1 - margin (境界ちょうどは hinge grad=0 で停滞)
     "main_grad_steps": 400,             # 本走 (GPU) の grad_steps 予算
     "latency_cap": 2000,                # pull-back を打ち切る step 上限
     "lr": 3e-3,                         # 本走と同じ Adam lr
