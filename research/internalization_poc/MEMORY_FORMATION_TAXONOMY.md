@@ -87,9 +87,10 @@ corpus paper 16 §最大リスク「ρ<1 が可塑性を殺さないか」への
   (正本 = [[VIABILITY_VERDICT.md]] 追補②③④: sound 単独支配 / RO 相乗 / hedging=CONDITIONAL)。
 - ✅ **安定 vs 可塑性 capability メトリクス** — robustness の H_capability に統合 (12/12, hard_mem 含む)。
 - ✅ **近接 parallel 精査** (2026-06-07, §反証条件 1 参照) — 棄却なし、novelty #2 生存、3 件 must_cite。
-- **[最優先] 論文編入**: 編入条件 (反証 #2 潰し + 近接 parallel 精査) が**両方充足** → 編入実行。
-  編入形 = §future work or 新節 (3 機構 taxonomy + 2 軸結果 + SEVerA/SGM/2510.04399 対比 + ④ premise
-  監視の問題提起)。over-claim 排除 (novelty 3 点限定) を維持。
+- ✅ **論文編入** (2026-06-07): PAPER_DRAFT **新 §9.6 "Who holds the verifier?"** (run_d null → viability
+  2 軸 → robustness 12/12 → factorial → META premise 監視) + abstract/contributions/repro 表 5 行 +
+  related work (SGM arXiv id 検証済化・2510.04399 新規エントリ・SEVerA に REVIVE 対比追記)。Codex
+  pair-review 数値突合済 (指摘 3 件即修正)。over-claim 排除 (novelty 3 点限定・各機構の先行明記) を維持。
 - **記事**: 「死を越えて経験が記憶になる 3 つの道 (予見/修復/観察) と、なぜ証明できる安全が観察で学ぶ安全に
   勝るのか」を Campbell BVSR + Gödel machine 対比で (over-claim 注意点 4 件を反映)。
 
