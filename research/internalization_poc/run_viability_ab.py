@@ -332,49 +332,49 @@ def run_substrate(sub):
             recs.append(_run_arm(sub, arm, seed, V))
     means = {arm: {
         "phase2_deaths": float(np.mean([r["phase2_deaths"] for r in recs if r["arm"] == arm])),
-        "fitness": float(np.mean([r["phase2_final_best_fitness"] for r in recs if r["arm"] == arm])),
-        "memory_ratio": float(np.mean([r["phase2_gen0_fitness"] / max(r["phase1_final_fitness"], 1e-9)
-                                       for r in recs if r["arm"] == arm])),
-        "survival": float(np.mean([r["phase2_survival_rate"] for r in recs if r["arm"] == arm])),
+        "best_fitness": float(np.mean([r["phase2_final_best_fitness"] for r in recs if r["arm"] == arm])),
+        "pop_mean_fitness": float(np.mean([r["phase2_pop_mean_fitness"] for r in recs if r["arm"] == arm])),
+        "diversity": float(np.mean([r["phase2_pop_diversity"] for r in recs if r["arm"] == arm])),
     } for arm in ARMS}
 
-    # 機構 vs baseline (NONE) の死回避 + 機構間比較 (paired, sign-flip)
+    # 2 軸: 死回避 (deaths 低) と 記憶保存 (pop_mean_fitness 高 = 死んでも記憶が残る)
     comp = {
+        # 死回避: ENDO (予見) は死を避ける / REVIVE は死を経験する (NONE 並み)
         "deaths_NONE_minus_ENDO": _stat(_paired(recs, "NONE", "ENDO", "phase2_deaths")),
         "deaths_NONE_minus_REVIVE": _stat(_paired(recs, "NONE", "REVIVE", "phase2_deaths")),
-        "deaths_NONE_minus_OBSERVE": _stat(_paired(recs, "NONE", "OBSERVE", "phase2_deaths")),
-        "deaths_ENDO_minus_REVIVE": _stat(_paired(recs, "ENDO", "REVIVE", "phase2_deaths")),
         "deaths_OBSERVE_minus_ENDO": _stat(_paired(recs, "OBSERVE", "ENDO", "phase2_deaths")),
-        "fitness_REVIVE_minus_ENDO": _stat(_paired(recs, "REVIVE", "ENDO", "phase2_final_best_fitness")),
-        "fitness_ENDO_minus_NONE": _stat(_paired(recs, "ENDO", "NONE", "phase2_final_best_fitness")),
+        # 記憶保存 (本丸): REVIVE は死を経験しても集団記憶を保つか (vs NONE 同死だが記憶喪失)
+        "popmean_REVIVE_minus_NONE": _stat(_paired(recs, "REVIVE", "NONE", "phase2_pop_mean_fitness")),
+        "popmean_ENDO_minus_NONE": _stat(_paired(recs, "ENDO", "NONE", "phase2_pop_mean_fitness")),
+        "popmean_REVIVE_minus_ENDO": _stat(_paired(recs, "REVIVE", "ENDO", "phase2_pop_mean_fitness")),
+        "popmean_ENDO_minus_OBSERVE": _stat(_paired(recs, "ENDO", "OBSERVE", "phase2_pop_mean_fitness")),
     }
 
     sound_viol, sound_checked = _soundness_violations(sub, V)   # ENDO/REVIVE の verifier 健全性
     none_d = means["NONE"]["phase2_deaths"]
     boundary_active = bool(none_d > 1.0)
 
-    # mechanism ランキング (死回避 = 低 deaths が良い)
     by_deaths = sorted(ARMS, key=lambda a: means[a]["phase2_deaths"])
+    by_mem = sorted(ARMS, key=lambda a: -means[a]["pop_mean_fitness"])
     if not boundary_active:
         verdict = (f"INVALID (死境界 inactive, F2): NONE deaths={none_d:.1f}。κ_high/V 再設計。")
     else:
-        rd = comp["deaths_ENDO_minus_REVIVE"]; od = comp["deaths_OBSERVE_minus_ENDO"]
-        mem_str = ", ".join("{}={:.2f}".format(a, means[a]["memory_ratio"]) for a in ARMS)
-        verdict = (f"[{sub.name}] 死回避 (低い順): {' < '.join(by_deaths)}。"
-                   f"REVIVE は死を 0 化 (全修復=経験を傷として保持) "
-                   f"vs ENDO は reject で {means['ENDO']['phase2_deaths']:.1f}。"
-                   f"REVIVE−ENDO 死差 Δ={rd['mean_delta']:+.1f} (p={rd['p_signflip_two_sided']:.3f})。"
-                   f"OBSERVE (経験的社会学習) deaths={means['OBSERVE']['phase2_deaths']:.1f} "
-                   f"vs ENDO (sound 予見) deaths={means['ENDO']['phase2_deaths']:.1f}, OBSERVE−ENDO "
-                   f"Δ={od['mean_delta']:+.1f} (p={od['p_signflip_two_sided']:.3f})。"
-                   f"verifier soundness viol={sound_viol}/{sound_checked} (ENDO/REVIVE は健全; OBSERVE は "
-                   f"empirical ゆえ deaths>0 = imperfect)。memory_ratio (catastrophe 直後/phase1): {mem_str}。")
+        rn = comp["popmean_REVIVE_minus_NONE"]; en = comp["deaths_NONE_minus_ENDO"]
+        eo = comp["popmean_ENDO_minus_OBSERVE"]
+        verdict = (f"[{sub.name}] 2 軸: ①死回避 (低い順) {' < '.join(by_deaths)} — ENDO (予見) が死を避ける "
+                   f"(NONE−ENDO Δ={en['mean_delta']:+.1f}, p={en['p_signflip_two_sided']:.3f}); REVIVE は死を経験 "
+                   f"({means['REVIVE']['phase2_deaths']:.1f}≈NONE {none_d:.1f})。"
+                   f"②記憶保存 (pop_mean_fit 高い順) {' > '.join(by_mem)} — **REVIVE は同死でも記憶を保つ** "
+                   f"(REVIVE−NONE pop_mean Δ={rn['mean_delta']:+.3f}, p={rn['p_signflip_two_sided']:.3f}) "
+                   f"= 復活が経験を記憶に残す。ENDO は予見で死を避けつつ記憶保持。OBSERVE (empirical) は死多+記憶低 "
+                   f"(ENDO−OBSERVE pop_mean Δ={eo['mean_delta']:+.3f})。verifier soundness viol={sound_viol}/{sound_checked}。")
 
     return {
         "substrate": sub.name, "V": V, "obs_gain": sub.obs_gain,
         "arm_means_phase2": means, "comparisons": comp,
         "soundness_violations": sound_viol, "soundness_checked": sound_checked,
-        "boundary_active": boundary_active, "deaths_ranking_low_to_high": by_deaths,
+        "boundary_active": boundary_active,
+        "deaths_ranking_low_to_high": by_deaths, "memory_ranking_high_to_low": by_mem,
         "verdict": verdict, "records": recs,
     }
 
