@@ -1,0 +1,101 @@
+[{"stream_name":"stdout","time":7.545909764,"data":"[    0.3s][setup] HD-1 grounding | RUN_N=64 RUN_MODE=main device=cuda (Tesla T4)\n"}
+,{"stream_name":"stdout","time":7.647005598,"data":"[    0.4s][corpus] downloaded tiny-shakespeare (1115394 chars), using 80000\n"}
+,{"stream_name":"stdout","time":7.657755123,"data":"[    0.4s][run] vocab=61 unigram_CE=3.3542 n=64 arms=['NONE', 'ENDO', 'REVIVE', 'OBSERVE_P1', 'OBSERVE_P2'] seeds=16\n"}
+,{"stream_name":"stdout","time":47.516940169,"data":"[   40.3s][run] n=64 NONE        seed=2026 ce=1.9890 d_con=32 d_harm= 0 rep=0 rb=0 av=0 rho_hp=1.184 (40s)\n"}
+,{"stream_name":"stdout","time":81.150741204,"data":"[   73.9s][run] n=64 NONE        seed=2027 ce=1.9900 d_con=32 d_harm= 0 rep=0 rb=0 av=0 rho_hp=1.130 (34s)\n"}
+,{"stream_name":"stdout","time":114.568601484,"data":"[  107.3s][run] n=64 NONE        seed=2028 ce=1.9731 d_con=40 d_harm= 0 rep=0 rb=0 av=0 rho_hp=1.205 (33s)\n"}
+,{"stream_name":"stdout","time":147.974477534,"data":"[  140.7s][run] n=64 NONE        seed=2029 ce=1.9913 d_con=45 d_harm= 0 rep=0 rb=0 av=0 rho_hp=1.272 (33s)\n"}
+,{"stream_name":"stdout","time":181.29236318,"data":"[  174.0s][run] n=64 NONE        seed=2030 ce=1.9823 d_con=39 d_harm= 0 rep=0 rb=0 av=0 rho_hp=1.190 (33s)\n"}
+,{"stream_name":"stdout","time":214.375102849,"data":"[  207.1s][run] n=64 NONE        seed=2031 ce=2.0529 d_con=35 d_harm= 0 rep=0 rb=0 av=0 rho_hp=1.225 (33s)\n"}
+,{"stream_name":"stdout","time":247.557488905,"data":"[  240.3s][run] n=64 NONE        seed=2032 ce=1.9713 d_con=40 d_harm= 0 rep=0 rb=0 av=0 rho_hp=1.310 (33s)\n"}
+,{"stream_name":"stdout","time":280.868077713,"data":"[  273.6s][run] n=64 NONE        seed=2033 ce=2.0654 d_con=52 d_harm= 0 rep=0 rb=0 av=0 rho_hp=1.131 (33s)\n"}
+,{"stream_name":"stdout","time":313.806965331,"data":"[  306.5s][run] n=64 NONE        seed=2034 ce=1.9447 d_con=26 d_harm= 0 rep=0 rb=0 av=0 rho_hp=1.058 (33s)\n"}
+,{"stream_name":"stdout","time":346.560633961,"data":"[  339.3s][run] n=64 NONE        seed=2035 ce=2.0019 d_con=23 d_harm= 0 rep=0 rb=0 av=0 rho_hp=1.075 (33s)\n"}
+,{"stream_name":"stdout","time":379.694119467,"data":"[  372.4s][run] n=64 NONE        seed=2036 ce=1.9727 d_con=43 d_harm= 0 rep=0 rb=0 av=0 rho_hp=1.448 (33s)\n"}
+,{"stream_name":"stdout","time":413.259306105,"data":"[  406.0s][run] n=64 NONE        seed=2037 ce=1.9451 d_con=43 d_harm= 0 rep=0 rb=0 av=0 rho_hp=1.288 (34s)\n"}
+,{"stream_name":"stdout","time":446.256973895,"data":"[  439.0s][run] n=64 NONE        seed=2038 ce=1.9901 d_con=49 d_harm= 0 rep=0 rb=0 av=0 rho_hp=1.218 (33s)\n"}
+,{"stream_name":"stdout","time":479.236579833,"data":"[  472.0s][run] n=64 NONE        seed=2039 ce=2.0441 d_con=40 d_harm= 0 rep=0 rb=0 av=0 rho_hp=1.226 (33s)\n"}
+,{"stream_name":"stdout","time":512.609535827,"data":"[  505.3s][run] n=64 NONE        seed=2040 ce=1.9374 d_con=27 d_harm= 0 rep=0 rb=0 av=0 rho_hp=1.207 (33s)\n"}
+,{"stream_name":"stdout","time":545.861374797,"data":"[  538.6s][run] n=64 NONE        seed=2041 ce=1.9671 d_con=43 d_harm= 0 rep=0 rb=0 av=0 rho_hp=1.279 (33s)\n"}
+,{"stream_name":"stdout","time":578.0830067,"data":"[  570.8s][run] n=64 ENDO        seed=2026 ce=2.1203 d_con= 0 d_harm= 0 rep=0 rb=98 av=0 rho_hp=0.905 (32s)\n"}
+,{"stream_name":"stdout","time":611.956371427,"data":"[  604.7s][run] n=64 ENDO        seed=2027 ce=2.1243 d_con= 0 d_harm= 0 rep=0 rb=96 av=0 rho_hp=0.910 (34s)\n"}
+,{"stream_name":"stdout","time":644.231477125,"data":"[  637.0s][run] n=64 ENDO        seed=2028 ce=2.0763 d_con= 0 d_harm= 0 rep=0 rb=98 av=0 rho_hp=0.897 (32s)\n"}
+,{"stream_name":"stdout","time":676.272075666,"data":"[  669.0s][run] n=64 ENDO        seed=2029 ce=2.1253 d_con= 0 d_harm= 0 rep=0 rb=97 av=0 rho_hp=0.896 (32s)\n"}
+,{"stream_name":"stdout","time":708.454708456,"data":"[  701.2s][run] n=64 ENDO        seed=2030 ce=2.1137 d_con= 0 d_harm= 0 rep=0 rb=99 av=0 rho_hp=0.935 (32s)\n"}
+,{"stream_name":"stdout","time":740.889914753,"data":"[  733.6s][run] n=64 ENDO        seed=2031 ce=2.1655 d_con= 0 d_harm= 0 rep=0 rb=98 av=0 rho_hp=0.908 (32s)\n"}
+,{"stream_name":"stdout","time":773.909740925,"data":"[  766.6s][run] n=64 ENDO        seed=2032 ce=2.0807 d_con= 0 d_harm= 0 rep=0 rb=98 av=0 rho_hp=0.884 (33s)\n"}
+,{"stream_name":"stdout","time":806.520983201,"data":"[  799.3s][run] n=64 ENDO        seed=2033 ce=2.1521 d_con= 0 d_harm= 0 rep=0 rb=99 av=0 rho_hp=0.892 (33s)\n"}
+,{"stream_name":"stdout","time":839.371857852,"data":"[  832.1s][run] n=64 ENDO        seed=2034 ce=2.0881 d_con= 0 d_harm= 0 rep=0 rb=99 av=0 rho_hp=0.916 (33s)\n"}
+,{"stream_name":"stdout","time":871.764190742,"data":"[  864.5s][run] n=64 ENDO        seed=2035 ce=2.1213 d_con= 0 d_harm= 0 rep=0 rb=99 av=0 rho_hp=0.892 (32s)\n"}
+,{"stream_name":"stdout","time":904.710105751,"data":"[  897.4s][run] n=64 ENDO        seed=2036 ce=2.1029 d_con= 0 d_harm= 0 rep=0 rb=99 av=0 rho_hp=0.918 (33s)\n"}
+,{"stream_name":"stdout","time":937.608811411,"data":"[  930.3s][run] n=64 ENDO        seed=2037 ce=2.1064 d_con= 0 d_harm= 0 rep=0 rb=99 av=0 rho_hp=0.874 (33s)\n"}
+,{"stream_name":"stdout","time":970.073025877,"data":"[  962.8s][run] n=64 ENDO        seed=2038 ce=2.1165 d_con= 0 d_harm= 0 rep=0 rb=99 av=0 rho_hp=0.947 (32s)\n"}
+,{"stream_name":"stdout","time":1002.362335714,"data":"[  995.1s][run] n=64 ENDO        seed=2039 ce=2.1499 d_con= 0 d_harm= 0 rep=0 rb=99 av=0 rho_hp=0.880 (32s)\n"}
+,{"stream_name":"stdout","time":1034.823538642,"data":"[ 1027.6s][run] n=64 ENDO        seed=2040 ce=2.0959 d_con= 0 d_harm= 0 rep=0 rb=99 av=0 rho_hp=0.905 (32s)\n"}
+,{"stream_name":"stdout","time":1067.267106385,"data":"[ 1060.0s][run] n=64 ENDO        seed=2041 ce=2.1046 d_con= 0 d_harm= 0 rep=0 rb=98 av=0 rho_hp=0.904 (32s)\n"}
+,{"stream_name":"stdout","time":1100.274584845,"data":"[ 1093.0s][run] n=64 REVIVE      seed=2026 ce=2.0576 d_con= 3 d_harm= 0 rep=3 rb=0 av=0 rho_hp=0.984 (33s)\n"}
+,{"stream_name":"stdout","time":1133.108236905,"data":"[ 1125.8s][run] n=64 REVIVE      seed=2027 ce=2.0426 d_con= 3 d_harm= 0 rep=3 rb=0 av=0 rho_hp=0.979 (33s)\n"}
+,{"stream_name":"stdout","time":1166.058768142,"data":"[ 1158.8s][run] n=64 REVIVE      seed=2028 ce=2.1016 d_con= 4 d_harm= 0 rep=4 rb=0 av=0 rho_hp=0.839 (33s)\n"}
+,{"stream_name":"stdout","time":1198.626705653,"data":"[ 1191.4s][run] n=64 REVIVE      seed=2029 ce=2.0186 d_con= 3 d_harm= 0 rep=3 rb=0 av=0 rho_hp=0.984 (33s)\n"}
+,{"stream_name":"stdout","time":1231.052188757,"data":"[ 1223.8s][run] n=64 REVIVE      seed=2030 ce=2.0344 d_con= 3 d_harm= 0 rep=3 rb=0 av=0 rho_hp=0.914 (32s)\n"}
+,{"stream_name":"stdout","time":1263.793828437,"data":"[ 1256.5s][run] n=64 REVIVE      seed=2031 ce=2.0925 d_con= 3 d_harm= 0 rep=3 rb=0 av=0 rho_hp=0.999 (33s)\n"}
+,{"stream_name":"stdout","time":1296.178548018,"data":"[ 1288.9s][run] n=64 REVIVE      seed=2032 ce=2.0192 d_con= 4 d_harm= 0 rep=4 rb=0 av=0 rho_hp=0.963 (32s)\n"}
+,{"stream_name":"stdout","time":1329.126506707,"data":"[ 1321.9s][run] n=64 REVIVE      seed=2033 ce=2.0779 d_con= 4 d_harm= 0 rep=4 rb=0 av=0 rho_hp=0.915 (33s)\n"}
+,{"stream_name":"stdout","time":1362.003529112,"data":"[ 1354.7s][run] n=64 REVIVE      seed=2034 ce=2.0322 d_con= 4 d_harm= 0 rep=4 rb=0 av=0 rho_hp=0.928 (33s)\n"}
+,{"stream_name":"stdout","time":1395.086718802,"data":"[ 1387.8s][run] n=64 REVIVE      seed=2035 ce=2.1033 d_con= 4 d_harm= 0 rep=4 rb=0 av=0 rho_hp=0.870 (33s)\n"}
+,{"stream_name":"stdout","time":1428.412939314,"data":"[ 1421.1s][run] n=64 REVIVE      seed=2036 ce=2.0074 d_con= 3 d_harm= 0 rep=3 rb=0 av=0 rho_hp=0.964 (33s)\n"}
+,{"stream_name":"stdout","time":1461.492080195,"data":"[ 1454.2s][run] n=64 REVIVE      seed=2037 ce=2.1613 d_con= 4 d_harm= 0 rep=4 rb=0 av=0 rho_hp=0.815 (33s)\n"}
+,{"stream_name":"stdout","time":1494.284307883,"data":"[ 1487.0s][run] n=64 REVIVE      seed=2038 ce=2.2553 d_con= 4 d_harm= 0 rep=4 rb=0 av=0 rho_hp=0.939 (33s)\n"}
+,{"stream_name":"stdout","time":1527.190111048,"data":"[ 1519.9s][run] n=64 REVIVE      seed=2039 ce=2.0748 d_con= 3 d_harm= 0 rep=3 rb=0 av=0 rho_hp=0.862 (33s)\n"}
+,{"stream_name":"stdout","time":1560.15038676,"data":"[ 1552.9s][run] n=64 REVIVE      seed=2040 ce=2.0161 d_con= 3 d_harm= 0 rep=3 rb=0 av=0 rho_hp=0.912 (33s)\n"}
+,{"stream_name":"stdout","time":1593.081146753,"data":"[ 1585.8s][run] n=64 REVIVE      seed=2041 ce=2.0206 d_con= 4 d_harm= 0 rep=4 rb=0 av=0 rho_hp=0.991 (33s)\n"}
+,{"stream_name":"stdout","time":1626.085641721,"data":"[ 1618.8s][run] n=64 OBSERVE_P1  seed=2026 ce=2.0112 d_con=23 d_harm= 0 rep=0 rb=0 av=40 rho_hp=1.089 (33s)\n"}
+,{"stream_name":"stdout","time":1659.060357225,"data":"[ 1651.8s][run] n=64 OBSERVE_P1  seed=2027 ce=1.9898 d_con=27 d_harm= 0 rep=0 rb=0 av=27 rho_hp=1.045 (33s)\n"}
+,{"stream_name":"stdout","time":1692.149619518,"data":"[ 1684.9s][run] n=64 OBSERVE_P1  seed=2028 ce=2.0022 d_con=37 d_harm= 0 rep=0 rb=0 av=34 rho_hp=1.069 (33s)\n"}
+,{"stream_name":"stdout","time":1725.162138328,"data":"[ 1717.9s][run] n=64 OBSERVE_P1  seed=2029 ce=2.0133 d_con=41 d_harm= 0 rep=0 rb=0 av=34 rho_hp=1.274 (33s)\n"}
+,{"stream_name":"stdout","time":1758.22844891,"data":"[ 1751.0s][run] n=64 OBSERVE_P1  seed=2030 ce=1.9986 d_con=33 d_harm= 0 rep=0 rb=0 av=28 rho_hp=1.079 (33s)\n"}
+,{"stream_name":"stdout","time":1791.308980416,"data":"[ 1784.0s][run] n=64 OBSERVE_P1  seed=2031 ce=2.0756 d_con=41 d_harm= 0 rep=0 rb=0 av=39 rho_hp=1.099 (33s)\n"}
+,{"stream_name":"stdout","time":1824.457938026,"data":"[ 1817.2s][run] n=64 OBSERVE_P1  seed=2032 ce=1.9661 d_con=36 d_harm= 0 rep=0 rb=0 av=32 rho_hp=1.155 (33s)\n"}
+,{"stream_name":"stdout","time":1857.741274089,"data":"[ 1850.5s][run] n=64 OBSERVE_P1  seed=2033 ce=2.0098 d_con=36 d_harm= 0 rep=0 rb=0 av=30 rho_hp=1.081 (33s)\n"}
+,{"stream_name":"stdout","time":1890.741818063,"data":"[ 1883.5s][run] n=64 OBSERVE_P1  seed=2034 ce=1.9403 d_con=27 d_harm= 0 rep=0 rb=0 av=27 rho_hp=1.056 (33s)\n"}
+,{"stream_name":"stdout","time":1923.612507081,"data":"[ 1916.3s][run] n=64 OBSERVE_P1  seed=2035 ce=2.0033 d_con=26 d_harm= 0 rep=0 rb=0 av=16 rho_hp=1.070 (33s)\n"}
+,{"stream_name":"stdout","time":1956.569033904,"data":"[ 1949.3s][run] n=64 OBSERVE_P1  seed=2036 ce=1.9805 d_con=38 d_harm= 0 rep=0 rb=0 av=33 rho_hp=1.215 (33s)\n"}
+,{"stream_name":"stdout","time":1989.710903036,"data":"[ 1982.4s][run] n=64 OBSERVE_P1  seed=2037 ce=1.9623 d_con=50 d_harm= 0 rep=0 rb=0 av=37 rho_hp=1.261 (33s)\n"}
+,{"stream_name":"stdout","time":2022.669899001,"data":"[ 2015.4s][run] n=64 OBSERVE_P1  seed=2038 ce=2.0049 d_con=45 d_harm= 0 rep=0 rb=0 av=35 rho_hp=1.161 (33s)\n"}
+,{"stream_name":"stdout","time":2055.917228225,"data":"[ 2048.7s][run] n=64 OBSERVE_P1  seed=2039 ce=2.0402 d_con=43 d_harm= 0 rep=0 rb=0 av=35 rho_hp=1.133 (33s)\n"}
+,{"stream_name":"stdout","time":2088.781374173,"data":"[ 2081.5s][run] n=64 OBSERVE_P1  seed=2040 ce=1.9523 d_con=36 d_harm= 0 rep=0 rb=0 av=29 rho_hp=1.077 (33s)\n"}
+,{"stream_name":"stdout","time":2122.115971263,"data":"[ 2114.9s][run] n=64 OBSERVE_P1  seed=2041 ce=1.9656 d_con=36 d_harm= 0 rep=0 rb=0 av=29 rho_hp=1.166 (33s)\n"}
+,{"stream_name":"stdout","time":2122.116024556,"data":"[ 2114.9s][run] OBSERVE_P2 pooled death log: 575 events\n"}
+,{"stream_name":"stdout","time":2155.020918873,"data":"[ 2147.8s][run] n=64 OBSERVE_P2  seed=2026 ce=2.0485 d_con=20 d_harm= 0 rep=0 rb=0 av=59 rho_hp=1.051 (33s)\n"}
+,{"stream_name":"stdout","time":2188.558246992,"data":"[ 2181.3s][run] n=64 OBSERVE_P2  seed=2027 ce=2.0548 d_con=13 d_harm= 0 rep=0 rb=0 av=54 rho_hp=1.015 (34s)\n"}
+,{"stream_name":"stdout","time":2221.361327091,"data":"[ 2214.1s][run] n=64 OBSERVE_P2  seed=2028 ce=2.0495 d_con=16 d_harm= 0 rep=0 rb=0 av=69 rho_hp=1.036 (33s)\n"}
+,{"stream_name":"stdout","time":2254.130684376,"data":"[ 2246.9s][run] n=64 OBSERVE_P2  seed=2029 ce=2.0765 d_con=18 d_harm= 0 rep=0 rb=0 av=78 rho_hp=1.148 (33s)\n"}
+,{"stream_name":"stdout","time":2286.783593403,"data":"[ 2279.5s][run] n=64 OBSERVE_P2  seed=2030 ce=2.0471 d_con=14 d_harm= 0 rep=0 rb=0 av=64 rho_hp=1.050 (33s)\n"}
+,{"stream_name":"stdout","time":2319.484401827,"data":"[ 2312.2s][run] n=64 OBSERVE_P2  seed=2031 ce=2.1301 d_con=10 d_harm= 0 rep=0 rb=0 av=71 rho_hp=1.020 (33s)\n"}
+,{"stream_name":"stdout","time":2352.63795902,"data":"[ 2345.4s][run] n=64 OBSERVE_P2  seed=2032 ce=2.0230 d_con=27 d_harm= 0 rep=0 rb=0 av=68 rho_hp=1.066 (33s)\n"}
+,{"stream_name":"stdout","time":2385.010773506,"data":"[ 2377.7s][run] n=64 OBSERVE_P2  seed=2033 ce=2.0905 d_con=17 d_harm= 0 rep=0 rb=0 av=63 rho_hp=1.010 (32s)\n"}
+,{"stream_name":"stdout","time":2417.36227506,"data":"[ 2410.1s][run] n=64 OBSERVE_P2  seed=2034 ce=2.0113 d_con= 7 d_harm= 0 rep=0 rb=0 av=68 rho_hp=1.015 (32s)\n"}
+,{"stream_name":"stdout","time":2449.682267266,"data":"[ 2442.4s][run] n=64 OBSERVE_P2  seed=2035 ce=2.0709 d_con=14 d_harm= 0 rep=0 rb=0 av=62 rho_hp=1.021 (32s)\n"}
+,{"stream_name":"stdout","time":2482.525779352,"data":"[ 2475.3s][run] n=64 OBSERVE_P2  seed=2036 ce=2.0479 d_con=11 d_harm= 0 rep=0 rb=0 av=71 rho_hp=1.032 (33s)\n"}
+,{"stream_name":"stdout","time":2515.680996936,"data":"[ 2508.4s][run] n=64 OBSERVE_P2  seed=2037 ce=1.9977 d_con=31 d_harm= 0 rep=0 rb=0 av=55 rho_hp=1.105 (33s)\n"}
+,{"stream_name":"stdout","time":2548.601951524,"data":"[ 2541.3s][run] n=64 OBSERVE_P2  seed=2038 ce=2.0553 d_con=18 d_harm= 0 rep=0 rb=0 av=61 rho_hp=1.047 (33s)\n"}
+,{"stream_name":"stdout","time":2581.430850381,"data":"[ 2574.2s][run] n=64 OBSERVE_P2  seed=2039 ce=2.0845 d_con=12 d_harm= 0 rep=0 rb=0 av=56 rho_hp=1.019 (33s)\n"}
+,{"stream_name":"stdout","time":2614.338475591,"data":"[ 2607.1s][run] n=64 OBSERVE_P2  seed=2040 ce=2.0158 d_con=22 d_harm= 0 rep=0 rb=0 av=63 rho_hp=1.041 (33s)\n"}
+,{"stream_name":"stdout","time":2647.146165282,"data":"[ 2639.9s][run] n=64 OBSERVE_P2  seed=2041 ce=2.0260 d_con=26 d_harm= 0 rep=0 rb=0 av=65 rho_hp=1.067 (33s)\n"}
+,{"stream_name":"stdout","time":2647.234184856,"data":"\n"}
+,{"stream_name":"stdout","time":2647.234215245,"data":"=== HD-1 grounding n=64 (unigram=3.3542; 80 ok; status=done; wall=2640s) ===\n"}
+,{"stream_name":"stdout","time":2647.234538296,"data":"  NONE        ce=1.9886 d_con= 38.1 d_harm=  0.0 rep= 0.0 rb=  0.0 av=  0.0 rho_hp=1.215\n"}
+,{"stream_name":"stdout","time":2647.234684614,"data":"  ENDO        ce=2.1152 d_con=  0.0 d_harm=  0.0 rep= 0.0 rb= 98.4 av=  0.0 rho_hp=0.904\n"}
+,{"stream_name":"stdout","time":2647.234858488,"data":"  REVIVE      ce=2.0697 d_con=  3.5 d_harm=  0.0 rep= 3.5 rb=  0.0 av=  0.0 rho_hp=0.929\n"}
+,{"stream_name":"stdout","time":2647.235054145,"data":"  OBSERVE_P1  ce=1.9947 d_con= 35.9 d_harm=  0.0 rep= 0.0 rb=  0.0 av= 31.6 rho_hp=1.127\n"}
+,{"stream_name":"stdout","time":2647.235240542,"data":"  OBSERVE_P2  ce=2.0519 d_con= 17.2 d_harm=  0.0 rep= 0.0 rb=  0.0 av= 64.2 rho_hp=1.046\n"}
+,{"stream_name":"stdout","time":2647.235919551,"data":"  F-check (contract): NONE window death rate = 47.58% (ACTIVE)\n"}
+,{"stream_name":"stdout","time":2647.235936288,"data":"  harm activity     : NONE window harm rate  = 0.00% (inactive -\u003e harm indicator excluded)\n"}
+,{"stream_name":"stdout","time":2647.235942804,"data":"[saved] result_hd1g_n64.json\n"}
+,{"stream_name":"stderr","time":2652.085961919,"data":"/usr/local/lib/python3.12/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":2652.08603588,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":2652.411179885,"data":"/usr/local/lib/python3.12/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":2652.411213672,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":2653.168228851,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":2654.584941232,"data":"[NbConvertApp] Writing 392619 bytes to __results__.html\n"}
+]
