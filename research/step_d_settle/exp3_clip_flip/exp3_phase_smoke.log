@@ -23,7 +23,7 @@ n_seeds=3 n_evals=40 honest_n=6 n_tr=12 grid_k=8 null_seeds=[20260701]
 [null-ridge FPR] clip=False ...
     null[0] seed=20260701 clip=False: LB=False beaten=0/3 me_mean=-0.7473
 
-[exp3] wrote D:\projects\llcore\research\step_d_settle\exp3_clip_flip\exp3_clip_flip_results.json  (total 32.891s, RunGuard 32.872s)
+[exp3] wrote research\step_d_settle\exp3_clip_flip\exp3_clip_flip_results.json  (total 32.891s, RunGuard 32.872s)
 [exp3] verdict = null_confirmed_at_power
 [exp3] K4 反証/降格: clip=False でも③ verdict-flip が起きない (spread 平坦化は診断量だが verdict は変えない) → K4 を『唯一の能動的 suppression 機序』から『spread を潰すが verdict 非 load-bearing な診断的所見』に降格。
 [exp3] src_unchanged=True changed=[]
@@ -45,7 +45,7 @@ n_seeds=3 n_evals=40 honest_n=6 n_tr=12 grid_k=8 null_seeds=[20260701]
 [null-ridge FPR] clip=False ...
     null[0] seed=20260701 clip=False: LB=False beaten=0/3 me_mean=-0.7473
 
-[exp3] wrote D:\projects\llcore\research\step_d_settle\exp3_clip_flip\exp3_clip_flip_results.json  (total 148.98s, RunGuard 148.974s)
+[exp3] wrote research\step_d_settle\exp3_clip_flip\exp3_clip_flip_results.json  (total 148.98s, RunGuard 148.974s)
 [exp3] verdict = null_confirmed_at_power
 [exp3] K4 反証/降格: clip=False でも③ verdict-flip が起きない (spread 平坦化は診断量だが verdict は変えない) → K4 を『唯一の能動的 suppression 機序』から『spread を潰すが verdict 非 load-bearing な診断的所見』に降格。
 [exp3] src_unchanged=True changed=[]

@@ -1,5 +1,5 @@
 corpus=8192B n=8 seeds=15 pop=12 gens=10 unigram_CE=3.5571
-D:\projects\llcore\research\verified_evolution_sdp_gate\coupled_nd.py:163: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
+research\verified_evolution_sdp_gate\coupled_nd.py:163: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
   prob.solve(solver=_SOLVER)
   seed 0: none=0.0303 inf_norm=0.0285 two_norm=0.0290 sdp=0.0291  (2051s)
   seed 1: none=0.0308 inf_norm=0.0285 two_norm=0.0296 sdp=0.0295  (3966s)

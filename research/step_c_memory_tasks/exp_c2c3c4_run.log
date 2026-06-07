@@ -26,7 +26,7 @@
   => C3 (flip_flop): 不成立
   (中間保存: exp_c2c3_results.json)
 
-結果を保存: D:\projects\llcore\research\step_c_memory_tasks\exp_c2c3_results.json
+結果を保存: research\step_c_memory_tasks\exp_c2c3_results.json
 === exp_c2c3 done (exit=0) ===
 === exp_c4 start ===
 

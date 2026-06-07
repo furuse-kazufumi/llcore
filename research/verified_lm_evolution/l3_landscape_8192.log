@@ -1,6 +1,6 @@
 corpus=8192B  n=8  n_genes=500  unigram_CE=3.5571
   50/500  (156s)
-D:\projects\llcore\research\verified_evolution_sdp_gate\coupled_nd.py:163: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
+research\verified_evolution_sdp_gate\coupled_nd.py:163: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
   prob.solve(solver=_SOLVER)
   100/500  (306s)
   150/500  (447s)

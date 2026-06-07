@@ -25,5 +25,5 @@ Phase A CrossMetric #3: DOWNHILL-NECESSITY on REAL tasks
     step6_text_proxy: 0.6111 CI[0.3721,0.8502] below=False (200s)
 ========================================================================================
 all_below_threshold=False  agrees_with_behavior_elite_dip=True (eb_all_below=False)
-wrote D:\projects\llcore\research\step_c_deceptiveness_measure\downhill_necessity_crossmetric.json
+wrote research\step_c_deceptiveness_measure\downhill_necessity_crossmetric.json
 EXITCODE=0

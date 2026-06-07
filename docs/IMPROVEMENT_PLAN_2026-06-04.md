@@ -15,7 +15,7 @@
 - **③ selection arc**: CPU-structurally closed (BG9) — niching is load-bearing only when deception lives
   in high-dimensional behavior space; CPU substrates' hard coordinates are low-dim and a strong
   random-restart baseline samples them directly. Further CPU ③ work is low-ROI; the only open venue is
-  GPU full-LLM (paid, gated).
+  GPU full-LLM (external GPU, gated).
 - **Paper**: verification-arc paper draft in progress (Workflow). Reproducibility/figures/bib are the gap.
 
 ## The arc's own honest limits == the highest-quality improvement targets
@@ -74,12 +74,10 @@
   payoff) + bib first-source verification. **Directly enables paper submission** (the current gap).
 - **Feasibility**: CPU/$0; bounded; highest leverage *if shipping the paper is the priority*.
 
-### Parked (decision recorded in memory `project_llcore_productionization_candidates`)
+### Parked (decision recorded separately)
 - **Eval Cython** (accelerate the non-native eval loops) — when eval is the measured bottleneck / at
   productionisation; profile + honest benchmark first.
-- **GPU ③ full-LLM (BG10)** — the only open ③ venue; **paid**, pre-registration first, portfolio-gated.
-- **IP protection / obfuscation** (Nuitka/Cython/Rust + encryption + license) — final/production stage,
-  crown-jewels-only, OSS framework stays open.
+- **GPU ③ full-LLM (BG10)** — the only open ③ venue; pre-registration first.
 
 ## Recommended sequence + decision gates
 
@@ -92,7 +90,7 @@ R2b (exact-JSR) and GPU(BG10): OFFER ONLY — user-gated, not auto-run.
 R3: opportunistic (after R2a/R4) — verifier-generality probe on a richer codec.
 ```
 **Rationale**: prioritise CPU/$0, bounded, falsifiable, paper-strengthening improvements (R1→R4/R2a→R-repro);
-gate the unbounded/paid ones (R2b/GPU). Every step pre-registered, CLARABEL-pinned, 0-unsound-checked,
+gate the unbounded ones (R2b/GPU). Every step pre-registered, CLARABEL-pinned, 0-unsound-checked,
 pair-reviewed. Re-plan after each verdict (results steer the next step — `feedback_self_made_freely_revisable`).
 
 ---

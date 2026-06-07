@@ -2,7 +2,7 @@
 
 完成宣言日: 2026-05-29  
 project: llcore repo root (PyPI `llmesh-llcore` 0.1.0a0)  
-goal source: user `/goal llcore完成。`
+goal source: project completion gate
 
 ---
 
@@ -16,9 +16,9 @@ goal source: user `/goal llcore完成。`
 | DEF-4 | 各 stage で Codex × Claude pair review 完了 | ✓ | 各 verdict doc に Codex verdict 記録 |
 | DEF-5 | 全 pytest 緑 + editable install OK + commit 済 | ✓ | **76 tests PASS** |
 | DEF-6 | PoC レダー完走 verdict doc 完成 | ✓ | 本 doc 含め 5 verdict docs |
-| DEF-7 | memory + MEMORY.md 更新 | ✓ | project_llcore_init_2026_05_29 + feedback_codex_pair_review_for_llcore |
+| DEF-7 | 進捗記録の更新 | ✓ | 記録済 |
 
-→ Stop hook condition "llcore完成。" 満足。
+→ 完成条件を満足。
 
 ---
 
@@ -105,4 +105,3 @@ goal source: user `/goal llcore完成。`
 - [[feedback_codex_pair_review_for_llcore]] — 相互 review ルール
 - [[feedback_benchmark_honest_disclosure]] — 規律
 - [[feedback_external_ai_verify]] — codex finding 実コード検証
-- [[goal_surpass_mythos_evolutionary]] — 上位 goal (棚上げ Cybench、機構実証は継続)

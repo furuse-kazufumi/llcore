@@ -1,5 +1,5 @@
 residual reference: {"transient": 1.4745985540423523, "decay": [0.9518975460886661, 0.5321053437913573], "W": [0.9555754937615548, 0.9344752712733384, -1.2205147408778023, 0.837540682604899], "deg4": false, "deg6": true}
-D:\projects\llcore\research\verified_evolution_sdp_gate\verifier_deg6.py:104: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
+research\verified_evolution_sdp_gate\verifier_deg6.py:104: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
   cp.Problem(cp.Minimize(cp.trace(P)), cons).solve(solver=_SOLVER)
 [rotation] reach means: {'L0_inf': 0.4082, 'L1_two': 0.7438, 'L2_sdp': 0.8587, 'L3_deg4': 0.932, 'L4_deg6': 0.9386}
 [residual_reach] reach means: {'L0_inf': 0.066, 'L1_two': 0.0589, 'L2_sdp': 0.9158, 'L3_deg4': 0.9238, 'L4_deg6': 0.9359}

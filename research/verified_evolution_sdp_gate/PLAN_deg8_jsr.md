@@ -4,13 +4,13 @@ Complements `DEG8_JSR_PREREGISTRATION.md` (gates) with the *sequence, dependenci
 parallelism, decision tree, and packaging*. Goal-fit: CPU, additive (`research/`), src untouched,
 honest disclosure. North star: **drive the verifier COVERAGE frontier to its JSR limit on CPU and
 quantify how close finite-degree SOS gets** — the coverage half of the two-frontier thesis, made
-rigorous (the fundable / surpass-llive deliverable).
+rigorous (the coverage-frontier deliverable for the paper).
 
 ## Phase 0 — LOCK deg6 first (gate: do not build on unverified ground)
 - [in-flight] red-team `redteam_deg6.py` (soundness 50k, admission-artifact, circularity, margins).
 - [in-flight] adversarial Workflow `_review_workflow.js` (6 skeptics → confirm → completeness critic).
 - On completion: fill `DEG6_VERDICT.md` §8 (red-team), apply critic corrections, re-check any
-  flagged claim. **Local git commit** (no push — exposure avoidance).
+  flagged claim. **Local git commit**.
 - **Decision:** any reviewer BLOCKER → fix before Phase 1. Otherwise proceed.
 
 ## Phase 1 — degree-8 SOS rung  (file: exp_deg8_ladder.py)   [~3-5 min]
@@ -51,7 +51,7 @@ rigorous (the fundable / surpass-llive deliverable).
   fundamental near-boundary tail; exact-JSR needs B&B, NP-hard) → document + package.
 - Either way the **bracket [jsr_lb, γ*_8]** quantifies exactly how close CPU SOS gets to exact-JSR.
 
-## Phase 5 — packaging (surpass-llive / funding arc; user-gated)
+## Phase 5 — packaging (user-gated)
 - The coverage frontier (inf→…→deg8→JSR limit, complementary non-nested rungs, all sound) +
   the deg6 **two-frontier** result (capability saturates at SDP, dimension-gated) = a complete,
   novel, falsifiable narrative: *"Certificate strength has two frontiers; the coverage frontier

@@ -39,4 +39,4 @@ n_sweep=[15, 30, 64, 82, 128, 169, 255] alpha=0.05 min_effect=0.147 CRN_seed=202
   flip_flop_MAPE_vs_rr_hillclimb: [still_inconclusive]
      psd_obs(n=15)=+0.067 は床 0.147 未満 → full gate は n に依らず 不可 (効果が床以下 = null 寄り、しかし『効果無し』の積極的確証ではない)。
 
-[exp1] wrote D:\projects\llcore\research\step_d_settle\exp1_proper_n\exp1_repower_proper_n_results.json  (541.455s, G1<900=True, src_unchanged=True)
+[exp1] wrote research\step_d_settle\exp1_proper_n\exp1_repower_proper_n_results.json  (541.455s, G1<900=True, src_unchanged=True)
