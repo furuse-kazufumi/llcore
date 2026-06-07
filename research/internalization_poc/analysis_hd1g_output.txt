@@ -1,0 +1,61 @@
+=== HD-1 grounding confirmatory analysis (prereg=HD1_GROUNDING_PREREG.md) ===
+inputs: ['research/internalization_poc/result_hd1g_n64.json', 'research/internalization_poc/result_hd1g_n128.json', 'research/internalization_poc/result_hd1g_n256.json'] | records=256 | n levels=[64, 128, 256]
+
+[gate] n= 64: NONE contract=47.58% (ACTIVE) | harm= 0.00% (harm indicator excluded)
+[gate] n=128: NONE contract=77.81% (ACTIVE) | harm= 0.00% (harm indicator excluded)
+[gate] n=256: NONE contract=96.09% (ACTIVE) | harm= 0.00% (harm indicator excluded)
+[H1] n= 64 contract_death: OBS_P2=0.2156 NONE=0.4758 median(diff)=-0.2687 p=0.0004358423668112835
+[H1] n=128 contract_death: OBS_P2=0.6461 NONE=0.7781 median(diff)=-0.1187 p=0.013449833688945485
+[H1] n=256 contract_death: OBS_P2=0.7453 NONE=0.9609 median(diff)=-0.2625 p=0.001853444740800289
+[H2] n= 64 CE: REVIVE=2.0697 ENDO=2.1152 median(diff)=-0.0737 p=0.013092041015625
+[H2] n=128 CE: REVIVE=2.0701 ENDO=2.1232 median(diff)=-0.0797 p=0.05767822265625
+[H2] n=256 CE: REVIVE=1.9693 ENDO=2.1165 median(diff)=-0.1824 p=9.1552734375e-05
+
+[H1] direction-consistent=True all-p<0.05=True Holm p=0.02689966737789097 -> PASS
+[H2] direction-consistent=True all-p<0.05=False Holm p=0.05767822265625 -> not supported
+
+[ENDO 反証条項] mean(OBS_P2)-mean(ENDO) per active n = ['+0.2156', '+0.6461', '+0.7453'] (δ=0.0125) -> 非発動
+
+[アーティファクト規律] H1 PASS のため連続量 2 指標を検査:
+  n= 64 max_rho   : OBS_P2=1.1984 NONE=1.2531 -> 一致
+  n= 64 rho_excess: OBS_P2=1.1991 NONE=4.4415 -> 一致
+  n=128 max_rho   : OBS_P2=1.4275 NONE=1.6092 -> 一致
+  n=128 rho_excess: OBS_P2=11.1638 NONE=24.3330 -> 一致
+  n=256 max_rho   : OBS_P2=1.6091 NONE=2.1147 -> 一致
+  n=256 rho_excess: OBS_P2=19.0469 NONE=72.5696 -> 一致
+  => 解釈: 部分的死回避を提供 (規律通過)
+
+=== Exploratory (補正外, 記述) ===
+[E1] n= 64 NONE 死亡率×CE Spearman=+0.221 (p=0.412)
+[E1] n=128 NONE 死亡率×CE Spearman=+0.890 (p=0.000)
+[E1] n=256 NONE 死亡率×CE Spearman=+0.575 (p=0.020)
+[E2] n= 64 flag×sep_rate Spearman=+0.621 -> 契約死を実害 proxy 採用
+[E2] n=128 flag×sep_rate Spearman=+0.801 -> 契約死を実害 proxy 採用
+[E2] n=256 flag×sep_rate Spearman=+0.794 -> 契約死を実害 proxy 採用
+[E3] n= 64: NONE max rho=1.253 (ρ>=1 到達 yes) final_rho_hp=1.215 | ENDO-NONE CE cost=+0.1266 (HD-1 帯 0.03-0.12; init protocol 差の注意 = prereg §4 E3)
+[E3] n=128: NONE max rho=1.609 (ρ>=1 到達 yes) final_rho_hp=1.319 | ENDO-NONE CE cost=+0.1556 (HD-1 帯 0.03-0.12; init protocol 差の注意 = prereg §4 E3)
+[E3] n=256: NONE max rho=2.115 (ρ>=1 到達 yes) final_rho_hp=1.969 | ENDO-NONE CE cost=+0.0763 (HD-1 帯 0.03-0.12; init protocol 差の注意 = prereg §4 E3)
+[E5] n= 64 tail=30%: OBS_P2=0.4896 NONE=0.9714
+[E5] n= 64 tail=50%: OBS_P2=0.3016 NONE=0.7984
+[E5] n= 64 tail=70%: OBS_P2=0.2154 NONE=0.5792
+[E5] n=128 tail=30%: OBS_P2=0.7786 NONE=0.9818
+[E5] n=128 tail=50%: OBS_P2=0.6813 NONE=0.9297
+[E5] n=128 tail=70%: OBS_P2=0.5926 NONE=0.8047
+[E5] n=256 tail=30%: OBS_P2=0.8776 NONE=1.0000
+[E5] n=256 tail=50%: OBS_P2=0.7703 NONE=0.9953
+[E5] n=256 tail=70%: OBS_P2=0.6942 NONE=0.9721
+[E8] n= 64 P2=0.2156 P1=0.4492 (2-pass 共有の寄与)
+[E8] n=128 P2=0.6461 P1=0.9391 (2-pass 共有の寄与)
+[E8] n=256 P2=0.7453 P1=0.9102 (2-pass 共有の寄与)
+[E9] n=128 CE: ENDO_K8=2.1227 ENDO=2.1232 (k 感度)
+[E10] avoid->死点消失タイミング (OBSERVE_P2, kernel 規則の offline 再構成):
+  n= 64: avoid 発動 1027 回中、直後測定点が非死 780 (76%)
+  n=128: avoid 発動 504 回中、直後測定点が非死 16 (3%)
+  n=256: avoid 発動 590 回中、直後測定点が非死 17 (3%)
+[E11] excursion 窓分割 (NONE 定義):
+  n= 64 excursion: OBS_P2=0.4231 NONE=0.8750
+  n= 64 補集合      : OBS_P2=0.0183 NONE=0.0960
+  n=128 excursion: OBS_P2=0.6461 NONE=0.7781
+  n=128 補集合      : OBS_P2=0.0000 NONE=0.0000
+  n=256 excursion: OBS_P2=0.7453 NONE=0.9609
+  n=256 補集合      : OBS_P2=0.0000 NONE=0.0000
