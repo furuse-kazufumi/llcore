@@ -392,8 +392,9 @@ def run_all():
         res = run_substrate(sub)
         out["substrates"][sub.name] = res
         m = res["arm_means_phase2"]
-        print(f"  [{sub.name}] deaths " + " ".join(f"{a}={m[a]['phase2_deaths']:.1f}" for a in ARMS) +
-              f" | viol={res['soundness_violations']}/{res['soundness_checked']} ({time.time()-t0:.0f}s)", flush=True)
+        print(f"  [{sub.name}] deaths " + " ".join(f"{a}={m[a]['phase2_deaths']:.0f}" for a in ARMS) +
+              " | pop_mean " + " ".join(f"{a}={m[a]['pop_mean_fitness']:.2f}" for a in ARMS) +
+              f" | viol={res['soundness_violations']} ({time.time()-t0:.0f}s)", flush=True)
     out["wall_seconds"] = round(time.time() - t0, 2)
     return out
 
