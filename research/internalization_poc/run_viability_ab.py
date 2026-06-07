@@ -387,17 +387,21 @@ def main():
     (_HERE / "results_viability_ab.json").write_text(
         json.dumps(out, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"\nwrote {_HERE / 'results_viability_ab.json'}")
-    print("\n=== R-endo viability A/B (環境=κ, phase2 κ_high, paired n=20) ===")
+    print("\n=== R-endo viability A/B — 記憶形成 3 機構 (環境=κ, phase2 κ_high, n=20) ===")
     for name, res in out["substrates"].items():
-        print(f"\n[{name}] V={res['V']} obs_gain={res['obs_gain']}")
+        print(f"\n[{name}] V={res['V']} obs_gain={res['obs_gain']} | deaths 低い順: "
+              f"{' < '.join(res['deaths_ranking_low_to_high'])}")
         m = res["arm_means_phase2"]
         for arm in ARMS:
-            print(f"   {arm:10s} phase2_deaths={m[arm]['phase2_deaths']:6.1f} "
-                  f"final_surv={m[arm]['survival']:.3f} fitness={m[arm]['fitness']:.4f}")
-        hd = res["H_deaths_exo_minus_endo"]; h1 = res["H1_fitness_endo_vs_exo"]
-        print(f"   H_deaths (EXO−ENDO) Δ={hd['mean_delta']:+.1f} p={hd['p_signflip_two_sided']:.4f} +{hd['n_positive']}/-{hd['n_negative']}")
-        print(f"   H1 fitness (ENDO−EXO) Δ={h1['mean_delta']:+.4f} p={h1['p_signflip_two_sided']:.4f}")
-        print(f"   soundness viol={res['soundness_violations']}/{res['soundness_checked']} | boundary_active={res['boundary_active']}")
+            print(f"   {arm:10s} deaths={m[arm]['phase2_deaths']:6.1f} fitness={m[arm]['fitness']:.4f} "
+                  f"memory_ratio={m[arm]['memory_ratio']:.3f}")
+        c = res["comparisons"]
+        print(f"   ENDO−REVIVE deaths Δ={c['deaths_ENDO_minus_REVIVE']['mean_delta']:+.1f} "
+              f"(p={c['deaths_ENDO_minus_REVIVE']['p_signflip_two_sided']:.3f}); "
+              f"OBSERVE−ENDO deaths Δ={c['deaths_OBSERVE_minus_ENDO']['mean_delta']:+.1f} "
+              f"(p={c['deaths_OBSERVE_minus_ENDO']['p_signflip_two_sided']:.3f})")
+        print(f"   REVIVE−ENDO fitness Δ={c['fitness_REVIVE_minus_ENDO']['mean_delta']:+.4f}; "
+              f"verifier soundness viol={res['soundness_violations']}/{res['soundness_checked']}")
         print(f"   verdict: {res['verdict']}")
     return 0
 
