@@ -202,6 +202,75 @@ def fig_coverage_vs_n(scale: dict) -> str:
                 "Cheap vertex-free coverage degrades with state dimension n")
 
 
+def fig_viability_axes(via: dict) -> str:
+    """§9.6: two pre-registered axes — steady-state deaths (left) and pop-mean fitness (right).
+
+    Grouped horizontal bars per arm; linear substrate solid, high-gain 55% opacity. Reads ONLY the
+    committed results_viability_ab.json. softsat is F2-invalid (transient boundary) and not drawn.
+    """
+    arms = ["NONE", "EXO_fixed", "OBSERVE", "REVIVE", "ENDO"]
+    colors = {"NONE": "#7f7f7f", "EXO_fixed": "#d99694", "OBSERVE": "#e8a33d",
+              "REVIVE": "#8064a2", "ENDO": "#4f81bd"}
+    subs = ["linear", "highgain"]
+    deaths = {s: {a: via["substrates"][s]["arm_means_phase2"][a]["phase2_deaths"]
+                  for a in arms} for s in subs}
+    popm = {s: {a: via["substrates"][s]["arm_means_phase2"][a]["pop_mean_fitness"]
+                for a in arms} for s in subs}
+
+    W, H = 980, 400
+    panel_w, x_l, x_r, y0 = 330, 150, 640, 78
+    bar_h, sub_gap, grp_gap = 13, 3, 18
+    d_max = max(max(d.values()) for d in deaths.values()) * 1.08
+    p_lo, p_hi = 0.60, 0.78
+
+    def dx(v: float) -> float:
+        return panel_w * (v / d_max)
+
+    def px(v: float) -> float:
+        return panel_w * ((v - p_lo) / (p_hi - p_lo))
+
+    rows = [
+        f'<text x="{x_l + panel_w/2}" y="{y0-22}" text-anchor="middle" font-size="13.5" '
+        f'font-weight="bold" fill="#333">Axis 1 - steady-state lethal evaluations</text>',
+        f'<text x="{x_r + panel_w/2}" y="{y0-22}" text-anchor="middle" font-size="13.5" '
+        f'font-weight="bold" fill="#333">Axis 2 - population-mean fitness</text>',
+    ]
+    y = y0
+    for a in arms:
+        rows.append(f'<text x="{x_l-12}" y="{y+bar_h+2}" text-anchor="end" font-size="12.5" '
+                    f'fill="#333">{_esc(a)}</text>')
+        yy = y
+        for s in subs:
+            op = 1.0 if s == "linear" else 0.55
+            dv, pv = deaths[s][a], popm[s][a]
+            rows.append(f'<rect x="{x_l}" y="{yy}" width="{max(dx(dv), 1.2):.1f}" height="{bar_h}" '
+                        f'fill="{colors[a]}" fill-opacity="{op}"/>')
+            rows.append(f'<text x="{x_l+max(dx(dv),1.2)+5:.1f}" y="{yy+bar_h-2}" font-size="10.5" '
+                        f'fill="#444">{dv:.1f}</text>')
+            rows.append(f'<rect x="{x_r}" y="{yy}" width="{px(pv):.1f}" height="{bar_h}" '
+                        f'fill="{colors[a]}" fill-opacity="{op}"/>')
+            rows.append(f'<text x="{x_r+px(pv)+5:.1f}" y="{yy+bar_h-2}" font-size="10.5" '
+                        f'fill="#444">{pv:.3f}</text>')
+            yy += bar_h + sub_gap
+        y = yy + grp_gap
+    # legend + annotations + axis note
+    ly = y + 2
+    rows.append(f'<rect x="{x_l}" y="{ly}" width="14" height="11" fill="#555"/>')
+    rows.append(f'<text x="{x_l+20}" y="{ly+10}" font-size="11.5" fill="#333">linear (upper bar)</text>')
+    rows.append(f'<rect x="{x_l+150}" y="{ly}" width="14" height="11" fill="#555" fill-opacity="0.55"/>')
+    rows.append(f'<text x="{x_l+170}" y="{ly+10}" font-size="11.5" fill="#333">high-gain (lower bar)</text>')
+    rows.append(f'<text x="{x_r}" y="{ly+10}" font-size="11" fill="#666">'
+                f'x-axis clipped to [{p_lo:.2f}, {p_hi:.2f}]</text>')
+    note = (f'<text x="{x_l}" y="{H-30}" font-size="11" fill="#666">'
+            f'n = 20 paired seeds; measure phase after 8-generation warm-up. ENDO: 0.0 deaths on both '
+            f'substrates (p &lt; 0.001 vs NONE).</text>'
+            f'<text x="{x_l}" y="{H-14}" font-size="11" fill="#666">'
+            f'REVIVE dies like NONE yet keeps population fitness (linear: +0.060, p = 0.0011) - repair '
+            f'carries memory through death. softsat omitted (F2: transient boundary).</text>')
+    return _svg(W, H, "\n".join(rows) + "\n" + note,
+                "Memory formation under viability threat - the two pre-registered axes (Sec. 9.6)")
+
+
 def main():
     with open(os.path.join(_CR, "poc_l2lite_results.json"), encoding="utf-8") as fh:
         poc1 = json.load(fh)
