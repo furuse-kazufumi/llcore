@@ -1,0 +1,1860 @@
+{
+  "preregistration": {
+    "arms": [
+      "NONE",
+      "E_only",
+      "O_only",
+      "META"
+    ],
+    "seeds": [
+      3000,
+      3001,
+      3002,
+      3003,
+      3004,
+      3005,
+      3006,
+      3007,
+      3008,
+      3009,
+      3010,
+      3011,
+      3012,
+      3013,
+      3014,
+      3015,
+      3016,
+      3017,
+      3018,
+      3019
+    ],
+    "substrates": [
+      "linear",
+      "highgain"
+    ],
+    "sense_good": 1.0,
+    "sense_bad": 0.6,
+    "measure_blocks": [
+      [
+        "GOOD",
+        10
+      ],
+      [
+        "BAD",
+        10
+      ],
+      [
+        "GOOD",
+        10
+      ],
+      [
+        "BAD",
+        10
+      ]
+    ],
+    "G1": 10,
+    "G2_WARMUP": 8,
+    "kappa_low": 1.0,
+    "kappa_high": 2.0,
+    "trust_rule": {
+      "t0": 1.0,
+      "floor": 0.05,
+      "decay_per_miss": 0.5,
+      "recover_per_clean_gen": 0.1
+    },
+    "cap_tol": 0.02,
+    "alpha": 0.05,
+    "perm_seed": 13,
+    "hypotheses": [
+      "H_bad",
+      "H_good",
+      "H_overall",
+      "H_capability",
+      "H_trust_tracks_regime"
+    ],
+    "note": "R(蘇生) は _repair が検証器モデル依存で BAD regime に汚染されるため除外 (future work)"
+  },
+  "substrates": {
+    "linear": {
+      "substrate": "linear",
+      "V": 10.0,
+      "arm_means": {
+        "NONE": {
+          "deaths_good": 46.95,
+          "deaths_bad": 46.35,
+          "deaths_total": 93.3,
+          "capability": 0.6436739439151847,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        "E_only": {
+          "deaths_good": 0.0,
+          "deaths_bad": 16.3,
+          "deaths_total": 16.3,
+          "capability": 0.7219925092965839,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        "O_only": {
+          "deaths_good": 15.8,
+          "deaths_bad": 11.25,
+          "deaths_total": 27.05,
+          "capability": 0.7103760734837875,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        "META": {
+          "deaths_good": 1.8,
+          "deaths_bad": 13.8,
+          "deaths_total": 15.6,
+          "capability": 0.7217546613728973,
+          "trust_good": 0.9081796875,
+          "trust_bad": 0.5124531249999998
+        }
+      },
+      "comparisons": {
+        "bad_E_minus_META": {
+          "mean_delta": 2.5,
+          "median_delta": 2.5,
+          "n_positive": 11,
+          "n_negative": 8,
+          "p_signflip_two_sided": 0.29096709032909673
+        },
+        "good_O_minus_META": {
+          "mean_delta": 14.0,
+          "median_delta": 14.0,
+          "n_positive": 19,
+          "n_negative": 0,
+          "p_signflip_two_sided": 9.99990000099999e-06
+        },
+        "total_E_minus_META": {
+          "mean_delta": 0.7,
+          "median_delta": -0.5,
+          "n_positive": 10,
+          "n_negative": 10,
+          "p_signflip_two_sided": 0.7932920670793292
+        },
+        "total_O_minus_META": {
+          "mean_delta": 11.45,
+          "median_delta": 12.0,
+          "n_positive": 14,
+          "n_negative": 6,
+          "p_signflip_two_sided": 0.0025299747002529975
+        },
+        "cap_META_minus_E": {
+          "mean_delta": -0.00023784792368661267,
+          "median_delta": -0.0002959297100014746,
+          "n_positive": 10,
+          "n_negative": 10,
+          "p_signflip_two_sided": 0.93690063099369
+        },
+        "cap_META_minus_O": {
+          "mean_delta": 0.01137858788910992,
+          "median_delta": 0.011177069131376005,
+          "n_positive": 16,
+          "n_negative": 4,
+          "p_signflip_two_sided": 0.00979990200097999
+        }
+      },
+      "boundary_active": true,
+      "H_bad": true,
+      "H_good": true,
+      "H_overall": true,
+      "H_capability": true,
+      "H_trust_tracks_regime": true,
+      "records": [
+        {
+          "arm": "NONE",
+          "seed": 3000,
+          "deaths_good": 29,
+          "deaths_bad": 37,
+          "deaths_total": 66,
+          "capability": 0.65423747142428,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3001,
+          "deaths_good": 34,
+          "deaths_bad": 34,
+          "deaths_total": 68,
+          "capability": 0.6664418775223953,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3002,
+          "deaths_good": 71,
+          "deaths_bad": 28,
+          "deaths_total": 99,
+          "capability": 0.6427421435697616,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3003,
+          "deaths_good": 68,
+          "deaths_bad": 43,
+          "deaths_total": 111,
+          "capability": 0.6211819173757227,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3004,
+          "deaths_good": 73,
+          "deaths_bad": 90,
+          "deaths_total": 163,
+          "capability": 0.5876935522812312,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3005,
+          "deaths_good": 27,
+          "deaths_bad": 24,
+          "deaths_total": 51,
+          "capability": 0.6858332096425266,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3006,
+          "deaths_good": 61,
+          "deaths_bad": 62,
+          "deaths_total": 123,
+          "capability": 0.6232669378501481,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3007,
+          "deaths_good": 29,
+          "deaths_bad": 22,
+          "deaths_total": 51,
+          "capability": 0.6682444580908067,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3008,
+          "deaths_good": 71,
+          "deaths_bad": 66,
+          "deaths_total": 137,
+          "capability": 0.6123521097086644,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3009,
+          "deaths_good": 11,
+          "deaths_bad": 26,
+          "deaths_total": 37,
+          "capability": 0.6913872938022306,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3010,
+          "deaths_good": 35,
+          "deaths_bad": 29,
+          "deaths_total": 64,
+          "capability": 0.6754253228121749,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3011,
+          "deaths_good": 36,
+          "deaths_bad": 42,
+          "deaths_total": 78,
+          "capability": 0.649211655313214,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3012,
+          "deaths_good": 53,
+          "deaths_bad": 67,
+          "deaths_total": 120,
+          "capability": 0.6248913353455412,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3013,
+          "deaths_good": 35,
+          "deaths_bad": 29,
+          "deaths_total": 64,
+          "capability": 0.665511272875775,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3014,
+          "deaths_good": 97,
+          "deaths_bad": 93,
+          "deaths_total": 190,
+          "capability": 0.5709075810665586,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3015,
+          "deaths_good": 24,
+          "deaths_bad": 17,
+          "deaths_total": 41,
+          "capability": 0.686520498111536,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3016,
+          "deaths_good": 73,
+          "deaths_bad": 94,
+          "deaths_total": 167,
+          "capability": 0.5882514023910699,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3017,
+          "deaths_good": 26,
+          "deaths_bad": 27,
+          "deaths_total": 53,
+          "capability": 0.6734000854814165,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3018,
+          "deaths_good": 17,
+          "deaths_bad": 25,
+          "deaths_total": 42,
+          "capability": 0.6791744980636103,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3019,
+          "deaths_good": 69,
+          "deaths_bad": 72,
+          "deaths_total": 141,
+          "capability": 0.6068042555750319,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3000,
+          "deaths_good": 0,
+          "deaths_bad": 2,
+          "deaths_total": 2,
+          "capability": 0.7394286361812142,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3001,
+          "deaths_good": 0,
+          "deaths_bad": 22,
+          "deaths_total": 22,
+          "capability": 0.7140936525003452,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3002,
+          "deaths_good": 0,
+          "deaths_bad": 6,
+          "deaths_total": 6,
+          "capability": 0.7361840402094563,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3003,
+          "deaths_good": 0,
+          "deaths_bad": 6,
+          "deaths_total": 6,
+          "capability": 0.7351514386803367,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3004,
+          "deaths_good": 0,
+          "deaths_bad": 19,
+          "deaths_total": 19,
+          "capability": 0.7219333555578746,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3005,
+          "deaths_good": 0,
+          "deaths_bad": 10,
+          "deaths_total": 10,
+          "capability": 0.7254138961823198,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3006,
+          "deaths_good": 0,
+          "deaths_bad": 15,
+          "deaths_total": 15,
+          "capability": 0.7173085359417646,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3007,
+          "deaths_good": 0,
+          "deaths_bad": 20,
+          "deaths_total": 20,
+          "capability": 0.7207596140592802,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3008,
+          "deaths_good": 0,
+          "deaths_bad": 23,
+          "deaths_total": 23,
+          "capability": 0.7122934293747766,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3009,
+          "deaths_good": 0,
+          "deaths_bad": 11,
+          "deaths_total": 11,
+          "capability": 0.721758610662947,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3010,
+          "deaths_good": 0,
+          "deaths_bad": 20,
+          "deaths_total": 20,
+          "capability": 0.7208648343360149,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3011,
+          "deaths_good": 0,
+          "deaths_bad": 16,
+          "deaths_total": 16,
+          "capability": 0.7194686284550287,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3012,
+          "deaths_good": 0,
+          "deaths_bad": 20,
+          "deaths_total": 20,
+          "capability": 0.7161303041993172,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3013,
+          "deaths_good": 0,
+          "deaths_bad": 15,
+          "deaths_total": 15,
+          "capability": 0.7235036105341338,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3014,
+          "deaths_good": 0,
+          "deaths_bad": 10,
+          "deaths_total": 10,
+          "capability": 0.7313022159766627,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3015,
+          "deaths_good": 0,
+          "deaths_bad": 13,
+          "deaths_total": 13,
+          "capability": 0.7291755044070167,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3016,
+          "deaths_good": 0,
+          "deaths_bad": 25,
+          "deaths_total": 25,
+          "capability": 0.7087942575611648,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3017,
+          "deaths_good": 0,
+          "deaths_bad": 32,
+          "deaths_total": 32,
+          "capability": 0.7071036507103458,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3018,
+          "deaths_good": 0,
+          "deaths_bad": 20,
+          "deaths_total": 20,
+          "capability": 0.7239067485282528,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3019,
+          "deaths_good": 0,
+          "deaths_bad": 21,
+          "deaths_total": 21,
+          "capability": 0.7152752218734265,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3000,
+          "deaths_good": 14,
+          "deaths_bad": 6,
+          "deaths_total": 20,
+          "capability": 0.7152767292349591,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3001,
+          "deaths_good": 18,
+          "deaths_bad": 12,
+          "deaths_total": 30,
+          "capability": 0.7072035049417345,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3002,
+          "deaths_good": 14,
+          "deaths_bad": 9,
+          "deaths_total": 23,
+          "capability": 0.7105692384510485,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3003,
+          "deaths_good": 10,
+          "deaths_bad": 4,
+          "deaths_total": 14,
+          "capability": 0.7270813646288214,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3004,
+          "deaths_good": 61,
+          "deaths_bad": 15,
+          "deaths_total": 76,
+          "capability": 0.661751917197387,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3005,
+          "deaths_good": 20,
+          "deaths_bad": 17,
+          "deaths_total": 37,
+          "capability": 0.7032504031123821,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3006,
+          "deaths_good": 16,
+          "deaths_bad": 14,
+          "deaths_total": 30,
+          "capability": 0.7023526671351933,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3007,
+          "deaths_good": 17,
+          "deaths_bad": 6,
+          "deaths_total": 23,
+          "capability": 0.7111145647087193,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3008,
+          "deaths_good": 4,
+          "deaths_bad": 5,
+          "deaths_total": 9,
+          "capability": 0.7303564680915865,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3009,
+          "deaths_good": 17,
+          "deaths_bad": 10,
+          "deaths_total": 27,
+          "capability": 0.7118447994205279,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3010,
+          "deaths_good": 9,
+          "deaths_bad": 13,
+          "deaths_total": 22,
+          "capability": 0.7120417766167395,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3011,
+          "deaths_good": 17,
+          "deaths_bad": 9,
+          "deaths_total": 26,
+          "capability": 0.7124460612783972,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3012,
+          "deaths_good": 16,
+          "deaths_bad": 13,
+          "deaths_total": 29,
+          "capability": 0.7113246931296757,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3013,
+          "deaths_good": 15,
+          "deaths_bad": 17,
+          "deaths_total": 32,
+          "capability": 0.7136517691824389,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3014,
+          "deaths_good": 6,
+          "deaths_bad": 14,
+          "deaths_total": 20,
+          "capability": 0.7120861640740123,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3015,
+          "deaths_good": 10,
+          "deaths_bad": 12,
+          "deaths_total": 22,
+          "capability": 0.7171549906751826,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3016,
+          "deaths_good": 9,
+          "deaths_bad": 14,
+          "deaths_total": 23,
+          "capability": 0.716790212112689,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3017,
+          "deaths_good": 15,
+          "deaths_bad": 18,
+          "deaths_total": 33,
+          "capability": 0.7057220414977804,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3018,
+          "deaths_good": 21,
+          "deaths_bad": 8,
+          "deaths_total": 29,
+          "capability": 0.7047376536311114,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3019,
+          "deaths_good": 7,
+          "deaths_bad": 9,
+          "deaths_total": 16,
+          "capability": 0.7207644505553619,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "META",
+          "seed": 3000,
+          "deaths_good": 4,
+          "deaths_bad": 10,
+          "deaths_total": 14,
+          "capability": 0.7273479119903189,
+          "trust_good": 0.86875,
+          "trust_bad": 0.59625
+        },
+        {
+          "arm": "META",
+          "seed": 3001,
+          "deaths_good": 1,
+          "deaths_bad": 14,
+          "deaths_total": 15,
+          "capability": 0.7226858776165257,
+          "trust_good": 0.9175000000000001,
+          "trust_bad": 0.505
+        },
+        {
+          "arm": "META",
+          "seed": 3002,
+          "deaths_good": 0,
+          "deaths_bad": 25,
+          "deaths_total": 25,
+          "capability": 0.7109787863118618,
+          "trust_good": 0.9328125,
+          "trust_bad": 0.3915625
+        },
+        {
+          "arm": "META",
+          "seed": 3003,
+          "deaths_good": 3,
+          "deaths_bad": 12,
+          "deaths_total": 15,
+          "capability": 0.7175126332243381,
+          "trust_good": 0.9193749999999999,
+          "trust_bad": 0.3753125
+        },
+        {
+          "arm": "META",
+          "seed": 3004,
+          "deaths_good": 0,
+          "deaths_bad": 4,
+          "deaths_total": 4,
+          "capability": 0.7314469146142716,
+          "trust_good": 1.0,
+          "trust_bad": 0.865
+        },
+        {
+          "arm": "META",
+          "seed": 3005,
+          "deaths_good": 3,
+          "deaths_bad": 16,
+          "deaths_total": 19,
+          "capability": 0.7238852751409028,
+          "trust_good": 0.85,
+          "trust_bad": 0.35
+        },
+        {
+          "arm": "META",
+          "seed": 3006,
+          "deaths_good": 2,
+          "deaths_bad": 11,
+          "deaths_total": 13,
+          "capability": 0.72473375571673,
+          "trust_good": 0.8818750000000002,
+          "trust_bad": 0.5912499999999999
+        },
+        {
+          "arm": "META",
+          "seed": 3007,
+          "deaths_good": 0,
+          "deaths_bad": 3,
+          "deaths_total": 3,
+          "capability": 0.7381133415690768,
+          "trust_good": 1.0,
+          "trust_bad": 0.74
+        },
+        {
+          "arm": "META",
+          "seed": 3008,
+          "deaths_good": 4,
+          "deaths_bad": 21,
+          "deaths_total": 25,
+          "capability": 0.7076122665753753,
+          "trust_good": 0.8873437500000001,
+          "trust_bad": 0.36328124999999994
+        },
+        {
+          "arm": "META",
+          "seed": 3009,
+          "deaths_good": 2,
+          "deaths_bad": 8,
+          "deaths_total": 10,
+          "capability": 0.7319885411057436,
+          "trust_good": 0.9400000000000001,
+          "trust_bad": 0.7328125
+        },
+        {
+          "arm": "META",
+          "seed": 3010,
+          "deaths_good": 1,
+          "deaths_bad": 12,
+          "deaths_total": 13,
+          "capability": 0.7223247321241317,
+          "trust_good": 0.9899999999999999,
+          "trust_bad": 0.5187499999999999
+        },
+        {
+          "arm": "META",
+          "seed": 3011,
+          "deaths_good": 1,
+          "deaths_bad": 17,
+          "deaths_total": 18,
+          "capability": 0.720079977087817,
+          "trust_good": 0.8424999999999999,
+          "trust_bad": 0.4140624999999999
+        },
+        {
+          "arm": "META",
+          "seed": 3012,
+          "deaths_good": 0,
+          "deaths_bad": 13,
+          "deaths_total": 13,
+          "capability": 0.7149270961465259,
+          "trust_good": 0.9025000000000001,
+          "trust_bad": 0.44125
+        },
+        {
+          "arm": "META",
+          "seed": 3013,
+          "deaths_good": 2,
+          "deaths_bad": 20,
+          "deaths_total": 22,
+          "capability": 0.7150750779322389,
+          "trust_good": 0.923125,
+          "trust_bad": 0.365625
+        },
+        {
+          "arm": "META",
+          "seed": 3014,
+          "deaths_good": 3,
+          "deaths_bad": 20,
+          "deaths_total": 23,
+          "capability": 0.7139841015471805,
+          "trust_good": 0.9175000000000001,
+          "trust_bad": 0.5512500000000001
+        },
+        {
+          "arm": "META",
+          "seed": 3015,
+          "deaths_good": 5,
+          "deaths_bad": 18,
+          "deaths_total": 23,
+          "capability": 0.7132287199713866,
+          "trust_good": 0.845,
+          "trust_bad": 0.45296875000000003
+        },
+        {
+          "arm": "META",
+          "seed": 3016,
+          "deaths_good": 1,
+          "deaths_bad": 8,
+          "deaths_total": 9,
+          "capability": 0.733123404106163,
+          "trust_good": 0.9099999999999999,
+          "trust_bad": 0.62
+        },
+        {
+          "arm": "META",
+          "seed": 3017,
+          "deaths_good": 0,
+          "deaths_bad": 14,
+          "deaths_total": 14,
+          "capability": 0.7297856220496867,
+          "trust_good": 0.8928125000000001,
+          "trust_bad": 0.4068749999999999
+        },
+        {
+          "arm": "META",
+          "seed": 3018,
+          "deaths_good": 1,
+          "deaths_bad": 9,
+          "deaths_total": 10,
+          "capability": 0.7276255668148728,
+          "trust_good": 0.9099999999999999,
+          "trust_bad": 0.5243749999999999
+        },
+        {
+          "arm": "META",
+          "seed": 3019,
+          "deaths_good": 3,
+          "deaths_bad": 21,
+          "deaths_total": 24,
+          "capability": 0.7086336258127989,
+          "trust_good": 0.8324999999999999,
+          "trust_bad": 0.44343749999999993
+        }
+      ]
+    },
+    "highgain": {
+      "substrate": "highgain",
+      "V": 5.0,
+      "arm_means": {
+        "NONE": {
+          "deaths_good": 8.85,
+          "deaths_bad": 7.6,
+          "deaths_total": 16.45,
+          "capability": 0.7386751562458234,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        "E_only": {
+          "deaths_good": 0.0,
+          "deaths_bad": 3.5,
+          "deaths_total": 3.5,
+          "capability": 0.7478037925360711,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        "O_only": {
+          "deaths_good": 2.45,
+          "deaths_bad": 1.6,
+          "deaths_total": 4.05,
+          "capability": 0.7497892302509251,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        "META": {
+          "deaths_good": 0.3,
+          "deaths_bad": 4.0,
+          "deaths_total": 4.3,
+          "capability": 0.7468960861474103,
+          "trust_good": 0.97409375,
+          "trust_bad": 0.79971875
+        }
+      },
+      "comparisons": {
+        "bad_E_minus_META": {
+          "mean_delta": -0.5,
+          "median_delta": -1.0,
+          "n_positive": 6,
+          "n_negative": 11,
+          "p_signflip_two_sided": 0.6110538894611054
+        },
+        "good_O_minus_META": {
+          "mean_delta": 2.15,
+          "median_delta": 1.5,
+          "n_positive": 12,
+          "n_negative": 0,
+          "p_signflip_two_sided": 0.0005899941000589994
+        },
+        "total_E_minus_META": {
+          "mean_delta": -0.8,
+          "median_delta": -1.0,
+          "n_positive": 6,
+          "n_negative": 12,
+          "p_signflip_two_sided": 0.4329656703432966
+        },
+        "total_O_minus_META": {
+          "mean_delta": -0.25,
+          "median_delta": -2.0,
+          "n_positive": 7,
+          "n_negative": 13,
+          "p_signflip_two_sided": 0.8695313046869532
+        },
+        "cap_META_minus_E": {
+          "mean_delta": -0.0009077063886606618,
+          "median_delta": -0.0004797186885950322,
+          "n_positive": 9,
+          "n_negative": 11,
+          "p_signflip_two_sided": 0.4730352696473035
+        },
+        "cap_META_minus_O": {
+          "mean_delta": -0.0028931441035147053,
+          "median_delta": -0.0038314515344261557,
+          "n_positive": 4,
+          "n_negative": 16,
+          "p_signflip_two_sided": 0.012789872101278988
+        }
+      },
+      "boundary_active": true,
+      "H_bad": false,
+      "H_good": true,
+      "H_overall": false,
+      "H_capability": true,
+      "H_trust_tracks_regime": true,
+      "records": [
+        {
+          "arm": "NONE",
+          "seed": 3000,
+          "deaths_good": 3,
+          "deaths_bad": 5,
+          "deaths_total": 8,
+          "capability": 0.7471349540210974,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3001,
+          "deaths_good": 0,
+          "deaths_bad": 1,
+          "deaths_total": 1,
+          "capability": 0.7518119693125983,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3002,
+          "deaths_good": 2,
+          "deaths_bad": 0,
+          "deaths_total": 2,
+          "capability": 0.7522192493113515,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3003,
+          "deaths_good": 81,
+          "deaths_bad": 85,
+          "deaths_total": 166,
+          "capability": 0.6030732320974785,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3004,
+          "deaths_good": 0,
+          "deaths_bad": 1,
+          "deaths_total": 1,
+          "capability": 0.7521594837306502,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3005,
+          "deaths_good": 0,
+          "deaths_bad": 1,
+          "deaths_total": 1,
+          "capability": 0.7531189178068999,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3006,
+          "deaths_good": 4,
+          "deaths_bad": 3,
+          "deaths_total": 7,
+          "capability": 0.7463671134128773,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3007,
+          "deaths_good": 2,
+          "deaths_bad": 2,
+          "deaths_total": 4,
+          "capability": 0.7511153023231365,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3008,
+          "deaths_good": 0,
+          "deaths_bad": 0,
+          "deaths_total": 0,
+          "capability": 0.7535981063044804,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3009,
+          "deaths_good": 0,
+          "deaths_bad": 0,
+          "deaths_total": 0,
+          "capability": 0.7502040675833799,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3010,
+          "deaths_good": 1,
+          "deaths_bad": 2,
+          "deaths_total": 3,
+          "capability": 0.7533131273751696,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3011,
+          "deaths_good": 3,
+          "deaths_bad": 5,
+          "deaths_total": 8,
+          "capability": 0.7510995886523437,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3012,
+          "deaths_good": 3,
+          "deaths_bad": 1,
+          "deaths_total": 4,
+          "capability": 0.7493716293356387,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3013,
+          "deaths_good": 9,
+          "deaths_bad": 5,
+          "deaths_total": 14,
+          "capability": 0.7382021708821952,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3014,
+          "deaths_good": 6,
+          "deaths_bad": 7,
+          "deaths_total": 13,
+          "capability": 0.7396538026041253,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3015,
+          "deaths_good": 2,
+          "deaths_bad": 5,
+          "deaths_total": 7,
+          "capability": 0.7445496620372728,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3016,
+          "deaths_good": 0,
+          "deaths_bad": 0,
+          "deaths_total": 0,
+          "capability": 0.7512195172722055,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3017,
+          "deaths_good": 7,
+          "deaths_bad": 2,
+          "deaths_total": 9,
+          "capability": 0.7492434528544153,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3018,
+          "deaths_good": 49,
+          "deaths_bad": 20,
+          "deaths_total": 69,
+          "capability": 0.6878506586866526,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "NONE",
+          "seed": 3019,
+          "deaths_good": 5,
+          "deaths_bad": 7,
+          "deaths_total": 12,
+          "capability": 0.7481971193124975,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3000,
+          "deaths_good": 0,
+          "deaths_bad": 3,
+          "deaths_total": 3,
+          "capability": 0.7491996632359817,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3001,
+          "deaths_good": 0,
+          "deaths_bad": 3,
+          "deaths_total": 3,
+          "capability": 0.7493547278269225,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3002,
+          "deaths_good": 0,
+          "deaths_bad": 10,
+          "deaths_total": 10,
+          "capability": 0.7430490838100539,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3003,
+          "deaths_good": 0,
+          "deaths_bad": 11,
+          "deaths_total": 11,
+          "capability": 0.740451334016741,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3004,
+          "deaths_good": 0,
+          "deaths_bad": 1,
+          "deaths_total": 1,
+          "capability": 0.7542237278260481,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3005,
+          "deaths_good": 0,
+          "deaths_bad": 0,
+          "deaths_total": 0,
+          "capability": 0.7496505325617563,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3006,
+          "deaths_good": 0,
+          "deaths_bad": 4,
+          "deaths_total": 4,
+          "capability": 0.7483091158293502,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3007,
+          "deaths_good": 0,
+          "deaths_bad": 1,
+          "deaths_total": 1,
+          "capability": 0.7495077355401756,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3008,
+          "deaths_good": 0,
+          "deaths_bad": 2,
+          "deaths_total": 2,
+          "capability": 0.7476022073291302,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3009,
+          "deaths_good": 0,
+          "deaths_bad": 7,
+          "deaths_total": 7,
+          "capability": 0.7414798229506385,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3010,
+          "deaths_good": 0,
+          "deaths_bad": 2,
+          "deaths_total": 2,
+          "capability": 0.7502259780197618,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3011,
+          "deaths_good": 0,
+          "deaths_bad": 4,
+          "deaths_total": 4,
+          "capability": 0.746377803499458,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3012,
+          "deaths_good": 0,
+          "deaths_bad": 7,
+          "deaths_total": 7,
+          "capability": 0.7446075454932458,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3013,
+          "deaths_good": 0,
+          "deaths_bad": 5,
+          "deaths_total": 5,
+          "capability": 0.7447579976705905,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3014,
+          "deaths_good": 0,
+          "deaths_bad": 1,
+          "deaths_total": 1,
+          "capability": 0.7494220000006554,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3015,
+          "deaths_good": 0,
+          "deaths_bad": 6,
+          "deaths_total": 6,
+          "capability": 0.7431610868950881,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3016,
+          "deaths_good": 0,
+          "deaths_bad": 3,
+          "deaths_total": 3,
+          "capability": 0.7480692238996662,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3017,
+          "deaths_good": 0,
+          "deaths_bad": 0,
+          "deaths_total": 0,
+          "capability": 0.7511640404046684,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3018,
+          "deaths_good": 0,
+          "deaths_bad": 0,
+          "deaths_total": 0,
+          "capability": 0.7503227172788123,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "E_only",
+          "seed": 3019,
+          "deaths_good": 0,
+          "deaths_bad": 0,
+          "deaths_total": 0,
+          "capability": 0.7551395066326773,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3000,
+          "deaths_good": 3,
+          "deaths_bad": 1,
+          "deaths_total": 4,
+          "capability": 0.7505546910840095,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3001,
+          "deaths_good": 0,
+          "deaths_bad": 1,
+          "deaths_total": 1,
+          "capability": 0.7518119693125983,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3002,
+          "deaths_good": 1,
+          "deaths_bad": 0,
+          "deaths_total": 1,
+          "capability": 0.7521440617002482,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3003,
+          "deaths_good": 0,
+          "deaths_bad": 3,
+          "deaths_total": 3,
+          "capability": 0.7517367475199814,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3004,
+          "deaths_good": 12,
+          "deaths_bad": 10,
+          "deaths_total": 22,
+          "capability": 0.7331328354537172,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3005,
+          "deaths_good": 1,
+          "deaths_bad": 0,
+          "deaths_total": 1,
+          "capability": 0.7517816999501604,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3006,
+          "deaths_good": 3,
+          "deaths_bad": 0,
+          "deaths_total": 3,
+          "capability": 0.7482947068304509,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3007,
+          "deaths_good": 3,
+          "deaths_bad": 0,
+          "deaths_total": 3,
+          "capability": 0.7531297777380614,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3008,
+          "deaths_good": 0,
+          "deaths_bad": 0,
+          "deaths_total": 0,
+          "capability": 0.7535981063044804,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3009,
+          "deaths_good": 0,
+          "deaths_bad": 0,
+          "deaths_total": 0,
+          "capability": 0.7502040675833799,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3010,
+          "deaths_good": 4,
+          "deaths_bad": 3,
+          "deaths_total": 7,
+          "capability": 0.7506151210456609,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3011,
+          "deaths_good": 2,
+          "deaths_bad": 1,
+          "deaths_total": 3,
+          "capability": 0.7473041175247215,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3012,
+          "deaths_good": 2,
+          "deaths_bad": 5,
+          "deaths_total": 7,
+          "capability": 0.7484655449005332,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3013,
+          "deaths_good": 0,
+          "deaths_bad": 0,
+          "deaths_total": 0,
+          "capability": 0.7528618226781316,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3014,
+          "deaths_good": 1,
+          "deaths_bad": 0,
+          "deaths_total": 1,
+          "capability": 0.7522283202341843,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3015,
+          "deaths_good": 7,
+          "deaths_bad": 1,
+          "deaths_total": 8,
+          "capability": 0.746280335020194,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3016,
+          "deaths_good": 0,
+          "deaths_bad": 0,
+          "deaths_total": 0,
+          "capability": 0.7517414205438373,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3017,
+          "deaths_good": 3,
+          "deaths_bad": 0,
+          "deaths_total": 3,
+          "capability": 0.7513715303162095,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3018,
+          "deaths_good": 3,
+          "deaths_bad": 2,
+          "deaths_total": 5,
+          "capability": 0.7512655425726333,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "O_only",
+          "seed": 3019,
+          "deaths_good": 4,
+          "deaths_bad": 5,
+          "deaths_total": 9,
+          "capability": 0.7472621867053094,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "META",
+          "seed": 3000,
+          "deaths_good": 0,
+          "deaths_bad": 6,
+          "deaths_total": 6,
+          "capability": 0.7415765434124448,
+          "trust_good": 1.0,
+          "trust_bad": 0.75125
+        },
+        {
+          "arm": "META",
+          "seed": 3001,
+          "deaths_good": 0,
+          "deaths_bad": 4,
+          "deaths_total": 4,
+          "capability": 0.7435508551152423,
+          "trust_good": 1.0,
+          "trust_bad": 0.7350000000000001
+        },
+        {
+          "arm": "META",
+          "seed": 3002,
+          "deaths_good": 0,
+          "deaths_bad": 4,
+          "deaths_total": 4,
+          "capability": 0.7482002930491778,
+          "trust_good": 0.95,
+          "trust_bad": 0.825
+        },
+        {
+          "arm": "META",
+          "seed": 3003,
+          "deaths_good": 0,
+          "deaths_bad": 5,
+          "deaths_total": 5,
+          "capability": 0.7456164696734955,
+          "trust_good": 1.0,
+          "trust_bad": 0.825
+        },
+        {
+          "arm": "META",
+          "seed": 3004,
+          "deaths_good": 0,
+          "deaths_bad": 7,
+          "deaths_total": 7,
+          "capability": 0.7412641206521917,
+          "trust_good": 0.9375,
+          "trust_bad": 0.7050000000000001
+        },
+        {
+          "arm": "META",
+          "seed": 3005,
+          "deaths_good": 1,
+          "deaths_bad": 7,
+          "deaths_total": 8,
+          "capability": 0.7441816270803642,
+          "trust_good": 0.928125,
+          "trust_bad": 0.72375
+        },
+        {
+          "arm": "META",
+          "seed": 3006,
+          "deaths_good": 0,
+          "deaths_bad": 4,
+          "deaths_total": 4,
+          "capability": 0.7482624926364132,
+          "trust_good": 1.0,
+          "trust_bad": 0.755
+        },
+        {
+          "arm": "META",
+          "seed": 3007,
+          "deaths_good": 1,
+          "deaths_bad": 4,
+          "deaths_total": 5,
+          "capability": 0.7476942223498382,
+          "trust_good": 0.925,
+          "trust_bad": 0.8150000000000001
+        },
+        {
+          "arm": "META",
+          "seed": 3008,
+          "deaths_good": 0,
+          "deaths_bad": 3,
+          "deaths_total": 3,
+          "capability": 0.7505241774451017,
+          "trust_good": 1.0,
+          "trust_bad": 0.8550000000000001
+        },
+        {
+          "arm": "META",
+          "seed": 3009,
+          "deaths_good": 0,
+          "deaths_bad": 4,
+          "deaths_total": 4,
+          "capability": 0.7492104433962957,
+          "trust_good": 0.9949999999999999,
+          "trust_bad": 0.8487500000000001
+        },
+        {
+          "arm": "META",
+          "seed": 3010,
+          "deaths_good": 0,
+          "deaths_bad": 2,
+          "deaths_total": 2,
+          "capability": 0.7505613446063558,
+          "trust_good": 0.9850000000000001,
+          "trust_bad": 0.9149999999999998
+        },
+        {
+          "arm": "META",
+          "seed": 3011,
+          "deaths_good": 0,
+          "deaths_bad": 2,
+          "deaths_total": 2,
+          "capability": 0.7518955046731709,
+          "trust_good": 0.95,
+          "trust_bad": 0.9
+        },
+        {
+          "arm": "META",
+          "seed": 3012,
+          "deaths_good": 0,
+          "deaths_bad": 0,
+          "deaths_total": 0,
+          "capability": 0.7504453642532563,
+          "trust_good": 1.0,
+          "trust_bad": 1.0
+        },
+        {
+          "arm": "META",
+          "seed": 3013,
+          "deaths_good": 0,
+          "deaths_bad": 3,
+          "deaths_total": 3,
+          "capability": 0.7452806694689076,
+          "trust_good": 0.95,
+          "trust_bad": 0.825
+        },
+        {
+          "arm": "META",
+          "seed": 3014,
+          "deaths_good": 0,
+          "deaths_bad": 4,
+          "deaths_total": 4,
+          "capability": 0.7485091858164024,
+          "trust_good": 1.0,
+          "trust_bad": 0.78
+        },
+        {
+          "arm": "META",
+          "seed": 3015,
+          "deaths_good": 1,
+          "deaths_bad": 6,
+          "deaths_total": 7,
+          "capability": 0.7402834737230235,
+          "trust_good": 0.97,
+          "trust_bad": 0.6074999999999999
+        },
+        {
+          "arm": "META",
+          "seed": 3016,
+          "deaths_good": 0,
+          "deaths_bad": 5,
+          "deaths_total": 5,
+          "capability": 0.7468635346096472,
+          "trust_good": 1.0,
+          "trust_bad": 0.74
+        },
+        {
+          "arm": "META",
+          "seed": 3017,
+          "deaths_good": 3,
+          "deaths_bad": 3,
+          "deaths_total": 6,
+          "capability": 0.7455135230114572,
+          "trust_good": 0.97,
+          "trust_bad": 0.7949999999999999
+        },
+        {
+          "arm": "META",
+          "seed": 3018,
+          "deaths_good": 0,
+          "deaths_bad": 1,
+          "deaths_total": 1,
+          "capability": 0.7524185455545398,
+          "trust_good": 1.0,
+          "trust_bad": 0.925
+        },
+        {
+          "arm": "META",
+          "seed": 3019,
+          "deaths_good": 0,
+          "deaths_bad": 6,
+          "deaths_total": 6,
+          "capability": 0.7460693324208828,
+          "trust_good": 0.92125,
+          "trust_bad": 0.668125
+        }
+      ]
+    }
+  },
+  "wall_seconds": 615.94
+}
