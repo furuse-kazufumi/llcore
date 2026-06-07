@@ -18,6 +18,8 @@
 - **GPU スケール実験 (HD-1 / Stage-B)**: `research/highdim_evolution/` + `research/rllm_stage_b/` —
   無拘束 gradient は収縮域を出るのが default (entropic drift)、実 Transformer 内で検証コアは
   load-bearing (論文 §7)
+- **知見スライド (ja/en, CC BY 4.0)**: `slides/` — 主要知見を 10 枚に要約 (pptx + pdf)。
+  出典明示で商用利用可
 
 ---
 
