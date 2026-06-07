@@ -61,6 +61,9 @@ corpus paper 16 §最大リスク「ρ<1 が可塑性を殺さないか」への
 2. **sound>>empirical (最重要)**: death-count 順序が **linear toy のアーティファクト**の可能性。非線形/高次元/
    複数 seed で逆転、または ρ<1 が保守的すぎ可塑性 (記憶獲得能力) を殺し能力指標で OBSERVE に負ければ格下げ。
    = 安定 vs 可塑性 TRIZ 矛盾が解けないなら llcore 中心仮説の棄却。
+   **→ ✅ 潰した (2026-06-07, `run_viability_robustness.py` 12/12 全成立)**: 2 軸 (死回避/記憶保存) は
+   seed shift / κ 1.5-3.0 / dim 24 / hard_mem delay20 / 非線形 highgain の全 config で頑健、可塑性 gap
+   最大 −0.007 (≥ −0.05)、viol 0。正本 = [[VIABILITY_VERDICT.md]] §追補②。
 3. **収縮=安全 必要十分**: ρ<1 は発散を止めるが意味的/論理的危険を捕捉しない。gate 通過後に misevolution が
    起きれば「sound=安全」棄却 → shield/Approval Bus との二層合成の健全性証明が別途必要 (未着手)。
 4. **REVIVE 独立性**: repair が reject+再合成と機能的に区別不能なら 3→2 機構に縮退。
