@@ -14,12 +14,13 @@ authors = [{ name = "Kazufumi Furuse", email = "kazufumi@furuse.work" }]
 keywords = [
   "neural-architecture-evolution",
   "verified-ml",
+  "contraction-verification",
+  "sound-verifier",
   "state-space-model",
   "evolutionary-computation",
-  "smt-solver",
-  "z3",
   "predictive-coding",
   "learning-rules",
+  "z3",
 ]
 classifiers = [
   "Development Status :: 1 - Planning",
