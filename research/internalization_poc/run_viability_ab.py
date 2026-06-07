@@ -155,9 +155,18 @@ def _gate_fn(sub, arm: str, w_env: float, V: float):
 
 
 def _ga_phase(sub, w_env: float, gate_fn, V: float, init_genes, rng, n_gen):
-    """minimal GA を 1 phase 走らせる (production operator 再利用, 任意 substrate/gate)。"""
+    """minimal GA を 1 phase 走らせる (production operator 再利用, 任意 substrate/gate)。
+
+    返り値に **被った致命評価数 (deaths)** を含む = 「死んで学ぶ」コスト。gate が評価前に
+    致命 gene を弾けば deaths は減る (= 自己保存の仕事)。NONE は致命 gene も評価して死ぬ。
+    """
+    deaths = [0]   # closure 経由で累積 (surv_prob<1 の評価を 1 死とカウント)
+
     def ff(g):
-        return _eval(sub, g, w_env, V, rng)[0]
+        fit, surv = _eval(sub, g, w_env, V, rng)
+        if surv < 1.0:
+            deaths[0] += 1
+        return fit
 
     genes = initialize_random_population(POP, rng) if init_genes is None else list(init_genes)
     pop = Population(tuple(Individual(gene=g, fitness=ff(g)) for g in genes))
@@ -180,7 +189,7 @@ def _ga_phase(sub, w_env: float, gate_fn, V: float, init_genes, rng, n_gen):
             children.append(child)
         pop = Population(tuple(Individual(gene=g, fitness=ff(g)) for g in children))
         best_curve.append(pop.best.fitness)
-    return [i.gene for i in pop.individuals], list(best_curve), pop
+    return [i.gene for i in pop.individuals], list(best_curve), pop, deaths[0]
 
 
 def _pop_survival_rate(sub, genes, w_env: float, V: float, seed: int) -> float:
