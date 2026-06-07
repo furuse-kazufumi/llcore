@@ -107,7 +107,7 @@ llcore が成熟し、その設計が llive にも価値があると判明した
 3. **破綻ゲートを before/after で計測**
 4. **mock 中心**、実 LLM / 重みは Stage 後半まで触らない
 5. **llive 資産は比較実験 (optional) のみで import**。本流は llcore 自前。改造したい個所は llcore 内で自前実装し、llive 互換は気にしない
-6. **PoC battery 文化** (進化要素 6 要素 battery と同じ規律, `project_llive_optimization_cycle` 末尾)
+6. **PoC battery 文化** (進化要素 6 要素 battery と同じ規律)
 
 ## ディレクトリ構成
 

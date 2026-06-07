@@ -149,4 +149,4 @@ per rounded genotype to bound cvxpy cost.
 - **G4 PASS but Lens A or D fails** → the apparent payoff is an artifact (admission-size or
   mis-attributed); headline retracted, reported as honest correction.
 
-No push (llcore remote not created — exposure avoidance). git via orchestrator, one batched commit.
+No push (local-only phase at the time). git via orchestrator, one batched commit.

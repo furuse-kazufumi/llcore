@@ -44,7 +44,7 @@
   "layer_a_bootstrap": {
     "C-gen4b_MAPE_vs_random": {
       "note": "diff>0 符号一貫 underpowered 候補",
-      "source": "D:\\projects\\llcore\\research\\ea_multitask\\exp_ea3_results.json",
+      "source": "research\\ea_multitask\\exp_ea3_results.json",
       "n_observed": 15,
       "diff": 0.06254864753354647,
       "sd": 0.17902389874722355,
@@ -112,7 +112,7 @@
     },
     "flip_flop_MAPE_vs_random": {
       "note": "",
-      "source": "D:\\projects\\llcore\\research\\step_c_memory_tasks\\exp_c2c3_results.json",
+      "source": "research\\step_c_memory_tasks\\exp_c2c3_results.json",
       "n_observed": 15,
       "diff": 0.004095723875934939,
       "sd": 0.01322637602448281,
@@ -180,7 +180,7 @@
     },
     "flip_flop_MAPE_vs_rr_hillclimb": {
       "note": "",
-      "source": "D:\\projects\\llcore\\research\\step_c_memory_tasks\\exp_c2c3_results.json",
+      "source": "research\\step_c_memory_tasks\\exp_c2c3_results.json",
       "n_observed": 15,
       "diff": 0.0035795090737160843,
       "sd": 0.013486297824204138,

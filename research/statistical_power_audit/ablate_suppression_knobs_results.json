@@ -326,7 +326,7 @@
           "p": 0.126190185546875
         }
       },
-      "source": "D:\\projects\\llcore\\research\\ea_multitask\\exp_ea3_results.json"
+      "source": "research\\ea_multitask\\exp_ea3_results.json"
     },
     "flip_flop_MAPE_vs_random": {
       "baseline_all_on": {
@@ -357,7 +357,7 @@
           "p": 0.151397705078125
         }
       },
-      "source": "D:\\projects\\llcore\\research\\step_c_memory_tasks\\exp_c2c3_results.json"
+      "source": "research\\step_c_memory_tasks\\exp_c2c3_results.json"
     },
     "K3_readout_global_vs_archive": {
       "readout_global_best_current": {

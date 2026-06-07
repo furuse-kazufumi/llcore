@@ -158,4 +158,4 @@ backends.py`) should also pin an accurate solver before any production use.
 
 Artifacts: `verifier_deg6.py` · `verifier_jsr.py` · `verify_solver_artifact.py` · `test_deg6.py` (13) ·
 `exp_deg6_ladder/jsr_bracket/deg8_ladder/dimension.py` · `verify_*` · `redteam_deg6.py` · result JSONs ·
-`DEG6_PREREGISTRATION.md` · `DEG8_JSR_PREREGISTRATION.md`. src/ untouched; push deferred (exposure avoidance).
+`DEG6_PREREGISTRATION.md` · `DEG8_JSR_PREREGISTRATION.md`. src/ untouched; push deferred (local-only phase at the time).

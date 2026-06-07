@@ -106,5 +106,5 @@ honestly rather than calling all of it a "verifier weakness".
 
 `verifier_deg6.py` (done, 13 tests), `exp_deg6_ladder.py` (EXP-A), `exp_deg6_capability.py`
 (EXP-B), `exp_deg6_dimension.py` (EXP-C), `jsr_bracket.py` (oracle), `redteam_deg6.py`,
-`DEG6_VERDICT.md`. No push (llcore remote not created — exposure avoidance). Codex pair-review
+`DEG6_VERDICT.md`. No push (local-only phase at the time). Codex pair-review
 best-effort (file-read has been timing out systemically — attempt, do not block).

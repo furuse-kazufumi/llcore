@@ -79,5 +79,5 @@ reported as the (committed) honest negative.
 `verifier_jsr.py` (γ*_d bisection bracket; degree-8 via `certify_degN(·,4)`), `exp_deg8_ladder.py`
 (degree-8 recovery + complementarity + soundness on the 47 finite-gap), `exp_jsr_bracket.py`
 (bracket per residual gene; fraction closed by γ*_8), `test_deg8_jsr.py`, `redteam_deg8.py`,
-`DEG8_JSR_VERDICT.md`. No push (exposure avoidance). Begin only after DEG6_VERDICT.md is locked
+`DEG8_JSR_VERDICT.md`. No push (local-only phase at the time). Begin only after DEG6_VERDICT.md is locked
 (red-team + adversarial review incorporated).

@@ -40,7 +40,7 @@
   "findings": {
     "C-gen4b_MAPE_vs_random": {
       "note": "diff>0 符号一貫 underpowered 候補",
-      "source": "D:\\projects\\llcore\\research\\ea_multitask\\exp_ea3_results.json",
+      "source": "research\\ea_multitask\\exp_ea3_results.json",
       "n_observed": 15,
       "diff": 0.06254864753354647,
       "sd": 0.17902389874722355,
@@ -114,7 +114,7 @@
     },
     "C-gen4a_MAPE_vs_panmictic": {
       "note": "diff<0 = 真に効果無し対照",
-      "source": "D:\\projects\\llcore\\research\\ea_multitask\\exp_ea3_results.json",
+      "source": "research\\ea_multitask\\exp_ea3_results.json",
       "n_observed": 15,
       "diff": -0.019301454685659743,
       "sd": 0.14563429731383495,
@@ -188,7 +188,7 @@
     },
     "flip_flop_MAPE_vs_random": {
       "note": "",
-      "source": "D:\\projects\\llcore\\research\\step_c_memory_tasks\\exp_c2c3_results.json",
+      "source": "research\\step_c_memory_tasks\\exp_c2c3_results.json",
       "n_observed": 15,
       "diff": 0.004095723875934939,
       "sd": 0.01322637602448281,
@@ -262,7 +262,7 @@
     },
     "flip_flop_MAPE_vs_rr_hillclimb": {
       "note": "",
-      "source": "D:\\projects\\llcore\\research\\step_c_memory_tasks\\exp_c2c3_results.json",
+      "source": "research\\step_c_memory_tasks\\exp_c2c3_results.json",
       "n_observed": 15,
       "diff": 0.0035795090737160843,
       "sd": 0.013486297824204138,
@@ -336,7 +336,7 @@
     },
     "delayed_parity_MAPE_vs_random": {
       "note": "",
-      "source": "D:\\projects\\llcore\\research\\step_c_memory_tasks\\exp_c2c3_results.json",
+      "source": "research\\step_c_memory_tasks\\exp_c2c3_results.json",
       "n_observed": 15,
       "diff": -0.000792495346761959,
       "sd": 0.003883201789894876,
@@ -410,7 +410,7 @@
     },
     "C-gen3_MAPE_vs_randselect": {
       "note": "PASS 対照 (negativeではない)",
-      "source": "D:\\projects\\llcore\\research\\ea_multitask\\exp_ea3_results.json",
+      "source": "research\\ea_multitask\\exp_ea3_results.json",
       "n_observed": 15,
       "diff": 0.12571150622290786,
       "sd": 0.1859711220051063,

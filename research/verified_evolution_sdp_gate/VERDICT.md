@@ -199,7 +199,7 @@ proving the single default-run divergent was an ungated initial elite, not a gat
 - **A behaviour-preserving SDP fast-path** (reject when ρ(J_v)≥1 at any t-box vertex,
   a necessary condition for the LMI) was added to make the sweep tractable. Gate
   decisions are provably identical (verified: 12 TDD tests unchanged).
-- **Push**: none (llcore remote not created — exposure avoidance). Local commit only.
+- **Push**: none (local-only phase at the time). Local commit only.
 
 ## 8. Bottom line
 
@@ -235,4 +235,4 @@ multi-kernel union, learning-rule genes; (2) a JSR / non-quadratic-Lyapunov
 Artifacts: `evolvable_core.py` (skeleton) · `coupled_components.py` · `test_skeleton.py`
 (12 PASS) · `demo_evolve.py` · `exp_runner.py` (exp1/exp2) · `redteam.py` (A–D) ·
 `PREREGISTRATION.md` · `README.md` · results JSONs. src/ untouched; push deferred
-(llcore remote not created — exposure avoidance).
+(local-only phase at the time).
