@@ -109,8 +109,11 @@ def load_corpus(max_chars):
         txt = urllib.request.urlopen(_TS_URL, timeout=30).read().decode("utf-8", "ignore")
         _log("corpus", f"downloaded tiny-shakespeare ({len(txt)} chars), using {min(len(txt), max_chars)}")
     except Exception as e:
+        if RUN_MODE == "main":
+            # binding run must not silently degrade to a fallback corpus (prereg sec.2)
+            raise RuntimeError(f"corpus download failed — fail-fast in main mode ({e})")
         txt = ("To be, or not to be, that is the question. " * 4000)
-        _log("corpus", f"download FAILED ({e}); offline fallback")
+        _log("corpus", f"download FAILED ({e}); offline fallback (smoke only)")
     return txt[:max_chars]
 
 
