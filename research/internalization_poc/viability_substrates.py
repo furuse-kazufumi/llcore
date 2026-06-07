@@ -1,21 +1,24 @@
 # SPDX-License-Identifier: Apache-2.0
-"""発散しうる基質 3 種 (R-endo viability PoC).
+"""発散しうる基質 3 種 (R-endo viability PoC) — 環境 = recurrence ゲイン κ。
 
-なぜなぜ分析の根本原因 = 「無条件有界な基質では証明対象 (収縮) と生存がデカップル」。
-→ 生存を収縮に再結合する 3 つの実現法 (各々 ×環境依存の死):
+なぜなぜ分析の根本原因 = 「無条件有界な基質では証明対象 (収縮) と生存がデカップル」。さらに
+スモークで判明: 外乱 (w̄) だけを環境にすると、進化は入力ゲイン g を小さくして「高 a (記憶) ×
+低包絡 (安全)」に逃げられ、soft 境界が回避可能。一方 hard 発散 (a≥1) は環境非依存で内外 gate が一致。
 
-- ``LinearSubstrate``  (#1 飽和除去): ``s' = a·s + g·x``, a=decay+(1−decay)·gate_str。
-  |a|≥1 で state~a^t 幾何発散=死。収縮=生存に再結合。tube r=G·w̄/(1−|a|) は線形で **厳密**。
-- ``SoftSatSubstrate`` (#2 soft 飽和/高天井): ``s' = decay·s + (1−decay)·K·tanh(pre/K)`` (大 K)。
-  horizon 内は事実上線形 (発散可)・遠方のみ |s|≤K で有界 (NaN なし) = TRIZ 条件分離。
-- ``HighGainSubstrate`` (#3 高ゲイン観測): 既存有界 tanh 力学のまま、出力を高ゲイン M で観測し
-  小さな state 誤差が致命的出力誤差になる。**既存 tracking_tube の L/G を再利用** (production verifier 直結)。
+→ **環境を recurrence ゲイン κ にする**: 実効収縮 = κ·a。κ↑ で以前は安定だった gene (a<1) が
+κ·a≥1 で**発散** = 環境変化が viability を脅かす・g で回避不能・real divergence。これで内的 gate に
+「自己保存の仕事」が生まれる (環境結合で κ を sense し再 gate)。
 
-共通契約 (duck typing): ``name`` / ``obs_gain`` 属性 + ``step(s,x,gene)`` / ``L(gene)`` / ``G(gene)``。
-- ``L`` = 状態方向 Lipschitz 上界 (収縮判定 L<1)。
-- ``G`` = 入力方向ゲイン (obs_gain 込み = 致命誤差スケール)。
-- tube r = G·w̄/(1−L) (runner が計算)。死 = 実測誤差包絡 (obs_gain 込み) > 生存閾 V or 非有限。
-すべて gene は clip 済み前提 (GA operator が clip する)。新規 production 依存なし (additive)。
+3 実現法 (各々 κ で発散境界が動く):
+- ``LinearSubstrate``  (#1 飽和除去): ``s' = (κ·a)·s + g·x``。|κ·a|≥1 で幾何発散=死。tube 厳密。
+- ``SoftSatSubstrate`` (#2 soft 飽和/高天井): horizon 内は線形 (発散可)・遠方のみ |s|≤K (NaN なし)。
+- ``HighGainSubstrate`` (#3 高ゲイン観測): 既存有界 tanh 力学・高ゲイン M で小 state 誤差が致命的出力誤差に。
+  発散はしないが κ↑ で出力包絡が生存閾を超える (soft death, 既存 tracking_tube 同型 L/G を再利用)。
+
+共通契約 (duck typing): ``name`` / ``obs_gain`` 属性 + ``step(s,x,gene,kappa)`` / ``L(gene,kappa)`` / ``G(gene)``。
+- ``L(gene,kappa)`` = 環境 κ 下の状態方向 Lipschitz 上界 (収縮判定 κ·... <1)。
+- ``G(gene)`` = 入力方向ゲイン (κ 非依存; obs_gain 込み)。tube r = G·w̄/(1−L)。
+すべて gene は clip 済み前提。新規 production 依存なし (additive)。
 """
 from __future__ import annotations
 
@@ -25,64 +28,66 @@ from llcore.state_update import StateUpdateGene
 
 
 class LinearSubstrate:
-    """#1 飽和除去: 線形 leak integrator。|a|≥1 で幾何発散=死。"""
+    """#1 飽和除去: 線形。実効収縮 κ·a。|κ·a|≥1 で幾何発散=死。"""
 
     name = "linear"
     obs_gain = 1.0
 
     @staticmethod
-    def _a(g: StateUpdateGene) -> float:
+    def _a0(g: StateUpdateGene) -> float:
         return g.decay + (1.0 - g.decay) * g.gate_str
 
     @staticmethod
     def _gin(g: StateUpdateGene) -> float:
         return (1.0 - g.decay) * g.mix
 
-    def step(self, s: np.ndarray, x: np.ndarray, g: StateUpdateGene) -> np.ndarray:
-        return self._a(g) * s + self._gin(g) * x
+    def step(self, s, x, g, kappa: float):
+        return (kappa * self._a0(g)) * s + self._gin(g) * x
 
-    def L(self, g: StateUpdateGene) -> float:
-        return abs(self._a(g))
+    def L(self, g: StateUpdateGene, kappa: float) -> float:
+        return abs(kappa * self._a0(g))
 
     def G(self, g: StateUpdateGene) -> float:
         return abs(self._gin(g))
 
 
 class SoftSatSubstrate:
-    """#2 soft 飽和 (高天井 K): horizon 内は線形 (発散可)・遠方のみ有界。"""
+    """#2 soft 飽和 (高天井 K): horizon 内は線形 (κ で発散可)・遠方のみ有界。"""
 
     name = "softsat"
     obs_gain = 1.0
     K = 50.0
 
-    def step(self, s: np.ndarray, x: np.ndarray, g: StateUpdateGene) -> np.ndarray:
-        pre = g.mix * x + g.gate_str * s
+    def step(self, s, x, g, kappa: float):
+        pre = g.mix * x + kappa * g.gate_str * s
         return g.decay * s + (1.0 - g.decay) * self.K * np.tanh(pre / self.K)
 
-    def L(self, g: StateUpdateGene) -> float:
-        # sound 上界: J = decay + (1−decay)·gate_str·tanh'(pre/K), |tanh'|≤1。
-        return g.decay + (1.0 - g.decay) * abs(g.gate_str)
+    def L(self, g: StateUpdateGene, kappa: float) -> float:
+        # sound 上界: J = decay + (1−decay)·κ·gate_str·tanh'(·), |tanh'|≤1。
+        return g.decay + (1.0 - g.decay) * kappa * abs(g.gate_str)
 
     def G(self, g: StateUpdateGene) -> float:
         return (1.0 - g.decay) * abs(g.mix)
 
 
 class HighGainSubstrate:
-    """#3 高ゲイン観測: 既存有界 tanh 力学。小 state 誤差が高ゲイン M で致命的出力誤差に。"""
+    """#3 高ゲイン観測: 既存有界 tanh 力学。小 state 誤差が高ゲイン M で致命的出力誤差に。
+
+    発散はしない (tanh 有界) が、κ↑ で state 応答が増し出力包絡 (obs_gain 倍) が生存閾 V を超える。
+    既存 tracking_tube と同型の L/G を再利用 (production verifier 直結の soft-death 版)。
+    """
 
     name = "highgain"
-    obs_gain = 20.0   # 出力ゲイン: state 誤差 → obs_gain 倍の致命誤差
+    obs_gain = 20.0
 
-    def step(self, s: np.ndarray, x: np.ndarray, g: StateUpdateGene) -> np.ndarray:
-        pre = g.mix * x + g.gate_str * s
-        return g.decay * s + (1.0 - g.decay) * np.tanh(pre)   # 既存有界力学 (|s|≤1)
+    def step(self, s, x, g, kappa: float):
+        pre = g.mix * x + kappa * g.gate_str * s
+        return g.decay * s + (1.0 - g.decay) * np.tanh(pre)
 
-    def L(self, g: StateUpdateGene) -> float:
-        # 既存 tanh substrate の L 上界 (tracking_tube と同型, |tanh'|≤1)。
-        return g.decay + (1.0 - g.decay) * abs(g.gate_str)
+    def L(self, g: StateUpdateGene, kappa: float) -> float:
+        return g.decay + (1.0 - g.decay) * kappa * abs(g.gate_str)
 
     def G(self, g: StateUpdateGene) -> float:
-        # 入力ゲイン × obs_gain (致命誤差スケール)。
         return self.obs_gain * (1.0 - g.decay) * abs(g.mix)
 
 
