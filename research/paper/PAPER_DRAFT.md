@@ -1453,7 +1453,7 @@ All runs are deterministic and CPU-only; the certifier path is float64, full sto
   | Viability 5-arm A/B, warm-up design (§9.6) | `research/internalization_poc/run_viability_ab.py` → `results_viability_ab.json` | ENDO steady-state deaths 0.0 vs NONE 27.2 (20/20, p < 0.001); REVIVE pop-mean Δ = +0.060 (p = 0.0011); third substrate F2-invalid (transient boundary) | internalization_poc/VIABILITY_VERDICT.md |
   | Viability robustness sweep (§9.6) | `run_viability_robustness.py` → `results_viability_robustness.json` | 12/12 both axes (seed/κ 1.5–3.0/dim 24/delay 20 × 2 substrates); worst capability gap −0.0072; soundness violations 0 | VIABILITY_VERDICT.md addendum ② |
   | Mechanism factorial 2³ (§9.6) | `run_viability_factorial.py` → `results_viability_factorial.json` | all sound-gate combos 0 deaths; E×O interaction +5.6 (p < 0.001) / +1.7 (p = 0.004); repair+observe 6.2 vs 18.8/17.3 alone | VIABILITY_VERDICT.md addendum ③ |
-  | Premise-broken sensing META (§9.6) | `run_viability_meta.py` → `results_viability_meta.json` | trust tracks regime (0.91/0.51); good blocks vs always-empirical 19/20 (p < 0.001); overall hypothesis holds on linear only (reported failure on high-gain) | VIABILITY_VERDICT.md addendum ④ |
+  | Premise-broken sensing META (§9.6) | `run_viability_meta.py` → `results_viability_meta.json` | trust tracks regime (linear 0.91/0.51, high-gain 0.97/0.80); good blocks vs always-empirical 19/20 (p < 0.001); overall hypothesis holds on linear only (reported failure on high-gain) | VIABILITY_VERDICT.md addendum ④ |
 
 Figure: reproduction-script dependency graph (substrate → certifiers → landscape/gated/null drivers →
 result JSON → verdict) (data: research/verified_lm_evolution/VERDICT.md, research/verifier_cost_reduction/SKETCH.md).
