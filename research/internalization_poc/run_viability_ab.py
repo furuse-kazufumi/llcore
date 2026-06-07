@@ -199,15 +199,37 @@ def _pop_survival_rate(sub, genes, w_env: float, V: float, seed: int) -> float:
 
 def _run_arm(sub, arm: str, seed: int, V: float) -> dict:
     rng = np.random.default_rng(seed)
-    genes1, curve1, _ = _ga_phase(sub, W_LOW, _gate_fn(sub, arm, W_LOW, V), V, None, rng, G1)
-    genes2, curve2, pop2 = _ga_phase(sub, W_HIGH, _gate_fn(sub, arm, W_HIGH, V), V, genes1, rng, G2)
+    genes1, curve1, _, deaths1 = _ga_phase(sub, W_LOW, _gate_fn(sub, arm, W_LOW, V), V, None, rng, G1)
+    genes2, curve2, pop2, deaths2 = _ga_phase(sub, W_HIGH, _gate_fn(sub, arm, W_HIGH, V), V, genes1, rng, G2)
     surv = _pop_survival_rate(sub, genes2, W_HIGH, V, seed)
     return {
         "arm": arm, "seed": seed,
+        "phase2_deaths": int(deaths2),          # 本丸: 環境ステップ後に被った致命評価数
+        "phase1_deaths": int(deaths1),
         "phase2_final_best_fitness": float(pop2.best.fitness),
         "phase2_auc": float(np.sum(curve2)),
         "phase2_survival_rate": surv,
     }
+
+
+def _soundness_violations(sub, V: float, n: int = 5000, seed: int = 0) -> int:
+    """admit された gene が実際に W_HIGH で死なないか (soundness 実証, H3)。
+
+    _admits(g, W_HIGH, V)=True の gene について実測包絡 ≤ V を確認。違反 = 認証/実装の破綻。
+    """
+    rng = np.random.default_rng(seed)
+    viol = 0
+    checked = 0
+    for _ in range(n):
+        g = StateUpdateGene(decay=float(rng.uniform(0, 1)),
+                            mix=float(rng.uniform(-1, 1)),
+                            gate_str=float(rng.uniform(-2, 2)))
+        if _admits(sub, g, W_HIGH, V):
+            checked += 1
+            _, surv = _eval(sub, g, W_HIGH, V, np.random.default_rng(700000 + checked))
+            if surv < 1.0:
+                viol += 1
+    return viol
 
 
 def _paired(recs, a, b, key):
