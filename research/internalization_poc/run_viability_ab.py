@@ -80,12 +80,14 @@ STATE_DIM = 8
 SEQ_LEN = 32
 DELAY = 8
 KAPPA_LOW = 1.0        # phase1 環境ゲイン (正常)
-KAPPA_HIGH = 1.3       # phase2 環境ゲイン (30% 増 = 以前安定な gene を発散させる)
+KAPPA_HIGH = 2.0       # phase2 環境ゲイン (2x = 以前安定な gene を発散させる; smoke で死境界 active 確認)
 W_BAR_FIX = 0.1        # 固定 sustained bias 外乱 (tube/包絡)
 G1 = 10
 G2 = 10
 D_SEEDS = list(range(3000, 3020))
-ARMS = ["NONE", "EXO_fixed", "ENDO"]
+# REVIVE = ユーザー洞察「復活プロセスがないと経験が記憶として残らない」の実装 =
+# 検証器で死を予見し reject でなく **修復** (記憶チャネル mix を保持しつつ dynamics を安全化)。
+ARMS = ["NONE", "EXO_fixed", "ENDO", "REVIVE"]
 N_TRIALS = 3
 N_SURV_TRIALS = 10
 OVERFLOW = 1e6
