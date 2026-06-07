@@ -326,15 +326,18 @@ def main() -> int:
     (_HERE / "results_viability_ab.json").write_text(
         json.dumps(out, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"\nwrote {_HERE / 'results_viability_ab.json'}")
-    print("\n=== R-endo viability A/B (ENDO − EXO_fixed, phase2 W_HIGH, paired n=20) ===")
+    print("\n=== R-endo viability A/B (phase2 W_HIGH, paired n=20) ===")
     for name, res in out["substrates"].items():
         print(f"\n[{name}] V={res['V']} obs_gain={res['obs_gain']}")
         m = res["arm_means_phase2"]
         for arm in ARMS:
-            print(f"   {arm:10s} survival={m[arm]['survival']:.3f} fitness={m[arm]['fitness']:.4f} auc={m[arm]['auc']:.2f}")
-        hs = res["H_survival_endo_vs_exo"]
-        print(f"   H_survival Δ={hs['mean_delta']:+.3f} p={hs['p_signflip_two_sided']:.4f} +{hs['n_positive']}/-{hs['n_negative']}")
-        print(f"   H3 soundness: ENDO surv={res['H3_endo_survival_rate']:.3f} ok={res['h3_soundness_ok']} | boundary_active={res['boundary_active']}")
+            print(f"   {arm:10s} phase2_deaths={m[arm]['phase2_deaths']:5.1f} "
+                  f"final_surv={m[arm]['survival']:.3f} fitness={m[arm]['fitness']:.4f}")
+        hd = res["H_deaths_exo_minus_endo"]
+        h1 = res["H1_fitness_endo_vs_exo"]
+        print(f"   H_deaths (EXO−ENDO) Δ={hd['mean_delta']:+.1f} p={hd['p_signflip_two_sided']:.4f} +{hd['n_positive']}/-{hd['n_negative']}")
+        print(f"   H1 fitness (ENDO−EXO) Δ={h1['mean_delta']:+.4f} p={h1['p_signflip_two_sided']:.4f}")
+        print(f"   soundness violations={res['soundness_violations']} (ok={res['h3_soundness_ok']}) | boundary_active={res['boundary_active']}")
         print(f"   verdict: {res['verdict']}")
     return 0
 
