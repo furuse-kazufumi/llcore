@@ -343,6 +343,7 @@ def run_substrate(sub):
         verdict = (f"INVALID (死境界 inactive, F2): NONE deaths={none_d:.1f}。κ_high/V 再設計。")
     else:
         rd = comp["deaths_ENDO_minus_REVIVE"]; od = comp["deaths_OBSERVE_minus_ENDO"]
+        mem_str = ", ".join("{}={:.2f}".format(a, means[a]["memory_ratio"]) for a in ARMS)
         verdict = (f"[{sub.name}] 死回避 (低い順): {' < '.join(by_deaths)}。"
                    f"REVIVE は死を 0 化 (全修復=経験を傷として保持) "
                    f"vs ENDO は reject で {means['ENDO']['phase2_deaths']:.1f}。"
@@ -351,8 +352,7 @@ def run_substrate(sub):
                    f"vs ENDO (sound 予見) deaths={means['ENDO']['phase2_deaths']:.1f}, OBSERVE−ENDO "
                    f"Δ={od['mean_delta']:+.1f} (p={od['p_signflip_two_sided']:.3f})。"
                    f"verifier soundness viol={sound_viol}/{sound_checked} (ENDO/REVIVE は健全; OBSERVE は "
-                   f"empirical ゆえ deaths>0 = imperfect)。memory_ratio (catastrophe 直後/phase1): "
-                   f"{', '.join(f'{a}={means[a][\"memory_ratio\"]:.2f}' for a in ARMS)}。")
+                   f"empirical ゆえ deaths>0 = imperfect)。memory_ratio (catastrophe 直後/phase1): {mem_str}。")
 
     return {
         "substrate": sub.name, "V": V, "obs_gain": sub.obs_gain,
