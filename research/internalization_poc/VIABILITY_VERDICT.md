@@ -107,3 +107,34 @@ phase1 (G1=10 世代) κ=1.0 → 助走 (G2_WARMUP=8, deaths 数えない) κ=2.
 - **次**: ② 反証#2 robustness (`run_viability_robustness.py`, 順序の seed/κ/dim/hard-mem 頑健性 +
   可塑性) → ③ factorial 2³ (`run_viability_factorial.py`, E×R「予見+復活」相乗 / E が O を冗長化するか)
   → ④ regime-aware adaptive meta-controller。
+
+## 追補 (同日): ③ factorial 2³ — 組み合わせと交互作用 (n=20, linear/highgain)
+
+正本 = `run_viability_factorial.py` (事前登録 commit, 結果取得前) + `results_viability_factorial.json`。
+事前登録 2 仮説とも**両基質で成立**。
+
+**measure 期 deaths / pop_mean (8 combos):**
+
+| combo | linear deaths | linear pop_mean | highgain deaths | highgain pop_mean |
+|---|---|---|---|---|
+| NONE | 27.2 | 0.649 | 5.0 | 0.734 |
+| E | **0.0** | 0.750 | **0.0** | 0.748 |
+| R | 18.8 | 0.708 | 6.3 | 0.751 |
+| O | 17.3 | 0.674 | 2.6 | 0.738 |
+| ER | **0.0** | 0.749 | **0.0** | 0.749 |
+| EO | **0.0** | 0.750 | **0.0** | 0.749 |
+| RO | 6.2 | 0.723 | 1.9 | **0.753** |
+| ERO | **0.0** | 0.750 | **0.0** | 0.751 |
+
+- **H_ER_best_of_both: True (両基質)** — ER は deaths=0 (E 並み) + pop_mean ≈ E。ただし内実は
+  「E 単独で両軸最良に到達し、R の追加価値がゼロ」(int pop_mean__ER = −0.027 p=0.000 = E on で
+  R の記憶保存ボーナスが消える)。「良いとこ取り」というより **sound 予見の単独支配**。
+- **H_EO_redundant: True (両基質)** — int deaths__EO = +5.61 (p=0.000) / +1.71 (p=0.004)。
+  sound gate は empirical 観察を完全冗長化 (E on で O の死削減効果が消滅)。
+- **探索的発見: RO 相乗 (sound なし世界の最適)** — E を使えない場合、R+O の合成は単独を大幅に
+  上回る (linear: RO 6.2 ≪ R 18.8 / O 17.3)。highgain では RO の pop_mean=0.753 が全 combo 最高。
+  「観察が大半の死を避け、漏れた死を蘇生が保全する」相補性 = **empirical 機構は重ねるほど良いが、
+  重ねても証明 1 つに勝てない** (RO 6.2 vs E 0.0)。
+- honest 留保: E の支配は検証器が κ を**完全観測できる前提** (oracle sensing)。検証器の前提が壊れる
+  regime (κ 推定ノイズ/遅延) では E が unsound 化しうる → ④ meta-controller の検証動機。3-way (ERO)
+  と R 系交互作用は事前登録どおり探索的扱い。
