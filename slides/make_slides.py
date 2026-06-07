@@ -101,11 +101,12 @@ def _arrow(slide, x1, y1, x2, y2, color=GRAY, weight=2.25):
     cn = slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, x1, y1, x2, y2)
     cn.line.color.rgb = color
     cn.line.width = Pt(weight)
-    # 矢じり (line end) は XML 直接操作
-    ln = cn.line._get_or_add_ln()
+    # 矢じり (a:tailEnd) — lxml SubElement で親 nsmap を継承させる (makeelement は PPT が拒否)
+    from lxml import etree
     from pptx.oxml.ns import qn
-    tail = ln.makeelement(qn("a:tailEnd"), {"type": "arrow", "w": "med", "len": "med"})
-    ln.append(tail)
+    ln = cn.line._get_or_add_ln()
+    tail = etree.SubElement(ln, qn("a:tailEnd"))
+    tail.set("type", "arrow")
     return cn
 
 
