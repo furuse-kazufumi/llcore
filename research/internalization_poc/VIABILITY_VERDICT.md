@@ -159,3 +159,37 @@ hard_mem_delay20) × 2 基質 (linear, highgain) × 5 arms × n=12。**全 12 �
 - honest 留保: E の支配は検証器が κ を**完全観測できる前提** (oracle sensing)。検証器の前提が壊れる
   regime (κ 推定ノイズ/遅延) では E が unsound 化しうる → ④ meta-controller の検証動機。3-way (ERO)
   と R 系交互作用は事前登録どおり探索的扱い。
+
+## 追補 (同日): ④ regime-aware META (E↔O hedging) — verdict=CONDITIONAL
+
+正本 = `run_viability_meta.py` (事前登録 commit, 結果取得前) + `results_viability_meta.json`。
+検証器前提を壊す regime (BAD: κ を 40% 過小推定 = lethal band を admit) を構成し、観測可能信号
+(admit したのに死んだ = predictive miss) だけで sound↔empirical を切替える META を固定戦略と比較。
+測定 40 世代 = [GOOD 10, BAD 10]×2、n=20、arms = NONE / E_only / O_only / META。
+
+**測定期 deaths (total / GOOD / BAD) と capability:**
+
+| arm | linear total (G/B) | linear cap | highgain total (G/B) | highgain cap |
+|---|---|---|---|---|
+| NONE | 93.3 (47.0/46.4) | 0.644 | 16.4 (8.8/7.6) | 0.739 |
+| E_only | 16.3 (0.0/16.3) | 0.722 | **3.5** (0.0/3.5) | 0.748 |
+| O_only | 27.1 (15.8/11.2) | 0.710 | 4.0 (2.5/1.6) | 0.750 |
+| META | **15.6** (1.8/13.8) | 0.722 | 4.3 (0.3/4.0) | 0.747 |
+
+| 事前登録仮説 | linear | highgain |
+|---|---|---|
+| H_bad (BAD: META < E_only) | True だが n.s. (Δ=+2.5, p=0.29) | **False** (Δ=−0.5, p=0.61) |
+| H_good (GOOD: META < O_only) | **True (Δ=+14.0, +19/−0, p=0.000)** | **True (Δ=+2.2, +12/−0, p=0.0006)** |
+| H_overall (META < 両固定) | True (vs O p=0.0025 / vs E Δ=+0.7 p=0.79 = 同等) | **False** |
+| H_capability | True (vs O +0.011 p=0.0098) | True |
+| H_trust (regime 追従) | True (0.91/0.51) | True (0.97/0.80) |
+
+**honest 判定: CONDITIONAL — hedging の価値は premise 違反コストに比例する。**
+1. **成立した核**: trust 機構は両基質で regime を実際に追従 (GOOD>BAD)。GOOD regime では META が
+   empirical 固定 (O_only) を強く上回る (+19/−0, +12/−0) = 「証明が信頼できる時に証明を使う」が学習できる。
+2. **不成立の核 (反証条項発動)**: 死圧が弱い highgain では E_only の premise 違反コスト (BAD 3.5) が
+   小さく、META の常時プローブコストが上回る → H_overall False。linear でも vs E_only は同等止まり
+   (p=0.79)。**「premise 違反が安い環境では常時 sound が最適」**— 単純 trust 則 (decay 0.5/recover 0.1)
+   の限界を honest 報告。EXP3 / 違反コスト推定型は future work。
+3. R (蘇生) は `_repair` の検証器モデル依存 (BAD で修復も汚染) のため除外した — sound 機構群の premise
+   共倒れ問題はそれ自体が今後の問い (検証器前提の独立監視 = certificate の前提を別 certificate で守るか)。
