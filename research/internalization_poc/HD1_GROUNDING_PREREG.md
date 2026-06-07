@@ -132,6 +132,12 @@
 - **E5**: 窓感度 (tail 30/50/70%) — H1 の主要対比を各窓で 1 回だけ再計算 (記述)。
 - **E8**: OBSERVE_P1 vs P2 (2-pass 死履歴共有の寄与; 記述)。
 - **E9**: ENDO_K8 vs ENDO (k 感度 @ n=128; H2 の従属所見確認; 記述)。
+- **E10**: OBSERVE の avoid 発動と死フラグ消失のタイミング対応 — 「縮小発動の直後測定点で
+  死点が消えた割合」を出し、回避が因果的 (軌道を変えた) か計数的 (測定点を均しただけ) かを
+  切り分ける (H1 アーティファクト規律の補助材料)。
+- **E11**: excursion 窓分割 — excursion 窓 = 「NONE の seed 平均 rho_hat ≥ 1 の測定点集合」
+  (NONE のみから定義 = OBSERVE 非依存) とその補集合で H1 対比を記述的に再計算。
+  excursion を均しただけなら補集合窓で OBSERVE ≈ NONE になるはず。
 - (feasibility 済として報告のみ: E4 = REVIVE vs ABLATE / E6 = Adam-sync / E7 = β sweep)
 
 ## 5. 結果の解釈マップ (取得前に固定)
