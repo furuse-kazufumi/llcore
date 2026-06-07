@@ -1,53 +1,50 @@
 # SPDX-License-Identifier: Apache-2.0
-"""R-endo viability A/B — 発散しうる基質 3 種で内的 gate に「自己保存の仕事」を与える決着 run.
+"""R-endo viability A/B — 発散しうる基質 3 種で内的 gate に「自己保存の仕事」を与える決着 run。
 
 ## 背景 (なぜなぜ分析の帰結)
 
 R-endo (run_d_internal_ab) は有界 CopyTask で autonomy null だった。根本原因 =「無条件有界な基質では
-証明対象 (収縮) と生存がデカップル」。本 runner は生存を収縮に再結合した 3 基質 (viability_substrates) で
-内的 gate に自己保存の仕事を与え、ENDO (環境結合 self-gate) が EXO_fixed (固定 gate) より生存・適応するかを測る。
+証明対象 (収縮) と生存がデカップル」。さらにスモークで2点判明:
+1. 死=0 fitness だと **selection 自体が死を回避** → gate は最終状態に冗長。内的 gate の真価は「死んで
+   学ぶコスト」の回避 = 評価 (rollout) 前に致命 gene を自己検証で弾く safe exploration。本丸指標 =
+   **進化中に被った致命評価数 (phase2_deaths)**。
+2. 環境を外乱 (w̄) だけにすると進化が入力ゲイン g を小さくして soft 境界を回避でき、hard 発散 (a≥1) は
+   環境非依存で内外 gate 一致 → null。→ **環境を recurrence ゲイン κ にする**: 実効収縮 κ·a。κ↑ で
+   以前安定だった gene (a<1) が κ·a≥1 で**発散** = 環境変化が viability を脅かす・g で回避不能・real
+   divergence。これで内的 gate に自己保存の仕事が生まれる。
 
-## 設計 (環境依存の死 = #4)
+## 設計 (環境 = recurrence ゲイン κ, #4)
 
-memory タスク (delay=8) を各発散基質で評価。環境 = 外乱 w_env を mid-run でステップ:
-phase1 (G1 世代) w_env=W_LOW → phase2 (G2 世代) w_env=W_HIGH。集団継続 + 同一 rng。
+memory タスク (delay=8) を各発散基質で評価。環境 κ を mid-run でステップ: phase1 (G1 世代) κ=KAPPA_LOW
+→ phase2 (G2 世代) κ=KAPPA_HIGH。集団継続 + 同一 rng。外乱は固定 W_BAR_FIX (sustained bias)。
 
-**死** = 実測誤差包絡 (obs_gain 込み, max_t |s_disturbed−s_ref|∞) > 生存閾 V、または非有限/|state|>OVERFLOW。
-死んだ gene の fitness = 0。生存閾 V は環境非依存だが、誤差包絡が w_env に比例するため **w_env↑ で死の境界が
-動く** = marginal-収縮 gene が W_HIGH で死ぬ。
+memory (delay-8 retention) は高 a (≈1) を報酬する → phase1 (κ_low) で集団は a≈1 へ。phase2 (κ_high) で
+それらは κ_high·a≥1 で**発散** = 致命。a0·κ の発散は g に依らない (回避不能)。
 
-### 指標の核心 (スモークで判明した重要点)
-死=0 fitness だと **selection 自体が死を回避する** (死んだ gene は子を残さない) ため、最終集団 survival は
-gate 有無に依らず ~1.0 = gate は最終状態には冗長。**内的 gate の真価は「死んで学ぶコスト」の回避** =
-評価 (rollout) 前に致命 gene を自己検証で弾く safe exploration。よって本丸指標 = **進化中に被った致命評価数
-(phase2_deaths)**。gate は ~100µs の閉形式判定で rollout なしに viability を予見し、致命試行を未然に防ぐ。
+**死** = 状態発散 (|state|>OVERFLOW or 非有限) or 実測誤差包絡 (obs_gain 込み) > 生存閾 V。死=fitness 0。
+**gate** (admit) = 収縮 (L=κ·...<1) ∧ 認証 tube `r=G·w̄/(1−L) ≤ V`。soundness: admit⇒実測包絡≤tube≤V ∧
+L<1⇒非発散 ⇒ 死なない (定理, gerrymander でない)。
+- **NONE**: gate なし (致命 gene も評価し死を被る)。 **EXO_fixed**: gate κ=KAPPA_LOW 固定 (設計時環境;
+  κ_high で発散する gene を見逃す)。 **ENDO**: gate κ=現 κ (環境結合; κ_high 発散を予見し弾く)。
 
-**gate** (admit 条件) = 収縮 (L<1) ∧ 認証 tube `r=G·w̄/(1−L) ≤ V`。**soundness の帰結**: admit された gene の
-実測包絡 ≤ 認証 tube ≤ V → **死なない** (gerrymander でなく定理)。
-- **NONE**: gate なし (致命 gene も評価して死を被る)。 **EXO_fixed**: gate w̄=W_LOW 固定 (設計時環境; W_HIGH で
-  致命な gene を見逃す)。 **ENDO**: gate w̄=現 w_env (環境結合; W_HIGH-致命を予見して弾く)。
-
-phase1 は ENDO=EXO_fixed (同 w̄=W_LOW)。分岐は phase2 (W_HIGH) のみ = 効果を環境変化に isolate。
+phase1 は ENDO=EXO_fixed (同 κ=KAPPA_LOW)。分岐は phase2 (κ_high) のみ。
 
 ## honest 前提
 
-内的化 ≡ 環境結合適応 gating (ENDO ≡ 外部 adaptive gate; location shift 自体は無価値)。本 runner が問うのは
-「**適応的自己保存** (内的化が可能にする) が、固定 gate が見逃す致命試行を予見・回避するか」。
-V は基質ごとに固定の pre-registered 定数。結果の頑健性は致命評価数 (V の正確値に依らず解釈可能) で担保。
+内的化 ≡ 環境結合適応 gating (ENDO ≡ 外部 adaptive gate; location shift 自体は無価値)。問うのは
+「適応的自己保存 (内的化が可能にする) が、固定 gate が見逃す致命試行を予見・回避するか」。
 
 ## 事前登録 (PRE-REGISTRATION — 結果取得前に commit)
 
-各基質 (linear/softsat/highgain) 独立に、phase2 (W_HIGH) で paired 比較 (seeds 3000-3019, n=20):
-- **H_deaths (本丸, confirmatory)**: ENDO の phase2 致命評価数 < EXO_fixed (= EXO−ENDO の paired delta > 0)。
-  sign-flip permutation (両側, 10^5 resamples, seed=13), α=0.05。「内的 gate が致命試行を予見回避する」中核。
+各基質 (linear/softsat/highgain) 独立に phase2 (κ_high) で paired 比較 (seeds 3000-3019, n=20):
+- **H_deaths (本丸, confirmatory)**: ENDO の phase2 致命評価数 < EXO_fixed (= EXO−ENDO paired delta>0)。
+  sign-flip permutation (両側, 10^5, seed=13), α=0.05。「内的 gate が致命試行を予見回避」の中核。
 - **H1 (fitness, confirmatory)**: ENDO の phase2 final best fitness ≥ EXO_fixed。
-- **H2 (re-adaptation AUC, exploratory)**: ENDO phase2 AUC vs EXO_fixed。
-- **H3 (soundness, 必須)**: _admits(g, W_HIGH, V)=True の gene が実測で死なない (random 5000 で violations==0)。
-  > 0 が出れば認証/実装の破綻 (致命)。
-- 反証: (F1) H_deaths で ENDO ≥ EXO → 自己保存に優位なし (selection が死を処理し gate 冗長)。
-  (F2) NONE が phase2 で死を被らない (致命試行 ≈0) → 死境界 inactive で実験無効 (V 要再設計)。
-  (F3) soundness violations > 0 → 認証破綻。
-- 判定: H_deaths p<0.05 ∧ ENDO<EXO ∧ H3 (violations=0) ∧ F2 不発 → **内的 gate の自己保存に固有価値あり** (基質別)。
+- **H2 (AUC, exploratory)** / **H3 (soundness, 必須)**: _admits(g,κ_high,V)=True の gene が死なない
+  (random 5000 で violations==0)。>0 = 認証破綻 (致命)。
+- 反証: (F1) H_deaths で ENDO≥EXO → 自己保存優位なし (selection 処理)。 (F2) NONE が phase2 で死なない
+  (致命試行≈0) → 死境界 inactive (κ_high/V 要再設計)。 (F3) soundness violations>0 → 認証破綻。
+- 判定: H_deaths p<0.05 ∧ ENDO<EXO ∧ violations=0 ∧ F2 不発 → **内的 gate の自己保存に固有価値あり** (基質別)。
 
 実行::  py -3.11 research/internalization_poc/run_viability_ab.py
 出力::  research/internalization_poc/results_viability_ab.json
@@ -82,29 +79,28 @@ from viability_substrates import ALL_SUBSTRATES  # noqa: E402
 STATE_DIM = 8
 SEQ_LEN = 32
 DELAY = 8
-W_LOW = 0.05
-W_HIGH = 0.20
+KAPPA_LOW = 1.0        # phase1 環境ゲイン (正常)
+KAPPA_HIGH = 1.3       # phase2 環境ゲイン (30% 増 = 以前安定な gene を発散させる)
+W_BAR_FIX = 0.1        # 固定 sustained bias 外乱 (tube/包絡)
 G1 = 10
 G2 = 10
 D_SEEDS = list(range(3000, 3020))
 ARMS = ["NONE", "EXO_fixed", "ENDO"]
-N_TRIALS = 3            # fitness eval の trial 数 (disturbance 平均)
-N_SURV_TRIALS = 10      # survival rate 計測の trial 数
+N_TRIALS = 3
+N_SURV_TRIALS = 10
 OVERFLOW = 1e6
 SETTLE_FRAC = 0.5
 PERM_N_RESAMPLES = 100_000
 PERM_RNG_SEED = 13
 ALPHA = 0.05
-# 生存閾 V (基質別 fixed; 死境界が active になる pre-registered 値)
-V_BY_SUBSTRATE = {"linear": 0.3, "softsat": 0.3, "highgain": 5.0}
-# GA (run_3arm_ab と同等)
+# 生存閾 V (基質別 fixed; 主たる死は発散=L≥1 で V は soft 上限)
+V_BY_SUBSTRATE = {"linear": 10.0, "softsat": 10.0, "highgain": 5.0}
 POP, TOURN_K, SIGMA, CX_RATE, ELITISM, RESAMPLE_CAP = 20, 3, 0.15, 0.5, 1, 50
 
 _READOUT = make_fixed_readout(STATE_DIM, STATE_DIM, seed=1001)
 
 
-def _rollout(sub, inputs: np.ndarray, gene: StateUpdateGene) -> np.ndarray:
-    """state 軌跡 (L+1, dim)。発散は大きな有限値として出る (32 step で inf には至らない)。"""
+def _rollout(sub, inputs, gene, kappa):
     g = gene.clipped()
     L, dim = inputs.shape
     s = np.zeros(dim, dtype=np.float64)
@@ -112,25 +108,22 @@ def _rollout(sub, inputs: np.ndarray, gene: StateUpdateGene) -> np.ndarray:
     out[0] = s
     with np.errstate(over="ignore", invalid="ignore"):
         for t in range(L):
-            s = sub.step(s, inputs[t], g)
+            s = sub.step(s, inputs[t], g, kappa)
             out[t + 1] = s
     return out
 
 
-def _eval(sub, gene: StateUpdateGene, w_env: float, V: float, rng: np.random.Generator):
-    """(mean_fitness, survival_prob) を返す。死 (包絡>V or 非有限) なら trial fitness=0。"""
+def _eval(sub, gene, kappa, V, rng):
+    """(mean_fitness, survival_prob)。死 (発散/包絡>V) なら trial fitness=0。"""
     settle = int((SEQ_LEN + 1) * SETTLE_FRAC)
     fits, alives = [], []
     for _ in range(N_TRIALS):
         clean = rng.uniform(-1.0, 1.0, size=(SEQ_LEN, STATE_DIM))
         target = clean[SEQ_LEN - 1 - DELAY].copy()
-        # 環境 = 持続的バイアス w_env (sustained stressor)。zero-mean ノイズより viability 脅威
-        # として現実的で、線形では実測包絡が認証 tube r=G·w̄/(1−L) に一致 → gate 保護が tight。
-        # 符号をランダム化し DC バイアスの方向で aliasing しないようにする。
         sign = 1.0 if rng.random() < 0.5 else -1.0
-        d = sign * w_env
-        s_ref = _rollout(sub, clean, gene)
-        s_act = _rollout(sub, clean + d, gene)
+        d = sign * W_BAR_FIX                                    # 固定 sustained bias
+        s_ref = _rollout(sub, clean, gene, kappa)
+        s_act = _rollout(sub, clean + d, gene, kappa)
         finite = np.isfinite(s_act).all() and np.isfinite(s_ref).all()
         if finite:
             env = sub.obs_gain * float(np.max(np.abs(s_act[settle:] - s_ref[settle:])))
@@ -149,32 +142,28 @@ def _eval(sub, gene: StateUpdateGene, w_env: float, V: float, rng: np.random.Gen
     return float(np.mean(fits)), float(np.mean(alives))
 
 
-def _admits(sub, gene: StateUpdateGene, w_bar: float, V: float) -> bool:
+def _admits(sub, gene, kappa, V):
     g = gene.clipped()
-    L = sub.L(g)
+    L = sub.L(g, kappa)
     if not (L < 1.0):
         return False
-    tube = sub.G(g) * w_bar / (1.0 - L)
+    tube = sub.G(g) * W_BAR_FIX / (1.0 - L)
     return bool(tube <= V)
 
 
-def _gate_fn(sub, arm: str, w_env: float, V: float):
+def _gate_fn(sub, arm, kappa, V):
     if arm == "NONE":
         return lambda g: True
-    gate_w = w_env if arm == "ENDO" else W_LOW   # EXO_fixed は設計時 W_LOW 固定
-    return lambda g: _admits(sub, g, gate_w, V)
+    gate_kappa = kappa if arm == "ENDO" else KAPPA_LOW   # EXO_fixed は設計時 κ_low 固定
+    return lambda g: _admits(sub, g, gate_kappa, V)
 
 
-def _ga_phase(sub, w_env: float, gate_fn, V: float, init_genes, rng, n_gen):
-    """minimal GA を 1 phase 走らせる (production operator 再利用, 任意 substrate/gate)。
-
-    返り値に **被った致命評価数 (deaths)** を含む = 「死んで学ぶ」コスト。gate が評価前に
-    致命 gene を弾けば deaths は減る (= 自己保存の仕事)。NONE は致命 gene も評価して死ぬ。
-    """
-    deaths = [0]   # closure 経由で累積 (surv_prob<1 の評価を 1 死とカウント)
+def _ga_phase(sub, kappa, gate_fn, V, init_genes, rng, n_gen):
+    """minimal GA を 1 phase。返り値に被った致命評価数 (deaths) を含む。"""
+    deaths = [0]
 
     def ff(g):
-        fit, surv = _eval(sub, g, w_env, V, rng)
+        fit, surv = _eval(sub, g, kappa, V, rng)
         if surv < 1.0:
             deaths[0] += 1
         return fit
@@ -203,44 +192,37 @@ def _ga_phase(sub, w_env: float, gate_fn, V: float, init_genes, rng, n_gen):
     return [i.gene for i in pop.individuals], list(best_curve), pop, deaths[0]
 
 
-def _pop_survival_rate(sub, genes, w_env: float, V: float, seed: int) -> float:
+def _pop_survival_rate(sub, genes, kappa, V, seed):
     rng = np.random.default_rng(800000 + seed)
-    return float(np.mean([_eval(sub, g, w_env, V, rng)[1] for g in genes]))
+    return float(np.mean([_eval(sub, g, kappa, V, rng)[1] for g in genes]))
 
 
-def _run_arm(sub, arm: str, seed: int, V: float) -> dict:
+def _soundness_violations(sub, V, n=5000, seed=0):
+    """admit(g, κ_high, V)=True の gene が κ_high で死なないか (H3)。違反=認証破綻。"""
     rng = np.random.default_rng(seed)
-    genes1, curve1, _, deaths1 = _ga_phase(sub, W_LOW, _gate_fn(sub, arm, W_LOW, V), V, None, rng, G1)
-    genes2, curve2, pop2, deaths2 = _ga_phase(sub, W_HIGH, _gate_fn(sub, arm, W_HIGH, V), V, genes1, rng, G2)
-    surv = _pop_survival_rate(sub, genes2, W_HIGH, V, seed)
-    return {
-        "arm": arm, "seed": seed,
-        "phase2_deaths": int(deaths2),          # 本丸: 環境ステップ後に被った致命評価数
-        "phase1_deaths": int(deaths1),
-        "phase2_final_best_fitness": float(pop2.best.fitness),
-        "phase2_auc": float(np.sum(curve2)),
-        "phase2_survival_rate": surv,
-    }
-
-
-def _soundness_violations(sub, V: float, n: int = 5000, seed: int = 0) -> int:
-    """admit された gene が実際に W_HIGH で死なないか (soundness 実証, H3)。
-
-    _admits(g, W_HIGH, V)=True の gene について実測包絡 ≤ V を確認。違反 = 認証/実装の破綻。
-    """
-    rng = np.random.default_rng(seed)
-    viol = 0
-    checked = 0
+    viol, checked = 0, 0
     for _ in range(n):
         g = StateUpdateGene(decay=float(rng.uniform(0, 1)),
                             mix=float(rng.uniform(-1, 1)),
                             gate_str=float(rng.uniform(-2, 2)))
-        if _admits(sub, g, W_HIGH, V):
+        if _admits(sub, g, KAPPA_HIGH, V):
             checked += 1
-            _, surv = _eval(sub, g, W_HIGH, V, np.random.default_rng(700000 + checked))
+            _, surv = _eval(sub, g, KAPPA_HIGH, V, np.random.default_rng(700000 + checked))
             if surv < 1.0:
                 viol += 1
-    return viol
+    return viol, checked
+
+
+def _run_arm(sub, arm, seed, V):
+    rng = np.random.default_rng(seed)
+    genes1, _, _, deaths1 = _ga_phase(sub, KAPPA_LOW, _gate_fn(sub, arm, KAPPA_LOW, V), V, None, rng, G1)
+    genes2, curve2, pop2, deaths2 = _ga_phase(sub, KAPPA_HIGH, _gate_fn(sub, arm, KAPPA_HIGH, V), V, genes1, rng, G2)
+    surv = _pop_survival_rate(sub, genes2, KAPPA_HIGH, V, seed)
+    return {
+        "arm": arm, "seed": seed, "phase2_deaths": int(deaths2), "phase1_deaths": int(deaths1),
+        "phase2_final_best_fitness": float(pop2.best.fitness),
+        "phase2_auc": float(np.sum(curve2)), "phase2_survival_rate": surv,
+    }
 
 
 def _paired(recs, a, b, key):
@@ -257,7 +239,7 @@ def _stat(deltas):
     }
 
 
-def run_substrate(sub) -> dict:
+def run_substrate(sub):
     V = V_BY_SUBSTRATE[sub.name]
     recs = []
     for arm in ARMS:
@@ -270,54 +252,49 @@ def run_substrate(sub) -> dict:
         "auc": float(np.mean([r["phase2_auc"] for r in recs if r["arm"] == arm])),
     } for arm in ARMS}
 
-    # 本丸 H_deaths: EXO_fixed − ENDO の phase2 致命評価数 (>0 = ENDO が死を回避)
     h_deaths = _stat(_paired(recs, "EXO_fixed", "ENDO", "phase2_deaths"))
     h1 = _stat(_paired(recs, "ENDO", "EXO_fixed", "phase2_final_best_fitness"))
     h2 = _stat(_paired(recs, "ENDO", "EXO_fixed", "phase2_auc"))
 
-    sound_viol = _soundness_violations(sub, V)              # H3: admit⇒生存 の違反数
+    sound_viol, sound_checked = _soundness_violations(sub, V)
     h3_sound = bool(sound_viol == 0)
     none_deaths = means["NONE"]["phase2_deaths"]
     endo_deaths = means["ENDO"]["phase2_deaths"]
-    boundary_active = bool(none_deaths > 0.5)               # NONE が phase2 で死を被る regime か (F2)
+    exo_deaths = means["EXO_fixed"]["phase2_deaths"]
+    boundary_active = bool(none_deaths > 0.5)
 
     if not boundary_active:
-        verdict = (f"INVALID (死境界 inactive, F2): NONE phase2_deaths={none_deaths:.1f} ≈0 = 本基質は "
-                   f"W_HIGH でも致命試行が起きない。V/W_HIGH 再設計が必要。")
+        verdict = (f"INVALID (死境界 inactive, F2): NONE phase2_deaths={none_deaths:.1f} ≈0。κ_high/V 再設計。")
     elif not h3_sound:
-        verdict = (f"SOUNDNESS 破綻 (F3, 致命): admit gene が {sound_viol} 件死んだ = 認証 tube ≤ V が "
-                   f"実測包絡を bound できていない。")
+        verdict = (f"SOUNDNESS 破綻 (F3, 致命): admit gene が {sound_viol}/{sound_checked} 件死んだ。")
     elif h_deaths["p_signflip_two_sided"] < ALPHA and h_deaths["mean_delta"] > 0:
-        verdict = (f"内的 gate の自己保存に固有価値あり [{sub.name}]: ENDO が致命試行を回避 "
-                   f"(phase2_deaths ENDO={endo_deaths:.1f} < EXO={means['EXO_fixed']['phase2_deaths']:.1f}, "
-                   f"Δ={h_deaths['mean_delta']:+.1f}, p={h_deaths['p_signflip_two_sided']:.4f}) ∧ soundness OK "
-                   f"(admit⇒生存 violations=0)。EXO は固定 gate で W_HIGH-致命 gene を見逃す。fitness Δ={h1['mean_delta']:+.3f}。")
+        verdict = (f"内的 gate の自己保存に固有価値あり [{sub.name}]: ENDO が致命試行を予見回避 "
+                   f"(phase2_deaths ENDO={endo_deaths:.1f} < EXO={exo_deaths:.1f}, Δ={h_deaths['mean_delta']:+.1f}, "
+                   f"p={h_deaths['p_signflip_two_sided']:.4f}) ∧ soundness OK (viol=0)。EXO は固定 gate で "
+                   f"κ_high 発散 gene を見逃す。fitness Δ(ENDO−EXO)={h1['mean_delta']:+.3f}。")
     else:
-        verdict = (f"自己保存優位なし [{sub.name}] (F1): ENDO ≈ EXO_fixed の致命試行数 "
-                   f"(ENDO={endo_deaths:.1f} vs EXO={means['EXO_fixed']['phase2_deaths']:.1f}, "
-                   f"p={h_deaths['p_signflip_two_sided']:.4f})。selection が死を処理し gate は冗長。")
+        verdict = (f"自己保存優位なし [{sub.name}] (F1): ENDO≈EXO 致命試行数 (ENDO={endo_deaths:.1f} "
+                   f"vs EXO={exo_deaths:.1f}, p={h_deaths['p_signflip_two_sided']:.4f})。selection が死を処理。")
 
     return {
         "substrate": sub.name, "V": V, "obs_gain": sub.obs_gain,
-        "arm_means_phase2": means,
-        "H_deaths_exo_minus_endo": h_deaths,
-        "H1_fitness_endo_vs_exo": h1,
-        "H2_auc_endo_vs_exo": h2,
-        "soundness_violations": sound_viol, "h3_soundness_ok": h3_sound,
-        "boundary_active": boundary_active,
-        "none_phase2_deaths": none_deaths, "endo_phase2_deaths": endo_deaths,
+        "arm_means_phase2": means, "H_deaths_exo_minus_endo": h_deaths,
+        "H1_fitness_endo_vs_exo": h1, "H2_auc_endo_vs_exo": h2,
+        "soundness_violations": sound_viol, "soundness_checked": sound_checked, "h3_soundness_ok": h3_sound,
+        "boundary_active": boundary_active, "none_phase2_deaths": none_deaths,
+        "endo_phase2_deaths": endo_deaths, "exo_phase2_deaths": exo_deaths,
         "verdict": verdict, "records": recs,
     }
 
 
-def run_all() -> dict:
+def run_all():
     _ensure_utf8_stdout()
     t0 = time.time()
     out = {"preregistration": {
-        "W_LOW": W_LOW, "W_HIGH": W_HIGH, "G1": G1, "G2": G2, "seeds": D_SEEDS,
-        "V_by_substrate": V_BY_SUBSTRATE, "delay": DELAY, "seq_len": SEQ_LEN,
-        "alpha": ALPHA, "perm_seed": PERM_RNG_SEED, "arms": ARMS,
-        "pop": POP, "tourn_k": TOURN_K, "sigma": SIGMA,
+        "KAPPA_LOW": KAPPA_LOW, "KAPPA_HIGH": KAPPA_HIGH, "W_BAR_FIX": W_BAR_FIX,
+        "G1": G1, "G2": G2, "seeds": D_SEEDS, "V_by_substrate": V_BY_SUBSTRATE,
+        "delay": DELAY, "seq_len": SEQ_LEN, "alpha": ALPHA, "perm_seed": PERM_RNG_SEED,
+        "arms": ARMS, "pop": POP,
     }, "substrates": {}}
     for sub in ALL_SUBSTRATES:
         res = run_substrate(sub)
@@ -326,29 +303,28 @@ def run_all() -> dict:
         hd = res["H_deaths_exo_minus_endo"]
         print(f"  [{sub.name}] phase2_deaths NONE={m['NONE']['phase2_deaths']:.1f} "
               f"EXO={m['EXO_fixed']['phase2_deaths']:.1f} ENDO={m['ENDO']['phase2_deaths']:.1f} | "
-              f"H_deaths(EXO−ENDO) Δ={hd['mean_delta']:+.1f} p={hd['p_signflip_two_sided']:.4f} | "
-              f"soundness_viol={res['soundness_violations']} ({time.time()-t0:.0f}s)", flush=True)
+              f"H_deaths Δ={hd['mean_delta']:+.1f} p={hd['p_signflip_two_sided']:.4f} | "
+              f"viol={res['soundness_violations']}/{res['soundness_checked']} ({time.time()-t0:.0f}s)", flush=True)
     out["wall_seconds"] = round(time.time() - t0, 2)
     return out
 
 
-def main() -> int:
+def main():
     out = run_all()
     (_HERE / "results_viability_ab.json").write_text(
         json.dumps(out, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"\nwrote {_HERE / 'results_viability_ab.json'}")
-    print("\n=== R-endo viability A/B (phase2 W_HIGH, paired n=20) ===")
+    print("\n=== R-endo viability A/B (環境=κ, phase2 κ_high, paired n=20) ===")
     for name, res in out["substrates"].items():
         print(f"\n[{name}] V={res['V']} obs_gain={res['obs_gain']}")
         m = res["arm_means_phase2"]
         for arm in ARMS:
-            print(f"   {arm:10s} phase2_deaths={m[arm]['phase2_deaths']:5.1f} "
+            print(f"   {arm:10s} phase2_deaths={m[arm]['phase2_deaths']:6.1f} "
                   f"final_surv={m[arm]['survival']:.3f} fitness={m[arm]['fitness']:.4f}")
-        hd = res["H_deaths_exo_minus_endo"]
-        h1 = res["H1_fitness_endo_vs_exo"]
+        hd = res["H_deaths_exo_minus_endo"]; h1 = res["H1_fitness_endo_vs_exo"]
         print(f"   H_deaths (EXO−ENDO) Δ={hd['mean_delta']:+.1f} p={hd['p_signflip_two_sided']:.4f} +{hd['n_positive']}/-{hd['n_negative']}")
         print(f"   H1 fitness (ENDO−EXO) Δ={h1['mean_delta']:+.4f} p={h1['p_signflip_two_sided']:.4f}")
-        print(f"   soundness violations={res['soundness_violations']} (ok={res['h3_soundness_ok']}) | boundary_active={res['boundary_active']}")
+        print(f"   soundness viol={res['soundness_violations']}/{res['soundness_checked']} | boundary_active={res['boundary_active']}")
         print(f"   verdict: {res['verdict']}")
     return 0
 
