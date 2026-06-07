@@ -65,7 +65,7 @@ def _slide(prs, lang, title, bullets, note=None, accent_bar=True):
         bar.fill.fore_color.rgb = ACCENT
         bar.line.fill.background()
     _txt(s, Inches(0.85), Inches(0.5), Inches(11.9), Inches(1.0), title, size=30, bold=True)
-    _txt(s, Inches(0.9), Inches(1.7), Inches(11.6), Inches(4.6), bullets, size=19)
+    _txt(s, Inches(0.9), Inches(1.7), Inches(11.6), Inches(4.6), bullets, size=19, space_after=14)
     if note:
         _txt(s, Inches(0.9), Inches(6.25), Inches(11.6), Inches(0.5), note, size=12, color=GRAY)
     _txt(s, Inches(0.9), Inches(7.0), Inches(11.6), Inches(0.4), FOOTER[lang], size=10, color=GRAY)
