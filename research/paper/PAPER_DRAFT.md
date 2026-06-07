@@ -1226,6 +1226,85 @@ parameter-derived (not trajectory-queried) bridge, the discrete-input approximat
 disturbance bound `w̄`, and the scalar-kernel scope — are listed in §10.1 alongside the paper's other
 limits.
 
+### 9.6 Who holds the verifier? Memory formation under viability threat (R-endo PoC)
+
+Everywhere above, the verifier sits in the *harness*: the evolutionary loop holds the certificate and
+the gene is passive. The Gödel-machine lineage asks the opposite question — what changes when the
+entity holds its own proof obligation? We report the answer in two stages, the first of which is a
+pre-registered null.
+
+**On a bounded substrate, moving the gate inside is worth nothing by itself.** A pre-registered A/B
+(arms: external gate / endogenous self-verification / both / none) on the bounded copy-task kernel
+found the endogenous verdict *exactly* reproduces the external gate (0/5000 disagreements — sound and
+feasible) at no fitness cost, but with **no autonomy benefit**: re-adaptation speed after an
+environment shift is unchanged (AUC Δ = −0.04, *p* = 0.67). The root cause is structural: on a
+substrate that cannot diverge, the certified property (contraction) is *decoupled from survival*, so
+a self-held certificate has no self-preservation work to do. The gate's seat is irrelevant until the
+environment can kill.
+
+**Re-coupling survival to contraction.** We therefore constructed substrates where the environment
+scales the recurrence gain: the effective contraction is `κ·a`, and a mid-run step `κ: 1.0 → 2.0`
+makes previously stable genes (`a < 1`) diverge — a real viability threat that input-gain evolution
+cannot route around. Death = divergence (or error envelope above a survival threshold); the quantity
+that matters is **lethal evaluations during evolution** — exploration wasted by death — measured in
+the *steady state*, after an 8-generation warm-up absorbs the step shock. (The warm-up is load-bearing
+twice over: it gives the empirical mechanism its fair learning window, and it exposed that one of three
+substrates has only a *transient* death boundary — a pre-registered invalidation we report, not hide.)
+Against `NONE` and a design-time-frozen gate (`EXO`), we measure three memory-formation mechanisms:
+**ENDO** (endogenous sound foresight: the gene rejects itself against the *sensed* environment),
+**REVIVE** (certificate-preserving repair: a dead individual is revived by minimally blending its
+dynamics into the admitted set while preserving its memory-mixing gene — it dies, but its experience
+survives), and **OBSERVE** (empirical: avoid the neighborhood of *observed* deaths of other
+individuals — learning from death, with death).
+
+**Two pre-registered axes, both confirmed (n = 20 paired seeds, sign-flip permutation).** On the death
+axis, ENDO eliminates steady-state lethal evaluations on both active substrates (linear: 0.0 vs NONE
+27.2, 20/20 positive, *p* < 0.001; high-gain: 0.0 vs 5.1, 17/17 nonzero positive, *p* < 0.001), while
+OBSERVE improves on NONE but never approaches zero (17.3 on linear) — empirical learning works, and
+pays for what it learns in deaths. On the memory axis, REVIVE dies about as often as NONE (18.8 vs
+27.2, n.s.) yet preserves *population* fitness through those deaths (pop-mean Δ = +0.060, *p* = 0.0011;
+high-gain Δ = +0.017, *p* = 0.034): repair carries each individual's memory gene across its own death.
+A pre-registered robustness sweep then held **12/12**: both axes survive seed-set replacement,
+κ ∈ {1.5, 2.0, 3.0}, state dimension 8 → 24, and a memory task (delay 20) whose optimum sits *near the
+divergence boundary* — with a capability guard showing the sound arms never fall more than 0.007 of
+fitness behind the unsafe arms (pre-registered tolerance 0.05). The stability-versus-plasticity
+objection — that a ρ < 1 gate must strangle memory capacity — did not materialize where it was most
+likely to.
+
+**One proof subsumes stacked observation (2³ factorial).** Every mechanism combination containing the
+sound gate records zero steady-state deaths, and the sound gate's presence *cancels* the empirical
+mechanisms' death reduction (E×O interaction +5.6, *p* < 0.001 linear; +1.7, *p* = 0.004 high-gain).
+Without it, the empirical mechanisms compose well — repair plus observation reaches 6.2 deaths versus
+18.8/17.3 alone — but stacked empirical mechanisms never reach the proof (6.2 vs 0.0).
+
+**The premise is the price (premise-broken sensing).** The sound gate's dominance assumes the verifier
+senses the true κ. Breaking that premise (sensed κ = 0.6·κ_true, alternating 10-generation blocks)
+makes the certificate admit a lethal band — soundness holds relative to the *sensed* model, which is
+now wrong. A trust meta-controller using only observable evidence (admitted-then-died counts) tracks
+the regime (mean trust 0.91 in good blocks vs 0.51 in bad) and decisively beats always-empirical where
+the certificate is trustworthy (good blocks: 19/20 and 12/20-with-0-losses, *p* ≤ 0.0006) — but beats
+always-sound *overall* only where premise violations are expensive (linear; on the high-gain substrate
+the pre-registered overall hypothesis **fails**, and we report it: when violations are cheap, always-
+sound wins and hedging is overhead). Certificate-preserving repair was excluded from this experiment
+because the repair operator itself trusts the verifier's model — under broken sensing the sound
+mechanisms fail *together*. Who certifies the certifier's premises is an open question this PoC
+surfaces rather than solves.
+
+**Positioning, at claimed strength only.** Each mechanism alone has clear priors — proof-gated
+self-modification (the Gödel-machine line, §Related work), certificate-preserving repair (safe-set
+projection), learning from observed failures (Campbell's vicarious selector; the Darwin–Gödel
+Machine's empirical gate). What we claim is the *measurement*: a side-by-side death-cost comparison of
+sound / repair / empirical memory formation under an evolving sound contraction certificate, on
+substrates where the certificate's subject is survival itself. We additionally verified against
+primary sources (fetched and quoted, with adversarial re-checks) that the nearest formal-gate
+self-evolution neighbors gate other objects: SGM's anytime-valid statistical certificate gates
+*discrete task performance* (arXiv:2510.10232), SEVerA's Dafny-verified contracts gate *discrete I/O
+behaviour* with a verified fallback (arXiv:2603.25111), and the PAC/VC self-improvement limits of
+arXiv:2510.04399 gate *hypothesis-family learnability* — none a contraction property of continuous
+internal dynamics, so that quadrant remains open at our PoC scale. Scope honesty: scalar genes, a
+single κ step, n = 20 seeds, and a kNN radius chosen once for OBSERVE — this is a mechanism PoC, not a
+scaled result.
+
 ---
 
 ## 10. Limitations, reproducibility, and the verified-evolution roadmap
