@@ -1631,13 +1631,27 @@ search.
   in a rejection sampler with a Dafny/SMT-verified fallback (Formally Guarded Generative Models),
   proving a first-order *output contract* sound for all inputs and parameters. The verification is a
   pre-hoc, by-construction guarantee over an output contract, not a per-update prove-then-reject gate on
-  an evolving memory core's contraction.
-- **SGM: A Statistical Gödel Machine (2025)** gates recursive self-modification but *explicitly replaces*
-  formal proof with statistical confidence tests (e-values, Empirical Bernstein), arguing that proofs
-  are "unattainable in stochastic, high-dimensional settings." We treat this as a feasibility objection
-  rather than a prior art collision, and answer it directly: restricting the certified property to
-  contraction over a low-dimensional Jacobian box is exactly what keeps a *sound* gate tractable here.
-  (Cited as a concept; no verified arXiv id assigned.)
+  an evolving memory core's contraction (primary source checked: no contraction/Lyapunov machinery
+  appears in the paper). Its verified fallback — every rejected call degrades to a Dafny-proved
+  default — is the closest structural relative of the certificate-preserving repair mechanism we
+  measure in §9.6.
+- **SGM: A Statistical Gödel Machine (arXiv:2510.10232, 2025)** gates recursive self-modification but
+  *explicitly replaces* formal proof with anytime-valid statistical certificates (Hoeffding lower
+  confidence bounds, e-value wealth supermartingales under a familywise error budget), arguing that
+  proofs are "unattainable in stochastic, high-dimensional settings"; the gated object is discrete
+  task performance (image-classification accuracy, RL reward — primary source checked: no
+  contraction/Lyapunov/internal-state machinery appears). We treat this as a feasibility objection
+  rather than a prior art collision, and answer it twice: restricting the certified property to
+  contraction over a low-dimensional Jacobian box is exactly what keeps a *sound* gate tractable here,
+  and §9.6 measures what the statistical/empirical end of the gate spectrum costs in the currency that
+  matters for evolution — lethal evaluations.
+- **On the Statistical Limits of Self-Improving Agents (arXiv:2510.04399, 2025)** gates
+  self-modifications inside a self-improvement loop with an empirical validation margin plus a
+  VC-capacity cap, yielding a distribution-free PAC oracle inequality over discrete hypothesis
+  families — a formal *generalization* guarantee, not a stability/contraction property of internal
+  dynamics (primary source checked, including appendices). Together with SGM it marks the statistical
+  end of the gate spectrum; our gate sits at the deductive end (sound, fail-closed, fabrication-proof
+  conditional on its sensing premises — a condition §9.6 makes explicit and stress-tests).
 
 *Sound gates on weight updates (corner iii on parameters — but not contraction, and not a memory core).*
 
