@@ -43,7 +43,7 @@ z3 = ["z3-solver>=4.13"]
 sdp = ["cvxpy>=1.9"]
 llive = ["llmesh-llive>=0.6"]
 # rad は stdlib のみで動くため optional-dep 不要 (RAD コーパスを path-based 参照)
-# LLCORE_RAD_DIR env で RAD 根ディレクトリを指定 (default D:/docs/)
+# LLCORE_RAD_DIR env で RAD 根ディレクトリを指定 (未設定時は graceful degrade = hint なし)
 dev = [
   "pytest>=8",
   "pytest-cov>=4.1",
