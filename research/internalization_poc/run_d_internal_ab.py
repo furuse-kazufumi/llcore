@@ -100,6 +100,7 @@ from run_3arm_ab import (  # noqa: E402  (Phase 2a と同一構成を保証)
     R_MAX,
     STATE_DIM,
     TEST_N_TRIALS,
+    TRAIN_N_TRIALS,
     W_BAR,
     _READOUT,
     _ensure_utf8_stdout,
