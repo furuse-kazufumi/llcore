@@ -34,17 +34,28 @@ phase1 は ENDO=EXO_fixed (同 κ=KAPPA_LOW)。分岐は phase2 (κ_high) のみ
 内的化 ≡ 環境結合適応 gating (ENDO ≡ 外部 adaptive gate; location shift 自体は無価値)。問うのは
 「適応的自己保存 (内的化が可能にする) が、固定 gate が見逃す致命試行を予見・回避するか」。
 
+## 記憶形成 3 機構 (ユーザー洞察) — 「経験が記憶になる」には死を越える機構が要る
+
+死 = fitness 0 + 除去 だと、その個体の蓄積記憶 (進化 genome) も消える。経験を記憶に残す 3 機構:
+- **ENDO (自己予見)**: 内的健全検証器で死を予見し回避 (reject)。境界を内的制約として zero-shot 記憶。sound。
+- **REVIVE (復活/修復)**: 死を予見し reject でなく **修復** — 記憶チャネル mix を保持しつつ dynamics を安全化。
+  死を傷 (= 安全化された自分) として残す。carried pop も修復 = catastrophe を越えて記憶を運ぶ。
+- **OBSERVE (社会的観察)**: 他個体の観察された死 (death_memory) 近傍を経験的に回避。empirical・社会的・lossy
+  (死んで学ぶ・Goodhart 可能)。ENDO の sound certificate と対比 = llcore 核心 (sound vs empirical)。
+baseline: NONE (死で無駄) / EXO_fixed (設計時固定 gate)。
+
 ## 事前登録 (PRE-REGISTRATION — 結果取得前に commit)
 
-各基質 (linear/softsat/highgain) 独立に phase2 (κ_high) で paired 比較 (seeds 3000-3019, n=20):
-- **H_deaths (本丸, confirmatory)**: ENDO の phase2 致命評価数 < EXO_fixed (= EXO−ENDO paired delta>0)。
-  sign-flip permutation (両側, 10^5, seed=13), α=0.05。「内的 gate が致命試行を予見回避」の中核。
-- **H1 (fitness, confirmatory)**: ENDO の phase2 final best fitness ≥ EXO_fixed。
-- **H2 (AUC, exploratory)** / **H3 (soundness, 必須)**: _admits(g,κ_high,V)=True の gene が死なない
-  (random 5000 で violations==0)。>0 = 認証破綻 (致命)。
-- 反証: (F1) H_deaths で ENDO≥EXO → 自己保存優位なし (selection 処理)。 (F2) NONE が phase2 で死なない
-  (致命試行≈0) → 死境界 inactive (κ_high/V 要再設計)。 (F3) soundness violations>0 → 認証破綻。
-- 判定: H_deaths p<0.05 ∧ ENDO<EXO ∧ violations=0 ∧ F2 不発 → **内的 gate の自己保存に固有価値あり** (基質別)。
+各基質 (linear/softsat/highgain) 独立に phase2 (κ_high) で paired 比較 (seeds 3000-3019, n=20, sign-flip
+permutation 両側 10^5 seed=13 α=0.05):
+- **H_avoid (本丸)**: ENDO/REVIVE/OBSERVE の phase2 致命評価数 < NONE (機構が死を回避するか)。
+- **H_repair (復活の価値)**: REVIVE の致命評価数 < ENDO (修復が reject より死を減らすか = 全個体を救う)。
+  + REVIVE fitness が ENDO に劣らないか (修復の保持コスト)。
+- **H_sound_vs_empirical (核心)**: ENDO (sound 予見) の致命評価数 < OBSERVE (empirical 社会学習)、かつ
+  verifier soundness violations==0 vs OBSERVE は deaths>0 (imperfect)。
+- **soundness (必須)**: _admits(g,κ_high,V)=True の gene が死なない (random 5000 で violations==0)。
+- **memory_ratio**: catastrophe 直後 fitness / phase1 final (進化中の記憶が段差を越えて生き残るか)。
+- 反証: (F2) NONE が phase2 で死なない → 死境界 inactive (無効)。 (F3) soundness violations>0 → 認証破綻。
 
 実行::  py -3.11 research/internalization_poc/run_viability_ab.py
 出力::  research/internalization_poc/results_viability_ab.json
