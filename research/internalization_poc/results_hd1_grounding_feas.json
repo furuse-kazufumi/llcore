@@ -13216,7 +13216,1655 @@
      "harm_death": false
     }
    ]
+  },
+  {
+   "arm": "ENDO_NOSYNC",
+   "n": 8,
+   "seed": 2026,
+   "beta": null,
+   "final_ce": 2.6744319200515747,
+   "deaths_contract": 0,
+   "deaths_harm": 0,
+   "repairs": 0,
+   "rollbacks": 3,
+   "avoids": 0,
+   "trajectory": [
+    {
+     "step": 5,
+     "rho_hat": 0.907567043358897,
+     "sep_rate": -0.11701783942992307,
+     "proxy_g": 0.04115144613154589,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 10,
+     "rho_hat": 0.9110458836492438,
+     "sep_rate": -0.11171778279243441,
+     "proxy_g": 0.012295405057384244,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 15,
+     "rho_hat": 0.9171305095921184,
+     "sep_rate": -0.10780708802631905,
+     "proxy_g": 0.058448528974714496,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 20,
+     "rho_hat": 0.9297345763816,
+     "sep_rate": -0.09746758352021646,
+     "proxy_g": 0.16016258834402333,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 25,
+     "rho_hat": 0.9315738012335901,
+     "sep_rate": -0.09859440484100794,
+     "proxy_g": -0.050915931802932704,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 30,
+     "rho_hat": 0.9292592335558596,
+     "sep_rate": -0.10170181981704736,
+     "proxy_g": 0.05314875166358389,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 35,
+     "rho_hat": 0.9253890167553359,
+     "sep_rate": -0.09938830940237042,
+     "proxy_g": -0.09861101393407153,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 40,
+     "rho_hat": 0.9178406284415542,
+     "sep_rate": -0.11468037457258706,
+     "proxy_g": -0.08934245317522523,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 45,
+     "rho_hat": 0.9125165162876783,
+     "sep_rate": -0.10989662968309878,
+     "proxy_g": 0.08172366850673951,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 50,
+     "rho_hat": 0.9093806625902484,
+     "sep_rate": -0.11844178794450701,
+     "proxy_g": 0.018119481090262127,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 55,
+     "rho_hat": 0.9067272043295199,
+     "sep_rate": -0.12201385071993757,
+     "proxy_g": 0.17233273129445156,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 60,
+     "rho_hat": 0.904208000737098,
+     "sep_rate": -0.1211901453675663,
+     "proxy_g": 0.1353885366404781,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 65,
+     "rho_hat": 0.9023596585131268,
+     "sep_rate": -0.12013034863359814,
+     "proxy_g": 0.01352266329273565,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 70,
+     "rho_hat": 0.9010895261759955,
+     "sep_rate": -0.12050331358743509,
+     "proxy_g": -0.1618886499123603,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 75,
+     "rho_hat": 0.9004276685954206,
+     "sep_rate": -0.121573076048121,
+     "proxy_g": -0.016018195099564193,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 80,
+     "rho_hat": 0.8999904053501987,
+     "sep_rate": -0.12035453711463866,
+     "proxy_g": 0.11542380249811451,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 85,
+     "rho_hat": 0.89989040725236,
+     "sep_rate": -0.12710396821418568,
+     "proxy_g": -0.017354732634011445,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 90,
+     "rho_hat": 0.8999328827510499,
+     "sep_rate": -0.1228105364109646,
+     "proxy_g": 0.005759414821208602,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 95,
+     "rho_hat": 0.8997722074458034,
+     "sep_rate": -0.12308167420021913,
+     "proxy_g": 0.09585074810286819,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 100,
+     "rho_hat": 0.8994529897731934,
+     "sep_rate": -0.12296717683652895,
+     "proxy_g": 0.1709423394807462,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 105,
+     "rho_hat": 0.8992868024638107,
+     "sep_rate": -0.12449897787745033,
+     "proxy_g": 0.20360179785953145,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 110,
+     "rho_hat": 0.8991966807684204,
+     "sep_rate": -0.12273924812493334,
+     "proxy_g": 0.09889582478939704,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 115,
+     "rho_hat": 0.8991476300074223,
+     "sep_rate": -0.12436669102474883,
+     "proxy_g": -0.04808406549831357,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 120,
+     "rho_hat": 0.899083938010403,
+     "sep_rate": -0.1270849485566141,
+     "proxy_g": -0.009032661290564193,
+     "contract_death": false,
+     "harm_death": false
+    }
+   ]
+  },
+  {
+   "arm": "ENDO_NOSYNC",
+   "n": 8,
+   "seed": 2027,
+   "beta": null,
+   "final_ce": 2.6126134991645813,
+   "deaths_contract": 0,
+   "deaths_harm": 0,
+   "repairs": 0,
+   "rollbacks": 4,
+   "avoids": 0,
+   "trajectory": [
+    {
+     "step": 5,
+     "rho_hat": 0.8001741018809038,
+     "sep_rate": -0.24806310150978025,
+     "proxy_g": -0.1674946960651978,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 10,
+     "rho_hat": 0.8281615973943786,
+     "sep_rate": -0.22890777220140912,
+     "proxy_g": -0.15417060441364266,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 15,
+     "rho_hat": 0.8761901969515189,
+     "sep_rate": -0.1807246566930404,
+     "proxy_g": -0.09528127508432323,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 20,
+     "rho_hat": 0.8451800163936114,
+     "sep_rate": -0.21227410559104745,
+     "proxy_g": -0.08097044863982654,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 25,
+     "rho_hat": 0.8549016021191564,
+     "sep_rate": -0.21123094636379106,
+     "proxy_g": 0.08424553171231527,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 30,
+     "rho_hat": 0.8554021037428532,
+     "sep_rate": -0.2160204655427308,
+     "proxy_g": -0.09537752989620714,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 35,
+     "rho_hat": 0.8609078742995341,
+     "sep_rate": -0.19985258416449908,
+     "proxy_g": 0.1922611111177458,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 40,
+     "rho_hat": 0.8393021368038175,
+     "sep_rate": -0.21193686329583158,
+     "proxy_g": -0.014682919363103262,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 45,
+     "rho_hat": 0.8122328706625271,
+     "sep_rate": -0.2484199035823523,
+     "proxy_g": -0.05888020866488673,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 50,
+     "rho_hat": 0.7956924674080779,
+     "sep_rate": -0.2553831136733074,
+     "proxy_g": 0.06054496689333312,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 55,
+     "rho_hat": 0.7876932378879816,
+     "sep_rate": -0.3142807127088911,
+     "proxy_g": 0.14274020729746517,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 60,
+     "rho_hat": 0.7833250010573947,
+     "sep_rate": -0.2559140437886441,
+     "proxy_g": 0.18855546572479262,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 65,
+     "rho_hat": 0.7797081207674822,
+     "sep_rate": -0.27593303821786197,
+     "proxy_g": -0.016936274835729452,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 70,
+     "rho_hat": 0.7774999508727919,
+     "sep_rate": -0.2861316891552407,
+     "proxy_g": -0.11642538695847442,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 75,
+     "rho_hat": 0.775119960797974,
+     "sep_rate": -0.2849601982674496,
+     "proxy_g": -0.031087233763880912,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 80,
+     "rho_hat": 0.7734498871259938,
+     "sep_rate": -0.2757690830184247,
+     "proxy_g": 0.02587661331049332,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 85,
+     "rho_hat": 0.7712375190403695,
+     "sep_rate": -0.2787197523914589,
+     "proxy_g": -0.005979241581444798,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 90,
+     "rho_hat": 0.7685117286553057,
+     "sep_rate": -0.3105476907998345,
+     "proxy_g": 0.06691064740221395,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 95,
+     "rho_hat": 0.7662437042183142,
+     "sep_rate": -0.2879642731101216,
+     "proxy_g": 0.06350514586505808,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 100,
+     "rho_hat": 0.7633091334536896,
+     "sep_rate": -0.2981909083813686,
+     "proxy_g": -0.009534768671194203,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 105,
+     "rho_hat": 0.7615538018812262,
+     "sep_rate": -0.29597773847226805,
+     "proxy_g": -0.021986199356211458,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 110,
+     "rho_hat": 0.7689720691767149,
+     "sep_rate": -0.31844392677205785,
+     "proxy_g": -0.022855515762820838,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 115,
+     "rho_hat": 0.782465376565983,
+     "sep_rate": -0.29114419627674165,
+     "proxy_g": -0.17721613858394253,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 120,
+     "rho_hat": 0.7877838156338342,
+     "sep_rate": -0.2881941339677053,
+     "proxy_g": -0.07996000735309053,
+     "contract_death": false,
+     "harm_death": false
+    }
+   ]
+  },
+  {
+   "arm": "ENDO_NOSYNC",
+   "n": 8,
+   "seed": 2028,
+   "beta": null,
+   "final_ce": 2.6519663333892822,
+   "deaths_contract": 0,
+   "deaths_harm": 0,
+   "repairs": 0,
+   "rollbacks": 17,
+   "avoids": 0,
+   "trajectory": [
+    {
+     "step": 5,
+     "rho_hat": 0.7851246928758034,
+     "sep_rate": -0.27704598449780293,
+     "proxy_g": -0.017936183328739624,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 10,
+     "rho_hat": 0.8069751688369747,
+     "sep_rate": -0.25955463172389787,
+     "proxy_g": 0.18240276721212964,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 15,
+     "rho_hat": 0.8384554086256654,
+     "sep_rate": -0.21988713979620853,
+     "proxy_g": 0.002862654069788634,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 20,
+     "rho_hat": 0.8178471694380778,
+     "sep_rate": -0.23770094654765425,
+     "proxy_g": -0.1105052524165749,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 25,
+     "rho_hat": 0.827644473723938,
+     "sep_rate": -0.24640858647932928,
+     "proxy_g": -0.08390792581315237,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 30,
+     "rho_hat": 0.8366360686469106,
+     "sep_rate": -0.2555023837905352,
+     "proxy_g": -0.047914748943910866,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 35,
+     "rho_hat": 0.837777173649898,
+     "sep_rate": -0.24068038507765693,
+     "proxy_g": -0.016282752274965784,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 40,
+     "rho_hat": 0.8257804632752374,
+     "sep_rate": -0.2475494266940022,
+     "proxy_g": 0.06753698450187869,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 45,
+     "rho_hat": 0.8232035232287218,
+     "sep_rate": -0.2342772983273204,
+     "proxy_g": 0.12656554740910625,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 50,
+     "rho_hat": 0.8058231286662245,
+     "sep_rate": -0.24436976684682385,
+     "proxy_g": 0.08436420181620173,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 55,
+     "rho_hat": 0.7887638656926578,
+     "sep_rate": -0.2657871732788418,
+     "proxy_g": 0.031728905192014115,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 60,
+     "rho_hat": 0.7810062548506969,
+     "sep_rate": -0.275528670022574,
+     "proxy_g": -0.04075299293256952,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 65,
+     "rho_hat": 0.7724969420116625,
+     "sep_rate": -0.27106966037316016,
+     "proxy_g": -0.06666715818838959,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 70,
+     "rho_hat": 0.7617684859875528,
+     "sep_rate": -0.30468239321405016,
+     "proxy_g": 0.06379848599633439,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 75,
+     "rho_hat": 0.756025766551513,
+     "sep_rate": -0.3021185632389266,
+     "proxy_g": 0.023880130567946845,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 80,
+     "rho_hat": 0.7560668430120715,
+     "sep_rate": -0.30685891364252654,
+     "proxy_g": -0.19221486184858974,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 85,
+     "rho_hat": 0.7548999576225284,
+     "sep_rate": -0.29408860930476693,
+     "proxy_g": 0.05747004131897228,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 90,
+     "rho_hat": 0.7565245902691673,
+     "sep_rate": -0.29842516531081537,
+     "proxy_g": -0.11049009539990713,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 95,
+     "rho_hat": 0.7568175161193985,
+     "sep_rate": -0.2877709744514159,
+     "proxy_g": 0.058671951426463136,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 100,
+     "rho_hat": 0.7560668430120715,
+     "sep_rate": -0.33473973312232397,
+     "proxy_g": 0.007542550340684879,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 105,
+     "rho_hat": 0.7552235960727984,
+     "sep_rate": -0.30879448071710086,
+     "proxy_g": 0.11692665230859586,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 110,
+     "rho_hat": 0.7562358312110917,
+     "sep_rate": -0.3249175174354153,
+     "proxy_g": -0.06474080945844712,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 115,
+     "rho_hat": 0.7579218584702794,
+     "sep_rate": -0.3009682185109355,
+     "proxy_g": 0.06701645566420696,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 120,
+     "rho_hat": 0.7560668430120715,
+     "sep_rate": -0.3026701288644162,
+     "proxy_g": 0.10640431389560662,
+     "contract_death": false,
+     "harm_death": false
+    }
+   ]
+  },
+  {
+   "arm": "ENDO_NOSYNC",
+   "n": 8,
+   "seed": 2029,
+   "beta": null,
+   "final_ce": 2.584413468837738,
+   "deaths_contract": 0,
+   "deaths_harm": 0,
+   "repairs": 0,
+   "rollbacks": 13,
+   "avoids": 0,
+   "trajectory": [
+    {
+     "step": 5,
+     "rho_hat": 0.8659428983103641,
+     "sep_rate": -0.16656050656375054,
+     "proxy_g": -0.08134137105405952,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 10,
+     "rho_hat": 0.868403520653912,
+     "sep_rate": -0.17206049250614175,
+     "proxy_g": 0.0014909173122,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 15,
+     "rho_hat": 0.8682500767552793,
+     "sep_rate": -0.1616396230473386,
+     "proxy_g": -0.02596505420034743,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 20,
+     "rho_hat": 0.8675574652498057,
+     "sep_rate": -0.1598869352765493,
+     "proxy_g": 0.010715055021706901,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 25,
+     "rho_hat": 0.8676528038427924,
+     "sep_rate": -0.17782720625334586,
+     "proxy_g": 0.1665249622347061,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 30,
+     "rho_hat": 0.8679632306088628,
+     "sep_rate": -0.1770383316487025,
+     "proxy_g": -0.001141947744789601,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 35,
+     "rho_hat": 0.8679754914631601,
+     "sep_rate": -0.16968541080222424,
+     "proxy_g": -0.012864860014831045,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 40,
+     "rho_hat": 0.8677639763749008,
+     "sep_rate": -0.1602315912438542,
+     "proxy_g": 0.22688460612999042,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 45,
+     "rho_hat": 0.8667575776268992,
+     "sep_rate": -0.17466261580070083,
+     "proxy_g": 0.0733705538878528,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 50,
+     "rho_hat": 0.8650229246379004,
+     "sep_rate": -0.17253012073756488,
+     "proxy_g": 0.017961152470364124,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 55,
+     "rho_hat": 0.8631878275741064,
+     "sep_rate": -0.1761112906117109,
+     "proxy_g": 0.16627281556640316,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 60,
+     "rho_hat": 0.8614833344820825,
+     "sep_rate": -0.17106739476190908,
+     "proxy_g": 0.0401450867957844,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 65,
+     "rho_hat": 0.8599862605339078,
+     "sep_rate": -0.17495776259823945,
+     "proxy_g": -0.012906842002562853,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 70,
+     "rho_hat": 0.8592870855640654,
+     "sep_rate": -0.19745270586500016,
+     "proxy_g": 0.06551161331632585,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 75,
+     "rho_hat": 0.8594040949647576,
+     "sep_rate": -0.19095538631499165,
+     "proxy_g": -0.026663742599770085,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 80,
+     "rho_hat": 0.8586233908538042,
+     "sep_rate": -0.17219458756020126,
+     "proxy_g": -0.04627678036118266,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 85,
+     "rho_hat": 0.8596976475102243,
+     "sep_rate": -0.1917122779455144,
+     "proxy_g": -0.17455376922524818,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 90,
+     "rho_hat": 0.8618242845787577,
+     "sep_rate": -0.18132632701399798,
+     "proxy_g": 0.011646341103583483,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 95,
+     "rho_hat": 0.8623351436690956,
+     "sep_rate": -0.18800688103111085,
+     "proxy_g": 0.15753950133278238,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 100,
+     "rho_hat": 0.861856965677578,
+     "sep_rate": -0.18478714073644695,
+     "proxy_g": 0.12385850693134123,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 105,
+     "rho_hat": 0.8619860651117522,
+     "sep_rate": -0.20081511792751883,
+     "proxy_g": -0.10557592505436371,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 110,
+     "rho_hat": 0.8594537678690203,
+     "sep_rate": -0.1840206940099058,
+     "proxy_g": -0.03813307154217009,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 115,
+     "rho_hat": 0.8611040410890395,
+     "sep_rate": -0.18565401845878907,
+     "proxy_g": 0.08291535736821774,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 120,
+     "rho_hat": 0.861856965677578,
+     "sep_rate": -0.18089748200716427,
+     "proxy_g": 0.11786165769216218,
+     "contract_death": false,
+     "harm_death": false
+    }
+   ]
+  },
+  {
+   "arm": "ENDO_NOSYNC",
+   "n": 32,
+   "seed": 2026,
+   "beta": null,
+   "final_ce": 2.6546477675437927,
+   "deaths_contract": 0,
+   "deaths_harm": 0,
+   "repairs": 0,
+   "rollbacks": 27,
+   "avoids": 0,
+   "trajectory": [
+    {
+     "step": 5,
+     "rho_hat": 0.8623801374318302,
+     "sep_rate": -0.17308034837579475,
+     "proxy_g": 0.02321577459471349,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 10,
+     "rho_hat": 0.864581537060488,
+     "sep_rate": -0.1724653432170899,
+     "proxy_g": 0.04476527588827853,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 15,
+     "rho_hat": 0.874314298927932,
+     "sep_rate": -0.16069315978004933,
+     "proxy_g": -0.0843990434622141,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 20,
+     "rho_hat": 0.8621087234699412,
+     "sep_rate": -0.18010832897720228,
+     "proxy_g": 0.059795249811615235,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 25,
+     "rho_hat": 0.8689552120538578,
+     "sep_rate": -0.1772895393193968,
+     "proxy_g": -0.009954782851812562,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 30,
+     "rho_hat": 0.8639562885788132,
+     "sep_rate": -0.17775873145640803,
+     "proxy_g": 0.0687823976674576,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 35,
+     "rho_hat": 0.86141410180222,
+     "sep_rate": -0.1801381762862509,
+     "proxy_g": -0.01026317379213195,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 40,
+     "rho_hat": 0.8667998119077556,
+     "sep_rate": -0.1790325090945194,
+     "proxy_g": 0.06728325112163003,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 45,
+     "rho_hat": 0.8633868097078281,
+     "sep_rate": -0.18178703172052363,
+     "proxy_g": 0.04278677469273348,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 50,
+     "rho_hat": 0.8618198969412437,
+     "sep_rate": -0.17565638754198776,
+     "proxy_g": 0.004545059416946104,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 55,
+     "rho_hat": 0.8608357209315719,
+     "sep_rate": -0.1807571940319426,
+     "proxy_g": -0.03739507380949677,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 60,
+     "rho_hat": 0.8602379561134775,
+     "sep_rate": -0.17908972996650865,
+     "proxy_g": 0.10123848801161747,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 65,
+     "rho_hat": 0.8599976180974923,
+     "sep_rate": -0.18194595080613796,
+     "proxy_g": 0.08658858953801203,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 70,
+     "rho_hat": 0.8597185642187481,
+     "sep_rate": -0.18096983943571582,
+     "proxy_g": 0.09724352060464689,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 75,
+     "rho_hat": 0.8595022627930633,
+     "sep_rate": -0.18117618929680773,
+     "proxy_g": 0.016847051641742106,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 80,
+     "rho_hat": 0.8602379561134775,
+     "sep_rate": -0.17545341107324575,
+     "proxy_g": -0.011716437345363543,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 85,
+     "rho_hat": 0.8600200411217823,
+     "sep_rate": -0.17552898938489486,
+     "proxy_g": 0.03573904967140513,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 90,
+     "rho_hat": 0.858737834756013,
+     "sep_rate": -0.18624585865710944,
+     "proxy_g": 0.009063465912255275,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 95,
+     "rho_hat": 0.858423734243936,
+     "sep_rate": -0.18415941824317333,
+     "proxy_g": -0.06445757804812126,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 100,
+     "rho_hat": 0.8592903063772374,
+     "sep_rate": -0.18066689690515242,
+     "proxy_g": 0.04715031971814431,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 105,
+     "rho_hat": 0.8591309054453153,
+     "sep_rate": -0.18282899374948725,
+     "proxy_g": 0.027496473034272228,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 110,
+     "rho_hat": 0.8590913459947345,
+     "sep_rate": -0.1822544679563076,
+     "proxy_g": 0.05346903614638449,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 115,
+     "rho_hat": 0.8589970887908231,
+     "sep_rate": -0.1861893885599925,
+     "proxy_g": -0.0077472251978608336,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 120,
+     "rho_hat": 0.8592903063772374,
+     "sep_rate": -0.1820774833303779,
+     "proxy_g": 0.019860757232602045,
+     "contract_death": false,
+     "harm_death": false
+    }
+   ]
+  },
+  {
+   "arm": "ENDO_NOSYNC",
+   "n": 32,
+   "seed": 2027,
+   "beta": null,
+   "final_ce": 2.6066831946372986,
+   "deaths_contract": 0,
+   "deaths_harm": 0,
+   "repairs": 0,
+   "rollbacks": 26,
+   "avoids": 0,
+   "trajectory": [
+    {
+     "step": 5,
+     "rho_hat": 0.8975317295265699,
+     "sep_rate": -0.13703219185651364,
+     "proxy_g": -0.007583085426733051,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 10,
+     "rho_hat": 0.898554702661406,
+     "sep_rate": -0.13830498487973014,
+     "proxy_g": 0.10271235387633211,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 15,
+     "rho_hat": 0.9016231180253041,
+     "sep_rate": -0.13255831469341559,
+     "proxy_g": 0.021685102824586015,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 20,
+     "rho_hat": 0.8969423130848282,
+     "sep_rate": -0.13785208070722932,
+     "proxy_g": -0.0729654255227785,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 25,
+     "rho_hat": 0.9012188856151172,
+     "sep_rate": -0.13474874836204842,
+     "proxy_g": -0.028030809921996004,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 30,
+     "rho_hat": 0.8979935156483649,
+     "sep_rate": -0.13655176282942935,
+     "proxy_g": -0.06075808279875439,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 35,
+     "rho_hat": 0.8972799537460053,
+     "sep_rate": -0.1368682430966694,
+     "proxy_g": -0.10153121041367456,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 40,
+     "rho_hat": 0.9001410732057368,
+     "sep_rate": -0.13779539710593927,
+     "proxy_g": 0.021670507490220963,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 45,
+     "rho_hat": 0.8988183300120423,
+     "sep_rate": -0.13741578170218566,
+     "proxy_g": 0.05913342794683094,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 50,
+     "rho_hat": 0.8963234132975566,
+     "sep_rate": -0.14077608610567702,
+     "proxy_g": 0.030919679104405958,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 55,
+     "rho_hat": 0.8958115909109694,
+     "sep_rate": -0.14143878753354233,
+     "proxy_g": 0.02732463256558277,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 60,
+     "rho_hat": 0.8960748576671066,
+     "sep_rate": -0.1387028487877404,
+     "proxy_g": 0.036888426946804574,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 65,
+     "rho_hat": 0.8958567219159317,
+     "sep_rate": -0.1387279491959914,
+     "proxy_g": 0.05570042461889371,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 70,
+     "rho_hat": 0.8956308294587014,
+     "sep_rate": -0.14038331988277378,
+     "proxy_g": -0.0024101397768783606,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 75,
+     "rho_hat": 0.8952949342518433,
+     "sep_rate": -0.13804289565080405,
+     "proxy_g": 0.0520390471313176,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 80,
+     "rho_hat": 0.8954373681717712,
+     "sep_rate": -0.14059367408628767,
+     "proxy_g": -0.024906004537806344,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 85,
+     "rho_hat": 0.8952502208495425,
+     "sep_rate": -0.13759316685984505,
+     "proxy_g": -0.006233590079625289,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 90,
+     "rho_hat": 0.8951997284115074,
+     "sep_rate": -0.13865727976954126,
+     "proxy_g": 0.018659244863461957,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 95,
+     "rho_hat": 0.8950325840405646,
+     "sep_rate": -0.14036344948601107,
+     "proxy_g": 0.014516372602977008,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 100,
+     "rho_hat": 0.8954373681717712,
+     "sep_rate": -0.13857259980783534,
+     "proxy_g": 0.08019130202819494,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 105,
+     "rho_hat": 0.8953412362908808,
+     "sep_rate": -0.14168959580810414,
+     "proxy_g": 0.028531183302442958,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 110,
+     "rho_hat": 0.895169275933171,
+     "sep_rate": -0.142246854255776,
+     "proxy_g": -0.02772141894788527,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 115,
+     "rho_hat": 0.8951251499588297,
+     "sep_rate": -0.13942590326397766,
+     "proxy_g": 0.08923102697968176,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 120,
+     "rho_hat": 0.8954373681717712,
+     "sep_rate": -0.14201407186435944,
+     "proxy_g": 0.09838638905228239,
+     "contract_death": false,
+     "harm_death": false
+    }
+   ]
+  },
+  {
+   "arm": "ENDO_NOSYNC",
+   "n": 32,
+   "seed": 2028,
+   "beta": null,
+   "final_ce": 2.6282865405082703,
+   "deaths_contract": 0,
+   "deaths_harm": 0,
+   "repairs": 0,
+   "rollbacks": 25,
+   "avoids": 0,
+   "trajectory": [
+    {
+     "step": 5,
+     "rho_hat": 0.8533581096908588,
+     "sep_rate": -0.18382540853608387,
+     "proxy_g": -0.0090697140341961,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 10,
+     "rho_hat": 0.8548647477594518,
+     "sep_rate": -0.18802164518438558,
+     "proxy_g": 0.03553239742217198,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 15,
+     "rho_hat": 0.8696841943961781,
+     "sep_rate": -0.1656384821333504,
+     "proxy_g": 0.06760137356046193,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 20,
+     "rho_hat": 0.8530016559903782,
+     "sep_rate": -0.18515606987704153,
+     "proxy_g": 0.05659295442575686,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 25,
+     "rho_hat": 0.8544367106788938,
+     "sep_rate": -0.18232239529983668,
+     "proxy_g": 0.058434858714702886,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 30,
+     "rho_hat": 0.8521585068414175,
+     "sep_rate": -0.18719437089329574,
+     "proxy_g": -0.001561664919050096,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 35,
+     "rho_hat": 0.8498675425028028,
+     "sep_rate": -0.1919981465750462,
+     "proxy_g": -0.016464946515316027,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 40,
+     "rho_hat": 0.8509342529650061,
+     "sep_rate": -0.19230823627077095,
+     "proxy_g": 0.02179064994345937,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 45,
+     "rho_hat": 0.8506292277322854,
+     "sep_rate": -0.19098105126933135,
+     "proxy_g": 0.032502332479826195,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 50,
+     "rho_hat": 0.8494806323962618,
+     "sep_rate": -0.1928374319842518,
+     "proxy_g": -0.0028694987600847086,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 55,
+     "rho_hat": 0.8493981988808289,
+     "sep_rate": -0.19139794948533667,
+     "proxy_g": 0.04651250011585468,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 60,
+     "rho_hat": 0.8493438476909414,
+     "sep_rate": -0.1880785159192658,
+     "proxy_g": -0.1019847066526848,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 65,
+     "rho_hat": 0.8492352700088072,
+     "sep_rate": -0.19662961661642545,
+     "proxy_g": 0.03794917949639617,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 70,
+     "rho_hat": 0.8488353006921239,
+     "sep_rate": -0.19561460067213027,
+     "proxy_g": 0.10265876164630726,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 75,
+     "rho_hat": 0.8482445269705027,
+     "sep_rate": -0.18885011554233608,
+     "proxy_g": 0.09405097437428343,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 80,
+     "rho_hat": 0.8489852040899684,
+     "sep_rate": -0.18836191800064292,
+     "proxy_g": -0.03488713006662627,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 85,
+     "rho_hat": 0.8489127188005794,
+     "sep_rate": -0.19315963667425198,
+     "proxy_g": 0.027646636672682755,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 90,
+     "rho_hat": 0.8486610362167802,
+     "sep_rate": -0.19191120451358382,
+     "proxy_g": 0.030298126797293424,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 95,
+     "rho_hat": 0.8488402889178229,
+     "sep_rate": -0.1946010355105535,
+     "proxy_g": 0.03619227895745506,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 100,
+     "rho_hat": 0.8489852040899684,
+     "sep_rate": -0.18704075765852482,
+     "proxy_g": -0.004295479436235648,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 105,
+     "rho_hat": 0.8487945547146503,
+     "sep_rate": -0.19452994030919155,
+     "proxy_g": -0.06627547386790796,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 110,
+     "rho_hat": 0.8487761109151248,
+     "sep_rate": -0.19286726805649015,
+     "proxy_g": -0.05037972846716896,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 115,
+     "rho_hat": 0.8483160182946163,
+     "sep_rate": -0.19299643687339832,
+     "proxy_g": 0.05103528463456831,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 120,
+     "rho_hat": 0.8489852040899684,
+     "sep_rate": -0.1963954972672993,
+     "proxy_g": 0.042341966944972664,
+     "contract_death": false,
+     "harm_death": false
+    }
+   ]
+  },
+  {
+   "arm": "ENDO_NOSYNC",
+   "n": 32,
+   "seed": 2029,
+   "beta": null,
+   "final_ce": 2.5529478788375854,
+   "deaths_contract": 0,
+   "deaths_harm": 0,
+   "repairs": 0,
+   "rollbacks": 27,
+   "avoids": 0,
+   "trajectory": [
+    {
+     "step": 5,
+     "rho_hat": 0.9037778989898386,
+     "sep_rate": -0.13158687732721192,
+     "proxy_g": 0.08760074273218622,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 10,
+     "rho_hat": 0.9039538333993693,
+     "sep_rate": -0.13120167826965962,
+     "proxy_g": -0.04022337729977817,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 15,
+     "rho_hat": 0.905565753470451,
+     "sep_rate": -0.1265664289193557,
+     "proxy_g": 0.08821674408476102,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 20,
+     "rho_hat": 0.9039522422887193,
+     "sep_rate": -0.1323894785672924,
+     "proxy_g": -0.03733114046565571,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 25,
+     "rho_hat": 0.9052017412660825,
+     "sep_rate": -0.12699700495783692,
+     "proxy_g": -0.0010810265149994863,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 30,
+     "rho_hat": 0.9034159886213606,
+     "sep_rate": -0.13046964693281624,
+     "proxy_g": -0.01691243588759737,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 35,
+     "rho_hat": 0.9023149425616724,
+     "sep_rate": -0.13565518968449067,
+     "proxy_g": 0.05647742121216806,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 40,
+     "rho_hat": 0.9027723588094189,
+     "sep_rate": -0.13166214018589972,
+     "proxy_g": -0.007990368576393129,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 45,
+     "rho_hat": 0.9019154917034048,
+     "sep_rate": -0.1338735877255773,
+     "proxy_g": 0.0629135116161889,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 50,
+     "rho_hat": 0.9017724126899885,
+     "sep_rate": -0.13491666040169467,
+     "proxy_g": -0.019439475209696928,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 55,
+     "rho_hat": 0.901767492527118,
+     "sep_rate": -0.1349580111255168,
+     "proxy_g": -0.014426031147822687,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 60,
+     "rho_hat": 0.902060394294407,
+     "sep_rate": -0.13517600798372859,
+     "proxy_g": 0.04953107906522516,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 65,
+     "rho_hat": 0.9019665491741768,
+     "sep_rate": -0.13409621601325056,
+     "proxy_g": 0.03169388970680161,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 70,
+     "rho_hat": 0.9018397766417708,
+     "sep_rate": -0.13459241264441021,
+     "proxy_g": 0.004821764443943193,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 75,
+     "rho_hat": 0.9018095343708733,
+     "sep_rate": -0.13672668571032062,
+     "proxy_g": -0.03563939668446899,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 80,
+     "rho_hat": 0.902060394294407,
+     "sep_rate": -0.13636926884751657,
+     "proxy_g": 0.07578905132275698,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 85,
+     "rho_hat": 0.9019380564559595,
+     "sep_rate": -0.1340371870428741,
+     "proxy_g": 0.12510025239398495,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 90,
+     "rho_hat": 0.9019299104911768,
+     "sep_rate": -0.1326158204191275,
+     "proxy_g": 0.09497215809179338,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 95,
+     "rho_hat": 0.9018415688559392,
+     "sep_rate": -0.13409096398495343,
+     "proxy_g": 0.007037764417253385,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 100,
+     "rho_hat": 0.902060394294407,
+     "sep_rate": -0.1340576438477971,
+     "proxy_g": -0.011579012956560195,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 105,
+     "rho_hat": 0.9019794937947294,
+     "sep_rate": -0.13562606271823718,
+     "proxy_g": 0.04195714683774159,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 110,
+     "rho_hat": 0.9018293066521631,
+     "sep_rate": -0.13431126398748555,
+     "proxy_g": 0.01056392332878878,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 115,
+     "rho_hat": 0.9017416854775068,
+     "sep_rate": -0.13592532653256445,
+     "proxy_g": 0.037284635266064806,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 120,
+     "rho_hat": 0.902060394294407,
+     "sep_rate": -0.1333912379595134,
+     "proxy_g": -0.006027455319023723,
+     "contract_death": false,
+     "harm_death": false
+    }
+   ]
   }
  ],
- "wall_seconds": 0.3
+ "wall_seconds": 32.3
 }

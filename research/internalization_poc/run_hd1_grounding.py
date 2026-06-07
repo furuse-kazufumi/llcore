@@ -191,15 +191,18 @@ def run_arm(arm, n, seed, data, beta=0.5):
         opt.step()
 
         # --- ENDO: gate cadence k で cert 検査 → fail なら core+Adam を同期 rollback
-        if arm == "ENDO" and ((it + 1) % GATE_K == 0 or it == cfg["grad_steps"] - 1):
+        #     (ENDO_NOSYNC は core のみ復元 = Adam-sync ablation)
+        if arm in ("ENDO", "ENDO_NOSYNC") and ((it + 1) % GATE_K == 0 or it == cfg["grad_steps"] - 1):
             failed = any(not H.cert_inf(*m.core_np(li)) for li in li_list)
             if failed:
                 core_restore(prev_core)
-                opt.load_state_dict(prev_opt_state)
+                if arm == "ENDO":
+                    opt.load_state_dict(prev_opt_state)
                 rollbacks += 1
             else:
                 prev_core = core_snapshot()
-                prev_opt_state = copy.deepcopy(opt.state_dict())
+                if arm == "ENDO":
+                    prev_opt_state = copy.deepcopy(opt.state_dict())
 
         # --- REVIVE_ABLATE: 死と無関係の固定周期縮小 (反事実)
         if arm == "REVIVE_ABLATE" and (it + 1) % ABLATE_PERIOD == 0:
