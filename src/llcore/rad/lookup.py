@@ -24,7 +24,7 @@ from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 from pathlib import Path
 
-DEFAULT_RAD_DIR = Path(os.environ.get("LLCORE_RAD_DIR", "D:/docs"))
+DEFAULT_RAD_DIR = Path(os.environ.get("LLCORE_RAD_DIR", str(Path.home() / ".llcore" / "rad")))
 _DOMAIN_SUFFIX = "_corpus_v2"
 _MAX_SNIPPET_CHARS = 240
 
