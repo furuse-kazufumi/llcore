@@ -250,3 +250,72 @@ delay 0 → 4 → 8 で単調に効果が立ち上がる dose-response パター
   probe-based fitness / scalar gene / 小規模 GA (pop=20×gen=20) のスコープ内に限る。
 - d0/d4 は依然主張しない (exploratory, n.s.)。「memory を要しないタスクでは差が消える」は
   むしろ仕様どおり (tube は memory 保持の保証であって万能の性能向上ではない)。
+
+---
+
+## 11. 第二独立軸 (外乱振幅 w̄) の決着 — 用量反応は horizon 固有 (2026-06-07 追補)
+
+(c) の用量反応 (delay 0→4→8 で効果が立つ) が「一般的な不変量負荷の法則」か「memory horizon
+固有」かを、**機構的に独立な第二軸**で事前登録検証した。`run_wbar_decision.py` (事前登録 commit
+ebdf703 = 結果取得前)。生結果 = `results_wbar_decision.json` (wall 316s)。
+
+### 動機と軸選定 (seq_len の機構的棄却)
+
+最初に第二軸候補とした **`seq_len` (入力列長) は無効**である: CopyTask の
+`target_idx = seq_len-1-delay` ゆえ target 入力→readout の保持ステップ数は**常に delay (=8) 固定**。
+seq_len を増やしても増えるのは target *前*のステップだけで、contraction (L<1) 下で古い入力は L^k
+で減衰し数ステップで飽和 = **保持 horizon を増やさない**。よって seq_len は負荷軸として使えない。
+
+正しい第二軸 = **task 外乱振幅 w̄_task** (tube 公式 r=G·w̄/(1−L) の**分子** G·w̄ 側; delay は**分母**
+1/(1−L) 側を動かすので機構独立)。`DisturbedCopyTask` は入力に d~U[−w̄_task,w̄_task] を注入し
+**クリーンな** target を復元させる (保持には外乱除去=tight contraction=小 tube が要る)。
+**交絡回避**: gate の w̄_gate=0.1/r_max=0.05 は固定 (admit 率不変=binding 交絡なし)、task 外乱のみ動かす。
+
+### 結果: **NEGATIVE — w̄ 軸では用量反応が立たない**
+
+| w̄_task | mean Δ (tube−contraction) | p (sign-flip) | 符号 | median | 役割 |
+|---|---|---|---|---|---|
+| 0.00 | +0.0116 | 0.093 | +13/−7 | +0.0091 | exploratory (= d8 再現) |
+| 0.05 | +0.0033 | 0.369 | +10/−10 | +0.0001 | exploratory |
+| 0.10 | +0.0070 | 0.082 | +15/−5 | +0.0065 | exploratory |
+| **0.20** | **+0.0026** | **0.594** | +11/−9 | +0.0009 | **confirmatory** |
+
+**monotone non-decreasing = False**。confirmatory (w̄=0.20) で p=0.594 → 反証条件 **F1 発火**:
+外乱軸では用量反応が立たない。gate は全 w̄ で binding (tube reject ~2500 vs contraction ~800,
+fallback 0) = 退化由来でない健全な NEGATIVE (F5/F8 不発)。
+
+### 解釈: 用量反応は分母 (保持余裕) 駆動、分子 (外乱) 駆動でない — **理論と整合**
+
+この NEGATIVE は ESN 記憶容量との同型理論 (tube r=G·w̄/(1−L) ↔ memory capacity ~1/(1−ρ)) と
+**整合する**。記憶容量の発散は**分母** (1−L) 現象であり、効果が住むのは保持余裕=horizon (delay) 軸。
+**分子** G·w̄ (外乱) を動かしても gate 価値は増えない — この memory タスクでは外乱除去 (tight
+contraction = 小 1/(1−L)) と保持 (L を小さくしすぎない) が**トレードオフ** (memory-nonlinearity
+trade-off) するため。→ 用量反応の正しい言明は「**verified gate の価値は保持余裕の負荷 (= memory
+horizon) に比例する**」であって「一般的な不変量負荷に比例する」ではない。**法則を分母軸に narrow**。
+
+### 副次: d8 効果の独立再現 + pooled 強化 (honest 内訳)
+
+w̄_task=0.00 セル (delay=8/seq_len=32/外乱なし) は **§10 の (c) d8 の fresh-seed 独立再現**
+(seeds 3000-3019 vs 原 2000-2019)。
+
+| run | n | mean Δ | median | 符号 | p |
+|---|---|---|---|---|---|
+| §10 d8 (s2000-19) | 20 | +0.0152 | +0.0054 | +16/−4 | 0.0056 |
+| 再現 w0 (s3000-19) | 20 | +0.0116 | +0.0091 | +13/−7 | **0.093** |
+| **pooled** | **40** | **+0.0134** | +0.0086 | +29/−11 | **0.0021** |
+
+(pooled: trimmed10%=+0.0108 / drop-max|Δ| p=0.0045 = outlier 非駆動)。
+
+honest 評価: **効果の方向は再現** (2/2 run 正、pooled +29/−11)。**pooled n=40 では robust に有意**
+(p=0.0021)。ただし **§10 の single-run p=0.0056 は seed 有利端**であり、fresh n=20 単独では
+p=0.093 (borderline)。→ d8 効果は real かつ pooled で強化されるが、「single n=20 で p=0.0056」を
+唯一の証拠として強く出すのは over-claim 気味。**pooled n=40 (p=0.0021) + single-run の seed
+感受性を併記する**のが正しい開示 (feedback_benchmark_honest_disclosure: 異常に低い p は内訳を疑う)。
+
+### §9/論文への含意 (要反映)
+
+論文 §9 の (c) 記述を更新する: (1) 証拠を pooled n=40 (p=0.0021, robust) に格上げしつつ
+single-run の seed 感受性を honest caveat として併記。(2) **dose-response は horizon (delay/分母)
+軸固有で、外乱 (w̄/分子) 軸では立たない (事前登録 NEGATIVE, p=0.594)** を明記 = 法則の適用範囲を
+正しく narrow。(3) ESN-capacity 同型 (1/(1−ρ)) は分母現象だから horizon 軸で立ち外乱軸で立たない
+ことを**予測する** = 理論と経験の整合を 1 段強める。
