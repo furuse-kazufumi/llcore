@@ -21,6 +21,8 @@ OBSERVE β 感度 / REVIVE_ABLATE / Adam-sync ablation) を収集する。
               β 縮小 (θ ← θ_snap + β(θ − θ_snap))。feasibility は自己履歴 (pass1) のみ。
 - REVIVE_ABLATE (feasibility 限定): REVIVE と同じ縮小を死と無関係に固定周期 (4m=20 step) で発動
               (純正則化との切り分け用反事実)
+- ENDO_NOSYNC (feasibility 限定): Adam-sync ablation — rollback で core のみ復元し
+              Adam state は流す (設計 §5 step 2 (c) の Adam state 交絡切り分け用反事実)
 
 ## 二層の死 (設計 §1)
 
