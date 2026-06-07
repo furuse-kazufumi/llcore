@@ -86,10 +86,10 @@ corpus paper 16 §最大リスク「ρ<1 が可塑性を殺さないか」への
 - ✅ **反証 #2 の潰し込み** (12/12, §反証条件 2 参照) — 助走版確定 run + factorial 2³ + META も完了
   (正本 = [[VIABILITY_VERDICT.md]] 追補②③④: sound 単独支配 / RO 相乗 / hedging=CONDITIONAL)。
 - ✅ **安定 vs 可塑性 capability メトリクス** — robustness の H_capability に統合 (12/12, hard_mem 含む)。
-- **[最優先] 近接 parallel 精査**: SEVerA/SGM/Two-Gate の gate 対象を WebFetch 1 件ずつ (過去 commit
-  5297f5ba「related work 盤石化」の防御線を 3 機構 taxonomy へ拡張)。novelty #2 (空白象限) の生死。
-- **[次] 論文編入判断**: 反証 #2 解消により「条件付き編入可」の条件が前進。残る条件 = 近接 parallel 精査。
-  編入形 = §future work or 新節 (3 機構 taxonomy + 2 軸結果 + ④ premise 監視の問題提起)。
+- ✅ **近接 parallel 精査** (2026-06-07, §反証条件 1 参照) — 棄却なし、novelty #2 生存、3 件 must_cite。
+- **[最優先] 論文編入**: 編入条件 (反証 #2 潰し + 近接 parallel 精査) が**両方充足** → 編入実行。
+  編入形 = §future work or 新節 (3 機構 taxonomy + 2 軸結果 + SEVerA/SGM/2510.04399 対比 + ④ premise
+  監視の問題提起)。over-claim 排除 (novelty 3 点限定) を維持。
 - **記事**: 「死を越えて経験が記憶になる 3 つの道 (予見/修復/観察) と、なぜ証明できる安全が観察で学ぶ安全に
   勝るのか」を Campbell BVSR + Gödel machine 対比で (over-claim 注意点 4 件を反映)。
 
