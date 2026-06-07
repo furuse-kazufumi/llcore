@@ -81,17 +81,19 @@ def _self_test():
     loss.backward()
     gW = raw_W.grad.abs().sum().item()
     gd = raw_decay.grad.abs().sum().item()
-    print(f"[2] surrogate loss={float(loss):.4f}  |grad raw_W|={gW:.4f}  |grad raw_decay|={gd:.4f} "
-          f"({'OK (flows)' if gW > 0 else 'NO GRAD'})")
+    print(f"[2] surrogate loss={float(loss.detach()):.4f}  |grad raw_W|={gW:.4f}  "
+          f"|grad raw_decay|={gd:.4f} ({'OK (flows)' if gW > 0 else 'NO GRAD'})")
 
-    # admit set 内では勾配ゼロ (片側 hinge) — 縮小した core で確認
-    raw_W2 = (raw_W.detach() * 0.05).clone().requires_grad_(True)
-    W2 = 2.0 * torch.tanh(raw_W2)
+    # 片側 hinge の整合: admit 内 (cert_inf=True) で loss=0、admit 外で loss>0 (threshold=1.0)
     d2 = torch.sigmoid(raw_decay.detach())
-    l2 = cert_surrogate_loss(d2, W2, threshold=0.95)
-    inside = H.cert_inf(d2.numpy(), W2.detach().numpy())
-    print(f"[3] shrunk core: cert_inf={inside}  surrogate loss={float(l2):.4f} "
-          f"({'OK (0 inside admit)' if (inside and float(l2) == 0.0) else 'check'})")
+    for shrink in (1.0, 0.005):
+        raw_W2 = (raw_W.detach() * shrink).clone().requires_grad_(True)
+        W2 = 2.0 * torch.tanh(raw_W2)
+        l2 = float(cert_surrogate_loss(d2, W2, threshold=1.0).detach())
+        inside = H.cert_inf(d2.numpy(), W2.detach().numpy())
+        ok = (inside and l2 == 0.0) or (not inside and l2 > 0.0)
+        print(f"[3] shrink={shrink:<5}: cert_inf={inside!s:5} loss={l2:.4f} "
+              f"({'OK consistent' if ok else 'INCONSISTENT'})")
     return 0
 
 
