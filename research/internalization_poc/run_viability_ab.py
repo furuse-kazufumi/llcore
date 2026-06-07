@@ -312,10 +312,11 @@ def run_all() -> dict:
         res = run_substrate(sub)
         out["substrates"][sub.name] = res
         m = res["arm_means_phase2"]
-        print(f"  [{sub.name}] surv NONE={m['NONE']['survival']:.2f} EXO={m['EXO_fixed']['survival']:.2f} "
-              f"ENDO={m['ENDO']['survival']:.2f} | H_surv Δ={res['H_survival_endo_vs_exo']['mean_delta']:+.3f} "
-              f"p={res['H_survival_endo_vs_exo']['p_signflip_two_sided']:.4f} | "
-              f"H3 endo_surv={res['H3_endo_survival_rate']:.3f} ({time.time()-t0:.0f}s)", flush=True)
+        hd = res["H_deaths_exo_minus_endo"]
+        print(f"  [{sub.name}] phase2_deaths NONE={m['NONE']['phase2_deaths']:.1f} "
+              f"EXO={m['EXO_fixed']['phase2_deaths']:.1f} ENDO={m['ENDO']['phase2_deaths']:.1f} | "
+              f"H_deaths(EXO−ENDO) Δ={hd['mean_delta']:+.1f} p={hd['p_signflip_two_sided']:.4f} | "
+              f"soundness_viol={res['soundness_violations']} ({time.time()-t0:.0f}s)", flush=True)
     out["wall_seconds"] = round(time.time() - t0, 2)
     return out
 
