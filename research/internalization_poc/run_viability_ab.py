@@ -197,17 +197,45 @@ def _near_observed_death(gene, death_memory) -> bool:
     return bool(np.min(np.sqrt(((dm - q) ** 2).sum(axis=1))) < OBSERVE_RADIUS)
 
 
-def _ga_phase(sub, kappa, gate_fn, V, init_genes, rng, n_gen):
-    """minimal GA を 1 phase。返り値に被った致命評価数 (deaths) を含む。"""
+def _ga_phase(sub, arm, kappa, V, init_genes, rng, n_gen, death_memory=None):
+    """minimal GA を 1 phase。arm ごとの記憶形成機構を適用し、被った致命評価数 (deaths) を返す。
+
+    - NONE: gate なし。 EXO_fixed: gate κ_low。 ENDO: gate κ_current (環境結合・健全予見, reject)。
+    - REVIVE: 死を予見した child を修復 (記憶 mix 保持; reject でなく repair)。init pop も修復。
+    - OBSERVE: 他個体の観察された死 (death_memory) 近傍の child を回避 (経験的・社会的境界)。
+    """
     deaths = [0]
+    gkappa = _gate_kappa_for(arm, kappa)
+    dm = death_memory if death_memory is not None else []   # OBSERVE 用 (社会的記憶, phase 跨ぎ継続)
 
     def ff(g):
         fit, surv = _eval(sub, g, kappa, V, rng)
         if surv < 1.0:
             deaths[0] += 1
+            dm.append(_normgene(g.clipped()))               # 観察された死を社会的記憶へ
         return fit
 
-    genes = initialize_random_population(POP, rng) if init_genes is None else list(init_genes)
+    def _make_viable(child):
+        """arm の機構で child を生存可能化して返す (REVIVE=修復, gate 系=resample, OBSERVE=回避)。"""
+        if arm == "REVIVE":
+            return _repair(sub, child, gkappa, V)
+        if arm == "NONE":
+            return child
+        tries = 0
+        while tries < RESAMPLE_CAP:
+            ok = (not _near_observed_death(child, dm)) if arm == "OBSERVE" else _admits(sub, child, gkappa, V)
+            if ok:
+                return child
+            src = tournament_select(pop, TOURN_K, rng).gene
+            child = uniform_mutate(src, SIGMA, rng)
+            tries += 1
+        return child
+
+    if init_genes is None:
+        genes = initialize_random_population(POP, rng)
+    else:
+        # REVIVE は catastrophe を越えて運ぶ記憶 (carried pop) を修復 = 記憶を消さず安全化。
+        genes = [_repair(sub, g, gkappa, V) for g in init_genes] if arm == "REVIVE" else list(init_genes)
     pop = Population(tuple(Individual(gene=g, fitness=ff(g)) for g in genes))
     best_curve = [pop.best.fitness]
     for _ in range(n_gen):
@@ -220,12 +248,7 @@ def _ga_phase(sub, kappa, gate_fn, V, init_genes, rng, n_gen):
                 child = crossover_uniform(pa, pb, rng)
             else:
                 child = uniform_mutate(pa, SIGMA, rng)
-            tries = 0
-            while not gate_fn(child) and tries < RESAMPLE_CAP:
-                src = tournament_select(pop, TOURN_K, rng).gene
-                child = uniform_mutate(src, SIGMA, rng)
-                tries += 1
-            children.append(child)
+            children.append(_make_viable(child))
         pop = Population(tuple(Individual(gene=g, fitness=ff(g)) for g in children))
         best_curve.append(pop.best.fitness)
     return [i.gene for i in pop.individuals], list(best_curve), pop, deaths[0]
