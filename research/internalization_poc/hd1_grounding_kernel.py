@@ -314,7 +314,7 @@ def run_arm(arm, seed, data, shared_death_log=None):
 
     if is_endo:
         prev_core = core_snapshot()
-        prev_opt_state = copy.deepcopy(opt.state_dict()) if arm != "ENDO_NOSYNC" else None
+        prev_opt_state = copy.deepcopy(opt.state_dict())
     if is_observe:
         snap_theta = copy.deepcopy(m.state_dict())
 
