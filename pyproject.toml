@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "llmesh-llcore"
 version = "0.1.0a0"
-description = "Verified Neural Architecture Evolution on CPU — core algorithm evolution (state-update kernels, learning rules, factor-driven adaptive computation) under Z3-gated selection pressure"
+description = "Verified Neural Architecture Evolution on CPU — core algorithm evolution (state-update kernels, learning rules, factor-driven adaptive computation) under a sound contraction-certifier gate (closed-form / vertex / Lyapunov-SDP ladder; optional Z3/SMT invariant checks)"
 readme = "README.md"
 license = "Apache-2.0"
 license-files = ["LICENSE", "LICENSE-COMMERCIAL", "NOTICE"]
