@@ -124,7 +124,11 @@ def _eval(sub, gene: StateUpdateGene, w_env: float, V: float, rng: np.random.Gen
     for _ in range(N_TRIALS):
         clean = rng.uniform(-1.0, 1.0, size=(SEQ_LEN, STATE_DIM))
         target = clean[SEQ_LEN - 1 - DELAY].copy()
-        d = rng.uniform(-w_env, w_env, size=clean.shape)
+        # 環境 = 持続的バイアス w_env (sustained stressor)。zero-mean ノイズより viability 脅威
+        # として現実的で、線形では実測包絡が認証 tube r=G·w̄/(1−L) に一致 → gate 保護が tight。
+        # 符号をランダム化し DC バイアスの方向で aliasing しないようにする。
+        sign = 1.0 if rng.random() < 0.5 else -1.0
+        d = sign * w_env
         s_ref = _rollout(sub, clean, gene)
         s_act = _rollout(sub, clean + d, gene)
         finite = np.isfinite(s_act).all() and np.isfinite(s_ref).all()
