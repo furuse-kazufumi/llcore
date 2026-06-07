@@ -75,11 +75,13 @@ llcore が成熟し、その設計が llive にも価値があると判明した
 6. **Lipschitz/Hurwitz invariants を進化ループ SMT gate に embedding**
 7. **VNN-COMP "online architecture evolution verification" 新カテゴリ提案余地**
 
-詳細: `llive/docs/papers/2026-05-29_core_evolution_master_survey.md` + `2026-05-29_research_plan_core_evolution.md`
+(発足時の事前調査 doc は llive リポジトリの `docs/papers/` 配下)
 
 ## 段階的 PoC レダー (構造破綻防止)
 
 各 PoC は **独立スクリプト + falsifiable 命題 + 破綻ゲート**。前段が破綻したら次段に進まない。
+**下表は発足時 (2026-05-29) の計画スナップショット** — 現在地と確定結果は上の「研究成果」節と
+`research/paper/PAPER_DRAFT.md` を正とする。
 
 | Stage | PoC | 命題 | 破綻ゲート | Status |
 |---|---|---|---|---|
