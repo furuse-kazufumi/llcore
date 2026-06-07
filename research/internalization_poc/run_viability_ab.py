@@ -406,19 +406,16 @@ def main():
     print(f"\nwrote {_HERE / 'results_viability_ab.json'}")
     print("\n=== R-endo viability A/B — 記憶形成 3 機構 (環境=κ, phase2 κ_high, n=20) ===")
     for name, res in out["substrates"].items():
-        print(f"\n[{name}] V={res['V']} obs_gain={res['obs_gain']} | deaths 低い順: "
-              f"{' < '.join(res['deaths_ranking_low_to_high'])}")
+        print(f"\n[{name}] 死回避: {' < '.join(res['deaths_ranking_low_to_high'])} | "
+              f"記憶保存: {' > '.join(res['memory_ranking_high_to_low'])}")
         m = res["arm_means_phase2"]
         for arm in ARMS:
-            print(f"   {arm:10s} deaths={m[arm]['phase2_deaths']:6.1f} fitness={m[arm]['fitness']:.4f} "
-                  f"memory_ratio={m[arm]['memory_ratio']:.3f}")
+            print(f"   {arm:10s} deaths={m[arm]['phase2_deaths']:6.1f} pop_mean_fit={m[arm]['pop_mean_fitness']:.4f} "
+                  f"diversity={m[arm]['diversity']:.3f} best={m[arm]['best_fitness']:.4f}")
         c = res["comparisons"]
-        print(f"   ENDO−REVIVE deaths Δ={c['deaths_ENDO_minus_REVIVE']['mean_delta']:+.1f} "
-              f"(p={c['deaths_ENDO_minus_REVIVE']['p_signflip_two_sided']:.3f}); "
-              f"OBSERVE−ENDO deaths Δ={c['deaths_OBSERVE_minus_ENDO']['mean_delta']:+.1f} "
-              f"(p={c['deaths_OBSERVE_minus_ENDO']['p_signflip_two_sided']:.3f})")
-        print(f"   REVIVE−ENDO fitness Δ={c['fitness_REVIVE_minus_ENDO']['mean_delta']:+.4f}; "
-              f"verifier soundness viol={res['soundness_violations']}/{res['soundness_checked']}")
+        print(f"   REVIVE−NONE pop_mean Δ={c['popmean_REVIVE_minus_NONE']['mean_delta']:+.4f} "
+              f"(p={c['popmean_REVIVE_minus_NONE']['p_signflip_two_sided']:.3f}) = 復活の記憶保存; "
+              f"NONE−ENDO deaths Δ={c['deaths_NONE_minus_ENDO']['mean_delta']:+.1f} = 予見の死回避")
         print(f"   verdict: {res['verdict']}")
     return 0
 
