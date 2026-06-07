@@ -277,11 +277,15 @@ def _soundness_violations(sub, V, n=5000, seed=0):
 
 def _run_arm(sub, arm, seed, V):
     rng = np.random.default_rng(seed)
-    genes1, _, _, deaths1 = _ga_phase(sub, KAPPA_LOW, _gate_fn(sub, arm, KAPPA_LOW, V), V, None, rng, G1)
-    genes2, curve2, pop2, deaths2 = _ga_phase(sub, KAPPA_HIGH, _gate_fn(sub, arm, KAPPA_HIGH, V), V, genes1, rng, G2)
+    dm = []   # OBSERVE 用社会的死記憶 (phase1→phase2 継続)
+    genes1, curve1, pop1, deaths1 = _ga_phase(sub, arm, KAPPA_LOW, V, None, rng, G1, death_memory=dm)
+    phase1_final = float(pop1.best.fitness)
+    genes2, curve2, pop2, deaths2 = _ga_phase(sub, arm, KAPPA_HIGH, V, genes1, rng, G2, death_memory=dm)
     surv = _pop_survival_rate(sub, genes2, KAPPA_HIGH, V, seed)
     return {
         "arm": arm, "seed": seed, "phase2_deaths": int(deaths2), "phase1_deaths": int(deaths1),
+        "phase1_final_fitness": phase1_final,
+        "phase2_gen0_fitness": float(curve2[0]),            # catastrophe 直後 = 記憶がどれだけ生き残ったか
         "phase2_final_best_fitness": float(pop2.best.fitness),
         "phase2_auc": float(np.sum(curve2)), "phase2_survival_rate": surv,
     }
