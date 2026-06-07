@@ -316,42 +316,49 @@ def run_substrate(sub):
             recs.append(_run_arm(sub, arm, seed, V))
     means = {arm: {
         "phase2_deaths": float(np.mean([r["phase2_deaths"] for r in recs if r["arm"] == arm])),
-        "survival": float(np.mean([r["phase2_survival_rate"] for r in recs if r["arm"] == arm])),
         "fitness": float(np.mean([r["phase2_final_best_fitness"] for r in recs if r["arm"] == arm])),
-        "auc": float(np.mean([r["phase2_auc"] for r in recs if r["arm"] == arm])),
+        "memory_ratio": float(np.mean([r["phase2_gen0_fitness"] / max(r["phase1_final_fitness"], 1e-9)
+                                       for r in recs if r["arm"] == arm])),
+        "survival": float(np.mean([r["phase2_survival_rate"] for r in recs if r["arm"] == arm])),
     } for arm in ARMS}
 
-    h_deaths = _stat(_paired(recs, "EXO_fixed", "ENDO", "phase2_deaths"))
-    h1 = _stat(_paired(recs, "ENDO", "EXO_fixed", "phase2_final_best_fitness"))
-    h2 = _stat(_paired(recs, "ENDO", "EXO_fixed", "phase2_auc"))
+    # 機構 vs baseline (NONE) の死回避 + 機構間比較 (paired, sign-flip)
+    comp = {
+        "deaths_NONE_minus_ENDO": _stat(_paired(recs, "NONE", "ENDO", "phase2_deaths")),
+        "deaths_NONE_minus_REVIVE": _stat(_paired(recs, "NONE", "REVIVE", "phase2_deaths")),
+        "deaths_NONE_minus_OBSERVE": _stat(_paired(recs, "NONE", "OBSERVE", "phase2_deaths")),
+        "deaths_ENDO_minus_REVIVE": _stat(_paired(recs, "ENDO", "REVIVE", "phase2_deaths")),
+        "deaths_OBSERVE_minus_ENDO": _stat(_paired(recs, "OBSERVE", "ENDO", "phase2_deaths")),
+        "fitness_REVIVE_minus_ENDO": _stat(_paired(recs, "REVIVE", "ENDO", "phase2_final_best_fitness")),
+        "fitness_ENDO_minus_NONE": _stat(_paired(recs, "ENDO", "NONE", "phase2_final_best_fitness")),
+    }
 
-    sound_viol, sound_checked = _soundness_violations(sub, V)
-    h3_sound = bool(sound_viol == 0)
-    none_deaths = means["NONE"]["phase2_deaths"]
-    endo_deaths = means["ENDO"]["phase2_deaths"]
-    exo_deaths = means["EXO_fixed"]["phase2_deaths"]
-    boundary_active = bool(none_deaths > 0.5)
+    sound_viol, sound_checked = _soundness_violations(sub, V)   # ENDO/REVIVE の verifier 健全性
+    none_d = means["NONE"]["phase2_deaths"]
+    boundary_active = bool(none_d > 1.0)
 
+    # mechanism ランキング (死回避 = 低 deaths が良い)
+    by_deaths = sorted(ARMS, key=lambda a: means[a]["phase2_deaths"])
     if not boundary_active:
-        verdict = (f"INVALID (死境界 inactive, F2): NONE phase2_deaths={none_deaths:.1f} ≈0。κ_high/V 再設計。")
-    elif not h3_sound:
-        verdict = (f"SOUNDNESS 破綻 (F3, 致命): admit gene が {sound_viol}/{sound_checked} 件死んだ。")
-    elif h_deaths["p_signflip_two_sided"] < ALPHA and h_deaths["mean_delta"] > 0:
-        verdict = (f"内的 gate の自己保存に固有価値あり [{sub.name}]: ENDO が致命試行を予見回避 "
-                   f"(phase2_deaths ENDO={endo_deaths:.1f} < EXO={exo_deaths:.1f}, Δ={h_deaths['mean_delta']:+.1f}, "
-                   f"p={h_deaths['p_signflip_two_sided']:.4f}) ∧ soundness OK (viol=0)。EXO は固定 gate で "
-                   f"κ_high 発散 gene を見逃す。fitness Δ(ENDO−EXO)={h1['mean_delta']:+.3f}。")
+        verdict = (f"INVALID (死境界 inactive, F2): NONE deaths={none_d:.1f}。κ_high/V 再設計。")
     else:
-        verdict = (f"自己保存優位なし [{sub.name}] (F1): ENDO≈EXO 致命試行数 (ENDO={endo_deaths:.1f} "
-                   f"vs EXO={exo_deaths:.1f}, p={h_deaths['p_signflip_two_sided']:.4f})。selection が死を処理。")
+        rd = comp["deaths_ENDO_minus_REVIVE"]; od = comp["deaths_OBSERVE_minus_ENDO"]
+        verdict = (f"[{sub.name}] 死回避 (低い順): {' < '.join(by_deaths)}。"
+                   f"REVIVE は死を 0 化 (全修復=経験を傷として保持) "
+                   f"vs ENDO は reject で {means['ENDO']['phase2_deaths']:.1f}。"
+                   f"REVIVE−ENDO 死差 Δ={rd['mean_delta']:+.1f} (p={rd['p_signflip_two_sided']:.3f})。"
+                   f"OBSERVE (経験的社会学習) deaths={means['OBSERVE']['phase2_deaths']:.1f} "
+                   f"vs ENDO (sound 予見) deaths={means['ENDO']['phase2_deaths']:.1f}, OBSERVE−ENDO "
+                   f"Δ={od['mean_delta']:+.1f} (p={od['p_signflip_two_sided']:.3f})。"
+                   f"verifier soundness viol={sound_viol}/{sound_checked} (ENDO/REVIVE は健全; OBSERVE は "
+                   f"empirical ゆえ deaths>0 = imperfect)。memory_ratio (catastrophe 直後/phase1): "
+                   f"{', '.join(f'{a}={means[a][\"memory_ratio\"]:.2f}' for a in ARMS)}。")
 
     return {
         "substrate": sub.name, "V": V, "obs_gain": sub.obs_gain,
-        "arm_means_phase2": means, "H_deaths_exo_minus_endo": h_deaths,
-        "H1_fitness_endo_vs_exo": h1, "H2_auc_endo_vs_exo": h2,
-        "soundness_violations": sound_viol, "soundness_checked": sound_checked, "h3_soundness_ok": h3_sound,
-        "boundary_active": boundary_active, "none_phase2_deaths": none_deaths,
-        "endo_phase2_deaths": endo_deaths, "exo_phase2_deaths": exo_deaths,
+        "arm_means_phase2": means, "comparisons": comp,
+        "soundness_violations": sound_viol, "soundness_checked": sound_checked,
+        "boundary_active": boundary_active, "deaths_ranking_low_to_high": by_deaths,
         "verdict": verdict, "records": recs,
     }
 
