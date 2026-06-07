@@ -391,7 +391,8 @@ def run_all():
     t0 = time.time()
     out = {"preregistration": {
         "KAPPA_LOW": KAPPA_LOW, "KAPPA_HIGH": KAPPA_HIGH, "W_BAR_FIX": W_BAR_FIX,
-        "G1": G1, "G2": G2, "seeds": D_SEEDS, "V_by_substrate": V_BY_SUBSTRATE,
+        "G1": G1, "G2_WARMUP": G2_WARMUP, "G2_MEASURE": G2_MEASURE,
+        "seeds": D_SEEDS, "V_by_substrate": V_BY_SUBSTRATE,
         "delay": DELAY, "seq_len": SEQ_LEN, "alpha": ALPHA, "perm_seed": PERM_RNG_SEED,
         "arms": ARMS, "pop": POP,
     }, "substrates": {}}
