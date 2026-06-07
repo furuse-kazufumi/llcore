@@ -76,6 +76,7 @@
 | 契約死 | empirical_rho ≥ 1 (測定点単位) | |
 | 実害死 | sep_rate ≥ 0 (測定点単位) | |
 | 窓死亡率 | (死フラグの立った測定点数) / 80 | run 単位の指標 |
+| corpus | tiny-shakespeare 先頭 80000 chars (URL download)。**fallback 禁止 = download 失敗で fail-fast** + vocab ≥ 40 sanity assert (offline 退化コーパスによる silent 汚染防止 — レビュー指摘) | vocab 実値は結果 meta に記録 |
 
 ## 3. confirmatory 仮説 (binding; family = {H1, H2}, Holm)
 
