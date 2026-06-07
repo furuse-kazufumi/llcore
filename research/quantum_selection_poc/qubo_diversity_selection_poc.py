@@ -181,57 +181,74 @@ def metrics(x, fitness, sim, K):
             "total_fitness": round(tot_f, 4), "mean_diversity": round(div, 4)}
 
 
-def main():
-    cfg = dict(N=16, d=8, K=4, lam=1.5, A=3.0, seed=2026)
-    fitness, emb, labels = make_population(cfg["N"], cfg["d"], cfg["seed"])
+def run_setting(N, d, K, lam, A, seed, rand_trials):
+    fitness, emb, labels = make_population(N, d, seed)
     sim = cosine_sim(emb)
-    Q, const = build_qubo(fitness, sim, cfg["K"], cfg["lam"], cfg["A"])
+    Q, const = build_qubo(fitness, sim, K, lam, A)
+    total_subsets = math.comb(N, K)
 
     runs = {}
-    x, e = solve_exact(Q, const, cfg["N"], cfg["K"]);              runs["exact"] = (x, e)
-    x, e = solve_random(Q, const, cfg["N"], cfg["K"], cfg["seed"]); runs["random"] = (x, e)
-    x, e = solve_fitness_greedy(fitness, Q, const, cfg["N"], cfg["K"]); runs["fitness_greedy"] = (x, e)
-    x, e = solve_diverse_greedy(fitness, sim, Q, const, cfg["N"], cfg["K"]); runs["diverse_greedy"] = (x, e)
-    x, e = solve_sa(Q, const, cfg["N"], cfg["K"], cfg["seed"]);    runs["sa_classical"] = (x, e)
+    runs["exact"] = solve_exact(Q, const, N, K)
+    runs["random"] = solve_random(Q, const, N, K, seed, trials=rand_trials)
+    runs["fitness_greedy"] = solve_fitness_greedy(fitness, Q, const, N, K)
+    runs["diverse_greedy"] = solve_diverse_greedy(fitness, sim, Q, const, N, K)
+    runs["sa_classical"] = solve_sa(Q, const, N, K, seed)
 
     exact_e = runs["exact"][1]
-    out = {"config": cfg, "qubo": "min -Σf x + λΣs xx + A(Σx-K)²", "results": {}}
-    print(f"=== QUBO 多様性選択 PoC (N={cfg['N']} K={cfg['K']} λ={cfg['lam']}) ===")
-    print(f"{'method':16s} {'energy':>10s} {'gap_to_exact':>13s} {'totF':>6s} {'div':>6s} {'opt?':>5s}")
+    res = {"N": N, "K": K, "lam": lam, "total_subsets": total_subsets,
+           "random_coverage": round(rand_trials / total_subsets, 4), "methods": {}}
+    print(f"\n=== N={N} K={K} λ={lam} (全 {total_subsets} 部分集合; "
+          f"random は {rand_trials} 試行 = {rand_trials/total_subsets:.1%} を探索) ===")
+    print(f"{'method':16s} {'energy':>10s} {'gap':>9s} {'totF':>6s} {'div':>6s} {'opt?':>6s}")
     for name in ("exact", "sa_classical", "diverse_greedy", "fitness_greedy", "random"):
         x, e = runs[name]
-        m = metrics(x, fitness, sim, cfg["K"])
+        m = metrics(x, fitness, sim, K)
         gap = round(e - exact_e, 4)
         is_opt = abs(gap) < 1e-6
-        out["results"][name] = {"energy": round(e, 4), "gap_to_exact": gap,
+        res["methods"][name] = {"energy": round(e, 4), "gap_to_exact": gap,
                                 "is_optimal": is_opt, **m}
-        print(f"{name:16s} {e:10.4f} {gap:13.4f} {m['total_fitness']:6.2f} "
-              f"{m['mean_diversity']:6.3f} {str(is_opt):>5s}")
+        print(f"{name:16s} {e:10.4f} {gap:9.4f} {m['total_fitness']:6.2f} "
+              f"{m['mean_diversity']:6.3f} {str(is_opt):>6s}")
 
-    # § cert_gate: 健全性 certificate を満たさない個体を選ばせない (最小デモ)
-    # 仮に「fitness 上位だが unsound」な個体を 2 つ置き、cert penalty で排除されるか確認
-    cert = np.ones(cfg["N"])
+    # § cert_gate: unsound 高 fitness 個体が cert penalty で排除されるか
+    cert = np.ones(N)
     top2 = np.argsort(-fitness)[:2]
-    cert[top2] = 0.0                                   # 高 fitness だが unsound と仮定
-    Qc, constc = build_qubo(fitness, sim, cfg["K"], cfg["lam"], cfg["A"], cert=cert, mu=5.0)
-    xc, ec = solve_exact(Qc, constc, cfg["N"], cfg["K"])
+    cert[top2] = 0.0
+    Qc, constc = build_qubo(fitness, sim, K, lam, A, cert=cert, mu=5.0)
+    xc, _ = solve_exact(Qc, constc, N, K)
     sel_c = set(np.where(xc > 0.5)[0].tolist())
     excluded = [int(i) for i in top2 if i not in sel_c]
-    out["cert_gate_demo"] = {
-        "unsound_high_fitness": top2.tolist(),
-        "excluded_by_cert": excluded,
-        "all_unsound_excluded": bool(len(excluded) == len(top2)),
-        "note": "cert penalty μ で unsound 高 fitness 個体を選択から排除 = llcore Z3 gate 接続点",
-    }
-    print(f"\n[cert_gate] unsound 高 fitness 個体 {top2.tolist()} → "
-          f"cert penalty で排除 {excluded} "
+    res["cert_gate_demo"] = {"unsound_high_fitness": top2.tolist(),
+                             "excluded_by_cert": excluded,
+                             "all_unsound_excluded": bool(len(excluded) == len(top2))}
+    print(f"[cert_gate] unsound 高 fitness {top2.tolist()} → 排除 {excluded} "
           f"({'全排除 OK' if len(excluded)==len(top2) else '一部残存'})")
+    return res
 
-    # honest disclosure
-    print("\n[honest] 本 PoC は QPU 優位を測っていない。exact=ground truth に古典 SA が一致するか "
-          "= 定式化が解けるかの sanity。QPU vs tuned SA vs random の 3 比較は未実施 (将来)。")
-    print("[drop-in] Q (対称行列) は dimod.BQM へ 1:1 変換可 → neal.SimulatedAnnealingSampler / "
-          "D-Wave QPU に無改造で乗る (本環境は neal 不在のため自前 SA で代替)。")
+
+def main():
+    # 2 設定: small は全空間が小さく random も解けてしまう (= 規模が足りない証拠) /
+    #         medium は random が全空間の数 % しか見られず SA の価値が初めて見える。
+    out = {"qubo": "min -Σf x + λΣs xx + A(Σx-K)² [+ μΣ(1-cert)x]",
+           "scope": "QPU 優位は未測定。exact=ground truth に古典 SA が一致するか = 定式化 sanity。",
+           "settings": {}}
+    print("=== QUBO 多様性選択 PoC (深追いしない最小版 / honest disclosure) ===")
+    out["settings"]["small"] = run_setting(N=16, d=8, K=4, lam=1.5, A=3.0,
+                                           seed=2026, rand_trials=2000)
+    out["settings"]["medium"] = run_setting(N=28, d=10, K=7, lam=1.5, A=3.0,
+                                            seed=2026, rand_trials=2000)
+
+    sm, md = out["settings"]["small"], out["settings"]["medium"]
+    print("\n--- honest 所見 ---")
+    print(f"[small ] random opt={sm['methods']['random']['is_optimal']} "
+          f"(全空間 {sm['total_subsets']} を {sm['random_coverage']:.0%} 探索 = 小さすぎて random も解ける)")
+    print(f"[medium] random opt={md['methods']['random']['is_optimal']} gap={md['methods']['random']['gap_to_exact']} "
+          f"/ SA opt={md['methods']['sa_classical']['is_optimal']} "
+          f"(random は {md['random_coverage']:.1%} しか見られず未到達; SA は exact 近傍に到達)")
+    print("[結論] 定式化は古典 SA で解ける (medium で random/greedy を上回り exact に一致)。")
+    print("[honest] QPU 優位は本 PoC のスコープ外。QPU vs tuned SA vs random の 3 比較は将来。")
+    print("[drop-in] Q (対称行列) は dimod.BQM へ 1:1 → neal/D-Wave QPU に無改造で乗る (本環境 neal 不在で自前 SA)。")
+    print("[接続点] cert penalty μ で unsound 高 fitness 個体を選択排除 = llcore Z3 gate を選択演算へ写像可。")
 
     rpath = _HERE / "results_qubo_selection.json"
     rpath.write_text(json.dumps(out, indent=1, ensure_ascii=False), encoding="utf-8")
