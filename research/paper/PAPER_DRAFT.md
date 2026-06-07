@@ -1268,7 +1268,7 @@ pays for what it learns in deaths. On the memory axis, REVIVE dies about as ofte
 high-gain Δ = +0.017, *p* = 0.034): repair carries each individual's memory gene across its own death.
 A pre-registered robustness sweep then held **12/12**: both axes survive seed-set replacement,
 κ ∈ {1.5, 2.0, 3.0}, state dimension 8 → 24, and a memory task (delay 20) whose optimum sits *near the
-divergence boundary* — with a capability guard showing the sound arms never fall more than 0.007 of
+divergence boundary* — with a capability guard showing the sound arms never fall more than 0.0072 of
 fitness behind the unsafe arms (pre-registered tolerance 0.05). The stability-versus-plasticity
 objection — that a ρ < 1 gate must strangle memory capacity — did not materialize where it was most
 likely to.
