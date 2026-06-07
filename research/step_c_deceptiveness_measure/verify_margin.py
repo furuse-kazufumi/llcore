@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # -*- coding: utf-8 -*-
 """
 verify_margin.py -- Phase B adversarial verification, lens=sampling_threshold_margin.

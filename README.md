@@ -2,7 +2,7 @@
 
 **Status**: 研究本体は論文 draft 段階 (2026-05-29 発足 → 2026-06-07 時点で §1-§10 + 318 tests green)  
 **License**: Apache-2.0 + Commercial (dual)  
-**Position**: 独立研究 project。llive (FullSense family) と思想を共有するが、**llcore 単独で完結する設計**。llive 仕様が進化の妨げになる局面では迷わず独立路線を取る (ユーザー指示 2026-05-29)。
+**Position**: 独立研究 project。llive (FullSense family) と思想を共有するが、**llcore 単独で完結する設計**。llive 仕様が進化の妨げになる局面では迷わず独立路線を取る (設計判断 2026-05-29)。
 
 ## 研究成果 (date of record)
 
@@ -39,7 +39,7 @@ Transformer のコアアルゴリズム (state update / 学習則 / 認知駆動
 - **必須**: numpy のみ
 - **optional [z3]**: Z3 SMT solver — **本体ゲートでは非 load-bearing** (Track-C で閉形式 ∞-norm と 0/3270 一致 = decorative)。比較・別 track 用途のみ
 - **optional [sdp]**: CLARABEL (SDP-Lyapunov rung)。閉形式で書けない spectral/2-norm 不変量はここが load-bearing
-- **optional [llive]**: **比較実験用のみ**。llcore 自前の minimal 進化エンジンが本流。llive の lldarwin_v2 を「baseline 比較」「アイデア参照」として import するが、依存しない (ユーザー指示「llive の仕様が llcore の進化の妨げになるなら llcore 単体で仕上げる」)
+- **optional [llive]**: **比較実験用のみ**。llcore 自前の minimal 進化エンジンが本流。llive の lldarwin_v2 を「baseline 比較」「アイデア参照」として import するが、依存しない (設計方針「llive の仕様が llcore の進化の妨げになるなら llcore 単体で仕上げる」)
 - **RAD コーパス** (`LLCORE_RAD_DIR` 配下の `<domain>_corpus_v2/`) は **path-based で参照** → llive 依存なしで進化中個体に先行研究 hint を注入できる (`src/llcore/rad/`; コーパス不在時は graceful degrade)
 
 ### なぜ llive 非依存か (設計判断)
