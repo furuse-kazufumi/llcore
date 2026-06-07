@@ -1855,6 +1855,9 @@ The following are the prior *concepts* this paper builds on. They are listed as 
 - **Multi-objective optimization / Pareto fronts** — the cost-as-selection (L4) framing in §8–§10.
 - **TRIZ ideality and contradiction resolution** — the design discipline of turning the verifier's conservatism constraint into a strength rather than trading it off.
 - **Active inference / predictive-coding framing of a "sense organ" + bounded internal state** — the conceptual framing of the fixed `tanh` byte-embedding as a sensory front end feeding stable internal dynamics.
+- **Proof-gated self-modification (the Gödel-machine line)** — self-modifications admitted only with a machine-checkable certificate; the ancestry of the endogenous gate of §9.6 and of related-work corner (iii).
+- **Safe-set projection / shielding (safe RL & runtime assurance)** — projecting or repairing unsafe candidates back into a certified safe set; the ancestry of the certificate-preserving repair mechanism of §9.6.
+- **Blind-variation / selective-retention and the vicarious selector (Campbell)** — learning boundaries from observed failures of others instead of first-person death; the ancestry of the observational mechanism of §9.6.
 - **Pre-registration and honest-disclosure / red-team methodology** — the practice of fixing gates and null controls in advance and reporting negatives at full strength.
 
 ---
