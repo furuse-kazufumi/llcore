@@ -73,6 +73,10 @@ def holm(pvals):
 
 
 def main():
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")   # cp932 console 対策 (既知パターン)
+    except Exception:
+        pass
     paths = sys.argv[1:] or sorted(_HERE.glob("result_hd1g_n*.json"))
     if not paths:
         print("no result_hd1g_n*.json found"); return 2
