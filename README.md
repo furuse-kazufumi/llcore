@@ -137,11 +137,11 @@ llcore/
 ## 関連
 
 - llive: https://github.com/furuse-kazufumi/llive
-- FullSense portal: https://github.com/furuse-kazufumi/fullsense (private)
-- 設計 doc: `llive/docs/papers/2026-05-29_research_plan_core_evolution.md`
 
 ## honest 留保
 
-- v0.1.0a0 = pre-alpha、Stage 0a だけ動く skeleton
+- パッケージ版数 v0.1.0a0 = pre-alpha (PyPI 配布物としては未成熟)。研究成果の正本は `research/` 配下
+- 研究スコープ: n=8 CPU reservoir byte-LM + スカラー記憶 kernel の PoC スケール。gradient-trained
+  Transformer の本格統合・n=32+ は roadmap (論文 §10)
 - llive と将来融合する流れだが、現段階では完全分離
 - 1B 級 scratch CPU 学習は不可能、機構実証 (mechanism feasibility) に絞る
