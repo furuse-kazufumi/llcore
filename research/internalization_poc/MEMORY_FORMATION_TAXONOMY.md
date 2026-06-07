@@ -69,12 +69,15 @@ corpus paper 16 §最大リスク「ρ<1 が可塑性を殺さないか」への
 4. **REVIVE 独立性**: repair が reject+再合成と機能的に区別不能なら 3→2 機構に縮退。
 5. **OBSERVE「社会的」**: 個体間情報伝達構造を PoC が実装していなければ「empirical boundary learning」に限定。
 
-## 次手 (優先順)
+## 次手 (優先順) — 2026-06-07 更新
 
-- **[最優先] 反証 #2 の潰し込み**: 非線形基質 + 複数 seed で death-count 順序の頑健性。論文中心仮説の生死。
-- **[次] 近接 parallel 精査**: SEVerA/SGM/Two-Gate の gate 対象を WebFetch 1 件ずつ (過去 commit 5297f5ba
-  「related work 盤石化」の防御線を 3 機構 taxonomy へ拡張)。
-- **[並行] 安定 vs 可塑性 capability メトリクス**: ρ<1 が記憶獲得能力を殺さない証拠を PoC に追加。
+- ✅ **反証 #2 の潰し込み** (12/12, §反証条件 2 参照) — 助走版確定 run + factorial 2³ + META も完了
+  (正本 = [[VIABILITY_VERDICT.md]] 追補②③④: sound 単独支配 / RO 相乗 / hedging=CONDITIONAL)。
+- ✅ **安定 vs 可塑性 capability メトリクス** — robustness の H_capability に統合 (12/12, hard_mem 含む)。
+- **[最優先] 近接 parallel 精査**: SEVerA/SGM/Two-Gate の gate 対象を WebFetch 1 件ずつ (過去 commit
+  5297f5ba「related work 盤石化」の防御線を 3 機構 taxonomy へ拡張)。novelty #2 (空白象限) の生死。
+- **[次] 論文編入判断**: 反証 #2 解消により「条件付き編入可」の条件が前進。残る条件 = 近接 parallel 精査。
+  編入形 = §future work or 新節 (3 機構 taxonomy + 2 軸結果 + ④ premise 監視の問題提起)。
 - **記事**: 「死を越えて経験が記憶になる 3 つの道 (予見/修復/観察) と、なぜ証明できる安全が観察で学ぶ安全に
   勝るのか」を Campbell BVSR + Gödel machine 対比で (over-claim 注意点 4 件を反映)。
 
