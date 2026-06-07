@@ -1795,9 +1795,9 @@ source confirmed) found the neighborhood densely occupied, always in one of thre
 - **Safeguarded AI (ARIA programme, 2024–2026)** is the most authoritative proof-gated-gatekeeper
   concept, but the gatekeeper certifies *actions/plans* against a formal world model before they reach
   the world — an output/behaviour gate on cyber-physical control, not a weight/memory-update gate, and
-  at programme stage rather than a shipped implementation. We pre-empt the inevitable "how does this
-  differ from davidad's gatekeeper" question: the difference is the gated object (memory update vs.
-  action) and the target (Transformer core vs. world model).
+  at programme stage rather than a shipped implementation. We answer the natural "how does this
+  differ from davidad's gatekeeper" question directly: the difference is the gated object (memory
+  update vs. action) and the target (Transformer core vs. world model).
 - **Emergent Formal Verification / substrate-guard (arXiv:2603.21149, 2026)** is a *running* Z3-based
   system that soundly verifies AI *outputs* (generated code, tool calls, contracts) across six domains —
   so a sound SMT gate on autonomous-AI behaviour is implemented. It is post-hoc observational monitoring
