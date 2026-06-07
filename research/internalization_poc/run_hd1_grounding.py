@@ -177,9 +177,9 @@ def run_arm(arm, n, seed, data, beta=0.5):
                 m.raw_decay[li].copy_(snap[li][0])
                 m.raw_W[li].copy_(snap[li][1])
 
-    if arm == "ENDO":
+    if arm in ("ENDO", "ENDO_NOSYNC"):
         prev_core = core_snapshot()
-        prev_opt_state = copy.deepcopy(opt.state_dict())
+        prev_opt_state = copy.deepcopy(opt.state_dict()) if arm == "ENDO" else None
     if arm == "OBSERVE":
         snap_theta = copy.deepcopy(m.state_dict())
 
