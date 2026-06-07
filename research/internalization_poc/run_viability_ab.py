@@ -303,6 +303,9 @@ def _run_arm(sub, arm, seed, V):
         "phase1_final_fitness": phase1_final,
         "phase2_gen0_fitness": float(curve2[0]),            # catastrophe 直後 = 記憶がどれだけ生き残ったか
         "phase2_final_best_fitness": float(pop2.best.fitness),
+        # REVIVE の真価指標: 死を経験しても記憶が消えず集団に残るか (mean fitness + 多様性)。
+        "phase2_pop_mean_fitness": float(pop2.fitness_array.mean()),
+        "phase2_pop_diversity": float(pop2.gene_matrix.var()),
         "phase2_auc": float(np.sum(curve2)), "phase2_survival_rate": surv,
     }
 
