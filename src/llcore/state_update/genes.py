@@ -94,6 +94,37 @@ class StateUpdateGene:
             gate_str=float(np.clip(self.gate_str, -2.0, 2.0)),
         )
 
+    def is_verified_trajectory_tube(
+        self, w_bar: float, r_max: float | None = None
+    ) -> bool:
+        """この gene 自身が trajectory-tube ゲートを pass するか (endogenous self-judge).
+
+        R-endo PoC (内的検証器) 用の **read-only** 自己検証メソッド。entity が外部 GA を
+        待たず「自分が現在の外乱環境 ``w_bar`` の下で contraction-certified か」を自己判断する。
+        本体は production ゲート (``minimal_ga._gate_admits(..., "trajectory_tube")``) と
+        **同一の** :func:`llcore.verifier.tracking_tube.tracking_tube` を呼ぶため、verdict は
+        外部ゲートと構成的に一致する (R-endo H3 correctness 不変量; threshold は外部引数 =
+        entity が改竄できない literal なので gameable でない)。
+
+        ローカル import で循環依存を回避 (verifier は state_update を import するため、
+        module 先頭で verifier を import すると循環する)。コストは閉形式 O(n²) (~100µs)。
+
+        Parameters
+        ----------
+        w_bar : float
+            現在の外乱上界 ‖d‖∞ ≤ w̄ (≥0)。entity が結合する「環境」量。
+        r_max : float | None
+            tube 半径許容上限。None なら contraction (tube 有限) のみで admit。
+
+        Returns
+        -------
+        bool
+            ``tracking_tube(self, w_bar=w_bar, r_max=r_max).admits`` (fail-closed)。
+        """
+        from llcore.verifier.tracking_tube import tracking_tube
+
+        return bool(tracking_tube(self, w_bar=w_bar, r_max=r_max).admits)
+
 
 def eval_step(
     state: np.ndarray, x: np.ndarray, gene: StateUpdateGene
