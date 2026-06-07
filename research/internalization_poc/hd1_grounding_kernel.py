@@ -389,6 +389,8 @@ def main():
     rpath = f"result_hd1g_n{N}.json" if RUN_MODE == "main" else f"result_hd1g_smoke_n{N}.json"
     data = make_data(CFG["max_chars"])
     tr, va, vocab = data
+    if RUN_MODE == "main":
+        assert vocab >= 40, f"corpus sanity failed (vocab={vocab}; offline fallback?)"
     uni = unigram_ce(tr, va, vocab)
     _log("run", f"vocab={vocab} unigram_CE={uni:.4f} n={N} arms={ARMS} seeds={len(SEEDS)}")
 
