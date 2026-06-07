@@ -282,11 +282,15 @@ def main():
         null = json.load(fh)
     with open(os.path.join(_CR, "poc_scale_results.json"), encoding="utf-8") as fh:
         scale = json.load(fh)
+    _ip = os.path.normpath(os.path.join(_HERE, "..", "internalization_poc"))
+    with open(os.path.join(_ip, "results_viability_ab.json"), encoding="utf-8") as fh:
+        via = json.load(fh)
     figs = {
         "fig_cost_speedup.svg": fig_cost_speedup(poc1["cost"]),
         "fig_admit_coverage.svg": fig_admit_coverage(v2),
         "fig_l3_gate_gap.svg": fig_l3_gate_gap(real, null),
         "fig_coverage_vs_n.svg": fig_coverage_vs_n(scale),
+        "fig_viability_axes.svg": fig_viability_axes(via),
     }
     for name, svg in figs.items():
         path = os.path.join(_HERE, name)
