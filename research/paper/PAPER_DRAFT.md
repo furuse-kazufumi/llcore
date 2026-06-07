@@ -1692,9 +1692,9 @@ search.
   as the prior carrying this banner.** Its gate is NLI-based contradiction detection (not a sound
   formal proof), its stability theorem is an `O(N·ε)` drift bound stated as a proof sketch, and it is
   explicitly "a rigorous theoretical architecture" with no implementation or experiments — so corners
-  (i) and (iv) stay open. The window on the implementation-and-sound-proof gap is the one a follow-up
-  SSGM implementation would close, which is why we treat it as time-sensitive. §9 reports our
-  occupation of exactly this gap at PoC scale: a sound closed-form trajectory-tube guarantee, a
+  (i) and (iv) stay open. SSGM thus names the gap — a sound stability proof plus a running
+  implementation — without filling it. §9 reports a PoC-scale instance of exactly that
+  combination: a sound closed-form trajectory-tube guarantee, a
   running fail-closed gate inside the evolution loop, and a pre-registered confirmatory experiment.
 - **STABLE: Gated Continual Learning for LLMs (arXiv:2510.16089, 2025)** gates candidate LoRA updates
   to a real LLM against a stability budget (EM-drop / bits / KL thresholds), rescaling or rejecting
