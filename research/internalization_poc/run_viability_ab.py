@@ -94,7 +94,11 @@ KAPPA_LOW = 1.0        # phase1 環境ゲイン (正常)
 KAPPA_HIGH = 2.0       # phase2 環境ゲイン (2x = 以前安定な gene を発散させる; smoke で死境界 active 確認)
 W_BAR_FIX = 0.1        # 固定 sustained bias 外乱 (tube/包絡)
 G1 = 10
-G2 = 10
+# phase2 を 助走 (warm-up) + 測定 (measure) に分割 (ユーザー指摘): κ_high で死を数回経験させ
+# (OBSERVE が death_memory を学習・REVIVE が傷を蓄積・初期 shock 通過) その deaths は数えず、
+# 定常状態 (measure 期) の deaths/記憶を正確な統計とする。死記憶/集団/rng は warm-up→measure 継続。
+G2_WARMUP = 8
+G2_MEASURE = 10
 D_SEEDS = list(range(3000, 3020))
 # 「経験が記憶になる」3 機構 (ユーザー洞察) + 2 baseline:
 #  ENDO    = 自己予見 (内的健全検証器で死を予見・回避; sound, zero-shot)

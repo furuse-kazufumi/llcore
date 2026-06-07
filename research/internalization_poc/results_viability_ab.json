@@ -53,33 +53,33 @@
       "arm_means_phase2": {
         "NONE": {
           "phase2_deaths": 37.8,
-          "fitness": 0.8070055875146526,
-          "memory_ratio": 0.9950224198822699,
-          "survival": 0.865
+          "best_fitness": 0.8070055875146526,
+          "pop_mean_fitness": 0.6256223697123151,
+          "diversity": 0.6722317630206326
         },
         "EXO_fixed": {
           "phase2_deaths": 22.45,
-          "fitness": 0.8173728933864337,
-          "memory_ratio": 0.9745238262425392,
-          "survival": 0.9424999999999999
+          "best_fitness": 0.8173728933864337,
+          "pop_mean_fitness": 0.6670205939043747,
+          "diversity": 0.4256173417497246
         },
         "ENDO": {
           "phase2_deaths": 8.9,
-          "fitness": 0.8208593689774822,
-          "memory_ratio": 0.9745238262425392,
-          "survival": 1.0
+          "best_fitness": 0.8208593689774822,
+          "pop_mean_fitness": 0.7454445003217296,
+          "diversity": 0.37779319768299024
         },
         "REVIVE": {
-          "phase2_deaths": 0.0,
-          "fitness": 0.8102466806546348,
-          "memory_ratio": 0.9855582263223065,
-          "survival": 1.0
+          "phase2_deaths": 32.65,
+          "best_fitness": 0.8193058474372183,
+          "pop_mean_fitness": 0.720066689963597,
+          "diversity": 0.3877045997275456
         },
         "OBSERVE": {
           "phase2_deaths": 31.5,
-          "fitness": 0.8177148002768965,
-          "memory_ratio": 0.9987602196730652,
-          "survival": 0.8949999999999999
+          "best_fitness": 0.8177148002768965,
+          "pop_mean_fitness": 0.6568877227343061,
+          "diversity": 0.6418618899621512
         }
       },
       "comparisons": {
@@ -91,25 +91,11 @@
           "p_signflip_two_sided": 1.999980000199998e-05
         },
         "deaths_NONE_minus_REVIVE": {
-          "mean_delta": 37.8,
-          "median_delta": 37.5,
-          "n_positive": 20,
-          "n_negative": 0,
-          "p_signflip_two_sided": 9.99990000099999e-06
-        },
-        "deaths_NONE_minus_OBSERVE": {
-          "mean_delta": 6.3,
-          "median_delta": 7.0,
-          "n_positive": 15,
-          "n_negative": 5,
-          "p_signflip_two_sided": 0.057749422505774944
-        },
-        "deaths_ENDO_minus_REVIVE": {
-          "mean_delta": 8.9,
-          "median_delta": 9.0,
-          "n_positive": 19,
-          "n_negative": 0,
-          "p_signflip_two_sided": 9.99990000099999e-06
+          "mean_delta": 5.15,
+          "median_delta": 4.5,
+          "n_positive": 11,
+          "n_negative": 7,
+          "p_signflip_two_sided": 0.23767762322376776
         },
         "deaths_OBSERVE_minus_ENDO": {
           "mean_delta": 22.6,
@@ -118,32 +104,53 @@
           "n_negative": 0,
           "p_signflip_two_sided": 9.99990000099999e-06
         },
-        "fitness_REVIVE_minus_ENDO": {
-          "mean_delta": -0.010612688322847452,
-          "median_delta": -0.010396566659892859,
-          "n_positive": 6,
-          "n_negative": 14,
-          "p_signflip_two_sided": 0.1073589264107359
+        "popmean_REVIVE_minus_NONE": {
+          "mean_delta": 0.09444432025128184,
+          "median_delta": 0.09377386533904525,
+          "n_positive": 16,
+          "n_negative": 4,
+          "p_signflip_two_sided": 6.999930000699993e-05
         },
-        "fitness_ENDO_minus_NONE": {
-          "mean_delta": 0.013853781462829557,
-          "median_delta": 0.009863749696663093,
-          "n_positive": 15,
-          "n_negative": 5,
-          "p_signflip_two_sided": 0.02822971770282297
+        "popmean_ENDO_minus_NONE": {
+          "mean_delta": 0.11982213060941438,
+          "median_delta": 0.11498172298439208,
+          "n_positive": 20,
+          "n_negative": 0,
+          "p_signflip_two_sided": 9.99990000099999e-06
+        },
+        "popmean_REVIVE_minus_ENDO": {
+          "mean_delta": -0.02537781035813256,
+          "median_delta": -0.017915920769182803,
+          "n_positive": 4,
+          "n_negative": 16,
+          "p_signflip_two_sided": 0.00044999550004499957
+        },
+        "popmean_ENDO_minus_OBSERVE": {
+          "mean_delta": 0.08855677758742346,
+          "median_delta": 0.05274823058064232,
+          "n_positive": 20,
+          "n_negative": 0,
+          "p_signflip_two_sided": 9.99990000099999e-06
         }
       },
       "soundness_violations": 0,
       "soundness_checked": 1412,
       "boundary_active": true,
       "deaths_ranking_low_to_high": [
-        "REVIVE",
         "ENDO",
+        "EXO_fixed",
+        "OBSERVE",
+        "REVIVE",
+        "NONE"
+      ],
+      "memory_ranking_high_to_low": [
+        "ENDO",
+        "REVIVE",
         "EXO_fixed",
         "OBSERVE",
         "NONE"
       ],
-      "verdict": "[linear] 死回避 (低い順): REVIVE < ENDO < EXO_fixed < OBSERVE < NONE。REVIVE は死を 0 化 (全修復=経験を傷として保持) vs ENDO は reject で 8.9。REVIVE−ENDO 死差 Δ=+8.9 (p=0.000)。OBSERVE (経験的社会学習) deaths=31.5 vs ENDO (sound 予見) deaths=8.9, OBSERVE−ENDO Δ=+22.6 (p=0.000)。verifier soundness viol=0/1412 (ENDO/REVIVE は健全; OBSERVE は empirical ゆえ deaths>0 = imperfect)。memory_ratio (catastrophe 直後/phase1): NONE=1.00, EXO_fixed=0.97, ENDO=0.97, REVIVE=0.99, OBSERVE=1.00。",
+      "verdict": "[linear] 2 軸: ①死回避 (低い順) ENDO < EXO_fixed < OBSERVE < REVIVE < NONE — ENDO (予見) が死を避ける (NONE−ENDO Δ=+28.9, p=0.000); REVIVE は死を経験 (32.6≈NONE 37.8)。②記憶保存 (pop_mean_fit 高い順) ENDO > REVIVE > EXO_fixed > OBSERVE > NONE — **REVIVE は同死でも記憶を保つ** (REVIVE−NONE pop_mean Δ=+0.094, p=0.000) = 復活が経験を記憶に残す。ENDO は予見で死を避けつつ記憶保持。OBSERVE (empirical) は死多+記憶低 (ENDO−OBSERVE pop_mean Δ=+0.089)。verifier soundness viol=0/1412。",
       "records": [
         {
           "arm": "NONE",
@@ -153,6 +160,8 @@
           "phase1_final_fitness": 0.8439962570210753,
           "phase2_gen0_fitness": 0.8174233030954494,
           "phase2_final_best_fitness": 0.7822059558394455,
+          "phase2_pop_mean_fitness": 0.6436424347468728,
+          "phase2_pop_diversity": 0.09006092486014008,
           "phase2_auc": 8.972497769933012,
           "phase2_survival_rate": 0.95
         },
@@ -164,6 +173,8 @@
           "phase1_final_fitness": 0.8293768397366407,
           "phase2_gen0_fitness": 0.8197346436669934,
           "phase2_final_best_fitness": 0.8055343159003382,
+          "phase2_pop_mean_fitness": 0.6600577024880103,
+          "phase2_pop_diversity": 1.4063589173943565,
           "phase2_auc": 8.872786923352624,
           "phase2_survival_rate": 0.9
         },
@@ -175,6 +186,8 @@
           "phase1_final_fitness": 0.812003910220787,
           "phase2_gen0_fitness": 0.8587142524787031,
           "phase2_final_best_fitness": 0.8066203434822962,
+          "phase2_pop_mean_fitness": 0.45254276115448056,
+          "phase2_pop_diversity": 0.5189902126471208,
           "phase2_auc": 9.006560610960598,
           "phase2_survival_rate": 0.6
         },
@@ -186,6 +199,8 @@
           "phase1_final_fitness": 0.8263748162447677,
           "phase2_gen0_fitness": 0.8574763227895653,
           "phase2_final_best_fitness": 0.8016383176098832,
+          "phase2_pop_mean_fitness": 0.7139408420117157,
+          "phase2_pop_diversity": 0.3297621790347441,
           "phase2_auc": 9.037568403914433,
           "phase2_survival_rate": 0.95
         },
@@ -197,6 +212,8 @@
           "phase1_final_fitness": 0.801059434776914,
           "phase2_gen0_fitness": 0.7929026211759393,
           "phase2_final_best_fitness": 0.7993700929310504,
+          "phase2_pop_mean_fitness": 0.5273642696167721,
+          "phase2_pop_diversity": 0.2280446930776897,
           "phase2_auc": 8.931616032700955,
           "phase2_survival_rate": 0.7
         },
@@ -208,6 +225,8 @@
           "phase1_final_fitness": 0.8252726623305935,
           "phase2_gen0_fitness": 0.777429892887383,
           "phase2_final_best_fitness": 0.8269479395953404,
+          "phase2_pop_mean_fitness": 0.6131999985630924,
+          "phase2_pop_diversity": 0.8064325605865539,
           "phase2_auc": 9.061980761964339,
           "phase2_survival_rate": 0.85
         },
@@ -219,6 +238,8 @@
           "phase1_final_fitness": 0.8056002955985404,
           "phase2_gen0_fitness": 0.7892935456854572,
           "phase2_final_best_fitness": 0.8049096937085416,
+          "phase2_pop_mean_fitness": 0.6169944520877053,
+          "phase2_pop_diversity": 1.1905986617435986,
           "phase2_auc": 8.922522171123045,
           "phase2_survival_rate": 0.9
         },
@@ -230,6 +251,8 @@
           "phase1_final_fitness": 0.8202104742718523,
           "phase2_gen0_fitness": 0.8148185162161877,
           "phase2_final_best_fitness": 0.8081630946622479,
+          "phase2_pop_mean_fitness": 0.7149953244250613,
+          "phase2_pop_diversity": 0.09902852243204997,
           "phase2_auc": 9.044668286230001,
           "phase2_survival_rate": 1.0
         },
@@ -241,6 +264,8 @@
           "phase1_final_fitness": 0.8144528119033277,
           "phase2_gen0_fitness": 0.826676023649596,
           "phase2_final_best_fitness": 0.7865811434302756,
+          "phase2_pop_mean_fitness": 0.6062791833960126,
+          "phase2_pop_diversity": 1.0424907397805938,
           "phase2_auc": 8.998633530617262,
           "phase2_survival_rate": 0.8
         },
@@ -252,6 +277,8 @@
           "phase1_final_fitness": 0.8134960895883427,
           "phase2_gen0_fitness": 0.7791551051511632,
           "phase2_final_best_fitness": 0.8509224963321227,
+          "phase2_pop_mean_fitness": 0.6757076742634975,
+          "phase2_pop_diversity": 0.4061498207666113,
           "phase2_auc": 8.860114016877151,
           "phase2_survival_rate": 0.9
         },
@@ -263,6 +290,8 @@
           "phase1_final_fitness": 0.8019136459094997,
           "phase2_gen0_fitness": 0.8189810677277077,
           "phase2_final_best_fitness": 0.7935124815399588,
+          "phase2_pop_mean_fitness": 0.6261229252006943,
+          "phase2_pop_diversity": 1.4643083598485467,
           "phase2_auc": 9.005766793147853,
           "phase2_survival_rate": 0.85
         },
@@ -274,6 +303,8 @@
           "phase1_final_fitness": 0.8154154465068832,
           "phase2_gen0_fitness": 0.8300977410293863,
           "phase2_final_best_fitness": 0.7935333127164999,
+          "phase2_pop_mean_fitness": 0.638369671325659,
+          "phase2_pop_diversity": 0.8711635713603447,
           "phase2_auc": 8.903142750199514,
           "phase2_survival_rate": 0.9
         },
@@ -285,6 +316,8 @@
           "phase1_final_fitness": 0.8233432576792712,
           "phase2_gen0_fitness": 0.8162354282247067,
           "phase2_final_best_fitness": 0.8191438236563995,
+          "phase2_pop_mean_fitness": 0.6602542979930994,
+          "phase2_pop_diversity": 0.24251429059659943,
           "phase2_auc": 9.02037350045794,
           "phase2_survival_rate": 0.9
         },
@@ -296,6 +329,8 @@
           "phase1_final_fitness": 0.8252657039986526,
           "phase2_gen0_fitness": 0.817291598623081,
           "phase2_final_best_fitness": 0.7856890594909922,
+          "phase2_pop_mean_fitness": 0.6317415669506636,
+          "phase2_pop_diversity": 1.2302001099240212,
           "phase2_auc": 8.8831653764342,
           "phase2_survival_rate": 0.9
         },
@@ -307,6 +342,8 @@
           "phase1_final_fitness": 0.8323975461595788,
           "phase2_gen0_fitness": 0.8011710883467899,
           "phase2_final_best_fitness": 0.8062643247574588,
+          "phase2_pop_mean_fitness": 0.5233149838046299,
+          "phase2_pop_diversity": 0.42412959249923443,
           "phase2_auc": 8.866573656379341,
           "phase2_survival_rate": 0.7
         },
@@ -318,6 +355,8 @@
           "phase1_final_fitness": 0.8052335025823826,
           "phase2_gen0_fitness": 0.8226469010706875,
           "phase2_final_best_fitness": 0.8086091504426864,
+          "phase2_pop_mean_fitness": 0.7546251947139002,
+          "phase2_pop_diversity": 0.44744893167967653,
           "phase2_auc": 8.983723038037514,
           "phase2_survival_rate": 1.0
         },
@@ -329,6 +368,8 @@
           "phase1_final_fitness": 0.8140204716815846,
           "phase2_gen0_fitness": 0.8199076717538256,
           "phase2_final_best_fitness": 0.8158653134438051,
+          "phase2_pop_mean_fitness": 0.5230846321097373,
+          "phase2_pop_diversity": 0.3319694340811458,
           "phase2_auc": 8.913198510778976,
           "phase2_survival_rate": 0.7
         },
@@ -340,6 +381,8 @@
           "phase1_final_fitness": 0.8297635497277862,
           "phase2_gen0_fitness": 0.8370700608517456,
           "phase2_final_best_fitness": 0.8209862990763516,
+          "phase2_pop_mean_fitness": 0.6134004551436123,
+          "phase2_pop_diversity": 1.2537976107070599,
           "phase2_auc": 8.925243138655302,
           "phase2_survival_rate": 0.95
         },
@@ -351,6 +394,8 @@
           "phase1_final_fitness": 0.8692518994203482,
           "phase2_gen0_fitness": 0.7983511583546781,
           "phase2_final_best_fitness": 0.7898049172898572,
+          "phase2_pop_mean_fitness": 0.7040386979681281,
+          "phase2_pop_diversity": 0.4501780967342784,
           "phase2_auc": 8.995334202708314,
           "phase2_survival_rate": 1.0
         },
@@ -362,6 +407,8 @@
           "phase1_final_fitness": 0.8328765769343306,
           "phase2_gen0_fitness": 0.8586929255888988,
           "phase2_final_best_fitness": 0.833809674387504,
+          "phase2_pop_mean_fitness": 0.6127703262829566,
+          "phase2_pop_diversity": 0.6110080306582873,
           "phase2_auc": 9.063638833813139,
           "phase2_survival_rate": 0.85
         },
@@ -373,6 +420,8 @@
           "phase1_final_fitness": 0.7970304517967074,
           "phase2_gen0_fitness": 0.8204034427306103,
           "phase2_final_best_fitness": 0.8244516523022302,
+          "phase2_pop_mean_fitness": 0.7519908693552112,
+          "phase2_pop_diversity": 0.08364296901860964,
           "phase2_auc": 9.057397707501401,
           "phase2_survival_rate": 1.0
         },
@@ -384,6 +433,8 @@
           "phase1_final_fitness": 0.8172090162083575,
           "phase2_gen0_fitness": 0.8284490093859938,
           "phase2_final_best_fitness": 0.8098079286547355,
+          "phase2_pop_mean_fitness": 0.6816838385710937,
+          "phase2_pop_diversity": 0.4158915190860183,
           "phase2_auc": 9.084352470149742,
           "phase2_survival_rate": 1.0
         },
@@ -395,6 +446,8 @@
           "phase1_final_fitness": 0.7998558981155722,
           "phase2_gen0_fitness": 0.7806980432353359,
           "phase2_final_best_fitness": 0.7796347186638041,
+          "phase2_pop_mean_fitness": 0.5818019312555958,
+          "phase2_pop_diversity": 0.7002212211423475,
           "phase2_auc": 8.902882437883104,
           "phase2_survival_rate": 0.8
         },
@@ -406,6 +459,8 @@
           "phase1_final_fitness": 0.8187900321622803,
           "phase2_gen0_fitness": 0.7909281661544182,
           "phase2_final_best_fitness": 0.8218570577711176,
+          "phase2_pop_mean_fitness": 0.6946402420122701,
+          "phase2_pop_diversity": 0.0327543540766704,
           "phase2_auc": 8.989284944446426,
           "phase2_survival_rate": 1.0
         },
@@ -417,6 +472,8 @@
           "phase1_final_fitness": 0.8306619731695375,
           "phase2_gen0_fitness": 0.7993496658382528,
           "phase2_final_best_fitness": 0.7969224282714452,
+          "phase2_pop_mean_fitness": 0.7414000960931167,
+          "phase2_pop_diversity": 0.02962182306295297,
           "phase2_auc": 8.859298148536423,
           "phase2_survival_rate": 1.0
         },
@@ -428,6 +485,8 @@
           "phase1_final_fitness": 0.8207977164200977,
           "phase2_gen0_fitness": 0.8194763411914693,
           "phase2_final_best_fitness": 0.8388098080395571,
+          "phase2_pop_mean_fitness": 0.7133895391488584,
+          "phase2_pop_diversity": 0.22958005778585389,
           "phase2_auc": 9.048552155413716,
           "phase2_survival_rate": 1.0
         },
@@ -439,6 +498,8 @@
           "phase1_final_fitness": 0.8082938468858535,
           "phase2_gen0_fitness": 0.8087329059887075,
           "phase2_final_best_fitness": 0.7979210696967559,
+          "phase2_pop_mean_fitness": 0.6345334607641687,
+          "phase2_pop_diversity": 1.1034276567523398,
           "phase2_auc": 9.108302498146054,
           "phase2_survival_rate": 0.9
         },
@@ -450,6 +511,8 @@
           "phase1_final_fitness": 0.8363323238515941,
           "phase2_gen0_fitness": 0.7569881847669659,
           "phase2_final_best_fitness": 0.8328733553179415,
+          "phase2_pop_mean_fitness": 0.6923659771874375,
+          "phase2_pop_diversity": 0.17204020711903978,
           "phase2_auc": 9.067026519857894,
           "phase2_survival_rate": 1.0
         },
@@ -461,6 +524,8 @@
           "phase1_final_fitness": 0.8626453191032919,
           "phase2_gen0_fitness": 0.8005822646587607,
           "phase2_final_best_fitness": 0.8127249223655716,
+          "phase2_pop_mean_fitness": 0.6929652273112358,
+          "phase2_pop_diversity": 0.3522936340345811,
           "phase2_auc": 8.89912416920056,
           "phase2_survival_rate": 0.95
         },
@@ -472,6 +537,8 @@
           "phase1_final_fitness": 0.8270957427865877,
           "phase2_gen0_fitness": 0.7795009496323341,
           "phase2_final_best_fitness": 0.818077797544531,
+          "phase2_pop_mean_fitness": 0.6528449758110733,
+          "phase2_pop_diversity": 0.1479539152920954,
           "phase2_auc": 8.976414029376077,
           "phase2_survival_rate": 0.95
         },
@@ -483,6 +550,8 @@
           "phase1_final_fitness": 0.8021327366300106,
           "phase2_gen0_fitness": 0.781240970835929,
           "phase2_final_best_fitness": 0.8371020451156751,
+          "phase2_pop_mean_fitness": 0.6676145972259622,
+          "phase2_pop_diversity": 0.056155840137902605,
           "phase2_auc": 8.912354258584596,
           "phase2_survival_rate": 0.95
         },
@@ -494,6 +563,8 @@
           "phase1_final_fitness": 0.8410799949914091,
           "phase2_gen0_fitness": 0.7637011752689907,
           "phase2_final_best_fitness": 0.8123120336404063,
+          "phase2_pop_mean_fitness": 0.6427894588874763,
+          "phase2_pop_diversity": 1.208190405163109,
           "phase2_auc": 8.890001540165999,
           "phase2_survival_rate": 0.9
         },
@@ -505,6 +576,8 @@
           "phase1_final_fitness": 0.8216491785001097,
           "phase2_gen0_fitness": 0.8383845338073841,
           "phase2_final_best_fitness": 0.8053559940206392,
+          "phase2_pop_mean_fitness": 0.5618861786092513,
+          "phase2_pop_diversity": 0.781068745916586,
           "phase2_auc": 8.973609136329069,
           "phase2_survival_rate": 0.85
         },
@@ -516,6 +589,8 @@
           "phase1_final_fitness": 0.818126532243746,
           "phase2_gen0_fitness": 0.8033575823335978,
           "phase2_final_best_fitness": 0.8402623491356137,
+          "phase2_pop_mean_fitness": 0.6035736482960987,
+          "phase2_pop_diversity": 0.23561857218318574,
           "phase2_auc": 8.998757124802694,
           "phase2_survival_rate": 0.9
         },
@@ -527,6 +602,8 @@
           "phase1_final_fitness": 0.840688433274898,
           "phase2_gen0_fitness": 0.7993638613198223,
           "phase2_final_best_fitness": 0.8254879158620838,
+          "phase2_pop_mean_fitness": 0.7407595048168767,
+          "phase2_pop_diversity": 0.20344806945122373,
           "phase2_auc": 8.861820896200651,
           "phase2_survival_rate": 1.0
         },
@@ -538,6 +615,8 @@
           "phase1_final_fitness": 0.8321511327212017,
           "phase2_gen0_fitness": 0.8554185035792036,
           "phase2_final_best_fitness": 0.802095007684,
+          "phase2_pop_mean_fitness": 0.7335123328865949,
+          "phase2_pop_diversity": 0.137797648594788,
           "phase2_auc": 8.990790555075572,
           "phase2_survival_rate": 1.0
         },
@@ -549,6 +628,8 @@
           "phase1_final_fitness": 0.8246655996852817,
           "phase2_gen0_fitness": 0.8199881138874877,
           "phase2_final_best_fitness": 0.8113533799562099,
+          "phase2_pop_mean_fitness": 0.6362029635431365,
+          "phase2_pop_diversity": 0.5286851229534713,
           "phase2_auc": 9.001147080954489,
           "phase2_survival_rate": 0.9
         },
@@ -560,6 +641,8 @@
           "phase1_final_fitness": 0.8083512803333269,
           "phase2_gen0_fitness": 0.8062147960342746,
           "phase2_final_best_fitness": 0.8180594914388015,
+          "phase2_pop_mean_fitness": 0.5737353343995848,
+          "phase2_pop_diversity": 1.5743351931409333,
           "phase2_auc": 8.835329080778568,
           "phase2_survival_rate": 0.85
         },
@@ -571,6 +654,8 @@
           "phase1_final_fitness": 0.8209040569093967,
           "phase2_gen0_fitness": 0.7771121703550108,
           "phase2_final_best_fitness": 0.8417103557891495,
+          "phase2_pop_mean_fitness": 0.7013464614746907,
+          "phase2_pop_diversity": 0.3390131296876228,
           "phase2_auc": 9.01494927305895,
           "phase2_survival_rate": 0.95
         },
@@ -582,6 +667,8 @@
           "phase1_final_fitness": 0.8167553051215904,
           "phase2_gen0_fitness": 0.7898719767561696,
           "phase2_final_best_fitness": 0.8206385564584058,
+          "phase2_pop_mean_fitness": 0.6413752404377637,
+          "phase2_pop_diversity": 0.18060675039515994,
           "phase2_auc": 8.812014892683148,
           "phase2_survival_rate": 0.95
         },
@@ -593,6 +680,8 @@
           "phase1_final_fitness": 0.7970304517967074,
           "phase2_gen0_fitness": 0.8204034427306103,
           "phase2_final_best_fitness": 0.8150155597524172,
+          "phase2_pop_mean_fitness": 0.7502440212750005,
+          "phase2_pop_diversity": 0.2321563212320871,
           "phase2_auc": 8.981340307179199,
           "phase2_survival_rate": 1.0
         },
@@ -604,6 +693,8 @@
           "phase1_final_fitness": 0.8172090162083575,
           "phase2_gen0_fitness": 0.8284490093859938,
           "phase2_final_best_fitness": 0.8163383042130011,
+          "phase2_pop_mean_fitness": 0.7374010260976613,
+          "phase2_pop_diversity": 0.4805133771778353,
           "phase2_auc": 8.981918316330278,
           "phase2_survival_rate": 1.0
         },
@@ -615,6 +706,8 @@
           "phase1_final_fitness": 0.7998558981155722,
           "phase2_gen0_fitness": 0.7806980432353359,
           "phase2_final_best_fitness": 0.7865250636133578,
+          "phase2_pop_mean_fitness": 0.7355760380430787,
+          "phase2_pop_diversity": 1.2277494783460399,
           "phase2_auc": 8.886033716507885,
           "phase2_survival_rate": 1.0
         },
@@ -626,6 +719,8 @@
           "phase1_final_fitness": 0.8187900321622803,
           "phase2_gen0_fitness": 0.7909281661544182,
           "phase2_final_best_fitness": 0.8291630487201863,
+          "phase2_pop_mean_fitness": 0.7444291562862486,
+          "phase2_pop_diversity": 0.09394422981067982,
           "phase2_auc": 9.110323337389598,
           "phase2_survival_rate": 1.0
         },
@@ -637,6 +732,8 @@
           "phase1_final_fitness": 0.8306619731695375,
           "phase2_gen0_fitness": 0.7993496658382528,
           "phase2_final_best_fitness": 0.7774816472000609,
+          "phase2_pop_mean_fitness": 0.7387713960375147,
+          "phase2_pop_diversity": 0.03670973675188913,
           "phase2_auc": 8.98696294941595,
           "phase2_survival_rate": 1.0
         },
@@ -648,6 +745,8 @@
           "phase1_final_fitness": 0.8207977164200977,
           "phase2_gen0_fitness": 0.8194763411914693,
           "phase2_final_best_fitness": 0.8316785248546514,
+          "phase2_pop_mean_fitness": 0.7466043473456812,
+          "phase2_pop_diversity": 0.1809164950571102,
           "phase2_auc": 9.094442227050756,
           "phase2_survival_rate": 1.0
         },
@@ -659,6 +758,8 @@
           "phase1_final_fitness": 0.8082938468858535,
           "phase2_gen0_fitness": 0.8087329059887075,
           "phase2_final_best_fitness": 0.806409027807181,
+          "phase2_pop_mean_fitness": 0.7348930570716287,
+          "phase2_pop_diversity": 0.03885079567444034,
           "phase2_auc": 8.944828730004136,
           "phase2_survival_rate": 1.0
         },
@@ -670,6 +771,8 @@
           "phase1_final_fitness": 0.8363323238515941,
           "phase2_gen0_fitness": 0.7569881847669659,
           "phase2_final_best_fitness": 0.8601169962263082,
+          "phase2_pop_mean_fitness": 0.7525608704948145,
+          "phase2_pop_diversity": 0.3028141370389587,
           "phase2_auc": 8.891377176184191,
           "phase2_survival_rate": 1.0
         },
@@ -681,6 +784,8 @@
           "phase1_final_fitness": 0.8626453191032919,
           "phase2_gen0_fitness": 0.8005822646587607,
           "phase2_final_best_fitness": 0.8391408238325767,
+          "phase2_pop_mean_fitness": 0.7646152122472697,
+          "phase2_pop_diversity": 0.1486430447635369,
           "phase2_auc": 8.965973802495046,
           "phase2_survival_rate": 1.0
         },
@@ -692,6 +797,8 @@
           "phase1_final_fitness": 0.8270957427865877,
           "phase2_gen0_fitness": 0.7795009496323341,
           "phase2_final_best_fitness": 0.8090021291602224,
+          "phase2_pop_mean_fitness": 0.7380392497317454,
+          "phase2_pop_diversity": 0.051348081741894466,
           "phase2_auc": 8.960074468342356,
           "phase2_survival_rate": 1.0
         },
@@ -703,6 +810,8 @@
           "phase1_final_fitness": 0.8021327366300106,
           "phase2_gen0_fitness": 0.781240970835929,
           "phase2_final_best_fitness": 0.8496329380704348,
+          "phase2_pop_mean_fitness": 0.7223695172614109,
+          "phase2_pop_diversity": 0.021782569416547024,
           "phase2_auc": 8.96177192191691,
           "phase2_survival_rate": 1.0
         },
@@ -714,6 +823,8 @@
           "phase1_final_fitness": 0.8410799949914091,
           "phase2_gen0_fitness": 0.7637011752689907,
           "phase2_final_best_fitness": 0.8180938845470962,
+          "phase2_pop_mean_fitness": 0.7504345123105198,
+          "phase2_pop_diversity": 1.2828613577238885,
           "phase2_auc": 8.835658214991318,
           "phase2_survival_rate": 1.0
         },
@@ -725,6 +836,8 @@
           "phase1_final_fitness": 0.8216491785001097,
           "phase2_gen0_fitness": 0.8383845338073841,
           "phase2_final_best_fitness": 0.826901684580258,
+          "phase2_pop_mean_fitness": 0.746431174575257,
+          "phase2_pop_diversity": 0.37920511132690865,
           "phase2_auc": 9.051606173228118,
           "phase2_survival_rate": 1.0
         },
@@ -736,6 +849,8 @@
           "phase1_final_fitness": 0.818126532243746,
           "phase2_gen0_fitness": 0.8033575823335978,
           "phase2_final_best_fitness": 0.8133519845149791,
+          "phase2_pop_mean_fitness": 0.7518617896763105,
+          "phase2_pop_diversity": 0.35686073842517085,
           "phase2_auc": 8.911336154140981,
           "phase2_survival_rate": 1.0
         },
@@ -747,6 +862,8 @@
           "phase1_final_fitness": 0.840688433274898,
           "phase2_gen0_fitness": 0.7993638613198223,
           "phase2_final_best_fitness": 0.8369738502238655,
+          "phase2_pop_mean_fitness": 0.7488585650187419,
+          "phase2_pop_diversity": 0.15800668194883952,
           "phase2_auc": 8.962861794782494,
           "phase2_survival_rate": 1.0
         },
@@ -758,6 +875,8 @@
           "phase1_final_fitness": 0.8321511327212017,
           "phase2_gen0_fitness": 0.8554185035792036,
           "phase2_final_best_fitness": 0.8175326615233497,
+          "phase2_pop_mean_fitness": 0.763915398553314,
+          "phase2_pop_diversity": 0.18088678560248908,
           "phase2_auc": 8.869457382627632,
           "phase2_survival_rate": 1.0
         },
@@ -769,6 +888,8 @@
           "phase1_final_fitness": 0.8246655996852817,
           "phase2_gen0_fitness": 0.8199881138874877,
           "phase2_final_best_fitness": 0.8078074857360823,
+          "phase2_pop_mean_fitness": 0.7442490382160467,
+          "phase2_pop_diversity": 0.5336173682510317,
           "phase2_auc": 9.014564556855554,
           "phase2_survival_rate": 1.0
         },
@@ -780,6 +901,8 @@
           "phase1_final_fitness": 0.8083512803333269,
           "phase2_gen0_fitness": 0.8062147960342746,
           "phase2_final_best_fitness": 0.8241762165114029,
+          "phase2_pop_mean_fitness": 0.736806635138824,
+          "phase2_pop_diversity": 1.0751438762548728,
           "phase2_auc": 8.886630925340889,
           "phase2_survival_rate": 1.0
         },
@@ -791,6 +914,8 @@
           "phase1_final_fitness": 0.8209040569093967,
           "phase2_gen0_fitness": 0.7771121703550108,
           "phase2_final_best_fitness": 0.8195397234728121,
+          "phase2_pop_mean_fitness": 0.7452053308359292,
+          "phase2_pop_diversity": 0.5780171928456769,
           "phase2_auc": 8.958073076733552,
           "phase2_survival_rate": 1.0
         },
@@ -802,227 +927,269 @@
           "phase1_final_fitness": 0.8167553051215904,
           "phase2_gen0_fitness": 0.7898719767561696,
           "phase2_final_best_fitness": 0.8323058249894024,
+          "phase2_pop_mean_fitness": 0.7556236702175921,
+          "phase2_pop_diversity": 0.19583657426990736,
           "phase2_auc": 8.966539607404314,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3000,
-          "phase2_deaths": 0,
+          "phase2_deaths": 14,
           "phase1_deaths": 9,
-          "phase1_final_fitness": 0.8439962570210753,
-          "phase2_gen0_fitness": 0.8174233030851168,
-          "phase2_final_best_fitness": 0.7764277039096011,
-          "phase2_auc": 8.973342434509602,
+          "phase1_final_fitness": 0.8138305330412171,
+          "phase2_gen0_fitness": 0.8027900058048029,
+          "phase2_final_best_fitness": 0.8188173636982251,
+          "phase2_pop_mean_fitness": 0.7457636410499048,
+          "phase2_pop_diversity": 0.16875757901204402,
+          "phase2_auc": 8.959113237285262,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3001,
-          "phase2_deaths": 0,
-          "phase1_deaths": 0,
-          "phase1_final_fitness": 0.8293967817661563,
-          "phase2_gen0_fitness": 0.8189607541818176,
-          "phase2_final_best_fitness": 0.7876363456007942,
-          "phase2_auc": 8.86116643607918,
+          "phase2_deaths": 41,
+          "phase1_deaths": 7,
+          "phase1_final_fitness": 0.847271056172043,
+          "phase2_gen0_fitness": 0.7972011375168488,
+          "phase2_final_best_fitness": 0.8013419940968897,
+          "phase2_pop_mean_fitness": 0.740278720914778,
+          "phase2_pop_diversity": 0.7068513963457849,
+          "phase2_auc": 8.948431599068176,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3002,
-          "phase2_deaths": 0,
-          "phase1_deaths": 3,
-          "phase1_final_fitness": 0.812003900864081,
-          "phase2_gen0_fitness": 0.7964316136399333,
-          "phase2_final_best_fitness": 0.8083638362336533,
-          "phase2_auc": 9.053405066563524,
+          "phase2_deaths": 43,
+          "phase1_deaths": 4,
+          "phase1_final_fitness": 0.8471548203145218,
+          "phase2_gen0_fitness": 0.7928436977105268,
+          "phase2_final_best_fitness": 0.8115028069845919,
+          "phase2_pop_mean_fitness": 0.7055127685881751,
+          "phase2_pop_diversity": 0.29511100614745267,
+          "phase2_auc": 8.829945970213629,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3003,
-          "phase2_deaths": 0,
+          "phase2_deaths": 48,
           "phase1_deaths": 5,
-          "phase1_final_fitness": 0.8286632521004593,
-          "phase2_gen0_fitness": 0.8050150111357494,
-          "phase2_final_best_fitness": 0.7906699447895745,
-          "phase2_auc": 8.924345022712075,
+          "phase1_final_fitness": 0.8266968915087703,
+          "phase2_gen0_fitness": 0.7895263864319594,
+          "phase2_final_best_fitness": 0.8212319900842614,
+          "phase2_pop_mean_fitness": 0.6987852000094997,
+          "phase2_pop_diversity": 0.7488450101526788,
+          "phase2_auc": 8.946669163341541,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3004,
-          "phase2_deaths": 0,
-          "phase1_deaths": 2,
-          "phase1_final_fitness": 0.8010562873778012,
-          "phase2_gen0_fitness": 0.8412965428152811,
-          "phase2_final_best_fitness": 0.7915955998008212,
-          "phase2_auc": 8.96081034000749,
+          "phase2_deaths": 19,
+          "phase1_deaths": 3,
+          "phase1_final_fitness": 0.7952550811782649,
+          "phase2_gen0_fitness": 0.8500607537056712,
+          "phase2_final_best_fitness": 0.8129821196552046,
+          "phase2_pop_mean_fitness": 0.698841672113456,
+          "phase2_pop_diversity": 0.22499024581401464,
+          "phase2_auc": 8.933640700103137,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3005,
-          "phase2_deaths": 0,
-          "phase1_deaths": 5,
-          "phase1_final_fitness": 0.8252597898725433,
-          "phase2_gen0_fitness": 0.7774298406103449,
-          "phase2_final_best_fitness": 0.83141721833071,
-          "phase2_auc": 9.0448639343468,
+          "phase2_deaths": 22,
+          "phase1_deaths": 6,
+          "phase1_final_fitness": 0.8532628176812328,
+          "phase2_gen0_fitness": 0.7946557541572513,
+          "phase2_final_best_fitness": 0.8249409261821355,
+          "phase2_pop_mean_fitness": 0.7438662334938313,
+          "phase2_pop_diversity": 0.3264307626430351,
+          "phase2_auc": 8.96416246314678,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3006,
-          "phase2_deaths": 0,
-          "phase1_deaths": 0,
-          "phase1_final_fitness": 0.8211491503844645,
-          "phase2_gen0_fitness": 0.7889684284438426,
-          "phase2_final_best_fitness": 0.8189804158076598,
-          "phase2_auc": 8.851678543389117,
+          "phase2_deaths": 42,
+          "phase1_deaths": 2,
+          "phase1_final_fitness": 0.7896750496312231,
+          "phase2_gen0_fitness": 0.7949716445273068,
+          "phase2_final_best_fitness": 0.7982795860522495,
+          "phase2_pop_mean_fitness": 0.7255109905024091,
+          "phase2_pop_diversity": 1.0162445675452578,
+          "phase2_auc": 8.893349670917399,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3007,
-          "phase2_deaths": 0,
+          "phase2_deaths": 9,
           "phase1_deaths": 5,
-          "phase1_final_fitness": 0.8202104742718523,
-          "phase2_gen0_fitness": 0.8148185162161877,
-          "phase2_final_best_fitness": 0.8114568767394034,
-          "phase2_auc": 9.053355464486847,
+          "phase1_final_fitness": 0.845427994549422,
+          "phase2_gen0_fitness": 0.8063046253090181,
+          "phase2_final_best_fitness": 0.8400324800035553,
+          "phase2_pop_mean_fitness": 0.7532809834858636,
+          "phase2_pop_diversity": 0.06135109192033127,
+          "phase2_auc": 9.007243238757171,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3008,
-          "phase2_deaths": 0,
+          "phase2_deaths": 38,
           "phase1_deaths": 2,
-          "phase1_final_fitness": 0.8144528121137661,
-          "phase2_gen0_fitness": 0.7694755574218696,
-          "phase2_final_best_fitness": 0.7992567084715132,
-          "phase2_auc": 8.915351105278724,
+          "phase1_final_fitness": 0.8010664456686755,
+          "phase2_gen0_fitness": 0.8123466531388043,
+          "phase2_final_best_fitness": 0.8352108661587604,
+          "phase2_pop_mean_fitness": 0.725691395102866,
+          "phase2_pop_diversity": 0.9338996381608717,
+          "phase2_auc": 8.929520847294631,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3009,
-          "phase2_deaths": 0,
-          "phase1_deaths": 6,
-          "phase1_final_fitness": 0.8128600080947291,
-          "phase2_gen0_fitness": 0.7616776073014521,
-          "phase2_final_best_fitness": 0.8466586028280477,
-          "phase2_auc": 8.927272057625009,
+          "phase2_deaths": 46,
+          "phase1_deaths": 8,
+          "phase1_final_fitness": 0.8379711791998347,
+          "phase2_gen0_fitness": 0.8420875552082668,
+          "phase2_final_best_fitness": 0.8264509401334617,
+          "phase2_pop_mean_fitness": 0.6643477325666616,
+          "phase2_pop_diversity": 0.5111117601661566,
+          "phase2_auc": 8.957336291875716,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3010,
-          "phase2_deaths": 0,
-          "phase1_deaths": 5,
-          "phase1_final_fitness": 0.8019136459094997,
-          "phase2_gen0_fitness": 0.8189810677277077,
-          "phase2_final_best_fitness": 0.7961684320970139,
-          "phase2_auc": 8.961790496308236,
+          "phase2_deaths": 29,
+          "phase1_deaths": 9,
+          "phase1_final_fitness": 0.8220441267825619,
+          "phase2_gen0_fitness": 0.7925165633413654,
+          "phase2_final_best_fitness": 0.8373246491014026,
+          "phase2_pop_mean_fitness": 0.7115494495757528,
+          "phase2_pop_diversity": 0.6178277367159268,
+          "phase2_auc": 8.92232112891533,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3011,
-          "phase2_deaths": 0,
+          "phase2_deaths": 24,
           "phase1_deaths": 3,
-          "phase1_final_fitness": 0.8154154459078612,
-          "phase2_gen0_fitness": 0.8178956653172849,
-          "phase2_final_best_fitness": 0.801114174104744,
-          "phase2_auc": 8.951407195959558,
+          "phase1_final_fitness": 0.8163138928156609,
+          "phase2_gen0_fitness": 0.8244388536345492,
+          "phase2_final_best_fitness": 0.8068890392491447,
+          "phase2_pop_mean_fitness": 0.6932617547870806,
+          "phase2_pop_diversity": 0.5449049159662478,
+          "phase2_auc": 8.932532417235032,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3012,
-          "phase2_deaths": 0,
-          "phase1_deaths": 4,
-          "phase1_final_fitness": 0.8233432590762672,
-          "phase2_gen0_fitness": 0.8136362802172158,
-          "phase2_final_best_fitness": 0.8150493238664199,
-          "phase2_auc": 9.01902493009314,
+          "phase2_deaths": 38,
+          "phase1_deaths": 5,
+          "phase1_final_fitness": 0.8004180262878293,
+          "phase2_gen0_fitness": 0.8019185231240237,
+          "phase2_final_best_fitness": 0.8103829770527285,
+          "phase2_pop_mean_fitness": 0.6542996023836343,
+          "phase2_pop_diversity": 0.2231475853831665,
+          "phase2_auc": 9.060512427283943,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3013,
-          "phase2_deaths": 0,
-          "phase1_deaths": 1,
-          "phase1_final_fitness": 0.8252657040435535,
-          "phase2_gen0_fitness": 0.8172915975165002,
-          "phase2_final_best_fitness": 0.8605435642765459,
-          "phase2_auc": 8.950069562217935,
+          "phase2_deaths": 6,
+          "phase1_deaths": 3,
+          "phase1_final_fitness": 0.8134138711998276,
+          "phase2_gen0_fitness": 0.8637312076208016,
+          "phase2_final_best_fitness": 0.8311925793727218,
+          "phase2_pop_mean_fitness": 0.7139345601633391,
+          "phase2_pop_diversity": 0.04250645764515401,
+          "phase2_auc": 9.002482189777394,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3014,
-          "phase2_deaths": 0,
-          "phase1_deaths": 5,
-          "phase1_final_fitness": 0.8224465944397871,
-          "phase2_gen0_fitness": 0.8655619311223953,
-          "phase2_final_best_fitness": 0.8168724793932748,
-          "phase2_auc": 9.032705359178605,
+          "phase2_deaths": 55,
+          "phase1_deaths": 6,
+          "phase1_final_fitness": 0.818102668039776,
+          "phase2_gen0_fitness": 0.8082924702168017,
+          "phase2_final_best_fitness": 0.8395647977654398,
+          "phase2_pop_mean_fitness": 0.7287397443869273,
+          "phase2_pop_diversity": 0.1950127106689033,
+          "phase2_auc": 9.00547454754147,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3015,
-          "phase2_deaths": 0,
+          "phase2_deaths": 42,
           "phase1_deaths": 4,
-          "phase1_final_fitness": 0.8052301612480512,
-          "phase2_gen0_fitness": 0.8374331940166607,
-          "phase2_final_best_fitness": 0.8085918889174021,
-          "phase2_auc": 9.021368594511197,
+          "phase1_final_fitness": 0.8271141925005567,
+          "phase2_gen0_fitness": 0.8660668504865724,
+          "phase2_final_best_fitness": 0.8173393814684841,
+          "phase2_pop_mean_fitness": 0.7218733560017875,
+          "phase2_pop_diversity": 0.3634338303611924,
+          "phase2_auc": 9.001657847265255,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3016,
-          "phase2_deaths": 0,
-          "phase1_deaths": 4,
-          "phase1_final_fitness": 0.8140204716835145,
-          "phase2_gen0_fitness": 0.8199076746215495,
-          "phase2_final_best_fitness": 0.8072220224111643,
-          "phase2_auc": 8.922301018660397,
+          "phase2_deaths": 32,
+          "phase1_deaths": 5,
+          "phase1_final_fitness": 0.8078736090576752,
+          "phase2_gen0_fitness": 0.8182159610065942,
+          "phase2_final_best_fitness": 0.7907138679243105,
+          "phase2_pop_mean_fitness": 0.7285360173094957,
+          "phase2_pop_diversity": 0.2883412241546095,
+          "phase2_auc": 8.873645913977086,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3017,
-          "phase2_deaths": 0,
-          "phase1_deaths": 3,
-          "phase1_final_fitness": 0.8356704407345262,
-          "phase2_gen0_fitness": 0.8334248879561491,
-          "phase2_final_best_fitness": 0.8180626929431618,
-          "phase2_auc": 8.96350650971453,
+          "phase2_deaths": 27,
+          "phase1_deaths": 5,
+          "phase1_final_fitness": 0.7998539572215794,
+          "phase2_gen0_fitness": 0.8170847291017088,
+          "phase2_final_best_fitness": 0.8102505590676953,
+          "phase2_pop_mean_fitness": 0.7595273644066722,
+          "phase2_pop_diversity": 0.02100032920040553,
+          "phase2_auc": 8.954914251413383,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3018,
-          "phase2_deaths": 0,
-          "phase1_deaths": 4,
-          "phase1_final_fitness": 0.8690329650017147,
-          "phase2_gen0_fitness": 0.7982764267546713,
-          "phase2_final_best_fitness": 0.785244201293799,
-          "phase2_auc": 8.958115311941022,
+          "phase2_deaths": 51,
+          "phase1_deaths": 7,
+          "phase1_final_fitness": 0.8689001896351741,
+          "phase2_gen0_fitness": 0.7984341602757099,
+          "phase2_final_best_fitness": 0.8343918372198185,
+          "phase2_pop_mean_fitness": 0.7297120777294163,
+          "phase2_pop_diversity": 0.40365792967275055,
+          "phase2_auc": 8.941590212811994,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3019,
-          "phase2_deaths": 0,
-          "phase1_deaths": 2,
-          "phase1_final_fitness": 0.8328765761380102,
-          "phase2_gen0_fitness": 0.79640531534089,
-          "phase2_final_best_fitness": 0.8336015812773933,
-          "phase2_auc": 9.023301195813675,
+          "phase2_deaths": 27,
+          "phase1_deaths": 4,
+          "phase1_final_fitness": 0.8254630510780013,
+          "phase2_gen0_fitness": 0.8176836252794567,
+          "phase2_final_best_fitness": 0.8172761874732853,
+          "phase2_pop_mean_fitness": 0.7580205347003872,
+          "phase2_pop_diversity": 0.06066621687492927,
+          "phase2_auc": 8.965140562791412,
           "phase2_survival_rate": 1.0
         },
         {
@@ -1033,6 +1200,8 @@
           "phase1_final_fitness": 0.7937597377883496,
           "phase2_gen0_fitness": 0.8273608614960105,
           "phase2_final_best_fitness": 0.8275548784777639,
+          "phase2_pop_mean_fitness": 0.6452443927243763,
+          "phase2_pop_diversity": 0.3904629149854515,
           "phase2_auc": 8.931516242882367,
           "phase2_survival_rate": 0.85
         },
@@ -1044,6 +1213,8 @@
           "phase1_final_fitness": 0.8293768397366407,
           "phase2_gen0_fitness": 0.8197346436669934,
           "phase2_final_best_fitness": 0.8260484375771419,
+          "phase2_pop_mean_fitness": 0.7057849689338055,
+          "phase2_pop_diversity": 1.0678535578541313,
           "phase2_auc": 8.967995065448987,
           "phase2_survival_rate": 0.95
         },
@@ -1055,6 +1226,8 @@
           "phase1_final_fitness": 0.812003910220787,
           "phase2_gen0_fitness": 0.8587142524787031,
           "phase2_final_best_fitness": 0.7964394225025483,
+          "phase2_pop_mean_fitness": 0.49142263684390386,
+          "phase2_pop_diversity": 0.7034366520488047,
           "phase2_auc": 8.895651501364869,
           "phase2_survival_rate": 0.65
         },
@@ -1066,6 +1239,8 @@
           "phase1_final_fitness": 0.8263748162447677,
           "phase2_gen0_fitness": 0.8574763227895653,
           "phase2_final_best_fitness": 0.8185308468979858,
+          "phase2_pop_mean_fitness": 0.5546412058467091,
+          "phase2_pop_diversity": 0.5348991482416603,
           "phase2_auc": 9.008098500785868,
           "phase2_survival_rate": 0.75
         },
@@ -1077,6 +1252,8 @@
           "phase1_final_fitness": 0.8382220127581794,
           "phase2_gen0_fitness": 0.8304744744331618,
           "phase2_final_best_fitness": 0.7962782223616892,
+          "phase2_pop_mean_fitness": 0.49220272706360974,
+          "phase2_pop_diversity": 0.050912398938714166,
           "phase2_auc": 9.102447698463886,
           "phase2_survival_rate": 0.65
         },
@@ -1088,6 +1265,8 @@
           "phase1_final_fitness": 0.8252726623305935,
           "phase2_gen0_fitness": 0.777429892887383,
           "phase2_final_best_fitness": 0.8305932535645669,
+          "phase2_pop_mean_fitness": 0.6438404471947006,
+          "phase2_pop_diversity": 0.7398638556764477,
           "phase2_auc": 9.016967116635332,
           "phase2_survival_rate": 0.9
         },
@@ -1099,6 +1278,8 @@
           "phase1_final_fitness": 0.8056002955985404,
           "phase2_gen0_fitness": 0.7892935456854572,
           "phase2_final_best_fitness": 0.8211774295618147,
+          "phase2_pop_mean_fitness": 0.7142846466124103,
+          "phase2_pop_diversity": 1.1219248965581985,
           "phase2_auc": 8.985281647185413,
           "phase2_survival_rate": 0.95
         },
@@ -1110,6 +1291,8 @@
           "phase1_final_fitness": 0.8202104742718523,
           "phase2_gen0_fitness": 0.8148185162161877,
           "phase2_final_best_fitness": 0.8374685252451757,
+          "phase2_pop_mean_fitness": 0.7389915549578687,
+          "phase2_pop_diversity": 0.18820674163892742,
           "phase2_auc": 8.959752073269819,
           "phase2_survival_rate": 1.0
         },
@@ -1121,6 +1304,8 @@
           "phase1_final_fitness": 0.8144528119033277,
           "phase2_gen0_fitness": 0.826676023649596,
           "phase2_final_best_fitness": 0.7978723910655362,
+          "phase2_pop_mean_fitness": 0.750359136803783,
+          "phase2_pop_diversity": 0.8582587462819004,
           "phase2_auc": 9.03585235009768,
           "phase2_survival_rate": 1.0
         },
@@ -1132,6 +1317,8 @@
           "phase1_final_fitness": 0.8134960895883427,
           "phase2_gen0_fitness": 0.7791551051511632,
           "phase2_final_best_fitness": 0.8562410478896304,
+          "phase2_pop_mean_fitness": 0.6829269796775258,
+          "phase2_pop_diversity": 0.06802870154481348,
           "phase2_auc": 9.089750931552357,
           "phase2_survival_rate": 0.95
         },
@@ -1143,6 +1330,8 @@
           "phase1_final_fitness": 0.8019136459094997,
           "phase2_gen0_fitness": 0.8189810677277077,
           "phase2_final_best_fitness": 0.8229314370025982,
+          "phase2_pop_mean_fitness": 0.7189519200052842,
+          "phase2_pop_diversity": 1.215736983188901,
           "phase2_auc": 8.883372300077562,
           "phase2_survival_rate": 0.95
         },
@@ -1154,6 +1343,8 @@
           "phase1_final_fitness": 0.8154154465068832,
           "phase2_gen0_fitness": 0.8300977410293863,
           "phase2_final_best_fitness": 0.810975980047219,
+          "phase2_pop_mean_fitness": 0.6755132223035993,
+          "phase2_pop_diversity": 0.8655012199135682,
           "phase2_auc": 9.068807525016727,
           "phase2_survival_rate": 0.95
         },
@@ -1165,6 +1356,8 @@
           "phase1_final_fitness": 0.8233432576792712,
           "phase2_gen0_fitness": 0.8162354282247067,
           "phase2_final_best_fitness": 0.8205263599825541,
+          "phase2_pop_mean_fitness": 0.7209762009082157,
+          "phase2_pop_diversity": 1.2103722676940671,
           "phase2_auc": 9.020110661815771,
           "phase2_survival_rate": 1.0
         },
@@ -1176,6 +1369,8 @@
           "phase1_final_fitness": 0.8252657039986526,
           "phase2_gen0_fitness": 0.817291598623081,
           "phase2_final_best_fitness": 0.8257685898098357,
+          "phase2_pop_mean_fitness": 0.5947941991734185,
+          "phase2_pop_diversity": 0.7375487544512425,
           "phase2_auc": 9.032020922076207,
           "phase2_survival_rate": 0.8
         },
@@ -1187,6 +1382,8 @@
           "phase1_final_fitness": 0.8323975461595788,
           "phase2_gen0_fitness": 0.8011710883467899,
           "phase2_final_best_fitness": 0.8268896085848573,
+          "phase2_pop_mean_fitness": 0.6476940637277793,
+          "phase2_pop_diversity": 0.5490338708386836,
           "phase2_auc": 9.022327524479962,
           "phase2_survival_rate": 0.85
         },
@@ -1198,6 +1395,8 @@
           "phase1_final_fitness": 0.8052335025823826,
           "phase2_gen0_fitness": 0.8226469010706875,
           "phase2_final_best_fitness": 0.8105056233991631,
+          "phase2_pop_mean_fitness": 0.713531207446249,
+          "phase2_pop_diversity": 0.19843301112516074,
           "phase2_auc": 8.883206849923269,
           "phase2_survival_rate": 1.0
         },
@@ -1209,6 +1408,8 @@
           "phase1_final_fitness": 0.8140204716815846,
           "phase2_gen0_fitness": 0.8199076717538256,
           "phase2_final_best_fitness": 0.8162666658216892,
+          "phase2_pop_mean_fitness": 0.7111962139456958,
+          "phase2_pop_diversity": 0.3162272164548362,
           "phase2_auc": 8.97635884972703,
           "phase2_survival_rate": 0.95
         },
@@ -1220,6 +1421,8 @@
           "phase1_final_fitness": 0.8297635497277862,
           "phase2_gen0_fitness": 0.8370700608517456,
           "phase2_final_best_fitness": 0.7970248297741146,
+          "phase2_pop_mean_fitness": 0.7170877366132267,
+          "phase2_pop_diversity": 1.129280996070017,
           "phase2_auc": 8.933468863967704,
           "phase2_survival_rate": 0.95
         },
@@ -1231,6 +1434,8 @@
           "phase1_final_fitness": 0.8692518994203482,
           "phase2_gen0_fitness": 0.7983511583546781,
           "phase2_final_best_fitness": 0.7941227620949762,
+          "phase2_pop_mean_fitness": 0.7022789430116944,
+          "phase2_pop_diversity": 0.39911743545221523,
           "phase2_auc": 8.976098591592578,
           "phase2_survival_rate": 0.95
         },
@@ -1242,6 +1447,8 @@
           "phase1_final_fitness": 0.8328765769343306,
           "phase2_gen0_fitness": 0.8586929255888988,
           "phase2_final_best_fitness": 0.8210796938770669,
+          "phase2_pop_mean_fitness": 0.5160320508922649,
+          "phase2_pop_diversity": 0.4921384302852843,
           "phase2_auc": 9.033217162081941,
           "phase2_survival_rate": 0.85
         }
@@ -1254,33 +1461,33 @@
       "arm_means_phase2": {
         "NONE": {
           "phase2_deaths": 2.25,
-          "fitness": 0.8097666672814693,
-          "memory_ratio": 1.0091337967539704,
-          "survival": 0.9983333333333334
+          "best_fitness": 0.8097666672814693,
+          "pop_mean_fitness": 0.7429516684736718,
+          "diversity": 0.6981190611618038
         },
         "EXO_fixed": {
           "phase2_deaths": 1.4,
-          "fitness": 0.8206099996285259,
-          "memory_ratio": 0.9957426123340835,
-          "survival": 1.0
+          "best_fitness": 0.8206099996285259,
+          "pop_mean_fitness": 0.7390327844333155,
+          "diversity": 0.19690387975724777
         },
         "ENDO": {
           "phase2_deaths": 0.95,
-          "fitness": 0.8209645924352227,
-          "memory_ratio": 0.9957426123340835,
-          "survival": 1.0
+          "best_fitness": 0.8209645924352227,
+          "pop_mean_fitness": 0.7457603117508393,
+          "diversity": 0.13118461441873858
         },
         "REVIVE": {
-          "phase2_deaths": 0.0,
-          "fitness": 0.8112393599936599,
-          "memory_ratio": 1.001947672597391,
-          "survival": 1.0
+          "phase2_deaths": 1.25,
+          "best_fitness": 0.808780206649217,
+          "pop_mean_fitness": 0.7443062899125111,
+          "diversity": 0.6159003844268862
         },
         "OBSERVE": {
           "phase2_deaths": 2.3,
-          "fitness": 0.8117795411931436,
-          "memory_ratio": 1.0057164218411194,
-          "survival": 1.0
+          "best_fitness": 0.8117795411931436,
+          "pop_mean_fitness": 0.7494447433764221,
+          "diversity": 0.7026350129116872
         }
       },
       "comparisons": {
@@ -1292,25 +1499,11 @@
           "p_signflip_two_sided": 0.2914070859291407
         },
         "deaths_NONE_minus_REVIVE": {
-          "mean_delta": 2.25,
-          "median_delta": 1.0,
-          "n_positive": 12,
-          "n_negative": 0,
-          "p_signflip_two_sided": 0.0004899951000489995
-        },
-        "deaths_NONE_minus_OBSERVE": {
-          "mean_delta": -0.05,
+          "mean_delta": 1.0,
           "median_delta": 0.0,
-          "n_positive": 2,
+          "n_positive": 8,
           "n_negative": 5,
-          "p_signflip_two_sided": 1.0
-        },
-        "deaths_ENDO_minus_REVIVE": {
-          "mean_delta": 0.95,
-          "median_delta": 0.0,
-          "n_positive": 5,
-          "n_negative": 0,
-          "p_signflip_two_sided": 0.06166938330616694
+          "p_signflip_two_sided": 0.2889771102288977
         },
         "deaths_OBSERVE_minus_ENDO": {
           "mean_delta": 1.35,
@@ -1319,32 +1512,53 @@
           "n_negative": 3,
           "p_signflip_two_sided": 0.28674713252867473
         },
-        "fitness_REVIVE_minus_ENDO": {
-          "mean_delta": -0.009725232441562892,
-          "median_delta": -0.015225154674361974,
+        "popmean_REVIVE_minus_NONE": {
+          "mean_delta": 0.0013546214388394484,
+          "median_delta": -0.0026815009979829774,
+          "n_positive": 9,
+          "n_negative": 11,
+          "p_signflip_two_sided": 0.9038709612903871
+        },
+        "popmean_ENDO_minus_NONE": {
+          "mean_delta": 0.002808643277167633,
+          "median_delta": -0.006012681374985007,
           "n_positive": 6,
           "n_negative": 14,
-          "p_signflip_two_sided": 0.1029889701102989
+          "p_signflip_two_sided": 0.8236517634823651
         },
-        "fitness_ENDO_minus_NONE": {
-          "mean_delta": 0.011197925153753535,
-          "median_delta": 0.017669064863600037,
-          "n_positive": 14,
-          "n_negative": 6,
-          "p_signflip_two_sided": 0.09535904640953591
+        "popmean_REVIVE_minus_ENDO": {
+          "mean_delta": -0.0014540218383281844,
+          "median_delta": 0.003803966990424068,
+          "n_positive": 12,
+          "n_negative": 8,
+          "p_signflip_two_sided": 0.7377326226737733
+        },
+        "popmean_ENDO_minus_OBSERVE": {
+          "mean_delta": -0.003684431625582835,
+          "median_delta": -0.004993940142701214,
+          "n_positive": 6,
+          "n_negative": 14,
+          "p_signflip_two_sided": 0.21537784622153777
         }
       },
       "soundness_violations": 0,
       "soundness_checked": 1245,
       "boundary_active": true,
       "deaths_ranking_low_to_high": [
-        "REVIVE",
         "ENDO",
+        "REVIVE",
         "EXO_fixed",
         "NONE",
         "OBSERVE"
       ],
-      "verdict": "[softsat] 死回避 (低い順): REVIVE < ENDO < EXO_fixed < NONE < OBSERVE。REVIVE は死を 0 化 (全修復=経験を傷として保持) vs ENDO は reject で 0.9。REVIVE−ENDO 死差 Δ=+0.9 (p=0.062)。OBSERVE (経験的社会学習) deaths=2.3 vs ENDO (sound 予見) deaths=0.9, OBSERVE−ENDO Δ=+1.4 (p=0.287)。verifier soundness viol=0/1245 (ENDO/REVIVE は健全; OBSERVE は empirical ゆえ deaths>0 = imperfect)。memory_ratio (catastrophe 直後/phase1): NONE=1.01, EXO_fixed=1.00, ENDO=1.00, REVIVE=1.00, OBSERVE=1.01。",
+      "memory_ranking_high_to_low": [
+        "OBSERVE",
+        "ENDO",
+        "REVIVE",
+        "NONE",
+        "EXO_fixed"
+      ],
+      "verdict": "[softsat] 2 軸: ①死回避 (低い順) ENDO < REVIVE < EXO_fixed < NONE < OBSERVE — ENDO (予見) が死を避ける (NONE−ENDO Δ=+1.3, p=0.291); REVIVE は死を経験 (1.2≈NONE 2.2)。②記憶保存 (pop_mean_fit 高い順) OBSERVE > ENDO > REVIVE > NONE > EXO_fixed — **REVIVE は同死でも記憶を保つ** (REVIVE−NONE pop_mean Δ=+0.001, p=0.904) = 復活が経験を記憶に残す。ENDO は予見で死を避けつつ記憶保持。OBSERVE (empirical) は死多+記憶低 (ENDO−OBSERVE pop_mean Δ=-0.004)。verifier soundness viol=0/1245。",
       "records": [
         {
           "arm": "NONE",
@@ -1354,6 +1568,8 @@
           "phase1_final_fitness": 0.8439962554184776,
           "phase2_gen0_fitness": 0.8166502694386382,
           "phase2_final_best_fitness": 0.8046217673323518,
+          "phase2_pop_mean_fitness": 0.7458957400501187,
+          "phase2_pop_diversity": 0.15243129926715376,
           "phase2_auc": 9.013332926993174,
           "phase2_survival_rate": 1.0
         },
@@ -1365,6 +1581,8 @@
           "phase1_final_fitness": 0.8293769864062478,
           "phase2_gen0_fitness": 0.8195766193503848,
           "phase2_final_best_fitness": 0.8055343159003382,
+          "phase2_pop_mean_fitness": 0.7551513774105391,
+          "phase2_pop_diversity": 1.6093318950748379,
           "phase2_auc": 8.874287981218599,
           "phase2_survival_rate": 1.0
         },
@@ -1376,6 +1594,8 @@
           "phase1_final_fitness": 0.812003910220787,
           "phase2_gen0_fitness": 0.8587142524787031,
           "phase2_final_best_fitness": 0.8066203434822962,
+          "phase2_pop_mean_fitness": 0.7561825494130867,
+          "phase2_pop_diversity": 0.5449559289231277,
           "phase2_auc": 9.126022533582722,
           "phase2_survival_rate": 1.0
         },
@@ -1387,6 +1607,8 @@
           "phase1_final_fitness": 0.8263748162447677,
           "phase2_gen0_fitness": 0.8574763227895653,
           "phase2_final_best_fitness": 0.7895999291913306,
+          "phase2_pop_mean_fitness": 0.7526601370523329,
+          "phase2_pop_diversity": 0.5315944839661203,
           "phase2_auc": 9.035882505840167,
           "phase2_survival_rate": 1.0
         },
@@ -1398,6 +1620,8 @@
           "phase1_final_fitness": 0.8010594347769122,
           "phase2_gen0_fitness": 0.8415398956261217,
           "phase2_final_best_fitness": 0.7938607941023372,
+          "phase2_pop_mean_fitness": 0.7246496020249935,
+          "phase2_pop_diversity": 0.2666128322657696,
           "phase2_auc": 8.988371337642594,
           "phase2_survival_rate": 1.0
         },
@@ -1409,6 +1633,8 @@
           "phase1_final_fitness": 0.8252726099544581,
           "phase2_gen0_fitness": 0.8024233711834579,
           "phase2_final_best_fitness": 0.8287417161979359,
+          "phase2_pop_mean_fitness": 0.7598520313033799,
+          "phase2_pop_diversity": 0.8929983551337938,
           "phase2_auc": 9.064295830119553,
           "phase2_survival_rate": 1.0
         },
@@ -1420,6 +1646,8 @@
           "phase1_final_fitness": 0.8056059330327573,
           "phase2_gen0_fitness": 0.8218073724796796,
           "phase2_final_best_fitness": 0.8197972644070085,
+          "phase2_pop_mean_fitness": 0.7462419814547895,
+          "phase2_pop_diversity": 1.168197701730553,
           "phase2_auc": 8.965055789914151,
           "phase2_survival_rate": 1.0
         },
@@ -1431,6 +1659,8 @@
           "phase1_final_fitness": 0.8202104682988826,
           "phase2_gen0_fitness": 0.8147154006955807,
           "phase2_final_best_fitness": 0.7966763881825741,
+          "phase2_pop_mean_fitness": 0.7379646042427324,
+          "phase2_pop_diversity": 0.0709428275465137,
           "phase2_auc": 8.922590399119244,
           "phase2_survival_rate": 1.0
         },
@@ -1442,6 +1672,8 @@
           "phase1_final_fitness": 0.8144527947260517,
           "phase2_gen0_fitness": 0.8439928704697262,
           "phase2_final_best_fitness": 0.7989052092392531,
+          "phase2_pop_mean_fitness": 0.7557269862955689,
+          "phase2_pop_diversity": 0.9705832579734518,
           "phase2_auc": 9.027643912724812,
           "phase2_survival_rate": 1.0
         },
@@ -1453,6 +1685,8 @@
           "phase1_final_fitness": 0.8134961231009856,
           "phase2_gen0_fitness": 0.8260416360210096,
           "phase2_final_best_fitness": 0.8495193939986407,
+          "phase2_pop_mean_fitness": 0.7630062569086109,
+          "phase2_pop_diversity": 0.5016873975739458,
           "phase2_auc": 8.98172788649318,
           "phase2_survival_rate": 1.0
         },
@@ -1464,6 +1698,8 @@
           "phase1_final_fitness": 0.8019150854622584,
           "phase2_gen0_fitness": 0.8308500898456614,
           "phase2_final_best_fitness": 0.7935124815399588,
+          "phase2_pop_mean_fitness": 0.6141879849440283,
+          "phase2_pop_diversity": 1.2615598938864951,
           "phase2_auc": 9.045372641823839,
           "phase2_survival_rate": 0.9666666666666666
         },
@@ -1475,6 +1711,8 @@
           "phase1_final_fitness": 0.8154154138789002,
           "phase2_gen0_fitness": 0.8300977410293863,
           "phase2_final_best_fitness": 0.8088492821062755,
+          "phase2_pop_mean_fitness": 0.7536234176182439,
+          "phase2_pop_diversity": 0.3842993914509731,
           "phase2_auc": 8.972057542035548,
           "phase2_survival_rate": 1.0
         },
@@ -1486,6 +1724,8 @@
           "phase1_final_fitness": 0.8233432576792712,
           "phase2_gen0_fitness": 0.8243595975037287,
           "phase2_final_best_fitness": 0.8124015782521633,
+          "phase2_pop_mean_fitness": 0.7597505612107993,
+          "phase2_pop_diversity": 1.0234215198543746,
           "phase2_auc": 9.018393298768194,
           "phase2_survival_rate": 1.0
         },
@@ -1497,6 +1737,8 @@
           "phase1_final_fitness": 0.825265730101787,
           "phase2_gen0_fitness": 0.820288278442821,
           "phase2_final_best_fitness": 0.8635636341153723,
+          "phase2_pop_mean_fitness": 0.7499955156809359,
+          "phase2_pop_diversity": 1.2093343290688534,
           "phase2_auc": 8.988677124242175,
           "phase2_survival_rate": 1.0
         },
@@ -1508,6 +1750,8 @@
           "phase1_final_fitness": 0.8323978291610697,
           "phase2_gen0_fitness": 0.8406621422682387,
           "phase2_final_best_fitness": 0.8067940675788629,
+          "phase2_pop_mean_fitness": 0.745116909214151,
+          "phase2_pop_diversity": 0.10739539485407125,
           "phase2_auc": 9.02740777254015,
           "phase2_survival_rate": 1.0
         },
@@ -1519,6 +1763,8 @@
           "phase1_final_fitness": 0.8052335025822693,
           "phase2_gen0_fitness": 0.8177420081508805,
           "phase2_final_best_fitness": 0.8071058888271988,
+          "phase2_pop_mean_fitness": 0.754955717820372,
+          "phase2_pop_diversity": 0.5644682004905831,
           "phase2_auc": 9.019702355192916,
           "phase2_survival_rate": 1.0
         },
@@ -1530,6 +1776,8 @@
           "phase1_final_fitness": 0.8140204836819515,
           "phase2_gen0_fitness": 0.8246907528329149,
           "phase2_final_best_fitness": 0.768993250512593,
+          "phase2_pop_mean_fitness": 0.7250984013958008,
+          "phase2_pop_diversity": 0.27690573502227583,
           "phase2_auc": 8.91625982321387,
           "phase2_survival_rate": 1.0
         },
@@ -1541,6 +1789,8 @@
           "phase1_final_fitness": 0.8297637612860628,
           "phase2_gen0_fitness": 0.8370272048114474,
           "phase2_final_best_fitness": 0.8179363304927638,
+          "phase2_pop_mean_fitness": 0.7627955632880946,
+          "phase2_pop_diversity": 1.2934986715045738,
           "phase2_auc": 9.02911109963457,
           "phase2_survival_rate": 1.0
         },
@@ -1552,6 +1802,8 @@
           "phase1_final_fitness": 0.869252362015791,
           "phase2_gen0_fitness": 0.7963835775338225,
           "phase2_final_best_fitness": 0.790085542965612,
+          "phase2_pop_mean_fitness": 0.7425192890182087,
+          "phase2_pop_diversity": 0.7722259792660257,
           "phase2_auc": 8.98196241019435,
           "phase2_survival_rate": 1.0
         },
@@ -1563,6 +1815,8 @@
           "phase1_final_fitness": 0.8328767439250969,
           "phase2_gen0_fitness": 0.8586929255888988,
           "phase2_final_best_fitness": 0.8322141672045177,
+          "phase2_pop_mean_fitness": 0.7536587431266479,
+          "phase2_pop_diversity": 0.3599361283825846,
           "phase2_auc": 9.106736059832674,
           "phase2_survival_rate": 1.0
         },
@@ -1574,6 +1828,8 @@
           "phase1_final_fitness": 0.8332380271730259,
           "phase2_gen0_fitness": 0.8006730716719154,
           "phase2_final_best_fitness": 0.8205900094649521,
+          "phase2_pop_mean_fitness": 0.7396388140079186,
+          "phase2_pop_diversity": 0.2533296745266245,
           "phase2_auc": 8.962336606125483,
           "phase2_survival_rate": 1.0
         },
@@ -1585,6 +1841,8 @@
           "phase1_final_fitness": 0.829437719414002,
           "phase2_gen0_fitness": 0.8116310868447968,
           "phase2_final_best_fitness": 0.8450791886703327,
+          "phase2_pop_mean_fitness": 0.7554599680844525,
+          "phase2_pop_diversity": 0.0800511140244465,
           "phase2_auc": 9.09229798896149,
           "phase2_survival_rate": 1.0
         },
@@ -1596,6 +1854,8 @@
           "phase1_final_fitness": 0.7968085098179669,
           "phase2_gen0_fitness": 0.8061381659178283,
           "phase2_final_best_fitness": 0.8402008438065867,
+          "phase2_pop_mean_fitness": 0.7578536695907663,
+          "phase2_pop_diversity": 0.19446600811565715,
           "phase2_auc": 8.972747331921411,
           "phase2_survival_rate": 1.0
         },
@@ -1607,6 +1867,8 @@
           "phase1_final_fitness": 0.8334159953333949,
           "phase2_gen0_fitness": 0.8028605859997141,
           "phase2_final_best_fitness": 0.8127563664057876,
+          "phase2_pop_mean_fitness": 0.7531138821352333,
+          "phase2_pop_diversity": 0.14887520803038698,
           "phase2_auc": 8.900958500297971,
           "phase2_survival_rate": 1.0
         },
@@ -1618,6 +1880,8 @@
           "phase1_final_fitness": 0.8351877978289423,
           "phase2_gen0_fitness": 0.8127462005055452,
           "phase2_final_best_fitness": 0.8239881673278546,
+          "phase2_pop_mean_fitness": 0.727712260905164,
+          "phase2_pop_diversity": 0.2857464875576348,
           "phase2_auc": 9.022816920761985,
           "phase2_survival_rate": 1.0
         },
@@ -1629,6 +1893,8 @@
           "phase1_final_fitness": 0.8108867637166606,
           "phase2_gen0_fitness": 0.8336146405895449,
           "phase2_final_best_fitness": 0.8301225274771952,
+          "phase2_pop_mean_fitness": 0.7604091242005037,
+          "phase2_pop_diversity": 0.09465881852584715,
           "phase2_auc": 9.017954275666423,
           "phase2_survival_rate": 1.0
         },
@@ -1640,6 +1906,8 @@
           "phase1_final_fitness": 0.8061852113589624,
           "phase2_gen0_fitness": 0.8400049005294802,
           "phase2_final_best_fitness": 0.799973497700932,
+          "phase2_pop_mean_fitness": 0.7061800704372263,
+          "phase2_pop_diversity": 0.09794412924175487,
           "phase2_auc": 9.071730814941423,
           "phase2_survival_rate": 1.0
         },
@@ -1651,6 +1919,8 @@
           "phase1_final_fitness": 0.8276881083034016,
           "phase2_gen0_fitness": 0.8242537684368226,
           "phase2_final_best_fitness": 0.8020167626850728,
+          "phase2_pop_mean_fitness": 0.7487763034802606,
+          "phase2_pop_diversity": 0.29561789283334317,
           "phase2_auc": 8.953434271998697,
           "phase2_survival_rate": 1.0
         },
@@ -1662,6 +1932,8 @@
           "phase1_final_fitness": 0.8108912612155255,
           "phase2_gen0_fitness": 0.8393857252416597,
           "phase2_final_best_fitness": 0.8388689118145858,
+          "phase2_pop_mean_fitness": 0.7473773098217675,
+          "phase2_pop_diversity": 0.3385719147239062,
           "phase2_auc": 9.078437861690526,
           "phase2_survival_rate": 1.0
         },
@@ -1673,6 +1945,8 @@
           "phase1_final_fitness": 0.8210489552015255,
           "phase2_gen0_fitness": 0.8387395640666678,
           "phase2_final_best_fitness": 0.8424920415547573,
+          "phase2_pop_mean_fitness": 0.7585428194812359,
+          "phase2_pop_diversity": 0.07053456854818695,
           "phase2_auc": 8.988929552459155,
           "phase2_survival_rate": 1.0
         },
@@ -1684,6 +1958,8 @@
           "phase1_final_fitness": 0.8128463695670908,
           "phase2_gen0_fitness": 0.811439526128073,
           "phase2_final_best_fitness": 0.8370607728665337,
+          "phase2_pop_mean_fitness": 0.7374599092560047,
+          "phase2_pop_diversity": 0.07096368909419853,
           "phase2_auc": 9.090456203776862,
           "phase2_survival_rate": 1.0
         },
@@ -1695,6 +1971,8 @@
           "phase1_final_fitness": 0.8425816680193959,
           "phase2_gen0_fitness": 0.8120327613906454,
           "phase2_final_best_fitness": 0.8218265235296857,
+          "phase2_pop_mean_fitness": 0.7428516280133317,
+          "phase2_pop_diversity": 0.22050316016231444,
           "phase2_auc": 8.998379721791881,
           "phase2_survival_rate": 1.0
         },
@@ -1706,6 +1984,8 @@
           "phase1_final_fitness": 0.8493246956646678,
           "phase2_gen0_fitness": 0.7942548418014495,
           "phase2_final_best_fitness": 0.8058307132698849,
+          "phase2_pop_mean_fitness": 0.7503434304949754,
+          "phase2_pop_diversity": 0.1351504699036137,
           "phase2_auc": 8.914977867182115,
           "phase2_survival_rate": 1.0
         },
@@ -1717,6 +1997,8 @@
           "phase1_final_fitness": 0.8550179877884129,
           "phase2_gen0_fitness": 0.7940344822869907,
           "phase2_final_best_fitness": 0.8279304682869625,
+          "phase2_pop_mean_fitness": 0.7154571454446507,
+          "phase2_pop_diversity": 0.28228773120279754,
           "phase2_auc": 9.05320229111612,
           "phase2_survival_rate": 1.0
         },
@@ -1728,6 +2010,8 @@
           "phase1_final_fitness": 0.7856091994256423,
           "phase2_gen0_fitness": 0.8624990212842155,
           "phase2_final_best_fitness": 0.8123086151286208,
+          "phase2_pop_mean_fitness": 0.7337346944445001,
+          "phase2_pop_diversity": 0.09063742742010643,
           "phase2_auc": 9.088276007842891,
           "phase2_survival_rate": 1.0
         },
@@ -1739,6 +2023,8 @@
           "phase1_final_fitness": 0.7980386647107789,
           "phase2_gen0_fitness": 0.80086595858849,
           "phase2_final_best_fitness": 0.8144712447938187,
+          "phase2_pop_mean_fitness": 0.7214062972274113,
+          "phase2_pop_diversity": 0.2486991701897866,
           "phase2_auc": 8.989318304215416,
           "phase2_survival_rate": 1.0
         },
@@ -1750,6 +2036,8 @@
           "phase1_final_fitness": 0.8531784263023411,
           "phase2_gen0_fitness": 0.8562271637734113,
           "phase2_final_best_fitness": 0.8151438595638308,
+          "phase2_pop_mean_fitness": 0.7514238373514124,
+          "phase2_pop_diversity": 0.3451106841716208,
           "phase2_auc": 9.0781737989727,
           "phase2_survival_rate": 1.0
         },
@@ -1761,6 +2049,8 @@
           "phase1_final_fitness": 0.8036365802866485,
           "phase2_gen0_fitness": 0.8384119784584726,
           "phase2_final_best_fitness": 0.7888738361820032,
+          "phase2_pop_mean_fitness": 0.7273797395358524,
+          "phase2_pop_diversity": 0.1781833516742721,
           "phase2_auc": 8.937443217466196,
           "phase2_survival_rate": 1.0
         },
@@ -1772,6 +2062,8 @@
           "phase1_final_fitness": 0.839430218021391,
           "phase2_gen0_fitness": 0.7975486668582844,
           "phase2_final_best_fitness": 0.820225420725505,
+          "phase2_pop_mean_fitness": 0.7469265011027703,
+          "phase2_pop_diversity": 0.3860455223892702,
           "phase2_auc": 9.011288402851802,
           "phase2_survival_rate": 1.0
         },
@@ -1783,6 +2075,8 @@
           "phase1_final_fitness": 0.8228073131519081,
           "phase2_gen0_fitness": 0.8067575406520474,
           "phase2_final_best_fitness": 0.8124402213156173,
+          "phase2_pop_mean_fitness": 0.6986082836508762,
+          "phase2_pop_diversity": 0.12070057280918639,
           "phase2_auc": 8.961140566648238,
           "phase2_survival_rate": 1.0
         },
@@ -1794,6 +2088,8 @@
           "phase1_final_fitness": 0.8332380271730259,
           "phase2_gen0_fitness": 0.8006730716719154,
           "phase2_final_best_fitness": 0.8051568865102618,
+          "phase2_pop_mean_fitness": 0.7399795984171086,
+          "phase2_pop_diversity": 0.08414863579388249,
           "phase2_auc": 8.932558567094333,
           "phase2_survival_rate": 1.0
         },
@@ -1805,6 +2101,8 @@
           "phase1_final_fitness": 0.829437719414002,
           "phase2_gen0_fitness": 0.8116310868447968,
           "phase2_final_best_fitness": 0.7976193539811699,
+          "phase2_pop_mean_fitness": 0.75209059597107,
+          "phase2_pop_diversity": 0.0313373343487272,
           "phase2_auc": 8.979644749018869,
           "phase2_survival_rate": 1.0
         },
@@ -1816,6 +2114,8 @@
           "phase1_final_fitness": 0.7968085098179669,
           "phase2_gen0_fitness": 0.8061381659178283,
           "phase2_final_best_fitness": 0.8385331835746167,
+          "phase2_pop_mean_fitness": 0.7500733282961268,
+          "phase2_pop_diversity": 0.04877197390037923,
           "phase2_auc": 9.05573270525588,
           "phase2_survival_rate": 1.0
         },
@@ -1827,6 +2127,8 @@
           "phase1_final_fitness": 0.8334159953333949,
           "phase2_gen0_fitness": 0.8028605859997141,
           "phase2_final_best_fitness": 0.8245689786072458,
+          "phase2_pop_mean_fitness": 0.7426553462370397,
+          "phase2_pop_diversity": 0.06590899230982562,
           "phase2_auc": 9.024987222906365,
           "phase2_survival_rate": 1.0
         },
@@ -1838,6 +2140,8 @@
           "phase1_final_fitness": 0.8351877978289423,
           "phase2_gen0_fitness": 0.8127462005055452,
           "phase2_final_best_fitness": 0.8307440890797065,
+          "phase2_pop_mean_fitness": 0.7558800526509887,
+          "phase2_pop_diversity": 0.13761173488516854,
           "phase2_auc": 8.962469008129453,
           "phase2_survival_rate": 1.0
         },
@@ -1849,6 +2153,8 @@
           "phase1_final_fitness": 0.8108867637166606,
           "phase2_gen0_fitness": 0.8336146405895449,
           "phase2_final_best_fitness": 0.8454393132466996,
+          "phase2_pop_mean_fitness": 0.7289649188912692,
+          "phase2_pop_diversity": 0.03985788693330465,
           "phase2_auc": 8.965243805467196,
           "phase2_survival_rate": 1.0
         },
@@ -1860,6 +2166,8 @@
           "phase1_final_fitness": 0.8061852113589624,
           "phase2_gen0_fitness": 0.8400049005294802,
           "phase2_final_best_fitness": 0.8146559411870103,
+          "phase2_pop_mean_fitness": 0.7380709094727591,
+          "phase2_pop_diversity": 0.2324230776217082,
           "phase2_auc": 8.950108668313657,
           "phase2_survival_rate": 1.0
         },
@@ -1871,6 +2179,8 @@
           "phase1_final_fitness": 0.8276881083034016,
           "phase2_gen0_fitness": 0.8242537684368226,
           "phase2_final_best_fitness": 0.8237272942551513,
+          "phase2_pop_mean_fitness": 0.7406765578491563,
+          "phase2_pop_diversity": 0.10396600717136455,
           "phase2_auc": 9.085667227395696,
           "phase2_survival_rate": 1.0
         },
@@ -1882,6 +2192,8 @@
           "phase1_final_fitness": 0.8108912612155255,
           "phase2_gen0_fitness": 0.8393857252416597,
           "phase2_final_best_fitness": 0.8175457419176895,
+          "phase2_pop_mean_fitness": 0.7516123429765093,
+          "phase2_pop_diversity": 0.23712576347777062,
           "phase2_auc": 8.963843275405454,
           "phase2_survival_rate": 1.0
         },
@@ -1893,6 +2205,8 @@
           "phase1_final_fitness": 0.8210489552015255,
           "phase2_gen0_fitness": 0.8387395640666678,
           "phase2_final_best_fitness": 0.8114959866006045,
+          "phase2_pop_mean_fitness": 0.75569661954227,
+          "phase2_pop_diversity": 0.08697922353185115,
           "phase2_auc": 9.014541372677705,
           "phase2_survival_rate": 1.0
         },
@@ -1904,6 +2218,8 @@
           "phase1_final_fitness": 0.8128463695670908,
           "phase2_gen0_fitness": 0.811439526128073,
           "phase2_final_best_fitness": 0.8081222318578164,
+          "phase2_pop_mean_fitness": 0.7306502389372239,
+          "phase2_pop_diversity": 0.11767281643145154,
           "phase2_auc": 8.879030030265756,
           "phase2_survival_rate": 1.0
         },
@@ -1915,6 +2231,8 @@
           "phase1_final_fitness": 0.8425816680193959,
           "phase2_gen0_fitness": 0.8120327613906454,
           "phase2_final_best_fitness": 0.8584738466743692,
+          "phase2_pop_mean_fitness": 0.7579717949962983,
+          "phase2_pop_diversity": 0.18754147926561707,
           "phase2_auc": 9.023660503157753,
           "phase2_survival_rate": 1.0
         },
@@ -1926,6 +2244,8 @@
           "phase1_final_fitness": 0.8493246956646678,
           "phase2_gen0_fitness": 0.7942548418014495,
           "phase2_final_best_fitness": 0.8545322907446994,
+          "phase2_pop_mean_fitness": 0.7585257628770817,
+          "phase2_pop_diversity": 0.13042997916924903,
           "phase2_auc": 9.00133670095209,
           "phase2_survival_rate": 1.0
         },
@@ -1937,6 +2257,8 @@
           "phase1_final_fitness": 0.8550179877884129,
           "phase2_gen0_fitness": 0.7940344822869907,
           "phase2_final_best_fitness": 0.8206538180789339,
+          "phase2_pop_mean_fitness": 0.7426222456192496,
+          "phase2_pop_diversity": 0.3242571572573039,
           "phase2_auc": 8.940879733271126,
           "phase2_survival_rate": 1.0
         },
@@ -1948,6 +2270,8 @@
           "phase1_final_fitness": 0.7856091994256423,
           "phase2_gen0_fitness": 0.8624990212842155,
           "phase2_final_best_fitness": 0.8316040278980444,
+          "phase2_pop_mean_fitness": 0.7577691543832664,
+          "phase2_pop_diversity": 0.14129550832299512,
           "phase2_auc": 8.888614291292463,
           "phase2_survival_rate": 1.0
         },
@@ -1959,6 +2283,8 @@
           "phase1_final_fitness": 0.7980386647107789,
           "phase2_gen0_fitness": 0.80086595858849,
           "phase2_final_best_fitness": 0.7796068510197466,
+          "phase2_pop_mean_fitness": 0.7444718034064428,
+          "phase2_pop_diversity": 0.18967387450451312,
           "phase2_auc": 8.930527019703648,
           "phase2_survival_rate": 1.0
         },
@@ -1970,6 +2296,8 @@
           "phase1_final_fitness": 0.8531784263023411,
           "phase2_gen0_fitness": 0.8562271637734113,
           "phase2_final_best_fitness": 0.8059806113438165,
+          "phase2_pop_mean_fitness": 0.7516690626805504,
+          "phase2_pop_diversity": 0.18039328964672732,
           "phase2_auc": 9.056554738094661,
           "phase2_survival_rate": 1.0
         },
@@ -1981,6 +2309,8 @@
           "phase1_final_fitness": 0.8036365802866485,
           "phase2_gen0_fitness": 0.8384119784584726,
           "phase2_final_best_fitness": 0.8481509928310342,
+          "phase2_pop_mean_fitness": 0.753567101088015,
+          "phase2_pop_diversity": 0.14641693724342797,
           "phase2_auc": 9.143119802689265,
           "phase2_survival_rate": 1.0
         },
@@ -1992,6 +2322,8 @@
           "phase1_final_fitness": 0.839430218021391,
           "phase2_gen0_fitness": 0.7975486668582844,
           "phase2_final_best_fitness": 0.8040680436910757,
+          "phase2_pop_mean_fitness": 0.7251017497928557,
+          "phase2_pop_diversity": 0.06219444752348603,
           "phase2_auc": 8.96468623152688,
           "phase2_survival_rate": 1.0
         },
@@ -2003,40 +2335,48 @@
           "phase1_final_fitness": 0.8228073131519081,
           "phase2_gen0_fitness": 0.8067575406520474,
           "phase2_final_best_fitness": 0.7986123656047628,
+          "phase2_pop_mean_fitness": 0.7371570509315061,
+          "phase2_pop_diversity": 0.07568616903601828,
           "phase2_auc": 9.07413398874697,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3000,
-          "phase2_deaths": 0,
-          "phase1_deaths": 8,
-          "phase1_final_fitness": 0.8439962554184776,
-          "phase2_gen0_fitness": 0.816650269466941,
-          "phase2_final_best_fitness": 0.8046217686654602,
-          "phase2_auc": 8.999165832080482,
+          "phase2_deaths": 1,
+          "phase1_deaths": 9,
+          "phase1_final_fitness": 0.8138305331016976,
+          "phase2_gen0_fitness": 0.8048066594119008,
+          "phase2_final_best_fitness": 0.8112517176200381,
+          "phase2_pop_mean_fitness": 0.7495621615290944,
+          "phase2_pop_diversity": 0.33742248768600563,
+          "phase2_auc": 8.983314169440991,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3001,
           "phase2_deaths": 0,
-          "phase1_deaths": 0,
-          "phase1_final_fitness": 0.8298803707470404,
-          "phase2_gen0_fitness": 0.8171395881798005,
-          "phase2_final_best_fitness": 0.8071656181903224,
-          "phase2_auc": 8.897418756328978,
+          "phase1_deaths": 4,
+          "phase1_final_fitness": 0.8439136889834105,
+          "phase2_gen0_fitness": 0.8196166785803752,
+          "phase2_final_best_fitness": 0.7983536770641404,
+          "phase2_pop_mean_fitness": 0.7551703949016159,
+          "phase2_pop_diversity": 1.3156643445723817,
+          "phase2_auc": 9.021309735556573,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3002,
           "phase2_deaths": 0,
-          "phase1_deaths": 3,
-          "phase1_final_fitness": 0.8120039008641028,
-          "phase2_gen0_fitness": 0.8542331865316181,
-          "phase2_final_best_fitness": 0.8093617078159981,
-          "phase2_auc": 9.134199798392961,
+          "phase1_deaths": 4,
+          "phase1_final_fitness": 0.8471548214293055,
+          "phase2_gen0_fitness": 0.8164313412222121,
+          "phase2_final_best_fitness": 0.80925163797987,
+          "phase2_pop_mean_fitness": 0.7494066855852755,
+          "phase2_pop_diversity": 0.15221000641111632,
+          "phase2_auc": 9.079785451446524,
           "phase2_survival_rate": 1.0
         },
         {
@@ -2044,131 +2384,155 @@
           "seed": 3003,
           "phase2_deaths": 0,
           "phase1_deaths": 5,
-          "phase1_final_fitness": 0.8286632506532984,
-          "phase2_gen0_fitness": 0.8650670183290353,
-          "phase2_final_best_fitness": 0.7933383365628212,
-          "phase2_auc": 9.069837355633696,
+          "phase1_final_fitness": 0.8266968693589515,
+          "phase2_gen0_fitness": 0.8011565980107339,
+          "phase2_final_best_fitness": 0.8233974869070538,
+          "phase2_pop_mean_fitness": 0.7533334550281152,
+          "phase2_pop_diversity": 0.6126362198352139,
+          "phase2_auc": 9.10446374450294,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3004,
           "phase2_deaths": 0,
-          "phase1_deaths": 2,
-          "phase1_final_fitness": 0.8009867161402738,
-          "phase2_gen0_fitness": 0.8415154297964027,
-          "phase2_final_best_fitness": 0.799198150926203,
-          "phase2_auc": 8.975633898518423,
+          "phase1_deaths": 3,
+          "phase1_final_fitness": 0.795255078675793,
+          "phase2_gen0_fitness": 0.845576553295515,
+          "phase2_final_best_fitness": 0.8154576052900492,
+          "phase2_pop_mean_fitness": 0.7484699347568509,
+          "phase2_pop_diversity": 0.09056864280342523,
+          "phase2_auc": 8.916107042609697,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3005,
-          "phase2_deaths": 0,
-          "phase1_deaths": 5,
-          "phase1_final_fitness": 0.8004516972575634,
-          "phase2_gen0_fitness": 0.7904394067441625,
-          "phase2_final_best_fitness": 0.8294765782239475,
-          "phase2_auc": 9.129163626033524,
+          "phase2_deaths": 1,
+          "phase1_deaths": 4,
+          "phase1_final_fitness": 0.7911954498229182,
+          "phase2_gen0_fitness": 0.8221269549108418,
+          "phase2_final_best_fitness": 0.8122640302768825,
+          "phase2_pop_mean_fitness": 0.7017657038019556,
+          "phase2_pop_diversity": 1.064283169506162,
+          "phase2_auc": 8.966210410109454,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3006,
-          "phase2_deaths": 0,
-          "phase1_deaths": 0,
-          "phase1_final_fitness": 0.8202315551996767,
-          "phase2_gen0_fitness": 0.8131211148491481,
-          "phase2_final_best_fitness": 0.8187412066804125,
-          "phase2_auc": 8.963830981896043,
+          "phase2_deaths": 6,
+          "phase1_deaths": 2,
+          "phase1_final_fitness": 0.789674956259415,
+          "phase2_gen0_fitness": 0.8068713247078408,
+          "phase2_final_best_fitness": 0.8475136126923006,
+          "phase2_pop_mean_fitness": 0.7585173033282577,
+          "phase2_pop_diversity": 1.544992377923735,
+          "phase2_auc": 9.094048878905266,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3007,
-          "phase2_deaths": 0,
-          "phase1_deaths": 5,
-          "phase1_final_fitness": 0.8202104682988826,
-          "phase2_gen0_fitness": 0.8145894387277014,
-          "phase2_final_best_fitness": 0.8092397199291795,
-          "phase2_auc": 9.004181094148933,
+          "phase2_deaths": 2,
+          "phase1_deaths": 4,
+          "phase1_final_fitness": 0.8300239910021182,
+          "phase2_gen0_fitness": 0.7949545609237499,
+          "phase2_final_best_fitness": 0.8098284040657768,
+          "phase2_pop_mean_fitness": 0.7428827077918017,
+          "phase2_pop_diversity": 0.27872657719355526,
+          "phase2_auc": 8.98777691566924,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3008,
-          "phase2_deaths": 0,
-          "phase1_deaths": 2,
-          "phase1_final_fitness": 0.812091327044406,
-          "phase2_gen0_fitness": 0.8438579589996053,
-          "phase2_final_best_fitness": 0.7935540502001519,
-          "phase2_auc": 8.99324769828941,
+          "phase2_deaths": 1,
+          "phase1_deaths": 1,
+          "phase1_final_fitness": 0.8190901416780352,
+          "phase2_gen0_fitness": 0.8469689324836437,
+          "phase2_final_best_fitness": 0.8244350629074692,
+          "phase2_pop_mean_fitness": 0.7760784084150193,
+          "phase2_pop_diversity": 0.11187175762671632,
+          "phase2_auc": 9.06889073379092,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3009,
           "phase2_deaths": 0,
-          "phase1_deaths": 6,
-          "phase1_final_fitness": 0.8128600984596543,
-          "phase2_gen0_fitness": 0.8213723571423762,
-          "phase2_final_best_fitness": 0.8509225057808333,
-          "phase2_auc": 8.973438491279234,
+          "phase1_deaths": 8,
+          "phase1_final_fitness": 0.8379707260126138,
+          "phase2_gen0_fitness": 0.8308904438125806,
+          "phase2_final_best_fitness": 0.8106719311597788,
+          "phase2_pop_mean_fitness": 0.7602247545925722,
+          "phase2_pop_diversity": 0.3355658431490097,
+          "phase2_auc": 9.10247972457206,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3010,
-          "phase2_deaths": 0,
-          "phase1_deaths": 5,
-          "phase1_final_fitness": 0.8297056488988203,
-          "phase2_gen0_fitness": 0.8061781853114168,
-          "phase2_final_best_fitness": 0.7937896675548434,
-          "phase2_auc": 9.009874803311664,
+          "phase2_deaths": 4,
+          "phase1_deaths": 9,
+          "phase1_final_fitness": 0.8220441276478234,
+          "phase2_gen0_fitness": 0.7925165633413654,
+          "phase2_final_best_fitness": 0.8078347490226162,
+          "phase2_pop_mean_fitness": 0.7479826684744496,
+          "phase2_pop_diversity": 1.0273785224318854,
+          "phase2_auc": 8.976055553392353,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3011,
-          "phase2_deaths": 0,
-          "phase1_deaths": 3,
-          "phase1_final_fitness": 0.8118321582266921,
-          "phase2_gen0_fitness": 0.8340514303029859,
-          "phase2_final_best_fitness": 0.8092113657730632,
-          "phase2_auc": 8.994126456745915,
+          "phase2_deaths": 1,
+          "phase1_deaths": 5,
+          "phase1_final_fitness": 0.848250017669011,
+          "phase2_gen0_fitness": 0.8117390951175812,
+          "phase2_final_best_fitness": 0.799763702171834,
+          "phase2_pop_mean_fitness": 0.7174020801969334,
+          "phase2_pop_diversity": 0.12207478233730687,
+          "phase2_auc": 8.973791850061225,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3012,
-          "phase2_deaths": 0,
+          "phase2_deaths": 2,
           "phase1_deaths": 3,
-          "phase1_final_fitness": 0.8238204660528363,
-          "phase2_gen0_fitness": 0.8171273956671987,
-          "phase2_final_best_fitness": 0.8198816069019096,
-          "phase2_auc": 9.034466031591876,
+          "phase1_final_fitness": 0.8247565408471841,
+          "phase2_gen0_fitness": 0.8300211045756093,
+          "phase2_final_best_fitness": 0.7960752365055308,
+          "phase2_pop_mean_fitness": 0.7327566794721465,
+          "phase2_pop_diversity": 1.2189378873602972,
+          "phase2_auc": 9.048894506186866,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3013,
-          "phase2_deaths": 0,
-          "phase1_deaths": 1,
-          "phase1_final_fitness": 0.826775001931388,
-          "phase2_gen0_fitness": 0.8225595922404709,
-          "phase2_final_best_fitness": 0.8478800629973771,
-          "phase2_auc": 9.00044922871917,
+          "phase2_deaths": 1,
+          "phase1_deaths": 2,
+          "phase1_final_fitness": 0.8033677612931117,
+          "phase2_gen0_fitness": 0.8291619763176361,
+          "phase2_final_best_fitness": 0.7800012945202202,
+          "phase2_pop_mean_fitness": 0.7234530856191572,
+          "phase2_pop_diversity": 0.15542761321569604,
+          "phase2_auc": 9.027584305733042,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3014,
-          "phase2_deaths": 0,
-          "phase1_deaths": 5,
-          "phase1_final_fitness": 0.8224465897725931,
-          "phase2_gen0_fitness": 0.8372143201676936,
-          "phase2_final_best_fitness": 0.806264338444996,
-          "phase2_auc": 9.05516068993648,
+          "phase2_deaths": 1,
+          "phase1_deaths": 4,
+          "phase1_final_fitness": 0.7754829946329775,
+          "phase2_gen0_fitness": 0.8204807243758484,
+          "phase2_final_best_fitness": 0.8073481790880915,
+          "phase2_pop_mean_fitness": 0.7195728630793357,
+          "phase2_pop_diversity": 1.3430188506971779,
+          "phase2_auc": 8.952649098265965,
           "phase2_survival_rate": 1.0
         },
         {
@@ -2176,54 +2540,64 @@
           "seed": 3015,
           "phase2_deaths": 0,
           "phase1_deaths": 4,
-          "phase1_final_fitness": 0.8051318825399701,
-          "phase2_gen0_fitness": 0.8177420072575091,
-          "phase2_final_best_fitness": 0.8090843661849446,
-          "phase2_auc": 8.995442830326063,
+          "phase1_final_fitness": 0.8271141925005567,
+          "phase2_gen0_fitness": 0.8088873246768497,
+          "phase2_final_best_fitness": 0.8088198913520571,
+          "phase2_pop_mean_fitness": 0.7523742181404447,
+          "phase2_pop_diversity": 0.595946739700292,
+          "phase2_auc": 9.001852711033333,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3016,
-          "phase2_deaths": 0,
-          "phase1_deaths": 4,
-          "phase1_final_fitness": 0.8173929856669142,
-          "phase2_gen0_fitness": 0.8033124596159844,
-          "phase2_final_best_fitness": 0.796302963264381,
-          "phase2_auc": 8.925771155306565,
+          "phase2_deaths": 1,
+          "phase1_deaths": 5,
+          "phase1_final_fitness": 0.8078736090576752,
+          "phase2_gen0_fitness": 0.8391533160823551,
+          "phase2_final_best_fitness": 0.8197835389232964,
+          "phase2_pop_mean_fitness": 0.7645728736188427,
+          "phase2_pop_diversity": 0.5495785030269661,
+          "phase2_auc": 9.010461478346071,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3017,
           "phase2_deaths": 0,
-          "phase1_deaths": 3,
-          "phase1_final_fitness": 0.8338272517211017,
-          "phase2_gen0_fitness": 0.800762162348824,
-          "phase2_final_best_fitness": 0.8152756760648302,
-          "phase2_auc": 8.989831975571974,
+          "phase1_deaths": 5,
+          "phase1_final_fitness": 0.7998539574587399,
+          "phase2_gen0_fitness": 0.8304193667375571,
+          "phase2_final_best_fitness": 0.8001616858821249,
+          "phase2_pop_mean_fitness": 0.749251715357253,
+          "phase2_pop_diversity": 0.23682048427574143,
+          "phase2_auc": 9.036842547271934,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3018,
-          "phase2_deaths": 0,
-          "phase1_deaths": 4,
-          "phase1_final_fitness": 0.8560858113400189,
-          "phase2_gen0_fitness": 0.7952530038113145,
-          "phase2_final_best_fitness": 0.7833443239019822,
-          "phase2_auc": 8.942428598124776,
+          "phase2_deaths": 3,
+          "phase1_deaths": 6,
+          "phase1_final_fitness": 0.790209629903781,
+          "phase2_gen0_fitness": 0.8528041620859326,
+          "phase2_final_best_fitness": 0.7796494925011133,
+          "phase2_pop_mean_fitness": 0.7346881216741379,
+          "phase2_pop_diversity": 0.20651672628358694,
+          "phase2_auc": 8.99721831703226,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3019,
-          "phase2_deaths": 0,
-          "phase1_deaths": 2,
-          "phase1_final_fitness": 0.8377651709324031,
-          "phase2_gen0_fitness": 0.8605058620647084,
-          "phase2_final_best_fitness": 0.8281331858095404,
-          "phase2_auc": 9.085391783403729,
+          "phase2_deaths": 1,
+          "phase1_deaths": 1,
+          "phase1_final_fitness": 0.8064315522122164,
+          "phase2_gen0_fitness": 0.7976417050076208,
+          "phase2_final_best_fitness": 0.8137411970540973,
+          "phase2_pop_mean_fitness": 0.7486599828869649,
+          "phase2_pop_diversity": 1.018366152501454,
+          "phase2_auc": 9.060024323784896,
           "phase2_survival_rate": 1.0
         },
         {
@@ -2234,6 +2608,8 @@
           "phase1_final_fitness": 0.8438206818309025,
           "phase2_gen0_fitness": 0.8092479807378355,
           "phase2_final_best_fitness": 0.8046217673323518,
+          "phase2_pop_mean_fitness": 0.7458528353834514,
+          "phase2_pop_diversity": 0.12492162535861473,
           "phase2_auc": 8.997958220822541,
           "phase2_survival_rate": 1.0
         },
@@ -2245,6 +2621,8 @@
           "phase1_final_fitness": 0.8293769864062478,
           "phase2_gen0_fitness": 0.8195766193503848,
           "phase2_final_best_fitness": 0.8243093515631809,
+          "phase2_pop_mean_fitness": 0.7561446997219535,
+          "phase2_pop_diversity": 1.4224542236264803,
           "phase2_auc": 8.930852092412357,
           "phase2_survival_rate": 1.0
         },
@@ -2256,6 +2634,8 @@
           "phase1_final_fitness": 0.812003910220787,
           "phase2_gen0_fitness": 0.8587142524787031,
           "phase2_final_best_fitness": 0.8066203434822962,
+          "phase2_pop_mean_fitness": 0.7561825494130867,
+          "phase2_pop_diversity": 0.5449559289231277,
           "phase2_auc": 9.126022533582722,
           "phase2_survival_rate": 1.0
         },
@@ -2267,6 +2647,8 @@
           "phase1_final_fitness": 0.8263748162447677,
           "phase2_gen0_fitness": 0.8574763227895653,
           "phase2_final_best_fitness": 0.8349006855658256,
+          "phase2_pop_mean_fitness": 0.7466701520236992,
+          "phase2_pop_diversity": 0.515033325890522,
           "phase2_auc": 9.169168959937736,
           "phase2_survival_rate": 1.0
         },
@@ -2278,6 +2660,8 @@
           "phase1_final_fitness": 0.8382220127581794,
           "phase2_gen0_fitness": 0.8304744744331618,
           "phase2_final_best_fitness": 0.8205498738530901,
+          "phase2_pop_mean_fitness": 0.7681863568291691,
+          "phase2_pop_diversity": 0.2851261354509823,
           "phase2_auc": 9.102705577454422,
           "phase2_survival_rate": 1.0
         },
@@ -2289,6 +2673,8 @@
           "phase1_final_fitness": 0.8252726099544581,
           "phase2_gen0_fitness": 0.8024233711834579,
           "phase2_final_best_fitness": 0.7890161276121977,
+          "phase2_pop_mean_fitness": 0.7499274251465284,
+          "phase2_pop_diversity": 0.892450187457177,
           "phase2_auc": 9.027688851496347,
           "phase2_survival_rate": 1.0
         },
@@ -2300,6 +2686,8 @@
           "phase1_final_fitness": 0.8056059330327573,
           "phase2_gen0_fitness": 0.8218073724796796,
           "phase2_final_best_fitness": 0.8197972644070085,
+          "phase2_pop_mean_fitness": 0.7462419814547895,
+          "phase2_pop_diversity": 1.168197701730553,
           "phase2_auc": 8.965055789914151,
           "phase2_survival_rate": 1.0
         },
@@ -2311,6 +2699,8 @@
           "phase1_final_fitness": 0.8202104682988826,
           "phase2_gen0_fitness": 0.8147154006955807,
           "phase2_final_best_fitness": 0.7966763881825741,
+          "phase2_pop_mean_fitness": 0.7379646042427324,
+          "phase2_pop_diversity": 0.0709428275465137,
           "phase2_auc": 8.922590399119244,
           "phase2_survival_rate": 1.0
         },
@@ -2322,6 +2712,8 @@
           "phase1_final_fitness": 0.8144527947260517,
           "phase2_gen0_fitness": 0.8439928704697262,
           "phase2_final_best_fitness": 0.7989052092392531,
+          "phase2_pop_mean_fitness": 0.7557269862955689,
+          "phase2_pop_diversity": 0.9705832579734518,
           "phase2_auc": 9.027643912724812,
           "phase2_survival_rate": 1.0
         },
@@ -2333,6 +2725,8 @@
           "phase1_final_fitness": 0.8134961231009856,
           "phase2_gen0_fitness": 0.8260416360210096,
           "phase2_final_best_fitness": 0.8495193939986407,
+          "phase2_pop_mean_fitness": 0.7630062569086109,
+          "phase2_pop_diversity": 0.5016873975739458,
           "phase2_auc": 8.98172788649318,
           "phase2_survival_rate": 1.0
         },
@@ -2344,6 +2738,8 @@
           "phase1_final_fitness": 0.8019150854622584,
           "phase2_gen0_fitness": 0.8308500898456614,
           "phase2_final_best_fitness": 0.8265742655021576,
+          "phase2_pop_mean_fitness": 0.7569409611973409,
+          "phase2_pop_diversity": 1.3675322148580424,
           "phase2_auc": 8.997739402402315,
           "phase2_survival_rate": 1.0
         },
@@ -2355,6 +2751,8 @@
           "phase1_final_fitness": 0.8154154138789002,
           "phase2_gen0_fitness": 0.8300977410293863,
           "phase2_final_best_fitness": 0.8088492821062755,
+          "phase2_pop_mean_fitness": 0.7536234176182439,
+          "phase2_pop_diversity": 0.3842993914509731,
           "phase2_auc": 8.972057542035548,
           "phase2_survival_rate": 1.0
         },
@@ -2366,6 +2764,8 @@
           "phase1_final_fitness": 0.8233432576792712,
           "phase2_gen0_fitness": 0.8243595975037287,
           "phase2_final_best_fitness": 0.8124015782521633,
+          "phase2_pop_mean_fitness": 0.7597505612107993,
+          "phase2_pop_diversity": 1.0234215198543746,
           "phase2_auc": 9.018393298768194,
           "phase2_survival_rate": 1.0
         },
@@ -2377,6 +2777,8 @@
           "phase1_final_fitness": 0.825265730101787,
           "phase2_gen0_fitness": 0.820288278442821,
           "phase2_final_best_fitness": 0.8218954853949719,
+          "phase2_pop_mean_fitness": 0.7279452194562105,
+          "phase2_pop_diversity": 1.2125930364386077,
           "phase2_auc": 8.947008975521774,
           "phase2_survival_rate": 1.0
         },
@@ -2388,6 +2790,8 @@
           "phase1_final_fitness": 0.8323978291610697,
           "phase2_gen0_fitness": 0.8406621422682387,
           "phase2_final_best_fitness": 0.8067940675788629,
+          "phase2_pop_mean_fitness": 0.745116909214151,
+          "phase2_pop_diversity": 0.10739539485407125,
           "phase2_auc": 9.02740777254015,
           "phase2_survival_rate": 1.0
         },
@@ -2399,6 +2803,8 @@
           "phase1_final_fitness": 0.8052335025822693,
           "phase2_gen0_fitness": 0.8177420081508805,
           "phase2_final_best_fitness": 0.8071058888271988,
+          "phase2_pop_mean_fitness": 0.754955717820372,
+          "phase2_pop_diversity": 0.5644682004905831,
           "phase2_auc": 9.019702355192916,
           "phase2_survival_rate": 1.0
         },
@@ -2410,6 +2816,8 @@
           "phase1_final_fitness": 0.8140204836819515,
           "phase2_gen0_fitness": 0.8246907528329149,
           "phase2_final_best_fitness": 0.768993250512593,
+          "phase2_pop_mean_fitness": 0.7250984013958008,
+          "phase2_pop_diversity": 0.27690573502227583,
           "phase2_auc": 8.91625982321387,
           "phase2_survival_rate": 1.0
         },
@@ -2421,6 +2829,8 @@
           "phase1_final_fitness": 0.8297637612860628,
           "phase2_gen0_fitness": 0.8370272048114474,
           "phase2_final_best_fitness": 0.8157608902820986,
+          "phase2_pop_mean_fitness": 0.7433818000510791,
+          "phase2_pop_diversity": 1.487570046084837,
           "phase2_auc": 9.054606147730821,
           "phase2_survival_rate": 1.0
         },
@@ -2432,6 +2842,8 @@
           "phase1_final_fitness": 0.869252362015791,
           "phase2_gen0_fitness": 0.7963835775338225,
           "phase2_final_best_fitness": 0.790085542965612,
+          "phase2_pop_mean_fitness": 0.7425192890182087,
+          "phase2_pop_diversity": 0.7722259792660257,
           "phase2_auc": 8.98196241019435,
           "phase2_survival_rate": 1.0
         },
@@ -2443,6 +2855,8 @@
           "phase1_final_fitness": 0.8328767439250969,
           "phase2_gen0_fitness": 0.8586929255888988,
           "phase2_final_best_fitness": 0.8322141672045177,
+          "phase2_pop_mean_fitness": 0.7536587431266479,
+          "phase2_pop_diversity": 0.3599361283825846,
           "phase2_auc": 9.106736059832674,
           "phase2_survival_rate": 1.0
         }
@@ -2455,33 +2869,33 @@
       "arm_means_phase2": {
         "NONE": {
           "phase2_deaths": 9.85,
-          "fitness": 0.8124876580121907,
-          "memory_ratio": 1.006701237134062,
-          "survival": 0.9824999999999999
+          "best_fitness": 0.8124876580121907,
+          "pop_mean_fitness": 0.737663582549294,
+          "diversity": 0.6398942513909582
         },
         "EXO_fixed": {
           "phase2_deaths": 8.5,
-          "fitness": 0.8182957235083084,
-          "memory_ratio": 0.9930158693562392,
-          "survival": 0.9850000000000001
+          "best_fitness": 0.8182957235083084,
+          "pop_mean_fitness": 0.740719871335145,
+          "diversity": 0.1447729686771982
         },
         "ENDO": {
           "phase2_deaths": 2.55,
-          "fitness": 0.8114079670387134,
-          "memory_ratio": 0.9930158693562392,
-          "survival": 1.0
+          "best_fitness": 0.8114079670387134,
+          "pop_mean_fitness": 0.7459968900288261,
+          "diversity": 0.1318292914997429
         },
         "REVIVE": {
-          "phase2_deaths": 0.0,
-          "fitness": 0.8118442562494288,
-          "memory_ratio": 1.0068656418264983,
-          "survival": 1.0
+          "phase2_deaths": 11.9,
+          "best_fitness": 0.8224472063947456,
+          "pop_mean_fitness": 0.750371418851166,
+          "diversity": 0.5184893086952017
         },
         "OBSERVE": {
           "phase2_deaths": 7.3,
-          "fitness": 0.8054552065782984,
-          "memory_ratio": 0.9985744508551264,
-          "survival": 0.9858333333333335
+          "best_fitness": 0.8054552065782984,
+          "pop_mean_fitness": 0.7418728665215202,
+          "diversity": 0.47670516403527197
         }
       },
       "comparisons": {
@@ -2493,25 +2907,11 @@
           "p_signflip_two_sided": 0.023739762602373975
         },
         "deaths_NONE_minus_REVIVE": {
-          "mean_delta": 9.85,
-          "median_delta": 4.5,
-          "n_positive": 16,
-          "n_negative": 0,
-          "p_signflip_two_sided": 5.999940000599994e-05
-        },
-        "deaths_NONE_minus_OBSERVE": {
-          "mean_delta": 2.55,
-          "median_delta": 0.0,
-          "n_positive": 7,
-          "n_negative": 3,
-          "p_signflip_two_sided": 0.5099049009509905
-        },
-        "deaths_ENDO_minus_REVIVE": {
-          "mean_delta": 2.55,
-          "median_delta": 1.0,
-          "n_positive": 12,
-          "n_negative": 0,
-          "p_signflip_two_sided": 0.0005899941000589994
+          "mean_delta": -2.05,
+          "median_delta": -3.5,
+          "n_positive": 8,
+          "n_negative": 12,
+          "p_signflip_two_sided": 0.6765832341676583
         },
         "deaths_OBSERVE_minus_ENDO": {
           "mean_delta": 4.75,
@@ -2520,32 +2920,53 @@
           "n_negative": 4,
           "p_signflip_two_sided": 0.03994960050399496
         },
-        "fitness_REVIVE_minus_ENDO": {
-          "mean_delta": 0.0004362892107152627,
-          "median_delta": -0.001868753249400612,
-          "n_positive": 10,
-          "n_negative": 10,
-          "p_signflip_two_sided": 0.943140568594314
+        "popmean_REVIVE_minus_NONE": {
+          "mean_delta": 0.012707836301871995,
+          "median_delta": 0.003125923630799665,
+          "n_positive": 12,
+          "n_negative": 8,
+          "p_signflip_two_sided": 0.13177868221317787
         },
-        "fitness_ENDO_minus_NONE": {
-          "mean_delta": -0.0010796909734771432,
-          "median_delta": -0.0017434961253427472,
+        "popmean_ENDO_minus_NONE": {
+          "mean_delta": 0.008333307479532065,
+          "median_delta": -0.003147518116529524,
+          "n_positive": 9,
+          "n_negative": 11,
+          "p_signflip_two_sided": 0.4936350636493635
+        },
+        "popmean_REVIVE_minus_ENDO": {
+          "mean_delta": 0.00437452882233993,
+          "median_delta": 0.004461706726991421,
+          "n_positive": 14,
+          "n_negative": 6,
+          "p_signflip_two_sided": 0.14206857931420686
+        },
+        "popmean_ENDO_minus_OBSERVE": {
+          "mean_delta": 0.004124023507305952,
+          "median_delta": -0.0047998100369098795,
           "n_positive": 8,
           "n_negative": 12,
-          "p_signflip_two_sided": 0.8644013559864402
+          "p_signflip_two_sided": 0.5131548684513155
         }
       },
       "soundness_violations": 0,
       "soundness_checked": 1003,
       "boundary_active": true,
       "deaths_ranking_low_to_high": [
+        "ENDO",
+        "OBSERVE",
+        "EXO_fixed",
+        "NONE",
+        "REVIVE"
+      ],
+      "memory_ranking_high_to_low": [
         "REVIVE",
         "ENDO",
         "OBSERVE",
         "EXO_fixed",
         "NONE"
       ],
-      "verdict": "[highgain] 死回避 (低い順): REVIVE < ENDO < OBSERVE < EXO_fixed < NONE。REVIVE は死を 0 化 (全修復=経験を傷として保持) vs ENDO は reject で 2.5。REVIVE−ENDO 死差 Δ=+2.5 (p=0.001)。OBSERVE (経験的社会学習) deaths=7.3 vs ENDO (sound 予見) deaths=2.5, OBSERVE−ENDO Δ=+4.8 (p=0.040)。verifier soundness viol=0/1003 (ENDO/REVIVE は健全; OBSERVE は empirical ゆえ deaths>0 = imperfect)。memory_ratio (catastrophe 直後/phase1): NONE=1.01, EXO_fixed=0.99, ENDO=0.99, REVIVE=1.01, OBSERVE=1.00。",
+      "verdict": "[highgain] 2 軸: ①死回避 (低い順) ENDO < OBSERVE < EXO_fixed < NONE < REVIVE — ENDO (予見) が死を避ける (NONE−ENDO Δ=+7.3, p=0.024); REVIVE は死を経験 (11.9≈NONE 9.8)。②記憶保存 (pop_mean_fit 高い順) REVIVE > ENDO > OBSERVE > EXO_fixed > NONE — **REVIVE は同死でも記憶を保つ** (REVIVE−NONE pop_mean Δ=+0.013, p=0.132) = 復活が経験を記憶に残す。ENDO は予見で死を避けつつ記憶保持。OBSERVE (empirical) は死多+記憶低 (ENDO−OBSERVE pop_mean Δ=+0.004)。verifier soundness viol=0/1003。",
       "records": [
         {
           "arm": "NONE",
@@ -2555,6 +2976,8 @@
           "phase1_final_fitness": 0.843992656547116,
           "phase2_gen0_fitness": 0.8166497125932145,
           "phase2_final_best_fitness": 0.8046217673323518,
+          "phase2_pop_mean_fitness": 0.7462200892315721,
+          "phase2_pop_diversity": 0.15243129926715376,
           "phase2_auc": 9.011120201895796,
           "phase2_survival_rate": 1.0
         },
@@ -2566,6 +2989,8 @@
           "phase1_final_fitness": 0.8397558697069205,
           "phase2_gen0_fitness": 0.8182980190446886,
           "phase2_final_best_fitness": 0.8055343159003382,
+          "phase2_pop_mean_fitness": 0.7430894978483465,
+          "phase2_pop_diversity": 1.6357921784518594,
           "phase2_auc": 8.892717124268083,
           "phase2_survival_rate": 0.9833333333333332
         },
@@ -2577,6 +3002,8 @@
           "phase1_final_fitness": 0.8032843012303911,
           "phase2_gen0_fitness": 0.8587142524787031,
           "phase2_final_best_fitness": 0.8066203434822962,
+          "phase2_pop_mean_fitness": 0.7564382520930517,
+          "phase2_pop_diversity": 0.602735759142104,
           "phase2_auc": 9.133296706711455,
           "phase2_survival_rate": 1.0
         },
@@ -2588,6 +3015,8 @@
           "phase1_final_fitness": 0.8263748162447677,
           "phase2_gen0_fitness": 0.8574763227895653,
           "phase2_final_best_fitness": 0.7919785563591267,
+          "phase2_pop_mean_fitness": 0.5834362379012389,
+          "phase2_pop_diversity": 1.022840728072204,
           "phase2_auc": 9.051224951043991,
           "phase2_survival_rate": 0.7666666666666666
         },
@@ -2599,6 +3028,8 @@
           "phase1_final_fitness": 0.8010594347722423,
           "phase2_gen0_fitness": 0.84153989564227,
           "phase2_final_best_fitness": 0.7938607941023372,
+          "phase2_pop_mean_fitness": 0.7184110790063761,
+          "phase2_pop_diversity": 0.2666128322657696,
           "phase2_auc": 8.991314052187686,
           "phase2_survival_rate": 0.95
         },
@@ -2610,6 +3041,8 @@
           "phase1_final_fitness": 0.8251491192629127,
           "phase2_gen0_fitness": 0.8040192435147953,
           "phase2_final_best_fitness": 0.8239916344002082,
+          "phase2_pop_mean_fitness": 0.7572844660924952,
+          "phase2_pop_diversity": 0.6819738505837759,
           "phase2_auc": 9.104520300590316,
           "phase2_survival_rate": 1.0
         },
@@ -2621,6 +3054,8 @@
           "phase1_final_fitness": 0.8070268343208308,
           "phase2_gen0_fitness": 0.8188692243461819,
           "phase2_final_best_fitness": 0.8172144687477964,
+          "phase2_pop_mean_fitness": 0.7451147884067303,
+          "phase2_pop_diversity": 1.628101192398423,
           "phase2_auc": 8.947769998964688,
           "phase2_survival_rate": 1.0
         },
@@ -2632,6 +3067,8 @@
           "phase1_final_fitness": 0.8201956300429899,
           "phase2_gen0_fitness": 0.8147154309147419,
           "phase2_final_best_fitness": 0.8093696954117595,
+          "phase2_pop_mean_fitness": 0.7380296142722459,
+          "phase2_pop_diversity": 0.24147792959887665,
           "phase2_auc": 8.974500628587482,
           "phase2_survival_rate": 1.0
         },
@@ -2643,6 +3080,8 @@
           "phase1_final_fitness": 0.8133347157095737,
           "phase2_gen0_fitness": 0.8438405649725582,
           "phase2_final_best_fitness": 0.7996170170569906,
+          "phase2_pop_mean_fitness": 0.7562065244761064,
+          "phase2_pop_diversity": 1.08026974999174,
           "phase2_auc": 9.026035760481433,
           "phase2_survival_rate": 1.0
         },
@@ -2654,6 +3093,8 @@
           "phase1_final_fitness": 0.8122546542286931,
           "phase2_gen0_fitness": 0.8272467828222342,
           "phase2_final_best_fitness": 0.8509224963321227,
+          "phase2_pop_mean_fitness": 0.7614695183587091,
+          "phase2_pop_diversity": 1.1018097439701686,
           "phase2_auc": 9.01184289041474,
           "phase2_survival_rate": 1.0
         },
@@ -2665,6 +3106,8 @@
           "phase1_final_fitness": 0.8044202765472818,
           "phase2_gen0_fitness": 0.8201315794629855,
           "phase2_final_best_fitness": 0.7935124815399588,
+          "phase2_pop_mean_fitness": 0.7259103160492617,
+          "phase2_pop_diversity": 1.2408351353522469,
           "phase2_auc": 9.038954360705315,
           "phase2_survival_rate": 1.0
         },
@@ -2676,6 +3119,8 @@
           "phase1_final_fitness": 0.8199300794327412,
           "phase2_gen0_fitness": 0.8300977410293863,
           "phase2_final_best_fitness": 0.8088492821062755,
+          "phase2_pop_mean_fitness": 0.7192049761674657,
+          "phase2_pop_diversity": 0.36444567172223413,
           "phase2_auc": 8.97680105941042,
           "phase2_survival_rate": 0.95
         },
@@ -2687,6 +3132,8 @@
           "phase1_final_fitness": 0.8233432576792712,
           "phase2_gen0_fitness": 0.8218044431785855,
           "phase2_final_best_fitness": 0.82141026739062,
+          "phase2_pop_mean_fitness": 0.7640172724537139,
+          "phase2_pop_diversity": 0.3064933620116225,
           "phase2_auc": 9.022579875177035,
           "phase2_survival_rate": 1.0
         },
@@ -2698,6 +3145,8 @@
           "phase1_final_fitness": 0.8266316953062237,
           "phase2_gen0_fitness": 0.806249496212596,
           "phase2_final_best_fitness": 0.8496082121566898,
+          "phase2_pop_mean_fitness": 0.7494371405355567,
+          "phase2_pop_diversity": 0.1318912304305548,
           "phase2_auc": 8.966011295962144,
           "phase2_survival_rate": 1.0
         },
@@ -2709,6 +3158,8 @@
           "phase1_final_fitness": 0.8069493560806779,
           "phase2_gen0_fitness": 0.8264968605865911,
           "phase2_final_best_fitness": 0.8077840141664159,
+          "phase2_pop_mean_fitness": 0.7474349848084698,
+          "phase2_pop_diversity": 0.07325420380576461,
           "phase2_auc": 8.97526884526559,
           "phase2_survival_rate": 1.0
         },
@@ -2720,6 +3171,8 @@
           "phase1_final_fitness": 0.7951509057728011,
           "phase2_gen0_fitness": 0.8067533203376338,
           "phase2_final_best_fitness": 0.8085111906004304,
+          "phase2_pop_mean_fitness": 0.7544278271518463,
+          "phase2_pop_diversity": 0.5247057480335554,
           "phase2_auc": 9.0021195935109,
           "phase2_survival_rate": 1.0
         },
@@ -2731,6 +3184,8 @@
           "phase1_final_fitness": 0.7978377620674485,
           "phase2_gen0_fitness": 0.8171872530115113,
           "phase2_final_best_fitness": 0.8147385127293276,
+          "phase2_pop_mean_fitness": 0.7413699689657702,
+          "phase2_pop_diversity": 0.15087497832123642,
           "phase2_auc": 8.98379778794085,
           "phase2_survival_rate": 1.0
         },
@@ -2742,6 +3197,8 @@
           "phase1_final_fitness": 0.8420892720570294,
           "phase2_gen0_fitness": 0.8370299251578226,
           "phase2_final_best_fitness": 0.8201808533079067,
+          "phase2_pop_mean_fitness": 0.7481726556103963,
+          "phase2_pop_diversity": 0.7716747711133177,
           "phase2_auc": 9.048318640721238,
           "phase2_survival_rate": 1.0
         },
@@ -2753,6 +3210,8 @@
           "phase1_final_fitness": 0.8802906633167235,
           "phase2_gen0_fitness": 0.7953055045599394,
           "phase2_final_best_fitness": 0.7891899958580462,
+          "phase2_pop_mean_fitness": 0.7438873141457858,
+          "phase2_pop_diversity": 0.45972853490397375,
           "phase2_auc": 8.977365622269499,
           "phase2_survival_rate": 1.0
         },
@@ -2764,6 +3223,8 @@
           "phase1_final_fitness": 0.8332559382721332,
           "phase2_gen0_fitness": 0.8586929255888988,
           "phase2_final_best_fitness": 0.8322372612628149,
+          "phase2_pop_mean_fitness": 0.7537091274107427,
+          "phase2_pop_diversity": 0.3599361283825846,
           "phase2_auc": 9.106749920151819,
           "phase2_survival_rate": 1.0
         },
@@ -2775,6 +3236,8 @@
           "phase1_final_fitness": 0.8053646589288502,
           "phase2_gen0_fitness": 0.7923706127459177,
           "phase2_final_best_fitness": 0.8326146983330562,
+          "phase2_pop_mean_fitness": 0.7048096306944063,
+          "phase2_pop_diversity": 0.06487734753828873,
           "phase2_auc": 8.945073701580844,
           "phase2_survival_rate": 0.95
         },
@@ -2786,6 +3249,8 @@
           "phase1_final_fitness": 0.8767019344478402,
           "phase2_gen0_fitness": 0.813825356924375,
           "phase2_final_best_fitness": 0.8165172576332188,
+          "phase2_pop_mean_fitness": 0.7495990478052189,
+          "phase2_pop_diversity": 0.19380802843463785,
           "phase2_auc": 9.118428287197121,
           "phase2_survival_rate": 1.0
         },
@@ -2797,6 +3262,8 @@
           "phase1_final_fitness": 0.823659331193295,
           "phase2_gen0_fitness": 0.8273817321415597,
           "phase2_final_best_fitness": 0.8237162850008056,
+          "phase2_pop_mean_fitness": 0.7582620846039484,
+          "phase2_pop_diversity": 0.13155170671016117,
           "phase2_auc": 8.999182959278007,
           "phase2_survival_rate": 1.0
         },
@@ -2808,6 +3275,8 @@
           "phase1_final_fitness": 0.8230318645502703,
           "phase2_gen0_fitness": 0.7912142278440163,
           "phase2_final_best_fitness": 0.8097285321665028,
+          "phase2_pop_mean_fitness": 0.7594554771431451,
+          "phase2_pop_diversity": 0.11730383884692709,
           "phase2_auc": 9.003921630051057,
           "phase2_survival_rate": 1.0
         },
@@ -2819,6 +3288,8 @@
           "phase1_final_fitness": 0.8328663466446996,
           "phase2_gen0_fitness": 0.8163898019391113,
           "phase2_final_best_fitness": 0.7893458175536235,
+          "phase2_pop_mean_fitness": 0.7504958366807789,
+          "phase2_pop_diversity": 0.24052872289497096,
           "phase2_auc": 9.227729478247399,
           "phase2_survival_rate": 1.0
         },
@@ -2830,6 +3301,8 @@
           "phase1_final_fitness": 0.7917954739969743,
           "phase2_gen0_fitness": 0.8273292683104184,
           "phase2_final_best_fitness": 0.8157235399390204,
+          "phase2_pop_mean_fitness": 0.7683307629437707,
+          "phase2_pop_diversity": 0.15575661777681146,
           "phase2_auc": 9.137093083949187,
           "phase2_survival_rate": 1.0
         },
@@ -2841,6 +3314,8 @@
           "phase1_final_fitness": 0.8160990579585107,
           "phase2_gen0_fitness": 0.803171832898803,
           "phase2_final_best_fitness": 0.8090901290383282,
+          "phase2_pop_mean_fitness": 0.7152178733240071,
+          "phase2_pop_diversity": 0.039004376307565335,
           "phase2_auc": 9.019310925737468,
           "phase2_survival_rate": 0.95
         },
@@ -2852,6 +3327,8 @@
           "phase1_final_fitness": 0.830816019943028,
           "phase2_gen0_fitness": 0.8229536318351484,
           "phase2_final_best_fitness": 0.823224942663081,
+          "phase2_pop_mean_fitness": 0.7533282905973894,
+          "phase2_pop_diversity": 0.04767622285592913,
           "phase2_auc": 8.93304347553181,
           "phase2_survival_rate": 1.0
         },
@@ -2863,6 +3340,8 @@
           "phase1_final_fitness": 0.8024753890995596,
           "phase2_gen0_fitness": 0.7957825377369073,
           "phase2_final_best_fitness": 0.8005069384538427,
+          "phase2_pop_mean_fitness": 0.7607111445726364,
+          "phase2_pop_diversity": 0.2272904787244309,
           "phase2_auc": 9.022019191394662,
           "phase2_survival_rate": 1.0
         },
@@ -2874,6 +3353,8 @@
           "phase1_final_fitness": 0.8215795098651317,
           "phase2_gen0_fitness": 0.8687600869111413,
           "phase2_final_best_fitness": 0.8133497103138149,
+          "phase2_pop_mean_fitness": 0.7453477760054581,
+          "phase2_pop_diversity": 0.10821867359707248,
           "phase2_auc": 9.095566864495435,
           "phase2_survival_rate": 1.0
         },
@@ -2885,6 +3366,8 @@
           "phase1_final_fitness": 0.8173559009840886,
           "phase2_gen0_fitness": 0.8238441265632259,
           "phase2_final_best_fitness": 0.8441929641752983,
+          "phase2_pop_mean_fitness": 0.708557542755144,
+          "phase2_pop_diversity": 0.24434902484312107,
           "phase2_auc": 8.983668348944914,
           "phase2_survival_rate": 0.95
         },
@@ -2896,6 +3379,8 @@
           "phase1_final_fitness": 0.8173456525210653,
           "phase2_gen0_fitness": 0.810448600134379,
           "phase2_final_best_fitness": 0.8126220862869031,
+          "phase2_pop_mean_fitness": 0.7599347776593308,
+          "phase2_pop_diversity": 0.14023406644126793,
           "phase2_auc": 8.892254798308112,
           "phase2_survival_rate": 1.0
         },
@@ -2907,6 +3392,8 @@
           "phase1_final_fitness": 0.8478564246052919,
           "phase2_gen0_fitness": 0.8154661755260836,
           "phase2_final_best_fitness": 0.8108754116339294,
+          "phase2_pop_mean_fitness": 0.6216385968379137,
+          "phase2_pop_diversity": 0.17242106625998246,
           "phase2_auc": 8.972066397436715,
           "phase2_survival_rate": 0.85
         },
@@ -2918,6 +3405,8 @@
           "phase1_final_fitness": 0.8164703110657139,
           "phase2_gen0_fitness": 0.8045274429667101,
           "phase2_final_best_fitness": 0.80113967126496,
+          "phase2_pop_mean_fitness": 0.7595454663028661,
+          "phase2_pop_diversity": 0.06971079698234386,
           "phase2_auc": 8.945210267647672,
           "phase2_survival_rate": 1.0
         },
@@ -2929,6 +3418,8 @@
           "phase1_final_fitness": 0.8040408671267182,
           "phase2_gen0_fitness": 0.8183682869921256,
           "phase2_final_best_fitness": 0.8392016272945924,
+          "phase2_pop_mean_fitness": 0.743084334886461,
+          "phase2_pop_diversity": 0.08080675447942531,
           "phase2_auc": 8.868779881943107,
           "phase2_survival_rate": 1.0
         },
@@ -2940,6 +3431,8 @@
           "phase1_final_fitness": 0.8400749818952583,
           "phase2_gen0_fitness": 0.8488246860025299,
           "phase2_final_best_fitness": 0.7859148138003175,
+          "phase2_pop_mean_fitness": 0.7458716382776939,
+          "phase2_pop_diversity": 0.22380686841115696,
           "phase2_auc": 8.970485131160178,
           "phase2_survival_rate": 1.0
         },
@@ -2951,6 +3444,8 @@
           "phase1_final_fitness": 0.8098819513827141,
           "phase2_gen0_fitness": 0.8102212987705496,
           "phase2_final_best_fitness": 0.8532439228888599,
+          "phase2_pop_mean_fitness": 0.7562324828206697,
+          "phase2_pop_diversity": 0.036868438752298234,
           "phase2_auc": 9.011390060719025,
           "phase2_survival_rate": 1.0
         },
@@ -2962,6 +3457,8 @@
           "phase1_final_fitness": 0.8412760407277368,
           "phase2_gen0_fitness": 0.8521674612536336,
           "phase2_final_best_fitness": 0.834027863527453,
+          "phase2_pop_mean_fitness": 0.7487835021338649,
+          "phase2_pop_diversity": 0.1271680756758981,
           "phase2_auc": 9.051151827450926,
           "phase2_survival_rate": 1.0
         },
@@ -2973,6 +3470,8 @@
           "phase1_final_fitness": 0.8060591889803218,
           "phase2_gen0_fitness": 0.7867935797238749,
           "phase2_final_best_fitness": 0.8201227678077275,
+          "phase2_pop_mean_fitness": 0.7401560452293888,
+          "phase2_pop_diversity": 0.3455632032880052,
           "phase2_auc": 9.00710984754257,
           "phase2_survival_rate": 1.0
         },
@@ -2984,6 +3483,8 @@
           "phase1_final_fitness": 0.8106774606379207,
           "phase2_gen0_fitness": 0.785599086374857,
           "phase2_final_best_fitness": 0.8307554903908322,
+          "phase2_pop_mean_fitness": 0.7650351154288092,
+          "phase2_pop_diversity": 0.1285150647236698,
           "phase2_auc": 8.983954743454728,
           "phase2_survival_rate": 1.0
         },
@@ -2995,6 +3496,8 @@
           "phase1_final_fitness": 0.8053646589288502,
           "phase2_gen0_fitness": 0.7923706127459177,
           "phase2_final_best_fitness": 0.8037705620366385,
+          "phase2_pop_mean_fitness": 0.7393749134122072,
+          "phase2_pop_diversity": 0.1246656363965947,
           "phase2_auc": 9.053569617695546,
           "phase2_survival_rate": 1.0
         },
@@ -3006,6 +3509,8 @@
           "phase1_final_fitness": 0.8767019344478402,
           "phase2_gen0_fitness": 0.813825356924375,
           "phase2_final_best_fitness": 0.8035160857209641,
+          "phase2_pop_mean_fitness": 0.7457110338426107,
+          "phase2_pop_diversity": 0.2609427441504249,
           "phase2_auc": 8.984606321621403,
           "phase2_survival_rate": 1.0
         },
@@ -3017,6 +3522,8 @@
           "phase1_final_fitness": 0.823659331193295,
           "phase2_gen0_fitness": 0.8273817321415597,
           "phase2_final_best_fitness": 0.7956033707922628,
+          "phase2_pop_mean_fitness": 0.7512784476456843,
+          "phase2_pop_diversity": 0.23585617879253012,
           "phase2_auc": 8.944763919404023,
           "phase2_survival_rate": 1.0
         },
@@ -3028,6 +3535,8 @@
           "phase1_final_fitness": 0.8230318645502703,
           "phase2_gen0_fitness": 0.7912142278440163,
           "phase2_final_best_fitness": 0.8223400325055864,
+          "phase2_pop_mean_fitness": 0.7490461323951911,
+          "phase2_pop_diversity": 0.09321742266128652,
           "phase2_auc": 8.945566135723341,
           "phase2_survival_rate": 1.0
         },
@@ -3039,6 +3548,8 @@
           "phase1_final_fitness": 0.8328663466446996,
           "phase2_gen0_fitness": 0.8163898019391113,
           "phase2_final_best_fitness": 0.8214150963242006,
+          "phase2_pop_mean_fitness": 0.7521383610288348,
+          "phase2_pop_diversity": 0.08098167626890698,
           "phase2_auc": 9.097652245663426,
           "phase2_survival_rate": 1.0
         },
@@ -3050,6 +3561,8 @@
           "phase1_final_fitness": 0.7917954739969743,
           "phase2_gen0_fitness": 0.8273292683104184,
           "phase2_final_best_fitness": 0.7982253027631055,
+          "phase2_pop_mean_fitness": 0.7412530976984345,
+          "phase2_pop_diversity": 0.11217012109702333,
           "phase2_auc": 9.037187901511617,
           "phase2_survival_rate": 1.0
         },
@@ -3061,6 +3574,8 @@
           "phase1_final_fitness": 0.8160990579585107,
           "phase2_gen0_fitness": 0.803171832898803,
           "phase2_final_best_fitness": 0.8357138510925214,
+          "phase2_pop_mean_fitness": 0.758582976495198,
+          "phase2_pop_diversity": 0.039314142452110096,
           "phase2_auc": 9.032352400409605,
           "phase2_survival_rate": 1.0
         },
@@ -3072,6 +3587,8 @@
           "phase1_final_fitness": 0.830816019943028,
           "phase2_gen0_fitness": 0.8229536318351484,
           "phase2_final_best_fitness": 0.8244723184132238,
+          "phase2_pop_mean_fitness": 0.7522524580194525,
+          "phase2_pop_diversity": 0.11906474452275653,
           "phase2_auc": 9.002332388755207,
           "phase2_survival_rate": 1.0
         },
@@ -3083,6 +3600,8 @@
           "phase1_final_fitness": 0.8024753890995596,
           "phase2_gen0_fitness": 0.7957825377369073,
           "phase2_final_best_fitness": 0.8058441719800395,
+          "phase2_pop_mean_fitness": 0.7237726256863308,
+          "phase2_pop_diversity": 0.14550386886174688,
           "phase2_auc": 8.901681586261097,
           "phase2_survival_rate": 1.0
         },
@@ -3094,6 +3613,8 @@
           "phase1_final_fitness": 0.8215795098651317,
           "phase2_gen0_fitness": 0.8687600869111413,
           "phase2_final_best_fitness": 0.8125157208854095,
+          "phase2_pop_mean_fitness": 0.7532567537926119,
+          "phase2_pop_diversity": 0.14875434362384332,
           "phase2_auc": 9.133909318497734,
           "phase2_survival_rate": 1.0
         },
@@ -3105,6 +3626,8 @@
           "phase1_final_fitness": 0.8173559009840886,
           "phase2_gen0_fitness": 0.8238441265632259,
           "phase2_final_best_fitness": 0.8162615529168535,
+          "phase2_pop_mean_fitness": 0.7493363767581362,
+          "phase2_pop_diversity": 0.1603574023171654,
           "phase2_auc": 8.990487722379374,
           "phase2_survival_rate": 1.0
         },
@@ -3116,6 +3639,8 @@
           "phase1_final_fitness": 0.8173456525210653,
           "phase2_gen0_fitness": 0.810448600134379,
           "phase2_final_best_fitness": 0.8530624201366033,
+          "phase2_pop_mean_fitness": 0.7654956337424601,
+          "phase2_pop_diversity": 0.10070376140101897,
           "phase2_auc": 9.081744892872369,
           "phase2_survival_rate": 1.0
         },
@@ -3127,6 +3652,8 @@
           "phase1_final_fitness": 0.8478564246052919,
           "phase2_gen0_fitness": 0.8154661755260836,
           "phase2_final_best_fitness": 0.7772800103218515,
+          "phase2_pop_mean_fitness": 0.7348585848310073,
+          "phase2_pop_diversity": 0.08870617235694227,
           "phase2_auc": 8.97735997291742,
           "phase2_survival_rate": 1.0
         },
@@ -3138,6 +3665,8 @@
           "phase1_final_fitness": 0.8164703110657139,
           "phase2_gen0_fitness": 0.8045274429667101,
           "phase2_final_best_fitness": 0.788974351887355,
+          "phase2_pop_mean_fitness": 0.748301908749865,
+          "phase2_pop_diversity": 0.022868071688363946,
           "phase2_auc": 9.005471211175351,
           "phase2_survival_rate": 1.0
         },
@@ -3149,6 +3678,8 @@
           "phase1_final_fitness": 0.8040408671267182,
           "phase2_gen0_fitness": 0.8183682869921256,
           "phase2_final_best_fitness": 0.8063152520951045,
+          "phase2_pop_mean_fitness": 0.729291551118975,
+          "phase2_pop_diversity": 0.10057052226847427,
           "phase2_auc": 8.959218516031022,
           "phase2_survival_rate": 1.0
         },
@@ -3160,6 +3691,8 @@
           "phase1_final_fitness": 0.8400749818952583,
           "phase2_gen0_fitness": 0.8488246860025299,
           "phase2_final_best_fitness": 0.7958642065386501,
+          "phase2_pop_mean_fitness": 0.7360710639100752,
+          "phase2_pop_diversity": 0.11924527711220717,
           "phase2_auc": 8.907856440743078,
           "phase2_survival_rate": 1.0
         },
@@ -3171,6 +3704,8 @@
           "phase1_final_fitness": 0.8098819513827141,
           "phase2_gen0_fitness": 0.8102212987705496,
           "phase2_final_best_fitness": 0.803525689054141,
+          "phase2_pop_mean_fitness": 0.7471457816610502,
+          "phase2_pop_diversity": 0.05033176255067187,
           "phase2_auc": 8.956917585580921,
           "phase2_survival_rate": 1.0
         },
@@ -3182,6 +3717,8 @@
           "phase1_final_fitness": 0.8412760407277368,
           "phase2_gen0_fitness": 0.8521674612536336,
           "phase2_final_best_fitness": 0.8161673999772298,
+          "phase2_pop_mean_fitness": 0.7397495021315066,
+          "phase2_pop_diversity": 0.20584027481707506,
           "phase2_auc": 8.957866589168702,
           "phase2_survival_rate": 1.0
         },
@@ -3193,6 +3730,8 @@
           "phase1_final_fitness": 0.8060591889803218,
           "phase2_gen0_fitness": 0.7867935797238749,
           "phase2_final_best_fitness": 0.834036707546204,
+          "phase2_pop_mean_fitness": 0.7563567375981606,
+          "phase2_pop_diversity": 0.21712113756477802,
           "phase2_auc": 8.993900513997737,
           "phase2_survival_rate": 1.0
         },
@@ -3204,227 +3743,269 @@
           "phase1_final_fitness": 0.8106774606379207,
           "phase2_gen0_fitness": 0.785599086374857,
           "phase2_final_best_fitness": 0.8132552377863256,
+          "phase2_pop_mean_fitness": 0.7466638600587305,
+          "phase2_pop_diversity": 0.2103705690909378,
           "phase2_auc": 9.000585145832606,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3000,
-          "phase2_deaths": 0,
-          "phase1_deaths": 8,
-          "phase1_final_fitness": 0.8466753122799499,
-          "phase2_gen0_fitness": 0.8102997635871277,
-          "phase2_final_best_fitness": 0.8046217690875196,
-          "phase2_auc": 8.995137844872927,
-          "phase2_survival_rate": 1.0
+          "phase2_deaths": 13,
+          "phase1_deaths": 13,
+          "phase1_final_fitness": 0.8159281255401787,
+          "phase2_gen0_fitness": 0.8293928684694499,
+          "phase2_final_best_fitness": 0.7999817876363225,
+          "phase2_pop_mean_fitness": 0.7148815122800316,
+          "phase2_pop_diversity": 0.70975362087925,
+          "phase2_auc": 8.924100064922207,
+          "phase2_survival_rate": 0.95
         },
         {
           "arm": "REVIVE",
           "seed": 3001,
-          "phase2_deaths": 0,
-          "phase1_deaths": 1,
-          "phase1_final_fitness": 0.8353650622831484,
-          "phase2_gen0_fitness": 0.8124249861263425,
-          "phase2_final_best_fitness": 0.8172540434381382,
-          "phase2_auc": 8.935896989076605,
+          "phase2_deaths": 49,
+          "phase1_deaths": 23,
+          "phase1_final_fitness": 0.8096274598298936,
+          "phase2_gen0_fitness": 0.8130856718879641,
+          "phase2_final_best_fitness": 0.8498001916700945,
+          "phase2_pop_mean_fitness": 0.7473650385546885,
+          "phase2_pop_diversity": 0.12359593002240582,
+          "phase2_auc": 8.96836140512256,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3002,
-          "phase2_deaths": 0,
-          "phase1_deaths": 4,
-          "phase1_final_fitness": 0.8120039204904487,
-          "phase2_gen0_fitness": 0.8500661910776953,
-          "phase2_final_best_fitness": 0.8055661410776116,
-          "phase2_auc": 9.146842806960677,
+          "phase2_deaths": 8,
+          "phase1_deaths": 6,
+          "phase1_final_fitness": 0.8128376196235867,
+          "phase2_gen0_fitness": 0.8017956768089946,
+          "phase2_final_best_fitness": 0.8149121151823732,
+          "phase2_pop_mean_fitness": 0.7536776356340298,
+          "phase2_pop_diversity": 1.078133576639772,
+          "phase2_auc": 9.006386020280921,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3003,
-          "phase2_deaths": 0,
-          "phase1_deaths": 8,
-          "phase1_final_fitness": 0.8263748111818076,
-          "phase2_gen0_fitness": 0.8649005986302726,
-          "phase2_final_best_fitness": 0.7885776426563146,
-          "phase2_auc": 9.079739660165988,
-          "phase2_survival_rate": 1.0
+          "phase2_deaths": 6,
+          "phase1_deaths": 10,
+          "phase1_final_fitness": 0.8143074765543035,
+          "phase2_gen0_fitness": 0.7878205066666698,
+          "phase2_final_best_fitness": 0.8402788575234797,
+          "phase2_pop_mean_fitness": 0.744244282338003,
+          "phase2_pop_diversity": 0.6193601447724026,
+          "phase2_auc": 8.98991706859495,
+          "phase2_survival_rate": 0.9833333333333334
         },
         {
           "arm": "REVIVE",
           "seed": 3004,
-          "phase2_deaths": 0,
+          "phase2_deaths": 9,
           "phase1_deaths": 5,
-          "phase1_final_fitness": 0.8010097498810301,
-          "phase2_gen0_fitness": 0.8414974630197999,
-          "phase2_final_best_fitness": 0.7955621408695084,
-          "phase2_auc": 9.01096923161574,
+          "phase1_final_fitness": 0.81085455095606,
+          "phase2_gen0_fitness": 0.812162063193158,
+          "phase2_final_best_fitness": 0.8316391499113255,
+          "phase2_pop_mean_fitness": 0.7655733292463702,
+          "phase2_pop_diversity": 0.9001621454039647,
+          "phase2_auc": 8.978055940030085,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3005,
-          "phase2_deaths": 0,
-          "phase1_deaths": 8,
-          "phase1_final_fitness": 0.8024941354311238,
-          "phase2_gen0_fitness": 0.8092180851500154,
-          "phase2_final_best_fitness": 0.8397928998082705,
-          "phase2_auc": 9.054217734624263,
+          "phase2_deaths": 44,
+          "phase1_deaths": 26,
+          "phase1_final_fitness": 0.8540962724178615,
+          "phase2_gen0_fitness": 0.842906754822176,
+          "phase2_final_best_fitness": 0.8201011942104716,
+          "phase2_pop_mean_fitness": 0.7631130882406982,
+          "phase2_pop_diversity": 0.1437903889935091,
+          "phase2_auc": 9.0283312177764,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3006,
-          "phase2_deaths": 0,
+          "phase2_deaths": 4,
           "phase1_deaths": 4,
-          "phase1_final_fitness": 0.8241448407810582,
-          "phase2_gen0_fitness": 0.820114791669908,
-          "phase2_final_best_fitness": 0.8285739794190156,
-          "phase2_auc": 8.985554910067298,
+          "phase1_final_fitness": 0.8344630272577308,
+          "phase2_gen0_fitness": 0.8102452779412156,
+          "phase2_final_best_fitness": 0.848177673084288,
+          "phase2_pop_mean_fitness": 0.7583613857651645,
+          "phase2_pop_diversity": 0.21331044766360405,
+          "phase2_auc": 9.084995294228136,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3007,
-          "phase2_deaths": 0,
-          "phase1_deaths": 6,
-          "phase1_final_fitness": 0.8201956300429899,
-          "phase2_gen0_fitness": 0.8145877420239632,
-          "phase2_final_best_fitness": 0.8107018105702716,
-          "phase2_auc": 9.086787883052818,
+          "phase2_deaths": 15,
+          "phase1_deaths": 9,
+          "phase1_final_fitness": 0.8295994343233136,
+          "phase2_gen0_fitness": 0.8395068712324143,
+          "phase2_final_best_fitness": 0.8280266085143131,
+          "phase2_pop_mean_fitness": 0.7591164061799349,
+          "phase2_pop_diversity": 0.2889225491093951,
+          "phase2_auc": 9.15721802241135,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3008,
-          "phase2_deaths": 0,
-          "phase1_deaths": 4,
-          "phase1_final_fitness": 0.8141160158033128,
-          "phase2_gen0_fitness": 0.8156541693198319,
-          "phase2_final_best_fitness": 0.7954497897789302,
-          "phase2_auc": 8.961850751549747,
+          "phase2_deaths": 4,
+          "phase1_deaths": 10,
+          "phase1_final_fitness": 0.8124852779886863,
+          "phase2_gen0_fitness": 0.7878322027695175,
+          "phase2_final_best_fitness": 0.7940467353032292,
+          "phase2_pop_mean_fitness": 0.7457845280635307,
+          "phase2_pop_diversity": 0.3563648673515379,
+          "phase2_auc": 8.886309513942015,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3009,
-          "phase2_deaths": 0,
-          "phase1_deaths": 7,
-          "phase1_final_fitness": 0.8107877904936575,
-          "phase2_gen0_fitness": 0.8240184261038704,
-          "phase2_final_best_fitness": 0.8388756606851318,
-          "phase2_auc": 8.987631716131528,
+          "phase2_deaths": 32,
+          "phase1_deaths": 27,
+          "phase1_final_fitness": 0.8169993754619974,
+          "phase2_gen0_fitness": 0.8194651726074774,
+          "phase2_final_best_fitness": 0.8418681198455665,
+          "phase2_pop_mean_fitness": 0.7605526014135761,
+          "phase2_pop_diversity": 0.10226942300137305,
+          "phase2_auc": 9.056605553684758,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3010,
           "phase2_deaths": 0,
-          "phase1_deaths": 8,
-          "phase1_final_fitness": 0.8063645406907325,
-          "phase2_gen0_fitness": 0.8024097442880941,
-          "phase2_final_best_fitness": 0.7990461273982881,
-          "phase2_auc": 9.002193545702331,
+          "phase1_deaths": 11,
+          "phase1_final_fitness": 0.826409657971649,
+          "phase2_gen0_fitness": 0.8236398553868575,
+          "phase2_final_best_fitness": 0.8031887862562866,
+          "phase2_pop_mean_fitness": 0.7506968471765394,
+          "phase2_pop_diversity": 0.1501824824978633,
+          "phase2_auc": 8.98469750095349,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3011,
           "phase2_deaths": 0,
-          "phase1_deaths": 3,
-          "phase1_final_fitness": 0.8174816620454247,
-          "phase2_gen0_fitness": 0.8300977475890939,
-          "phase2_final_best_fitness": 0.8088492769459389,
-          "phase2_auc": 8.98632543455271,
+          "phase1_deaths": 9,
+          "phase1_final_fitness": 0.8314465020280309,
+          "phase2_gen0_fitness": 0.800684215402863,
+          "phase2_final_best_fitness": 0.8180881418864292,
+          "phase2_pop_mean_fitness": 0.7544693333388564,
+          "phase2_pop_diversity": 0.6788177296951833,
+          "phase2_auc": 8.909874160583346,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3012,
-          "phase2_deaths": 0,
-          "phase1_deaths": 6,
-          "phase1_final_fitness": 0.8238173197224697,
-          "phase2_gen0_fitness": 0.8239039341515096,
-          "phase2_final_best_fitness": 0.8186068866382105,
-          "phase2_auc": 9.031883365526882,
+          "phase2_deaths": 2,
+          "phase1_deaths": 12,
+          "phase1_final_fitness": 0.8398362392144977,
+          "phase2_gen0_fitness": 0.8343750418730712,
+          "phase2_final_best_fitness": 0.8015021859256103,
+          "phase2_pop_mean_fitness": 0.7502826167035169,
+          "phase2_pop_diversity": 1.23324075709585,
+          "phase2_auc": 8.99952918403728,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3013,
-          "phase2_deaths": 0,
-          "phase1_deaths": 2,
-          "phase1_final_fitness": 0.8269034327007004,
-          "phase2_gen0_fitness": 0.8023312585021204,
-          "phase2_final_best_fitness": 0.8450598982306438,
-          "phase2_auc": 8.969849911166571,
+          "phase2_deaths": 2,
+          "phase1_deaths": 7,
+          "phase1_final_fitness": 0.8040397956242692,
+          "phase2_gen0_fitness": 0.8581809480171104,
+          "phase2_final_best_fitness": 0.8213972155920494,
+          "phase2_pop_mean_fitness": 0.7560543112543763,
+          "phase2_pop_diversity": 0.6607136976833509,
+          "phase2_auc": 9.075506661937256,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3014,
-          "phase2_deaths": 0,
-          "phase1_deaths": 6,
-          "phase1_final_fitness": 0.8020999631357365,
-          "phase2_gen0_fitness": 0.828360364817792,
-          "phase2_final_best_fitness": 0.8066291180055059,
-          "phase2_auc": 9.017731877840163,
+          "phase2_deaths": 14,
+          "phase1_deaths": 22,
+          "phase1_final_fitness": 0.8186558390253413,
+          "phase2_gen0_fitness": 0.806301690124965,
+          "phase2_final_best_fitness": 0.812409132337735,
+          "phase2_pop_mean_fitness": 0.7588357713569137,
+          "phase2_pop_diversity": 0.4505347418040001,
+          "phase2_auc": 8.840032015832394,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3015,
-          "phase2_deaths": 0,
-          "phase1_deaths": 8,
-          "phase1_final_fitness": 0.8067224922733548,
-          "phase2_gen0_fitness": 0.8288966496286355,
-          "phase2_final_best_fitness": 0.8047291382535485,
-          "phase2_auc": 9.02542805309313,
+          "phase2_deaths": 5,
+          "phase1_deaths": 12,
+          "phase1_final_fitness": 0.830197462354907,
+          "phase2_gen0_fitness": 0.783789726343104,
+          "phase2_final_best_fitness": 0.8369503693286203,
+          "phase2_pop_mean_fitness": 0.7425952893757125,
+          "phase2_pop_diversity": 0.19688714547982328,
+          "phase2_auc": 9.005456999724805,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3016,
-          "phase2_deaths": 0,
+          "phase2_deaths": 5,
           "phase1_deaths": 5,
-          "phase1_final_fitness": 0.8139700450257461,
-          "phase2_gen0_fitness": 0.8138509059961127,
-          "phase2_final_best_fitness": 0.7988040401671692,
-          "phase2_auc": 8.96618455686679,
+          "phase1_final_fitness": 0.8306154452775599,
+          "phase2_gen0_fitness": 0.7899895232927227,
+          "phase2_final_best_fitness": 0.8162554997991848,
+          "phase2_pop_mean_fitness": 0.7383696309711155,
+          "phase2_pop_diversity": 0.9660993177005593,
+          "phase2_auc": 8.996139806768841,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3017,
-          "phase2_deaths": 0,
-          "phase1_deaths": 5,
-          "phase1_final_fitness": 0.8421142421534608,
-          "phase2_gen0_fitness": 0.8426410928035589,
-          "phase2_final_best_fitness": 0.8121160275680271,
-          "phase2_auc": 9.054317528310731,
+          "phase2_deaths": 3,
+          "phase1_deaths": 10,
+          "phase1_final_fitness": 0.819934977427526,
+          "phase2_gen0_fitness": 0.7968597833685456,
+          "phase2_final_best_fitness": 0.7914849249391772,
+          "phase2_pop_mean_fitness": 0.7486640826832505,
+          "phase2_pop_diversity": 0.16854078586254306,
+          "phase2_auc": 8.991257052971443,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3018,
-          "phase2_deaths": 0,
-          "phase1_deaths": 7,
-          "phase1_final_fitness": 0.8344972631740893,
-          "phase2_gen0_fitness": 0.8152378351749482,
-          "phase2_final_best_fitness": 0.7919328150500503,
-          "phase2_auc": 8.948594960358173,
+          "phase2_deaths": 2,
+          "phase1_deaths": 8,
+          "phase1_final_fitness": 0.8299066076490998,
+          "phase2_gen0_fitness": 0.8001915662955934,
+          "phase2_final_best_fitness": 0.8473163454501087,
+          "phase2_pop_mean_fitness": 0.7458636207010432,
+          "phase2_pop_diversity": 1.1796658025298339,
+          "phase2_auc": 9.04422332821114,
           "phase2_survival_rate": 1.0
         },
         {
           "arm": "REVIVE",
           "seed": 3019,
-          "phase2_deaths": 0,
-          "phase1_deaths": 3,
-          "phase1_final_fitness": 0.8376595514570663,
-          "phase2_gen0_fitness": 0.8630347142986016,
-          "phase2_final_best_fitness": 0.8261359193404814,
-          "phase2_auc": 9.088141883055982,
+          "phase2_deaths": 21,
+          "phase1_deaths": 6,
+          "phase1_final_fitness": 0.867300926041767,
+          "phase2_gen0_fitness": 0.8195062974726174,
+          "phase2_final_best_fitness": 0.8315190934982489,
+          "phase2_pop_mean_fitness": 0.7489270657459693,
+          "phase2_pop_diversity": 0.14944061971781158,
+          "phase2_auc": 9.035681031702447,
           "phase2_survival_rate": 1.0
         },
         {
@@ -3435,6 +4016,8 @@
           "phase1_final_fitness": 0.8274935385712062,
           "phase2_gen0_fitness": 0.8298627536331624,
           "phase2_final_best_fitness": 0.7996787349413497,
+          "phase2_pop_mean_fitness": 0.7596845915236363,
+          "phase2_pop_diversity": 0.3108569836434883,
           "phase2_auc": 9.010092146218145,
           "phase2_survival_rate": 1.0
         },
@@ -3446,6 +4029,8 @@
           "phase1_final_fitness": 0.8397558697069205,
           "phase2_gen0_fitness": 0.8182980190446886,
           "phase2_final_best_fitness": 0.7836139635267743,
+          "phase2_pop_mean_fitness": 0.7173815603275878,
+          "phase2_pop_diversity": 1.5821288087205254,
           "phase2_auc": 8.870796771894518,
           "phase2_survival_rate": 0.9666666666666666
         },
@@ -3457,6 +4042,8 @@
           "phase1_final_fitness": 0.8032843012303911,
           "phase2_gen0_fitness": 0.8587142524787031,
           "phase2_final_best_fitness": 0.8066203434822962,
+          "phase2_pop_mean_fitness": 0.7564382520930517,
+          "phase2_pop_diversity": 0.602735759142104,
           "phase2_auc": 9.133296706711455,
           "phase2_survival_rate": 1.0
         },
@@ -3468,6 +4055,8 @@
           "phase1_final_fitness": 0.8579328705591628,
           "phase2_gen0_fitness": 0.873027768102531,
           "phase2_final_best_fitness": 0.7812898875920399,
+          "phase2_pop_mean_fitness": 0.7121587123116107,
+          "phase2_pop_diversity": 0.20276760944463587,
           "phase2_auc": 8.990811414626426,
           "phase2_survival_rate": 0.95
         },
@@ -3479,6 +4068,8 @@
           "phase1_final_fitness": 0.8567111686432995,
           "phase2_gen0_fitness": 0.8168462709948495,
           "phase2_final_best_fitness": 0.8064415779934784,
+          "phase2_pop_mean_fitness": 0.6936640773329794,
+          "phase2_pop_diversity": 0.050421077222955205,
           "phase2_auc": 8.925022624544265,
           "phase2_survival_rate": 0.9333333333333332
         },
@@ -3490,6 +4081,8 @@
           "phase1_final_fitness": 0.8577457981995796,
           "phase2_gen0_fitness": 0.8142229686353089,
           "phase2_final_best_fitness": 0.7904401773036742,
+          "phase2_pop_mean_fitness": 0.7446753629997082,
+          "phase2_pop_diversity": 0.24509073261515033,
           "phase2_auc": 9.015843437459285,
           "phase2_survival_rate": 1.0
         },
@@ -3501,6 +4094,8 @@
           "phase1_final_fitness": 0.8637361858060509,
           "phase2_gen0_fitness": 0.8376303458124684,
           "phase2_final_best_fitness": 0.7788774574726799,
+          "phase2_pop_mean_fitness": 0.698569761006353,
+          "phase2_pop_diversity": 0.09351464385364025,
           "phase2_auc": 9.071352224057819,
           "phase2_survival_rate": 0.95
         },
@@ -3512,6 +4107,8 @@
           "phase1_final_fitness": 0.8201956300429899,
           "phase2_gen0_fitness": 0.8147154309147419,
           "phase2_final_best_fitness": 0.7952877645520827,
+          "phase2_pop_mean_fitness": 0.748591090727826,
+          "phase2_pop_diversity": 0.3870606244179827,
           "phase2_auc": 9.002748390323243,
           "phase2_survival_rate": 0.9833333333333332
         },
@@ -3523,6 +4120,8 @@
           "phase1_final_fitness": 0.8133347157095737,
           "phase2_gen0_fitness": 0.8438405649725582,
           "phase2_final_best_fitness": 0.7996170170569906,
+          "phase2_pop_mean_fitness": 0.7562065244761064,
+          "phase2_pop_diversity": 1.08026974999174,
           "phase2_auc": 9.026035760481433,
           "phase2_survival_rate": 1.0
         },
@@ -3534,6 +4133,8 @@
           "phase1_final_fitness": 0.8122546542286931,
           "phase2_gen0_fitness": 0.8272467828222342,
           "phase2_final_best_fitness": 0.8509224963321227,
+          "phase2_pop_mean_fitness": 0.7614695183587091,
+          "phase2_pop_diversity": 1.1018097439701686,
           "phase2_auc": 9.01184289041474,
           "phase2_survival_rate": 1.0
         },
@@ -3545,6 +4146,8 @@
           "phase1_final_fitness": 0.8044202765472818,
           "phase2_gen0_fitness": 0.8201315794629855,
           "phase2_final_best_fitness": 0.8356225512927443,
+          "phase2_pop_mean_fitness": 0.7617096429484224,
+          "phase2_pop_diversity": 1.2597763333320129,
           "phase2_auc": 9.064480979228565,
           "phase2_survival_rate": 1.0
         },
@@ -3556,6 +4159,8 @@
           "phase1_final_fitness": 0.8199300794327412,
           "phase2_gen0_fitness": 0.8300977410293863,
           "phase2_final_best_fitness": 0.8088492821062755,
+          "phase2_pop_mean_fitness": 0.7192049761674657,
+          "phase2_pop_diversity": 0.36444567172223413,
           "phase2_auc": 8.97680105941042,
           "phase2_survival_rate": 0.95
         },
@@ -3567,6 +4172,8 @@
           "phase1_final_fitness": 0.8233432576792712,
           "phase2_gen0_fitness": 0.8218044431785855,
           "phase2_final_best_fitness": 0.82141026739062,
+          "phase2_pop_mean_fitness": 0.7640172724537139,
+          "phase2_pop_diversity": 0.3064933620116225,
           "phase2_auc": 9.022579875177035,
           "phase2_survival_rate": 1.0
         },
@@ -3578,6 +4185,8 @@
           "phase1_final_fitness": 0.8266316953062237,
           "phase2_gen0_fitness": 0.806249496212596,
           "phase2_final_best_fitness": 0.7984414646041745,
+          "phase2_pop_mean_fitness": 0.7469905756807436,
+          "phase2_pop_diversity": 0.1007225707716302,
           "phase2_auc": 8.908199292813661,
           "phase2_survival_rate": 1.0
         },
@@ -3589,6 +4198,8 @@
           "phase1_final_fitness": 0.8069493560806779,
           "phase2_gen0_fitness": 0.8264968605865911,
           "phase2_final_best_fitness": 0.8077840141664159,
+          "phase2_pop_mean_fitness": 0.7474349848084698,
+          "phase2_pop_diversity": 0.07325420380576461,
           "phase2_auc": 8.97526884526559,
           "phase2_survival_rate": 1.0
         },
@@ -3600,6 +4211,8 @@
           "phase1_final_fitness": 0.8016562566808153,
           "phase2_gen0_fitness": 0.7607139320041959,
           "phase2_final_best_fitness": 0.7961442025734499,
+          "phase2_pop_mean_fitness": 0.7505139332242333,
+          "phase2_pop_diversity": 0.11491475026114471,
           "phase2_auc": 8.962544530361344,
           "phase2_survival_rate": 1.0
         },
@@ -3611,6 +4224,8 @@
           "phase1_final_fitness": 0.7978377620674485,
           "phase2_gen0_fitness": 0.8171872530115113,
           "phase2_final_best_fitness": 0.814352093797222,
+          "phase2_pop_mean_fitness": 0.7515855972875025,
+          "phase2_pop_diversity": 0.20484801446930445,
           "phase2_auc": 8.852747665318844,
           "phase2_survival_rate": 1.0
         },
@@ -3622,6 +4237,8 @@
           "phase1_final_fitness": 0.8420892720570294,
           "phase2_gen0_fitness": 0.8370299251578226,
           "phase2_final_best_fitness": 0.7959018533813267,
+          "phase2_pop_mean_fitness": 0.7493644772421372,
+          "phase2_pop_diversity": 0.6381194789332497,
           "phase2_auc": 9.06084691446107,
           "phase2_survival_rate": 1.0
         },
@@ -3633,6 +4250,8 @@
           "phase1_final_fitness": 0.8268813555794782,
           "phase2_gen0_fitness": 0.7925370279323354,
           "phase2_final_best_fitness": 0.8055717207374339,
+          "phase2_pop_mean_fitness": 0.7440872920494039,
+          "phase2_pop_diversity": 0.45493703399350005,
           "phase2_auc": 8.954291500535975,
           "phase2_survival_rate": 0.9833333333333332
         },
@@ -3644,11 +4263,13 @@
           "phase1_final_fitness": 0.8332559382721332,
           "phase2_gen0_fitness": 0.8586929255888988,
           "phase2_final_best_fitness": 0.8322372612628149,
+          "phase2_pop_mean_fitness": 0.7537091274107427,
+          "phase2_pop_diversity": 0.3599361283825846,
           "phase2_auc": 9.106749920151819,
           "phase2_survival_rate": 1.0
         }
       ]
     }
   },
-  "wall_seconds": 260.36
+  "wall_seconds": 419.2
 }
