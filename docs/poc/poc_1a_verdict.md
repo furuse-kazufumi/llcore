@@ -97,7 +97,7 @@ PoC 1a verdict: PASS — Z3 verifier で clip 範囲下の有界性を symbolic 
 ## 実行方法
 
 ```powershell
-cd D:/projects/llcore
+cd <llcore-root>
 py -3.11 -m pip install -e .[z3]
 py -3.11 scripts/poc_1a_z3_invariant.py
 py -3.11 -m pytest tests/unit/test_poc_1a_z3_invariant.py -v

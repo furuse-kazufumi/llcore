@@ -101,7 +101,7 @@ pip install maraboupy
 ## 実行方法
 
 ```powershell
-cd D:/projects/llcore
+cd <llcore-root>
 py -3.11 -m pip install -e .[z3]
 py -3.11 scripts/poc_3a_marabou_bridge_skeleton.py
 py -3.11 -m pytest tests/unit/test_poc_3a_marabou_bridge.py -v
@@ -120,13 +120,13 @@ py -3.11 -m pytest tests/unit/test_poc_3a_marabou_bridge.py -v
 You are gpt-5.4 reviewing llcore PoC 3a (Marabou bridge with sound refinement extension and open-ended ChangeOp curriculum).
 
 # Files to review (Read actual code)
-- D:/projects/llcore/scripts/poc_3a_marabou_bridge_skeleton.py
-- D:/projects/llcore/src/llcore/verifier/changeop.py
-- D:/projects/llcore/src/llcore/verifier/refinement.py
-- D:/projects/llcore/src/llcore/verifier/curriculum.py
-- D:/projects/llcore/tests/unit/test_poc_3a_marabou_bridge.py
-- D:/projects/llcore/docs/poc/poc_3a_verdict.md
-- D:/projects/llcore/docs/papers/marabou_sound_extension_sketch.md
+- ./scripts/poc_3a_marabou_bridge_skeleton.py
+- ./src/llcore/verifier/changeop.py
+- ./src/llcore/verifier/refinement.py
+- ./src/llcore/verifier/curriculum.py
+- ./tests/unit/test_poc_3a_marabou_bridge.py
+- ./docs/poc/poc_3a_verdict.md
+- ./docs/papers/marabou_sound_extension_sketch.md
 
 # Q1-Q7
 Q1: sound 拡張 refinement relation R の Z3 定式化は本当に sound か? ε(ChangeOp) の数式選択は妥当か?

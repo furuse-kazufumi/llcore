@@ -22,7 +22,7 @@ falsifiable 命題:
 
 実行::
 
-    py -3.11 D:/projects/llcore/research/other_archs/snn/izhikevich/poc.py
+    py -3.11 ./research/other_archs/snn/izhikevich/poc.py
 
 依存: numpy, z3-solver. ``llcore.evolution.adaptive_floor`` のみ直接 reuse.
 LineageReservoir / ModesMeter は IzhikevichGene 専用 minimal 再実装.

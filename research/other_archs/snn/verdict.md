@@ -89,7 +89,7 @@ Adaptive GR(1) shielding (LTL spec → reactive controller) との対応は doc 
 
 ## 実行結果 (PASS)
 
-実行コマンド: `py -3.11 D:/projects/llcore/research/other_archs/snn/poc.py`
+実行コマンド: `py -3.11 ./research/other_archs/snn/poc.py`
 実行時間: **12.1 秒** (32 個体 × 50 世代)
 verifier reject: **0 件** (clip 範囲下では構造的に admit が期待される)
 
@@ -162,11 +162,11 @@ LIF は neuromorphic chip の最頻 neuron model:
 You are gpt-5.4 reviewing llcore research/other_archs/snn PoC (SNN + Shielded RL hint への llcore approach 移植).
 
 # Files to review (Read actual code)
-- D:/projects/llcore/research/other_archs/snn/snn_gene.py
-- D:/projects/llcore/research/other_archs/snn/snn_verifier.py
-- D:/projects/llcore/research/other_archs/snn/poc.py
-- D:/projects/llcore/research/other_archs/snn/test_snn.py
-- D:/projects/llcore/research/other_archs/snn/verdict.md
+- ./research/other_archs/snn/snn_gene.py
+- ./research/other_archs/snn/snn_verifier.py
+- ./research/other_archs/snn/poc.py
+- ./research/other_archs/snn/test_snn.py
+- ./research/other_archs/snn/verdict.md
 
 # Q1-Q6
 Q1: LIF model の forward Euler discretization は連続時間 SNN dynamics を保存するか? Z3 invariant が discrete artifact になっていないか?
@@ -228,9 +228,9 @@ Codex pair-review [[feedback_codex_pair_review_for_llcore]] で 5 Findings + Q1-
 
 ## 出力ファイル一覧
 
-- `D:/projects/llcore/research/other_archs/snn/__init__.py` — 公開 API
-- `D:/projects/llcore/research/other_archs/snn/snn_gene.py` — LIFGene + simulator + 入力生成
-- `D:/projects/llcore/research/other_archs/snn/snn_verifier.py` — Z3 invariant 3 種
-- `D:/projects/llcore/research/other_archs/snn/poc.py` — main entry (G1-G8 runner)
-- `D:/projects/llcore/research/other_archs/snn/test_snn.py` — pytest battery (17 passed)
-- `D:/projects/llcore/research/other_archs/snn/verdict.md` — 本 doc
+- `./research/other_archs/snn/__init__.py` — 公開 API
+- `./research/other_archs/snn/snn_gene.py` — LIFGene + simulator + 入力生成
+- `./research/other_archs/snn/snn_verifier.py` — Z3 invariant 3 種
+- `./research/other_archs/snn/poc.py` — main entry (G1-G8 runner)
+- `./research/other_archs/snn/test_snn.py` — pytest battery (17 passed)
+- `./research/other_archs/snn/verdict.md` — 本 doc

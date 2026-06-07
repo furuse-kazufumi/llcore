@@ -98,7 +98,7 @@ def test_delayed_recall_returns_initial_cue():
 
 - [ ] **Step 2: テストを実行して失敗を確認**
 
-Run: `cd D:/projects/llcore && py -3.11 -m pytest research/step_c_memory_tasks/tests/test_memory_tasks.py -v`
+Run: `cd <llcore-root> && py -3.11 -m pytest research/step_c_memory_tasks/tests/test_memory_tasks.py -v`
 Expected: FAIL（`ModuleNotFoundError: No module named 'memory_tasks'`）
 
 - [ ] **Step 3: 最小実装を書く**
@@ -179,12 +179,12 @@ class DelayedRecallTask:
 
 - [ ] **Step 4: テストを実行して成功を確認**
 
-Run: `cd D:/projects/llcore && py -3.11 -m pytest research/step_c_memory_tasks/tests/test_memory_tasks.py -v`
+Run: `cd <llcore-root> && py -3.11 -m pytest research/step_c_memory_tasks/tests/test_memory_tasks.py -v`
 Expected: PASS（3 件）
 
 - [ ] **Step 5: Codex pair-review してコミット**
 
-Run: `cd D:/projects/llcore && codex exec -s read-only "research/step_c_memory_tasks/memory_tasks.py と tests/test_memory_tasks.py をレビュー。各タスクが (1) 記憶必須か (final state からのみ解ける) (2) target ラベルが決定論的に正しいか (3) 退化 (常に同じ target / 自明に解ける) していないか を確認。BLOCKERS のみ報告。" 2>&1 | tail -40`
+Run: `cd <llcore-root> && codex exec -s read-only "research/step_c_memory_tasks/memory_tasks.py と tests/test_memory_tasks.py をレビュー。各タスクが (1) 記憶必須か (final state からのみ解ける) (2) target ラベルが決定論的に正しいか (3) 退化 (常に同じ target / 自明に解ける) していないか を確認。BLOCKERS のみ報告。" 2>&1 | tail -40`
 findings を実コードで検証し、BLOCKERS のみ反映してから:
 
 ```bash
@@ -265,7 +265,7 @@ def _slow_leak_gene(res):
 
 - [ ] **Step 2: テストを実行して失敗を確認**
 
-Run: `cd D:/projects/llcore && py -3.11 -m pytest research/step_c_memory_tasks/tests/test_reservoir.py -v`
+Run: `cd <llcore-root> && py -3.11 -m pytest research/step_c_memory_tasks/tests/test_reservoir.py -v`
 Expected: FAIL（`ModuleNotFoundError: No module named 'reservoir'`）
 
 - [ ] **Step 3: 最小実装を書く**
@@ -386,12 +386,12 @@ def make_behavior(res):
 
 - [ ] **Step 4: テストを実行して成功を確認**
 
-Run: `cd D:/projects/llcore && py -3.11 -m pytest research/step_c_memory_tasks/tests/test_reservoir.py -v`
+Run: `cd <llcore-root> && py -3.11 -m pytest research/step_c_memory_tasks/tests/test_reservoir.py -v`
 Expected: PASS（4 件）
 
 - [ ] **Step 5: Codex pair-review してコミット**
 
-Run: `cd D:/projects/llcore && codex exec -s read-only "research/step_c_memory_tasks/reservoir.py をレビュー。(1) run の数値安定性 (NaN/発散) (2) eval_once が held-out で leakage なく R² を測れているか (3) fit_ridge_readout の流用が正しいか (4) behavior descriptor が記憶戦略を弁別できるか。BLOCKERS のみ。" 2>&1 | tail -40`
+Run: `cd <llcore-root> && codex exec -s read-only "research/step_c_memory_tasks/reservoir.py をレビュー。(1) run の数値安定性 (NaN/発散) (2) eval_once が held-out で leakage なく R² を測れているか (3) fit_ridge_readout の流用が正しいか (4) behavior descriptor が記憶戦略を弁別できるか。BLOCKERS のみ。" 2>&1 | tail -40`
 BLOCKERS を実コード検証して反映後:
 
 ```bash
@@ -447,7 +447,7 @@ def test_tie_fails():
 
 - [ ] **Step 2: テストを実行して失敗を確認**
 
-Run: `cd D:/projects/llcore && py -3.11 -m pytest research/step_c_memory_tasks/tests/test_strict_compare.py -v`
+Run: `cd <llcore-root> && py -3.11 -m pytest research/step_c_memory_tasks/tests/test_strict_compare.py -v`
 Expected: FAIL（`ModuleNotFoundError: No module named 'strict_compare'`）
 
 - [ ] **Step 3: 最小実装を書く**
@@ -516,7 +516,7 @@ def strict_compare(
 
 - [ ] **Step 4: テストを実行して成功を確認**
 
-Run: `cd D:/projects/llcore && py -3.11 -m pytest research/step_c_memory_tasks/tests/test_strict_compare.py -v`
+Run: `cd <llcore-root> && py -3.11 -m pytest research/step_c_memory_tasks/tests/test_strict_compare.py -v`
 Expected: PASS（3 件）
 
 - [ ] **Step 5: コミット**
@@ -570,7 +570,7 @@ def test_report_keys():
 
 - [ ] **Step 2: テストを実行して失敗を確認**
 
-Run: `cd D:/projects/llcore && py -3.11 -m pytest research/step_c_memory_tasks/tests/test_landscape_map.py -v`
+Run: `cd <llcore-root> && py -3.11 -m pytest research/step_c_memory_tasks/tests/test_landscape_map.py -v`
 Expected: FAIL（`ModuleNotFoundError`）
 
 - [ ] **Step 3: 最小実装を書く**
@@ -634,12 +634,12 @@ def multimodality_report(eval_once, *, dim, bounds, n_restarts, n_evals, sigma, 
 
 - [ ] **Step 4: テストを実行して成功を確認**
 
-Run: `cd D:/projects/llcore && py -3.11 -m pytest research/step_c_memory_tasks/tests/test_landscape_map.py -v`
+Run: `cd <llcore-root> && py -3.11 -m pytest research/step_c_memory_tasks/tests/test_landscape_map.py -v`
 Expected: PASS（2 件）
 
 - [ ] **Step 5: Codex pair-review してコミット**
 
-Run: `cd D:/projects/llcore && codex exec -s read-only "research/step_c_memory_tasks/landscape_map.py をレビュー。谷判定の閾値・収束点重複除外・中点ノイズ平均が C1 (多峰性) の機械的判定として妥当か。BLOCKERS のみ。" 2>&1 | tail -40`
+Run: `cd <llcore-root> && codex exec -s read-only "research/step_c_memory_tasks/landscape_map.py をレビュー。谷判定の閾値・収束点重複除外・中点ノイズ平均が C1 (多峰性) の機械的判定として妥当か。BLOCKERS のみ。" 2>&1 | tail -40`
 反映後:
 
 ```bash
@@ -698,7 +698,7 @@ if __name__ == "__main__":
 
 - [ ] **Step 2: 実行して結果を記録**
 
-Run: `cd D:/projects/llcore && py -3.11 research/step_c_memory_tasks/exp_c1_landscape.py`
+Run: `cd <llcore-root> && py -3.11 research/step_c_memory_tasks/exp_c1_landscape.py`
 Expected: 各タスクの `valley_fraction` / `is_multimodal` が出力される。**判断分岐**: いずれかのタスクで `is_multimodal=True` → そのタスクを Task 6 へ。全タスクで False（滑らか）→ §「撤退判定」へ（Task 6 はスキップして verdict へ）。
 
 - [ ] **Step 3: コミット**
@@ -759,7 +759,7 @@ def main() -> None:
 
 - [ ] **Step 2: 実行して C2/C3 を記録**
 
-Run: `cd D:/projects/llcore && py -3.11 research/step_c_memory_tasks/exp_c2c3_compare.py`
+Run: `cd <llcore-root> && py -3.11 research/step_c_memory_tasks/exp_c2c3_compare.py`
 Expected: 3 baseline 全てに対し `passes=True` なら C3 成立（C2 は baseline の到達率が低いことで担保）。
 
 - [ ] **Step 3: exp_c4 ablation を書く**
@@ -806,12 +806,12 @@ def main() -> None:
 
 - [ ] **Step 4: 実行して C4 を記録**
 
-Run: `cd D:/projects/llcore && py -3.11 research/step_c_memory_tasks/exp_c4_ablation.py`
+Run: `cd <llcore-root> && py -3.11 research/step_c_memory_tasks/exp_c4_ablation.py`
 Expected: 小 init_batch でも到達 → 勝因は archive ratchet（C4 成立）。
 
 - [ ] **Step 5: Codex pair-review してコミット**
 
-Run: `cd D:/projects/llcore && codex exec -s read-only "exp_c2c3_compare.py / exp_c4_ablation.py をレビュー。予算 (n_evals) が全 method 同一か、honest 再評価が独立 seed か、結論の overclaim がないか。BLOCKERS のみ。" 2>&1 | tail -40`
+Run: `cd <llcore-root> && codex exec -s read-only "exp_c2c3_compare.py / exp_c4_ablation.py をレビュー。予算 (n_evals) が全 method 同一か、honest 再評価が独立 seed か、結論の overclaim がないか。BLOCKERS のみ。" 2>&1 | tail -40`
 反映後:
 
 ```bash
@@ -837,12 +837,12 @@ C1-C4 の実数（valley_fraction / 各 baseline の diff・p・δ・passes / in
 
 - [ ] **Step 2: 全テスト回帰確認**
 
-Run: `cd D:/projects/llcore && py -3.11 -m pytest research/step_c_memory_tasks/tests/ -q`
+Run: `cd <llcore-root> && py -3.11 -m pytest research/step_c_memory_tasks/tests/ -q`
 Expected: 全 PASS。
 
 - [ ] **Step 3: verdict を最終 Codex pair-review してコミット**
 
-Run: `cd D:/projects/llcore && codex exec -s read-only "docs/poc/STEP_C_VERDICT.md をレビュー。C1-C4 の実数から結論が overclaim/underclaim していないか、honest 留保が十分か。" 2>&1 | tail -40`
+Run: `cd <llcore-root> && codex exec -s read-only "docs/poc/STEP_C_VERDICT.md をレビュー。C1-C4 の実数から結論が overclaim/underclaim していないか、honest 留保が十分か。" 2>&1 | tail -40`
 反映後:
 
 ```bash

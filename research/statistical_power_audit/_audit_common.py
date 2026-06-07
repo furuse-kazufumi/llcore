@@ -29,7 +29,7 @@ import numpy as np
 # --- repo root / 隔離 dir ---
 _THIS = Path(__file__).resolve()
 AUDIT_DIR = _THIS.parent  # research/statistical_power_audit/
-REPO_ROOT = AUDIT_DIR.parents[1]  # D:/projects/llcore
+REPO_ROOT = AUDIT_DIR.parents[1]  # <llcore-root>
 SRC_DIR = REPO_ROOT / "src"
 STEP4_DIR = REPO_ROOT / "research" / "step4_selection"
 KNOB_SWEEP_DIR = REPO_ROOT / "research" / "step_c_applicability"

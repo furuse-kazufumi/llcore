@@ -34,7 +34,7 @@ for _stream in (sys.stdout, sys.stderr):
 
 _HERE = Path(__file__).resolve().parent          # research/ea_multitask/candidates
 _EA = _HERE.parent                                # research/ea_multitask
-_LLCORE = _EA.parents[1]                          # D:/projects/llcore
+_LLCORE = _EA.parents[1]                          # <llcore-root>
 sys.path.insert(0, str(_HERE))                    # variable_delay_recall
 sys.path.insert(0, str(_EA))                      # ea_lab, task_mixture
 sys.path.insert(0, str(_LLCORE / "research" / "step_c_memory_tasks"))  # reservoir

@@ -8,7 +8,7 @@ export const meta = {
   ],
 }
 
-const DIR = 'D:/projects/llcore/research/verified_evolution_sdp_gate'
+const DIR = './research/verified_evolution_sdp_gate'
 
 const VERDICT_SCHEMA = {
   type: 'object',

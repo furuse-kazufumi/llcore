@@ -12,7 +12,7 @@ max |ds'/ds| (a from-below approximation of the true box sup). We use both llcor
 ``empirical_lipschitz`` (n_samples >= 4000) AND an independent central-difference grid as a
 cross-check.
 
-Run: cd D:/projects/llcore && py -3.11 research/lipschitz_refinement/exp_a3_soundness.py
+Run: cd <llcore-root> && py -3.11 research/lipschitz_refinement/exp_a3_soundness.py
 """
 from __future__ import annotations
 

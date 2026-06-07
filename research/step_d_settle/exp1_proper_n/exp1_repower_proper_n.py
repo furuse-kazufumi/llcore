@@ -43,7 +43,7 @@ import numpy as np
 _THIS = Path(__file__).resolve()
 EXP1_DIR = _THIS.parent  # research/step_d_settle/exp1_proper_n/
 STEP_D_DIR = EXP1_DIR.parent  # research/step_d_settle/
-REPO_ROOT = STEP_D_DIR.parents[1]  # D:/projects/llcore
+REPO_ROOT = STEP_D_DIR.parents[1]  # <llcore-root>
 SRC_DIR = REPO_ROOT / "src"
 AUDIT_DIR = REPO_ROOT / "research" / "statistical_power_audit"
 EA_DIR = REPO_ROOT / "research" / "ea_multitask"

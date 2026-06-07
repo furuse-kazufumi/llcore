@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 """Unit tests for ``llcore.rad`` — stdlib-only RAD lookup.
 
-実 RAD コーパス (D:/docs/) に依存しない。tmp_path に minimal な
+実 RAD コーパス (ローカル環境) に依存しない。tmp_path に minimal な
 ``<domain>_corpus_v2/`` 構造を作り、API の振る舞いを単独検証する。
 """
 from __future__ import annotations

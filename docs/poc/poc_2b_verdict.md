@@ -81,14 +81,14 @@ Test: `tests/unit/test_poc_2b_persona_indexed.py` (24 tests, all PASS)
 You are gpt-5.4 reviewing llcore PoC 2b (persona-indexed × verifier with open-ended guards).
 
 # Files to review (Read actual code)
-- D:/projects/llcore/scripts/poc_2b_persona_indexed_verified_evolution.py
-- D:/projects/llcore/src/llcore/persona/priors.py
-- D:/projects/llcore/src/llcore/evolution/adaptive_floor.py
-- D:/projects/llcore/src/llcore/evolution/lineage_reservoir.py
-- D:/projects/llcore/src/llcore/evolution/modes_meter.py
-- D:/projects/llcore/src/llcore/verifier/invariants.py
-- D:/projects/llcore/tests/unit/test_poc_2b_persona_indexed.py
-- D:/projects/llcore/docs/poc/poc_2b_verdict.md
+- ./scripts/poc_2b_persona_indexed_verified_evolution.py
+- ./src/llcore/persona/priors.py
+- ./src/llcore/evolution/adaptive_floor.py
+- ./src/llcore/evolution/lineage_reservoir.py
+- ./src/llcore/evolution/modes_meter.py
+- ./src/llcore/verifier/invariants.py
+- ./tests/unit/test_poc_2b_persona_indexed.py
+- ./docs/poc/poc_2b_verdict.md
 
 # Q1-Q6
 Q1: persona prior 8 種は parameter identifiability があるか? 重複・退化はないか?

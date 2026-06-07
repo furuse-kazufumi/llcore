@@ -8,8 +8,8 @@ export const meta = {
   ],
 }
 
-const DIR = 'D:/projects/llcore/research/verified_lm_evolution'
-const SDP = 'D:/projects/llcore/research/verified_evolution_sdp_gate'
+const DIR = './research/verified_lm_evolution'
+const SDP = './research/verified_evolution_sdp_gate'
 
 // The POSITIVE headline under attack (the result REVERSED from the underpowered 40/60-gene smoke).
 const HEADLINE = (args && args.headline) ||

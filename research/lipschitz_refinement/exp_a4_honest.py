@@ -14,7 +14,7 @@ sample missed it. We report counts and the largest gaps without claiming "exact"
 We also directly compare the over-rejection counts of FREE vs ACHIEVABLE under the same
 empirical_L<1 criterion, to show whether the refinement reduces over-rejection at all.
 
-Run: cd D:/projects/llcore && py -3.11 research/lipschitz_refinement/exp_a4_honest.py
+Run: cd <llcore-root> && py -3.11 research/lipschitz_refinement/exp_a4_honest.py
 """
 from __future__ import annotations
 

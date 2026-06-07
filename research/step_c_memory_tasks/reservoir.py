@@ -7,8 +7,8 @@ fitness は per-gene ridge readout (src の fit_ridge_readout 流用) の held-o
 research/ 隔離。src は read-only 流用のみ (非変更)。
 
 NOTE: プランのコードは ``parents[3] / "src"`` と書いてあるが、実際のディレクトリ構造では
-  reservoir.py の parents[2] が ``D:/projects/llcore`` であり、
-  parents[3] は ``D:/projects`` になる。よって ``parents[2] / "src"`` が正しいパス。
+  reservoir.py の parents[2] が リポジトリ root であり、
+  parents[3] はその親になる。よって ``parents[2] / "src"`` が正しいパス。
 """
 from __future__ import annotations
 

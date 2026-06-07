@@ -80,7 +80,7 @@ PoC 0c としては通してよい。ただし external-facing wording は hones
 ## 実行方法
 
 ```powershell
-cd D:/projects/llcore
+cd <llcore-root>
 py -3.11 scripts/poc_0c_minimal_ga.py
 py -3.11 -m pytest tests/unit/test_poc_0c_minimal_ga.py -v
 ```

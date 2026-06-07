@@ -195,7 +195,7 @@ completeness (sat の false-reject 排除) も意図的に放棄。Hurwitz (固�
 ## 実行方法
 
 ```powershell
-cd D:/projects/llcore
+cd <llcore-root>
 py -3.11 -m pip install -e .[z3]
 py -3.11 scripts/poc_1b_lipschitz_invariant.py
 py -3.11 -m pytest tests/unit/test_poc_1b_lipschitz.py -v

@@ -14,7 +14,7 @@ the genuine, measurable contribution of the refinement even when the binary cert
 decision is unchanged. (Honest disclosure: see A_VERDICT.md — both certifiers share the
 J(1) endpoint, so binary certification gain is structurally 0; the win is the tighter bound.)
 
-Run: cd D:/projects/llcore && py -3.11 research/lipschitz_refinement/exp_a1_a2.py
+Run: cd <llcore-root> && py -3.11 research/lipschitz_refinement/exp_a1_a2.py
 """
 from __future__ import annotations
 

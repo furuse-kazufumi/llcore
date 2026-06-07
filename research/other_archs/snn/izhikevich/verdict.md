@@ -99,7 +99,7 @@ honest 留保 (重要):
 
 ## 実行結果 (PASS)
 
-実行コマンド: ``py -3.11 D:/projects/llcore/research/other_archs/snn/izhikevich/poc.py``
+実行コマンド: ``py -3.11 ./research/other_archs/snn/izhikevich/poc.py``
 
 実行時間: **8.7 秒** (32 個体 × 30 世代)
 verifier reject: **0 件** (clip 範囲下 + margin=100 mV では構造的に admit が期待される)
@@ -178,11 +178,11 @@ verifier reject: **0 件** (clip 範囲下 + margin=100 mV では構造的に ad
 You are gpt-5.4 reviewing llcore research/other_archs/snn/izhikevich PoC.
 
 # Files to review (Read actual code)
-- D:/projects/llcore/research/other_archs/snn/izhikevich/izh_gene.py
-- D:/projects/llcore/research/other_archs/snn/izhikevich/izh_verifier.py
-- D:/projects/llcore/research/other_archs/snn/izhikevich/poc.py
-- D:/projects/llcore/research/other_archs/snn/izhikevich/test_izhikevich.py
-- D:/projects/llcore/research/other_archs/snn/izhikevich/verdict.md
+- ./research/other_archs/snn/izhikevich/izh_gene.py
+- ./research/other_archs/snn/izhikevich/izh_verifier.py
+- ./research/other_archs/snn/izhikevich/poc.py
+- ./research/other_archs/snn/izhikevich/test_izhikevich.py
+- ./research/other_archs/snn/izhikevich/verdict.md
 
 # Q1-Q6
 Q1: Izhikevich の v^2 非線形を Z3 (quantifier-free real arithmetic) で扱う際の
@@ -256,9 +256,9 @@ Codex pair-review [[feedback_codex_pair_review_for_llcore]] で 5 Findings + Q1-
 
 ## 出力ファイル一覧
 
-- `D:/projects/llcore/research/other_archs/snn/izhikevich/__init__.py` — 公開 API
-- `D:/projects/llcore/research/other_archs/snn/izhikevich/izh_gene.py` — IzhikevichGene + simulator + 入力生成
-- `D:/projects/llcore/research/other_archs/snn/izhikevich/izh_verifier.py` — Z3 invariant 2 種 + global/per-gene
-- `D:/projects/llcore/research/other_archs/snn/izhikevich/poc.py` — main entry (G1-G8 runner)
-- `D:/projects/llcore/research/other_archs/snn/izhikevich/test_izhikevich.py` — pytest battery (22 passed, 1 skipped)
-- `D:/projects/llcore/research/other_archs/snn/izhikevich/verdict.md` — 本 doc
+- `./research/other_archs/snn/izhikevich/__init__.py` — 公開 API
+- `./research/other_archs/snn/izhikevich/izh_gene.py` — IzhikevichGene + simulator + 入力生成
+- `./research/other_archs/snn/izhikevich/izh_verifier.py` — Z3 invariant 2 種 + global/per-gene
+- `./research/other_archs/snn/izhikevich/poc.py` — main entry (G1-G8 runner)
+- `./research/other_archs/snn/izhikevich/test_izhikevich.py` — pytest battery (22 passed, 1 skipped)
+- `./research/other_archs/snn/izhikevich/verdict.md` — 本 doc

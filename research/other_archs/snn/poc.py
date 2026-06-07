@@ -25,7 +25,7 @@ falsifiable 命題:
 
 実行::
 
-    py -3.11 D:/projects/llcore/research/other_archs/snn/poc.py
+    py -3.11 ./research/other_archs/snn/poc.py
 
 依存: numpy, z3-solver. llcore.evolution.* 経由で AdaptiveFloorGate / LineageReservoir /
 ModesMeter を import 利用.

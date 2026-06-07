@@ -20,7 +20,7 @@ solver.add(abs_A >= -A)
 abs_A = z3.If(A >= 0, A, -A)  # 式として真の |A| を表現
 ```
 
-詳細: `D:/projects/llcore/research/other_archs/neural_ode/verdict.md` Codex review record.
+詳細: `./research/other_archs/neural_ode/verdict.md` Codex review record.
 
 ## Audit 対象
 

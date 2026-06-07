@@ -64,7 +64,7 @@ delay > 0 に拡張。
 ## 実行方法
 
 ```powershell
-cd D:/projects/llcore
+cd <llcore-root>
 py -3.11 scripts/poc_0b_synthetic_fitness.py
 py -3.11 -m pytest tests/unit/test_poc_0b_fitness.py -v
 ```

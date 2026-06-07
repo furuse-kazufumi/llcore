@@ -113,12 +113,12 @@ You are gpt-5.4 reviewing llcore VNN-COMP new category proposal
 (paper + benchmark + reference impl).
 
 # Files to review (Read actual content)
-- D:/projects/llcore/docs/papers/vnn_comp_online_arch_evolution_proposal.md
-- D:/projects/llcore/docs/papers/vnn_comp_benchmark_spec.md
-- D:/projects/llcore/docs/papers/vnn_comp_reference_impl_spec.md
-- D:/projects/llcore/scripts/poc_7a_vnn_comp_reference_impl.py
-- D:/projects/llcore/tests/unit/test_poc_7a_vnn_comp_reference.py
-- D:/projects/llcore/docs/poc/poc_7a_verdict.md
+- ./docs/papers/vnn_comp_online_arch_evolution_proposal.md
+- ./docs/papers/vnn_comp_benchmark_spec.md
+- ./docs/papers/vnn_comp_reference_impl_spec.md
+- ./scripts/poc_7a_vnn_comp_reference_impl.py
+- ./tests/unit/test_poc_7a_vnn_comp_reference.py
+- ./docs/poc/poc_7a_verdict.md
 
 # Q1-Q8
 Q1: 論文 abstract の主張は VNN-COMP community に sharp に響くか?

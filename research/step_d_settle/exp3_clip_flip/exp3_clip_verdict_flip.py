@@ -56,7 +56,7 @@ import numpy as np
 
 # --- path 設定 (read-only import; src 非改変) ---
 _HERE = Path(__file__).resolve().parent
-REPO_ROOT = _HERE.parents[2]  # D:/projects/llcore
+REPO_ROOT = _HERE.parents[2]  # <llcore-root>
 EXP3_DIR = _HERE
 for _p in (
     str(REPO_ROOT / "src"),

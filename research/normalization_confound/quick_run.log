@@ -20,4 +20,4 @@ total wall-clock = 1852.0s
 
 => any_flip=False flip_settings=[]
    spread_ratios(none/hard)=[1.0, 1.0]
-   wrote D:/projects/llcore/research/normalization_confound/c1_sweep_results_quick.json
+   wrote ./research/normalization_confound/c1_sweep_results_quick.json

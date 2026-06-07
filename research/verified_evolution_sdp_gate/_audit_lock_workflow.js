@@ -7,7 +7,7 @@ export const meta = {
   ],
 }
 
-const RES = 'D:/projects/llcore/research'
+const RES = './research'
 const DIR = RES + '/verified_evolution_sdp_gate'
 
 const V = {

@@ -137,10 +137,10 @@ seconds-long smoke; real signal needs the GPU feasibility/full run.
 ## How to run (Kaggle GPU T4, $0)
 1. Push as a kernel (kaggle CLI, token set up — see memory `reference_api_keys`):
    ```
-   kaggle kernels init -p D:/projects/llcore/research/highdim_evolution
+   kaggle kernels init -p ./research/highdim_evolution
    # edit kernel-metadata.json: id "furusekazufumi/hd1-highdim-evo", code_file "hd1_highdim_evo.py",
    #   language python, kernel_type script, enable_gpu true, enable_internet true (corpus download)
-   kaggle kernels push -p D:/projects/llcore/research/highdim_evolution
+   kaggle kernels push -p ./research/highdim_evolution
    ```
    Toggle `RUN_MODE="feasibility"` (n≤64, cheap) first, then `"full"` (n≤256). `RUN_NULL=True` for the
    shuffled-corpus control.

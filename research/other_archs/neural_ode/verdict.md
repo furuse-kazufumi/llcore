@@ -1,7 +1,7 @@
 # PoC Verdict — Neural ODE / LTC への llcore approach 移植
 
 調査日: 2026-05-29
-場所: `D:/projects/llcore/research/other_archs/neural_ode/`
+場所: `./research/other_archs/neural_ode/`
 ファイル:
 - `ode_gene.py` (NeuralODEGene dataclass + vector_field + forward_euler + empirical_lipschitz)
 - `ode_verifier.py` (Z3 で Lipschitz + Hurwitz invariant 検査)
@@ -173,11 +173,11 @@ arch ごとに異なるだけ。これが「llcore approach は arch をまた�
 You are gpt-5.4 reviewing llcore research/other_archs/neural_ode PoC (Neural ODE への llcore approach 移植).
 
 # Files to review (Read actual code)
-- D:/projects/llcore/research/other_archs/neural_ode/ode_gene.py
-- D:/projects/llcore/research/other_archs/neural_ode/ode_verifier.py
-- D:/projects/llcore/research/other_archs/neural_ode/poc.py
-- D:/projects/llcore/research/other_archs/neural_ode/test_neural_ode.py
-- D:/projects/llcore/research/other_archs/neural_ode/verdict.md
+- ./research/other_archs/neural_ode/ode_gene.py
+- ./research/other_archs/neural_ode/ode_verifier.py
+- ./research/other_archs/neural_ode/poc.py
+- ./research/other_archs/neural_ode/test_neural_ode.py
+- ./research/other_archs/neural_ode/verdict.md
 
 # Q1-Q6
 Q1: Lipschitz 上界 |A|+|W|*|b| は sound か? sech^2 <= 1 で近似する根拠と保守性は妥当か?

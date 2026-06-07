@@ -186,11 +186,11 @@ unsat (invariant 成立) を取る。simplex 違反 gene を投入すると sat 
 You are gpt-5.4 reviewing llcore research/other_archs/gnn PoC (GNN への llcore approach 移植).
 
 # Files to review (Read actual code)
-- D:/projects/llcore/research/other_archs/gnn/gnn_gene.py
-- D:/projects/llcore/research/other_archs/gnn/gnn_verifier.py
-- D:/projects/llcore/research/other_archs/gnn/poc.py
-- D:/projects/llcore/research/other_archs/gnn/test_gnn.py
-- D:/projects/llcore/research/other_archs/gnn/verdict.md
+- ./research/other_archs/gnn/gnn_gene.py
+- ./research/other_archs/gnn/gnn_verifier.py
+- ./research/other_archs/gnn/poc.py
+- ./research/other_archs/gnn/test_gnn.py
+- ./research/other_archs/gnn/verdict.md
 
 # Q1-Q6
 Q1: Over-smoothing lower bound (W^2 - U^2*α*(1-1/N)) >= ε^(1/L) は sound か?

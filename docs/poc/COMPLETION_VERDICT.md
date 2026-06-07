@@ -1,7 +1,7 @@
 # llcore CPU PoC Battery 完成 — Final Verdict
 
 完成宣言日: 2026-05-29  
-project: `D:/projects/llcore/` (PyPI `llmesh-llcore` 0.1.0a0)  
+project: llcore repo root (PyPI `llmesh-llcore` 0.1.0a0)  
 goal source: user `/goal llcore完成。`
 
 ---

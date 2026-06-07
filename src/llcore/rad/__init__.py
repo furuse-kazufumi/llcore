@@ -8,7 +8,7 @@ hint を注入する」研究フレームワークとして単独運用できる
 
 設計判断:
 - stdlib のみ依存 (依存爆発回避)
-- 環境変数 ``LLCORE_RAD_DIR`` で RAD 根ディレクトリを設定 (default ``D:/docs``)
+- 環境変数 ``LLCORE_RAD_DIR`` で RAD 根ディレクトリを設定 (default ``~/.llcore/rad``; 不在なら graceful degrade)
 - corpus2skill 階層 (cluster_*/SKILL.md) を理解せず、markdown ファイルを path/regex
   で直接 grep する素朴な API。階層理解は将来 (PoC 3 以降) の課題。
 - 結果は :class:`RADHit` (path + snippet) のリスト。実コード時は ``read_doc()`` で本文取得。

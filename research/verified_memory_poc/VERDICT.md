@@ -1,7 +1,7 @@
 # Phase 2a — trajectory_tube gate PoC VERDICT
 
 作成日: 2026-06-06
-正本設計 doc: `D:/projects/fullsense/docs/research/phase2a_verified_memory_evolution_design_2026_06_06.md`
+正本設計 doc: fullsense リポジトリ (private) の `docs/research/phase2a_verified_memory_evolution_design_2026_06_06.md`
 規律: honest disclosure 厳守 (`feedback_benchmark_honest_disclosure`)。誇張禁止。
 ステータス: **実装完了 + falsifiable 検証完走**。
 

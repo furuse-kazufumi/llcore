@@ -78,7 +78,7 @@ PoC 0a v2 verdict: PASS — RWKV-style state update gene は falsifiable
 ## 実行方法
 
 ```powershell
-cd D:/projects/llcore
+cd <llcore-root>
 py -3.11 -m pip install -e .[dev]
 py -3.11 scripts/poc_0a_state_update_gene.py
 py -3.11 -m pytest tests/unit/test_poc_0a_state_update.py -v

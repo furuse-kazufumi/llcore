@@ -1,6 +1,6 @@
 # A_VERDICT — Track A: Achievable-t Lipschitz Refinement
 
-**Date:** 2026-06-02 | **Repo:** D:/projects/llcore | **Python:** py -3.11 | **z3-solver:** 4.16.0
+**Date:** 2026-06-02 | **Repo:** <llcore-root> | **Python:** py -3.11 | **z3-solver:** 4.16.0
 **Seed:** 0 (all sampling) | **Genes:** 6096 total (4096-pt grid 16^3 + 2000 random, full box)
 **All scripts ran to completion.** Results JSON: `exp_a1_a2_results.json`, `exp_a3_results.json`, `exp_a4_results.json`.
 

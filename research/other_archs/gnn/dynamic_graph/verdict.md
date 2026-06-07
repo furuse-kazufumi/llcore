@@ -259,11 +259,11 @@ relation 拡張」を **graph 構造変化に展開** した実装。
 You are gpt-5.4 reviewing llcore research/other_archs/gnn/dynamic_graph PoC (動的 graph ChangeOp).
 
 # Files to review (Read actual code)
-- D:/projects/llcore/research/other_archs/gnn/dynamic_graph/dgnn_gene.py
-- D:/projects/llcore/research/other_archs/gnn/dynamic_graph/dgnn_verifier.py
-- D:/projects/llcore/research/other_archs/gnn/dynamic_graph/poc.py
-- D:/projects/llcore/research/other_archs/gnn/dynamic_graph/test_dynamic_graph.py
-- D:/projects/llcore/research/other_archs/gnn/dynamic_graph/verdict.md
+- ./research/other_archs/gnn/dynamic_graph/dgnn_gene.py
+- ./research/other_archs/gnn/dynamic_graph/dgnn_verifier.py
+- ./research/other_archs/gnn/dynamic_graph/poc.py
+- ./research/other_archs/gnn/dynamic_graph/test_dynamic_graph.py
+- ./research/other_archs/gnn/dynamic_graph/verdict.md
 
 # Q1-Q6
 Q1: 動的 N での over-smoothing shrink_upper(N, gene) は sound か? agg_amplify_upper(N) の数式選択は妥当か?
