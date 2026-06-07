@@ -480,7 +480,8 @@ def main():
             k = math.ceil(BINDING["topk_frac"] * 2 * n)
             for variant in variants:
                 for seed in SEEDS_ANALYTIC:
-                    r = pull_back_latency(variant, n, seed, target, thr, lr, cap, tau, k)
+                    r = pull_back_latency(variant, n, seed, target, thr, lr, cap, tau, k,
+                                          BINDING["pullback_margin"])
                     recs.append(r)
                 _log("e", f"n={n:4d} {variant:10s} steps(median)="
                      f"{int(np.median([x['steps'] for x in recs if x['n']==n and x['variant']==variant]))}"

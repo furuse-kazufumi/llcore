@@ -1,0 +1,78 @@
+[   0.0s][setup] HD-1 starting | RUN_MODE=feasibility RUN_NULL=False
+[   0.0s][deps] torch 2.12.0+cpu ok
+[   0.0s][setup] device=cpu (CPU -> slow; enable GPU accelerator)
+[    0.0s][selftest] rows.max vs numpy max abs err=3.55e-15; vs cert_surrogate=0.00e+00 (OK)
+[    0.0s][e] pull-back latency (3 variants × n_analytic × seeds)
+[    2.8s][e] n=   8 max        steps(median)=165 reached=4/4
+[    4.0s][e] n=   8 logsumexp  steps(median)=80 reached=4/4
+[    5.1s][e] n=   8 topk       steps(median)=86 reached=4/4
+[    6.8s][e] n=  32 max        steps(median)=104 reached=4/4
+[    7.4s][e] n=  32 logsumexp  steps(median)=21 reached=4/4
+[    7.9s][e] n=  32 topk       steps(median)=24 reached=4/4
+[   11.4s][e] n=  64 max        steps(median)=318 reached=4/4
+[   11.7s][e] n=  64 logsumexp  steps(median)=21 reached=4/4
+[   12.1s][e] n=  64 topk       steps(median)=22 reached=4/4
+[   41.5s][e] n= 128 max        steps(median)=1736 reached=4/4
+[   42.1s][e] n= 128 logsumexp  steps(median)=29 reached=4/4
+[   42.8s][e] n= 128 topk       steps(median)=34 reached=4/4
+[   97.0s][e] n= 256 max        steps(median)=2000 reached=0/4
+[   98.7s][e] n= 256 logsumexp  steps(median)=33 reached=4/4
+[   99.9s][e] n= 256 topk       steps(median)=28 reached=4/4
+[   99.9s][f] gradient coverage (行被覆率 + 飽和)
+[  100.3s][f] n=   8 max        row_coverage=0.125
+[  100.3s][f] n=   8 logsumexp  row_coverage=1.000
+[  100.3s][f] n=   8 topk       row_coverage=0.500
+[  100.9s][f] n=  32 max        row_coverage=0.031
+[  100.9s][f] n=  32 logsumexp  row_coverage=1.000
+[  100.9s][f] n=  32 topk       row_coverage=0.500
+[  101.4s][f] n=  64 max        row_coverage=0.016
+[  101.4s][f] n=  64 logsumexp  row_coverage=1.000
+[  101.4s][f] n=  64 topk       row_coverage=0.500
+[  102.0s][f] n= 128 max        row_coverage=0.008
+[  102.0s][f] n= 128 logsumexp  row_coverage=1.000
+[  102.0s][f] n= 128 topk       row_coverage=0.500
+[  103.0s][f] n= 256 max        row_coverage=0.004
+[  103.0s][f] n= 256 logsumexp  row_coverage=0.984
+[  103.0s][f] n= 256 topk       row_coverage=0.500
+[  103.0s][g] admit-boundary true-rho slack (HARNESS の真ρ分布)
+[  103.7s][g] n=   8 at infnorm≈1.0: mean_emp_rho=0.846 slack=0.154
+[  107.1s][g] n=  32 at infnorm≈1.0: mean_emp_rho=0.874 slack=0.126
+[  116.7s][g] n=  64 at infnorm≈1.0: mean_emp_rho=0.895 slack=0.105
+[  146.5s][g] n= 128 at infnorm≈1.0: mean_emp_rho=0.891 slack=0.109
+[  237.3s][g] n= 256 at infnorm≈1.0: mean_emp_rho=0.909 slack=0.091
+[  237.3s][b] lambda grad-norm probe (|∂CE| vs |∂surrogate|)
+[ 237.5s][corpus] downloaded tiny-shakespeare (1115394 chars), using 30000
+[  241.5s][b] n=   8 seed=0 |gCE|=2.56e-03 |gSurr|=7.98e-02
+[  241.5s][b] n=   8 seed=1 |gCE|=2.56e-03 |gSurr|=6.38e-02
+[  241.5s][b] n=  32 seed=0 |gCE|=9.75e-04 |gSurr|=2.18e-02
+[  241.5s][b] n=  32 seed=1 |gCE|=1.43e-03 |gSurr|=2.40e-02
+[  241.5s][b] selected λ (decade match) = 0.1
+[  241.5s][decide] provisional selected variant = logsumexp
+[  241.5s][b] margin selection (near-boundary residence)
+[  259.4s][b] margin=0.00 near-boundary residence=0.222
+[  277.8s][b] margin=0.05 near-boundary residence=0.222
+[  295.1s][b] margin=0.10 near-boundary residence=0.222
+[  310.4s][b] margin=0.15 near-boundary residence=0.222
+[  310.5s][b] selected margin = 0.15
+[  310.5s][ah] NONE (F条項) + ENDO_GRAD (tautology) model runs
+[  324.5s][a] n=   8 NONE death_rate=0.000 (inactive→excluded)
+[  343.2s][h] n=   8 ENDO_GRAD death_rate=0.000 never_touched=1.00 dot=-0.197
+[  366.9s][a] n=  32 NONE death_rate=0.188 (ACTIVE)
+[  392.6s][h] n=  32 ENDO_GRAD death_rate=0.073 never_touched=0.00 dot=-0.138
+
+==============================================================================
+  FEASIBILITY VERDICT — 検証シグナル勾配内蔵 (gradient-embedded supervision)
+==============================================================================
+  DECISION: GO
+  selected variant (provisional) = logsumexp  λ=0.1  margin=0.15
+  budget (FRAC·main_grad_steps) = 200 steps; main n = [64, 128, 256]
+  --- per-variant go/no-go ---
+   max        GO=False lat_ok=False cov_ok=False | latency[n8:165  n32:104  n64:318  n128:1736  n256:2000]
+              coverage[n8:0.12  n32:0.03  n64:0.02  n128:0.01  n256:0.00]
+   logsumexp  GO=True  lat_ok=True  cov_ok=True  | latency[n8:80  n32:21  n64:22  n128:29  n256:33]
+              coverage[n8:1.00  n32:1.00  n64:1.00  n128:1.00  n256:0.98]
+   topk       GO=True  lat_ok=True  cov_ok=True  | latency[n8:86  n32:24  n64:22  n128:34  n256:28]
+              coverage[n8:0.50  n32:0.50  n64:0.50  n128:0.50  n256:0.50]
+  F条項 active by n: {8: False, 32: True}
+  tautology by n   : {8: {'never_touched_frac': 1.0, 'death_rate': 0.0}, 32: {'never_touched_frac': 0.0, 'death_rate': 0.07291666666666666}}
+==============================================================================

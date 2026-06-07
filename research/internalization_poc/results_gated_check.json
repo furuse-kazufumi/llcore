@@ -1,0 +1,39 @@
+{
+ "silence_ok": false,
+ "latency_gated_vs_plain": {
+  "32": [
+   21.0,
+   21.0
+  ],
+  "128": [
+   29.0,
+   29.0
+  ],
+  "256": [
+   33.0,
+   33.0
+  ]
+ },
+ "model_gated": [
+  {
+   "death_rate": 0.041666666666666664,
+   "core_active": 0,
+   "core_steps": 14
+  },
+  {
+   "death_rate": 0.08333333333333333,
+   "core_active": 0,
+   "core_steps": 13
+  },
+  {
+   "death_rate": 0.08333333333333333,
+   "core_active": 0,
+   "core_steps": 13
+  },
+  {
+   "death_rate": 0.08333333333333333,
+   "core_active": 0,
+   "core_steps": 14
+  }
+ ]
+}
