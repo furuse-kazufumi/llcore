@@ -203,21 +203,31 @@ def cores_from_raw(raw_W, raw_decay):
 # ============================================================================ #
 #  (e) pull-back latency                                                        #
 # ============================================================================ #
-def pull_back_latency(variant, n, seed, target, threshold, lr, cap, tau, k):
+def pull_back_latency(variant, n, seed, target, admit_threshold, lr, cap, tau, k, push_margin):
+    """violating init から純 surrogate で admissible (true infnorm_sup < admit_threshold) へ。
+
+    hinge の押し先は (admit_threshold - push_margin); 境界ちょうどだと grad=0 で停滞するため。
+    latency = true infnorm_sup が admit_threshold を初めて下回る step。
+    """
+    push_to = admit_threshold - push_margin
     raw_W, raw_decay = make_scaled_violating(n, seed, target)
-    decay, W = cores_from_raw(raw_W, raw_decay)
-    inf0 = float(rows_torch(decay, W).max())
+    with torch.no_grad():
+        decay, W = cores_from_raw(raw_W, raw_decay)
+        inf0 = float(rows_torch(decay, W).max())
     opt = torch.optim.Adam([raw_W, raw_decay], lr=lr)
     steps = cap
     reached = False
     for it in range(cap):
         decay, W = cores_from_raw(raw_W, raw_decay)
-        if float(rows_torch(decay, W).max()) < threshold:
+        with torch.no_grad():
+            cur = float(rows_torch(decay, W).max())
+        if cur < admit_threshold:
             steps = it; reached = True; break
-        loss = torch.relu(agg(variant, rows_torch(decay, W), tau, k) - threshold)
+        loss = torch.relu(agg(variant, rows_torch(decay, W), tau, k) - push_to)
         opt.zero_grad(); loss.backward(); opt.step()
-    decay, W = cores_from_raw(raw_W, raw_decay)
-    inf_final = float(rows_torch(decay, W).max())
+    with torch.no_grad():
+        decay, W = cores_from_raw(raw_W, raw_decay)
+        inf_final = float(rows_torch(decay, W).max())
     return {"variant": variant, "n": n, "seed": seed, "inf0": inf0,
             "steps": steps, "reached": bool(reached), "inf_final": inf_final}
 
