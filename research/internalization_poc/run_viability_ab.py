@@ -253,42 +253,48 @@ def run_substrate(sub) -> dict:
         for seed in D_SEEDS:
             recs.append(_run_arm(sub, arm, seed, V))
     means = {arm: {
+        "phase2_deaths": float(np.mean([r["phase2_deaths"] for r in recs if r["arm"] == arm])),
         "survival": float(np.mean([r["phase2_survival_rate"] for r in recs if r["arm"] == arm])),
         "fitness": float(np.mean([r["phase2_final_best_fitness"] for r in recs if r["arm"] == arm])),
         "auc": float(np.mean([r["phase2_auc"] for r in recs if r["arm"] == arm])),
     } for arm in ARMS}
 
-    h_surv = _stat(_paired(recs, "ENDO", "EXO_fixed", "phase2_survival_rate"))
+    # 本丸 H_deaths: EXO_fixed − ENDO の phase2 致命評価数 (>0 = ENDO が死を回避)
+    h_deaths = _stat(_paired(recs, "EXO_fixed", "ENDO", "phase2_deaths"))
     h1 = _stat(_paired(recs, "ENDO", "EXO_fixed", "phase2_final_best_fitness"))
     h2 = _stat(_paired(recs, "ENDO", "EXO_fixed", "phase2_auc"))
-    endo_surv = means["ENDO"]["survival"]
-    none_surv = means["NONE"]["survival"]
-    h3_sound = bool(endo_surv >= 0.999)
-    boundary_active = bool(none_surv < 0.95)   # NONE が W_HIGH で死ぬ regime か (F2)
+
+    sound_viol = _soundness_violations(sub, V)              # H3: admit⇒生存 の違反数
+    h3_sound = bool(sound_viol == 0)
+    none_deaths = means["NONE"]["phase2_deaths"]
+    endo_deaths = means["ENDO"]["phase2_deaths"]
+    boundary_active = bool(none_deaths > 0.5)               # NONE が phase2 で死を被る regime か (F2)
 
     if not boundary_active:
-        verdict = (f"INVALID (死境界 inactive, F2): NONE survival={none_surv:.3f} ≥0.95 = 本基質は "
-                   f"W_HIGH でも viability 非脅威。V 再設計が必要。")
+        verdict = (f"INVALID (死境界 inactive, F2): NONE phase2_deaths={none_deaths:.1f} ≈0 = 本基質は "
+                   f"W_HIGH でも致命試行が起きない。V/W_HIGH 再設計が必要。")
     elif not h3_sound:
-        verdict = (f"SOUNDNESS 破綻 (F3, 致命): ENDO survival={endo_surv:.3f} <1.0 = admit gene が死んだ。"
-                   f"認証 tube ≤ V が実測包絡を bound できていない。")
-    elif h_surv["p_signflip_two_sided"] < ALPHA and h_surv["mean_delta"] > 0:
-        verdict = (f"内的 gate の自己保存に固有価値あり [{sub.name}]: ENDO survival > EXO_fixed "
-                   f"(Δ={h_surv['mean_delta']:+.3f}, p={h_surv['p_signflip_two_sided']:.4f}); "
-                   f"ENDO 健全に生存 (surv={endo_surv:.3f}) ∧ EXO は固定 gate で W_HIGH で死ぬ "
-                   f"(surv={means['EXO_fixed']['survival']:.3f})。fitness Δ={h1['mean_delta']:+.3f}。")
+        verdict = (f"SOUNDNESS 破綻 (F3, 致命): admit gene が {sound_viol} 件死んだ = 認証 tube ≤ V が "
+                   f"実測包絡を bound できていない。")
+    elif h_deaths["p_signflip_two_sided"] < ALPHA and h_deaths["mean_delta"] > 0:
+        verdict = (f"内的 gate の自己保存に固有価値あり [{sub.name}]: ENDO が致命試行を回避 "
+                   f"(phase2_deaths ENDO={endo_deaths:.1f} < EXO={means['EXO_fixed']['phase2_deaths']:.1f}, "
+                   f"Δ={h_deaths['mean_delta']:+.1f}, p={h_deaths['p_signflip_two_sided']:.4f}) ∧ soundness OK "
+                   f"(admit⇒生存 violations=0)。EXO は固定 gate で W_HIGH-致命 gene を見逃す。fitness Δ={h1['mean_delta']:+.3f}。")
     else:
-        verdict = (f"自己保存優位なし [{sub.name}] (F1): ENDO survival ≈ EXO_fixed "
-                   f"(Δ={h_surv['mean_delta']:+.3f}, p={h_surv['p_signflip_two_sided']:.4f})。")
+        verdict = (f"自己保存優位なし [{sub.name}] (F1): ENDO ≈ EXO_fixed の致命試行数 "
+                   f"(ENDO={endo_deaths:.1f} vs EXO={means['EXO_fixed']['phase2_deaths']:.1f}, "
+                   f"p={h_deaths['p_signflip_two_sided']:.4f})。selection が死を処理し gate は冗長。")
 
     return {
         "substrate": sub.name, "V": V, "obs_gain": sub.obs_gain,
         "arm_means_phase2": means,
-        "H_survival_endo_vs_exo": h_surv,
+        "H_deaths_exo_minus_endo": h_deaths,
         "H1_fitness_endo_vs_exo": h1,
         "H2_auc_endo_vs_exo": h2,
-        "H3_endo_survival_rate": endo_surv, "h3_soundness_ok": h3_sound,
-        "boundary_active": boundary_active, "none_survival": none_surv,
+        "soundness_violations": sound_viol, "h3_soundness_ok": h3_sound,
+        "boundary_active": boundary_active,
+        "none_phase2_deaths": none_deaths, "endo_phase2_deaths": endo_deaths,
         "verdict": verdict, "records": recs,
     }
 
