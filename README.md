@@ -1,8 +1,23 @@
 # llcore — Verified Neural Architecture Evolution on CPU
 
-**Status**: Stage 0 PoC skeleton (2026-05-29 発足)  
+**Status**: 研究本体は論文 draft 段階 (2026-05-29 発足 → 2026-06-07 時点で §1-§10 + 318 tests green)  
 **License**: Apache-2.0 + Commercial (dual)  
 **Position**: 独立研究 project。llive (FullSense family) と思想を共有するが、**llcore 単独で完結する設計**。llive 仕様が進化の妨げになる局面では迷わず独立路線を取る (ユーザー指示 2026-05-29)。
+
+## 研究成果 (date of record)
+
+本リポジトリの主成果物 (いずれも事前登録 → 結果の順で記録し、negative も全強度で開示):
+
+- **論文 draft**: `research/paper/PAPER_DRAFT.md` — 進化する再帰コアを健全な収縮証明 (sound contraction
+  certifier ladder) で fail-closed にゲートする研究の全結果 (§1-§10 + honest-disclosure box + 再現表)
+- **verified memory evolution (trajectory-tube gate)**: `research/verified_memory_poc/` — 一段収縮証明を
+  閉形式の軌道チューブ保証 (`limsup‖e‖ ≤ G·w̄/(1−L)`) に拡張し、事前登録 n=40 で記憶 horizon への
+  用量反応を確認 (論文 §9)
+- **記憶形成 3 機構 × viability 基質**: `research/internalization_poc/` — 「検証器を誰が持つか」を
+  死ねる環境で測定 (自己予見 / 復活修復 / 社会的観察; 論文 §9.6 + `VIABILITY_VERDICT.md`)
+- **GPU スケール実験 (HD-1 / Stage-B)**: `research/highdim_evolution/` + `research/rllm_stage_b/` —
+  無拘束 gradient は収縮域を出るのが default (entropic drift)、実 Transformer 内で検証コアは
+  load-bearing (論文 §7)
 
 ---
 
