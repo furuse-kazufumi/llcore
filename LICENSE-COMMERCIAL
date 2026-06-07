@@ -1,7 +1,7 @@
-Commercial License for llive
-============================
+Commercial License for llcore
+=============================
 
-This software (llive, including the PyPI package `llmesh-llive`) is dual-licensed:
+This software (llcore, including the PyPI package `llmesh-llcore`) is dual-licensed:
 
   * **Open Source License**: Apache License, Version 2.0 (see `LICENSE`)
   * **Commercial License**: this file
