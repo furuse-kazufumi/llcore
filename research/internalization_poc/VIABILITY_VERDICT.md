@@ -108,6 +108,27 @@ phase1 (G1=10 世代) κ=1.0 → 助走 (G2_WARMUP=8, deaths 数えない) κ=2.
   可塑性) → ③ factorial 2³ (`run_viability_factorial.py`, E×R「予見+復活」相乗 / E が O を冗長化するか)
   → ④ regime-aware adaptive meta-controller。
 
+## 追補 (同日): ② 反証#2 robustness — 12/12 全成立 (反証を潰した)
+
+正本 = `run_viability_robustness.py` (2 軸意味論へ事前登録更新, 結果取得前 commit) +
+`results_viability_robustness.json`。6 config (baseline / seed_shift 4000- / κ=1.5 / κ=3.0 / dim=24 /
+hard_mem_delay20) × 2 基質 (linear, highgain) × 5 arms × n=12。**全 12 で死境界 active**。
+
+| 事前登録条件 | 結果 |
+|---|---|
+| 軸1 死回避 (ENDO < NONE かつ ENDO < OBSERVE) | **12/12** — 全 config で ENDO 定常死 0.0 |
+| 軸2 記憶保存 (REVIVE pop_mean > NONE) | **12/12** |
+| 能力 (sound best ≥ unsafe best − 0.05) | **12/12** — 最大逆 gap −0.007 (hard_mem/linear) |
+| soundness violations | **0** (全 config) |
+
+- **反証#2 (「linear toy アーティファクト」) を潰した**: 順序は seed 集合・κ 規模 (1.5/2.0/3.0)・
+  次元 (8/24)・記憶難度 (delay 8/20)・非線形 (highgain) の全変化で保持。
+- **安定↔可塑性 TRIZ 矛盾は壊れなかった**: 記憶最適が発散境界近傍を要求する hard_mem_delay20 でも
+  capability gap は −0.007/−0.004 (≥ −0.05) = **ρ<1 ゲートは記憶獲得能力を殺さない**。
+  taxonomy の「最大リスク」(corpus paper 16) への実験的応答。
+- 副次所見: OBSERVE は全 config で NONE より改善 (empirical 学習は機能する) が ENDO の 0 には一度も
+  届かない — 「死んで学ぶ」構造コストの一貫した定量化。
+
 ## 追補 (同日): ③ factorial 2³ — 組み合わせと交互作用 (n=20, linear/highgain)
 
 正本 = `run_viability_factorial.py` (事前登録 commit, 結果取得前) + `results_viability_factorial.json`。
