@@ -172,7 +172,7 @@ def _evolve_two_phase(arm: str, seed: int):
         "arm": arm, "seed": seed,
         "phase1_best_curve": list(res1.best_fitness_curve),
         "phase2_best_curve": list(res2.best_fitness_curve),
-        "phase2_auc": float(np.trapz(res2.best_fitness_curve)),     # H2: 再適応の面積
+        "phase2_auc": float(np.sum(res2.best_fitness_curve)),       # H2: 再適応の面積 (世代和)
         "phase2_final_train": float(res2.final_best.fitness),
         "phase2_final_test_whigh": _test_fitness(best2, task2, seed),  # H1: 最終適応品質
         "phase2_final_diversity": float(res2.generations[-1].gene_matrix.var()),
