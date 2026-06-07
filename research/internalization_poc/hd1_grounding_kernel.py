@@ -19,11 +19,6 @@
 # Output: result_hd1g_n{N}.json (resumable; checkpoint after every record).
 from __future__ import annotations
 
-# ===================== USER TOGGLES ===================== #
-RUN_N = 64            # 64 | 128 | 256  (one kernel per n)
-RUN_MODE = "main"     # "main" (preregistered) | "smoke" (tiny wiring check)
-# ======================================================== #
-
 import copy
 import datetime
 import json
@@ -32,6 +27,11 @@ import sys
 import time
 import traceback
 import urllib.request
+
+# ===================== USER TOGGLES ===================== #
+RUN_N = int(os.environ.get("HD1G_N", "64"))            # 64 | 128 | 256 (one kernel per n)
+RUN_MODE = os.environ.get("HD1G_MODE", "main")         # "main" | "smoke" (wiring check)
+# ======================================================== #
 
 import numpy as np
 import torch
