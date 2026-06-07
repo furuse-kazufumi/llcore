@@ -1283,7 +1283,7 @@ Without it, the empirical mechanisms compose well — repair plus observation re
 senses the true κ. Breaking that premise (sensed κ = 0.6·κ_true, alternating 10-generation blocks)
 makes the certificate admit a lethal band — soundness holds relative to the *sensed* model, which is
 now wrong. A trust meta-controller using only observable evidence (admitted-then-died counts) tracks
-the regime (mean trust 0.91 in good blocks vs 0.51 in bad) and decisively beats always-empirical where
+the regime (mean trust in good vs bad blocks: 0.91/0.51 linear, 0.97/0.80 high-gain) and decisively beats always-empirical where
 the certificate is trustworthy (good blocks: 19/20 and 12/20-with-0-losses, *p* ≤ 0.0006) — but beats
 always-sound *overall* only where premise violations are expensive (linear; on the high-gain substrate
 the pre-registered overall hypothesis **fails**, and we report it: when violations are cheap, always-
