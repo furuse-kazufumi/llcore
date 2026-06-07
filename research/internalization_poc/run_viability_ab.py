@@ -153,11 +153,48 @@ def _admits(sub, gene, kappa, V):
     return bool(tube <= V)
 
 
-def _gate_fn(sub, arm, kappa, V):
-    if arm == "NONE":
-        return lambda g: True
-    gate_kappa = kappa if arm == "ENDO" else KAPPA_LOW   # EXO_fixed は設計時 κ_low 固定
-    return lambda g: _admits(sub, g, gate_kappa, V)
+def _gate_kappa_for(arm, kappa):
+    """gate/repair に使う κ: ENDO/REVIVE=現 κ (環境結合), EXO_fixed=設計時 κ_low。"""
+    return kappa if arm in ("ENDO", "REVIVE") else KAPPA_LOW
+
+
+# ---- 記憶形成機構 (ユーザー洞察): 修復 (REVIVE) と 社会的観察 (OBSERVE) ----------
+_SCALE = np.array([1.0, 1.0, 2.0])   # gene 正規化 (decay∈[0,1], mix∈[-1,1], gate_str∈[-2,2])
+
+
+def _normgene(g) -> np.ndarray:
+    return np.array([g.decay, g.mix, g.gate_str]) / _SCALE
+
+
+def _repair(sub, gene, kappa, V):
+    """REVIVE: 死を予見した gene を **修復** — 記憶チャネル mix を保持しつつ (decay, gate_str) を
+    安全側 (0,0) へ最小 blend して admit させる。死を傷 (= 安全化された dynamics) として記憶に残す。"""
+    g = gene.clipped()
+    if _admits(sub, g, kappa, V):
+        return g
+    lo, hi = 0.0, 1.0
+    for _ in range(24):
+        mid = 0.5 * (lo + hi)
+        cand = StateUpdateGene(decay=(1 - mid) * g.decay, mix=g.mix,
+                               gate_str=(1 - mid) * g.gate_str).clipped()
+        if _admits(sub, cand, kappa, V):
+            hi = mid
+        else:
+            lo = mid
+    return StateUpdateGene(decay=(1 - hi) * g.decay, mix=g.mix,
+                           gate_str=(1 - hi) * g.gate_str).clipped()
+
+
+OBSERVE_RADIUS = 0.15   # 観察した死から半径内を「予測致命」とみなす (empirical 境界)
+
+
+def _near_observed_death(gene, death_memory) -> bool:
+    """OBSERVE: 他個体が死んだ gene 近傍 (観察された致命域) かを経験的に判定 (kNN 風)。"""
+    if not death_memory:
+        return False
+    q = _normgene(gene.clipped())
+    dm = np.asarray(death_memory)
+    return bool(np.min(np.sqrt(((dm - q) ** 2).sum(axis=1))) < OBSERVE_RADIUS)
 
 
 def _ga_phase(sub, kappa, gate_fn, V, init_genes, rng, n_gen):
