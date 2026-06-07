@@ -1273,6 +1273,13 @@ fitness behind the unsafe arms (pre-registered tolerance 0.05). The stability-ve
 objection — that a ρ < 1 gate must strangle memory capacity — did not materialize where it was most
 likely to.
 
+![Memory formation under viability threat: the two pre-registered axes](../paper_assets/fig_viability_axes.svg)
+
+*Figure: the two pre-registered axes per mechanism arm, linear (upper bar) and high-gain (lower bar)
+substrates. Left: steady-state lethal evaluations — ENDO is 0.0 on both. Right: population-mean
+fitness — REVIVE dies like NONE yet preserves population memory (rendered:
+`research/paper_assets/fig_viability_axes.svg`; data: `internalization_poc/results_viability_ab.json`).*
+
 **One proof subsumes stacked observation (2³ factorial).** Every mechanism combination containing the
 sound gate records zero steady-state deaths, and the sound gate's presence *cancels* the empirical
 mechanisms' death reduction (E×O interaction +5.6, *p* < 0.001 linear; +1.7, *p* = 0.004 high-gain).
