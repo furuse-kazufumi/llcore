@@ -58,6 +58,18 @@ corpus paper 16 §最大リスク「ρ<1 が可塑性を殺さないか」への
 
 1. **空白象限**: SEVerA (2603.25111) / SGM (2510.10232) / Two-Gate (2510.04399) が「連続 homeostasis を収縮で
    gate」していれば novelty #2 棄却。各 gate 対象 (discrete task vs continuous dynamics) を要精査。
+   **→ ✅ 精査済・棄却なし (2026-06-07, Workflow 6 agents = 一次 fetch×3 経路 + 敵対検証 3/3 uphold)**:
+   - **SEVerA = partial**: Dafny で離散 FOL I/O contract (∀x: Φ(x)⇒Ψ(x,f(x))) を sound 検証 (Theorem 5.3) +
+     fail-closed verified fallback (FGGM) を Search→Verify→Learn ループ内で保持 — **FGGM fallback は REVIVE の
+     構造的 parallel**。contraction/Lyapunov/ρ<1/homeostasis は全文ゼロ。
+   - **SGM = partial (最近接・最優先 must_cite)**: anytime-valid **統計** certificate (Hoeffding LCB>0 /
+     e-value wealth W_t≥1/δ) で再帰 self-modification を fail-closed gate — だが対象は**離散 task 性能**
+     (CIFAR/ImageNet acc, RL reward) で連続内部状態でなく、保証は statistical で deductive-sound でない。
+     査読者対策: 差別化は「statistical vs sound-contraction」×「discrete-task vs continuous-dynamics」の 2 軸で明示。
+   - **2510.04399 = none**: 実タイトル "On The Statistical Limits of Self-Improving Agents" (Wang et al.) —
+     validation margin + VC capacity cap の PAC oracle inequality (離散仮説族)。最強の empirical-gate 対比。
+   - **3 件とも must_cite** (各 1 行対比は Workflow 出力 `wthvr1be4` / 論文編入済みの文面を正とする)。
+   **novelty #2 の「contraction × 連続 memory-core dynamics」象限は無傷。**
 2. **sound>>empirical (最重要)**: death-count 順序が **linear toy のアーティファクト**の可能性。非線形/高次元/
    複数 seed で逆転、または ρ<1 が保守的すぎ可塑性 (記憶獲得能力) を殺し能力指標で OBSERVE に負ければ格下げ。
    = 安定 vs 可塑性 TRIZ 矛盾が解けないなら llcore 中心仮説の棄却。
