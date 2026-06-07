@@ -85,9 +85,12 @@ W_BAR_FIX = 0.1        # 固定 sustained bias 外乱 (tube/包絡)
 G1 = 10
 G2 = 10
 D_SEEDS = list(range(3000, 3020))
-# REVIVE = ユーザー洞察「復活プロセスがないと経験が記憶として残らない」の実装 =
-# 検証器で死を予見し reject でなく **修復** (記憶チャネル mix を保持しつつ dynamics を安全化)。
-ARMS = ["NONE", "EXO_fixed", "ENDO", "REVIVE"]
+# 「経験が記憶になる」3 機構 (ユーザー洞察) + 2 baseline:
+#  ENDO    = 自己予見 (内的健全検証器で死を予見・回避; sound, zero-shot)
+#  REVIVE  = 復活/修復 (死を予見し reject でなく修復; 記憶チャネル mix 保持 = 死を傷として残す)
+#  OBSERVE = 社会的観察 (他個体の観察された死から経験的に境界を学ぶ; empirical, lossy, Goodhart 可能)
+#  NONE/EXO_fixed = baseline (死で無駄 / 設計時固定 gate)
+ARMS = ["NONE", "EXO_fixed", "ENDO", "REVIVE", "OBSERVE"]
 N_TRIALS = 3
 N_SURV_TRIALS = 10
 OVERFLOW = 1e6
