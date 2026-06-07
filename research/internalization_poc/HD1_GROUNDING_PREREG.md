@@ -157,5 +157,7 @@
 1. kernel = `hd1_grounding_kernel.py` (self-contained, RUN_N toggle)。Kaggle T4 で n ごとに
    別 kernel 3 本 (furusekazufumi/hd1-grounding-n{64,128,256})、resumable JSON checkpoint。
    概算: n=64 ≈ 1.2h / n=128 ≈ 3.7h / n=256 ≈ 6h (いずれも 9h 制限内; 量子余裕で順次 or 2 並列)。
+   kernel-metadata 固定項目 (レビュー指摘): `enable_internet: "true"` / `enable_gpu: "true"` /
+   `machine_shape: "NvidiaTeslaT4"`。push 間で変えてよいのは id/title と RUN_N のみ。
 2. pull 後、分析スクリプト (検定は本 doc §3 を実装) で confirmatory 判定 → VERDICT 追補。
 3. 逸脱が必要になった場合は結果 doc に「逸脱」節を設け、本 doc は書き換えない。
