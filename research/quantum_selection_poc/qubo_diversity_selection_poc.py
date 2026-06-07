@@ -38,11 +38,17 @@ from __future__ import annotations
 import itertools
 import json
 import math
+import sys
 from pathlib import Path
 
 import numpy as np
 
 _HERE = Path(__file__).resolve().parent
+
+try:
+    sys.stdout.reconfigure(encoding="utf-8")   # cp932 console 対策 (既知パターン)
+except Exception:
+    pass
 
 
 # ---- 合成集団 (seed 固定; embedding に粗いクラスタ構造を入れて多様性軸を意味あるものに) ----
