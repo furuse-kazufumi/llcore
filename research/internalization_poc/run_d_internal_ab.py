@@ -158,7 +158,7 @@ def _evolve_two_phase(arm: str, seed: int):
     task1 = _build_task(W_LOW)
     task2 = _build_task(W_HIGH)
 
-    base_kw = {k: v for k, v in GA_KW.items()}
+    base_kw = {k: v for k, v in GA_KW.items() if k != "n_generations"}  # n_gen は phase で上書き
     # phase 1
     res1 = evolve(_ff_for(task1), rng=rng, n_generations=G1,
                   **base_kw, **_gate_kw(arm, W_LOW))
