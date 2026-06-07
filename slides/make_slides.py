@@ -34,7 +34,7 @@ def _blank(prs):
 
 
 def _txt(slide, x, y, w, h, lines, size=18, bold=False, color=DARK, align=PP_ALIGN.LEFT,
-         font_ja=True):
+         font_ja=True, space_after=None):
     box = slide.shapes.add_textbox(x, y, w, h)
     tf = box.text_frame
     tf.word_wrap = True
@@ -47,6 +47,8 @@ def _txt(slide, x, y, w, h, lines, size=18, bold=False, color=DARK, align=PP_ALI
             text = line
         p.text = text
         p.alignment = align
+        if space_after is not None:
+            p.space_after = Pt(space_after)
         for r in p.runs:
             r.font.size = Pt(size)
             r.font.bold = bold
