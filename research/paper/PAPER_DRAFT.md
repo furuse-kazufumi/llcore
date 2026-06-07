@@ -1261,7 +1261,7 @@ individuals — learning from death, with death).
 
 **Two pre-registered axes, both confirmed (n = 20 paired seeds, sign-flip permutation).** On the death
 axis, ENDO eliminates steady-state lethal evaluations on both active substrates (linear: 0.0 vs NONE
-27.2, 20/20 positive, *p* < 0.001; high-gain: 0.0 vs 5.1, 17/17 nonzero positive, *p* < 0.001), while
+27.2, 20/20 positive, *p* < 0.001; high-gain: 0.0 vs 5.0, 17/17 nonzero positive, *p* < 0.001), while
 OBSERVE improves on NONE but never approaches zero (17.3 on linear) — empirical learning works, and
 pays for what it learns in deaths. On the memory axis, REVIVE dies about as often as NONE (18.8 vs
 27.2, n.s.) yet preserves *population* fitness through those deaths (pop-mean Δ = +0.060, *p* = 0.0011;
