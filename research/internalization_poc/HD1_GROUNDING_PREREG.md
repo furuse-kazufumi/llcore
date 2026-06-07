@@ -63,7 +63,7 @@
 
 | 項目 | 値 | 備考 |
 |---|---|---|
-| 基質 cfg | layers=1, d=96, T=64, B=24, lr=3e-3, **grad_steps=400**, max_chars=80000 | HD-1 full 同等 (E3 比較) |
+| 基質 cfg | layers=1, d=96, T=64, B=24, lr=3e-3, **grad_steps=400**, max_chars=80000, eval_batches=6 | HD-1 full 同等 (E3 比較) |
 | n | {64, 128, 256} | |
 | seeds | 2026..2041 (16) | 全 arm 共通 (paired) |
 | arms | NONE / ENDO / REVIVE / OBSERVE_P1 / OBSERVE_P2 (+ ENDO_K8 @n=128 探索) | A2 |

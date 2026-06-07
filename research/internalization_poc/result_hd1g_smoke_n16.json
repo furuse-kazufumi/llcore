@@ -1,0 +1,599 @@
+{
+ "meta": {
+  "experiment": "HD-1 grounding main run (preregistered)",
+  "prereg": "HD1_GROUNDING_PREREG.md",
+  "mode": "smoke",
+  "n": 16,
+  "device": "cpu",
+  "gpu": "cpu",
+  "cfg": {
+   "layers": 1,
+   "d": 32,
+   "T": 16,
+   "B": 4,
+   "lr": 0.003,
+   "grad_steps": 20,
+   "max_chars": 4000,
+   "eval_batches": 2,
+   "seeds": [
+    2026,
+    2027
+   ],
+   "gate_k": 4,
+   "measure_m": 5,
+   "sep_T": 60,
+   "observe_pctl": 10.0,
+   "beta": 0.5,
+   "ma_window": 4,
+   "rho_samples_pt": 16,
+   "rho_samples_hp": 32,
+   "unigram_ce": 3.2117029039509926
+  },
+  "status": "done",
+  "error": null,
+  "start_time": "2026-06-07T18:37:10",
+  "end_time": "2026-06-07T18:37:14"
+ },
+ "records": [
+  {
+   "arm": "NONE",
+   "n": 16,
+   "seed": 2026,
+   "final_ce": 3.3293296098709106,
+   "deaths_contract": 0,
+   "deaths_harm": 0,
+   "repairs": 0,
+   "rollbacks": 0,
+   "avoids": 0,
+   "death_proxy_log": [],
+   "final_rho_hp": 0.9119737025364595,
+   "trajectory": [
+    {
+     "step": 5,
+     "rho_hat": 0.8620980484380707,
+     "sep_rate": -0.18071242561809342,
+     "proxy_g": 0.0793705407126076,
+     "infnorm_sup": 0.9220160946364605,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": 0.0793705407126076
+    },
+    {
+     "step": 10,
+     "rho_hat": 0.8621949167196237,
+     "sep_rate": -0.17531881563570814,
+     "proxy_g": 0.24496902008258245,
+     "infnorm_sup": 0.9600947286184556,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": 0.16216978039759503
+    },
+    {
+     "step": 15,
+     "rho_hat": 0.8614649737384881,
+     "sep_rate": -0.16451311313027805,
+     "proxy_g": -0.09027478933686843,
+     "infnorm_sup": 1.022734678100753,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": 0.0780215904861072
+    },
+    {
+     "step": 20,
+     "rho_hat": 0.8993645919891186,
+     "sep_rate": -0.1619889868890088,
+     "proxy_g": 0.07664988695692668,
+     "infnorm_sup": 1.1028235648487494,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": 0.07767866460381206
+    }
+   ],
+   "status": "ok"
+  },
+  {
+   "arm": "NONE",
+   "n": 16,
+   "seed": 2027,
+   "final_ce": 3.431327223777771,
+   "deaths_contract": 0,
+   "deaths_harm": 0,
+   "repairs": 0,
+   "rollbacks": 0,
+   "avoids": 0,
+   "death_proxy_log": [],
+   "final_rho_hp": 0.9700858114603151,
+   "trajectory": [
+    {
+     "step": 5,
+     "rho_hat": 0.8431283812291479,
+     "sep_rate": -0.19749028371235025,
+     "proxy_g": -0.03992109100880713,
+     "infnorm_sup": 0.9386776124783266,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": -0.03992109100880713
+    },
+    {
+     "step": 10,
+     "rho_hat": 0.8553962095834626,
+     "sep_rate": -0.19297222211096923,
+     "proxy_g": 0.03045171226544997,
+     "infnorm_sup": 0.9763539059470031,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": -0.004734689371678579
+    },
+    {
+     "step": 15,
+     "rho_hat": 0.9029492725206693,
+     "sep_rate": -0.13627946635984836,
+     "proxy_g": 0.012098220233333672,
+     "infnorm_sup": 1.0322157131823062,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": 0.000876280496658838
+    },
+    {
+     "step": 20,
+     "rho_hat": 0.9736735560807618,
+     "sep_rate": -0.12428161513980102,
+     "proxy_g": -0.044310751943410026,
+     "infnorm_sup": 1.1273046203730455,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": -0.010420477613358379
+    }
+   ],
+   "status": "ok"
+  },
+  {
+   "arm": "ENDO",
+   "n": 16,
+   "seed": 2026,
+   "final_ce": 3.3510838747024536,
+   "deaths_contract": 0,
+   "deaths_harm": 0,
+   "repairs": 0,
+   "rollbacks": 2,
+   "avoids": 0,
+   "death_proxy_log": [],
+   "final_rho_hp": 0.8626314182496917,
+   "trajectory": [
+    {
+     "step": 5,
+     "rho_hat": 0.8620980484380707,
+     "sep_rate": -0.18071242561809342,
+     "proxy_g": 0.0793705407126076,
+     "infnorm_sup": 0.9220160946364605,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": 0.0793705407126076
+    },
+    {
+     "step": 10,
+     "rho_hat": 0.8621949167196237,
+     "sep_rate": -0.17531881563570814,
+     "proxy_g": 0.24496902008258245,
+     "infnorm_sup": 0.9600947286184556,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": 0.16216978039759503
+    },
+    {
+     "step": 15,
+     "rho_hat": 0.8614649737384881,
+     "sep_rate": -0.16451311313027805,
+     "proxy_g": -0.09027478933686843,
+     "infnorm_sup": 1.022734678100753,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": 0.0780215904861072
+    },
+    {
+     "step": 20,
+     "rho_hat": 0.8622010729950318,
+     "sep_rate": -0.16851865032396243,
+     "proxy_g": 0.05550898131281366,
+     "infnorm_sup": 0.9818906330195363,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": 0.07239343819278382
+    }
+   ],
+   "status": "ok"
+  },
+  {
+   "arm": "ENDO",
+   "n": 16,
+   "seed": 2027,
+   "final_ce": 3.4756139516830444,
+   "deaths_contract": 0,
+   "deaths_harm": 0,
+   "repairs": 0,
+   "rollbacks": 2,
+   "avoids": 0,
+   "death_proxy_log": [],
+   "final_rho_hp": 0.8684454238499507,
+   "trajectory": [
+    {
+     "step": 5,
+     "rho_hat": 0.8431283812291479,
+     "sep_rate": -0.19749028371235025,
+     "proxy_g": -0.03992109100880713,
+     "infnorm_sup": 0.9386776124783266,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": -0.03992109100880713
+    },
+    {
+     "step": 10,
+     "rho_hat": 0.8553962095834626,
+     "sep_rate": -0.19297222211096923,
+     "proxy_g": 0.03045171226544997,
+     "infnorm_sup": 0.9763539059470031,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": -0.004734689371678579
+    },
+    {
+     "step": 15,
+     "rho_hat": 0.9029492725206693,
+     "sep_rate": -0.13627946635984836,
+     "proxy_g": 0.012098220233333672,
+     "infnorm_sup": 1.0322157131823062,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": 0.000876280496658838
+    },
+    {
+     "step": 20,
+     "rho_hat": 0.8697511872138497,
+     "sep_rate": -0.17904047686362545,
+     "proxy_g": -0.05463145257185396,
+     "infnorm_sup": 0.9967001596718847,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": -0.01300065277046936
+    }
+   ],
+   "status": "ok"
+  },
+  {
+   "arm": "REVIVE",
+   "n": 16,
+   "seed": 2026,
+   "final_ce": 3.3293296098709106,
+   "deaths_contract": 0,
+   "deaths_harm": 0,
+   "repairs": 0,
+   "rollbacks": 0,
+   "avoids": 0,
+   "death_proxy_log": [],
+   "final_rho_hp": 0.9119737025364595,
+   "trajectory": [
+    {
+     "step": 5,
+     "rho_hat": 0.8620980484380707,
+     "sep_rate": -0.18071242561809342,
+     "proxy_g": 0.0793705407126076,
+     "infnorm_sup": 0.9220160946364605,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": 0.0793705407126076
+    },
+    {
+     "step": 10,
+     "rho_hat": 0.8621949167196237,
+     "sep_rate": -0.17531881563570814,
+     "proxy_g": 0.24496902008258245,
+     "infnorm_sup": 0.9600947286184556,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": 0.16216978039759503
+    },
+    {
+     "step": 15,
+     "rho_hat": 0.8614649737384881,
+     "sep_rate": -0.16451311313027805,
+     "proxy_g": -0.09027478933686843,
+     "infnorm_sup": 1.022734678100753,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": 0.0780215904861072
+    },
+    {
+     "step": 20,
+     "rho_hat": 0.8993645919891186,
+     "sep_rate": -0.1619889868890088,
+     "proxy_g": 0.07664988695692668,
+     "infnorm_sup": 1.1028235648487494,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": 0.07767866460381206
+    }
+   ],
+   "status": "ok"
+  },
+  {
+   "arm": "REVIVE",
+   "n": 16,
+   "seed": 2027,
+   "final_ce": 3.431327223777771,
+   "deaths_contract": 0,
+   "deaths_harm": 0,
+   "repairs": 0,
+   "rollbacks": 0,
+   "avoids": 0,
+   "death_proxy_log": [],
+   "final_rho_hp": 0.9700858114603151,
+   "trajectory": [
+    {
+     "step": 5,
+     "rho_hat": 0.8431283812291479,
+     "sep_rate": -0.19749028371235025,
+     "proxy_g": -0.03992109100880713,
+     "infnorm_sup": 0.9386776124783266,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": -0.03992109100880713
+    },
+    {
+     "step": 10,
+     "rho_hat": 0.8553962095834626,
+     "sep_rate": -0.19297222211096923,
+     "proxy_g": 0.03045171226544997,
+     "infnorm_sup": 0.9763539059470031,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": -0.004734689371678579
+    },
+    {
+     "step": 15,
+     "rho_hat": 0.9029492725206693,
+     "sep_rate": -0.13627946635984836,
+     "proxy_g": 0.012098220233333672,
+     "infnorm_sup": 1.0322157131823062,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": 0.000876280496658838
+    },
+    {
+     "step": 20,
+     "rho_hat": 0.9736735560807618,
+     "sep_rate": -0.12428161513980102,
+     "proxy_g": -0.044310751943410026,
+     "infnorm_sup": 1.1273046203730455,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": -0.010420477613358379
+    }
+   ],
+   "status": "ok"
+  },
+  {
+   "arm": "OBSERVE_P1",
+   "n": 16,
+   "seed": 2026,
+   "final_ce": 3.3293296098709106,
+   "deaths_contract": 0,
+   "deaths_harm": 0,
+   "repairs": 0,
+   "rollbacks": 0,
+   "avoids": 0,
+   "death_proxy_log": [],
+   "final_rho_hp": 0.9119737025364595,
+   "trajectory": [
+    {
+     "step": 5,
+     "rho_hat": 0.8620980484380707,
+     "sep_rate": -0.18071242561809342,
+     "proxy_g": 0.0793705407126076,
+     "infnorm_sup": 0.9220160946364605,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": 0.0793705407126076
+    },
+    {
+     "step": 10,
+     "rho_hat": 0.8621949167196237,
+     "sep_rate": -0.17531881563570814,
+     "proxy_g": 0.24496902008258245,
+     "infnorm_sup": 0.9600947286184556,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": 0.16216978039759503
+    },
+    {
+     "step": 15,
+     "rho_hat": 0.8614649737384881,
+     "sep_rate": -0.16451311313027805,
+     "proxy_g": -0.09027478933686843,
+     "infnorm_sup": 1.022734678100753,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": 0.0780215904861072
+    },
+    {
+     "step": 20,
+     "rho_hat": 0.8993645919891186,
+     "sep_rate": -0.1619889868890088,
+     "proxy_g": 0.07664988695692668,
+     "infnorm_sup": 1.1028235648487494,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": 0.07767866460381206
+    }
+   ],
+   "status": "ok"
+  },
+  {
+   "arm": "OBSERVE_P1",
+   "n": 16,
+   "seed": 2027,
+   "final_ce": 3.431327223777771,
+   "deaths_contract": 0,
+   "deaths_harm": 0,
+   "repairs": 0,
+   "rollbacks": 0,
+   "avoids": 0,
+   "death_proxy_log": [],
+   "final_rho_hp": 0.9700858114603151,
+   "trajectory": [
+    {
+     "step": 5,
+     "rho_hat": 0.8431283812291479,
+     "sep_rate": -0.19749028371235025,
+     "proxy_g": -0.03992109100880713,
+     "infnorm_sup": 0.9386776124783266,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": -0.03992109100880713
+    },
+    {
+     "step": 10,
+     "rho_hat": 0.8553962095834626,
+     "sep_rate": -0.19297222211096923,
+     "proxy_g": 0.03045171226544997,
+     "infnorm_sup": 0.9763539059470031,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": -0.004734689371678579
+    },
+    {
+     "step": 15,
+     "rho_hat": 0.9029492725206693,
+     "sep_rate": -0.13627946635984836,
+     "proxy_g": 0.012098220233333672,
+     "infnorm_sup": 1.0322157131823062,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": 0.000876280496658838
+    },
+    {
+     "step": 20,
+     "rho_hat": 0.9736735560807618,
+     "sep_rate": -0.12428161513980102,
+     "proxy_g": -0.044310751943410026,
+     "infnorm_sup": 1.1273046203730455,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": -0.010420477613358379
+    }
+   ],
+   "status": "ok"
+  },
+  {
+   "arm": "OBSERVE_P2",
+   "n": 16,
+   "seed": 2026,
+   "final_ce": 3.3293296098709106,
+   "deaths_contract": 0,
+   "deaths_harm": 0,
+   "repairs": 0,
+   "rollbacks": 0,
+   "avoids": 0,
+   "death_proxy_log": [],
+   "final_rho_hp": 0.9119737025364595,
+   "trajectory": [
+    {
+     "step": 5,
+     "rho_hat": 0.8620980484380707,
+     "sep_rate": -0.18071242561809342,
+     "proxy_g": 0.0793705407126076,
+     "infnorm_sup": 0.9220160946364605,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": 0.0793705407126076
+    },
+    {
+     "step": 10,
+     "rho_hat": 0.8621949167196237,
+     "sep_rate": -0.17531881563570814,
+     "proxy_g": 0.24496902008258245,
+     "infnorm_sup": 0.9600947286184556,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": 0.16216978039759503
+    },
+    {
+     "step": 15,
+     "rho_hat": 0.8614649737384881,
+     "sep_rate": -0.16451311313027805,
+     "proxy_g": -0.09027478933686843,
+     "infnorm_sup": 1.022734678100753,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": 0.0780215904861072
+    },
+    {
+     "step": 20,
+     "rho_hat": 0.8993645919891186,
+     "sep_rate": -0.1619889868890088,
+     "proxy_g": 0.07664988695692668,
+     "infnorm_sup": 1.1028235648487494,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": 0.07767866460381206
+    }
+   ],
+   "status": "ok"
+  },
+  {
+   "arm": "OBSERVE_P2",
+   "n": 16,
+   "seed": 2027,
+   "final_ce": 3.431327223777771,
+   "deaths_contract": 0,
+   "deaths_harm": 0,
+   "repairs": 0,
+   "rollbacks": 0,
+   "avoids": 0,
+   "death_proxy_log": [],
+   "final_rho_hp": 0.9700858114603151,
+   "trajectory": [
+    {
+     "step": 5,
+     "rho_hat": 0.8431283812291479,
+     "sep_rate": -0.19749028371235025,
+     "proxy_g": -0.03992109100880713,
+     "infnorm_sup": 0.9386776124783266,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": -0.03992109100880713
+    },
+    {
+     "step": 10,
+     "rho_hat": 0.8553962095834626,
+     "sep_rate": -0.19297222211096923,
+     "proxy_g": 0.03045171226544997,
+     "infnorm_sup": 0.9763539059470031,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": -0.004734689371678579
+    },
+    {
+     "step": 15,
+     "rho_hat": 0.9029492725206693,
+     "sep_rate": -0.13627946635984836,
+     "proxy_g": 0.012098220233333672,
+     "infnorm_sup": 1.0322157131823062,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": 0.000876280496658838
+    },
+    {
+     "step": 20,
+     "rho_hat": 0.9736735560807618,
+     "sep_rate": -0.12428161513980102,
+     "proxy_g": -0.044310751943410026,
+     "infnorm_sup": 1.1273046203730455,
+     "contract_death": false,
+     "harm_death": false,
+     "proxy_ma": -0.010420477613358379
+    }
+   ],
+   "status": "ok"
+  }
+ ]
+}
