@@ -1,0 +1,104 @@
+{
+  "meta": {
+    "z3_available": true,
+    "n_gene_per_kernel": 400,
+    "state_bound": 1.0,
+    "max_input": 1.0,
+    "note": "feasibility smoke; diagonal scalar kernel mocks; NOT full impl"
+  },
+  "kernels": {
+    "rwkv": {
+      "BG1_state_norm": {
+        "admit_rate": 1.0,
+        "reject": 0,
+        "unknown": 0,
+        "pass": true
+      },
+      "BG2_lipschitz_match": {
+        "match_rate": 1.0,
+        "timeout": 0,
+        "pass": true
+      },
+      "BG3_overapprox": {
+        "violations": 0,
+        "pass": true
+      },
+      "L_upper_bound_range": [
+        0.03010289014216621,
+        1.9248706302682508
+      ],
+      "contraction_frac_closedform": 0.7175
+    },
+    "mamba_selective": {
+      "BG1_state_norm": {
+        "admit_rate": 1.0,
+        "reject": 0,
+        "unknown": 0,
+        "pass": true
+      },
+      "BG2_lipschitz_match": {
+        "match_rate": 1.0,
+        "timeout": 0,
+        "pass": true
+      },
+      "BG3_overapprox": {
+        "violations": 0,
+        "pass": true
+      },
+      "L_upper_bound_range": [
+        1.0,
+        1.0
+      ],
+      "contraction_frac_closedform": 0.0
+    },
+    "hopfield_dense": {
+      "BG1_state_norm": {
+        "admit_rate": 1.0,
+        "reject": 0,
+        "unknown": 0,
+        "pass": true
+      },
+      "BG2_lipschitz_match": {
+        "match_rate": 1.0,
+        "timeout": 0,
+        "pass": true
+      },
+      "BG3_overapprox": {
+        "violations": 0,
+        "pass": true
+      },
+      "L_upper_bound_range": [
+        0.05207691260916461,
+        2.470108108649314
+      ],
+      "contraction_frac_closedform": 0.7975
+    },
+    "linear_attn": {
+      "BG1_state_norm": {
+        "admit_rate": 0.42,
+        "reject": 232,
+        "unknown": 0,
+        "pass": true
+      },
+      "BG2_lipschitz_match": {
+        "match_rate": 1.0,
+        "timeout": 0,
+        "pass": true
+      },
+      "BG3_overapprox": {
+        "violations": 0,
+        "pass": true
+      },
+      "L_upper_bound_range": [
+        0.00325484085428851,
+        0.9997218795658168
+      ],
+      "contraction_frac_closedform": 1.0
+    }
+  },
+  "BG5_rwkv_backcompat": {
+    "n_tested": 50,
+    "all_bit_match": true,
+    "pass": true
+  }
+}

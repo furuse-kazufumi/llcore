@@ -1,0 +1,122 @@
+{
+  "task": "delayed_parity(seq_len=20,window=5)",
+  "mechanism": "wide_single",
+  "n_random": 300,
+  "n_seeds": 8,
+  "n_train": 48,
+  "n_eval": 48,
+  "floor_lift_threshold": 0.5,
+  "widths": [
+    8,
+    24,
+    48,
+    64
+  ],
+  "ceilings": {
+    "8": {
+      "n_taps": 8,
+      "gene_dim": 16,
+      "total_taps": 8,
+      "per_seed_max_r2": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.045205686904055464,
+        0.0,
+        0.0
+      ],
+      "mean": 0.005650710863006933,
+      "std": 0.014950375674247517,
+      "max": 0.045205686904055464,
+      "min": 0.0
+    },
+    "24": {
+      "n_taps": 24,
+      "gene_dim": 48,
+      "total_taps": 24,
+      "per_seed_max_r2": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.024591025556019885,
+        0.0,
+        0.0
+      ],
+      "mean": 0.0030738781945024857,
+      "std": 0.008132717263157807,
+      "max": 0.024591025556019885,
+      "min": 0.0
+    },
+    "48": {
+      "n_taps": 48,
+      "gene_dim": 96,
+      "total_taps": 48,
+      "per_seed_max_r2": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean": 0.0,
+      "std": 0.0,
+      "max": 0.0,
+      "min": 0.0
+    },
+    "64": {
+      "n_taps": 64,
+      "gene_dim": 128,
+      "total_taps": 64,
+      "per_seed_max_r2": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean": 0.0,
+      "std": 0.0,
+      "max": 0.0,
+      "min": 0.0
+    }
+  },
+  "baseline_1L8_max_r2": 0.045205686904055464,
+  "baseline_1L8_mean_r2": 0.005650710863006933,
+  "mechanism_best_max_r2": 0.045205686904055464,
+  "mechanism_best_wide_only_max_r2": 0.024591025556019885,
+  "best_wide_width": 24,
+  "floor_lifted": false,
+  "vs_baseline": {
+    "24": {
+      "diff": -0.0025768326685044474,
+      "wilcoxon_p": 1.0,
+      "paired_sign_delta": -0.125,
+      "win_rate": 0.0,
+      "passes": false
+    },
+    "48": {
+      "diff": -0.005650710863006933,
+      "wilcoxon_p": 1.0,
+      "paired_sign_delta": -0.125,
+      "win_rate": 0.0,
+      "passes": false
+    },
+    "64": {
+      "diff": -0.005650710863006933,
+      "wilcoxon_p": 1.0,
+      "paired_sign_delta": -0.125,
+      "win_rate": 0.0,
+      "passes": false
+    }
+  }
+}

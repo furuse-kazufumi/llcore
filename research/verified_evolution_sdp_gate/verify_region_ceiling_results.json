@@ -1,0 +1,131 @@
+{
+  "n_scan": 6000,
+  "seed": 31337,
+  "quad_region_ceilings": {
+    "inf": 0.3392,
+    "two_only": 0.6179,
+    "sdp_only": 0.7196
+  },
+  "ceiling_L2_sdp": 0.7196,
+  "ceiling_L3_deg4": 0.7196,
+  "ceiling_L4_deg6": 0.7196,
+  "payoff_deg4_over_sdp": 0.0,
+  "payoff_deg6_over_deg4": 0.0,
+  "n_deg4_cert_in_top": 70,
+  "n_deg6_only_in_top": 28,
+  "deg4_top5_fitness": [
+    0.6051,
+    0.3939,
+    0.389,
+    0.3822,
+    0.3713
+  ],
+  "deg6_only_top5_fitness": [
+    0.5012,
+    0.4977,
+    0.4318,
+    0.39,
+    0.3625
+  ],
+  "deg4_ceiling_gene": {
+    "decay": [
+      0.5987236077160768,
+      0.1665326066419377
+    ],
+    "W": [
+      -0.34003185672831737,
+      -0.876852238170498,
+      0.7786042592412992,
+      0.7705918227790773
+    ]
+  },
+  "soundness_deg4_top": [
+    {
+      "fitness": 0.6051,
+      "rho_50k": 0.77603,
+      "sound": true
+    },
+    {
+      "fitness": 0.3939,
+      "rho_50k": 0.66676,
+      "sound": true
+    },
+    {
+      "fitness": 0.389,
+      "rho_50k": 0.64139,
+      "sound": true
+    },
+    {
+      "fitness": 0.3822,
+      "rho_50k": 0.90163,
+      "sound": true
+    },
+    {
+      "fitness": 0.3713,
+      "rho_50k": 0.60093,
+      "sound": true
+    },
+    {
+      "fitness": 0.357,
+      "rho_50k": 0.92662,
+      "sound": true
+    },
+    {
+      "fitness": 0.3421,
+      "rho_50k": 0.73768,
+      "sound": true
+    },
+    {
+      "fitness": 0.3247,
+      "rho_50k": 0.65871,
+      "sound": true
+    }
+  ],
+  "soundness_deg6only_top": [
+    {
+      "fitness": 0.5012,
+      "rho_50k": 0.93638,
+      "sound": true
+    },
+    {
+      "fitness": 0.4977,
+      "rho_50k": 0.85949,
+      "sound": true
+    },
+    {
+      "fitness": 0.4318,
+      "rho_50k": 0.84801,
+      "sound": true
+    },
+    {
+      "fitness": 0.39,
+      "rho_50k": 0.89916,
+      "sound": true
+    },
+    {
+      "fitness": 0.3625,
+      "rho_50k": 0.82678,
+      "sound": true
+    },
+    {
+      "fitness": 0.2928,
+      "rho_50k": 0.88962,
+      "sound": true
+    },
+    {
+      "fitness": 0.2555,
+      "rho_50k": 0.81408,
+      "sound": true
+    },
+    {
+      "fitness": 0.2481,
+      "rho_50k": 0.66545,
+      "sound": true
+    }
+  ],
+  "n_unsound_deg4": 0,
+  "n_unsound_deg6only": 0,
+  "SOUND": true,
+  "REAL_deg4_payoff": false,
+  "elapsed_s": 157.4
+}

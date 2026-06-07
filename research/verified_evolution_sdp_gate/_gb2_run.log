@@ -1,0 +1,69 @@
+residual reference: {"transient": 1.4745985540423523, "decay": [0.9518975460886661, 0.5321053437913573], "W": [0.9555754937615548, 0.9344752712733384, -1.2205147408778023, 0.837540682604899], "deg4": false, "deg6": true}
+research\verified_evolution_sdp_gate\verifier_deg6.py:104: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
+  cp.Problem(cp.Minimize(cp.trace(P)), cons).solve(solver=_SOLVER)
+[rotation] reach means: {'L0_inf': 0.4082, 'L1_two': 0.7438, 'L2_sdp': 0.8587, 'L3_deg4': 0.932, 'L4_deg6': 0.9386}
+[residual_reach] reach means: {'L0_inf': 0.066, 'L1_two': 0.0589, 'L2_sdp': 0.9158, 'L3_deg4': 0.9238, 'L4_deg6': 0.9359}
+{
+  "n_seeds": 15,
+  "base_seed": 4000,
+  "scipy": true,
+  "residual_reference": {
+    "transient": 1.4745985540423523,
+    "decay": [
+      0.9518975460886661,
+      0.5321053437913573
+    ],
+    "W": [
+      0.9555754937615548,
+      0.9344752712733384,
+      -1.2205147408778023,
+      0.837540682604899
+    ],
+    "deg4": false,
+    "deg6": true
+  },
+  "reach_means": {
+    "rotation": {
+      "L0_inf": 0.4082,
+      "L1_two": 0.7438,
+      "L2_sdp": 0.8587,
+      "L3_deg4": 0.932,
+      "L4_deg6": 0.9386
+    },
+    "residual_reach": {
+      "L0_inf": 0.066,
+      "L1_two": 0.0589,
+      "L2_sdp": 0.9158,
+      "L3_deg4": 0.9238,
+      "L4_deg6": 0.9359
+    }
+  },
+  "G_B1_positive_control_rotation_L1_vs_L0": {
+    "mean_a": 0.7437898136821578,
+    "mean_b": 0.4081999677465831,
+    "mean_delta": 0.33558984593557467,
+    "paired_sign_delta": 1.0,
+    "wilcoxon_p_greater": 3.0517578125e-05,
+    "n": 15,
+    "strict_pass": true
+  },
+  "G_B2_capability_L4deg6_vs_L2sdp": {
+    "mean_a": 0.9358664461355499,
+    "mean_b": 0.9158221728814792,
+    "mean_delta": 0.020044273254070728,
+    "paired_sign_delta": 0.3333333333333333,
+    "wilcoxon_p_greater": 0.138427734375,
+    "n": 15,
+    "strict_pass": false
+  },
+  "G_B2_capability_L3deg4_vs_L2sdp": {
+    "mean_a": 0.9237897486341449,
+    "mean_b": 0.9158221728814792,
+    "mean_delta": 0.007967575752665882,
+    "paired_sign_delta": 0.13333333333333333,
+    "wilcoxon_p_greater": 0.26514229841680476,
+    "n": 15,
+    "strict_pass": false
+  },
+  "elapsed_s": 1308.4
+}

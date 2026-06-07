@@ -1,0 +1,27 @@
+corpus=8192B  n=8  n_genes=500  unigram_CE=3.5571
+  50/500  (156s)
+research\verified_evolution_sdp_gate\coupled_nd.py:163: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
+  prob.solve(solver=_SOLVER)
+  100/500  (306s)
+  150/500  (447s)
+  200/500  (589s)
+  250/500  (728s)
+  300/500  (874s)
+  350/500  (1009s)
+  400/500  (1134s)
+  450/500  (1261s)
+  500/500  (1388s)
+
+region               n  best_CE best_CE(contr) median_CE <unigram(best) %expansive
+inf                202   3.4395         3.4395    3.5264         0.1176        0.0
+two_norm_only       55   3.4294         3.4294    3.5306         0.1277        0.0
+sdp_only           110   3.4413         3.4413    3.5288         0.1158        0.0
+non_certified      133   3.4512         3.4858    3.5330         0.1059       76.7
+
+--- L3 frontier (best CONTRACTING held-out CE per region; lower=better) ---
+  inf              best_contracting_CE=3.4395
+  two_norm_only    best_contracting_CE=3.4294  (Δ vs prev=+0.0101)
+  sdp_only         best_contracting_CE=3.4413  (Δ vs prev=-0.0119)
+  non_certified    best_contracting_CE=3.4858  (Δ vs prev=-0.0445)
+
+saved exp_landscape_results.json  (1387.9s)

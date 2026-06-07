@@ -1,0 +1,579 @@
+{
+  "_meta": {
+    "script": "exp3_clip_verdict_flip",
+    "wall_clock_s": 1202.914,
+    "src_unchanged": true,
+    "src_changed_files": [],
+    "exit_ok": true,
+    "wall_clock_s_total": 1202.911,
+    "mode": "full",
+    "design": "EXP3 K4 clip verdict-flip + null-ridge FPR (Codex F2 確定/反証)",
+    "base_seed": 20260601,
+    "n_seeds": 15,
+    "n_evals_verdict": 60,
+    "n_evals_null": 40,
+    "honest_n": 8,
+    "n_tr": 16,
+    "grid_k": 12,
+    "null_seeds": [
+      20260701,
+      20260801,
+      20260901,
+      20261001
+    ],
+    "ea_baselines": [
+      "map_elites_randselect",
+      "panmictic_ga",
+      "random"
+    ],
+    "supersedes": "research/statistical_power_audit/ablate_suppression_knobs.py K4_clip_spread (spread/floor 率のみ; verdict-flip 未測)",
+    "budget_reduction_disclosure": "ridge_fitness は ~10ms/call (n_tr=16)。verdict-flip / FPR の ③判定に効果量精度は不要なので n_evals/honest_n/n_tr を縮小: verdict n_evals=60, null n_evals=40, honest_n=8, n_tr=16, grid_k=12。注: 縮小後も --phase both 1 プロセスは ~1203s と G1(900s) 超過 — g1_break_gate 参照。--phase 分割で各 phase は G1 内。exp_ea3 本実験は n_evals=400/honest_n=30/n_tr=48。本実験は③の有無 (verdict 反転) の検出が目的で精密な効果量は不要なため縮小。silent truncation なし。CRN seed は clip True/False 間で共通。",
+    "honest_caveats": "(1) ridge_fitness の clip=True 0.0 は raw R²<0 を潰した床で『信号皆無』とは識別不能 (ridge_readout docstring の Codex High finding)。(2) 縮小予算ゆえ underpowered な case では verdict_flip=False が 『clip 無関係』でなく『低 power で③検出不能』の可能性 (EXP1 の psd 床 問題と同根)。本実験は『clip を外しても③が出ないか』の方向性確認が主眼。(3) null-ridge FPR は len(null_seeds) 反復のみで MC 誤差大 (±1/sqrt(N))。FPR delta が 0.05 床近傍なら『分離不能』判定が妥当。",
+    "g1_break_gate": {
+      "limit_s": 900.0,
+      "wall_clock_s": 1202.914,
+      "phase": "both",
+      "g1_pass": false,
+      "note": "G1 違反 (honest disclosure): この authoritative 結果は --phase both を 1 プロセスで 回した初回 full run で wall_clock=1202.9s と G1(900s) を超過。silent truncation は していない (全 verdict-flip + null-FPR を完走)。再現で G1 を守る remedy = --phase verdict と --phase null の 2 run に分割 (TRIZ #1 分割; partial JSON で merge)。分割等価性は smoke で検証済 (per-seed/FPR/G3 配列が both と split で完全一致, 決定論 G2)。full 分割の実走では verdict phase が並列 sibling agent との CPU 競合で kill (verdict_EXIT=-1) されたが、これは予算ではなく環境競合 (本実験は src 非改変・決定論なので再走で同値再現可)。verdict phase 単独 ~770s / null phase 単独 ~430s と推定 (both 1203s の内訳; 各 phase は G1 内)。"
+    },
+    "cf2_and_cf4_amendment": "[CF2] 統合判定に g3.diagnostic_valid を配線: diagnostic_valid=False なら still_inconclusive に降格 (sanity 不成立ゆえ判定保留)。現 run は diagnostic_valid=True ゆえ verdict 不変。[CF4] K4 null verdict label を null_confirmed_at_power → not_load_bearing_at_this_budget に 精緻化 (数値不変, label 後付け訂正)。partial 不在ゆえ JSON フィールド直接更新。"
+  },
+  "g3_gate_sanity": {
+    "known_positive_passes": true,
+    "known_positive_p": 3.0517578125e-05,
+    "known_positive_psd": 1.0,
+    "known_null_fpr": 0.0275,
+    "known_null_fpr_under_010": true,
+    "diagnostic_valid": true
+  },
+  "verdict_flip": {
+    "addition": {
+      "clip_true": {
+        "map_elites_mean": 0.009985452364906455,
+        "map_elites_std": 0.013443140426592235,
+        "per_baseline": {
+          "map_elites_randselect": {
+            "diff": 0.005322533977704332,
+            "wilcoxon_p": 0.12056068413870913,
+            "paired_sign_delta": 0.4,
+            "cliff_delta_textbook": 0.20444444444444446,
+            "cond_diff_pos": true,
+            "cond_p": false,
+            "cond_effect": true,
+            "cond_n": true,
+            "passes": false
+          },
+          "panmictic_ga": {
+            "diff": 0.006855040151360234,
+            "wilcoxon_p": 0.0331580156494654,
+            "paired_sign_delta": 0.4666666666666667,
+            "cliff_delta_textbook": 0.26222222222222225,
+            "cond_diff_pos": true,
+            "cond_p": true,
+            "cond_effect": true,
+            "cond_n": true,
+            "passes": true
+          },
+          "random": {
+            "diff": 0.0026494072064426537,
+            "wilcoxon_p": 0.19313536018324134,
+            "paired_sign_delta": 0.26666666666666666,
+            "cliff_delta_textbook": 0.17333333333333334,
+            "cond_diff_pos": true,
+            "cond_p": false,
+            "cond_effect": true,
+            "cond_n": true,
+            "passes": false
+          }
+        },
+        "n_baselines_beaten": 1,
+        "load_bearing": false
+      },
+      "clip_false": {
+        "map_elites_mean": -1.2116947418254405,
+        "map_elites_std": 0.8326071505174995,
+        "per_baseline": {
+          "map_elites_randselect": {
+            "diff": -0.029983873839396588,
+            "wilcoxon_p": 0.4234619140625,
+            "paired_sign_delta": 0.2,
+            "cliff_delta_textbook": -0.0044444444444444444,
+            "cond_diff_pos": false,
+            "cond_p": false,
+            "cond_effect": true,
+            "cond_n": true,
+            "passes": false
+          },
+          "panmictic_ga": {
+            "diff": -0.36028477035249995,
+            "wilcoxon_p": 0.946502685546875,
+            "paired_sign_delta": -0.6,
+            "cliff_delta_textbook": -0.27111111111111114,
+            "cond_diff_pos": false,
+            "cond_p": false,
+            "cond_effect": true,
+            "cond_n": true,
+            "passes": false
+          },
+          "random": {
+            "diff": -0.42313610686027037,
+            "wilcoxon_p": 0.924285888671875,
+            "paired_sign_delta": -0.4666666666666667,
+            "cliff_delta_textbook": -0.3422222222222222,
+            "cond_diff_pos": false,
+            "cond_p": false,
+            "cond_effect": true,
+            "cond_n": true,
+            "passes": false
+          }
+        },
+        "n_baselines_beaten": 0,
+        "load_bearing": false
+      },
+      "verdict_flip_false_reveals_third": false,
+      "reverse_flip_clip_needed_for_third": false,
+      "per_seed_clip_true": {
+        "map_elites": [
+          0.0,
+          0.0037205769330277416,
+          0.019239470950605853,
+          0.0,
+          0.0158853836519737,
+          0.006409317659908612,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.03267427552826442,
+          0.0,
+          0.0193102967735142,
+          0.007454571192795134,
+          0.04508789278350718
+        ],
+        "map_elites_randselect": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0027096655618297633,
+          0.0,
+          0.0,
+          0.02126550058437117,
+          0.0,
+          0.0,
+          0.0064409107980965274,
+          0.028480211162166202,
+          0.0,
+          0.0049653004949847535,
+          0.006082187206583448
+        ],
+        "panmictic_ga": [
+          0.0,
+          0.0,
+          0.008830697682661467,
+          0.0,
+          0.002576514044956804,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.02171263360343459,
+          0.009764006739758108,
+          0.0040723311323823674,
+          0.0
+        ],
+        "random": [
+          0.0,
+          0.0,
+          0.00014986329519019181,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.010083888092048049,
+          0.0,
+          0.0,
+          0.0,
+          0.037481503614949355,
+          0.0,
+          0.02280907826919147,
+          0.03951634410557797
+        ]
+      },
+      "per_seed_clip_false": {
+        "map_elites": [
+          -1.6463095744799854,
+          -1.8638791202622609,
+          -1.440912786635876,
+          -0.753477734751066,
+          -0.7390687927651973,
+          -0.2269167138584526,
+          -1.3607170614513842,
+          -3.675866261478725,
+          -1.0863000161676553,
+          -1.1436693983104713,
+          -1.3884975335406473,
+          -0.20332567561384346,
+          -0.5402491386957673,
+          -0.47661013654416073,
+          -1.6296211828261133
+        ],
+        "map_elites_randselect": [
+          -1.7905390937563435,
+          -1.2662853181510536,
+          -1.0252116231873731,
+          -0.8006177798429409,
+          -1.1977771064651304,
+          -2.3380877666060487,
+          -2.867049967805589,
+          -0.25497903887071804,
+          -1.136309637212337,
+          -0.6750534654810909,
+          -0.5292078005853045,
+          -0.814756927047443,
+          -1.1102043451581887,
+          -0.20372598959433905,
+          -1.7158571600267567
+        ],
+        "panmictic_ga": [
+          -0.07152153463546067,
+          -1.0487214496092572,
+          -1.2224822957828212,
+          -0.5955099363644039,
+          -0.320053276269889,
+          -2.1363813389925763,
+          -0.5294720221250397,
+          -1.5417303794195765,
+          -0.621694362705175,
+          -0.4741466663433114,
+          -0.15924418318334896,
+          -0.8091421736693584,
+          -1.5490239422388687,
+          -0.3107708598438857,
+          -1.3812551509111362
+        ],
+        "random": [
+          -0.2946561620507189,
+          -1.256549662212286,
+          -0.46654720815129314,
+          -0.4417393919111877,
+          -2.3339307516332037,
+          -1.6295375180929441,
+          -0.9968633146558379,
+          -0.23868387014287434,
+          -0.3429856782121292,
+          -0.7688070151022741,
+          -1.6627280738072436,
+          -0.16636019746344516,
+          -0.10414374735607901,
+          -1.0107704719087443,
+          -0.11407646177729003
+        ]
+      }
+    },
+    "flip_flop": {
+      "clip_true": {
+        "map_elites_mean": 0.4257207254793693,
+        "map_elites_std": 0.05467094431931532,
+        "per_baseline": {
+          "map_elites_randselect": {
+            "diff": -0.028765072805465124,
+            "wilcoxon_p": 0.834869384765625,
+            "paired_sign_delta": -0.2,
+            "cliff_delta_textbook": -0.22666666666666666,
+            "cond_diff_pos": false,
+            "cond_p": false,
+            "cond_effect": true,
+            "cond_n": true,
+            "passes": false
+          },
+          "panmictic_ga": {
+            "diff": -0.01815347515614193,
+            "wilcoxon_p": 0.772857666015625,
+            "paired_sign_delta": -0.06666666666666667,
+            "cliff_delta_textbook": -0.22666666666666666,
+            "cond_diff_pos": false,
+            "cond_p": false,
+            "cond_effect": false,
+            "cond_n": true,
+            "passes": false
+          },
+          "random": {
+            "diff": 0.002857595373251524,
+            "wilcoxon_p": 0.8052978515625,
+            "paired_sign_delta": -0.06666666666666667,
+            "cliff_delta_textbook": -0.15555555555555556,
+            "cond_diff_pos": true,
+            "cond_p": false,
+            "cond_effect": false,
+            "cond_n": true,
+            "passes": false
+          }
+        },
+        "n_baselines_beaten": 0,
+        "load_bearing": false
+      },
+      "clip_false": {
+        "map_elites_mean": 0.43760838245163597,
+        "map_elites_std": 0.062032891371747806,
+        "per_baseline": {
+          "map_elites_randselect": {
+            "diff": 0.007023432456826036,
+            "wilcoxon_p": 0.619232177734375,
+            "paired_sign_delta": -0.06666666666666667,
+            "cliff_delta_textbook": -0.12,
+            "cond_diff_pos": true,
+            "cond_p": false,
+            "cond_effect": false,
+            "cond_n": true,
+            "passes": false
+          },
+          "panmictic_ga": {
+            "diff": -0.0028328578701736773,
+            "wilcoxon_p": 0.619232177734375,
+            "paired_sign_delta": 0.06666666666666667,
+            "cliff_delta_textbook": -0.10222222222222223,
+            "cond_diff_pos": false,
+            "cond_p": false,
+            "cond_effect": false,
+            "cond_n": true,
+            "passes": false
+          },
+          "random": {
+            "diff": 0.048540102478339696,
+            "wilcoxon_p": 0.64013671875,
+            "paired_sign_delta": -0.06666666666666667,
+            "cliff_delta_textbook": -0.04888888888888889,
+            "cond_diff_pos": true,
+            "cond_p": false,
+            "cond_effect": false,
+            "cond_n": true,
+            "passes": false
+          }
+        },
+        "n_baselines_beaten": 0,
+        "load_bearing": false
+      },
+      "verdict_flip_false_reveals_third": false,
+      "reverse_flip_clip_needed_for_third": false,
+      "per_seed_clip_true": {
+        "map_elites": [
+          0.4316166703076221,
+          0.3465265722201344,
+          0.43437442208370675,
+          0.4761752769650368,
+          0.38149750631568075,
+          0.4890641868462256,
+          0.3873244132072242,
+          0.4781024701596518,
+          0.39365119228681344,
+          0.32101821973533723,
+          0.4939106479823292,
+          0.44994187060760515,
+          0.47294726430560513,
+          0.4697176498595656,
+          0.35994251930800125
+        ],
+        "map_elites_randselect": [
+          0.32613083359047507,
+          0.41893245179543503,
+          0.4339806040548431,
+          0.3043722198322256,
+          0.5600996208747664,
+          0.42495718319579634,
+          0.5461619358741336,
+          0.43131131282664054,
+          0.4169467400069599,
+          0.5294951104723356,
+          0.43567084735462586,
+          0.4673317632880843,
+          0.4900563625763255,
+          0.5309400256530101,
+          0.5008999628768592
+        ],
+        "panmictic_ga": [
+          0.40582960744559743,
+          0.4324389633261341,
+          0.19610028273116628,
+          0.4841548128202666,
+          0.2847900796206373,
+          0.40127316670197266,
+          0.5343172284719194,
+          0.5808154295247876,
+          0.5393246439806455,
+          0.4719072294384544,
+          0.4357035741614541,
+          0.4274006378221413,
+          0.4499909961994855,
+          0.5263436963138635,
+          0.48772266097414263
+        ],
+        "random": [
+          0.2776999882120638,
+          0.3462084160822819,
+          0.5211238840727958,
+          0.4183105533884312,
+          0.41202794982404384,
+          0.4842043167388726,
+          0.49157820329801816,
+          0.4694867757833501,
+          0.45689718209534724,
+          0.41407475441201474,
+          0.029992184222104187,
+          0.5403601097251693,
+          0.4481565967564885,
+          0.5450757529774353,
+          0.48775028400334985
+        ]
+      },
+      "per_seed_clip_false": {
+        "map_elites": [
+          0.4316166703076221,
+          0.30574226115189174,
+          0.43437442208370675,
+          0.4761752769650368,
+          0.38149750631568075,
+          0.4890641868462256,
+          0.373075974440022,
+          0.4781024701596518,
+          0.39365119228681344,
+          0.554365824154782,
+          0.4939106479823292,
+          0.44994187060760515,
+          0.47294726430560513,
+          0.4697176498595656,
+          0.35994251930800125
+        ],
+        "map_elites_randselect": [
+          0.3165236479176514,
+          0.4034457106683964,
+          0.4339806040548431,
+          0.011484703376933802,
+          0.5600996208747664,
+          0.4221479471722025,
+          0.5461619358741336,
+          0.3943364885381866,
+          0.4169467400069599,
+          0.5294951104723356,
+          0.4349236265714602,
+          0.4673317632880843,
+          0.4900563625763255,
+          0.5309400256530101,
+          0.5008999628768592
+        ],
+        "panmictic_ga": [
+          0.40582960744559743,
+          0.4324389633261341,
+          0.17044903653854168,
+          0.4841548128202666,
+          0.2847900796206373,
+          0.37543000818907335,
+          0.5343172284719194,
+          0.5808154295247876,
+          0.5393246439806455,
+          0.4719072294384544,
+          0.4357035741614541,
+          0.4274006378221413,
+          0.4499909961994855,
+          0.5263436963138635,
+          0.48772266097414263
+        ],
+        "random": [
+          0.2776999882120638,
+          0.3361513983909215,
+          0.5211238840727958,
+          0.4183105533884312,
+          0.41202794982404384,
+          0.4842043167388726,
+          0.49157820329801816,
+          0.4694867757833501,
+          0.45689718209534724,
+          0.41407475441201474,
+          -0.466873550078858,
+          0.5403601097251693,
+          0.4481565967564885,
+          0.5450757529774353,
+          0.48775028400334985
+        ]
+      }
+    }
+  },
+  "null_ridge_fpr": {
+    "clip_true": {
+      "fpr": 0.0,
+      "n_null_repeats": 4,
+      "per_repeat": [
+        {
+          "null_seed": 20260701,
+          "load_bearing": false,
+          "n_baselines_beaten": 0,
+          "map_elites_mean": 0.012185135437574235
+        },
+        {
+          "null_seed": 20260801,
+          "load_bearing": false,
+          "n_baselines_beaten": 0,
+          "map_elites_mean": 0.004034729525065773
+        },
+        {
+          "null_seed": 20260901,
+          "load_bearing": false,
+          "n_baselines_beaten": 0,
+          "map_elites_mean": 0.008053358457189972
+        },
+        {
+          "null_seed": 20261001,
+          "load_bearing": false,
+          "n_baselines_beaten": 0,
+          "map_elites_mean": 0.0068330547282115855
+        }
+      ]
+    },
+    "clip_false": {
+      "fpr": 0.0,
+      "n_null_repeats": 4,
+      "per_repeat": [
+        {
+          "null_seed": 20260701,
+          "load_bearing": false,
+          "n_baselines_beaten": 0,
+          "map_elites_mean": -0.5670737243205661
+        },
+        {
+          "null_seed": 20260801,
+          "load_bearing": false,
+          "n_baselines_beaten": 0,
+          "map_elites_mean": -0.5111314617814098
+        },
+        {
+          "null_seed": 20260901,
+          "load_bearing": false,
+          "n_baselines_beaten": 0,
+          "map_elites_mean": -0.5092948608159449
+        },
+        {
+          "null_seed": 20261001,
+          "load_bearing": false,
+          "n_baselines_beaten": 0,
+          "map_elites_mean": -0.5325899933309208
+        }
+      ]
+    },
+    "fpr_delta_false_minus_true": 0.0,
+    "clip_false_inflates_fpr": false,
+    "note": "null-ridge は gene 非依存 target (inputs と無相関ノイズ) = 真の H0。clip=False FPR > clip=True FPR + 0.05 なら『clip を外すとノイズを構造として 拾い偽陽性を増やす』= Type I コスト。clip は信号の有無を識別できない床だが FPR 抑制の役割があることになる。"
+  },
+  "summary": {
+    "any_real_verdict_flip": false,
+    "tasks_flipped": [],
+    "null_fpr_clip_true": 0.0,
+    "null_fpr_clip_false": 0.0,
+    "null_fpr_delta": 0.0,
+    "clip_false_inflates_fpr": false,
+    "third_axis_verdict": "not_load_bearing_at_this_budget",
+    "verdict_text": "K4 反証/降格: clip=False でも③ verdict-flip が起きない (spread 平坦化は診断量だが verdict は変えない) → K4 を『唯一の能動的 suppression 機序』から『spread を潰すが verdict 非 load-bearing な診断的所見』に降格。null-ridge FPR=0/0 + ~7x 縮小予算ゆえ 『null 確定』ではなく『この予算 (at this budget) で非載荷』と限定する (CF4)。",
+    "verdict_label_correction_cf4": "旧 label=null_confirmed_at_power → 新 label=not_load_bearing_at_this_budget。FPR 0/0 (null_seeds=4 の床値) + ~7x 縮小予算 (n_evals 60 vs 400, n_tr 16 vs 48) ゆえ 『null 確定』より『at this budget 限定の非載荷』が正確 (Codex CF4)。数値は不変、label のみ後付け訂正。"
+  }
+}

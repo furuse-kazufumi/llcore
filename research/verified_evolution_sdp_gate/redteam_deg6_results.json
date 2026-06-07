@@ -1,0 +1,61 @@
+{
+  "lens3_circularity": {
+    "reference_region": "non_certified",
+    "is_quad_rejected": true,
+    "deg4": true,
+    "deg6": false,
+    "transient": 1.491,
+    "PASS_noncircular": true
+  },
+  "lens4_numerical": {
+    "residual_pool": 80,
+    "by_margin": {
+      "1e-06": {
+        "deg4_only": 9,
+        "deg6_only": 11,
+        "both": 15,
+        "complement_both_pos": true
+      },
+      "1e-07": {
+        "deg4_only": 9,
+        "deg6_only": 9,
+        "both": 11,
+        "complement_both_pos": true
+      },
+      "1e-08": {
+        "deg4_only": 11,
+        "deg6_only": 7,
+        "both": 7,
+        "complement_both_pos": true
+      }
+    },
+    "PASS_complement_robust": true
+  },
+  "lens2_admission_artifact": {
+    "reach_means": {
+      "L0_inf": 0.998,
+      "L1_two": 0.9986,
+      "L2_sdp": 0.9973,
+      "L3_deg4": 0.9982,
+      "L4_deg6": 0.9983
+    },
+    "L4_vs_L2_strict": {
+      "mean_a": 0.9982649363209382,
+      "mean_b": 0.9972500515053585,
+      "mean_delta": 0.001014884815579667,
+      "paired_sign_delta": 0.25,
+      "wilcoxon_p_greater": 0.15625,
+      "n": 8,
+      "strict_pass": false
+    },
+    "PASS_no_artifact_payoff": true
+  },
+  "lens1_soundness": {
+    "n_deg_certified": 54,
+    "n_unsound_at_50k": 0,
+    "unsound": [],
+    "PASS": true
+  },
+  "elapsed_s": 2406.9,
+  "all_pass": true
+}

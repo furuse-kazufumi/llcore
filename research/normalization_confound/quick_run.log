@@ -1,0 +1,23 @@
+=== C1 正規化交絡 sweep (mode=quick) ===
+tasks=['vdr_D60', 'vdr_D15'] seeds=[20260530, 20260531, 20260601]
+n_restarts=6 n_evals=100 n_train=40 n_eval=40
+grid (clip,sigma,bounds) x6: [('hard', 0.15, 'current'), ('none', 0.15, 'current'), ('soft', 0.15, 'current'), ('hard', 0.1, 'current'), ('hard', 0.2, 'current'), ('hard', 0.15, 'wide')]
+
+[vdr_D60|clip=hard|sigma=0.15|bounds=current] verdict=noise_confounded valley_mean=0.889 null_vf=1.000 noise_std=0.157(thr=0.0142) noise_dom=True mm_flags=[True, True, True] spread=0.4213 R2[0.408,0.829] (209.6s)
+[vdr_D60|clip=none|sigma=0.15|bounds=current] verdict=noise_confounded valley_mean=0.867 null_vf=1.000 noise_std=0.206(thr=0.0130) noise_dom=True mm_flags=[True, True, True] spread=0.4213 R2[0.408,0.829] (237.0s)
+[vdr_D60|clip=soft|sigma=0.15|bounds=current] verdict=noise_confounded valley_mean=0.867 null_vf=1.000 noise_std=0.194(thr=0.0123) noise_dom=True mm_flags=[True, True, True] spread=0.2933 R2[0.387,0.680] (203.9s)
+[vdr_D60|clip=hard|sigma=0.1|bounds=current] verdict=noise_confounded valley_mean=0.889 null_vf=1.000 noise_std=0.157(thr=0.0142) noise_dom=True mm_flags=[True, True, True] spread=0.4349 R2[0.404,0.839] (220.7s)
+[vdr_D60|clip=hard|sigma=0.2|bounds=current] verdict=noise_confounded valley_mean=0.933 null_vf=1.000 noise_std=0.157(thr=0.0142) noise_dom=True mm_flags=[True, True, True] spread=0.3331 R2[0.493,0.826] (191.6s)
+[vdr_D60|clip=hard|sigma=0.15|bounds=wide] verdict=noise_confounded valley_mean=0.911 null_vf=1.000 noise_std=0.154(thr=0.0187) noise_dom=True mm_flags=[True, True, True] spread=0.1973 R2[0.459,0.656] (213.8s)
+[vdr_D15|clip=hard|sigma=0.15|bounds=current] verdict=noise_confounded valley_mean=0.800 null_vf=1.000 noise_std=0.062(thr=0.0388) noise_dom=True mm_flags=[True, True, True] spread=0.0661 R2[0.916,0.982] (66.7s)
+[vdr_D15|clip=none|sigma=0.15|bounds=current] verdict=noise_confounded valley_mean=0.800 null_vf=1.000 noise_std=0.062(thr=0.0388) noise_dom=True mm_flags=[True, True, True] spread=0.0661 R2[0.916,0.982] (99.1s)
+[vdr_D15|clip=soft|sigma=0.15|bounds=current] verdict=noise_confounded valley_mean=0.644 null_vf=1.000 noise_std=0.036(thr=0.0324) noise_dom=True mm_flags=[True, True, True] spread=0.0300 R2[0.724,0.754] (130.6s)
+[vdr_D15|clip=hard|sigma=0.1|bounds=current] verdict=noise_confounded valley_mean=0.644 null_vf=1.000 noise_std=0.062(thr=0.0388) noise_dom=True mm_flags=[True, True, True] spread=0.1087 R2[0.873,0.982] (120.5s)
+[vdr_D15|clip=hard|sigma=0.2|bounds=current] verdict=noise_confounded valley_mean=0.778 null_vf=1.000 noise_std=0.062(thr=0.0388) noise_dom=True mm_flags=[True, True, True] spread=0.0417 R2[0.936,0.978] (94.2s)
+[vdr_D15|clip=hard|sigma=0.15|bounds=wide] verdict=noise_confounded valley_mean=0.622 null_vf=1.000 noise_std=0.065(thr=0.0390) noise_dom=True mm_flags=[True, True, True] spread=0.1196 R2[0.859,0.978] (64.4s)
+
+total wall-clock = 1852.0s
+
+=> any_flip=False flip_settings=[]
+   spread_ratios(none/hard)=[1.0, 1.0]
+   wrote ./research/normalization_confound/c1_sweep_results_quick.json

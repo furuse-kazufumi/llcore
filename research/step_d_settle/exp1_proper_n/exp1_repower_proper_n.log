@@ -1,0 +1,42 @@
+=== EXP1 proper-n 再検定 (smoke=False layer=b B=5000) ===
+n_sweep=[15, 30, 64, 82, 128, 169, 255] alpha=0.05 min_effect=0.147 CRN_seed=20260601
+[G3] power-engine: null=0.023 big=1.000 cg4b_n15=0.593 cg4b_n30=0.842 VALID=True
+
+--- A 層: CRN paired bootstrap re-power ---
+  [A] C-gen4b_MAPE_vs_random: diff=+0.0625 psd_obs=+0.200 p_exact=0.1262 dz=+0.35
+       power(full) @ [15, 30, 64, 82, 128, 169, 255] = ['0.304', '0.480', '0.676', '0.646', '0.722', '0.781', '0.794']  n80=None
+       P(|psd|>=0.147) @ n = ['0.713', '0.605', '0.697', '0.650', '0.722', '0.782', '0.794']  ceiling=0.794
+       median psd @ n = ['0.200', '0.200', '0.188', '0.195', '0.203', '0.207', '0.200']  floor_below_threshold=False
+  [A] flip_flop_MAPE_vs_random: diff=+0.0041 psd_obs=+0.333 p_exact=0.1514 dz=+0.31
+       power(full) @ [15, 30, 64, 82, 128, 169, 255] = ['0.287', '0.446', '0.712', '0.798', '0.932', '0.972', '0.996']  n80=82.75409836065577
+       P(|psd|>=0.147) @ n = ['0.832', '0.835', '0.949', '0.954', '0.986', '0.994', '0.999']  ceiling=0.999
+       median psd @ n = ['0.333', '0.333', '0.344', '0.341', '0.328', '0.337', '0.333']  floor_below_threshold=False
+  [A] flip_flop_MAPE_vs_rr_hillclimb: diff=+0.0036 psd_obs=+0.067 p_exact=0.2622 dz=+0.27
+       power(full) @ [15, 30, 64, 82, 128, 169, 255] = ['0.155', '0.206', '0.252', '0.202', '0.178', '0.167', '0.095']  n80=None
+       P(|psd|>=0.147) @ n = ['0.612', '0.403', '0.326', '0.227', '0.186', '0.171', '0.095']  ceiling=0.612
+       median psd @ n = ['0.067', '0.067', '0.062', '0.073', '0.078', '0.065', '0.067']  floor_below_threshold=True
+
+--- B 層: fresh 真再走 (chunked-resumable) ---
+  [B/C-gen4b] seed 55: mape=0.6523 rnd=0.6496 diff=+0.0026 (n_done=56)
+  [B/C-gen4b] seed 56: mape=0.7342 rnd=0.6192 diff=+0.1150 (n_done=57)
+  [B/C-gen4b] seed 57: mape=0.6846 rnd=0.5288 diff=+0.1558 (n_done=58)
+  [B/C-gen4b] seed 58: mape=0.7824 rnd=0.7448 diff=+0.0376 (n_done=59)
+  [B/C-gen4b] seed 59: mape=0.6052 rnd=0.7169 diff=-0.1117 (n_done=60)
+  [B/C-gen4b] seed 60: mape=0.4973 rnd=0.7104 diff=-0.2131 (n_done=61)
+  [B/C-gen4b] seed 61: mape=0.5278 rnd=0.6993 diff=-0.1716 (n_done=62)
+  [B/C-gen4b] seed 62: mape=0.5261 rnd=0.5721 diff=-0.0460 (n_done=63)
+  [B/C-gen4b] seed 63: mape=0.4130 rnd=0.5203 diff=-0.1073 (n_done=64)
+  [B/C-gen4b] n_done=64 (chunk 526.4s)
+
+--- fresh 評価 (full gate) ---
+  C-gen4b_MAPE_vs_random: n=64 diff=+0.0472 p=0.0382 psd=+0.188 pass=True
+
+=== 3 値判定 ===
+  C-gen4b_MAPE_vs_random: [still_inconclusive]
+     fresh 真再走 n=64 で full gate PASS (diff=+0.0472, p<0.05, psd=+0.188) し ③ load-bearing 寄りに転じたが、更新 power@n=64=0.5174 < 0.80 (検出力なお不足) → load_bearing **候補** だが 確証には fresh n80≈None まで要 (honest: 単発 PASS を断定しない)。
+  flip_flop_MAPE_vs_random: [still_inconclusive]
+     psd_obs=+0.333 で効果量条件は n と共に満たせる (P(|psd|>=床) 上限=0.999>=0.80) が、A 層 full power n80=82.75409836065577 (検定 p が律速)、fresh 真再走未到達/未 PASS のため確定保留。 (fresh 未到達/不足)
+  flip_flop_MAPE_vs_rr_hillclimb: [still_inconclusive]
+     psd_obs(n=15)=+0.067 は床 0.147 未満 → full gate は n に依らず 不可 (効果が床以下 = null 寄り、しかし『効果無し』の積極的確証ではない)。
+
+[exp1] wrote research\step_d_settle\exp1_proper_n\exp1_repower_proper_n_results.json  (541.455s, G1<900=True, src_unchanged=True)

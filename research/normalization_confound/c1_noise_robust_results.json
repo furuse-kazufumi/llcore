@@ -1,0 +1,82 @@
+{
+  "proposition": "P_robust: 既存 C1 の valley≈1.0 は評価ノイズ起源。noise-robust C1 (n_avg seed 平均 + SEM scale 谷閾) で valley_fraction が noisy-flat null と同軌道で減衰すれば確証。null より高い plateau なら真の幾何谷 (反証)。",
+  "mode": "smoke",
+  "seeds": [
+    20260530,
+    20260531
+  ],
+  "n_avgs": [
+    1,
+    4
+  ],
+  "clip_bounds": [
+    [
+      "hard",
+      "current"
+    ]
+  ],
+  "n_restarts": 4,
+  "n_evals": 40,
+  "sigma": 0.15,
+  "n_train": 32,
+  "n_eval": 32,
+  "total_wall_clock_s": 13.613503217697144,
+  "any_flip": false,
+  "has_geometric_valley": false,
+  "denoise_collapse_per_setting": {
+    "vdr_D15|clip=hard|bounds=current": {
+      "n_avg_min": 1,
+      "n_avg_max": 4,
+      "valley_at_min_navg": 0.25,
+      "valley_at_max_navg": 0.3333333333333333,
+      "null_at_max_navg": 0.3333333333333333,
+      "tracks_null": true,
+      "decreased": false
+    }
+  },
+  "results": [
+    {
+      "setting": "vdr_D15|clip=hard|bounds=current|n_avg=1",
+      "task": "vdr_D15",
+      "clip": "hard",
+      "bounds": "current",
+      "n_avg": 1,
+      "noise_std": 0.08793328479191215,
+      "sem": 0.08793328479191215,
+      "valley_fractions": [
+        0.3333333333333333,
+        0.16666666666666666
+      ],
+      "valley_mean": 0.25,
+      "mean_pairs": 6.0,
+      "null_vf": 0.3333333333333333,
+      "margin": -0.08333333333333331,
+      "optima_r2_min": 0.8948939830011847,
+      "optima_r2_max": 0.976011236252288,
+      "verdict": "noise_confounded",
+      "note": "valley(0.25) ~ null(0.33) margin=-0.08; SEM=0.088, mean_pairs=6.0"
+    },
+    {
+      "setting": "vdr_D15|clip=hard|bounds=current|n_avg=4",
+      "task": "vdr_D15",
+      "clip": "hard",
+      "bounds": "current",
+      "n_avg": 4,
+      "noise_std": 0.08793328479191215,
+      "sem": 0.043966642395956074,
+      "valley_fractions": [
+        0.3333333333333333,
+        0.3333333333333333
+      ],
+      "valley_mean": 0.3333333333333333,
+      "mean_pairs": 6.0,
+      "null_vf": 0.3333333333333333,
+      "margin": 0.0,
+      "optima_r2_min": 0.8290425646254022,
+      "optima_r2_max": 0.9610462133503047,
+      "verdict": "noise_confounded",
+      "note": "valley(0.33) ~ null(0.33) margin=0.00; SEM=0.044, mean_pairs=6.0"
+    }
+  ],
+  "verdict_summary": "geometric_valley なし。valley_fraction が n_avg 増で null と同軌道なら 『既存 C1 の谷=評価ノイズ起源』を頑健に確証。よって prior の vdr 地形を C1 で smooth とも deceptive とも言えない (C1 は stochastic fitness に計測不能)。『③不要』を主張するには noise-robust C1 か deterministic fitness が必要。"
+}

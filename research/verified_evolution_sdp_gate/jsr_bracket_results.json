@@ -1,0 +1,327 @@
+{
+  "n_deg6_residual": 53,
+  "switched_expansive_correct_reject": 6,
+  "finite_degree_gap_candidate": 47,
+  "frac_correct_reject": 0.113,
+  "frac_finite_degree_gap": 0.887,
+  "per_gene": [
+    {
+      "pointwise_max_rho_vertices": 0.8823,
+      "jsr_lb": 0.9185,
+      "argmax_len": 3,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.8175,
+      "jsr_lb": 0.8772,
+      "argmax_len": 2,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.9328,
+      "jsr_lb": 0.9328,
+      "argmax_len": 2,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.9787,
+      "jsr_lb": 0.9787,
+      "argmax_len": 1,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.8251,
+      "jsr_lb": 0.8251,
+      "argmax_len": 2,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.8055,
+      "jsr_lb": 0.853,
+      "argmax_len": 4,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.986,
+      "jsr_lb": 0.986,
+      "argmax_len": 1,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.9613,
+      "jsr_lb": 0.9613,
+      "argmax_len": 1,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.9508,
+      "jsr_lb": 0.9508,
+      "argmax_len": 1,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.9862,
+      "jsr_lb": 0.9862,
+      "argmax_len": 1,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.9915,
+      "jsr_lb": 0.9915,
+      "argmax_len": 2,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.9262,
+      "jsr_lb": 0.9262,
+      "argmax_len": 1,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 1.0001,
+      "jsr_lb": 1.0001,
+      "argmax_len": 1,
+      "class": "switched_expansive_correct_reject"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.9839,
+      "jsr_lb": 1.0272,
+      "argmax_len": 5,
+      "class": "switched_expansive_correct_reject"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.8678,
+      "jsr_lb": 0.8678,
+      "argmax_len": 3,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.8648,
+      "jsr_lb": 0.8648,
+      "argmax_len": 1,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 1.0012,
+      "jsr_lb": 1.0012,
+      "argmax_len": 1,
+      "class": "switched_expansive_correct_reject"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.8567,
+      "jsr_lb": 0.8567,
+      "argmax_len": 1,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.8917,
+      "jsr_lb": 0.8917,
+      "argmax_len": 1,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.9583,
+      "jsr_lb": 0.9583,
+      "argmax_len": 1,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.9227,
+      "jsr_lb": 0.9465,
+      "argmax_len": 5,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.9394,
+      "jsr_lb": 0.9394,
+      "argmax_len": 4,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.9963,
+      "jsr_lb": 0.9963,
+      "argmax_len": 1,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.7999,
+      "jsr_lb": 0.7999,
+      "argmax_len": 3,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 1.0571,
+      "jsr_lb": 1.0571,
+      "argmax_len": 1,
+      "class": "switched_expansive_correct_reject"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.9074,
+      "jsr_lb": 0.9382,
+      "argmax_len": 2,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.7573,
+      "jsr_lb": 0.8426,
+      "argmax_len": 3,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.996,
+      "jsr_lb": 0.996,
+      "argmax_len": 1,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.8246,
+      "jsr_lb": 0.8246,
+      "argmax_len": 1,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.9605,
+      "jsr_lb": 0.9605,
+      "argmax_len": 3,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.9815,
+      "jsr_lb": 0.9815,
+      "argmax_len": 1,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.9969,
+      "jsr_lb": 0.9969,
+      "argmax_len": 4,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.9704,
+      "jsr_lb": 0.9704,
+      "argmax_len": 1,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 1.0054,
+      "jsr_lb": 1.0054,
+      "argmax_len": 1,
+      "class": "switched_expansive_correct_reject"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.8901,
+      "jsr_lb": 0.8901,
+      "argmax_len": 1,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.8873,
+      "jsr_lb": 0.8873,
+      "argmax_len": 1,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.9286,
+      "jsr_lb": 0.9286,
+      "argmax_len": 2,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.998,
+      "jsr_lb": 0.998,
+      "argmax_len": 1,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.946,
+      "jsr_lb": 0.946,
+      "argmax_len": 1,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.8513,
+      "jsr_lb": 0.8513,
+      "argmax_len": 1,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.9516,
+      "jsr_lb": 0.9516,
+      "argmax_len": 1,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.9502,
+      "jsr_lb": 0.9502,
+      "argmax_len": 1,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.9886,
+      "jsr_lb": 0.9886,
+      "argmax_len": 1,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.8198,
+      "jsr_lb": 0.8198,
+      "argmax_len": 1,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.9929,
+      "jsr_lb": 0.9929,
+      "argmax_len": 3,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.8461,
+      "jsr_lb": 0.8461,
+      "argmax_len": 1,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.9241,
+      "jsr_lb": 0.9241,
+      "argmax_len": 1,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.5778,
+      "jsr_lb": 0.5778,
+      "argmax_len": 1,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 1.022,
+      "jsr_lb": 1.022,
+      "argmax_len": 1,
+      "class": "switched_expansive_correct_reject"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.9994,
+      "jsr_lb": 0.9994,
+      "argmax_len": 1,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.8905,
+      "jsr_lb": 0.8905,
+      "argmax_len": 1,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.9151,
+      "jsr_lb": 0.9706,
+      "argmax_len": 5,
+      "class": "finite_degree_gap_candidate"
+    },
+    {
+      "pointwise_max_rho_vertices": 0.7037,
+      "jsr_lb": 0.823,
+      "argmax_len": 2,
+      "class": "finite_degree_gap_candidate"
+    }
+  ]
+}

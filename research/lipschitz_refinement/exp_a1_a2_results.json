@@ -1,0 +1,22 @@
+{
+  "seed": 0,
+  "n_total": 6096,
+  "n_grid": 4096,
+  "n_random": 2000,
+  "z3_version": "4.16.0",
+  "A1_containment_violations": 0,
+  "A1_pass": true,
+  "A2_strict_gain_count": 0,
+  "A2_strict_gain_fraction": 0.0,
+  "A2_pass": false,
+  "n_free_certified": 4022,
+  "n_achievable_certified": 4022,
+  "certified_sets_identical": true,
+  "bound_refinement": {
+    "L_achievable_le_L_free_violations": 0,
+    "tighter_bound_count": 1939,
+    "tighter_bound_fraction": 0.3180774278215223,
+    "max_bound_delta": 0.24369978896255198,
+    "mean_bound_delta_when_tighter": 0.05177118764264447
+  }
+}

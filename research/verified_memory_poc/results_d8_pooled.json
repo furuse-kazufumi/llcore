@@ -1,0 +1,36 @@
+{
+  "rows": [
+    {
+      "name": "phase2a_d8_s2000-19",
+      "n": 20,
+      "mean_delta": 0.0152037348276254,
+      "median_delta": 0.005405696684503754,
+      "n_positive": 16,
+      "n_negative": 4,
+      "p_signflip_two_sided": 0.0055699443005569945
+    },
+    {
+      "name": "replication_w0_s3000-19",
+      "n": 20,
+      "mean_delta": 0.011576959554837427,
+      "median_delta": 0.009123087586475183,
+      "n_positive": 13,
+      "n_negative": 7,
+      "p_signflip_two_sided": 0.0928890711092889
+    },
+    {
+      "name": "pooled_n40",
+      "n": 40,
+      "mean_delta": 0.013390347191231416,
+      "median_delta": 0.008644202686202924,
+      "n_positive": 29,
+      "n_negative": 11,
+      "p_signflip_two_sided": 0.002109978900210998
+    }
+  ],
+  "pooled_robustness": {
+    "trimmed_10pct": 0.010760983645604658,
+    "p_after_dropping_max_abs_seed": 0.004549954500454995
+  },
+  "interpretation": "d8 効果の方向は 2/2 独立 run で再現 (pooled +29/-11)。pooled n=40 で robust に有意 (p=0.0021, trimmed=+0.0108, drop-max p=0.0045)。ただし single-run p は seed 感受性あり (s2000-19: 0.0056 / s3000-19: 0.093)。論文は pooled を主証拠とし single-run 感受性を併記する。"
+}

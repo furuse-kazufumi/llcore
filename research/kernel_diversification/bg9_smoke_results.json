@@ -1,0 +1,458 @@
+{
+  "meta": {
+    "stage": "BG9-4/BG9-5(smoke) — harness 実装 + smoke validity 確認",
+    "preregistration": "BG9_PREREGISTRATION.md",
+    "config": {
+      "n_evals": 800,
+      "n_seeds": 5,
+      "honest_n_trials": 20,
+      "dim": 8,
+      "base_seed": 20260602,
+      "min_seeds_gate": 3
+    },
+    "fixed_params": {
+      "n_bins": [
+        4,
+        8
+      ],
+      "sigma": 0.2,
+      "me_init_batch": 64,
+      "gate_alpha": 0.05,
+      "gate_min_effect": 0.147,
+      "real_tasks": [
+        "selective_copy",
+        "bistable_denoise",
+        "weighted_accum"
+      ]
+    },
+    "wall_clock_sec": 1195.7,
+    "honest_note": "smoke 水準 (小 budget・小 seed)。本検定 (>=15 seed, n_evals=4000) は次段 BG9-5。fitness は固定射影 P + per-gene held-out ridge readout で kernel 寄与を分離。kernel dynamics は対角 mock (full kernel 非主張)。positive control は kernel_id 軸の合成 deceptive corridor (実 fitness でない harness validity 専用)。整いすぎた③成立は内訳を疑う (feedback_benchmark_honest_disclosure)。"
+  },
+  "substrates": {
+    "positive": {
+      "substrate": "positive",
+      "means": {
+        "map_elites": 0.9712671323601795,
+        "rr_hillclimb": 0.9200695378896034,
+        "panmictic_ga": 0.5484806261442561,
+        "random": 0.7630018925512918
+      },
+      "stds": {
+        "map_elites": 0.027018395853241846,
+        "rr_hillclimb": 0.0916508930887521,
+        "panmictic_ga": 0.0016028623160507208,
+        "random": 0.07518960416752286
+      },
+      "reach_rate": {
+        "map_elites": 1.0,
+        "rr_hillclimb": 0.8,
+        "panmictic_ga": 0.0,
+        "random": 0.4
+      },
+      "gates": {
+        "rr_hillclimb": {
+          "name_a": "map_elites",
+          "name_b": "rr_hillclimb",
+          "mean_a": 0.9712671323601795,
+          "mean_b": 0.9200695378896034,
+          "diff": 0.051197594470576015,
+          "win_rate": 0.6,
+          "wilcoxon_p": 0.3125,
+          "paired_sign_delta": 0.2,
+          "n_seeds": 5,
+          "passes": false
+        },
+        "panmictic_ga": {
+          "name_a": "map_elites",
+          "name_b": "panmictic_ga",
+          "mean_a": 0.9712671323601795,
+          "mean_b": 0.5484806261442561,
+          "diff": 0.4227865062159234,
+          "win_rate": 1.0,
+          "wilcoxon_p": 0.03125,
+          "paired_sign_delta": 1.0,
+          "n_seeds": 5,
+          "passes": true
+        },
+        "random": {
+          "name_a": "map_elites",
+          "name_b": "random",
+          "mean_a": 0.9712671323601795,
+          "mean_b": 0.7630018925512918,
+          "diff": 0.2082652398088877,
+          "win_rate": 1.0,
+          "wilcoxon_p": 0.03125,
+          "paired_sign_delta": 1.0,
+          "n_seeds": 5,
+          "passes": true
+        }
+      },
+      "n_baselines_beaten": 2,
+      "load_bearing": false,
+      "a1_theta_only_mean": 0.6365635640032454,
+      "a1_vs_baselines": {
+        "rr_hillclimb": {
+          "name_a": "map_elites_theta_only",
+          "name_b": "rr_hillclimb",
+          "mean_a": 0.6365635640032454,
+          "mean_b": 0.9200695378896034,
+          "diff": -0.28350597388635795,
+          "win_rate": 0.2,
+          "wilcoxon_p": 0.96875,
+          "paired_sign_delta": -0.6,
+          "n_seeds": 5,
+          "passes": false
+        },
+        "panmictic_ga": {
+          "name_a": "map_elites_theta_only",
+          "name_b": "panmictic_ga",
+          "mean_a": 0.6365635640032454,
+          "mean_b": 0.5484806261442561,
+          "diff": 0.08808293785898944,
+          "win_rate": 0.6,
+          "wilcoxon_p": 0.3125,
+          "paired_sign_delta": 0.2,
+          "n_seeds": 5,
+          "passes": false
+        },
+        "random": {
+          "name_a": "map_elites_theta_only",
+          "name_b": "random",
+          "mean_a": 0.6365635640032454,
+          "mean_b": 0.7630018925512918,
+          "diff": -0.1264383285480462,
+          "win_rate": 0.2,
+          "wilcoxon_p": 0.90625,
+          "paired_sign_delta": -0.6,
+          "n_seeds": 5,
+          "passes": false
+        }
+      },
+      "a1_n_baselines_beaten": 0,
+      "a1_attribution": "N/A — full MAP-E が 3 baseline 全勝でないため帰属判定の前提なし。",
+      "raw_scores": {
+        "map_elites": [
+          0.9891130900646979,
+          0.9953178905890072,
+          0.9528590780577458,
+          0.9268246646036656,
+          0.9922209384857805
+        ],
+        "rr_hillclimb": [
+          0.7430786732204058,
+          0.9493216105918754,
+          0.9767366497270817,
+          1.000675265759242,
+          0.9305354901494123
+        ],
+        "panmictic_ga": [
+          0.5490003917074837,
+          0.5475531889590541,
+          0.5487970271404338,
+          0.5461167732029896,
+          0.5509357497113191
+        ],
+        "random": [
+          0.6881478107315134,
+          0.8415945816221349,
+          0.7631987954823993,
+          0.6702606401085162,
+          0.8518076348118948
+        ],
+        "map_elites_theta_only": [
+          0.5488494218352336,
+          0.5422029967757882,
+          0.5491113374488812,
+          0.5464453549889695,
+          0.996208708967355
+        ]
+      }
+    },
+    "negative": {
+      "substrate": "negative",
+      "means": {
+        "map_elites": 0.9999999995392621,
+        "rr_hillclimb": 0.9999999994699957,
+        "panmictic_ga": 0.9999999995392621,
+        "random": 0.9999999995086453
+      },
+      "stds": {
+        "map_elites": 1.3237709225756017e-11,
+        "rr_hillclimb": 1.3647857771329935e-10,
+        "panmictic_ga": 1.3237709225756017e-11,
+        "random": 2.1418964812422946e-11
+      },
+      "reach_rate": null,
+      "gates": {
+        "rr_hillclimb": {
+          "name_a": "map_elites",
+          "name_b": "rr_hillclimb",
+          "mean_a": 0.9999999995392621,
+          "mean_b": 0.9999999994699957,
+          "diff": 6.926639262161415e-11,
+          "win_rate": 1.0,
+          "wilcoxon_p": 1.0,
+          "paired_sign_delta": 0.2,
+          "n_seeds": 5,
+          "passes": false
+        },
+        "panmictic_ga": {
+          "name_a": "map_elites",
+          "name_b": "panmictic_ga",
+          "mean_a": 0.9999999995392621,
+          "mean_b": 0.9999999995392621,
+          "diff": 0.0,
+          "win_rate": 1.0,
+          "wilcoxon_p": 1.0,
+          "paired_sign_delta": 0.0,
+          "n_seeds": 5,
+          "passes": false
+        },
+        "random": {
+          "name_a": "map_elites",
+          "name_b": "random",
+          "mean_a": 0.9999999995392621,
+          "mean_b": 0.9999999995086453,
+          "diff": 3.06167535768509e-11,
+          "win_rate": 1.0,
+          "wilcoxon_p": 1.0,
+          "paired_sign_delta": 1.0,
+          "n_seeds": 5,
+          "passes": false
+        }
+      },
+      "n_baselines_beaten": 0,
+      "load_bearing": false,
+      "a1_theta_only_mean": 0.9999999994703079,
+      "a1_vs_baselines": {
+        "rr_hillclimb": {
+          "name_a": "map_elites_theta_only",
+          "name_b": "rr_hillclimb",
+          "mean_a": 0.9999999994703079,
+          "mean_b": 0.9999999994699957,
+          "diff": 3.1223912344557904e-13,
+          "win_rate": 0.8,
+          "wilcoxon_p": 1.0,
+          "paired_sign_delta": 0.0,
+          "n_seeds": 5,
+          "passes": false
+        },
+        "panmictic_ga": {
+          "name_a": "map_elites_theta_only",
+          "name_b": "panmictic_ga",
+          "mean_a": 0.9999999994703079,
+          "mean_b": 0.9999999995392621,
+          "diff": -6.895415349816859e-11,
+          "win_rate": 0.8,
+          "wilcoxon_p": 1.0,
+          "paired_sign_delta": -0.2,
+          "n_seeds": 5,
+          "passes": false
+        },
+        "random": {
+          "name_a": "map_elites_theta_only",
+          "name_b": "random",
+          "mean_a": 0.9999999994703079,
+          "mean_b": 0.9999999995086453,
+          "diff": -3.833739992131768e-11,
+          "win_rate": 0.8,
+          "wilcoxon_p": 1.0,
+          "paired_sign_delta": 0.6,
+          "n_seeds": 5,
+          "passes": false
+        }
+      },
+      "a1_n_baselines_beaten": 0,
+      "a1_attribution": "N/A — full MAP-E が 3 baseline 全勝でないため帰属判定の前提なし。",
+      "raw_scores": {
+        "map_elites": [
+          0.9999999995514844,
+          0.9999999995138971,
+          0.9999999995466584,
+          0.9999999995396653,
+          0.999999999544605
+        ],
+        "rr_hillclimb": [
+          0.9999999995514844,
+          0.9999999995138971,
+          0.9999999995466584,
+          0.9999999995396653,
+          0.999999999198273
+        ],
+        "panmictic_ga": [
+          0.9999999995514844,
+          0.9999999995138971,
+          0.9999999995466584,
+          0.9999999995396653,
+          0.999999999544605
+        ],
+        "random": [
+          0.9999999995107396,
+          0.9999999994772605,
+          0.9999999994924741,
+          0.9999999995291878,
+          0.9999999995335644
+        ],
+        "map_elites_theta_only": [
+          0.9999999995514844,
+          0.9999999995138971,
+          0.9999999992018876,
+          0.9999999995396653,
+          0.999999999544605
+        ]
+      }
+    },
+    "real": {
+      "substrate": "real",
+      "means": {
+        "map_elites": 0.5231332903679414,
+        "rr_hillclimb": 0.5509094498216921,
+        "panmictic_ga": 0.6232492970485131,
+        "random": 0.5212554806790848
+      },
+      "stds": {
+        "map_elites": 0.09544996881379757,
+        "rr_hillclimb": 0.10429927572570483,
+        "panmictic_ga": 0.0402335759762232,
+        "random": 0.11447490289382163
+      },
+      "reach_rate": null,
+      "gates": {
+        "rr_hillclimb": {
+          "name_a": "map_elites",
+          "name_b": "rr_hillclimb",
+          "mean_a": 0.5231332903679414,
+          "mean_b": 0.5509094498216921,
+          "diff": -0.02777615945375069,
+          "win_rate": 0.4,
+          "wilcoxon_p": 0.78125,
+          "paired_sign_delta": -0.2,
+          "n_seeds": 5,
+          "passes": false
+        },
+        "panmictic_ga": {
+          "name_a": "map_elites",
+          "name_b": "panmictic_ga",
+          "mean_a": 0.5231332903679414,
+          "mean_b": 0.6232492970485131,
+          "diff": -0.1001160066805717,
+          "win_rate": 0.2,
+          "wilcoxon_p": 0.96875,
+          "paired_sign_delta": -0.6,
+          "n_seeds": 5,
+          "passes": false
+        },
+        "random": {
+          "name_a": "map_elites",
+          "name_b": "random",
+          "mean_a": 0.5231332903679414,
+          "mean_b": 0.5212554806790848,
+          "diff": 0.0018778096888567464,
+          "win_rate": 0.4,
+          "wilcoxon_p": 0.59375,
+          "paired_sign_delta": -0.2,
+          "n_seeds": 5,
+          "passes": false
+        }
+      },
+      "n_baselines_beaten": 0,
+      "load_bearing": false,
+      "a1_theta_only_mean": 0.5081871260305323,
+      "a1_vs_baselines": {
+        "rr_hillclimb": {
+          "name_a": "map_elites_theta_only",
+          "name_b": "rr_hillclimb",
+          "mean_a": 0.5081871260305323,
+          "mean_b": 0.5509094498216921,
+          "diff": -0.04272232379115989,
+          "win_rate": 0.2,
+          "wilcoxon_p": 0.78125,
+          "paired_sign_delta": -0.6,
+          "n_seeds": 5,
+          "passes": false
+        },
+        "panmictic_ga": {
+          "name_a": "map_elites_theta_only",
+          "name_b": "panmictic_ga",
+          "mean_a": 0.5081871260305323,
+          "mean_b": 0.6232492970485131,
+          "diff": -0.11506217101798091,
+          "win_rate": 0.2,
+          "wilcoxon_p": 0.9375,
+          "paired_sign_delta": -0.6,
+          "n_seeds": 5,
+          "passes": false
+        },
+        "random": {
+          "name_a": "map_elites_theta_only",
+          "name_b": "random",
+          "mean_a": 0.5081871260305323,
+          "mean_b": 0.5212554806790848,
+          "diff": -0.013068354648552449,
+          "win_rate": 0.4,
+          "wilcoxon_p": 0.6875,
+          "paired_sign_delta": -0.2,
+          "n_seeds": 5,
+          "passes": false
+        }
+      },
+      "a1_n_baselines_beaten": 0,
+      "a1_attribution": "N/A — full MAP-E が 3 baseline 全勝でないため帰属判定の前提なし。",
+      "raw_scores": {
+        "map_elites": [
+          0.6351340381906523,
+          0.4953410747619606,
+          0.6096353195837896,
+          0.366422354581902,
+          0.5091336647214029
+        ],
+        "rr_hillclimb": [
+          0.7054665015744888,
+          0.6385884534014389,
+          0.5070433104059628,
+          0.42706019872911066,
+          0.4763887849974596
+        ],
+        "panmictic_ga": [
+          0.5852288074972352,
+          0.6373983966893771,
+          0.6763858295432245,
+          0.5686402754261667,
+          0.6485931760865624
+        ],
+        "random": [
+          0.7128970308639435,
+          0.5582794827145661,
+          0.5060505071947287,
+          0.3675605454433776,
+          0.46148983717880776
+        ],
+        "map_elites_theta_only": [
+          0.5866544739860674,
+          0.4797520771094953,
+          0.6758519828070968,
+          0.3847066687460293,
+          0.4139704275039725
+        ]
+      }
+    }
+  },
+  "verdicts": {
+    "harness_validity_code": "N/A",
+    "harness_validity": "N/A (測定不能・構造的) — positive control で MAP-E は panmictic-GA / random を strict gate で撃破するが、RR-hillclimb には勝てない。RR は kernel_id∈[0,4) を restart で直接サンプルし谷を回避するため、5 次元 KernelGenome の kid-axis 欺瞞 corridor では RR を構造的に排除できない(exp4 の CLT 不到達 corridor と異なる)。harness が③を『RR より』検出できる保証は立たず → BG9 = N/A 方向 (pre-reg §2.1/§4)。harness 実装自体は健全 (GA/random は明瞭に検出、negative は null)。",
+    "positive_load_bearing": false,
+    "positive_n_baselines_beaten": 2,
+    "positive_beats_per_baseline": {
+      "rr_hillclimb": false,
+      "panmictic_ga": true,
+      "random": true
+    },
+    "positive_beats_rr": false,
+    "positive_beats_ga_and_random": true,
+    "positive_a1_attribution": "N/A — full MAP-E が 3 baseline 全勝でないため帰属判定の前提なし。",
+    "negative_false_positive": false,
+    "negative_note": "OK — negative control で MAP-E が③優位を持たない (null 確認)。",
+    "real_smoke_primary_image": "real smoke 一次像 (断定禁止): MAP-E が baseline を beaten=0/3。 勝ち気配なし/僅差。",
+    "real_n_baselines_beaten": 0
+  }
+}

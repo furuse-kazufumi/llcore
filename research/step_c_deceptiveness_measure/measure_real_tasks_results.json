@@ -1,0 +1,109 @@
+{
+  "metric_name": "behavior_elite_fitness_dip",
+  "metric_at_dstar": 0.015281642817850516,
+  "d_star": 0.16,
+  "calibration_source": "synth_calibration_results.json (ρ=1, strictly monotone, 5 seeds)",
+  "real_tasks": {
+    "ea_multitask_variable_delay_recall": {
+      "mean": 0.0651819947723769,
+      "std": 0.02852190232157223,
+      "ci95_lo": 0.029773052986441444,
+      "ci95_hi": 0.10059093655831236,
+      "per_seed": [
+        0.07561494486816529,
+        0.11027050596996521,
+        0.05363285049749235,
+        0.04564637630355927,
+        0.04074529622270238
+      ],
+      "n_seeds": 5,
+      "n_samples": 1600,
+      "n_bins": 16,
+      "honest_n_trials": 10,
+      "metric_at_dstar": 0.015281642817850516,
+      "below_threshold": false,
+      "ci_strictly_below": false,
+      "ci_strictly_above": true,
+      "task": "ea_multitask_variable_delay_recall"
+    },
+    "flip_flop": {
+      "mean": 0.016092457495001964,
+      "std": 0.005351547432252472,
+      "ci95_lo": 0.009448698977184606,
+      "ci95_hi": 0.022736216012819322,
+      "per_seed": [
+        0.02195858456687696,
+        0.009476417378652603,
+        0.0114653225762525,
+        0.018277937702003737,
+        0.019284025251224014
+      ],
+      "n_seeds": 5,
+      "n_samples": 1600,
+      "n_bins": 16,
+      "honest_n_trials": 10,
+      "metric_at_dstar": 0.015281642817850516,
+      "below_threshold": false,
+      "ci_strictly_below": false,
+      "ci_strictly_above": false,
+      "task": "flip_flop"
+    },
+    "step6_text_proxy": {
+      "mean": 0.01068581960695853,
+      "std": 0.0025912222429778646,
+      "ci95_lo": 0.007468908037682578,
+      "ci95_hi": 0.01390273117623448,
+      "per_seed": [
+        0.010256410256410265,
+        0.010398613518197583,
+        0.006861063464837008,
+        0.013864818024263348,
+        0.012048192771084444
+      ],
+      "n_seeds": 5,
+      "n_samples": 800,
+      "n_bins": 16,
+      "honest_n_trials": 1,
+      "metric_at_dstar": 0.015281642817850516,
+      "below_threshold": true,
+      "ci_strictly_below": true,
+      "ci_strictly_above": false,
+      "task": "step6_text_proxy",
+      "wiring": "exp7 §(A) 3-param ESN: gene[0,1,2]->(rho in[0.1,1.5], leak in[0.05,1.0], in_scale in[0.3,1.5]); behavior=(rho,leak); deterministic fitness (next-char held-out accuracy), honest_n_trials=1."
+    }
+  },
+  "configs": {
+    "reservoir_tasks": {
+      "n_seeds": 5,
+      "n_samples": 1600,
+      "n_bins": 16,
+      "honest_n_trials": 10
+    },
+    "step6_text_proxy": {
+      "n_seeds": 5,
+      "n_samples": 800,
+      "n_bins": 16,
+      "honest_n_trials": 1
+    }
+  },
+  "conclusion": {
+    "all_below_threshold": false,
+    "below_threshold_per_task": {
+      "ea_multitask_variable_delay_recall": false,
+      "flip_flop": false,
+      "step6_text_proxy": true
+    },
+    "ci_strictly_below_per_task": {
+      "ea_multitask_variable_delay_recall": false,
+      "flip_flop": false,
+      "step6_text_proxy": true
+    },
+    "verdict": "At least one real task measured AT/ABOVE metric_at_dstar -> see per-task flags; ③ may be load-bearing there. Inspect CI before concluding."
+  },
+  "honest_disclosure": {
+    "axis_mismatch": "Real-task behavior axes (reservoir: eff_mem/std(leak); step6: rho/leak) differ from synthetic behavior=mean. below_threshold is an OPERATIONAL same-metric/same-estimator comparison of raw dip vs the raw value (0.0153) that corresponded to d* in calibration; it is NOT a claim about each task's true d. RANK transfers (ρ=1), calibrated MAGNITUDE does not.",
+    "envelope_bias": "finite-sample bin max is upward-biased; >=~50 samples/bin enforced; mean±std + t-based 95%CI reported over 5 seeds (no single-seed point claim).",
+    "pca_projection": "2D->1D PCA picks the max-variance direction, not necessarily the deceptive direction; projection may miss niche structure (caveat).",
+    "step6_not_skipped": "Unlike the earlier calibrate_dip_metric.py note, step6 is wired and measured here: deterministic fitness, ~30-40ms/eval, cheap to sample."
+  }
+}

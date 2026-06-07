@@ -1,0 +1,13 @@
+NULL corpus=8192B n=8 seeds=15 pop=12 gens=10 unigram_CE=3.6486
+research\verified_evolution_sdp_gate\coupled_nd.py:163: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
+  prob.solve(solver=_SOLVER)
+  seed 0: none=0.0260 inf_norm=0.0223 two_norm=0.0228 sdp=0.0234  (977s)
+  seed 1: none=0.0259 inf_norm=0.0223 two_norm=0.0232 sdp=0.0231  (1967s)
+  seed 2: none=0.0259 inf_norm=0.0223 two_norm=0.0227 sdp=0.0232  (3049s)
+  seed 3: none=0.0260 inf_norm=0.0223 two_norm=0.0232 sdp=0.0232  (4212s)
+  seed 4: none=0.0259 inf_norm=0.0223 two_norm=0.0230 sdp=0.0238  (5639s)
+  seed 5: none=0.0260 inf_norm=0.0223 two_norm=0.0230 sdp=0.0233  (7163s)
+  seed 6: none=0.0259 inf_norm=0.0223 two_norm=0.0229 sdp=0.0236  (8634s)
+  seed 7: none=0.0260 inf_norm=0.0223 two_norm=0.0230 sdp=0.0236  (10964s)
+  seed 8: none=0.0259 inf_norm=0.0223 two_norm=0.0229 sdp=0.0234  (12719s)
+  seed 9: none=0.0259 inf_norm=0.0223 two_norm=0.0229 sdp=0.0232  (13953s)

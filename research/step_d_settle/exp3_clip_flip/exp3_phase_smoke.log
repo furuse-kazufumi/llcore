@@ -1,0 +1,52 @@
+=== phase=verdict (smoke) ===
+=== EXP3 clip verdict-flip + null-ridge FPR (smoke) ===
+n_seeds=3 n_evals=40 honest_n=6 n_tr=12 grid_k=8 null_seeds=[20260701]
+
+[G3] gate sanity: known_pos_passes=True known_null_fpr=0.028 valid=True
+
+[verdict-flip] task=addition clip=True ...
+[verdict-flip] task=addition clip=False ...
+  addition: clip=True LB=False (beaten=0/3)  clip=False LB=False (beaten=0/3)  flip=False
+[verdict-flip] task=flip_flop clip=True ...
+[verdict-flip] task=flip_flop clip=False ...
+  flip_flop: clip=True LB=False (beaten=0/3)  clip=False LB=False (beaten=0/3)  flip=False
+[exp3] phase=verdict 完了。merge 判定には verdict/null 両 partial が必要。(verdict=有 null=無) (RunGuard 84.993s, src_unchanged=True)
+verdict_EXIT=0
+=== phase=null (smoke) ===
+=== EXP3 clip verdict-flip + null-ridge FPR (smoke) ===
+n_seeds=3 n_evals=40 honest_n=6 n_tr=12 grid_k=8 null_seeds=[20260701]
+
+[G3] gate sanity: known_pos_passes=True known_null_fpr=0.028 valid=True
+
+[null-ridge FPR] clip=True ...
+    null[0] seed=20260701 clip=True: LB=False beaten=0/3 me_mean=0.0059
+[null-ridge FPR] clip=False ...
+    null[0] seed=20260701 clip=False: LB=False beaten=0/3 me_mean=-0.7473
+
+[exp3] wrote research\step_d_settle\exp3_clip_flip\exp3_clip_flip_results.json  (total 32.891s, RunGuard 32.872s)
+[exp3] verdict = null_confirmed_at_power
+[exp3] K4 反証/降格: clip=False でも③ verdict-flip が起きない (spread 平坦化は診断量だが verdict は変えない) → K4 を『唯一の能動的 suppression 機序』から『spread を潰すが verdict 非 load-bearing な診断的所見』に降格。
+[exp3] src_unchanged=True changed=[]
+null_EXIT=0
+=== phase=both reads nothing new but merges via re-run; instead test merge path with both partials present ===
+=== EXP3 clip verdict-flip + null-ridge FPR (smoke) ===
+n_seeds=3 n_evals=40 honest_n=6 n_tr=12 grid_k=8 null_seeds=[20260701]
+
+[G3] gate sanity: known_pos_passes=True known_null_fpr=0.028 valid=True
+
+[verdict-flip] task=addition clip=True ...
+[verdict-flip] task=addition clip=False ...
+  addition: clip=True LB=False (beaten=0/3)  clip=False LB=False (beaten=0/3)  flip=False
+[verdict-flip] task=flip_flop clip=True ...
+[verdict-flip] task=flip_flop clip=False ...
+  flip_flop: clip=True LB=False (beaten=0/3)  clip=False LB=False (beaten=0/3)  flip=False
+[null-ridge FPR] clip=True ...
+    null[0] seed=20260701 clip=True: LB=False beaten=0/3 me_mean=0.0059
+[null-ridge FPR] clip=False ...
+    null[0] seed=20260701 clip=False: LB=False beaten=0/3 me_mean=-0.7473
+
+[exp3] wrote research\step_d_settle\exp3_clip_flip\exp3_clip_flip_results.json  (total 148.98s, RunGuard 148.974s)
+[exp3] verdict = null_confirmed_at_power
+[exp3] K4 反証/降格: clip=False でも③ verdict-flip が起きない (spread 平坦化は診断量だが verdict は変えない) → K4 を『唯一の能動的 suppression 機序』から『spread を潰すが verdict 非 load-bearing な診断的所見』に降格。
+[exp3] src_unchanged=True changed=[]
+both_EXIT=0

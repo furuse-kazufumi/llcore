@@ -1,0 +1,325 @@
+{
+  "meta": {
+    "task": "red_team(2) faithful positive control: ③ が RR 含む 3 baseline 全勝を探す",
+    "n_seeds": 5,
+    "n_evals": 800,
+    "base_seed": 20260602,
+    "min_seeds_gate": 3,
+    "gate_alpha": 0.05,
+    "gate_min_effect": 0.147,
+    "sigma": 0.2,
+    "wall_clock_sec": 4.2,
+    "honest_note": "smoke (5 seed/800 evals)。strict_gate は本番同基準 (p<0.05 ∧ |δ|>=0.147 ∧ diff>0)。RR は不当に縛らず faithful (restart/kid 直接サンプルそのまま)。"
+  },
+  "results": {
+    "C-A_highdim_theta_corridor": {
+      "config": "C-A_highdim_theta_corridor",
+      "pre_reg_deviation": true,
+      "means": {
+        "map_elites": 0.6742,
+        "rr_hillclimb": 0.6251,
+        "panmictic_ga": 0.5485,
+        "random": 0.5968
+      },
+      "reach_rate": {
+        "map_elites": 0.2,
+        "rr_hillclimb": 0.2,
+        "panmictic_ga": 0.0,
+        "random": 0.0
+      },
+      "gates": {
+        "rr_hillclimb": {
+          "diff": 0.0491,
+          "wilcoxon_p": 0.3125,
+          "paired_sign_delta": 0.2,
+          "mean_a": 0.6742,
+          "mean_b": 0.6251,
+          "passes": false
+        },
+        "panmictic_ga": {
+          "diff": 0.1257,
+          "wilcoxon_p": 0.0625,
+          "paired_sign_delta": 0.6,
+          "mean_a": 0.6742,
+          "mean_b": 0.5485,
+          "passes": false
+        },
+        "random": {
+          "diff": 0.0774,
+          "wilcoxon_p": 0.3125,
+          "paired_sign_delta": 0.2,
+          "mean_a": 0.6742,
+          "mean_b": 0.5968,
+          "passes": false
+        }
+      },
+      "n_baselines_beaten": 0,
+      "beats_rr": false,
+      "map_elites_beats_all_3": false,
+      "raw_scores": {
+        "map_elites": [
+          0.871677761934661,
+          0.5849953110851063,
+          0.6411551429464549,
+          0.7252963966669291,
+          0.5478899312657955
+        ],
+        "rr_hillclimb": [
+          0.5436029753435784,
+          0.8833445839299005,
+          0.5490881965135694,
+          0.6010427630986407,
+          0.5482199789360441
+        ],
+        "panmictic_ga": [
+          0.5490003917074837,
+          0.5475531889590541,
+          0.5487970271404338,
+          0.5461167732029896,
+          0.5509357497113191
+        ],
+        "random": [
+          0.5431067751546668,
+          0.5454019575662865,
+          0.6982351221656774,
+          0.5511449867319599,
+          0.6462211326460339
+        ]
+      },
+      "desc": "4D behavior (kid, theta0/1/2 frac), in-basin 3D theta corner corridor"
+    },
+    "C-B_sequential_kernel_multibarrier": {
+      "config": "C-B_sequential_kernel_multibarrier",
+      "pre_reg_deviation": false,
+      "means": {
+        "map_elites": 0.8239,
+        "rr_hillclimb": 0.8136,
+        "panmictic_ga": 0.6893,
+        "random": 0.7779
+      },
+      "reach_rate": {
+        "map_elites": 0.4,
+        "rr_hillclimb": 0.4,
+        "panmictic_ga": 0.0,
+        "random": 0.4
+      },
+      "gates": {
+        "rr_hillclimb": {
+          "diff": 0.0103,
+          "wilcoxon_p": 0.5,
+          "paired_sign_delta": 0.2,
+          "mean_a": 0.8239,
+          "mean_b": 0.8136,
+          "passes": false
+        },
+        "panmictic_ga": {
+          "diff": 0.1346,
+          "wilcoxon_p": 0.0312,
+          "paired_sign_delta": 1.0,
+          "mean_a": 0.8239,
+          "mean_b": 0.6893,
+          "passes": true
+        },
+        "random": {
+          "diff": 0.0461,
+          "wilcoxon_p": 0.3125,
+          "paired_sign_delta": 0.2,
+          "mean_a": 0.8239,
+          "mean_b": 0.7779,
+          "passes": false
+        }
+      },
+      "n_baselines_beaten": 1,
+      "beats_rr": false,
+      "map_elites_beats_all_3": false,
+      "raw_scores": {
+        "map_elites": [
+          0.9143048143616138,
+          0.7474504040635457,
+          0.772670782901357,
+          0.9344496907174957,
+          0.7508031824197997
+        ],
+        "rr_hillclimb": [
+          0.7481961742371754,
+          0.9523456493087499,
+          0.7481662483579284,
+          0.7504100498344936,
+          0.8688338338817749
+        ],
+        "panmictic_ga": [
+          0.748644500970874,
+          0.5977607069230865,
+          0.7484183866568592,
+          0.7508302659693515,
+          0.6010051087366567
+        ],
+        "random": [
+          0.7476330980962465,
+          0.8169141592206589,
+          0.8313538407652468,
+          0.7455499334770113,
+          0.7478741797235507
+        ]
+      },
+      "desc": "kid 軸 3 連 dip multi-barrier + target theta corridor (pre-reg behavior)"
+    },
+    "C-C_inbasin_L1_corridor": {
+      "config": "C-C_inbasin_L1_corridor",
+      "pre_reg_deviation": false,
+      "means": {
+        "map_elites": 0.8563,
+        "rr_hillclimb": 0.891,
+        "panmictic_ga": 0.5485,
+        "random": 0.7088
+      },
+      "reach_rate": {
+        "map_elites": 0.6,
+        "rr_hillclimb": 0.8,
+        "panmictic_ga": 0.0,
+        "random": 0.2
+      },
+      "gates": {
+        "rr_hillclimb": {
+          "diff": -0.0348,
+          "wilcoxon_p": 0.7812,
+          "paired_sign_delta": -0.6,
+          "mean_a": 0.8563,
+          "mean_b": 0.891,
+          "passes": false
+        },
+        "panmictic_ga": {
+          "diff": 0.3078,
+          "wilcoxon_p": 0.0312,
+          "paired_sign_delta": 1.0,
+          "mean_a": 0.8563,
+          "mean_b": 0.5485,
+          "passes": true
+        },
+        "random": {
+          "diff": 0.1475,
+          "wilcoxon_p": 0.1562,
+          "paired_sign_delta": 0.6,
+          "mean_a": 0.8563,
+          "mean_b": 0.7088,
+          "passes": false
+        }
+      },
+      "n_baselines_beaten": 1,
+      "beats_rr": false,
+      "map_elites_beats_all_3": false,
+      "raw_scores": {
+        "map_elites": [
+          0.9919382273560551,
+          0.9602174298727528,
+          0.7920247155173183,
+          0.9302909230163685,
+          0.6067962270093578
+        ],
+        "rr_hillclimb": [
+          0.5436029753435784,
+          0.9952302548747218,
+          0.9827823836023011,
+          0.933490509435069,
+          1.0000420639612855
+        ],
+        "panmictic_ga": [
+          0.5490003917074837,
+          0.5475531889590541,
+          0.5487970271404338,
+          0.5461167732029896,
+          0.5509357497113191
+        ],
+        "random": [
+          0.5431067751546668,
+          0.7925661629174537,
+          0.7790056803622813,
+          0.5511449867319599,
+          0.8781301322378268
+        ]
+      },
+      "desc": "target 内 theta-L1 corridor を L1 niche 軸に整列 (pre-reg behavior)"
+    },
+    "C-D_deceptive_multibasin": {
+      "config": "C-D_deceptive_multibasin",
+      "pre_reg_deviation": false,
+      "means": {
+        "map_elites": 0.8653,
+        "rr_hillclimb": 0.7991,
+        "panmictic_ga": 0.7879,
+        "random": 0.8092
+      },
+      "reach_rate": {
+        "map_elites": 0.4,
+        "rr_hillclimb": 0.2,
+        "panmictic_ga": 0.0,
+        "random": 0.6
+      },
+      "gates": {
+        "rr_hillclimb": {
+          "diff": 0.0662,
+          "wilcoxon_p": 0.3125,
+          "paired_sign_delta": 0.2,
+          "mean_a": 0.8653,
+          "mean_b": 0.7991,
+          "passes": false
+        },
+        "panmictic_ga": {
+          "diff": 0.0775,
+          "wilcoxon_p": 0.0625,
+          "paired_sign_delta": 0.6,
+          "mean_a": 0.8653,
+          "mean_b": 0.7879,
+          "passes": false
+        },
+        "random": {
+          "diff": 0.0561,
+          "wilcoxon_p": 0.3125,
+          "paired_sign_delta": 0.2,
+          "mean_a": 0.8653,
+          "mean_b": 0.8092,
+          "passes": false
+        }
+      },
+      "n_baselines_beaten": 0,
+      "beats_rr": false,
+      "map_elites_beats_all_3": false,
+      "raw_scores": {
+        "map_elites": [
+          0.9811313208474918,
+          0.7981282709958674,
+          0.7954222592286819,
+          0.95220970288189,
+          0.7997469002328331
+        ],
+        "rr_hillclimb": [
+          0.798983057980969,
+          0.7972251449002348,
+          0.7990770610661562,
+          0.7993727684213393,
+          0.8008310372367689
+        ],
+        "panmictic_ga": [
+          0.7989960523121431,
+          0.7465499826374578,
+          0.7971419199214382,
+          0.7993783981487456,
+          0.7973024755352035
+        ],
+        "random": [
+          0.7973592492888868,
+          0.7973004725618238,
+          0.8497824879220068,
+          0.8009927191347899,
+          0.8006414533179015
+        ]
+      },
+      "desc": "4 basin 局所峰 + target のみ theta corridor (pre-reg behavior)"
+    }
+  },
+  "verdict": {
+    "found_faithful_disproof": false,
+    "disproof_configs": [],
+    "summary": "③ が RR 含む 3 baseline 全勝した faithful 構成: なし。→ faithful には反証できず。BG9-4 構造 N/A 主張を裏付け (RR 排除不能)。"
+  }
+}

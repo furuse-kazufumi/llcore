@@ -1,0 +1,103 @@
+{
+  "meta": {
+    "mode": "smoke",
+    "null": false,
+    "device": "cpu",
+    "gpu": "cpu",
+    "cfg": {
+      "n": 8,
+      "layers": 1,
+      "d": 64,
+      "T": 48,
+      "B": 16,
+      "lr": 0.003,
+      "grad_steps": 40,
+      "evo_gens": 20,
+      "sigma": 0.12,
+      "eval_batches": 3,
+      "max_chars": 10000,
+      "cert_every": 8
+    },
+    "vocab": 57,
+    "unigram_ce": 3.284284935748785,
+    "sdp_available": true,
+    "start_time": "2026-06-05T22:15:51",
+    "end_time": "2026-06-05T22:17:48",
+    "status": "done",
+    "error": null
+  },
+  "records": [
+    {
+      "mode": "smoke",
+      "null": false,
+      "gate": "none",
+      "seed": 1234,
+      "device": "cpu",
+      "start_time": "2026-06-05T22:15:51",
+      "end_time": "2026-06-05T22:16:13",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.732876698176066,
+        "grad_reject_rate": 0.0,
+        "evo_ce": 2.9751851558685303,
+        "evo_admit_rate": 1.0
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 1.007064364624632,
+        "grad_winner_region": "non_certified",
+        "evo_winner_region": "non_certified",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_smoke.json",
+      "error": null
+    },
+    {
+      "mode": "smoke",
+      "null": false,
+      "gate": "inf",
+      "seed": 1234,
+      "device": "cpu",
+      "start_time": "2026-06-05T22:16:13",
+      "end_time": "2026-06-05T22:16:19",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.72857928276062,
+        "grad_reject_rate": 0.075,
+        "evo_ce": 2.9811336199442544,
+        "evo_admit_rate": 0.0
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.9079780412106496,
+        "grad_winner_region": "inf",
+        "evo_winner_region": "inf",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_smoke.json",
+      "error": null
+    },
+    {
+      "mode": "smoke",
+      "null": false,
+      "gate": "sdp",
+      "seed": 1234,
+      "device": "cpu",
+      "start_time": "2026-06-05T22:16:19",
+      "end_time": "2026-06-05T22:17:48",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.731837034225464,
+        "grad_reject_rate": 0.025,
+        "evo_ce": 2.9795788129170737,
+        "evo_admit_rate": 0.3
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.9851607422780215,
+        "grad_winner_region": "sdp_only",
+        "evo_winner_region": "sdp_only",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_smoke.json",
+      "error": null
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+{
+  "n_deg6_residual": 10,
+  "finite_gap": 4,
+  "closed_by_gamma_star_individual": {
+    "deg4": 0,
+    "deg6": 0,
+    "deg8": 2
+  },
+  "closed_by_lifted_union_gstar_min": 2,
+  "frac_finite_gap_closed_by_union": 0.5,
+  "tightest_lift_winner_degree": {
+    "4": 4,
+    "6": 0,
+    "8": 6
+  },
+  "higher_degree_worse_count": 1,
+  "mean_bracket_width_union": 0.0088,
+  "bracket_invalid_lb_gt_ub": 0,
+  "near_boundary_tail_count": 2,
+  "near_boundary_tail_jsr_lb": [
+    0.9915,
+    0.9787
+  ],
+  "G_JSR_majority_closed_by_union": false,
+  "rows": [
+    {
+      "jsr_lb": 0.9787,
+      "gstar_deg4": 1.0212,
+      "gstar_deg6": 1.0064,
+      "gstar_deg8": 1.0004,
+      "gstar_min": 1.0004
+    },
+    {
+      "jsr_lb": 0.9915,
+      "gstar_deg4": 1.0081,
+      "gstar_deg6": 1.0023,
+      "gstar_deg8": 1.0003,
+      "gstar_min": 1.0003
+    },
+    {
+      "jsr_lb": 1.0001,
+      "gstar_deg4": 1.001,
+      "gstar_deg6": 1.001,
+      "gstar_deg8": 1.001,
+      "gstar_min": 1.001
+    },
+    {
+      "jsr_lb": 1.0272,
+      "gstar_deg4": 1.0696,
+      "gstar_deg6": 1.0522,
+      "gstar_deg8": 1.0445,
+      "gstar_min": 1.0445
+    },
+    {
+      "jsr_lb": 1.0012,
+      "gstar_deg4": 1.0022,
+      "gstar_deg6": 1.0022,
+      "gstar_deg8": 1.0031,
+      "gstar_min": 1.0022
+    },
+    {
+      "jsr_lb": 0.9757,
+      "gstar_deg4": 1.0182,
+      "gstar_deg6": 1.0034,
+      "gstar_deg8": 0.9935,
+      "gstar_min": 0.9935
+    },
+    {
+      "jsr_lb": 1.0571,
+      "gstar_deg4": 1.0808,
+      "gstar_deg6": 1.0704,
+      "gstar_deg8": 1.0656,
+      "gstar_min": 1.0656
+    },
+    {
+      "jsr_lb": 1.0054,
+      "gstar_deg4": 1.0064,
+      "gstar_deg6": 1.0064,
+      "gstar_deg8": 1.0064,
+      "gstar_min": 1.0064
+    },
+    {
+      "jsr_lb": 1.022,
+      "gstar_deg4": 1.0229,
+      "gstar_deg6": 1.0229,
+      "gstar_deg8": 1.0229,
+      "gstar_min": 1.0229
+    },
+    {
+      "jsr_lb": 0.9852,
+      "gstar_deg4": 1.0177,
+      "gstar_deg6": 1.0029,
+      "gstar_deg8": 0.995,
+      "gstar_min": 0.995
+    }
+  ],
+  "elapsed_s": 6.5
+}

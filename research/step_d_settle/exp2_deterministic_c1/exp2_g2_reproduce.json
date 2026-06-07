@@ -1,0 +1,31 @@
+{
+  "g2_all_reproduced": true,
+  "checks": [
+    {
+      "cell": "ctrl_multipeak_dim3|nr=12|ne=200|seed=20260530",
+      "stored_vf": 0.7272727272727273,
+      "rerun_vf": 0.7272727272727273,
+      "stored_is_mm": true,
+      "rerun_is_mm": true,
+      "stored_n_optima": 12,
+      "rerun_n_optima": 12,
+      "vf_bit_match": true,
+      "is_mm_match": true,
+      "n_optima_match": true,
+      "reproduced": true
+    },
+    {
+      "cell": "ctrl_quadratic_dim3|nr=24|ne=300|seed=20260601",
+      "stored_vf": 0.0,
+      "rerun_vf": 0.0,
+      "stored_is_mm": false,
+      "rerun_is_mm": false,
+      "stored_n_optima": 24,
+      "rerun_n_optima": 24,
+      "vf_bit_match": true,
+      "is_mm_match": true,
+      "n_optima_match": true,
+      "reproduced": true
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+[23:58:12] EXP2 start (smoke=False) per_run_budget=820.0s
+[23:58:14] self-check ESN_3param: det_fit=0.3513 eval_noise_std=0.000e+00 (machine-epsilon; valley_thr ~0.05*|fit|)
+[23:58:15] self-check ESN_perneuron40: det_fit=0.3673 eval_noise_std=0.000e+00 (machine-epsilon; valley_thr ~0.05*|fit|)
+[23:58:15] self-check ctrl_multipeak_dim3: det_fit=0.0407 eval_noise_std=2.168e-19 (machine-epsilon; valley_thr ~0.05*|fit|)
+[23:58:15] self-check ctrl_multipeak_dim40: det_fit=0.0000 eval_noise_std=3.944e-31 (machine-epsilon; valley_thr ~0.05*|fit|)
+[23:58:15] self-check ctrl_quadratic_dim3: det_fit=-0.0672 eval_noise_std=1.388e-17 (machine-epsilon; valley_thr ~0.05*|fit|)
+[23:58:15] self-check ctrl_quadratic_dim40: det_fit=-0.0945 eval_noise_std=1.388e-17 (machine-epsilon; valley_thr ~0.05*|fit|)
+[23:58:15] self-check note_corridor_d016: det_fit=0.6007 eval_noise_std=1.110e-16 (machine-epsilon; valley_thr ~0.05*|fit|)
+[23:58:15] total cells=39 done_before=0
+[00:01:14] cell ESN_3param|nr=12|ne=200|seed=20260530: vf=0.000 n_optima=12 is_mm=False (178.9s)
+[00:03:52] cell ESN_3param|nr=12|ne=200|seed=20260531: vf=0.000 n_optima=12 is_mm=False (158.4s)
+[00:06:37] cell ESN_3param|nr=12|ne=200|seed=20260601: vf=0.000 n_optima=12 is_mm=False (164.7s)
+[00:13:59] cell ESN_3param|nr=24|ne=300|seed=20260530: vf=0.000 n_optima=24 is_mm=False (442.4s)
+[00:13:59] per-run budget reached, stopping. 4 cells this run.
+[00:13:59] run finished: 4 cells, wall=949.2s (per-run G1 OVER)
+[00:14:26] EXP2 start (smoke=False) per_run_budget=430.0s
+[00:14:26] total cells=39 done_before=4
+[00:26:05] EXP2 start (smoke=False) per_run_budget=430.0s
+[00:26:05] total cells=39 done_before=4
+[00:39:09] cell ESN_3param|nr=24|ne=300|seed=20260531: vf=0.000 n_optima=24 is_mm=False (784.5s)
+[00:39:09] per-run budget reached, stopping. 1 cells this run.
+[00:39:09] run finished: 1 cells, wall=786.5s (per-run G1 OK)
+[00:39:11] EXP2 start (smoke=False) per_run_budget=430.0s
+[00:39:11] total cells=39 done_before=5
+[00:44:30] EXP2 start (smoke=False) per_run_budget=300.0s
+[00:44:30] total cells=39 done_before=5
+[00:56:32] cell ESN_3param|nr=24|ne=300|seed=20260601: vf=0.000 n_optima=24 is_mm=False (721.1s)
+[00:56:32] per-run budget reached, stopping. 1 cells this run.
+[00:56:32] run finished: 1 cells, wall=722.3s (per-run G1 OK)
+[00:56:51] EXP2 start (smoke=False) per_run_budget=400.0s
+[00:56:51] total cells=39 done_before=6
+[01:01:03] cell ESN_perneuron40|nr=12|ne=200|seed=20260530: vf=0.091 n_optima=12 is_mm=False (252.6s)
+[01:05:17] cell ESN_perneuron40|nr=12|ne=200|seed=20260531: vf=0.076 n_optima=12 is_mm=False (253.5s)
+[01:05:17] per-run budget reached, stopping. 2 cells this run.
+[01:05:17] run finished: 2 cells, wall=507.3s (per-run G1 OK)
+[01:05:38] EXP2 start (smoke=False) per_run_budget=400.0s
+[01:05:38] total cells=39 done_before=8
+[01:10:02] cell ESN_perneuron40|nr=12|ne=200|seed=20260601: vf=0.121 n_optima=12 is_mm=False (264.8s)
+[01:23:35] EXP2 start (smoke=False) per_run_budget=800.0s
+[01:23:35] total cells=36 done_before=9
+[01:23:35] cell ctrl_multipeak_dim3|nr=12|ne=200|seed=20260530: vf=0.727 n_optima=12 is_mm=True (0.1s)
+[01:23:35] cell ctrl_multipeak_dim3|nr=12|ne=200|seed=20260531: vf=0.712 n_optima=12 is_mm=True (0.1s)
+[01:23:35] cell ctrl_multipeak_dim3|nr=12|ne=200|seed=20260601: vf=0.723 n_optima=12 is_mm=True (0.0s)
+[01:23:36] cell ctrl_multipeak_dim3|nr=24|ne=300|seed=20260530: vf=0.675 n_optima=24 is_mm=True (0.2s)
+[01:23:36] cell ctrl_multipeak_dim3|nr=24|ne=300|seed=20260531: vf=0.675 n_optima=24 is_mm=True (0.2s)
+[01:23:36] cell ctrl_multipeak_dim3|nr=24|ne=300|seed=20260601: vf=0.694 n_optima=24 is_mm=True (0.2s)
+[01:23:36] cell ctrl_multipeak_dim40|nr=12|ne=200|seed=20260530: vf=0.818 n_optima=12 is_mm=True (0.1s)
+[01:23:36] cell ctrl_multipeak_dim40|nr=12|ne=200|seed=20260531: vf=0.818 n_optima=12 is_mm=True (0.1s)
+[01:23:36] cell ctrl_multipeak_dim40|nr=12|ne=200|seed=20260601: vf=0.818 n_optima=12 is_mm=True (0.1s)
+[01:23:36] cell ctrl_multipeak_dim40|nr=24|ne=300|seed=20260530: vf=0.757 n_optima=24 is_mm=True (0.3s)
+[01:23:37] cell ctrl_multipeak_dim40|nr=24|ne=300|seed=20260531: vf=0.772 n_optima=24 is_mm=True (0.3s)
+[01:23:37] cell ctrl_multipeak_dim40|nr=24|ne=300|seed=20260601: vf=0.786 n_optima=24 is_mm=True (0.3s)
+[01:23:37] cell ctrl_quadratic_dim3|nr=12|ne=200|seed=20260530: vf=0.000 n_optima=12 is_mm=False (0.0s)
+[01:23:37] cell ctrl_quadratic_dim3|nr=12|ne=200|seed=20260531: vf=0.000 n_optima=12 is_mm=False (0.0s)
+[01:23:37] cell ctrl_quadratic_dim3|nr=12|ne=200|seed=20260601: vf=0.000 n_optima=12 is_mm=False (0.1s)
+[01:23:37] cell ctrl_quadratic_dim3|nr=24|ne=300|seed=20260530: vf=0.000 n_optima=24 is_mm=False (0.2s)
+[01:23:38] cell ctrl_quadratic_dim3|nr=24|ne=300|seed=20260531: vf=0.000 n_optima=24 is_mm=False (0.1s)
+[01:23:38] cell ctrl_quadratic_dim3|nr=24|ne=300|seed=20260601: vf=0.000 n_optima=24 is_mm=False (0.2s)
+[01:23:38] cell ctrl_quadratic_dim40|nr=12|ne=200|seed=20260530: vf=0.000 n_optima=12 is_mm=False (0.1s)
+[01:23:38] cell ctrl_quadratic_dim40|nr=12|ne=200|seed=20260531: vf=0.000 n_optima=12 is_mm=False (0.0s)
+[01:23:38] cell ctrl_quadratic_dim40|nr=12|ne=200|seed=20260601: vf=0.000 n_optima=12 is_mm=False (0.0s)
+[01:23:38] cell ctrl_quadratic_dim40|nr=24|ne=300|seed=20260530: vf=0.000 n_optima=24 is_mm=False (0.1s)
+[01:23:38] cell ctrl_quadratic_dim40|nr=24|ne=300|seed=20260531: vf=0.000 n_optima=24 is_mm=False (0.2s)
+[01:23:38] cell ctrl_quadratic_dim40|nr=24|ne=300|seed=20260601: vf=0.000 n_optima=24 is_mm=False (0.2s)
+[01:23:39] cell note_corridor_d016|nr=24|ne=300|seed=20260530: vf=0.000 n_optima=24 is_mm=False (0.1s)
+[01:23:39] cell note_corridor_d016|nr=24|ne=300|seed=20260531: vf=0.000 n_optima=24 is_mm=False (0.2s)
+[01:23:39] cell note_corridor_d016|nr=24|ne=300|seed=20260601: vf=0.000 n_optima=24 is_mm=False (0.2s)
+[01:23:39] run finished: 27 cells, wall=4.9s (per-run G1 OK)

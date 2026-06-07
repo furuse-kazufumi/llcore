@@ -1,0 +1,176 @@
+{
+  "meta": {
+    "experiment": "R-LLM Stage-B verified core in gradient-trained Transformer",
+    "mode": "feasibility",
+    "null": false,
+    "device": "cuda",
+    "gpu": "Tesla T4",
+    "NS": [
+      64
+    ],
+    "conds": [
+      "pure",
+      "none",
+      "project",
+      "reject"
+    ],
+    "n_seeds": 2,
+    "base_cfg": {
+      "d": 128,
+      "T": 160,
+      "B": 24,
+      "heads": 4,
+      "w_att": 8,
+      "blocks": 2,
+      "lr": 0.003,
+      "grad_steps": 300,
+      "eval_batches": 8,
+      "max_chars": 100000,
+      "cert_every": 4
+    },
+    "vocab": 61,
+    "unigram_ce": 3.3230869662915614,
+    "start_time": "2026-06-06T00:58:17",
+    "end_time": "2026-06-06T01:00:56",
+    "status": "done",
+    "error": null
+  },
+  "records": [
+    {
+      "n": 64,
+      "cond": "pure",
+      "seed": 1234,
+      "start_time": "2026-06-06T00:58:17",
+      "status": "ok",
+      "metrics": {
+        "ce": 1.9284017980098724,
+        "n_params": 432957
+      },
+      "error": null,
+      "end_time": "2026-06-06T00:58:26"
+    },
+    {
+      "n": 64,
+      "cond": "pure",
+      "seed": 1235,
+      "start_time": "2026-06-06T00:58:26",
+      "status": "ok",
+      "metrics": {
+        "ce": 1.9370795637369156,
+        "n_params": 432957
+      },
+      "error": null,
+      "end_time": "2026-06-06T00:58:28"
+    },
+    {
+      "n": 64,
+      "cond": "none",
+      "seed": 1234,
+      "start_time": "2026-06-06T00:58:28",
+      "status": "ok",
+      "metrics": {
+        "ce": 1.908994659781456,
+        "n_params": 453693,
+        "max_emp_rho": 1.0822730015860313,
+        "cert_pass_final": false,
+        "sound": false,
+        "postproject_gamma": 0.08281609405204654,
+        "ce_postproject": 2.0316522419452667,
+        "rho_postproject": 0.8678128789420804
+      },
+      "error": null,
+      "end_time": "2026-06-06T00:58:53"
+    },
+    {
+      "n": 64,
+      "cond": "none",
+      "seed": 1235,
+      "start_time": "2026-06-06T00:58:53",
+      "status": "ok",
+      "metrics": {
+        "ce": 1.907932460308075,
+        "n_params": 453693,
+        "max_emp_rho": 1.065272190352542,
+        "cert_pass_final": false,
+        "sound": false,
+        "postproject_gamma": 0.05986607163213194,
+        "ce_postproject": 2.1235497891902924,
+        "rho_postproject": 0.8598952807952964
+      },
+      "error": null,
+      "end_time": "2026-06-06T00:59:18"
+    },
+    {
+      "n": 64,
+      "cond": "project",
+      "seed": 1234,
+      "start_time": "2026-06-06T00:59:18",
+      "status": "ok",
+      "metrics": {
+        "ce": 1.9583625793457031,
+        "n_params": 453693,
+        "max_emp_rho": 0.8912702044623536,
+        "cert_pass_final": true,
+        "sound": true,
+        "project_rate": 1.0,
+        "mean_gamma": 0.5383296398301167,
+        "fallbacks": 0
+      },
+      "error": null,
+      "end_time": "2026-06-06T00:59:43"
+    },
+    {
+      "n": 64,
+      "cond": "project",
+      "seed": 1235,
+      "start_time": "2026-06-06T00:59:43",
+      "status": "ok",
+      "metrics": {
+        "ce": 1.9659864604473114,
+        "n_params": 453693,
+        "max_emp_rho": 0.8972882800033994,
+        "cert_pass_final": true,
+        "sound": true,
+        "project_rate": 1.0,
+        "mean_gamma": 0.511615240882686,
+        "fallbacks": 0
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:00:08"
+    },
+    {
+      "n": 64,
+      "cond": "reject",
+      "seed": 1234,
+      "start_time": "2026-06-06T01:00:08",
+      "status": "ok",
+      "metrics": {
+        "ce": 1.9260487407445908,
+        "n_params": 453693,
+        "max_emp_rho": 0.8780347074334882,
+        "cert_pass_final": true,
+        "sound": true,
+        "reject_rate": 0.9866666666666667
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:00:32"
+    },
+    {
+      "n": 64,
+      "cond": "reject",
+      "seed": 1235,
+      "start_time": "2026-06-06T01:00:32",
+      "status": "ok",
+      "metrics": {
+        "ce": 1.9453053176403046,
+        "n_params": 453693,
+        "max_emp_rho": 0.877673216320531,
+        "cert_pass_final": true,
+        "sound": true,
+        "reject_rate": 0.9866666666666667
+      },
+      "error": null,
+      "end_time": "2026-06-06T01:00:56"
+    }
+  ]
+}

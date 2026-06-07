@@ -1,0 +1,152 @@
+{
+  "metric": "fdc_behavior",
+  "metric_name": "FDC-behavior (Fitness-Distance Correlation in behavior space)",
+  "purpose": "Phase A CrossMetric: re-test the behavior_elite_dip per-task below/above-threshold conclusion with an independent metric (FDC-behavior). Same task wiring, different metric, to check cross-metric agreement.",
+  "fast_mode": true,
+  "fast_mode_note": "RAPTOR_FDC_FAST=1: reduced sampling budget to complete within the harness time limit (full-budget reservoir run is ~80 min). Verdicts are reported with 95% CI; the reduced budget widens CIs but the below/above conclusion is checked against the CI, not a single point.",
+  "threshold_at_d_star": 0.22817556485363727,
+  "d_star": 0.16,
+  "threshold_source": "calibrate_fdc_behavior_results.json",
+  "calibration": {
+    "spearman_with_d": 0.39999999999999997,
+    "spearman_with_d_low_range_le_0p20": 1.0,
+    "high_d_collapse_observed": true
+  },
+  "real_tasks": {
+    "variable_delay_recall": {
+      "task": "variable_delay_recall",
+      "deceptiveness_mean": 0.9260112662282242,
+      "deceptiveness_std": 0.047108600206505716,
+      "ci95_lo": 0.872702866727894,
+      "ci95_hi": 0.9793196657285543,
+      "fdc_mean": 0.07398873377177594,
+      "fdc_std": 0.04710860020650573,
+      "any_degenerate": false,
+      "per_repeat_deceptiveness": [
+        0.9802984211921296,
+        0.9018507773906241,
+        0.8958846001019184
+      ],
+      "per_repeat_fdc": [
+        0.01970157880787033,
+        0.09814922260937588,
+        0.10411539989808156
+      ],
+      "n_samples": 200,
+      "honest_n_trials": 3,
+      "n_repeats": 3,
+      "metric_at_dstar": 0.22817556485363727,
+      "below_threshold": false,
+      "ci_strictly_below": false,
+      "ci_strictly_above": true
+    },
+    "flip_flop": {
+      "task": "flip_flop",
+      "deceptiveness_mean": 0.7646737329136517,
+      "deceptiveness_std": 0.027052011622497863,
+      "ci95_lo": 0.7340614999766064,
+      "ci95_hi": 0.795285965850697,
+      "fdc_mean": 0.23532626708634818,
+      "fdc_std": 0.0270520116224979,
+      "any_degenerate": false,
+      "per_repeat_deceptiveness": [
+        0.7714579292382839,
+        0.7876879283760646,
+        0.7348753411266069
+      ],
+      "per_repeat_fdc": [
+        0.228542070761716,
+        0.2123120716239354,
+        0.26512465887339315
+      ],
+      "n_samples": 200,
+      "honest_n_trials": 3,
+      "n_repeats": 3,
+      "metric_at_dstar": 0.22817556485363727,
+      "below_threshold": false,
+      "ci_strictly_below": false,
+      "ci_strictly_above": true
+    },
+    "step6_text_proxy": {
+      "task": "step6_text_proxy",
+      "deceptiveness_mean": 0.3071941545467381,
+      "deceptiveness_std": 0.16138658671007253,
+      "ci95_lo": 0.1245680395566538,
+      "ci95_hi": 0.4898202695368224,
+      "fdc_mean": 0.692805845453262,
+      "fdc_std": 0.16138658671007253,
+      "any_degenerate": false,
+      "per_repeat_deceptiveness": [
+        0.4927471086784998,
+        0.22935776716131118,
+        0.19947758780040326
+      ],
+      "per_repeat_fdc": [
+        0.5072528913215002,
+        0.7706422328386888,
+        0.8005224121995967
+      ],
+      "n_samples": 400,
+      "honest_n_trials": 1,
+      "n_repeats": 3,
+      "metric_at_dstar": 0.22817556485363727,
+      "below_threshold": false,
+      "ci_strictly_below": false,
+      "ci_strictly_above": false,
+      "wiring": "exp7 §(A) 3-param ESN: gene[0,1,2]->(rho in[0.1,1.5], leak in[0.05,1.0], in_scale in[0.3,1.5]); behavior=(rho,leak); deterministic fitness (next-char held-out accuracy), honest_n_trials=1."
+    }
+  },
+  "configs": {
+    "reservoir_tasks": {
+      "n_samples": 200,
+      "honest_n_trials": 3,
+      "n_repeats": 3,
+      "rng_seed": 12345
+    },
+    "step6_text_proxy": {
+      "n_samples": 400,
+      "honest_n_trials": 1,
+      "n_repeats": 3,
+      "rng_seed": 12345
+    }
+  },
+  "conclusion": {
+    "all_below_threshold": false,
+    "below_threshold_per_task": {
+      "variable_delay_recall": false,
+      "flip_flop": false,
+      "step6_text_proxy": false
+    },
+    "ci_strictly_below_per_task": {
+      "variable_delay_recall": false,
+      "flip_flop": false,
+      "step6_text_proxy": false
+    },
+    "verdict": "At least one real task measured AT/ABOVE FDC metric_at_dstar -> see per-task flags; ③ may be load-bearing there. Inspect CI and compare with behavior_elite_dip."
+  },
+  "cross_metric_comparison": {
+    "behavior_elite_dip_below_per_task": {
+      "variable_delay_recall": false,
+      "flip_flop": false,
+      "step6_text_proxy": true
+    },
+    "fdc_behavior_below_per_task": {
+      "variable_delay_recall": false,
+      "flip_flop": false,
+      "step6_text_proxy": false
+    },
+    "per_task_agreement": {
+      "variable_delay_recall": true,
+      "flip_flop": true,
+      "step6_text_proxy": false
+    },
+    "all_tasks_agree": false,
+    "note": "agreement compares the BELOW/ABOVE verdict per task across the two metrics. Disagreement is a meaningful finding (which metric / why they diverge)."
+  },
+  "honest_disclosure": {
+    "axis_mismatch": "Real-task behavior axes (reservoir: eff_mem/std(leak); step6: rho/leak) differ from synthetic behavior=mean. below_threshold is an OPERATIONAL same-metric/same-estimator comparison vs the raw FDC value at d*; RANK transfers, calibrated MAGNITUDE does not.",
+    "fdc_high_d_collapse": "FDC-behavior INVERTS for d>=0.30 in calibration (operational best- behavior reference relocates). In the deceptive (low-d) regime expected for these smooth tasks this is fine, but a low/negative FDC must not be naively read as deep deception without checking the collapse regime.",
+    "estimation_noise": "5 seeds; mean±std + 95% CI reported (no single-seed point claim).",
+    "metric_provisional": "FDC calibration JSON is itself flagged provisional (reproduces_threshold=false; spearman over full sweep=0.4, =1.0 only on d<=0.20). Treat the threshold as operational, not final."
+  }
+}

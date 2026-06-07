@@ -1,0 +1,108 @@
+{
+  "A": {
+    "lens": "A_circular_random_fitness",
+    "sdp_vs_inf_on_random": {
+      "n": 15,
+      "mean_delta": -0.0005010339380293901,
+      "median_delta": -0.00014734735613286531,
+      "n_pos": 4,
+      "n_neg": 10,
+      "paired_sign_delta": -0.4,
+      "wilcoxon_p": 0.9136962890625,
+      "alternative": "greater"
+    },
+    "interpretation": "PASS(no artifact) if NOT significant: random fitness gives sdp no edge over inf. A significant sdp>inf here would mean the G4 effect is an admission-SIZE artifact.",
+    "artifact_detected": false
+  },
+  "D": {
+    "lens": "D_mechanism_attribution",
+    "winner_regions": {
+      "rotation": {
+        "inf_norm": {
+          "inf": 13,
+          "two_norm_only": 0,
+          "sdp_only": 0,
+          "non_certified": 2
+        },
+        "two_norm": {
+          "inf": 0,
+          "two_norm_only": 15,
+          "sdp_only": 0,
+          "non_certified": 0
+        },
+        "sdp": {
+          "inf": 0,
+          "two_norm_only": 3,
+          "sdp_only": 12,
+          "non_certified": 0
+        }
+      },
+      "nonnormal": {
+        "inf_norm": {
+          "inf": 15,
+          "two_norm_only": 0,
+          "sdp_only": 0,
+          "non_certified": 0
+        },
+        "two_norm": {
+          "inf": 0,
+          "two_norm_only": 15,
+          "sdp_only": 0,
+          "non_certified": 0
+        },
+        "sdp": {
+          "inf": 1,
+          "two_norm_only": 6,
+          "sdp_only": 8,
+          "non_certified": 0
+        }
+      }
+    },
+    "interpretation": "Mechanism holds if sdp/two winners on rotation/nonnormal sit in inf-REJECTED regions (two_norm_only/sdp_only) while inf winners are confined to 'inf'. Confirms the payoff comes from the extra reach."
+  },
+  "C": {
+    "lens": "C_power_seed",
+    "families": {
+      "f1": {
+        "n": 15,
+        "mean_delta": 0.46306496173040296,
+        "median_delta": 0.4757072815150295,
+        "n_pos": 15,
+        "n_neg": 0,
+        "paired_sign_delta": 1.0,
+        "wilcoxon_p": 3.0517578125e-05,
+        "alternative": "greater"
+      },
+      "f2": {
+        "n": 15,
+        "mean_delta": 0.4586455721238286,
+        "median_delta": 0.4749630092734346,
+        "n_pos": 15,
+        "n_neg": 0,
+        "paired_sign_delta": 1.0,
+        "wilcoxon_p": 3.0517578125e-05,
+        "alternative": "greater"
+      },
+      "f3": {
+        "n": 15,
+        "mean_delta": 0.4383503614477666,
+        "median_delta": 0.4522181987297109,
+        "n_pos": 15,
+        "n_neg": 0,
+        "paired_sign_delta": 1.0,
+        "wilcoxon_p": 3.0517578125e-05,
+        "alternative": "greater"
+      }
+    },
+    "all_families_significant_bonf": true,
+    "interpretation": "PASS if G4 holds across all 3 base-seed families (Bonferroni alpha=0.0167); robust, not seed-cherry-picked."
+  },
+  "B": {
+    "lens": "B_soundness_independent",
+    "winners_checked": 60,
+    "scope": "sdp+two_norm winners on rotation+nonnormal, 50k independent oracle",
+    "false_admit_violations": 0,
+    "violations": [],
+    "interpretation": "PASS if false_admit_violations == 0 (the richest sound gates never yield a divergent winner under a stronger independent oracle)."
+  }
+}

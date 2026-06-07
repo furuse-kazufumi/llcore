@@ -1,0 +1,214 @@
+{
+  "lens": "sampling_threshold_margin",
+  "P1_threshold_stability": [
+    {
+      "vary": "base_seed",
+      "val": 20260531,
+      "mean": 0.01528,
+      "std": 0.01015,
+      "per_seed": [
+        0.0259,
+        0.0218,
+        0.0053,
+        0.0035,
+        0.0199
+      ]
+    },
+    {
+      "vary": "base_seed",
+      "val": 1,
+      "mean": 0.0166,
+      "std": 0.00777,
+      "per_seed": [
+        0.0257,
+        0.0192,
+        0.0102,
+        0.007,
+        0.0209
+      ]
+    },
+    {
+      "vary": "base_seed",
+      "val": 777,
+      "mean": 0.01612,
+      "std": 0.00729,
+      "per_seed": [
+        0.0215,
+        0.0182,
+        0.0227,
+        0.0135,
+        0.0048
+      ]
+    },
+    {
+      "vary": "base_seed",
+      "val": 424242,
+      "mean": 0.01898,
+      "std": 0.00793,
+      "per_seed": [
+        0.0194,
+        0.019,
+        0.0191,
+        0.0075,
+        0.0299
+      ]
+    },
+    {
+      "vary": "n_seeds",
+      "val": 3,
+      "mean": 0.01767,
+      "std": 0.01087
+    },
+    {
+      "vary": "n_seeds",
+      "val": 5,
+      "mean": 0.01528,
+      "std": 0.01015
+    },
+    {
+      "vary": "n_seeds",
+      "val": 10,
+      "mean": 0.02026,
+      "std": 0.01054
+    },
+    {
+      "vary": "n_samples",
+      "val": 2000,
+      "mean": 0.01511,
+      "std": 0.01367
+    },
+    {
+      "vary": "n_samples",
+      "val": 4000,
+      "mean": 0.01528,
+      "std": 0.01015
+    },
+    {
+      "vary": "n_samples",
+      "val": 8000,
+      "mean": 0.0309,
+      "std": 0.00541
+    },
+    {
+      "vary": "n_bins",
+      "val": 16,
+      "mean": 0.0214,
+      "std": 0.00382
+    },
+    {
+      "vary": "n_bins",
+      "val": 24,
+      "mean": 0.01528,
+      "std": 0.01015
+    },
+    {
+      "vary": "n_bins",
+      "val": 32,
+      "mean": 0.02038,
+      "std": 0.00775
+    }
+  ],
+  "P1_summary": {
+    "stored_threshold": 0.015281642817850516,
+    "remeasured_min": 0.01511,
+    "remeasured_max": 0.0309,
+    "remeasured_spread_factor": 2.05,
+    "stored_threshold_std_5seed": 0.01015,
+    "stored_threshold_cv": 0.66,
+    "note": "threshold raw value at d=0.16 moves by this factor under seed/sample/bin perturbation; its own 5-seed std is ~67% of its value (CV>0.6)."
+  },
+  "P2_real_margin": {
+    "ea_multitask_variable_delay_recall": {
+      "per_seed": [
+        0.0756,
+        0.1103,
+        0.0536,
+        0.0456,
+        0.0407
+      ],
+      "mean": 0.06518,
+      "std": 0.02852,
+      "cv_seed_noise": 0.438,
+      "ci95": [
+        0.02977,
+        0.10059
+      ],
+      "threshold": 0.01528,
+      "margin_to_threshold": 0.0499,
+      "margin_in_std_units": 1.75,
+      "below_threshold_pointest": false,
+      "ci_brackets_threshold": false,
+      "verdict_could_flip_under_resample": false
+    },
+    "flip_flop": {
+      "per_seed": [
+        0.022,
+        0.0095,
+        0.0115,
+        0.0183,
+        0.0193
+      ],
+      "mean": 0.01609,
+      "std": 0.00535,
+      "cv_seed_noise": 0.333,
+      "ci95": [
+        0.00945,
+        0.02274
+      ],
+      "threshold": 0.01528,
+      "margin_to_threshold": 0.00081,
+      "margin_in_std_units": 0.15,
+      "below_threshold_pointest": false,
+      "ci_brackets_threshold": true,
+      "verdict_could_flip_under_resample": true
+    },
+    "step6_text_proxy": {
+      "per_seed": [
+        0.0103,
+        0.0104,
+        0.0069,
+        0.0139,
+        0.012
+      ],
+      "mean": 0.01069,
+      "std": 0.00259,
+      "cv_seed_noise": 0.242,
+      "ci95": [
+        0.00747,
+        0.0139
+      ],
+      "threshold": 0.01528,
+      "margin_to_threshold": -0.0046,
+      "margin_in_std_units": -1.77,
+      "below_threshold_pointest": true,
+      "ci_brackets_threshold": false,
+      "verdict_could_flip_under_resample": false
+    }
+  },
+  "P3_summary": {
+    "on_disk_conclusion_all_below_threshold": false,
+    "on_disk_below_per_task": {
+      "ea_multitask_variable_delay_recall": false,
+      "flip_flop": false,
+      "step6_text_proxy": true
+    },
+    "recomputed_below_per_task": {
+      "ea_multitask_variable_delay_recall": false,
+      "flip_flop": false,
+      "step6_text_proxy": true
+    },
+    "verdict_flippable_per_task": {
+      "ea_multitask_variable_delay_recall": false,
+      "flip_flop": true,
+      "step6_text_proxy": false
+    },
+    "brief_premise_was": "all below, max 0.041, d*=0.1234",
+    "brief_premise_matches_disk": false,
+    "actual_real_values": {
+      "ea_multitask_variable_delay_recall": 0.0652,
+      "flip_flop": 0.0161,
+      "step6_text_proxy": 0.0107
+    },
+    "actual_threshold": 0.0153
+  }
+}

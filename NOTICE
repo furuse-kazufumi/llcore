@@ -1,0 +1,77 @@
+llcore
+Copyright 2026 Kazufumi Furuse
+
+This product includes software developed by Kazufumi Furuse
+(https://github.com/furuse-kazufumi).
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+implied. See the License for the specific language governing permissions
+and limitations under the License.
+
+Commercial licenses are also available; see LICENSE-COMMERCIAL.
+
+================================================================
+Trademarks
+================================================================
+
+"FullSense" (umbrella brand and spec name), "llmesh", "llive", "llove",
+and "llcore" are trademarks of Kazufumi Furuse.
+
+llcore is part of the FullSense family of products:
+
+    FullSense (umbrella) — brand + technical specification
+      ├─ llmesh — secure LLM hub / on-prem MCP server
+      ├─ llive  — self-evolving modular memory LLM framework
+      ├─ llove  — TUI dashboard / HITL workbench
+      └─ llcore — verified neural-architecture evolution on CPU (this project)
+
+================================================================
+Third-party software
+================================================================
+
+llcore depends on third-party Python packages. Each is governed by its
+own license, which can be reviewed via:
+
+    pip-licenses --format=markdown
+
+Core dependency and its primary license (as of 2026-06-07):
+
+  * numpy            — BSD-3-Clause
+
+Optional extras and their primary licenses:
+
+  * z3-solver (`[z3]`)        — MIT
+  * cvxpy (`[sdp]`)           — Apache-2.0
+  * llmesh-llive (`[llive]`)  — Apache-2.0 (dual-licensed; same author)
+
+The `[dev]` extra (pytest, hypothesis, etc.) is for development only;
+review licenses with `pip-licenses` after installing the relevant extras.
+
+================================================================
+Datasets and corpora
+================================================================
+
+llcore ships **no** dataset or corpus in this repository or in the PyPI
+distribution. The optional RAD-corpus hint feature (`src/llcore/rad/`)
+reads a locally provisioned corpus directory referenced by the
+`LLCORE_RAD_DIR` environment variable; when the variable is unset or the
+directory is absent, the feature degrades gracefully (no hints). Each
+corpus directory contains content licensed under its own terms — **users
+are responsible for verifying the license of each individual corpus**
+before redistribution.
+
+================================================================
+Attribution
+================================================================
+
+Portions of the design, naming, and architecture were developed in
+collaboration with Claude (Anthropic's language model) under user
+direction. Code authorship and copyright remain with the human author.

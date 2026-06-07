@@ -1,0 +1,34 @@
+{
+  "g2_realcell_all_reproduced": true,
+  "note": "§6.2(a) 残務: 実 cell (ESN_3param / ESN_perneuron40) の決定論再現を committed ファイルに移植。既存 verify_g2_reproduce.py は control のみ再検証 していた。実 cell も同 gene→multimodality 手順 bit 一致を確認。",
+  "checks": [
+    {
+      "cell": "ESN_3param|nr=12|ne=200|seed=20260530",
+      "stored_vf": 0.0,
+      "rerun_vf": 0.0,
+      "stored_is_mm": false,
+      "rerun_is_mm": false,
+      "stored_n_optima": 12,
+      "rerun_n_optima": 12,
+      "vf_bit_match": true,
+      "is_mm_match": true,
+      "n_optima_match": true,
+      "reproduced": true,
+      "wall_s": 132.6
+    },
+    {
+      "cell": "ESN_perneuron40|nr=12|ne=200|seed=20260530",
+      "stored_vf": 0.09090909090909091,
+      "rerun_vf": 0.09090909090909091,
+      "stored_is_mm": false,
+      "rerun_is_mm": false,
+      "stored_n_optima": 12,
+      "rerun_n_optima": 12,
+      "vf_bit_match": true,
+      "is_mm_match": true,
+      "n_optima_match": true,
+      "reproduced": true,
+      "wall_s": 143.6
+    }
+  ]
+}

@@ -1,0 +1,303 @@
+# SPDX-License-Identifier: Apache-2.0
+"""Hand-rolled (matplotlib-free) declarative-SVG figures for the llcore paper.
+
+matplotlib is not installed in this CPU-only environment, and FullSense's expression thesis is
+declarative CPU/SVG anyway — so figures are emitted as self-contained SVG (stdlib + json only).
+Reads ONLY the committed, stable cost-reduction result JSONs. src/ untouched.
+
+Figures:
+  fig_cost_speedup.svg   — L2-lite vertex-free vs exact 2^n cert_two: per-gene seconds + speedup (n=8/12/16)
+  fig_admit_coverage.svg — certifier admit counts as % of the exact cert_two reach (inf / B1 / B2 / inf∪B2)
+"""
+from __future__ import annotations
+
+import html
+import json
+import math
+import os
+
+_HERE = os.path.dirname(os.path.abspath(__file__))
+_CR = os.path.normpath(os.path.join(_HERE, "..", "verifier_cost_reduction"))
+_LM = os.path.normpath(os.path.join(_HERE, "..", "verified_lm_evolution"))
+
+
+def _esc(s: str) -> str:
+    return html.escape(str(s), quote=True)
+
+
+def _svg(w: int, h: int, body: str, title: str) -> str:
+    return (
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" '
+        f'viewBox="0 0 {w} {h}" font-family="Segoe UI, Arial, sans-serif">\n'
+        f'<rect width="{w}" height="{h}" fill="#ffffff"/>\n'
+        f'<text x="{w//2}" y="28" text-anchor="middle" font-size="18" '
+        f'font-weight="bold" fill="#1a1a1a">{_esc(title)}</text>\n'
+        f'{body}</svg>\n'
+    )
+
+
+def fig_cost_speedup(cost: dict) -> str:
+    """Grouped horizontal bars: log10(sec/gene) for cert_two vs L2-lite at each n, speedup annotated."""
+    ns = sorted(cost.keys(), key=int)
+    W, H = 760, 360
+    x0, y0 = 250, 70           # plot origin (left axis x, top y)
+    bar_h, grp_gap, bar_gap = 18, 34, 6
+    plot_w = 420
+    # log scale over seconds; find range
+    vals = []
+    for n in ns:
+        vals += [cost[n]["sec_per_gene_two_exact"], cost[n]["sec_per_gene_l2lite"]]
+    lo, hi = math.log10(min(vals)), math.log10(max(vals))
+    span = hi - lo or 1.0
+
+    def bx(sec: float) -> float:
+        return 10 + plot_w * (math.log10(sec) - lo) / span
+
+    rows = []
+    y = y0
+    for n in ns:
+        c = cost[n]
+        two, l2 = c["sec_per_gene_two_exact"], c["sec_per_gene_l2lite"]
+        rows.append(f'<text x="{x0-12}" y="{y+bar_h+2}" text-anchor="end" font-size="13" '
+                    f'fill="#333">n={n} (2^n={c["vertices_2pow_n"]})</text>')
+        # exact 2^n bar (top of group)
+        rows.append(f'<rect x="{x0}" y="{y}" width="{bx(two):.1f}" height="{bar_h}" fill="#c0504d"/>')
+        rows.append(f'<text x="{x0+bx(two)+6:.1f}" y="{y+bar_h-4}" font-size="11" fill="#c0504d">'
+                    f'cert_two {two:.4g}s</text>')
+        y += bar_h + bar_gap
+        # L2-lite bar
+        rows.append(f'<rect x="{x0}" y="{y}" width="{max(bx(l2),2):.1f}" height="{bar_h}" fill="#4f81bd"/>')
+        rows.append(f'<text x="{x0+max(bx(l2),2)+6:.1f}" y="{y+bar_h-4}" font-size="11" fill="#4f81bd">'
+                    f'L2-lite {l2:.4g}s  ({c["speedup_x"]:.0f}x faster)</text>')
+        y += bar_h + grp_gap
+    legend = (f'<text x="{x0}" y="{H-14}" font-size="11" fill="#666">'
+              f'horizontal axis = log10(seconds/gene); L2-lite = 2 SVDs (vertex-free), '
+              f'cert_two = 2^n vertex SVDs</text>')
+    return _svg(W, H, "\n".join(rows) + "\n" + legend,
+                "Verifier cost: vertex-free L2-lite vs exact 2^n enumeration")
+
+
+def fig_admit_coverage(v2: dict) -> str:
+    """Horizontal bars: admit count and % of exact cert_two reach for each certifier."""
+    cnt = v2["admit_counts"]
+    pct = v2["pct_of_exact_two"]
+    two = cnt["two_exact"]
+    order = [
+        ("cert_two (exact 2^n)", two, 100.0, "#7f7f7f"),
+        ("cert_inf (O(n^2))", cnt["inf"], pct["inf"], "#9bbb59"),
+        ("B1 = sigma(M)+sigma(R)", cnt["b1"], pct["b1"], "#d99694"),
+        ("B2 = sigma(|M|+R)  [1 SVD]", cnt["b2"], pct["b2"], "#4f81bd"),
+        ("cert_inf OR B2", cnt["inf_or_b2"], pct["inf_or_b2"], "#8064a2"),
+    ]
+    W, H = 760, 300
+    x0, y0 = 250, 60
+    bar_h, gap = 26, 16
+    plot_w = 380
+    rows = []
+    y = y0
+    for label, c, p, color in order:
+        w = plot_w * (c / two)
+        rows.append(f'<text x="{x0-12}" y="{y+bar_h-7}" text-anchor="end" font-size="12.5" '
+                    f'fill="#333">{_esc(label)}</text>')
+        rows.append(f'<rect x="{x0}" y="{y}" width="{w:.1f}" height="{bar_h}" fill="{color}"/>')
+        rows.append(f'<text x="{x0+w+6:.1f}" y="{y+bar_h-7}" font-size="12" fill="#333">'
+                    f'{c}  ({p:.1f}% of exact)</text>')
+        y += bar_h + gap
+    note = (f'<text x="{x0}" y="{H-12}" font-size="11" fill="#666">'
+            f'n=8, 3000 random genes; all bounds 0 soundness violations. '
+            f'B2 recovers {pct["b2"]:.0f}% of the 2^n reach at 1 SVD.</text>')
+    return _svg(W, H, "\n".join(rows) + "\n" + note,
+                "Certifier admit coverage vs the exact 2-norm certifier")
+
+
+def fig_l3_gate_gap(real: dict, null: dict) -> str:
+    """The honest-disclosure headline: mean held-out CE per gate, real vs null (shuffled) corpus.
+
+    Real: sound gates (two/sdp) beat the unigram baseline (learning). Null: every gate sits BELOW
+    unigram and the gate ORDERING PERSISTS (the relaxed-vs-inf gap does NOT tie) -> the gate-gap is
+    structure-independent (evolvability), not language learning.
+    """
+    gates = [("inf_norm", "inf"), ("two_norm", "two"), ("sdp", "sdp"), ("none", "none")]
+    W, H = 760, 380
+    x0, y_base = 90, 300
+    col_w, grp_gap, bar_w = 150, 26, 46
+    # CE axis: pick a window around both unigrams
+    rce = real["summary"]; nce = null["summary"]
+    ru, nu = real["unigram_ce"], null["unigram_ce"]
+    all_ce = [rce[g]["mean_ce"] for g, _ in gates] + [nce[g]["mean_ce"] for g, _ in gates] + [ru, nu]
+    lo, hi = min(all_ce) - 0.02, max(all_ce) + 0.02
+    span = hi - lo
+
+    def yy(ce: float) -> float:
+        return y_base - (y_base - 60) * (ce - lo) / span
+
+    rows = [f'<text x="40" y="{y_base+24}" font-size="12" fill="#333">CE</text>']
+    # y-axis gridlines at unigram refs
+    for u, lab, col in ((ru, f"real unigram {ru:.3f}", "#c0504d"), (nu, f"null unigram {nu:.3f}", "#4f81bd")):
+        rows.append(f'<line x1="{x0}" y1="{yy(u):.1f}" x2="{W-30}" y2="{yy(u):.1f}" '
+                    f'stroke="{col}" stroke-dasharray="5 4" stroke-width="1"/>')
+        rows.append(f'<text x="{W-30}" y="{yy(u)-4:.1f}" text-anchor="end" font-size="10.5" '
+                    f'fill="{col}">{_esc(lab)}</text>')
+    x = x0 + 30
+    for g, short in gates:
+        rb, nb = rce[g]["mean_ce"], nce[g]["mean_ce"]
+        # real bar (red) then null bar (blue), grown downward from top of CE window
+        rows.append(f'<rect x="{x}" y="{yy(rb):.1f}" width="{bar_w}" height="{y_base-yy(rb):.1f}" fill="#c0504d"/>')
+        rows.append(f'<text x="{x+bar_w/2:.1f}" y="{yy(rb)-5:.1f}" text-anchor="middle" font-size="10" '
+                    f'fill="#c0504d">{rb:.3f}</text>')
+        rows.append(f'<rect x="{x+bar_w+6}" y="{yy(nb):.1f}" width="{bar_w}" height="{y_base-yy(nb):.1f}" fill="#4f81bd"/>')
+        rows.append(f'<text x="{x+bar_w+6+bar_w/2:.1f}" y="{yy(nb)-5:.1f}" text-anchor="middle" font-size="10" '
+                    f'fill="#4f81bd">{nb:.3f}</text>')
+        rows.append(f'<text x="{x+bar_w+3:.1f}" y="{y_base+18}" text-anchor="middle" font-size="12.5" '
+                    f'fill="#333">{_esc(short)}</text>')
+        x += col_w
+    rows.append(f'<rect x="{x0+30}" y="40" width="12" height="12" fill="#c0504d"/>'
+                f'<text x="{x0+46}" y="50" font-size="11" fill="#333">real corpus</text>')
+    rows.append(f'<rect x="{x0+140}" y="40" width="12" height="12" fill="#4f81bd"/>'
+                f'<text x="{x0+156}" y="50" font-size="11" fill="#333">null (shuffled) corpus</text>')
+    note = (f'<text x="{x0}" y="{H-14}" font-size="11" fill="#666">'
+            f'lower CE = better. Gate ordering inf&gt;two&gt;sdp persists on the null '
+            f'(gap ~107% of real on the CE scale) =&gt; evolvability, not language learning.</text>')
+    return _svg(W, H, "\n".join(rows) + "\n" + note,
+                "L3 honest disclosure: gate-gap persists on the null corpus")
+
+
+def fig_coverage_vs_n(scale: dict) -> str:
+    """Grouped bars: cert_inf / B2 / inf∪B2 coverage (% of exact cert_two) at n=8/12/16 — the honest
+    degradation of the cheap vertex-free bound as the state dimension grows."""
+    rows_d = scale["results"]
+    ns = [r["n"] for r in rows_d]
+    series = [("cert_inf", "inf", "#9bbb59"), ("B2 = σ(|M|+R)", "b2", "#4f81bd"),
+              ("inf ∪ B2", "inf_or_b2", "#8064a2")]
+    W, H = 720, 360
+    x0, y_base = 70, 290
+    grp_w, bar_w, bar_gap = 190, 50, 8
+    plot_h = y_base - 60
+    rows = [f'<text x="35" y="{y_base+22}" font-size="12" fill="#333">%</text>']
+    # y grid 0..100
+    for yv in (0, 25, 50, 75, 100):
+        y = y_base - plot_h * yv / 100.0
+        rows.append(f'<line x1="{x0}" y1="{y:.1f}" x2="{W-20}" y2="{y:.1f}" stroke="#eee" stroke-width="1"/>')
+        rows.append(f'<text x="{x0-8}" y="{y+4:.1f}" text-anchor="end" font-size="10" fill="#999">{yv}</text>')
+    x = x0 + 20
+    for r in rows_d:
+        for j, (_, key, color) in enumerate(series):
+            p = r["pct_of_exact_two"][key]
+            bh = plot_h * p / 100.0
+            bx = x + j * (bar_w + bar_gap)
+            rows.append(f'<rect x="{bx}" y="{y_base-bh:.1f}" width="{bar_w}" height="{bh:.1f}" fill="{color}"/>')
+            rows.append(f'<text x="{bx+bar_w/2:.1f}" y="{y_base-bh-4:.1f}" text-anchor="middle" font-size="10" fill="{color}">{p:.0f}</text>')
+        rows.append(f'<text x="{x+1.5*(bar_w+bar_gap):.1f}" y="{y_base+18}" text-anchor="middle" font-size="12.5" fill="#333">n={r["n"]} (2^n={r["vertices_2pow_n"]})</text>')
+        x += grp_w
+    # legend
+    lx = x0 + 20
+    for name, key, color in series:
+        rows.append(f'<rect x="{lx}" y="40" width="12" height="12" fill="{color}"/>'
+                    f'<text x="{lx+16}" y="50" font-size="11" fill="#333">{_esc(name)}</text>')
+        lx += 150
+    note = (f'<text x="{x0}" y="{H-12}" font-size="11" fill="#666">'
+            f'coverage of the exact 2^n cert_two reach; all 0 soundness violations. '
+            f'inf∪B2 erodes 87→77→60% and meets inf by n=16.</text>')
+    return _svg(W, H, "\n".join(rows) + "\n" + note,
+                "Cheap vertex-free coverage degrades with state dimension n")
+
+
+def fig_viability_axes(via: dict) -> str:
+    """§9.6: two pre-registered axes — steady-state deaths (left) and pop-mean fitness (right).
+
+    Grouped horizontal bars per arm; linear substrate solid, high-gain 55% opacity. Reads ONLY the
+    committed results_viability_ab.json. softsat is F2-invalid (transient boundary) and not drawn.
+    """
+    arms = ["NONE", "EXO_fixed", "OBSERVE", "REVIVE", "ENDO"]
+    colors = {"NONE": "#7f7f7f", "EXO_fixed": "#d99694", "OBSERVE": "#e8a33d",
+              "REVIVE": "#8064a2", "ENDO": "#4f81bd"}
+    subs = ["linear", "highgain"]
+    deaths = {s: {a: via["substrates"][s]["arm_means_phase2"][a]["phase2_deaths"]
+                  for a in arms} for s in subs}
+    popm = {s: {a: via["substrates"][s]["arm_means_phase2"][a]["pop_mean_fitness"]
+                for a in arms} for s in subs}
+
+    W, H = 980, 400
+    panel_w, x_l, x_r, y0 = 330, 150, 640, 78
+    bar_h, sub_gap, grp_gap = 13, 3, 18
+    d_max = max(max(d.values()) for d in deaths.values()) * 1.08
+    p_lo, p_hi = 0.60, 0.78
+
+    def dx(v: float) -> float:
+        return panel_w * (v / d_max)
+
+    def px(v: float) -> float:
+        return panel_w * ((v - p_lo) / (p_hi - p_lo))
+
+    rows = [
+        f'<text x="{x_l + panel_w/2}" y="{y0-22}" text-anchor="middle" font-size="13.5" '
+        f'font-weight="bold" fill="#333">Axis 1 - steady-state lethal evaluations</text>',
+        f'<text x="{x_r + panel_w/2}" y="{y0-22}" text-anchor="middle" font-size="13.5" '
+        f'font-weight="bold" fill="#333">Axis 2 - population-mean fitness</text>',
+    ]
+    y = y0
+    for a in arms:
+        rows.append(f'<text x="{x_l-12}" y="{y+bar_h+2}" text-anchor="end" font-size="12.5" '
+                    f'fill="#333">{_esc(a)}</text>')
+        yy = y
+        for s in subs:
+            op = 1.0 if s == "linear" else 0.55
+            dv, pv = deaths[s][a], popm[s][a]
+            rows.append(f'<rect x="{x_l}" y="{yy}" width="{max(dx(dv), 1.2):.1f}" height="{bar_h}" '
+                        f'fill="{colors[a]}" fill-opacity="{op}"/>')
+            rows.append(f'<text x="{x_l+max(dx(dv),1.2)+5:.1f}" y="{yy+bar_h-2}" font-size="10.5" '
+                        f'fill="#444">{dv:.1f}</text>')
+            rows.append(f'<rect x="{x_r}" y="{yy}" width="{px(pv):.1f}" height="{bar_h}" '
+                        f'fill="{colors[a]}" fill-opacity="{op}"/>')
+            rows.append(f'<text x="{x_r+px(pv)+5:.1f}" y="{yy+bar_h-2}" font-size="10.5" '
+                        f'fill="#444">{pv:.3f}</text>')
+            yy += bar_h + sub_gap
+        y = yy + grp_gap
+    # legend + annotations + axis note
+    ly = y + 2
+    rows.append(f'<rect x="{x_l}" y="{ly}" width="14" height="11" fill="#555"/>')
+    rows.append(f'<text x="{x_l+20}" y="{ly+10}" font-size="11.5" fill="#333">linear (upper bar)</text>')
+    rows.append(f'<rect x="{x_l+150}" y="{ly}" width="14" height="11" fill="#555" fill-opacity="0.55"/>')
+    rows.append(f'<text x="{x_l+170}" y="{ly+10}" font-size="11.5" fill="#333">high-gain (lower bar)</text>')
+    rows.append(f'<text x="{x_r}" y="{ly+10}" font-size="11" fill="#666">'
+                f'x-axis clipped to [{p_lo:.2f}, {p_hi:.2f}]</text>')
+    note = (f'<text x="{x_l}" y="{H-30}" font-size="11" fill="#666">'
+            f'n = 20 paired seeds; measure phase after 8-generation warm-up. ENDO: 0.0 deaths on both '
+            f'substrates (p &lt; 0.001 vs NONE).</text>'
+            f'<text x="{x_l}" y="{H-14}" font-size="11" fill="#666">'
+            f'REVIVE dies like NONE yet keeps population fitness (linear: +0.060, p = 0.0011) - repair '
+            f'carries memory through death. softsat omitted (F2: transient boundary).</text>')
+    return _svg(W, H, "\n".join(rows) + "\n" + note,
+                "Memory formation under viability threat - the two pre-registered axes (Sec. 9.6)")
+
+
+def main():
+    with open(os.path.join(_CR, "poc_l2lite_results.json"), encoding="utf-8") as fh:
+        poc1 = json.load(fh)
+    with open(os.path.join(_CR, "poc_l2lite_v2_results.json"), encoding="utf-8") as fh:
+        v2 = json.load(fh)
+    with open(os.path.join(_LM, "exp_gated_real10_results.json"), encoding="utf-8") as fh:
+        real = json.load(fh)
+    with open(os.path.join(_LM, "exp_gated_null_results.json"), encoding="utf-8") as fh:
+        null = json.load(fh)
+    with open(os.path.join(_CR, "poc_scale_results.json"), encoding="utf-8") as fh:
+        scale = json.load(fh)
+    _ip = os.path.normpath(os.path.join(_HERE, "..", "internalization_poc"))
+    with open(os.path.join(_ip, "results_viability_ab.json"), encoding="utf-8") as fh:
+        via = json.load(fh)
+    figs = {
+        "fig_cost_speedup.svg": fig_cost_speedup(poc1["cost"]),
+        "fig_admit_coverage.svg": fig_admit_coverage(v2),
+        "fig_l3_gate_gap.svg": fig_l3_gate_gap(real, null),
+        "fig_coverage_vs_n.svg": fig_coverage_vs_n(scale),
+        "fig_viability_axes.svg": fig_viability_axes(via),
+    }
+    for name, svg in figs.items():
+        path = os.path.join(_HERE, name)
+        with open(path, "w", encoding="utf-8") as fh:
+            fh.write(svg)
+        print(f"wrote {name} ({len(svg)} bytes)")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="360" viewBox="0 0 760 360" font-family="Segoe UI, Arial, sans-serif">
+<rect width="760" height="360" fill="#ffffff"/>
+<text x="380" y="28" text-anchor="middle" font-size="18" font-weight="bold" fill="#1a1a1a">Verifier cost: vertex-free L2-lite vs exact 2^n enumeration</text>
+<text x="238" y="90" text-anchor="end" font-size="13" fill="#333">n=8 (2^n=256)</text>
+<rect x="250" y="70" width="185.0" height="18" fill="#c0504d"/>
+<text x="441.0" y="84" font-size="11" fill="#c0504d">cert_two 0.006402s</text>
+<rect x="250" y="94" width="19.4" height="18" fill="#4f81bd"/>
+<text x="275.4" y="108" font-size="11" fill="#4f81bd">L2-lite 0.000106s  (60x faster)</text>
+<text x="238" y="166" text-anchor="end" font-size="13" fill="#333">n=12 (2^n=4096)</text>
+<rect x="250" y="146" width="288.0" height="18" fill="#c0504d"/>
+<text x="544.0" y="160" font-size="11" fill="#c0504d">cert_two 0.08212s</text>
+<rect x="250" y="170" width="10.0" height="18" fill="#4f81bd"/>
+<text x="266.0" y="184" font-size="11" fill="#4f81bd">L2-lite 8.4e-05s  (980x faster)</text>
+<text x="238" y="242" text-anchor="end" font-size="13" fill="#333">n=16 (2^n=65536)</text>
+<rect x="250" y="222" width="430.0" height="18" fill="#c0504d"/>
+<text x="686.0" y="236" font-size="11" fill="#c0504d">cert_two 2.762s</text>
+<rect x="250" y="246" width="49.1" height="18" fill="#4f81bd"/>
+<text x="305.1" y="260" font-size="11" fill="#4f81bd">L2-lite 0.000221s  (12520x faster)</text>
+<text x="250" y="346" font-size="11" fill="#666">horizontal axis = log10(seconds/gene); L2-lite = 2 SVDs (vertex-free), cert_two = 2^n vertex SVDs</text></svg>

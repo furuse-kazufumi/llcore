@@ -1,0 +1,24 @@
+{
+  "meta": {
+    "seed": 2024,
+    "n_target": 300,
+    "pool_size": 300,
+    "scanned": 786,
+    "jsr_max_len": 6,
+    "sound_samples": 20000,
+    "elapsed_s": 222.7
+  },
+  "float_recheck_sdp_admit": 286,
+  "rump_or_admit": 286,
+  "delta_rump_or_minus_float": 0,
+  "admit_set_preserved_or_grown": true,
+  "n_extra_rump_or_only": 0,
+  "n_lost_float_only": 0,
+  "extra_admits_all_sound_jsr_lt_1": true,
+  "n_extra_unsound": 0,
+  "extra_jsr_lb_max": null,
+  "extra_records": [],
+  "lost_records": [],
+  "unsound_extra_examples": [],
+  "counts_equal": true
+}

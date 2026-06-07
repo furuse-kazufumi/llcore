@@ -1,0 +1,799 @@
+{
+  "meta": {
+    "mode": "full",
+    "null": false,
+    "device": "cuda",
+    "gpu": "Tesla T4",
+    "cfg": {
+      "n": 8,
+      "layers": 1,
+      "d": 64,
+      "T": 64,
+      "B": 16,
+      "lr": 0.003,
+      "grad_steps": 400,
+      "evo_gens": 150,
+      "sigma": 0.12,
+      "eval_batches": 6,
+      "max_chars": 80000,
+      "cert_every": 3
+    },
+    "vocab": 61,
+    "unigram_ce": 3.3542142835083593,
+    "sdp_available": true,
+    "start_time": "2026-06-05T14:20:17",
+    "end_time": "2026-06-05T15:40:39",
+    "status": "done",
+    "error": null
+  },
+  "records": [
+    {
+      "mode": "full",
+      "null": false,
+      "gate": "none",
+      "seed": 1234,
+      "device": "cuda",
+      "start_time": "2026-06-05T14:20:17",
+      "end_time": "2026-06-05T14:20:50",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.208108425140381,
+        "grad_reject_rate": 0.0,
+        "evo_ce": 2.256516973177592,
+        "evo_admit_rate": 1.0
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.885729275375454,
+        "grad_winner_region": "sdp_only",
+        "evo_winner_region": "sdp_only",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_full.json",
+      "error": null
+    },
+    {
+      "mode": "full",
+      "null": false,
+      "gate": "none",
+      "seed": 1235,
+      "device": "cuda",
+      "start_time": "2026-06-05T14:20:50",
+      "end_time": "2026-06-05T14:21:18",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.1359735329945884,
+        "grad_reject_rate": 0.0,
+        "evo_ce": 2.233516534169515,
+        "evo_admit_rate": 1.0
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.9303940949433775,
+        "grad_winner_region": "non_certified",
+        "evo_winner_region": "sdp_only",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_full.json",
+      "error": null
+    },
+    {
+      "mode": "full",
+      "null": false,
+      "gate": "none",
+      "seed": 1236,
+      "device": "cuda",
+      "start_time": "2026-06-05T14:21:18",
+      "end_time": "2026-06-05T14:21:46",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.225208838780721,
+        "grad_reject_rate": 0.0,
+        "evo_ce": 2.314422130584717,
+        "evo_admit_rate": 1.0
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.8539331621686953,
+        "grad_winner_region": "sdp_only",
+        "evo_winner_region": "sdp_only",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_full.json",
+      "error": null
+    },
+    {
+      "mode": "full",
+      "null": false,
+      "gate": "none",
+      "seed": 1237,
+      "device": "cuda",
+      "start_time": "2026-06-05T14:21:46",
+      "end_time": "2026-06-05T14:22:14",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.199862003326416,
+        "grad_reject_rate": 0.0,
+        "evo_ce": 2.3035457531611123,
+        "evo_admit_rate": 1.0
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.9598806099706086,
+        "grad_winner_region": "non_certified",
+        "evo_winner_region": "sdp_only",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_full.json",
+      "error": null
+    },
+    {
+      "mode": "full",
+      "null": false,
+      "gate": "none",
+      "seed": 1238,
+      "device": "cuda",
+      "start_time": "2026-06-05T14:22:14",
+      "end_time": "2026-06-05T14:22:39",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.2352020740509033,
+        "grad_reject_rate": 0.0,
+        "evo_ce": 2.3270703156789145,
+        "evo_admit_rate": 1.0
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 1.0621790906239494,
+        "grad_winner_region": "non_certified",
+        "evo_winner_region": "sdp_only",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_full.json",
+      "error": null
+    },
+    {
+      "mode": "full",
+      "null": false,
+      "gate": "none",
+      "seed": 1239,
+      "device": "cuda",
+      "start_time": "2026-06-05T14:22:39",
+      "end_time": "2026-06-05T14:23:05",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.240372101465861,
+        "grad_reject_rate": 0.0,
+        "evo_ce": 2.3167688051859536,
+        "evo_admit_rate": 1.0
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.970671281641095,
+        "grad_winner_region": "non_certified",
+        "evo_winner_region": "sdp_only",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_full.json",
+      "error": null
+    },
+    {
+      "mode": "full",
+      "null": false,
+      "gate": "none",
+      "seed": 1240,
+      "device": "cuda",
+      "start_time": "2026-06-05T14:23:05",
+      "end_time": "2026-06-05T14:23:31",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.179166316986084,
+        "grad_reject_rate": 0.0,
+        "evo_ce": 2.259078025817871,
+        "evo_admit_rate": 1.0
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.9380734346062634,
+        "grad_winner_region": "sdp_only",
+        "evo_winner_region": "non_certified",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_full.json",
+      "error": null
+    },
+    {
+      "mode": "full",
+      "null": false,
+      "gate": "none",
+      "seed": 1241,
+      "device": "cuda",
+      "start_time": "2026-06-05T14:23:31",
+      "end_time": "2026-06-05T14:23:57",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.2055634260177612,
+        "grad_reject_rate": 0.0,
+        "evo_ce": 2.2843255599339805,
+        "evo_admit_rate": 1.0
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.9050175164078486,
+        "grad_winner_region": "non_certified",
+        "evo_winner_region": "sdp_only",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_full.json",
+      "error": null
+    },
+    {
+      "mode": "full",
+      "null": false,
+      "gate": "inf",
+      "seed": 1234,
+      "device": "cuda",
+      "start_time": "2026-06-05T14:23:57",
+      "end_time": "2026-06-05T14:24:14",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.237654527028402,
+        "grad_reject_rate": 0.305,
+        "evo_ce": 2.2802590131759644,
+        "evo_admit_rate": 0.0
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.8674440182752965,
+        "grad_winner_region": "inf",
+        "evo_winner_region": "inf",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_full.json",
+      "error": null
+    },
+    {
+      "mode": "full",
+      "null": false,
+      "gate": "inf",
+      "seed": 1235,
+      "device": "cuda",
+      "start_time": "2026-06-05T14:24:14",
+      "end_time": "2026-06-05T14:24:32",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.1701221466064453,
+        "grad_reject_rate": 0.29,
+        "evo_ce": 2.2392690976460776,
+        "evo_admit_rate": 0.0
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.800302116205491,
+        "grad_winner_region": "inf",
+        "evo_winner_region": "inf",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_full.json",
+      "error": null
+    },
+    {
+      "mode": "full",
+      "null": false,
+      "gate": "inf",
+      "seed": 1236,
+      "device": "cuda",
+      "start_time": "2026-06-05T14:24:32",
+      "end_time": "2026-06-05T14:24:50",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.262877265612284,
+        "grad_reject_rate": 0.24,
+        "evo_ce": 2.3348554372787476,
+        "evo_admit_rate": 0.013333333333333334
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.7576982304905645,
+        "grad_winner_region": "inf",
+        "evo_winner_region": "inf",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_full.json",
+      "error": null
+    },
+    {
+      "mode": "full",
+      "null": false,
+      "gate": "inf",
+      "seed": 1237,
+      "device": "cuda",
+      "start_time": "2026-06-05T14:24:50",
+      "end_time": "2026-06-05T14:25:07",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.2396514813105264,
+        "grad_reject_rate": 0.27,
+        "evo_ce": 2.319063107172648,
+        "evo_admit_rate": 0.013333333333333334
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.8224065100578067,
+        "grad_winner_region": "inf",
+        "evo_winner_region": "inf",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_full.json",
+      "error": null
+    },
+    {
+      "mode": "full",
+      "null": false,
+      "gate": "inf",
+      "seed": 1238,
+      "device": "cuda",
+      "start_time": "2026-06-05T14:25:07",
+      "end_time": "2026-06-05T14:25:25",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.2676088015238443,
+        "grad_reject_rate": 0.3075,
+        "evo_ce": 2.3411282300949097,
+        "evo_admit_rate": 0.02666666666666667
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.8378082623190346,
+        "grad_winner_region": "inf",
+        "evo_winner_region": "inf",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_full.json",
+      "error": null
+    },
+    {
+      "mode": "full",
+      "null": false,
+      "gate": "inf",
+      "seed": 1239,
+      "device": "cuda",
+      "start_time": "2026-06-05T14:25:25",
+      "end_time": "2026-06-05T14:25:42",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.27963387966156,
+        "grad_reject_rate": 0.285,
+        "evo_ce": 2.338829755783081,
+        "evo_admit_rate": 0.0
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.8386203506839901,
+        "grad_winner_region": "inf",
+        "evo_winner_region": "inf",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_full.json",
+      "error": null
+    },
+    {
+      "mode": "full",
+      "null": false,
+      "gate": "inf",
+      "seed": 1240,
+      "device": "cuda",
+      "start_time": "2026-06-05T14:25:42",
+      "end_time": "2026-06-05T14:26:00",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.2019265492757163,
+        "grad_reject_rate": 0.1825,
+        "evo_ce": 2.2763806184132895,
+        "evo_admit_rate": 0.0
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.808924838632486,
+        "grad_winner_region": "inf",
+        "evo_winner_region": "inf",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_full.json",
+      "error": null
+    },
+    {
+      "mode": "full",
+      "null": false,
+      "gate": "inf",
+      "seed": 1241,
+      "device": "cuda",
+      "start_time": "2026-06-05T14:26:00",
+      "end_time": "2026-06-05T14:26:17",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.234840194384257,
+        "grad_reject_rate": 0.2775,
+        "evo_ce": 2.2993210554122925,
+        "evo_admit_rate": 0.0
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.8749542925054368,
+        "grad_winner_region": "inf",
+        "evo_winner_region": "inf",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_full.json",
+      "error": null
+    },
+    {
+      "mode": "full",
+      "null": false,
+      "gate": "two",
+      "seed": 1234,
+      "device": "cuda",
+      "start_time": "2026-06-05T14:26:17",
+      "end_time": "2026-06-05T14:26:38",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.210145036379496,
+        "grad_reject_rate": 0.0525,
+        "evo_ce": 2.264872749646505,
+        "evo_admit_rate": 0.1
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.8320971831288458,
+        "grad_winner_region": "two_norm_only",
+        "evo_winner_region": "two_norm_only",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_full.json",
+      "error": null
+    },
+    {
+      "mode": "full",
+      "null": false,
+      "gate": "two",
+      "seed": 1235,
+      "device": "cuda",
+      "start_time": "2026-06-05T14:26:38",
+      "end_time": "2026-06-05T14:26:58",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.1517608165740967,
+        "grad_reject_rate": 0.185,
+        "evo_ce": 2.236697872479757,
+        "evo_admit_rate": 0.10666666666666667
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.8414192829389601,
+        "grad_winner_region": "two_norm_only",
+        "evo_winner_region": "two_norm_only",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_full.json",
+      "error": null
+    },
+    {
+      "mode": "full",
+      "null": false,
+      "gate": "two",
+      "seed": 1236,
+      "device": "cuda",
+      "start_time": "2026-06-05T14:26:58",
+      "end_time": "2026-06-05T14:27:19",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.249162793159485,
+        "grad_reject_rate": 0.19,
+        "evo_ce": 2.3291974465052285,
+        "evo_admit_rate": 0.06666666666666667
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.8117333488172224,
+        "grad_winner_region": "two_norm_only",
+        "evo_winner_region": "two_norm_only",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_full.json",
+      "error": null
+    },
+    {
+      "mode": "full",
+      "null": false,
+      "gate": "two",
+      "seed": 1237,
+      "device": "cuda",
+      "start_time": "2026-06-05T14:27:19",
+      "end_time": "2026-06-05T14:27:39",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.215583403905233,
+        "grad_reject_rate": 0.2,
+        "evo_ce": 2.3106441100438437,
+        "evo_admit_rate": 0.14
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.8634991738538882,
+        "grad_winner_region": "two_norm_only",
+        "evo_winner_region": "two_norm_only",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_full.json",
+      "error": null
+    },
+    {
+      "mode": "full",
+      "null": false,
+      "gate": "two",
+      "seed": 1238,
+      "device": "cuda",
+      "start_time": "2026-06-05T14:27:39",
+      "end_time": "2026-06-05T14:28:00",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.2572245995203652,
+        "grad_reject_rate": 0.2425,
+        "evo_ce": 2.3253129720687866,
+        "evo_admit_rate": 0.12
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.8677477350725402,
+        "grad_winner_region": "two_norm_only",
+        "evo_winner_region": "two_norm_only",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_full.json",
+      "error": null
+    },
+    {
+      "mode": "full",
+      "null": false,
+      "gate": "two",
+      "seed": 1239,
+      "device": "cuda",
+      "start_time": "2026-06-05T14:28:00",
+      "end_time": "2026-06-05T14:28:20",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.2632426023483276,
+        "grad_reject_rate": 0.2,
+        "evo_ce": 2.3220443725585938,
+        "evo_admit_rate": 0.02666666666666667
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.8440795657509415,
+        "grad_winner_region": "two_norm_only",
+        "evo_winner_region": "two_norm_only",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_full.json",
+      "error": null
+    },
+    {
+      "mode": "full",
+      "null": false,
+      "gate": "two",
+      "seed": 1240,
+      "device": "cuda",
+      "start_time": "2026-06-05T14:28:20",
+      "end_time": "2026-06-05T14:28:40",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.194769859313965,
+        "grad_reject_rate": 0.21,
+        "evo_ce": 2.26592751344045,
+        "evo_admit_rate": 0.08
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.8244264563550375,
+        "grad_winner_region": "two_norm_only",
+        "evo_winner_region": "two_norm_only",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_full.json",
+      "error": null
+    },
+    {
+      "mode": "full",
+      "null": false,
+      "gate": "two",
+      "seed": 1241,
+      "device": "cuda",
+      "start_time": "2026-06-05T14:28:40",
+      "end_time": "2026-06-05T14:29:00",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.2301090161005654,
+        "grad_reject_rate": 0.2025,
+        "evo_ce": 2.2870963414510093,
+        "evo_admit_rate": 0.05333333333333334
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.8747866634140363,
+        "grad_winner_region": "two_norm_only",
+        "evo_winner_region": "two_norm_only",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_full.json",
+      "error": null
+    },
+    {
+      "mode": "full",
+      "null": false,
+      "gate": "sdp",
+      "seed": 1234,
+      "device": "cuda",
+      "start_time": "2026-06-05T14:29:00",
+      "end_time": "2026-06-05T14:35:55",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.2088112036387124,
+        "grad_reject_rate": 0.005,
+        "evo_ce": 2.256516973177592,
+        "evo_admit_rate": 0.4866666666666667
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.8624243431926771,
+        "grad_winner_region": "sdp_only",
+        "evo_winner_region": "sdp_only",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_full.json",
+      "error": null
+    },
+    {
+      "mode": "full",
+      "null": false,
+      "gate": "sdp",
+      "seed": 1235,
+      "device": "cuda",
+      "start_time": "2026-06-05T14:35:55",
+      "end_time": "2026-06-05T14:45:56",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.1361477375030518,
+        "grad_reject_rate": 0.0075,
+        "evo_ce": 2.2297863562901816,
+        "evo_admit_rate": 0.9533333333333334
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.9254448102075855,
+        "grad_winner_region": "sdp_only",
+        "evo_winner_region": "sdp_only",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_full.json",
+      "error": null
+    },
+    {
+      "mode": "full",
+      "null": false,
+      "gate": "sdp",
+      "seed": 1236,
+      "device": "cuda",
+      "start_time": "2026-06-05T14:45:56",
+      "end_time": "2026-06-05T14:54:18",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.2270220518112183,
+        "grad_reject_rate": 0.0075,
+        "evo_ce": 2.314422130584717,
+        "evo_admit_rate": 0.6133333333333333
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.8478068472374851,
+        "grad_winner_region": "sdp_only",
+        "evo_winner_region": "sdp_only",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_full.json",
+      "error": null
+    },
+    {
+      "mode": "full",
+      "null": false,
+      "gate": "sdp",
+      "seed": 1237,
+      "device": "cuda",
+      "start_time": "2026-06-05T14:54:18",
+      "end_time": "2026-06-05T15:03:52",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.1989688873291016,
+        "grad_reject_rate": 0.0075,
+        "evo_ce": 2.3035457531611123,
+        "evo_admit_rate": 0.8333333333333334
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.9480761509063641,
+        "grad_winner_region": "sdp_only",
+        "evo_winner_region": "sdp_only",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_full.json",
+      "error": null
+    },
+    {
+      "mode": "full",
+      "null": false,
+      "gate": "sdp",
+      "seed": 1238,
+      "device": "cuda",
+      "start_time": "2026-06-05T15:03:52",
+      "end_time": "2026-06-05T15:11:49",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.2362422148386636,
+        "grad_reject_rate": 0.0775,
+        "evo_ce": 2.3270703156789145,
+        "evo_admit_rate": 0.8533333333333334
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.923911359330417,
+        "grad_winner_region": "sdp_only",
+        "evo_winner_region": "sdp_only",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_full.json",
+      "error": null
+    },
+    {
+      "mode": "full",
+      "null": false,
+      "gate": "sdp",
+      "seed": 1239,
+      "device": "cuda",
+      "start_time": "2026-06-05T15:11:49",
+      "end_time": "2026-06-05T15:22:06",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.242569923400879,
+        "grad_reject_rate": 0.065,
+        "evo_ce": 2.315739393234253,
+        "evo_admit_rate": 0.7266666666666667
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.9097709170446157,
+        "grad_winner_region": "sdp_only",
+        "evo_winner_region": "sdp_only",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_full.json",
+      "error": null
+    },
+    {
+      "mode": "full",
+      "null": false,
+      "gate": "sdp",
+      "seed": 1240,
+      "device": "cuda",
+      "start_time": "2026-06-05T15:22:06",
+      "end_time": "2026-06-05T15:31:20",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.177593469619751,
+        "grad_reject_rate": 0.0075,
+        "evo_ce": 2.259310324986776,
+        "evo_admit_rate": 0.5466666666666666
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.9016437673987743,
+        "grad_winner_region": "sdp_only",
+        "evo_winner_region": "sdp_only",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_full.json",
+      "error": null
+    },
+    {
+      "mode": "full",
+      "null": false,
+      "gate": "sdp",
+      "seed": 1241,
+      "device": "cuda",
+      "start_time": "2026-06-05T15:31:20",
+      "end_time": "2026-06-05T15:40:39",
+      "status": "ok",
+      "metrics": {
+        "grad_ce": 2.2095035711924234,
+        "grad_reject_rate": 0.0475,
+        "evo_ce": 2.2843255599339805,
+        "evo_admit_rate": 0.8733333333333333
+      },
+      "cert_result": {
+        "grad_max_emp_rho": 0.8749745025088173,
+        "grad_winner_region": "sdp_only",
+        "evo_winner_region": "sdp_only",
+        "grad_sound": true
+      },
+      "checkpoint_path": "result_full.json",
+      "error": null
+    }
+  ]
+}

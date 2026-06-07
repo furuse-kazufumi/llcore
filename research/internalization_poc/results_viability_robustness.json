@@ -1,0 +1,614 @@
+{
+  "preregistration": {
+    "configs": [
+      {
+        "name": "baseline",
+        "kappa": 2.0,
+        "dim": 8,
+        "delay": 8,
+        "seed0": 3000
+      },
+      {
+        "name": "seed_shift",
+        "kappa": 2.0,
+        "dim": 8,
+        "delay": 8,
+        "seed0": 4000
+      },
+      {
+        "name": "kappa_1.5",
+        "kappa": 1.5,
+        "dim": 8,
+        "delay": 8,
+        "seed0": 3000
+      },
+      {
+        "name": "kappa_3.0",
+        "kappa": 3.0,
+        "dim": 8,
+        "delay": 8,
+        "seed0": 3000
+      },
+      {
+        "name": "dim_24",
+        "kappa": 2.0,
+        "dim": 24,
+        "delay": 8,
+        "seed0": 3000
+      },
+      {
+        "name": "hard_mem_delay20",
+        "kappa": 2.0,
+        "dim": 8,
+        "delay": 20,
+        "seed0": 3000
+      }
+    ],
+    "n_seeds": 12,
+    "delta_cap": 0.05,
+    "boundary_min_none_deaths": 1.0,
+    "substrates": [
+      "linear",
+      "highgain"
+    ],
+    "G1": 10,
+    "G2_WARMUP": 8,
+    "G2_MEASURE": 10,
+    "revive_semantics": "死を経験してから蘇生 (死回避軸の対象外; 記憶保存軸 pop_mean で測る)"
+  },
+  "results": {
+    "baseline": {
+      "linear": {
+        "substrate": "linear",
+        "arm_means": {
+          "NONE": {
+            "deaths": 27.0,
+            "fitness": 0.8118671379648053,
+            "pop_mean": 0.6332898177056416
+          },
+          "EXO_fixed": {
+            "deaths": 8.916666666666666,
+            "fitness": 0.8129665663148864,
+            "pop_mean": 0.6942291824796757
+          },
+          "ENDO": {
+            "deaths": 0.0,
+            "fitness": 0.8181663562889324,
+            "pop_mean": 0.7483669313045516
+          },
+          "REVIVE": {
+            "deaths": 18.416666666666668,
+            "fitness": 0.8275014699056639,
+            "pop_mean": 0.7118421699294145
+          },
+          "OBSERVE": {
+            "deaths": 19.166666666666668,
+            "fitness": 0.8064414899702017,
+            "pop_mean": 0.6637115411286268
+          }
+        },
+        "death_order_low_to_high": [
+          "ENDO",
+          "EXO_fixed",
+          "REVIVE",
+          "OBSERVE",
+          "NONE"
+        ],
+        "boundary_active": true,
+        "avoid_holds": true,
+        "memory_holds": true,
+        "soundness_violations": 0,
+        "soundness_checked": 1412,
+        "capability_ok": true,
+        "capability_gap_sound_minus_unsafe": 0.0156
+      },
+      "highgain": {
+        "substrate": "highgain",
+        "arm_means": {
+          "NONE": {
+            "deaths": 6.083333333333333,
+            "fitness": 0.8132296241560377,
+            "pop_mean": 0.7295426422826069
+          },
+          "EXO_fixed": {
+            "deaths": 3.6666666666666665,
+            "fitness": 0.8143003319926917,
+            "pop_mean": 0.7419286326063897
+          },
+          "ENDO": {
+            "deaths": 0.0,
+            "fitness": 0.8106889192088945,
+            "pop_mean": 0.7511769590401228
+          },
+          "REVIVE": {
+            "deaths": 7.166666666666667,
+            "fitness": 0.8145298289008588,
+            "pop_mean": 0.7483463187627435
+          },
+          "OBSERVE": {
+            "deaths": 3.0833333333333335,
+            "fitness": 0.8188369112874084,
+            "pop_mean": 0.7367615801584235
+          }
+        },
+        "death_order_low_to_high": [
+          "ENDO",
+          "OBSERVE",
+          "EXO_fixed",
+          "NONE",
+          "REVIVE"
+        ],
+        "boundary_active": true,
+        "avoid_holds": true,
+        "memory_holds": true,
+        "soundness_violations": 0,
+        "soundness_checked": 1003,
+        "capability_ok": true,
+        "capability_gap_sound_minus_unsafe": -0.0043
+      }
+    },
+    "seed_shift": {
+      "linear": {
+        "substrate": "linear",
+        "arm_means": {
+          "NONE": {
+            "deaths": 16.083333333333332,
+            "fitness": 0.8170180792861462,
+            "pop_mean": 0.6828369562161477
+          },
+          "EXO_fixed": {
+            "deaths": 24.5,
+            "fitness": 0.8071374866207975,
+            "pop_mean": 0.6853692160491796
+          },
+          "ENDO": {
+            "deaths": 0.0,
+            "fitness": 0.81052937401925,
+            "pop_mean": 0.7430112395197958
+          },
+          "REVIVE": {
+            "deaths": 14.916666666666666,
+            "fitness": 0.8195527893275169,
+            "pop_mean": 0.7184002295877101
+          },
+          "OBSERVE": {
+            "deaths": 12.083333333333334,
+            "fitness": 0.8167117856048319,
+            "pop_mean": 0.7147680477284148
+          }
+        },
+        "death_order_low_to_high": [
+          "ENDO",
+          "OBSERVE",
+          "REVIVE",
+          "NONE",
+          "EXO_fixed"
+        ],
+        "boundary_active": true,
+        "avoid_holds": true,
+        "memory_holds": true,
+        "soundness_violations": 0,
+        "soundness_checked": 1412,
+        "capability_ok": true,
+        "capability_gap_sound_minus_unsafe": 0.0025
+      },
+      "highgain": {
+        "substrate": "highgain",
+        "arm_means": {
+          "NONE": {
+            "deaths": 2.5,
+            "fitness": 0.8165549181819189,
+            "pop_mean": 0.7421675736044984
+          },
+          "EXO_fixed": {
+            "deaths": 3.25,
+            "fitness": 0.8143493868707962,
+            "pop_mean": 0.7438796888418255
+          },
+          "ENDO": {
+            "deaths": 0.0,
+            "fitness": 0.8132766314359349,
+            "pop_mean": 0.7515307951922847
+          },
+          "REVIVE": {
+            "deaths": 4.583333333333333,
+            "fitness": 0.8143982210280954,
+            "pop_mean": 0.7519579572794907
+          },
+          "OBSERVE": {
+            "deaths": 1.0,
+            "fitness": 0.8129081799997797,
+            "pop_mean": 0.7475300911300033
+          }
+        },
+        "death_order_low_to_high": [
+          "ENDO",
+          "OBSERVE",
+          "NONE",
+          "EXO_fixed",
+          "REVIVE"
+        ],
+        "boundary_active": true,
+        "avoid_holds": true,
+        "memory_holds": true,
+        "soundness_violations": 0,
+        "soundness_checked": 1003,
+        "capability_ok": true,
+        "capability_gap_sound_minus_unsafe": -0.0022
+      }
+    },
+    "kappa_1.5": {
+      "linear": {
+        "substrate": "linear",
+        "arm_means": {
+          "NONE": {
+            "deaths": 14.666666666666666,
+            "fitness": 0.8098672976905164,
+            "pop_mean": 0.6805096732765311
+          },
+          "EXO_fixed": {
+            "deaths": 2.9166666666666665,
+            "fitness": 0.8136955473681088,
+            "pop_mean": 0.7086090575157362
+          },
+          "ENDO": {
+            "deaths": 0.0,
+            "fitness": 0.8197604122521923,
+            "pop_mean": 0.7514982857469126
+          },
+          "REVIVE": {
+            "deaths": 13.083333333333334,
+            "fitness": 0.811528947027602,
+            "pop_mean": 0.7211501994382221
+          },
+          "OBSERVE": {
+            "deaths": 8.583333333333334,
+            "fitness": 0.8217749743294407,
+            "pop_mean": 0.6935905779329098
+          }
+        },
+        "death_order_low_to_high": [
+          "ENDO",
+          "EXO_fixed",
+          "OBSERVE",
+          "REVIVE",
+          "NONE"
+        ],
+        "boundary_active": true,
+        "avoid_holds": true,
+        "memory_holds": true,
+        "soundness_violations": 0,
+        "soundness_checked": 1968,
+        "capability_ok": true,
+        "capability_gap_sound_minus_unsafe": -0.002
+      },
+      "highgain": {
+        "substrate": "highgain",
+        "arm_means": {
+          "NONE": {
+            "deaths": 4.25,
+            "fitness": 0.812497698710065,
+            "pop_mean": 0.7298303314546984
+          },
+          "EXO_fixed": {
+            "deaths": 2.9166666666666665,
+            "fitness": 0.8151403386310166,
+            "pop_mean": 0.7350540019470198
+          },
+          "ENDO": {
+            "deaths": 0.0,
+            "fitness": 0.8144177037898963,
+            "pop_mean": 0.7523701487454342
+          },
+          "REVIVE": {
+            "deaths": 3.5,
+            "fitness": 0.8133400854444984,
+            "pop_mean": 0.7504276256307199
+          },
+          "OBSERVE": {
+            "deaths": 1.5833333333333333,
+            "fitness": 0.8209245474664493,
+            "pop_mean": 0.7436068972305504
+          }
+        },
+        "death_order_low_to_high": [
+          "ENDO",
+          "OBSERVE",
+          "EXO_fixed",
+          "REVIVE",
+          "NONE"
+        ],
+        "boundary_active": true,
+        "avoid_holds": true,
+        "memory_holds": true,
+        "soundness_violations": 0,
+        "soundness_checked": 1349,
+        "capability_ok": true,
+        "capability_gap_sound_minus_unsafe": -0.0065
+      }
+    },
+    "kappa_3.0": {
+      "linear": {
+        "substrate": "linear",
+        "arm_means": {
+          "NONE": {
+            "deaths": 40.833333333333336,
+            "fitness": 0.8089999506962974,
+            "pop_mean": 0.6049172575712355
+          },
+          "EXO_fixed": {
+            "deaths": 17.666666666666668,
+            "fitness": 0.8110079794165587,
+            "pop_mean": 0.639297665996539
+          },
+          "ENDO": {
+            "deaths": 0.0,
+            "fitness": 0.8160475185079065,
+            "pop_mean": 0.7413521558950027
+          },
+          "REVIVE": {
+            "deaths": 30.833333333333332,
+            "fitness": 0.8187511877802883,
+            "pop_mean": 0.7126479013691864
+          },
+          "OBSERVE": {
+            "deaths": 31.333333333333332,
+            "fitness": 0.8212687488921103,
+            "pop_mean": 0.6435199212017634
+          }
+        },
+        "death_order_low_to_high": [
+          "ENDO",
+          "EXO_fixed",
+          "REVIVE",
+          "OBSERVE",
+          "NONE"
+        ],
+        "boundary_active": true,
+        "avoid_holds": true,
+        "memory_holds": true,
+        "soundness_violations": 0,
+        "soundness_checked": 924,
+        "capability_ok": true,
+        "capability_gap_sound_minus_unsafe": -0.0025
+      },
+      "highgain": {
+        "substrate": "highgain",
+        "arm_means": {
+          "NONE": {
+            "deaths": 8.416666666666666,
+            "fitness": 0.8144700701831518,
+            "pop_mean": 0.7322357422345499
+          },
+          "EXO_fixed": {
+            "deaths": 6.75,
+            "fitness": 0.8237451876241834,
+            "pop_mean": 0.7162634038778114
+          },
+          "ENDO": {
+            "deaths": 0.0,
+            "fitness": 0.8223302990854084,
+            "pop_mean": 0.7513125081934126
+          },
+          "REVIVE": {
+            "deaths": 9.833333333333334,
+            "fitness": 0.8101054464275039,
+            "pop_mean": 0.752522294785662
+          },
+          "OBSERVE": {
+            "deaths": 2.75,
+            "fitness": 0.819517697213297,
+            "pop_mean": 0.7514046948214856
+          }
+        },
+        "death_order_low_to_high": [
+          "ENDO",
+          "OBSERVE",
+          "EXO_fixed",
+          "NONE",
+          "REVIVE"
+        ],
+        "boundary_active": true,
+        "avoid_holds": true,
+        "memory_holds": true,
+        "soundness_violations": 0,
+        "soundness_checked": 673,
+        "capability_ok": true,
+        "capability_gap_sound_minus_unsafe": 0.0028
+      }
+    },
+    "dim_24": {
+      "linear": {
+        "substrate": "linear",
+        "arm_means": {
+          "NONE": {
+            "deaths": 24.833333333333332,
+            "fitness": 0.7832448692765966,
+            "pop_mean": 0.6234375619341287
+          },
+          "EXO_fixed": {
+            "deaths": 10.5,
+            "fitness": 0.7877173496590469,
+            "pop_mean": 0.690368090214831
+          },
+          "ENDO": {
+            "deaths": 0.0,
+            "fitness": 0.7873557562445382,
+            "pop_mean": 0.7463454068728334
+          },
+          "REVIVE": {
+            "deaths": 22.416666666666668,
+            "fitness": 0.792286389818722,
+            "pop_mean": 0.7070939427629214
+          },
+          "OBSERVE": {
+            "deaths": 8.0,
+            "fitness": 0.7901617228012608,
+            "pop_mean": 0.7247261390345193
+          }
+        },
+        "death_order_low_to_high": [
+          "ENDO",
+          "OBSERVE",
+          "EXO_fixed",
+          "REVIVE",
+          "NONE"
+        ],
+        "boundary_active": true,
+        "avoid_holds": true,
+        "memory_holds": true,
+        "soundness_violations": 0,
+        "soundness_checked": 1412,
+        "capability_ok": true,
+        "capability_gap_sound_minus_unsafe": 0.0021
+      },
+      "highgain": {
+        "substrate": "highgain",
+        "arm_means": {
+          "NONE": {
+            "deaths": 4.666666666666667,
+            "fitness": 0.7872251878477537,
+            "pop_mean": 0.7380892033055156
+          },
+          "EXO_fixed": {
+            "deaths": 2.6666666666666665,
+            "fitness": 0.7829813583389799,
+            "pop_mean": 0.7453300385850586
+          },
+          "ENDO": {
+            "deaths": 0.0,
+            "fitness": 0.7894839926893246,
+            "pop_mean": 0.7502257479975262
+          },
+          "REVIVE": {
+            "deaths": 2.6666666666666665,
+            "fitness": 0.790799669816328,
+            "pop_mean": 0.7475889202047744
+          },
+          "OBSERVE": {
+            "deaths": 1.3333333333333333,
+            "fitness": 0.7932894346101755,
+            "pop_mean": 0.7430806459577664
+          }
+        },
+        "death_order_low_to_high": [
+          "ENDO",
+          "OBSERVE",
+          "EXO_fixed",
+          "REVIVE",
+          "NONE"
+        ],
+        "boundary_active": true,
+        "avoid_holds": true,
+        "memory_holds": true,
+        "soundness_violations": 0,
+        "soundness_checked": 1003,
+        "capability_ok": true,
+        "capability_gap_sound_minus_unsafe": -0.0025
+      }
+    },
+    "hard_mem_delay20": {
+      "linear": {
+        "substrate": "linear",
+        "arm_means": {
+          "NONE": {
+            "deaths": 31.333333333333332,
+            "fitness": 0.8228258238595124,
+            "pop_mean": 0.6400930041029794
+          },
+          "EXO_fixed": {
+            "deaths": 12.833333333333334,
+            "fitness": 0.811020221918893,
+            "pop_mean": 0.6784145657157469
+          },
+          "ENDO": {
+            "deaths": 0.0,
+            "fitness": 0.8156592859081807,
+            "pop_mean": 0.7472258887484425
+          },
+          "REVIVE": {
+            "deaths": 25.666666666666668,
+            "fitness": 0.8108952482273839,
+            "pop_mean": 0.7149607122474936
+          },
+          "OBSERVE": {
+            "deaths": 13.333333333333334,
+            "fitness": 0.8128558071504558,
+            "pop_mean": 0.7050638591933377
+          }
+        },
+        "death_order_low_to_high": [
+          "ENDO",
+          "EXO_fixed",
+          "OBSERVE",
+          "REVIVE",
+          "NONE"
+        ],
+        "boundary_active": true,
+        "avoid_holds": true,
+        "memory_holds": true,
+        "soundness_violations": 0,
+        "soundness_checked": 1412,
+        "capability_ok": true,
+        "capability_gap_sound_minus_unsafe": -0.0072
+      },
+      "highgain": {
+        "substrate": "highgain",
+        "arm_means": {
+          "NONE": {
+            "deaths": 5.0,
+            "fitness": 0.8259558892418423,
+            "pop_mean": 0.7461991186267772
+          },
+          "EXO_fixed": {
+            "deaths": 3.0,
+            "fitness": 0.8200181593143596,
+            "pop_mean": 0.7353738325510485
+          },
+          "ENDO": {
+            "deaths": 0.0,
+            "fitness": 0.8215405393208653,
+            "pop_mean": 0.7538903235916258
+          },
+          "REVIVE": {
+            "deaths": 3.5,
+            "fitness": 0.8187490079245979,
+            "pop_mean": 0.7528859173484205
+          },
+          "OBSERVE": {
+            "deaths": 1.3333333333333333,
+            "fitness": 0.8244870395740409,
+            "pop_mean": 0.7451222002557412
+          }
+        },
+        "death_order_low_to_high": [
+          "ENDO",
+          "OBSERVE",
+          "EXO_fixed",
+          "REVIVE",
+          "NONE"
+        ],
+        "boundary_active": true,
+        "avoid_holds": true,
+        "memory_holds": true,
+        "soundness_violations": 0,
+        "soundness_checked": 1003,
+        "capability_ok": true,
+        "capability_gap_sound_minus_unsafe": -0.0044
+      }
+    }
+  },
+  "summary": {
+    "n_config_substrate": 12,
+    "n_active": 12,
+    "inactive_excluded": [],
+    "avoid_holds_count": 12,
+    "memory_holds_count": 12,
+    "capability_ok_count": 12,
+    "soundness_violations_total": 0,
+    "avoid_holds_all": true,
+    "memory_holds_all": true,
+    "capability_ok_all": true
+  },
+  "wall_seconds": 1787.75
+}

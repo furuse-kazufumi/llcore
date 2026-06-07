@@ -1,0 +1,284 @@
+{
+  "metric_name": "downhill_necessity",
+  "metric_at_dstar": 0.22222222222222224,
+  "d_star": 0.16,
+  "calibration_reconfirm": {
+    "spearman_vs_d": 0.4945054945054945,
+    "metric_at_dstar": 0.22222222222222224,
+    "monotone": false,
+    "d_levels": [
+      0.0,
+      0.05,
+      0.1,
+      0.13,
+      0.16,
+      0.2,
+      0.3,
+      0.4,
+      0.5,
+      0.6,
+      0.7,
+      0.85,
+      1.0
+    ],
+    "per_level": [
+      {
+        "d": 0.0,
+        "mean": 0.0,
+        "se": 0.0,
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "d": 0.05,
+        "mean": 0.0,
+        "se": 0.0,
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "d": 0.1,
+        "mean": 0.0,
+        "se": 0.0,
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "d": 0.13,
+        "mean": 0.0,
+        "se": 0.0,
+        "samples": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "d": 0.16,
+        "mean": 0.22222222222222224,
+        "se": 0.22222222222222227,
+        "samples": [
+          0.0,
+          0.0,
+          0.6667
+        ]
+      },
+      {
+        "d": 0.2,
+        "mean": 0.5,
+        "se": 0.16666666666666669,
+        "samples": [
+          0.6667,
+          0.6667,
+          0.1667
+        ]
+      },
+      {
+        "d": 0.3,
+        "mean": 0.4444444444444445,
+        "se": 0.22222222222222224,
+        "samples": [
+          0.0,
+          0.6667,
+          0.6667
+        ]
+      },
+      {
+        "d": 0.4,
+        "mean": 0.34920634920634913,
+        "se": 0.18253968253968256,
+        "samples": [
+          0.1667,
+          0.7143,
+          0.1667
+        ]
+      },
+      {
+        "d": 0.5,
+        "mean": 0.055555555555555546,
+        "se": 0.055555555555555546,
+        "samples": [
+          0.0,
+          0.1667,
+          0.0
+        ]
+      },
+      {
+        "d": 0.6,
+        "mean": 0.16666666666666666,
+        "se": 0.09622504486493764,
+        "samples": [
+          0.3333,
+          0.1667,
+          0.0
+        ]
+      },
+      {
+        "d": 0.7,
+        "mean": 0.11111111111111109,
+        "se": 0.055555555555555546,
+        "samples": [
+          0.1667,
+          0.0,
+          0.1667
+        ]
+      },
+      {
+        "d": 0.85,
+        "mean": 0.2380952380952381,
+        "se": 0.23809523809523808,
+        "samples": [
+          0.0,
+          0.0,
+          0.7143
+        ]
+      },
+      {
+        "d": 1.0,
+        "mean": 0.11111111111111109,
+        "se": 0.055555555555555546,
+        "samples": [
+          0.0,
+          0.1667,
+          0.1667
+        ]
+      }
+    ],
+    "n_seeds": 3,
+    "n_samples": 4000,
+    "n_bins": 12
+  },
+  "calibration_existing_file": "calibration_results.json",
+  "real_tasks": {
+    "variable_delay_recall": {
+      "task": "variable_delay_recall",
+      "mean": 0.46296296296296297,
+      "std": 0.18495355884664977,
+      "ci95_lo": 0.0034757699549219923,
+      "ci95_hi": 0.9224501559710039,
+      "samples": [
+        0.5833,
+        0.25,
+        0.5556
+      ],
+      "n_seeds": 3,
+      "n_samples": 250,
+      "n_bins": 12,
+      "fitness_trials": 2,
+      "pca_proj": {
+        "pc1": [
+          0.9823,
+          0.1875
+        ],
+        "proj_lo": -0.17089613924791947,
+        "proj_hi": 0.28230702608208763
+      },
+      "metric_at_dstar": 0.22222222222222224,
+      "below_threshold": false,
+      "ci_strictly_below": false,
+      "ci_strictly_above": false
+    },
+    "flip_flop": {
+      "task": "flip_flop",
+      "mean": 0.3888888888888889,
+      "std": 0.3367876570272817,
+      "ci95_lo": -0.4478055555555556,
+      "ci95_hi": 1.2255833333333335,
+      "samples": [
+        0.0833,
+        0.3333,
+        0.75
+      ],
+      "n_seeds": 3,
+      "n_samples": 250,
+      "n_bins": 12,
+      "fitness_trials": 2,
+      "pca_proj": {
+        "pc1": [
+          0.9823,
+          0.1875
+        ],
+        "proj_lo": -0.17089613924791947,
+        "proj_hi": 0.28230702608208763
+      },
+      "metric_at_dstar": 0.22222222222222224,
+      "below_threshold": false,
+      "ci_strictly_below": false,
+      "ci_strictly_above": false
+    },
+    "step6_text_proxy": {
+      "task": "step6_text_proxy",
+      "mean": 0.6111111111111112,
+      "std": 0.09622504486493767,
+      "ci95_lo": 0.3720555555555555,
+      "ci95_hi": 0.8501666666666668,
+      "samples": [
+        0.5,
+        0.6667,
+        0.6667
+      ],
+      "n_seeds": 3,
+      "n_samples": 600,
+      "n_bins": 12,
+      "fitness_trials": 1,
+      "pca_proj": {
+        "pc1": [
+          0.7344,
+          0.6787
+        ],
+        "proj_lo": -0.6536423897885808,
+        "proj_hi": 0.7041036716629446
+      },
+      "metric_at_dstar": 0.22222222222222224,
+      "below_threshold": false,
+      "ci_strictly_below": false,
+      "ci_strictly_above": true,
+      "wiring": "exp7 3-param ESN: gene->(rho[0.1,1.5],leak[0.05,1.0],in_scale[0.3,1.5]); behavior=(rho,leak)->PCA1D; deterministic fitness, fitness_trials=1."
+    }
+  },
+  "configs": {
+    "reservoir_tasks": {
+      "n_seeds": 3,
+      "n_samples": 250,
+      "fitness_trials": 2,
+      "n_bins": 12
+    },
+    "step6_text_proxy": {
+      "n_seeds": 3,
+      "n_samples": 600,
+      "fitness_trials": 1,
+      "n_bins": 12
+    }
+  },
+  "conclusion": {
+    "all_below_threshold": false,
+    "below_threshold_per_task": {
+      "variable_delay_recall": false,
+      "flip_flop": false,
+      "step6_text_proxy": false
+    },
+    "ci_strictly_below_per_task": {
+      "variable_delay_recall": false,
+      "flip_flop": false,
+      "step6_text_proxy": false
+    },
+    "behavior_elite_dip_all_below": false,
+    "agrees_with_behavior_elite_dip": true
+  },
+  "honest_disclosure": {
+    "operational_comparison": "below_threshold = same-metric/same-estimator/same-grid-dim (1D) comparison of raw downhill vs the raw value at d*=0.16 in synthetic calibration. RANK transfers, MAGNITUDE does not.",
+    "pca_projection": "real-task 2D behavior -> PCA 1st PC before downhill grid; max-variance direction may not be the deceptive direction.",
+    "not_fully_independent": "shares sampling population + PCA-1D style with the other two metrics; '3-metric agreement' != 3 independent proofs.",
+    "downhill_grid_sparsity": "sparse/disconnected occupied cells can artificially raise deceptiveness; 1D + n_bins=24 keeps the grid dense.",
+    "calibration_noise": "existing calibration_results.json had spearman_with_d=0.458, monotone_strict=false, and EXACT 0.0 for smooth d<=0.10 then a jump to ~0.72 -- downhill is a noisier/non-monotone instrument than fdc_behavior (rho=1). Interpret with care; see calibration_reconfirm."
+  }
+}

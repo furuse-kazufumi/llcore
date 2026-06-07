@@ -1,0 +1,107 @@
+{
+  "clarabel_OK_flag": true,
+  "solver_is_clarabel": true,
+  "solver_str": "CLARABEL",
+  "installed": [
+    "CLARABEL",
+    "SCS",
+    "SCIPY",
+    "HIGHS",
+    "OSQP"
+  ],
+  "lift_max_err_independent": 2.546585164964199e-11,
+  "lift_ok": true,
+  "lift_per": [
+    {
+      "n": 3,
+      "k": 2,
+      "lift_dim": 6,
+      "max_err": 2.842170943040401e-14
+    },
+    {
+      "n": 3,
+      "k": 3,
+      "lift_dim": 10,
+      "max_err": 2.2737367544323206e-13
+    },
+    {
+      "n": 3,
+      "k": 4,
+      "lift_dim": 15,
+      "max_err": 1.8189894035458565e-12
+    },
+    {
+      "n": 4,
+      "k": 2,
+      "lift_dim": 10,
+      "max_err": 2.842170943040401e-14
+    },
+    {
+      "n": 4,
+      "k": 3,
+      "lift_dim": 20,
+      "max_err": 1.1368683772161603e-12
+    },
+    {
+      "n": 4,
+      "k": 4,
+      "lift_dim": 35,
+      "max_err": 2.546585164964199e-11
+    }
+  ],
+  "recomputed_per_n": [
+    {
+      "n": 3,
+      "residual_in": 41,
+      "deg_new": {
+        "4": 7,
+        "6": 2,
+        "8": 0
+      },
+      "cum_by_deg": {
+        "4": 7,
+        "6": 9,
+        "8": 9
+      },
+      "cum_recovered": 9,
+      "still_residual": 32,
+      "recovery_frac": 0.2195,
+      "unsound": 0,
+      "unsound_examples": [],
+      "max_rho_over_recovered": 0.995107,
+      "max_jsr_over_recovered": 0.99672,
+      "still_switched_expansive_jsr_ge1": 20,
+      "still_finite_gap_jsr_lt1": 12,
+      "max_gap_jsr_lb": 0.9981,
+      "min_expansive_jsr_lb": 1.0009
+    },
+    {
+      "n": 4,
+      "residual_in": 104,
+      "deg_new": {
+        "4": 17,
+        "6": 11,
+        "8": 2
+      },
+      "cum_by_deg": {
+        "4": 17,
+        "6": 28,
+        "8": 30
+      },
+      "cum_recovered": 30,
+      "still_residual": 74,
+      "recovery_frac": 0.2885,
+      "unsound": 0,
+      "unsound_examples": [],
+      "max_rho_over_recovered": 0.997385,
+      "max_jsr_over_recovered": 0.998796,
+      "still_switched_expansive_jsr_ge1": 47,
+      "still_finite_gap_jsr_lt1": 27,
+      "max_gap_jsr_lb": 0.9996,
+      "min_expansive_jsr_lb": 1.0009
+    }
+  ],
+  "diffs_vs_claimed": [],
+  "reproduces": true,
+  "zero_unsound": true
+}
