@@ -262,7 +262,7 @@ def main():
         per_mode = {}
         for m in modes:
             sweeps = sweeps_by_mode[m]
-            certs = ("inf", "two") if do_two else ("inf",)
+            certs = ("inf", "b2", "two") if do_two else ("inf", "b2")
             per_cert = {}
             for cert in certs:
                 metr = [s[cert] for s in sweeps]

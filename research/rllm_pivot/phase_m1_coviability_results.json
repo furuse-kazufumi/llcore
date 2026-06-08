@@ -16,6 +16,13 @@
             "band_width_median": 0.0,
             "change_at_eps_max_median": 0.005304489390312131
           },
+          "b2": {
+            "frac_coviability_band": 0.1,
+            "eps_max_median": 0.38461538461538464,
+            "eps_alive_median_finite": 0.6153846153846154,
+            "band_width_median": 0.0,
+            "change_at_eps_max_median": 0.016121729998297862
+          },
           "two": {
             "frac_coviability_band": 0.575,
             "eps_max_median": 0.6923076923076923,
@@ -31,6 +38,13 @@
             "eps_alive_median_finite": 0.6153846153846154,
             "band_width_median": 0.0,
             "change_at_eps_max_median": 0.006106167439202464
+          },
+          "b2": {
+            "frac_coviability_band": 0.25833333333333336,
+            "eps_max_median": 0.2692307692307693,
+            "eps_alive_median_finite": 0.6153846153846154,
+            "band_width_median": 0.0,
+            "change_at_eps_max_median": 0.024365501421489678
           },
           "two": {
             "frac_coviability_band": 0.6666666666666666,
@@ -53,6 +67,13 @@
             "band_width_median": 0.0,
             "change_at_eps_max_median": 0.005109764132364466
           },
+          "b2": {
+            "frac_coviability_band": 0.0,
+            "eps_max_median": 0.23076923076923078,
+            "eps_alive_median_finite": 0.7692307692307693,
+            "band_width_median": 0.0,
+            "change_at_eps_max_median": 0.003291423605947831
+          },
           "two": {
             "frac_coviability_band": 0.35,
             "eps_max_median": 0.6538461538461539,
@@ -69,12 +90,56 @@
             "band_width_median": 0.0,
             "change_at_eps_max_median": 0.0061946919253973
           },
+          "b2": {
+            "frac_coviability_band": 0.0,
+            "eps_max_median": 0.038461538461538464,
+            "eps_alive_median_finite": 1.2307692307692308,
+            "band_width_median": 0.0,
+            "change_at_eps_max_median": 0.0006767260212386402
+          },
           "two": {
             "frac_coviability_band": 0.325,
             "eps_max_median": 1.0,
             "eps_alive_median_finite": 1.2307692307692308,
             "band_width_median": 0.0,
             "change_at_eps_max_median": 0.038788925481317994
+          }
+        }
+      }
+    },
+    "12": {
+      "ti1_dominance_frac": 1.0,
+      "by_mode": {
+        "fresh": {
+          "inf": {
+            "frac_coviability_band": 0.0,
+            "eps_max_median": 0.15384615384615385,
+            "eps_alive_median_finite": 0.7692307692307693,
+            "band_width_median": 0.0,
+            "change_at_eps_max_median": 0.0030763096936622203
+          },
+          "b2": {
+            "frac_coviability_band": 0.0,
+            "eps_max_median": 0.15384615384615385,
+            "eps_alive_median_finite": 0.7692307692307693,
+            "band_width_median": 0.0,
+            "change_at_eps_max_median": 0.0021743200678377666
+          }
+        },
+        "net2net": {
+          "inf": {
+            "frac_coviability_band": 0.0,
+            "eps_max_median": 0.23076923076923078,
+            "eps_alive_median_finite": 1.6153846153846154,
+            "band_width_median": 0.0,
+            "change_at_eps_max_median": 0.005201259050442579
+          },
+          "b2": {
+            "frac_coviability_band": 0.0,
+            "eps_max_median": 0.11538461538461539,
+            "eps_alive_median_finite": 1.6153846153846154,
+            "band_width_median": 0.0,
+            "change_at_eps_max_median": 0.0012678919706296417
           }
         }
       }
@@ -88,16 +153,30 @@
             "eps_max_median": 0.15384615384615385,
             "eps_alive_median_finite": 0.8461538461538463,
             "band_width_median": 0.0,
-            "change_at_eps_max_median": 0.002828644477692918
+            "change_at_eps_max_median": 0.003484894717654282
+          },
+          "b2": {
+            "frac_coviability_band": 0.0,
+            "eps_max_median": 0.23076923076923078,
+            "eps_alive_median_finite": 0.8461538461538463,
+            "band_width_median": 0.0,
+            "change_at_eps_max_median": 0.0042504332979429885
           }
         },
         "net2net": {
           "inf": {
             "frac_coviability_band": 0.0,
-            "eps_max_median": 0.2692307692307693,
-            "eps_alive_median_finite": 2.153846153846154,
+            "eps_max_median": 0.3076923076923077,
+            "eps_alive_median_finite": 2.076923076923077,
             "band_width_median": 0.0,
-            "change_at_eps_max_median": 0.004604713285091647
+            "change_at_eps_max_median": 0.005852415056982191
+          },
+          "b2": {
+            "frac_coviability_band": 0.0,
+            "eps_max_median": 0.3076923076923077,
+            "eps_alive_median_finite": 2.076923076923077,
+            "band_width_median": 0.0,
+            "change_at_eps_max_median": 0.005160580335139365
           }
         }
       }
