@@ -239,7 +239,7 @@ def main():
     results = {"meta": {"seed": 20260609, "tau": 0.05, "kernel": "coupled RWKV s'=decay*s+(1-decay)*tanh(Ws+Vx)"},
                "per_n": {}}
 
-    for n in (4, 8, 16):
+    for n in (4, 8, 12, 16):
         print(f"[n={n}] 開始...", flush=True)
         Xs = [rng.normal(size=(L, n)) for _ in range(n_inputs)]  # |x|~N(0,1) (max_input_abs=1.0 と整合は別途留保)
         dom = ti1_dominance(rng, n, n_genes=300)
