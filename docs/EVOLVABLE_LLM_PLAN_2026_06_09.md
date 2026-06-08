@@ -172,7 +172,7 @@ recurrent adapter block(`CoupledNDGene` の `(decay∈[0,1]^n, W∈[-2,2]^{n×n}
 ### Phase −1 — 純数値 両立帯 scan(F5: 最優先・実装投資ゼロ)
 - SmolLM2/Net2Net **不要**。`_infnorm_sup`/`_t_min` だけで synthetic `CoupledNDGene` を n→n+1 拡張し、新 unit 結合 `|W[i,n+1]|,|W[n+1,j]|` を 0 から増やしながら (a) 関数が非自明に変わる かつ (b) 全既存 row `_infnorm_sup<1` を保つ **ε>0 帯が存在するか**を実測。
 - **max_input_abs 較正**: SmolLM2 入力 `abs(x)_inf` を実測し sound 上界に設定(現 1.0 ハードコード `backends.py:154/171` の box 被覆未検証を是正)。
-- **Decision gate −1**: ε>0 両立帯が**存在 → GO**(VSOA を最初の被験 method として続行)。**空 → VSOA は「成長と両立不能」の第一級 negative を枠組みが記録し、被験 method を固定 topology / 経験 gate / Mamba 比較へ切替**(枠組みは生存)。最尤失敗を最安・最速で引く。
+- **Decision gate −1 【実測済 2026-06-09 → PHASE_M1_VERDICT.md】**: ε>0 両立帯は **cert_two・小 n(n≤4-6)で存在 → GO**(VSOA を最初の被験 method として続行、ただし per-component gate は cert_two・small-n に確定)。**cert_inf では空**=その regime では「成長と両立不能」の第一級 negative を枠組みが記録(枠組みは生存)。**残る最尤失敗 = 賭け2(navigable cert の scale)**: vertex-free cert が cert_two 並みの navigability を高次元で保てるか(体系化は B2 が n=16 で cert_inf に収束=navigability 喪失を既示)。次の純数値 scan 候補 = SDP 比較(小 n)+ vertex-free B2 の navigability scale 測定。
 
 ### Phase 0 — base 継承 + instrument 校正
 - SmolLM2-135M load + 数百 step fine-tune が T4 で回ることを確認。Mamba-130M を正の対照に。
