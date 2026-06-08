@@ -45,16 +45,13 @@ from llcore.verifier.backends import _infnorm_sup, _t_min  # noqa: E402
 def coupled_run(X: np.ndarray, decay: np.ndarray, W: np.ndarray, V: np.ndarray) -> np.ndarray:
     """s_{t+1} = decay⊙s_t + (1-decay)⊙tanh(W s_t + V x_t). X:(L,n) -> states:(L,n)."""
     n = decay.shape[0]
+    assert X.shape[1] == n, f"X dim {X.shape[1]} != n {n}"
     s = np.zeros(n)
     out = np.empty((X.shape[0], n))
     for t in range(X.shape[0]):
-        s = decay * s + (1.0 - decay) * np.tanh(W @ s + V @ x_row(X, t, n))
+        s = decay * s + (1.0 - decay) * np.tanh(W @ s + V @ X[t])
         out[t] = s
     return out
-
-
-def x_row(X: np.ndarray, t: int, n: int) -> np.ndarray:
-    return X[t, :n]
 
 
 def cert_inf_sup(decay, W, V, max_input_abs=1.0) -> float:
