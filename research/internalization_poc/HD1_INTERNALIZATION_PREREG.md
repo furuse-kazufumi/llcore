@@ -136,8 +136,11 @@ stage-1 が失敗したら stage-2 に進まず結果 doc に記録 (逸脱で�
 3. pull 後、分析スクリプト (検定は §3 実装) で confirmatory 判定 → VERDICT。逸脱は結果 doc に明記。
 4. VERDICT → 論文 §9.8「勾配内蔵監督 vs 事後 rollback」。
 
-## 7. 未作成 (本登録 commit 前に要すもの)
+## 7. 実装 (本登録 commit で結果取得前に固定; 作成・検証済)
 
-- `internalization_kernel.py` (GPU kernel; gated-logsumexp arm 実装 + stage-1/stage-2 構造)。
-- 分析スクリプト (H1 Wilcoxon + アーティファクト連続量 / H2 Pareto bootstrap / A4 相関 / stage-1 判定)。
-- 上記 2 本は **結果取得前 commit** (HD-1 grounding と同じ規律: analyze スクリプトも事前 commit)。
+- `internalization_kernel.py` (GPU kernel; gated-logsumexp arm + stage-1/stage-2 + H2 λ-sweep, resumable)。
+  **CPU smoke 検証済**: stage-1 (8 jobs) / stage-2 (208 jobs = 5 arm×16 + 4 λ×32) 完走、stage-1 verdict 自動算出。
+- `analyze_internalization.py` (H1 Wilcoxon + アーティファクト連続量 + A4 相関 / H2 Pareto bootstrap / F 条項 / Holm)。
+  **合成データ検証済**: H1 dir_ok/p、H2 Pareto 内挿 P、Holm 正常動作。degenerate (死 0) で F 条項 INVALID graceful。
+- 両 doc とも本登録と同 commit で**結果取得前に固定** (HD-1 grounding と同規律)。GPU 実行は無料 T4、stage-1 で時間
+  実測 → 無料週次 quota 内なら $0 で stage-2、超過/有料が要る場合はコスト見積をユーザー承認後 (「安ければ可」)。
