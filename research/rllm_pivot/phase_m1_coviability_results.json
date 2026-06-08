@@ -1,0 +1,87 @@
+{
+  "meta": {
+    "seed": 20260609,
+    "tau": 0.05,
+    "kernel": "coupled RWKV s'=decay*s+(1-decay)*tanh(Ws+Vx)"
+  },
+  "per_n": {
+    "4": {
+      "ti1_dominance_frac": 0.9608333333333333,
+      "n_sweeps": 120,
+      "frac_coviability_band": 0.041666666666666664,
+      "eps_max_median": 0.23076923076923078,
+      "eps_alive_median_finite": 0.6153846153846154,
+      "band_width_median": 0.0,
+      "max_change_in_band_median": 0.07214371895893577,
+      "by_headroom_tercile": [
+        {
+          "headroom_mean": 0.007913133144475745,
+          "frac_band": 0.0,
+          "band_width_mean": 0.0
+        },
+        {
+          "headroom_mean": 0.03961798150640294,
+          "frac_band": 0.05,
+          "band_width_mean": 0.005769230769230771
+        },
+        {
+          "headroom_mean": 0.12074021461179829,
+          "frac_band": 0.075,
+          "band_width_mean": 0.005769230769230768
+        }
+      ]
+    },
+    "8": {
+      "ti1_dominance_frac": 0.9991666666666666,
+      "n_sweeps": 120,
+      "frac_coviability_band": 0.0,
+      "eps_max_median": 0.23076923076923078,
+      "eps_alive_median_finite": 0.7692307692307693,
+      "band_width_median": 0.0,
+      "max_change_in_band_median": 0.0,
+      "by_headroom_tercile": [
+        {
+          "headroom_mean": 0.0023574169436262004,
+          "frac_band": 0.0,
+          "band_width_mean": 0.0
+        },
+        {
+          "headroom_mean": 0.012044470407841651,
+          "frac_band": 0.0,
+          "band_width_mean": 0.0
+        },
+        {
+          "headroom_mean": 0.042060054929582015,
+          "frac_band": 0.0,
+          "band_width_mean": 0.0
+        }
+      ]
+    },
+    "16": {
+      "ti1_dominance_frac": 1.0,
+      "n_sweeps": 120,
+      "frac_coviability_band": 0.0,
+      "eps_max_median": 0.23076923076923078,
+      "eps_alive_median_finite": 0.9230769230769231,
+      "band_width_median": 0.0,
+      "max_change_in_band_median": 0.0,
+      "by_headroom_tercile": [
+        {
+          "headroom_mean": 0.0015593120702962788,
+          "frac_band": 0.0,
+          "band_width_mean": 0.0
+        },
+        {
+          "headroom_mean": 0.005903726012992242,
+          "frac_band": 0.0,
+          "band_width_mean": 0.0
+        },
+        {
+          "headroom_mean": 0.023273300610195398,
+          "frac_band": 0.0,
+          "band_width_mean": 0.0
+        }
+      ]
+    }
+  }
+}

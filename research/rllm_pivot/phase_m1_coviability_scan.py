@@ -243,7 +243,7 @@ def main():
         }
         print(f"[n={n}] ti=1 支配={dom:.3f}  両立帯あり={frac_band:.3f}  "
               f"ε_max中央={np.median([s['eps_max'] for s in sweeps]):.3f}  "
-              f"band幅中央={np.median(bw):.3f}  帯内max変化中央={(np.median(max_change_band) if max_change_band.size else 0):.3f}")
+              f"band幅中央={np.median(bw):.3f}  帯内max変化中央={(np.median(max_change_band) if max_change_band.size else 0):.3f}", flush=True)
 
     out = os.path.join(os.path.dirname(__file__), "phase_m1_coviability_results.json")
     with open(out, "w", encoding="utf-8") as f:
