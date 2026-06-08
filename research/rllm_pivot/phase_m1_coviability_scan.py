@@ -198,16 +198,19 @@ def sweep(decay, W, V, rng, Xs, max_input_abs=1.0, tau=0.05, n_eps=40, eps_hi=3.
 
     eps_grid = np.linspace(0.0, eps_hi, n_eps)
     sound_inf = np.zeros(n_eps, dtype=bool)
+    sound_b2 = np.zeros(n_eps, dtype=bool)
     sound_two = np.zeros(n_eps, dtype=bool)
     change = np.zeros(n_eps)
     for ke, eps in enumerate(eps_grid):
         d2, W2, V2 = grow_one(decay, W, V, rng, eps, in_dir, out_dir, self_w, new_decay, mode=mode, k=kunit)
         sound_inf[ke] = cert_inf_sup(d2, W2, V2, max_input_abs) < 1.0
+        sound_b2[ke] = cert_b2_admits(d2, W2, V2, max_input_abs)   # vertex-free, 高次元 feasible
         if do_two:
             sound_two[ke] = cert_two_admits(d2, W2, V2, max_input_abs)
         change[ke] = function_change(decay, W, V, d2, W2, V2, Xs)
 
-    out = {"inf": _band_metrics(sound_inf, change, eps_grid, tau)}
+    out = {"inf": _band_metrics(sound_inf, change, eps_grid, tau),
+           "b2": _band_metrics(sound_b2, change, eps_grid, tau)}
     out["two"] = _band_metrics(sound_two, change, eps_grid, tau) if do_two else None
     return out
 
