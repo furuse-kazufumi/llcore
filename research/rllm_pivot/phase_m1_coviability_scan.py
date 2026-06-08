@@ -109,8 +109,9 @@ def function_change(decay, W, V, decay2, W2, V2, Xs):
     n = decay.shape[0]
     rels = []
     for X in Xs:
-        base = coupled_run(X, decay, W, V)            # (L, n)
-        grown = coupled_run(X, decay2, W2, V2)[:, :n]  # 既存次元のみ
+        base = coupled_run(X, decay, W, V)             # (L, n)
+        Xg = np.concatenate([X, np.zeros((X.shape[0], 1))], axis=1)  # 新 unit は外部入力なし
+        grown = coupled_run(Xg, decay2, W2, V2)[:, :n]  # 既存次元のみ比較
         num = np.linalg.norm(grown - base)
         den = np.linalg.norm(base) + 1e-12
         rels.append(num / den)
