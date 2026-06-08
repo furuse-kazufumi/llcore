@@ -1,0 +1,31 @@
+{
+  "meta": {
+    "model": "HuggingFaceTB/SmolLM2-135M",
+    "layer": 15,
+    "n": 6,
+    "T": 52,
+    "eps_stable": 0.001,
+    "K": 300,
+    "seed": 20260609
+  },
+  "methods": {
+    "cert_two": {
+      "n_admitted": 3,
+      "admit_rate": 0.01,
+      "certified_stable_rate": 1.0,
+      "false_admit_count": 0,
+      "forget_median": 1.268063647889964e-11,
+      "forget_p95": 3.6556983164516535e-08,
+      "forget_max": 4.061746122318739e-08
+    },
+    "none": {
+      "n_admitted": 300,
+      "admit_rate": 1.0,
+      "certified_stable_rate": 0.68,
+      "false_admit_count": null,
+      "forget_median": 8.323863989709269e-05,
+      "forget_p95": 0.012102224223761296,
+      "forget_max": 0.06156160050936823
+    }
+  }
+}
