@@ -69,4 +69,27 @@ VSOA の width_grow は **存立条件 width_grow 自体(賭け1)では死なな
 - §⑬ 留保1: 「両立帯 ε>0 未証明」→ **「cert_two・小 n で実証。scale が本丸の未解決」に更新**。
 - 第一級 negative の評価資産化(eval-framework 主軸の最初の測定): 「verified width_grow の両立帯は certifier-gated — cert_two で navigable・cert_inf で空・n で縮小」は枠組みの最初の falsifiable な測定結果として記録。
 
-正本データ = `phase_m1_coviability_results.json` / 実装 = `phase_m1_coviability_scan.py`。次 = block 間 coupling soundness scan(F6, `phase_m1_coupling_scan.py`)。
+正本データ = `phase_m1_coviability_results.json` / 実装 = `phase_m1_coviability_scan.py`。
+
+---
+
+## 6. F6 — block 間 coupling soundness scan(`phase_m1_coupling_scan.py` → `phase_m1_coupling_results.json`)
+
+**問い**: 計画 §5.2 の per-block AND 合成(各 block 独立 cert_inf<1)は block 間 coupling(γ·C12, γ·C21)を未 certify。per-block AND が admit した構成で合成系の真 ρ が 1 を越える率は?(full_true_rho は box sample 最大=sup の下界ゆえ blind-spot は**下限**。)
+
+| γ | n=4 blind-spot | n=8 blind-spot | 合成真ρ平均(n=8) | full cert_inf 救済率(n=8) |
+|---|---|---|---|---|
+| 0.0 | 0.000 | 0.000 | 0.951 | 1.000(sanity: 無結合は per-block=合成) |
+| 0.5 | 0.007 | 0.000 | 0.954 | 0.000 |
+| 1.0 | 0.340 | 0.367 | 1.000 | 0.000 |
+| 1.5 | 0.800 | 0.953 | 1.168 | 0.000 |
+| 2.0 | 0.953 | 1.000 | 1.399 | 0.000 |
+
+**確定知見**:
+1. **per-block AND は coupling 下で genuinely 不 sound** — γ≥1.0 で per-block admit 済の **34-100% が合成真 ρ≥1(実際は発散)**。**red-team F6 を実データ確認**。per-block AND は禁止必須(計画 §⑬-4 / North Star #2 を裏付け)。
+2. **full cert_inf(sound 合成)は過保守** — γ=0.5(真 ρ=0.93=実際は収縮)でも per-block admit 済を **全 reject(救済率 0.000)**。sound な合成 gate を cert_inf で作ると navigable でない。
+3. **width_grow と同じ navigability×scalability トレードオフが coupling でも再現** — navigable な合成 cert(cert_two/SDP on 2n)は **2^(2n) 頂点で width_grow より scale が悪化**。coupling は賭け2(2^n 壁)を**増幅**する。
+
+**統合 verdict(width_grow + coupling)**: VSOA は **small-n・低 coupling・cert_two の regime で生存**(両立帯あり・per-block の代わりに full small-system cert)。だが (a) cert_two は 2^n で非スケール、(b) coupling は full-system 化で 2^(2n) に悪化。**唯一の活路 = navigability を保ったまま scale する vertex-free sound certifier**(体系化は候補 B2 が n=16 で cert_inf に収束=navigability 喪失を既示)。**現時点で「高次元で navigable かつ sound」な certifier の存在証拠はない = これが FW の最大の未解決の賭け**。
+
+正本データ = `phase_m1_coupling_results.json` / 実装 = `phase_m1_coupling_scan.py`。
