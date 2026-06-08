@@ -36,7 +36,7 @@ _SRC = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "src"
 if _SRC not in sys.path:
     sys.path.insert(0, _SRC)
 
-from llcore.verifier.backends import _infnorm_sup, _t_min  # noqa: E402
+from llcore.verifier.backends import _infnorm_sup, _t_min, _jac_at_t, _box_vertices  # noqa: E402
 
 
 # --------------------------------------------------------------------------- #
