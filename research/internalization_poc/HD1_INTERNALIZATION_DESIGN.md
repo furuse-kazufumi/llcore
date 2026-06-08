@@ -1,8 +1,19 @@
 # 検証シグナルを勾配に内蔵する — 設計 v2 (敵対レビュー反映)
 
-> 状態: **設計 v2**。骨子 v1 への敵対レビュー (Workflow 18 agents, 4 lenses → **confirmed 14 /
-> refuted 0**; 記録 = [[HD1_INTERNALIZATION_REVIEW_2026_06_08.md]]) を全反映。骨子 v1 が粗かった
-> ことを規律が捕捉した = 恥でなく fail-closed が機能した証拠。次 = feasibility → 事前登録 → GPU。
+> 状態: **設計 v2 → feasibility 完了 (GO conditional, 2026-06-08)**。骨子 v1 への敵対レビュー
+> (Workflow 18 agents, 4 lenses → **confirmed 14 / refuted 0**; 記録 =
+> [[HD1_INTERNALIZATION_REVIEW_2026_06_08.md]]) を全反映。骨子 v1 が粗かったことを規律が捕捉した
+> = 恥でなく fail-closed が機能した証拠。
+>
+> **feasibility 決着 (正本 = [[HD1_INTERNALIZATION_FEASIBILITY.md]], 敵対レビュー 41 agents
+> confirmed 16 反映済)**: §6 の go/no-go を CPU で実測 → (e) `.max()` は単一行 subgradient で
+> latency 超線形爆発 (n=128 で 1736 step) = **NO-GO** / logsumexp・top-k は flat (~20-35) = **GO**。
+> (f) `.max()` 行被覆 = 厳密に 1/n。**本走 surrogate を gated-logsumexp に確定**
+> (`1[infnorm_sup.detach() ≥ θ] · relu(logsumexp(rows, τ=10) − θ)`; logsumexp の offset が C14
+> admit 中核 silence を破るのを detached true-infnorm gate で復元、配備 θ=0.85 で 0/16 active 検証)。
+> λ=0.1 (decade match)、margin=0.05 (gated で退化解消を実証) / MATCHED θ=1.0。**死削減は変種非依存**
+> (n=32 で max=logsumexp=gated=0.069)= 変種選定は latency/coverage の大 n 論拠のみに立脚。
+> 死 regime/tautology/MATCHED/飽和の main n 確認は **GPU stage-1 first-check**。次 = 事前登録 → GPU。
 >
 > **用語是正 (C8/C9, 最重要)**: 「内的化」を本文・見出し・仮説名・論文節名から除去し
 > **「検証シグナルの勾配内蔵 (gradient-embedded supervision)」** に統一。HD-1 設計 §2 が
