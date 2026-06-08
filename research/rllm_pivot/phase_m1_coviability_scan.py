@@ -28,6 +28,9 @@ import sys
 
 import numpy as np
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")  # cp932 console で日本語/記号を出す
+
 # llcore.src を path に (本 research script は自己完結, raptor path 規約は別 project ゆえ非適用)
 _SRC = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "src"))
 if _SRC not in sys.path:
