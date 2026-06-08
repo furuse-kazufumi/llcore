@@ -73,15 +73,21 @@ def row_bounds_at(decay, W, t_lo, ti_choice):
 # --------------------------------------------------------------------------- #
 # base gene 生成 (admit 済 = cert_inf PASS) を headroom 帯ごとに
 # --------------------------------------------------------------------------- #
-def sample_admitted_base(rng, n, max_input_abs=1.0, w_scale=0.35, tries=2000):
-    """cert_inf PASS な (decay, W, V=I) を 1 個サンプル。失敗時 None。"""
+def sample_admitted_base(rng, n, max_input_abs=1.0, max_tries=60):
+    """W を admit するまで縮小して cert_inf PASS な (decay, W, V=I) を返す。
+
+    高 n では一様サンプルの admit 率が指数的に低い (全 row sup<1 が必要) ため、
+    W を 0.85 倍ずつ縮小して必ず admit に到達させる (任意 n で確実、初期スケールで headroom を散らす)。
+    """
     V = np.eye(n)
-    for _ in range(tries):
+    for _ in range(max_tries):
         decay = rng.uniform(0.0, 1.0, size=n)
-        W = rng.normal(0.0, w_scale, size=(n, n)) / np.sqrt(n)
-        sup = cert_inf_sup(decay, W, V, max_input_abs)
-        if sup < 1.0:
-            return decay, W, V, float(sup)
+        W = (rng.normal(0.0, 1.0, size=(n, n)) / np.sqrt(n)) * float(rng.uniform(0.2, 0.9))
+        for _ in range(50):
+            sup = cert_inf_sup(decay, W, V, max_input_abs)
+            if sup < 1.0:
+                return decay, W, V, float(sup)
+            W = W * 0.85
     return None
 
 
