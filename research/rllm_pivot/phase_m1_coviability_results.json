@@ -9,56 +9,36 @@
       "ti1_dominance_frac": 0.9608333333333333,
       "by_mode": {
         "fresh": {
-          "n_sweeps": 120,
-          "frac_coviability_band": 0.03333333333333333,
-          "eps_max_median": 0.15384615384615385,
-          "eps_alive_median_finite": 0.6153846153846154,
-          "band_width_median": 0.0,
-          "change_at_eps_max_median": 0.005304489390312131,
-          "max_change_in_band_median": 0.0725751942865551,
-          "by_headroom_tercile": [
-            {
-              "headroom_mean": 0.007337831998985902,
-              "frac_band": 0.025,
-              "band_width_mean": 0.0019230769230769219
-            },
-            {
-              "headroom_mean": 0.036901531466295615,
-              "frac_band": 0.05,
-              "band_width_mean": 0.0038461538461538464
-            },
-            {
-              "headroom_mean": 0.10859718231745094,
-              "frac_band": 0.025,
-              "band_width_mean": 0.0019230769230769219
-            }
-          ]
+          "inf": {
+            "frac_coviability_band": 0.03333333333333333,
+            "eps_max_median": 0.15384615384615385,
+            "eps_alive_median_finite": 0.6153846153846154,
+            "band_width_median": 0.0,
+            "change_at_eps_max_median": 0.005304489390312131
+          },
+          "two": {
+            "frac_coviability_band": 0.575,
+            "eps_max_median": 0.6923076923076923,
+            "eps_alive_median_finite": 0.6153846153846154,
+            "band_width_median": 0.1538461538461538,
+            "change_at_eps_max_median": 0.08371271588743745
+          }
         },
         "net2net": {
-          "n_sweeps": 120,
-          "frac_coviability_band": 0.10833333333333334,
-          "eps_max_median": 0.07692307692307693,
-          "eps_alive_median_finite": 0.6153846153846154,
-          "band_width_median": 0.0,
-          "change_at_eps_max_median": 0.006106167439202464,
-          "max_change_in_band_median": 0.07418581100483154,
-          "by_headroom_tercile": [
-            {
-              "headroom_mean": 0.007337831998985902,
-              "frac_band": 0.05,
-              "band_width_mean": 0.01730769230769231
-            },
-            {
-              "headroom_mean": 0.036901531466295615,
-              "frac_band": 0.075,
-              "band_width_mean": 0.019230769230769235
-            },
-            {
-              "headroom_mean": 0.10859718231745094,
-              "frac_band": 0.2,
-              "band_width_mean": 0.04423076923076924
-            }
-          ]
+          "inf": {
+            "frac_coviability_band": 0.10833333333333334,
+            "eps_max_median": 0.07692307692307693,
+            "eps_alive_median_finite": 0.6153846153846154,
+            "band_width_median": 0.0,
+            "change_at_eps_max_median": 0.006106167439202464
+          },
+          "two": {
+            "frac_coviability_band": 0.6666666666666666,
+            "eps_max_median": 0.9230769230769231,
+            "eps_alive_median_finite": 0.6153846153846154,
+            "band_width_median": 0.3846153846153846,
+            "change_at_eps_max_median": 0.08725954365367797
+          }
         }
       }
     },
@@ -66,56 +46,36 @@
       "ti1_dominance_frac": 1.0,
       "by_mode": {
         "fresh": {
-          "n_sweeps": 120,
-          "frac_coviability_band": 0.0,
-          "eps_max_median": 0.23076923076923078,
-          "eps_alive_median_finite": 0.7692307692307693,
-          "band_width_median": 0.0,
-          "change_at_eps_max_median": 0.005109764132364466,
-          "max_change_in_band_median": 0.0,
-          "by_headroom_tercile": [
-            {
-              "headroom_mean": 0.004018256271722445,
-              "frac_band": 0.0,
-              "band_width_mean": 0.0
-            },
-            {
-              "headroom_mean": 0.015511349113516284,
-              "frac_band": 0.0,
-              "band_width_mean": 0.0
-            },
-            {
-              "headroom_mean": 0.056766908776219885,
-              "frac_band": 0.0,
-              "band_width_mean": 0.0
-            }
-          ]
+          "inf": {
+            "frac_coviability_band": 0.0,
+            "eps_max_median": 0.23076923076923078,
+            "eps_alive_median_finite": 0.7692307692307693,
+            "band_width_median": 0.0,
+            "change_at_eps_max_median": 0.005109764132364466
+          },
+          "two": {
+            "frac_coviability_band": 0.35,
+            "eps_max_median": 0.6538461538461539,
+            "eps_alive_median_finite": 0.7692307692307693,
+            "band_width_median": 0.0,
+            "change_at_eps_max_median": 0.04273816188282916
+          }
         },
         "net2net": {
-          "n_sweeps": 120,
-          "frac_coviability_band": 0.0,
-          "eps_max_median": 0.15384615384615385,
-          "eps_alive_median_finite": 1.2307692307692308,
-          "band_width_median": 0.0,
-          "change_at_eps_max_median": 0.0061946919253973,
-          "max_change_in_band_median": 0.0,
-          "by_headroom_tercile": [
-            {
-              "headroom_mean": 0.004018256271722445,
-              "frac_band": 0.0,
-              "band_width_mean": 0.0
-            },
-            {
-              "headroom_mean": 0.015511349113516284,
-              "frac_band": 0.0,
-              "band_width_mean": 0.0
-            },
-            {
-              "headroom_mean": 0.056766908776219885,
-              "frac_band": 0.0,
-              "band_width_mean": 0.0
-            }
-          ]
+          "inf": {
+            "frac_coviability_band": 0.0,
+            "eps_max_median": 0.15384615384615385,
+            "eps_alive_median_finite": 1.2307692307692308,
+            "band_width_median": 0.0,
+            "change_at_eps_max_median": 0.0061946919253973
+          },
+          "two": {
+            "frac_coviability_band": 0.325,
+            "eps_max_median": 1.0,
+            "eps_alive_median_finite": 1.2307692307692308,
+            "band_width_median": 0.0,
+            "change_at_eps_max_median": 0.038788925481317994
+          }
         }
       }
     },
@@ -123,56 +83,22 @@
       "ti1_dominance_frac": 1.0,
       "by_mode": {
         "fresh": {
-          "n_sweeps": 120,
-          "frac_coviability_band": 0.0,
-          "eps_max_median": 0.15384615384615385,
-          "eps_alive_median_finite": 0.8461538461538463,
-          "band_width_median": 0.0,
-          "change_at_eps_max_median": 0.002828644477692918,
-          "max_change_in_band_median": 0.0,
-          "by_headroom_tercile": [
-            {
-              "headroom_mean": 0.0033559999738069918,
-              "frac_band": 0.0,
-              "band_width_mean": 0.0
-            },
-            {
-              "headroom_mean": 0.010802776933175884,
-              "frac_band": 0.0,
-              "band_width_mean": 0.0
-            },
-            {
-              "headroom_mean": 0.031477986824198126,
-              "frac_band": 0.0,
-              "band_width_mean": 0.0
-            }
-          ]
+          "inf": {
+            "frac_coviability_band": 0.0,
+            "eps_max_median": 0.15384615384615385,
+            "eps_alive_median_finite": 0.8461538461538463,
+            "band_width_median": 0.0,
+            "change_at_eps_max_median": 0.002828644477692918
+          }
         },
         "net2net": {
-          "n_sweeps": 120,
-          "frac_coviability_band": 0.0,
-          "eps_max_median": 0.2692307692307693,
-          "eps_alive_median_finite": 2.153846153846154,
-          "band_width_median": 0.0,
-          "change_at_eps_max_median": 0.004604713285091647,
-          "max_change_in_band_median": 0.0,
-          "by_headroom_tercile": [
-            {
-              "headroom_mean": 0.0033559999738069918,
-              "frac_band": 0.0,
-              "band_width_mean": 0.0
-            },
-            {
-              "headroom_mean": 0.010802776933175884,
-              "frac_band": 0.0,
-              "band_width_mean": 0.0
-            },
-            {
-              "headroom_mean": 0.031477986824198126,
-              "frac_band": 0.0,
-              "band_width_mean": 0.0
-            }
-          ]
+          "inf": {
+            "frac_coviability_band": 0.0,
+            "eps_max_median": 0.2692307692307693,
+            "eps_alive_median_finite": 2.153846153846154,
+            "band_width_median": 0.0,
+            "change_at_eps_max_median": 0.004604713285091647
+          }
         }
       }
     }
