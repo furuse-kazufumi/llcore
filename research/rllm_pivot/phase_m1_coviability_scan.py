@@ -127,7 +127,7 @@ def function_change(decay, W, V, decay2, W2, V2, Xs):
 # --------------------------------------------------------------------------- #
 # 1 base × 1 方向 で ε を sweep し両立帯を測る
 # --------------------------------------------------------------------------- #
-def sweep(decay, W, V, rng, Xs, max_input_abs=1.0, tau=0.05, n_eps=60, eps_hi=3.0):
+def sweep(decay, W, V, rng, Xs, max_input_abs=1.0, tau=0.05, n_eps=40, eps_hi=3.0):
     n = decay.shape[0]
     in_dir = rng.normal(size=n); in_dir /= (np.linalg.norm(in_dir) + 1e-12)
     out_dir = rng.normal(size=n); out_dir /= (np.linalg.norm(out_dir) + 1e-12)
