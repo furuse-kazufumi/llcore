@@ -141,20 +141,21 @@ def function_change(decay, W, V, decay2, W2, V2, Xs):
 # --------------------------------------------------------------------------- #
 # 1 base × 1 方向 で ε を sweep し両立帯を測る
 # --------------------------------------------------------------------------- #
-def sweep(decay, W, V, rng, Xs, max_input_abs=1.0, tau=0.05, n_eps=40, eps_hi=3.0):
+def sweep(decay, W, V, rng, Xs, max_input_abs=1.0, tau=0.05, n_eps=40, eps_hi=3.0, mode="fresh"):
     n = decay.shape[0]
     in_dir = rng.normal(size=n); in_dir /= (np.linalg.norm(in_dir) + 1e-12)
     out_dir = rng.normal(size=n); out_dir /= (np.linalg.norm(out_dir) + 1e-12)
     self_w = float(rng.uniform(-0.5, 0.5))
     new_decay = float(rng.uniform(0.0, 1.0))
+    kunit = int(np.argmax(np.abs(W).sum(axis=1)))  # net2net で copy する活性既存 unit
 
     eps_grid = np.linspace(0.0, eps_hi, n_eps)
     sound = np.zeros(n_eps, dtype=bool)
     change = np.zeros(n_eps)
-    for k, eps in enumerate(eps_grid):
-        d2, W2, V2 = grow_one(decay, W, V, rng, eps, in_dir, out_dir, self_w, new_decay)
-        sound[k] = cert_inf_sup(d2, W2, V2, max_input_abs) < 1.0
-        change[k] = function_change(decay, W, V, d2, W2, V2, Xs)
+    for ke, eps in enumerate(eps_grid):
+        d2, W2, V2 = grow_one(decay, W, V, rng, eps, in_dir, out_dir, self_w, new_decay, mode=mode, k=kunit)
+        sound[ke] = cert_inf_sup(d2, W2, V2, max_input_abs) < 1.0
+        change[ke] = function_change(decay, W, V, d2, W2, V2, Xs)
 
     # ε_max = 最大の連続 sound 区間 (ε=0 から) の上端
     eps_max = 0.0
