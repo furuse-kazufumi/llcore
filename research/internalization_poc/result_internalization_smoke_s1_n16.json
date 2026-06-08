@@ -1,0 +1,545 @@
+{
+ "meta": {
+  "experiment": "gradient-embedded supervision vs post-hoc rollback",
+  "prereg": "HD1_INTERNALIZATION_PREREG.md",
+  "stage": 1,
+  "mode": "smoke",
+  "n": 16,
+  "device": "cpu",
+  "gpu": "cpu",
+  "cfg": {
+   "layers": 1,
+   "d": 32,
+   "T": 16,
+   "B": 4,
+   "lr": 0.003,
+   "grad_steps": 20,
+   "max_chars": 4000,
+   "eval_batches": 2,
+   "tau": 10.0,
+   "lam": 0.1,
+   "margin": 0.05,
+   "gate_k": 4,
+   "measure_m": 5,
+   "sep_T": 60,
+   "rho_samples_pt": 16,
+   "rho_samples_hp": 32,
+   "unigram_ce": 3.2117029039509926,
+   "arm_spec": {
+    "NONE": [
+     false,
+     null,
+     0.0,
+     false
+    ],
+    "ENDO_HARNESS": [
+     false,
+     null,
+     0.0,
+     true
+    ],
+    "ENDO_GRAD": [
+     true,
+     0.95,
+     0.1,
+     false
+    ],
+    "ENDO_GRAD_MATCHED": [
+     true,
+     1.0,
+     0.1,
+     false
+    ],
+    "ENDO_BOTH": [
+     true,
+     0.95,
+     0.1,
+     true
+    ],
+    "ENDO_GRAD_L003": [
+     true,
+     0.95,
+     0.03,
+     false
+    ],
+    "ENDO_GRAD_L01": [
+     true,
+     0.95,
+     0.1,
+     false
+    ],
+    "ENDO_GRAD_L03": [
+     true,
+     0.95,
+     0.3,
+     false
+    ],
+    "ENDO_GRAD_L10": [
+     true,
+     0.95,
+     1.0,
+     false
+    ]
+   }
+  },
+  "status": "done",
+  "error": null,
+  "start_time": "2026-06-08T12:30:15",
+  "end_time": "2026-06-08T12:30:19"
+ },
+ "records": [
+  {
+   "arm": "NONE",
+   "n": 16,
+   "seed": 2026,
+   "lam": 0.0,
+   "theta": null,
+   "final_ce": 3.3293296098709106,
+   "deaths_contract": 0,
+   "deaths_harm": 0,
+   "rollbacks": 0,
+   "n_meas": 4,
+   "death_rate": 0.0,
+   "never_touched_death": true,
+   "window_max_rho": 0.8993645919891186,
+   "rho_excess_integral": 0.0,
+   "admit_core_active": 0,
+   "admit_core_steps": 0,
+   "final_rho_hp": 0.9119737025364595,
+   "trajectory": [
+    {
+     "step": 5,
+     "rho_hat": 0.8620980484380707,
+     "sep_rate": -0.18071242561809342,
+     "infnorm_sup": 0.9220160946364605,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 10,
+     "rho_hat": 0.8621949167196237,
+     "sep_rate": -0.17531881563570814,
+     "infnorm_sup": 0.9600947286184556,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 15,
+     "rho_hat": 0.8614649737384881,
+     "sep_rate": -0.16451311313027805,
+     "infnorm_sup": 1.022734678100753,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 20,
+     "rho_hat": 0.8993645919891186,
+     "sep_rate": -0.1619889868890088,
+     "infnorm_sup": 1.1028235648487494,
+     "contract_death": false,
+     "harm_death": false
+    }
+   ],
+   "status": "ok"
+  },
+  {
+   "arm": "NONE",
+   "n": 16,
+   "seed": 2027,
+   "lam": 0.0,
+   "theta": null,
+   "final_ce": 3.431327223777771,
+   "deaths_contract": 0,
+   "deaths_harm": 0,
+   "rollbacks": 0,
+   "n_meas": 4,
+   "death_rate": 0.0,
+   "never_touched_death": true,
+   "window_max_rho": 0.9736735560807618,
+   "rho_excess_integral": 0.0,
+   "admit_core_active": 0,
+   "admit_core_steps": 0,
+   "final_rho_hp": 0.9700858114603151,
+   "trajectory": [
+    {
+     "step": 5,
+     "rho_hat": 0.8431283812291479,
+     "sep_rate": -0.19749028371235025,
+     "infnorm_sup": 0.9386776124783266,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 10,
+     "rho_hat": 0.8553962095834626,
+     "sep_rate": -0.19297222211096923,
+     "infnorm_sup": 0.9763539059470031,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 15,
+     "rho_hat": 0.9029492725206693,
+     "sep_rate": -0.13627946635984836,
+     "infnorm_sup": 1.0322157131823062,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 20,
+     "rho_hat": 0.9736735560807618,
+     "sep_rate": -0.12428161513980102,
+     "infnorm_sup": 1.1273046203730455,
+     "contract_death": false,
+     "harm_death": false
+    }
+   ],
+   "status": "ok"
+  },
+  {
+   "arm": "NONE",
+   "n": 16,
+   "seed": 2028,
+   "lam": 0.0,
+   "theta": null,
+   "final_ce": 3.614411234855652,
+   "deaths_contract": 0,
+   "deaths_harm": 0,
+   "rollbacks": 0,
+   "n_meas": 4,
+   "death_rate": 0.0,
+   "never_touched_death": true,
+   "window_max_rho": 0.9554741854393746,
+   "rho_excess_integral": 0.0,
+   "admit_core_active": 0,
+   "admit_core_steps": 0,
+   "final_rho_hp": 0.9608480444414913,
+   "trajectory": [
+    {
+     "step": 5,
+     "rho_hat": 0.9264868042138473,
+     "sep_rate": -0.10116748836149744,
+     "infnorm_sup": 0.9587184022895135,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 10,
+     "rho_hat": 0.9270259505845889,
+     "sep_rate": -0.09818063263399507,
+     "infnorm_sup": 0.9690436275155889,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 15,
+     "rho_hat": 0.9311097463412961,
+     "sep_rate": -0.09397335176624406,
+     "infnorm_sup": 1.0075653143791885,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 20,
+     "rho_hat": 0.9554741854393746,
+     "sep_rate": -0.07566581072658442,
+     "infnorm_sup": 1.1355142457137182,
+     "contract_death": false,
+     "harm_death": false
+    }
+   ],
+   "status": "ok"
+  },
+  {
+   "arm": "NONE",
+   "n": 16,
+   "seed": 2029,
+   "lam": 0.0,
+   "theta": null,
+   "final_ce": 3.550861954689026,
+   "deaths_contract": 0,
+   "deaths_harm": 0,
+   "rollbacks": 0,
+   "n_meas": 4,
+   "death_rate": 0.0,
+   "never_touched_death": true,
+   "window_max_rho": 0.9246657811858314,
+   "rho_excess_integral": 0.0,
+   "admit_core_active": 0,
+   "admit_core_steps": 0,
+   "final_rho_hp": 0.9131834074578891,
+   "trajectory": [
+    {
+     "step": 5,
+     "rho_hat": 0.8245391869620587,
+     "sep_rate": -0.21281447691516678,
+     "infnorm_sup": 0.9180415167252438,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 10,
+     "rho_hat": 0.8252246115643073,
+     "sep_rate": -0.21013731282996045,
+     "infnorm_sup": 0.9712586041157318,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 15,
+     "rho_hat": 0.8438567139420555,
+     "sep_rate": -0.18791506998397,
+     "infnorm_sup": 1.0468853626081938,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 20,
+     "rho_hat": 0.9246657811858314,
+     "sep_rate": -0.14359257358077285,
+     "infnorm_sup": 1.1472861133843044,
+     "contract_death": false,
+     "harm_death": false
+    }
+   ],
+   "status": "ok"
+  },
+  {
+   "arm": "ENDO_GRAD",
+   "n": 16,
+   "seed": 2026,
+   "lam": 0.1,
+   "theta": 0.95,
+   "final_ce": 3.3343344926834106,
+   "deaths_contract": 0,
+   "deaths_harm": 0,
+   "rollbacks": 0,
+   "n_meas": 4,
+   "death_rate": 0.0,
+   "never_touched_death": true,
+   "window_max_rho": 0.8853150748921133,
+   "rho_excess_integral": 0.0,
+   "admit_core_active": 0,
+   "admit_core_steps": 1,
+   "final_rho_hp": 0.8945636737575732,
+   "trajectory": [
+    {
+     "step": 5,
+     "rho_hat": 0.8620980484380707,
+     "sep_rate": -0.18071242561809342,
+     "infnorm_sup": 0.9220160946364605,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 10,
+     "rho_hat": 0.8621949167196237,
+     "sep_rate": -0.17531881563570814,
+     "infnorm_sup": 0.9600947286184556,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 15,
+     "rho_hat": 0.8611394960223675,
+     "sep_rate": -0.16656797704984969,
+     "infnorm_sup": 0.9861311526780921,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 20,
+     "rho_hat": 0.8853150748921133,
+     "sep_rate": -0.17182312852258355,
+     "infnorm_sup": 1.0071466039633348,
+     "contract_death": false,
+     "harm_death": false
+    }
+   ],
+   "status": "ok"
+  },
+  {
+   "arm": "ENDO_GRAD",
+   "n": 16,
+   "seed": 2027,
+   "lam": 0.1,
+   "theta": 0.95,
+   "final_ce": 3.4415827989578247,
+   "deaths_contract": 0,
+   "deaths_harm": 0,
+   "rollbacks": 0,
+   "n_meas": 4,
+   "death_rate": 0.0,
+   "never_touched_death": true,
+   "window_max_rho": 0.9340724510301585,
+   "rho_excess_integral": 0.0,
+   "admit_core_active": 0,
+   "admit_core_steps": 1,
+   "final_rho_hp": 0.9341167253657583,
+   "trajectory": [
+    {
+     "step": 5,
+     "rho_hat": 0.8431283812291479,
+     "sep_rate": -0.19749028371235025,
+     "infnorm_sup": 0.9386776124783266,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 10,
+     "rho_hat": 0.8523404119040103,
+     "sep_rate": -0.19287706490189824,
+     "infnorm_sup": 0.9616967757956066,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 15,
+     "rho_hat": 0.8841514671739895,
+     "sep_rate": -0.1488265984002544,
+     "infnorm_sup": 0.9917608516107825,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 20,
+     "rho_hat": 0.9340724510301585,
+     "sep_rate": -0.16869352475553168,
+     "infnorm_sup": 1.0392380621009936,
+     "contract_death": false,
+     "harm_death": false
+    }
+   ],
+   "status": "ok"
+  },
+  {
+   "arm": "ENDO_GRAD",
+   "n": 16,
+   "seed": 2028,
+   "lam": 0.1,
+   "theta": 0.95,
+   "final_ce": 3.6220414638519287,
+   "deaths_contract": 0,
+   "deaths_harm": 0,
+   "rollbacks": 0,
+   "n_meas": 4,
+   "death_rate": 0.0,
+   "never_touched_death": true,
+   "window_max_rho": 0.9345739039672462,
+   "rho_excess_integral": 0.0,
+   "admit_core_active": 0,
+   "admit_core_steps": 1,
+   "final_rho_hp": 0.9383993472057363,
+   "trajectory": [
+    {
+     "step": 5,
+     "rho_hat": 0.9260817943009398,
+     "sep_rate": -0.10125697864921107,
+     "infnorm_sup": 0.9448560556027086,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 10,
+     "rho_hat": 0.9261406085919092,
+     "sep_rate": -0.10048524031692976,
+     "infnorm_sup": 0.9523662293996443,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 15,
+     "rho_hat": 0.9263152864404405,
+     "sep_rate": -0.10001032033333754,
+     "infnorm_sup": 0.9698900834984238,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 20,
+     "rho_hat": 0.9345739039672462,
+     "sep_rate": -0.09340382000166923,
+     "infnorm_sup": 1.0416096532644996,
+     "contract_death": false,
+     "harm_death": false
+    }
+   ],
+   "status": "ok"
+  },
+  {
+   "arm": "ENDO_GRAD",
+   "n": 16,
+   "seed": 2029,
+   "lam": 0.1,
+   "theta": 0.95,
+   "final_ce": 3.5608956813812256,
+   "deaths_contract": 0,
+   "deaths_harm": 0,
+   "rollbacks": 0,
+   "n_meas": 4,
+   "death_rate": 0.0,
+   "never_touched_death": true,
+   "window_max_rho": 0.8970950849490771,
+   "rho_excess_integral": 0.0,
+   "admit_core_active": 0,
+   "admit_core_steps": 1,
+   "final_rho_hp": 0.8939875656377436,
+   "trajectory": [
+    {
+     "step": 5,
+     "rho_hat": 0.8245391869620587,
+     "sep_rate": -0.21281447691516678,
+     "infnorm_sup": 0.9180415167252438,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 10,
+     "rho_hat": 0.8244057594332066,
+     "sep_rate": -0.2107906456564896,
+     "infnorm_sup": 0.9637430152423438,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 15,
+     "rho_hat": 0.8350296228007932,
+     "sep_rate": -0.19919243735463343,
+     "infnorm_sup": 0.9989601288177549,
+     "contract_death": false,
+     "harm_death": false
+    },
+    {
+     "step": 20,
+     "rho_hat": 0.8970950849490771,
+     "sep_rate": -0.17399264972124867,
+     "infnorm_sup": 1.0500416227276637,
+     "contract_death": false,
+     "harm_death": false
+    }
+   ],
+   "status": "ok"
+  }
+ ],
+ "stage1_verdict": {
+  "n": 16,
+  "S1_NONE_death_active": {
+   "none_death_rate": 0.0,
+   "pass": false,
+   "note": "INACTIVE -> exclude this n"
+  },
+  "S2_tautology_nonapplicable": {
+   "never_touched_frac": 1.0,
+   "pass": false,
+   "note": "tautology suspect (gate-like)"
+  },
+  "S3_gate_silence": {
+   "admit_core_active": 0,
+   "admit_core_steps": 4,
+   "pass": true,
+   "note": "C14 gated silence OK"
+  },
+  "S5_egrad_window_max_rho": 0.9127641287096488,
+  "go_stage2": false
+ }
+}
