@@ -65,6 +65,20 @@ def cert_two_admits(decay, W, V, max_input_abs=1.0) -> bool:
                for v in _box_vertices(t_lo))
 
 
+def cert_b2_admits(decay, W, V, max_input_abs=1.0) -> bool:
+    """vertex-free B2 = σ_max(|M| + R) < 1 (paper §8.3, 単一 SVD, 2^n 列挙なし=高次元 feasible)。
+
+    M = J(t_mid)(box 中点), R_ij = (1-decay_i)·((1-t_lo_i)/2)·|W_ij| (entrywise 半幅)。
+    box 上 sup σ_max(J) の sound 上界 (|J| ≤ |M|+R entrywise ∧ σ_max は非負支配で単調)。
+    cert_two の admit set ⊆ B2 (sound, 0 false-admit)。体系化: n=16 で cert_inf に収束(navigability 喪失)。
+    """
+    t_lo = _t_min(decay, W, V, max_input_abs)
+    t_mid = 0.5 * (t_lo + 1.0)
+    M = _jac_at_t(decay, W, t_mid)
+    R = ((1.0 - decay) * ((1.0 - t_lo) / 2.0))[:, None] * np.abs(W)
+    return bool(float(np.linalg.svd(np.abs(M) + R, compute_uv=False)[0]) < 1.0)
+
+
 def _band_metrics(sound, change, eps_grid, tau):
     """sound(bool array) と change(float array) から両立帯メトリクスを計算。"""
     eps_max = 0.0
