@@ -238,7 +238,8 @@ def pull_back_latency(variant, n, seed, target, admit_threshold, lr, cap, tau, k
 def coverage_probe(variant, n, seed, target, threshold, tau, k):
     raw_W, raw_decay = make_scaled_violating(n, seed, target)
     decay, W = cores_from_raw(raw_W, raw_decay)
-    inf0 = float(rows_torch(decay, W).max())
+    with torch.no_grad():
+        inf0 = float(rows_torch(decay, W).max())
     loss = torch.relu(agg(variant, rows_torch(decay, W), tau, k) - threshold)
     if raw_W.grad is not None:
         raw_W.grad = None
