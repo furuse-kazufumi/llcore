@@ -1,233 +1,236 @@
-# 「進化可能な LLM」FW — 確定再設計計画
+# 「進化可能な LLM」FW — 確定再設計計画 v2(評価枠組み主軸)
 
-**作成**: 2026-06-09
-**前提文書**: `docs/SYSTEMATIZATION_2026_06_09.md`(確定結論=GUARANTEE は立つ / CAPABILITY は decisive NEGATIVE / 4 条件 / 賭け 1-4)、`research/rllm_pivot/topology_evolution_prior_art.md`(prior-art マップ)
-**統合方法**: 5 設計案 + 3 敵対 judge スコアを統合。勝者 framing を核に runner-up の長所を接ぐ(単純な 1 案選択ではない)。
-**規律**: 全編 honest-disclosure。capability(進化が perplexity/CE で勾配を上回る)と guarantee(進化した個体が証明付きで安定)を**決して混同しない**。NEGATIVE を前景化する。load-bearing な実装事実は `src/llcore/` で一次照合済。
+**作成**: 2026-06-09 / **改訂**: v2(フォーク (b) 採択 + red-team must-fix 全反映)
+**前提文書**: `docs/SYSTEMATIZATION_2026_06_09.md`(体系化=GUARANTEE は立つ / CAPABILITY は decisive NEGATIVE / 4 必要条件 / 賭け 1-4)、`research/rllm_pivot/topology_evolution_prior_art.md`(prior-art)、`docs/EVOLVABLE_LLM_PLAN_REDTEAM_2026_06_09.md`(敵対 red-team 決定メモ=F1-F13 + 数理判定 + 戦略フォーク)
+**意思決定**: 5 設計案 → 3 judge 採点(E=20 最高 / A=B=19 / C=18 / D=16)→ 4 レンズ敵対 red-team → **ディレクター判断で主軸 = (b) Verified-Plasticity Evaluation Framework を採択**。
+**規律**: 全編 honest-disclosure。capability(進化が perplexity/CE で勾配を上回る)と guarantee(進化した個体が証明付きで安定)を**決して混同しない**。load-bearing な実装事実は `src/llcore/` 一次照合済。
 
-> **一行宣言**: 本計画は「**guarantee 主軸 + capability terrain-design を明示ラベル付き falsifiable 副線**」の構成を採る。judge 2 案が同点(各 total 19/25)だが、honest_alignment 満点の guarantee-first(案 A=VSOA)を**主軸**に、terrain-capability-bet(案 B)を **meta-gate 付き副線**に、verified-topology-NAS(案 3, prior-art 象限 A=最も未踏)の **三者分業 framing** を接ぐ。
+> **一行宣言(v2)**: 本 FW の主軸は **Verified-Plasticity Evaluation Framework** — 「実小型 LLM の online 構造適応が *発散しない・収縮する(ρ<1 を sound に保つ)* か」を第一級指標に据え、llcore 唯一の confirmatory 資産(6 装置の統計的厳密性ハーネス)で **任意の候補 method を falsifiable に測る評価枠組み**。VSOA(cert_inf-gated topology evolution)は枠組みで測る**最初の被験 method**、capability terrain-bet は **Phase2 必須の上振れ実験**(EXISTS/NULL/ARTIFACT verdict を産む)。この主軸転換で red-team の fatal 3 件(F2 退避先 / F4 score 逆転 / F7 主軸独立性)が構造的に解消する——**機構が失敗しても「枠組みの妥当性 + 測定された negative」が deliverable として残る**。
 
 ---
 
 ## ① エグゼクティブ・サマリ
 
-**FW を一文で**: 実小型 LLM(SmolLM2-135M)に後付けした **n≤16 の verified recurrent adapter block** に対し、その**離散トポロジー(width / branch / op)を進化が探索**し、各構造変更を**訓練ループ内に常駐する per-component cert_inf fail-closed gate** が `ρ<1` で admit/reject し、**重みは gradient に全面譲渡**する——「証明付きで安定な構造変更だけが世代を越える」三者分業フレームワーク。
+**FW を一文で**: 実小型 LLM(SmolLM2-135M)に後付けした **n≤16 の verified recurrent adapter block** の online 構造適応について、「**成長操作下でも収縮 certificate(ρ<1)を sound に保てるか**」「**block 間 coupling 込みで合成安定か**」「**離散トポロジー軸は多峰か**」を、事前登録・Holm 連言・artifact 規律・反証条項・自己検出力監査・反 over-claim critic の **6 装置**で測る評価枠組み。複数 method(VSOA cert_inf-gate / 無 gate baseline / STABLE 風経験 gate / Mamba stable-by-construction 正の対照)を plug-in して比較する。
 
-**価値命題(guarantee 主軸)**: 売りは guarantee 一本。「PostNAS と同じ後付け構造探索だが、**採用する各 architecture が収縮 certificate(ρ<1, echo-state 安定)を持つ**——provably-stable architecture を産む NAS を、Kaggle T4 級の安さで訓練ループ内に常駐させ、無 gate baseline 比で online drift(出力ノルム発散 ρ→1 越境)を有意に抑える」。**capability(perplexity 改善・進化が勾配に勝つ)は一切売りにしない**(M3 戒め)。prior-art 象限 A(verified gate × 構造進化 × LLM 認知核=corpus 全実装研究で空白)に正確に着地する。
+**価値命題(評価枠組み = deliverable)**: 売りは「**provably-stable online structural adaptation を測る、再現可能で falsifiable な評価枠組み**」そのもの。既存 NAS が accuracy/latency/FLOPs で compete するのに対し、本枠組みは「発散しない・収縮する構造適応」を第一級指標にし、stability-plasticity の TRIZ 矛盾を **guarantee 側から測る**。**capability(perplexity 改善・進化が勾配に勝つ)は一切売りにしない**(M3 戒め)。被験 method が何を出しても(PASS でも第一級 negative でも)枠組みの妥当性が deliverable になる——これが脆弱な単一機構に賭けない設計。
 
-**最大の賭け**: 案の唯一の価値「0 *観測* false-admit」が、**未実装の `width_grow`(Net2Net function-preserving 拡張)× cert_inf soundness の整合**に全面依存する。しかも `width_grow` が n を増やすと `_t_min` の `M=Σ|W|` が単調増加 → `sech²(M)` が縮む → achievable-t box が広がる → 拡張後に `sup‖J‖∞` が 1 を越えやすくなる**構造的圧力**がある。これは「リスク」ではなく**存立条件**であり、Phase 1 で潰せねば案全体が崩壊する(§⑩ 賭け 1 / 撤退条件参照)。
-
----
-
-## ② 5 設計の比較と勝者選定
-
-### 2.1 比較表
-
-| 案 | angle | judge total | 核心 | fatal flaw / 最大弱点 |
-|---|---|---|---|---|
-| **A** | A-guarantee-first(VSOA: Verified-Stable Online Adaptation) | **19/25** | 構造変更を per-component cert_inf fail-closed gate で admit/reject。capability 封印・guarantee 主軸。次元の壁を「block を小 n に切る」設計制約に転化 | `width_grow×Net2Net×cert_inf` soundness 未証明=**存立条件**(リスクでなく)。width_grow が box を広げ soundness が壊れやすい構造的圧力。novelty は STABLE との 2 点差に圧縮 |
-| **B** | B-terrain-capability-bet(Multimodal-Landscape Verified Evolution) | **19/25** | 多峰/欺瞞地形を意図的に構成し ③(MAP-Elites)が gradient を held-out CE で上回るか BG10 meta-gate 付きで falsify。capability の**存否**を決着 | 最尤シナリオ(NULL→guarantee 退避)の着地点が案 A=「高価な多峰検証を経て案 A が既に居る場所に戻る」公算。novelty は方法論資産に限定 |
-| **3** | C-role-split-verified-NAS(Contraction-Gated Topology Mutation) | (truncated, 推定 guarantee 系) | gradient=重み / 進化=離散 topology / verified gate=provably-stable architecture のみ採用、の三者分業。prior-art 象限 A「最も未踏」に着地 | 案 A と同系の guarantee-niche。NAS 機構自体は Jet-Nemotron/PostNAS で枯れ、正味 novelty は「certificate × NAS × 安さ」の交差のみ |
-| 4 | (入力 JSON で truncated) | — | — | — |
-| 5 | (入力 JSON で truncated) | — | — | — |
-
-> ⚠ honest 留保: 入力 JSON で案 3 は途中まで、案 4/5 は本文未到達。確認できた範囲(案 1=A / 案 2=B / 案 3 冒頭)で統合判断する。案 3 は案 A と同じ guarantee-first 系で prior-art 象限 A に着地し、framing(三者分業 NAS)が最も明快——よってその **framing を主軸の説明枠**として採用する。
-
-### 2.2 勝者選定理由
-
-1. **honest 制約整合が最優先**: judge は 2 案とも honest_alignment=5 / guarantee_capability_honesty=5(B は 4)を付け、SYSTEMATIZATION の confirmatory/NEGATIVE 線引きと矛盾しない唯一の framing が **guarantee-first** であることを確認。CAPABILITY decisive NEGATIVE(M3)を主張で踏まない案だけが 3 敵対レビューを構造的に通過する。
-2. **B 単独は最尤で A に合流する**: judge B verdict「最尤シナリオは NULL→guarantee 退避、その着地点は prior-art 既定本命(案 A)と一致」。よって B を主軸にすると高価な遠回りになる。**B は capability の存否を falsify する副線**として価値を保つ(EXISTS なら最大差別化、NULL なら decisive negative が guarantee-niche を正当化)。
-3. **3 案の framing が最も運べる**: 「gradient=重み / 進化=離散 topology / verified gate=安定 architecture」の三者分業は、§7.2-3(b)「進化を勾配の解けない離散自由度へ移す」を実装に直結させ、M3(素の loss 地形で進化は無価値)を**構造的に回避**する。
-4. **接ぎ木の方針**: **A の核(small-n verified block + cert_inf fail-closed gate + width_grow soundness を存立条件として最優先検証)** + **B の副線(terrain-design + capability-vs-artifact meta-gate)** + **3 の framing(三者分業 NAS、prior-art 象限 A)**。
+**最大の賭け(数理判定済)**: 枠組みの最初の被験 method VSOA の存立は「width_grow 後も cert_inf soundness が保たれる **非自明な進化価値を持つ両立帯 ε>0** が存在するか」に賭かる。red-team 数理判定 = **条件付き成立**(dead-on-arrival ではない: per-row 不変条件で soundness 保存可、EXP5b 0/2000。だが自明経路=死んだ unit では無進化)。両立帯の存否は **Phase -1 の純数値 scan(実装投資ゼロ)で最初に潰す**。空でも枠組みは「contraction-gate は動的構造成長と両立しない」という第一級 negative を産んで生存する。
 
 ---
 
-## ③ 確定 framing(統合版)
+## ② 主軸選定(フォーク (b))と解消された fatal
 
-### 3.1 FW の定義
+### 2.1 5 設計 × judge × red-team の意思決定マトリクス(F4 反映)
 
-> **「進化可能な LLM」FW = 実小型 LLM の重みを gradient に全面譲渡し、進化は gradient が微分できない離散トポロジー空間(block の width / branch / op 種別)だけを探索し、各構造変更候補を訓練ループ内に常駐する per-component sound contraction certifier(cert_inf, `ρ<1`)が fail-closed に admit/reject し、admit された provably-stable な architecture のみを gradient が訓練する——三者分業フレームワーク。**
+| 案 | angle | judge total | honest_align | 確立済資産活用 | ユーザーゴール適合 | 存立条件の脆さ | 採否 |
+|---|---|---|---|---|---|---|---|
+| **E** | Verified-Plasticity Evaluation Framework | **20** | 5 | **6 装置を前景化** | 「FW 確立」を評価枠組みとして満たす | **FAIL でも生存** | **主軸採択** |
+| A | guarantee-first VSOA | 19 | 5 | 6 装置を埋没 | 実進化 FW だが脆い | 単一点 collapse(F1/F7) | **最初の被験 method へ** |
+| B | terrain-capability-bet | 19 | 4 | — | capability 存否を決着 | 最尤 NULL | **Phase2 必須副線へ** |
+| C | role-split verified-NAS | 18 | — | — | 三者分業 framing | A と同系 | framing を③に流用 |
+| D | literal verified-NAS | 16 | — | — | 字義的だが novelty 最狭 | — | 不採用 |
 
-これは Jet-Nemotron/PostNAS を「証明付き」にした NAS であり、llcore Stage-B「検証 core を訓練ループ内 long-range path に」を実 base へ拡張したものである。
+### 2.2 主軸を E にしたことで解消された red-team fatal
 
-### 3.2 価値命題(guarantee 主軸・capability 封印)
+- **F2(退避先が価値ゼロ着地の承認ゲート)解消**: 評価枠組みが主軸なので、VSOA の機構失敗は「退避」でなく **measurable な第一級 negative=評価資産**。「別物の退避先」を作る必要が消える(枠組み自体が destination)。
+- **F4(judge 最高 E を退避先に降格した score 逆転)解消**: E を主軸に据え直し、確立済 confirmatory 資産(6 装置)を前景化。
+- **F7(主軸独立性の崩壊)解消**: 主軸が単一機構(width_grow×cert_inf)に依存しなくなる。method-agnostic な枠組みは存立条件 FAIL でも生存。
 
-| 項目 | 内容 |
-|---|---|
-| **第一義の売り** | 採用 architecture **全件が訓練ループ内 cheap gate で形式安定 certificate(ρ<1)を持つ**。無 gate baseline 比で online drift(出力ノルム ρ→1 越境)を有意に抑える |
-| **capability の扱い** | perplexity は gradient/PostNAS と**同等を目指す(勝つと言わない=M3 honest)**。可塑性を殺さない(無 gate と perplexity 有意差なし)ことのみ示す |
-| **正味 novelty(狭く明示)** | 「certificate × NAS mutation × 実 LLM × T4 級の安さ」の統合縮約。機構(node/branch を動かす / MAP-Elites / certificate)はどれも単独先行あり=盛れない。**capability 目新しさはゼロ** |
-| **prior-art 着地** | 象限 A(形式安定 gate × 逐次自己改変 × LLM 認知核=corpus 全実装研究で空白)。STABLE(2510.16089)が gate 発想を既踏、差は「パラメータ編集→構造変更」「経験 budget→sound cert_inf」の 2 点のみ(honest) |
-| **FullSense 接続** | on-prem / Approval Bus / 責任ある AI 哲学と整合する「迂回できない安定 gate」。fail-closed = FullSense デフォルト |
-
-### 3.3 North Star(測れる成功)
-
-guarantee 主軸の北極星は **2 点同時成立**(perplexity 改善幅は北極星に**含めない**):
-
-1. **certified-stable rate = 100%**: 進化が探索した N 個の architecture 候補のうち admit された**全件**が `ρ<1` certificate を持ち、**0 *観測* false-admit を実 LLM block で維持**。
-2. **capability 非劣化 + drift 抑制**: admit 集団から gradient 訓練した best architecture が、(i) 無 gate baseline と perplexity で**有意差なし**(可塑性を殺していない)、(ii) online drift(長系列出力ノルム発散 ρ→1 越境)が無 gate / STABLE 風経験 gate より**有意に小さい**(片側検定 p<0.05, 事前登録)。
-
-**副線(terrain-design)の北極星**: `capability-or-artifact verdict ∈ {EXISTS, NULL, ARTIFACT}` を proper power で 1 つ確定すること(perplexity 改善幅ではない)。
+> ⚠ honest 留保: (b) でも普及ファネルは別途空白になりうる(F11)。「評価枠組み」自体は地味=§⑫ で consumer story + 動きで魅せるデモ + 需要側証拠 を必須対応とする。
 
 ---
 
-## ④ base 選定
+## ③ 確定 framing — Verified-Plasticity Evaluation Framework
+
+### 3.1 FW の定義(主軸)
+
+> **「進化可能な LLM」FW = 実小型 LLM に後付けした verified recurrent adapter の online 構造適応 method を入力に取り、(i) 成長操作下の収縮 soundness、(ii) block 間 coupling 込みの合成安定、(iii) 離散トポロジー軸の多峰性、(iv) capability の存否(terrain EXISTS/NULL/ARTIFACT)を、6 装置の統計的厳密性ハーネスで falsifiable に測り、method 間で比較する評価枠組み。**
+
+被験 method を差し替え可能にする 3 plug-point(`minimal_ga` の `GeneCodec`=基質 / `Objective`=方向 / `VerifierBackend`=gate)を **framework 約束として明文化・テスト化**(F8)。
+
+### 3.2 何を測るか(被験 method、§④で詳述)
+
+VSOA(cert_inf-gated topology evolution)/ 無 gate baseline / STABLE 風経験 gate / Mamba stable-by-construction(正の対照)。
+
+### 3.3 6 装置(llcore 唯一の confirmatory 資産=枠組みの背骨)
+
+事前登録→結果順 / Holm 連言 / アーティファクト規律 / 反証条項 / 自己検出力監査 / 反 over-claim critic。SYSTEMATIZATION §3.6 で framework 化済・自己検出力監査が n=15 で gate 健全と確認(suppress=False)。**この方法論層なしに「進化が本物」と主張する権利は成立しない**——だからこれを deliverable の核に据える。
+
+---
+
+## ④ 被験 methods(plug-in 比較対象)
+
+| method | 役割 | 内容 |
+|---|---|---|
+| **VSOA(cert_inf-gate)** | 最初の被験 method | 重みは gradient、進化は離散トポロジー(width/branch/op)、訓練ループ内 per-component cert_inf fail-closed gate が ρ<1 で admit/reject |
+| **無 gate baseline** | 負の対照 | gate なし。HD-1 で ρ→1.95 発散(既確立)。枠組みが「危険な method」を検出できるか |
+| **STABLE 風経験 gate** | 既踏比較 | stability budget を経験メトリクス(EM drop/KL)で clip-or-reject(arXiv:2510.16089)。sound cert_inf との soundness/コスト比を測る |
+| **Mamba-130M(stable-by-construction)** | 正の対照 | 非正の最大 Lyapunov 指数(arXiv:2406.00209)で cert が自明 PASS。枠組みの判別力(SmolLM2 で reject 発生 / Mamba で自明 PASS)を示す |
+
+> 枠組みの妥当性 = 「負の対照(無 gate)を危険と・正の対照(Mamba)を安全と・既踏(STABLE)を soundness で区別して測れるか」。これが §⑥ North Star の中核。
+
+---
+
+## ⑤ base 選定(変更なし)
 
 | 役割 | モデル | license | 理由 |
 |---|---|---|---|
-| **主 base** | **SmolLM2-135M** (HuggingFace) | Apache-2.0 | (a) certificate 計算成立帯(Lipschitz-Transformer arXiv:2507.13338 が 2M〜145M で成立)と param 帯が重なる**唯一の安全帯**、(b) 135M なら Kaggle T4 で full fine-tune + 多世代探索が現実的、(c) Qwen 回避で商用障壁なし(`feedback_qwen_commercial_barrier`) |
-| **副 base(正の対照)** | **Mamba-130M** (state-spaces) | Apache-2.0 | stable-by-construction(arXiv:2406.00209, 非正の最大 Lyapunov 指数)= **cert が自明 PASS する正の対照**。gate の判別力(SmolLM2 で reject 発生 / Mamba で自明 PASS)を示す。GPU カーネル依存ゆえ**副経路のみ**(主経路は T4 純正に保つ) |
-| **再現性予備** | Pythia-160M (EleutherAI) | Apache-2.0 | 学習過程 checkpoint 公開 = ablation/再現性に強い |
-| **除外** | Gemma 系 | Gemma license(Apache/MIT 要件外) | license 要件外で除外 |
+| **主 base** | **SmolLM2-135M** | Apache-2.0 | certificate 計算成立帯(Lipschitz-Transformer arXiv:2507.13338 が 2M〜145M)と重なる唯一の安全帯。T4 で full fine-tune + 多世代探索が現実的。Qwen 回避(商用障壁) |
+| **正の対照** | **Mamba-130M** | Apache-2.0 | stable-by-construction = cert 自明 PASS の正の対照。GPU カーネル依存ゆえ副経路のみ(主経路は T4 純正) |
+| **再現性予備** | Pythia-160M | Apache-2.0 | 学習過程 checkpoint 公開 |
+| **除外** | Gemma 系 | Apache/MIT 要件外 | license 除外 |
 
-> ⚠ honest 留保: param/license は公開情報からの記載。**採用前に各モデルカードで再確認**(prior-art §⑧)。base 凍結 + 探索対象 block のみ可変(PostNAS 流の MLP/attention 凍結戦略)で T4 budget を守る。1B 級 scratch CPU 学習は**不可能と明言**——base 継承を死守。
-
----
-
-## ⑤ 最初の 1 構造部品 + gate 設計
-
-### 5.1 最初に進化させる構造単位
-
-**SmolLM2-135M に後付けする 1 個の recurrent adapter block(verified core)** = `CoupledNDGene` 型 `(decay∈[0,1]^n, W∈[-2,2]^{n×n})`、**n を小さく固定(n=8〜16)**。
-
-なぜこの低次元 certificate を許すか(**次元の壁を設計制約に転化**):
-
-1. **certificate は block 全体でなく*この小 n の Jacobian* だけに掛かる**——実 LLM の数千次元 weight space を直接 certify しない(`2^n` 壁を回避する設計上の分離)。
-2. `cert_inf` は `_infnorm_sup(decay, W, t_lo) < 1`(`backends.py:111-119`)で **per-row O(n²) 閉形式・頂点列挙ゼロ**=ladder で**唯一スケールする段**(SYSTEMATIZATION §1.2 表「唯一スケール」)。一次照合済: `_infnorm_sup` は `for i in range(n)` の per-row ループで 2^n 列挙を含まない。
-3. この block を Stage-B 流に「実 Transformer 内の唯一の long-range/adaptive path」に配線すれば、core が load-bearing(Stage-B B-G1 4/4)かつ certify 対象は n 次元に閉じる。
-
-地形多峰性は「block の topology(branch 有無 / op 種別 / memory horizon)という離散自由度」に注入し、連続 `(decay, W)` は gradient に任せる分業(§6 の三者分業を実装に焼く)。
-
-### 5.2 gate 設計(どの certificate を実 LLM 次元で成立させるか)
-
-**per-component 低次元 cert_inf を主力**にする。SYSTEMATIZATION §5.2 が示す通り、実 LLM 次元では `cert_two`/`cert_sdp` は `2^n` 壁(n=32 で 1099GB)で測定不能、vertex-free B2 も n=16 で cert_inf に収束(scale 解にならない)。よって:
-
-| 設計判断 | 内容 |
-|---|---|
-| **block を小 n に切る** | 各 block の Jacobian に cert_inf(O(n²) 閉形式 `sup‖J‖∞<1`, 頂点フリー)を per-component に掛ける=**次元の壁の*下*で動く**設計 |
-| **soundness 範囲** | achievable-t box(`_t_min = 1 - tanh²(Σ|W| + max_input·Σ|V|)`, `backends.py:96-98`)上で保証。0 *観測* false-admit を継承(機械証明でなく数値検査+独立 eigen 再検査と明示) |
-| **multi-block 合成** | 各 block 独立 cert_inf を **AND** して保守的に合成安定を保証(per-component 合成は低次元のまま)。**⚠ 後述の coupling 盲点リスクを承知の上で**——§⑪ 留保参照 |
-| **gate 常駐位置** | **訓練ループ内に常駐**(Stage-B B-G4: post-hoc certify は 17-19x コスト + 学習破壊)。admit = `ρ<1` sound 証明済の topology 変異のみ世代越え |
-| **fail-closed admission** | `minimal_ga` の fail-closed admission(reject → resample_cap=50 → known-safe fallback `(decay=0.5, mix=0, gate_str=0)`, 閉形式 L=0.5<1)を流用 |
-| **SDP rung の扱い** | 副 base Mamba(stable-by-construction)や n≤8 の対照でのみ「より緩い feasible set が navigable」を示す**補助**に使い、主張の主軸には載せない |
-| **gate 選択基準** | BG10 教訓: **gate を soundness/coverage のみで選び navigability で選ばない**(gradient が gate-indifferent ゆえ、§6.2 条件 3) |
-| **Z3/SMT** | orthogonal optional として封印(decorative。SYSTEMATIZATION §1.2: 証明の主役は収縮 certifier) |
+> ⚠ param/license は採用前に各モデルカード再確認。base 凍結 + adapter のみ可変で T4 budget を守る。1B 級 scratch CPU 学習は不可能と明言。
 
 ---
 
-## ⑥ 進化機構(ChangeOp の実構造手術化)
+## ⑥ 第一級指標と North Star(F3/F8 反映: トートロジー除去 + framework 性追加)
 
-### 6.1 何を進化させるか
+**削除した非新規命題(F3)**: 「certified-stable rate=100%」(=admit の定義の言い換え=トートロジー)、「gate付き<無gate 単純 drift 比」(=機能する filter の定義効果、tiny で既 PASS)は North Star から**削除**。
 
-上記 recurrent adapter block の **離散トポロジー自由度**(branch 追加/削除、op 入替、memory horizon ±1、width ±1)。連続 `(decay, W)` は **gradient が担当**、進化は **gradient の解けない離散層**を担当する分業。
+**North Star = 5 軸(falsifiable かつ新規なもののみ)**:
 
-### 6.2 ChangeOp の実構造手術化(pivot 必須作業)
+1. **成長操作下 soundness(新規・主命題, F3)**: width_grow/branch_add で構造を成長させた後も `_infnorm_sup` の box-bound が独立 eigen 再検査と不一致(false-admit)を起こさない。**成長操作 N 回中 false-admit ≥1 で FAIL**(=存立条件と一本化)。
+2. **coupling-aware 合成 soundness(新規・第二存立条件, F6)**: 2 block を residual で結合した最小系の**実 Jacobian の真 ρ** を独立 eigen で測り、per-block cert が admit した構成で合成 ρ≥1 が 1 件でも出れば FAIL。per-block AND を禁止し block 間 coupling 込み cert を要求。
+3. **枠組み判別力(F4 → 枠組み妥当性)**: 負の対照(無 gate=危険)/ 正の対照(Mamba=安全)/ 既踏(STABLE=経験 gate)を soundness で区別して測れる。
+4. **framework 性(F8)**: (a) N 世代後の admit topology が param-shift baseline 比で構造的に多様化し、その多様性が held-out tasks への汎化に load-bearing。(b) 新 base / 新 changeop / 新 certifier を 1 オブジェクト差替で載せ替えられる拡張性(3 plug-point をテスト化)。
+5. **capability verdict(Phase2 必須, F12)**: terrain-design で `EXISTS/NULL/ARTIFACT` を proper power で 1 つ確定。
 
-**⚠ 現 ChangeOp は実構造手術でない**(一次照合済): `changeop.py` の `apply_changeop`(line 160-193)は scalar `StateUpdateGene` の 3 float(`decay`/`mix`/`gate_str`)のみを操作し、`kernel_swap_mock`(line 21, 189-192)は「実 NN kernel 交換ではなく gate 構造の mock スイッチ」と明記。`CoupledNDGene` の `(decay, W)` n 次元構造には一切触れない。VSOA の全機構は新規実装を要する:
+**主軸 PASS から外す(NULL 許容副次, F7/F13)**: H-forgetting(忘却抑制)は H2 系 3 件が系統的 NULL(memory 軸 Δ≈+0.0134 極小)ゆえ高確率 NULL を事前登録で許容、立てば bonus。
 
-| move | 実装 | gate |
+---
+
+## ⑦ 進化機構 / ChangeOp の実構造手術化(F1 per-row 訂正反映)
+
+### 7.1 何を進化させるか
+
+recurrent adapter block(`CoupledNDGene` の `(decay∈[0,1]^n, W∈[-2,2]^{n×n})`, n≤16)の**離散トポロジー自由度**(branch 追加/削除、op 入替、width ±1)。連続 `(decay,W)` は gradient、進化は gradient の解けない離散層を担当する分業。
+
+### 7.2 ChangeOp の実構造手術化(pivot 必須・未実装)
+
+**⚠ 現 ChangeOp は実構造手術でない**(一次照合済 `changeop.py:160-193`): scalar 3 float のみ操作、`kernel_swap_mock` は「実 NN kernel 交換でなく mock スイッチ」と明記、`CoupledNDGene` の n 次元構造に触れない。新規実装を要する。
+
+| move | 実装 | gate(F1 訂正済) |
 |---|---|---|
-| **param shift**(既存) | 現 ChangeOp の decay/mix/gate_shift をそのまま | per-component cert_inf 再計算 |
-| **`width_grow`** | W を `(n)→(n+1)` に **Net2Net** 流 function-preserving 拡張で初期化(拡張直後は元と同関数, arXiv:1511.05641) | 拡張後 Jacobian が box 上で `sup‖J‖∞<1` を破らないことを **stress 検証**(§⑩ 賭け 1) |
-| **`branch_add`** | 並列 recurrent path 追加 | 追加後 per-block cert_inf を AND 合成 |
-| **`op_swap`** | kernel 種別の*実*置換(mock でない) | 置換後 cert_inf 再計算 |
+| `width_grow` | W を `(n)→(n+1)` に **Net2Net** function-preserving 拡張(arXiv:1511.05641) | **per-row 不変条件**: 新 column 寄与後の各既存行 `Σ_j|W[i,j]| ≤ 元` を保ち `ti=1` での sup が 1 を越えないこと(✕ box 拡大ではない) |
+| `branch_add` | 並列 recurrent path 追加 | **block 間 coupling 込み**の結合 cert(per-block AND 禁止, F6) |
+| `op_swap` | kernel 種別の*実*置換(mock でない) | 置換後 per-row sup 再計算 |
+| param shift(既存) | decay/mix/gate_shift | per-component cert_inf 再計算 |
 
-各 move は世代横断で certifier に問い合わせ、**変更後の per-block cert_inf が `ρ<1` を sound に証明できなければ fail-closed reject**。gate するのは「move が安定 certificate を破らないこと」**のみ**で、fitness(capability)で gate しない——適応は許すが発散・忘却は許さない **homeostatic constraint**。Net2Net 初期化で「構造を安全に大きくする」を function-preserving に担保し、cert_inf がその上で online 力学の収縮を保証する**二段構え**。
+> **F1 数理訂正(最重要)**: `_infnorm_sup`(`backends.py:111-119`)は per-row sup の max で `ti∈{t_lo[i],1.0}` 端点。sup は 99.6% の行で `ti=1` 達成(box 幅と無関係)。よって真の越境脅威は「**新 column が既存行 i の `off_i=Σ_{j≠i}|W[i,j]|` を増やし `ti=1` の sup が 1 超**」=per-row abs-sum 増(EXP4 が PASS→FAIL 0.847→1.039 実測)。「box 拡大」は起きない脅威で、旧 stress-test はこれを偽 PASS していた。width_grow gate は per-row 不変条件で fail-closed reject。
+>
+> **両立帯の本質(③ honest)**: per-row 不変条件で soundness は保てる(自明)が、結合ゼロ=関数保存だが死んだ unit(無進化)、結合非ゼロ=進化するが abs-sum 増、の間に「**非自明な進化価値を持つ ε>0 帯**」があるかが真の存立条件。Decision gate の PASS に「非自明な進化価値を持つ admit ≥1 件」を AND で課す(死んだ unit の自明 PASS を排除)。
 
-> ⚠ Net2Net × cert_inf 整合の構造的圧力(honest): `width_grow` で n が増えると `_t_min = 1 - tanh²(M)` の `M = Σ|W|` が単調増加 → `sech²(M)` が縮む → `t_min` が下がり achievable-t box が広がる → 拡張後に `sup‖J‖∞` が 1 を越えやすくなる。**この soundness が VSOA の存立条件**(§⑩ 賭け 1)。
+各 move は世代横断で per-row + coupling cert に問い合わせ、破れば fail-closed reject。**gate は安定 certificate を破らないことのみで gate し、fitness(capability)で gate しない**=適応は許すが発散・忘却は許さない homeostatic constraint。
 
 ---
 
-## ⑦ 事前登録 existence-bet
+## ⑧ 事前登録 existence-bet(真に新規な命題のみ)
 
-### 7.1 主軸(guarantee, falsifiable, capability 封印, negative 可)
+### 8.1 主軸(枠組み妥当性 + 真に未検証な soundness)
 
-> **H-feasibility**: SmolLM2-135M に後付けした n≤16 verified adapter block に対し、per-component cert_inf fail-closed gate 付きの構造変更(width_grow/branch_add/op_swap を含む)online 適応 N 世代閉ループは、T4/30h budget の **X% 以内**で完走する。
+> **H-growth-soundness(主命題)**: SmolLM2-135M に後付けした n≤16 adapter に対し、width_grow/branch_add で構造成長後も per-row cert_inf が **0 *観測* false-admit** を維持(成長操作 N 回中 false-admit ≥1 で FAIL)。
 >
-> **H-stability(certified-stable rate)**: admit された**全件**が `ρ<1` certificate を持ち、無 gate baseline が `ρ_eff>1` へ越境する適応系列で gate 付きは `ρ_eff<1` を **0 *観測* false-admit** で維持する(HD-1 の ρ→1.95 越境の再現を実 LLM core で示す)。
+> **H-coupling-soundness(第二存立条件, F6)**: 2 block residual 結合の実 Jacobian 真 ρ を独立 eigen で測り、per-block cert が admit した構成で合成 ρ≥1 が 1 件でも出れば FAIL(per-block AND の coupling 盲点を正面検定)。
 >
-> **H-drift / H-forgetting**: 同一適応予算で、gate 付きは online drift(出力ノルム発散)/ 保持タスク held-out CE 劣化が無 gate / STABLE 風経験 gate より片側 p<0.05 で小さい。
+> **H-discriminative(枠組み妥当性)**: 枠組みが 無 gate(危険・ρ→1.95)/ Mamba(安全・自明 PASS)/ STABLE(経験 gate)を soundness で区別して測れる。
 
-**封印**: capability(絶対 perplexity 改善・進化 > 勾配)は仮説に**入れない**(M3 戒め)。可塑性非劣化(無 gate と perplexity 有意差なし)のみ確認。
+### 8.2 副線(capability terrain-bet, Phase2 必須, F12)
 
-### 7.2 副線(terrain-design, capability-vs-artifact meta-gate)
-
-> **H-EXISTS**: SmolLM2-135M の long-range memory block に、(a) behavioral-reach 欺瞞 corridor または (b) 構造化推論/riddle/shiritori 由来の離散多峰、を持つ事前登録 fitness family を構成したとき、`ρ<1` fail-closed gate 付き MAP-Elites(③)が同予算 gradient と random を fresh-seed held-out CE で honest_eval 4 条件 AND(`diff>0 ∧ 片側 Wilcoxon p<0.05 ∧ n_seeds≥15 ∧ |paired_sign_delta|≥0.147`)で上回る constellation が ≥1 個**存在する**。
+> **H-multimodal(前提条件, F9)**: 離散トポロジー軸(width/branch/op)が多峰か。width_grow greedy baseline vs MAP-Elites archive を同予算比較し、greedy が並べば**単峰=capability 立たず**と事前宣言(M3 が離散軸でも再現)。
 >
-> **capability-vs-artifact meta-gate(BG10)**: ③ が勝った constellation に **gradient-on-same-terrain で利得が消えないこと**を要求。消えれば `ARTIFACT`(navigability 最適化現象)判定 → guarantee 副線へ退避。消えなければ `EXISTS=True` を proper power(n80)で確定試行。
+> **H-EXISTS**: 多峰が確認された fitness family 上で、ρ<1 gate 付き MAP-Elites が同予算 gradient/random を fresh-seed held-out CE で honest_eval 4 条件 AND(`diff>0 ∧ 片側 Wilcoxon p<0.05 ∧ n_seeds≥15 ∧ |paired_sign_delta|≥0.147`)で上回る constellation が ≥1 存在する。
+>
+> **capability-vs-artifact meta-gate(BG10)**: 勝った constellation で gradient-on-same-terrain でも利得が消えなければ `EXISTS`、消えれば `ARTIFACT`(navigability 最適化現象)→ guarantee 主軸へ。立たねば `NULL`(実 small-LLM 地形は単峰=decisive negative=研究成果)。
 
-**verdict ∈ {EXISTS, NULL, ARTIFACT}**: capability を主張するのでなく**存否を決着**させる。EXISTS なら FullSense 唯一の capability 差別化、NULL/ARTIFACT なら「実 small-LLM 損失地形は単峰/navigability artifact」の **decisive negative が guarantee-niche を正当化**(どちらも publishable な honest 結論)。
+### 8.3 negative 全面許容(撤退でなく評価資産化)
 
-### 7.3 negative 全面許容
-
-- 全 family で ③ が gradient に並ぶ/負ける(M3 の full-LLM 再現)→ `EXISTS=False` 確定、guarantee 副線へ退避と事前宣言。
-- `ρ<1` 強制で適応タスク性能が baseline より有意劣化(可塑性が殺される=M3/H2 が示唆する後者リスク)→「contraction gate が能力を殺さない」が反証され、guarantee の実用価値が縮小と honest に宣言。
-- gate 付き・無 gate で忘却差が NULL(H2 系の系統的反証圧が再発)→ guarantee が忘却に効かないと開示。
+- 両立帯 ε>0 が空 → 「contraction-gate は動的構造成長と両立しない」を第一級 negative として枠組みが測定(deliverable)。
+- ρ<1 強制で適応性能が有意劣化 → 「contraction gate が可塑性を殺す」を反証・honest 開示。
+- terrain NULL/ARTIFACT → 「実 small-LLM 損失地形は単峰/navigability artifact」の decisive negative。
+- H-forgetting NULL → 高確率を事前許容済、主軸 PASS から除外。
 
 ---
 
-## ⑧ Kaggle feasibility-first PoC
-
-**最初の 1 本で「安さ × 形式保証」を潰す。** T4(16GB×2, 30h, resumable)に収めるか外挿で判定。
+## ⑨ Kaggle feasibility-first PoC
 
 | 項目 | 内容 |
 |---|---|
-| **最大の計算リスク** | 「構造変更 1 回ごとの cert_inf 検証 × N 世代 × M block」が budget を食うか。**特に width_grow が n を成長させると cert コストが n² で増大**(judge B fatal flaw: 固定 n 前提と本案の構造成長が緊張) |
-| **cert_inf コスト見込み** | per-block O(n²)・頂点列挙ゼロで n≤16 なら μ秒〜ms 級=forward/backward に対し無視可の**見込みだが要実測** |
-| **PoC 合否判定** | Phase 0: SmolLM2-135M load + 数百 step fine-tune が T4 で回ることだけ確認 → Phase 1: 「変異 1 回 + cert_inf 1 回 + held-out CE 1 回」の wall-time/MB を実測し 30h に N 世代分が収まるか外挿。**width_grow 後の成長 n でも再計測**(固定 n の 1 回計測で過小評価しない) |
-| **超過時の縮小** | base は SmolLM2-135M 固定、block n を 8 へ縮小 or family 数を削る。重い base 学習(1B scratch CPU)は明示放棄 |
-| **resumable** | MAP-Elites archive / checkpoint で 30h 跨ぎに対応 |
-| **GPU カーネル依存** | Mamba は副 base のみ(主経路を T4 純正に保つ) |
+| **最大の計算リスク** | 構造変更 1 回ごとの cert(per-row + coupling)× N 世代 × M block が budget を食うか。**width_grow が n を成長させると cert コストが n² で増大** |
+| **cert_inf コスト見込み** | per-block O(n²)・頂点列挙ゼロで n≤16 なら μs〜ms 級=forward/backward に対し無視可の見込みだが**成長 n でも要実測** |
+| **PoC 合否** | §⑩ Phase -1(純数値 scan)→ Phase0(load+fine-tune)→ Phase1(変異1回+cert1回+CE1回の wall-time/MB 実測 → 30h に N 世代収まるか外挿、成長 n で再計測) |
+| **超過時縮小** | base 固定、block n を 8 へ、family 数削減。1B scratch CPU は明示放棄 |
+| **resumable** | MAP-Elites archive / checkpoint で 30h 跨ぎ対応 |
 
 ---
 
-## ⑨ Phase 0/1/2 ロードマップ + decision gate
+## ⑩ Phase −1/0/1/2 ロードマップ + decision gate
 
-### Phase 0 — base 継承(リスクほぼ無)
-- SmolLM2-135M を Kaggle Notebook で load → 数百 step fine-tune が T4 で回ることを確認。副 base Mamba-130M を control に。
-- 「動かせる最小構造単位」= 1 個の verified adapter block(n≤16 の `(decay,W)`)を 1 個だけ特定。**トポロジー全探索はしない。**
-- **instrument 校正**(副線準備): 構成した fitness family が本当に多峰/欺瞞かを決定論化(eval_noise を機械 eps へ)して valley_fraction で検証(deceptiveness-measure N/A の instrument 問題を最初に潰す。positive control=合成多峰、negative control=ESN 単峰)。
-- **Decision gate 0**: load + 数百 step が T4 で回る → GO。回らねば縮小。
+### Phase −1 — 純数値 両立帯 scan(F5: 最優先・実装投資ゼロ)
+- SmolLM2/Net2Net **不要**。`_infnorm_sup`/`_t_min` だけで synthetic `CoupledNDGene` を n→n+1 拡張し、新 unit 結合 `|W[i,n+1]|,|W[n+1,j]|` を 0 から増やしながら (a) 関数が非自明に変わる かつ (b) 全既存 row `_infnorm_sup<1` を保つ **ε>0 帯が存在するか**を実測。
+- **max_input_abs 較正**: SmolLM2 入力 `abs(x)_inf` を実測し sound 上界に設定(現 1.0 ハードコード `backends.py:154/171` の box 被覆未検証を是正)。
+- **Decision gate −1**: ε>0 両立帯が**存在 → GO**(VSOA を最初の被験 method として続行)。**空 → VSOA は「成長と両立不能」の第一級 negative を枠組みが記録し、被験 method を固定 topology / 経験 gate / Mamba 比較へ切替**(枠組みは生存)。最尤失敗を最安・最速で引く。
 
-### Phase 1 — 最初の 1 部品の検証付き online 適応(feasibility 主役 + **存立条件検証**)
-1. その block の Jacobian に対し per-component cert_inf(`_infnorm_sup<1`)で `ρ` 上界を安く計算する関数を実装し、固定構造で `ρ` が測れることを確認。
-2. **ChangeOp を実構造手術へ拡張**(`width_grow`=Net2Net function-preserving / `branch_add` / `op_swap`)を **`width_grow` 1 種だけ**実装。
-3. **存立条件 stress 検証(最優先)**: `width_grow` 1 回で拡張後 Jacobian が box 上で `sup‖J‖∞<1` を破らないことを stress 検証(0 false-admit を**成長操作下で**再確認)。**ここが通らなければ即 案 3/評価枠組みへ退避**(§⑩ 賭け 1)。
-4. mutation × gate の 1 ループ:構造変異 → 変異後 cert_inf 再計算 → `ρ<1` で admit / さもなくば fail-closed reject の閉ループを 1 世代回す。
-5. **feasibility 測定(合否判定)**: 変異 1 回 + cert 検証 1 回の秒/MB を実測し 30h に N 世代収まるか外挿(成長 n でも再計測)。
-- **Decision gate 1**: (3) 存立条件 PASS **かつ** (5) feasibility PASS → Phase 2 へ。(3) FAIL → 即退避。
+### Phase 0 — base 継承 + instrument 校正
+- SmolLM2-135M load + 数百 step fine-tune が T4 で回ることを確認。Mamba-130M を正の対照に。
+- 1 個の adapter block(n≤16)を特定。**トポロジー全探索はしない。**
+- **多峰性 instrument 校正(F9)**: 構成 fitness family が本当に多峰/欺瞞かを決定論化(eval_noise を機械 eps へ)し valley_fraction で検証(positive control=合成多峰、negative control=ESN 単峰)。
+- **Decision gate 0**: load+fine-tune が T4 で回る → GO。
 
-### Phase 2 — homeostasis 主張(guarantee 主軸)+ 差別化深掘り
-- admit された変異のみ世代横断で積み、無 gate / STABLE 風経験 gate に対し (a) `ρ_eff<1` 維持 0 観測 false-admit、(b) 保持タスク忘却/drift の有意減を**事前登録検定**で示す。capability は二の次、guarantee メトリクスを主軸に報告。
-- Mamba 副 base で gate 判別力(SmolLM2 で reject 発生 / Mamba で自明 PASS)を対照。
-- **副線(任意・余力時)**: terrain-design family 上で MAP-Elites vs gradient vs random を honest_eval → capability-vs-artifact meta-gate で EXISTS/NULL/ARTIFACT を 1 つ確定。
-- **Decision gate 2**: H-stability/H-drift PASS → guarantee 差別化として結実。副線 EXISTS → capability 差別化を追加主張。
+### Phase 1 — 被験 method 測定(soundness 主役)
+1. per-component cert_inf(`_infnorm_sup<1`)で ρ 上界を安く計算する関数を実装、固定構造で ρ が測れることを確認。
+2. ChangeOp を実構造手術へ拡張(`width_grow`=Net2Net + **per-row 不変条件 gate**)を `width_grow` 1 種だけ実装。
+3. **存立条件 stress(per-row, F1)**: width_grow 1 回で**各既存行 abs-sum が `ti=1` sup を 1 超させない**ことを stress 検証(0 false-admit を成長操作下で再確認)。**PASS 条件に「非自明な進化価値を持つ admit ≥1」を AND**。
+4. **coupling stress(F6)**: 2 block residual 結合の真 ρ を独立 eigen で測り per-block AND の盲点を検定。
+5. mutation×gate の 1 ループを回し feasibility(変異1回+cert1回の秒/MB → 30h 外挿、成長 n で再計測)。
+- **Decision gate 1**: (3) PASS ∧ (4) PASS ∧ (5) feasibility PASS → Phase 2。いずれか FAIL → 枠組みが第一級 negative を記録し被験 method を切替(撤退でなく測定)。
 
----
-
-## ⑩ make-or-break 賭け 1-4 への回答 + 撤退条件
-
-| 賭け | SYSTEMATIZATION の定義 | 本計画の回答 | negative 時の退避 |
-|---|---|---|---|
-| **賭け 1(存立条件: width_grow×cert_inf soundness)** | 案の唯一の価値「0 false-admit」が未実装の width_grow×Net2Net×cert_inf 整合に依存。width_grow が box を広げ soundness が壊れやすい構造的圧力 | **Phase 1 step 3 を最優先**: width_grow 1 種を実装 → 拡張後 Jacobian が box 上で `sup‖J‖∞<1` を破らないことを stress 検証(0 false-admit を成長操作下で再確認) | **FAIL → 即 案 3(固定アーキの guarantee 副線=topology を成長させず param-shift + branch のみ)または評価枠組みへ退避を事前登録に明記** |
-| **賭け 2(スケール: 2^n 壁)** | n=32 で 1099GB。vertex-free B2 も n=16 で cert_inf に収束 | **block を小 n(n≤16)に切る設計制約で 2^n 壁の*下*で動く**。cert_inf(O(n²)頂点フリー)を主力に。SDP rung は補助のみ | cert_inf 単独に縮退でも guarantee は成立(最弱だが sound)。賭け 4 と連動 |
-| **賭け 3(transfer: tiny→実 LLM)** | 全実証が proxy/mock/小スケール(~0.5M)。実 LLM transfer 未検証 | SmolLM2-135M を主 base に選定(cert 成立帯 2M〜145M と重なる)。**「切り出した低次元 core が実 LLM で load-bearing か」は Stage-B tiny からの外挿=未検証と明示**(§⑪) | transfer 未達なら guarantee の実 LLM 妥当性が縮小と honest 開示。Stage-B 範囲に主張を限定 |
-| **賭け 4(guarantee の scale 連結崩壊)** | 実 LLM 次元で cert_inf 単独に縮退すると「強い verifier が fitness 解放」L3 物語が検証不能=ladder 階梯価値が消える | **L3 物語を主軸に載せない**(SDP rung は補助)。主軸は「cert_inf 1 段で 0 false-admit を保つこと」のみ。階梯価値を主張しないことで賭け 4 を回避 | ladder 階梯が崩れても「安いが最弱な cert_inf 1 段」の guarantee は残る。忘却に効かねば案 3/評価枠組みへ |
-
-**総合撤退条件**: Phase 1 step 3(存立条件)FAIL なら案全体崩壊 → **即 案 3(成長させない固定 topology の guarantee)または評価枠組み(Verified-Plasticity Eval)へ退避**。capability 副線が NULL/ARTIFACT でも guarantee 主軸は独立に PASS 可能なので、副線の失敗は案全体を崩さない。
+### Phase 2 — 枠組み妥当性 + capability 必須副線 + framework 性
+- 4 method(VSOA / 無 gate / STABLE / Mamba)を枠組みで比較し **H-discriminative** を事前登録検定で示す。
+- **capability 副線(必須, F12)**: terrain family 上で MAP-Elites vs gradient vs random を honest_eval → meta-gate で EXISTS/NULL/ARTIFACT を 1 つ確定。
+- **framework 性(F8)**: topology 多様化の汎化 load-bearing + 3 plug-point 拡張性をテスト化。
+- adapter の実 LLM load-bearing(Stage-B B-G1「benefit が core dim と増大」)を SmolLM2 で再現(F10)。
+- **Decision gate 2**: H-discriminative + framework 性 PASS → 評価枠組みとして結実。capability EXISTS → 普及の派手な軸を追加。
 
 ---
 
-## ⑪ honest 留保
+## ⑪ make-or-break 賭け 1-4 への回答(主軸が評価枠組みになり弱まった)
 
-1. **正味 novelty の狭さ**: STABLE(2510.16089)が「LLM 編集を stability budget で clip-or-reject」で gate 発想を既踏。差は「パラメータ編集→構造変更」「経験 budget→sound cert_inf」の **2 点のみ**=査読で「delta が小さい・既存の自明な組合せ」と評される最大リスク。CT-BaB(2411.18235, 固定アーキ)/ Net2Net(1511.05641, 関数保存止まりで online 安定 certificate でない)/ COMP(2508.08144, LLM 非対象・approximate)/ Jet-Nemotron(2508.15884, 無 certificate・200B token)も近接。**capability 目新しさはゼロと明記**。corpus の「空白象限」主張は内部判断=外部再現不能と honest 開示。
+| 賭け | 本計画 v2 の回答 | negative 時 |
+|---|---|---|
+| **賭け 1(存立条件 width_grow×cert_inf)** | Phase −1 純数値 scan で ε>0 両立帯を最安・最速で判定(F5)。**枠組みが主軸なので空でも第一級 negative=資産** | 被験 method を固定 topology / 経験 gate / Mamba 比較へ切替、枠組み生存 |
+| **賭け 2(2^n 壁)** | block を小 n(≤16)に切り cert_inf(O(n²)頂点フリー)で壁の*下*で動く。SDP rung は Mamba/対照の補助のみ | cert_inf 単独でも枠組みの測定は成立 |
+| **賭け 3(transfer tiny→実 LLM)** | 「実 LLM」修飾を adapter scope に限定(F10)。adapter の load-bearing を Phase2 必須測定 | 未達なら「実 LLM 寄与は未確立」と開示 |
+| **賭け 4(guarantee の scale 連結崩壊)** | L3「強い verifier が fitness 解放」を主軸に載せない。主軸は「成長操作下 + coupling 込みで 0 false-admit を保つか」の測定 | ladder 階梯が崩れても枠組みの soundness 測定は残る |
 
-2. **transfer 未検証**: 「切り出した低次元 core が実 LLM で本当に load-bearing か」は Stage-B tiny-scale(~0.5M, 1 corpus, char-level, T4)からの外挿で、SmolLM2-135M への transfer は SYSTEMATIZATION が明示的に「未検証」とする領域(賭け 3)。Phase 1 feasibility が通っても guarantee の実 LLM 妥当性は別途残る。
+---
 
-3. **coupling 盲点リスク**: cert_inf の per-component AND 合成は、実 Transformer 内で block 間に residual/attention 経由の coupling がある場合に soundness が崩れうる。SYSTEMATIZATION §3.3 は「対角 scalar heuristic が 1267/3270 誤 admit、coupling-awareness が load-bearing」と明記。**block を小 n に切って独立扱いする設計はこの coupling 盲点を再導入するリスク**——per-block で閉じても block 間 coupling は未 certify。Phase 2 で block 間 coupling を含む安定性を別途検証する必要を明記。
+## ⑫ consumer story + 普及設計(F11: 評価枠組みの地味さを解く)
 
-4. **H2 系の系統的反証圧**: 「内的化/autonomy/safety 機構が優位を生む」仮説は SYSTEMATIZATION で 3 件とも NULL/not-supported(HD-1 H2 Holm p=0.058 / R-endo H2 Δ=−0.04 p=0.67 / viability autonomy NULL)。**忘却抑制(H-forgetting)が NULL に終わる確率は構造的に高い**(memory 軸 Δ≈+0.0134 極小の前例)。条件 4(memory horizon)が 4 本柱中最弱という確定事実と整合させ、事前登録で NULL を許容し、立たねば honest に開示する。
+1. **consumer story 1 本**: FullSense 3 製品のどれに乗るかを確定 —
+   - **第一候補 = llive 自己進化メモリ層**: llive の online 進化が verified gate で「発散・破滅的忘却しない」ことを本枠組みが fail-closed に保証・測定(`feedback_llive_measurement_purity` の on-prem 思想と整合)。
+   - 副候補 = llmesh SPC 適応制御の online 構造適応を verified gate が守る。
+2. **動きで魅せるデモ(guarantee 側, `project_f25_demo_polish`)**: 無 gate baseline が ρ→1.95 で**出力ノルムが発散していく** vs gate 付きが ρ<1 に留まる **リアルタイム可視化**=「破綻が止まる動き」=SNS 拡散素材。capability を捨てた分の派手さをここで作る。
+3. **需要側証拠 or 明示判断**: guarantee-niche の market 価値(産業 online 学習の発散事故 / EU AI Act high-risk 連続学習の安定性要求 等)を 1 つ提示する。出せなければ「市場価値は未実証・研究 niche への賭け」と明記し、ユーザー判断を仰ぐ(この時点では (b) 採択で枠組み妥当性が deliverable と確定済)。
 
-5. **soundness は機械証明でない**: 0 *観測* false-admit は「float `eigvalsh>0` の数値検査 + JSR oracle 片側有限長下界 + 独立 eigen 再検査」レベルであり、機械検証された定理ではない。確立は小スケール基質に限られる(SYSTEMATIZATION §0.1)。
+---
 
-6. **普及ファネルとして地味**: capability を捨てた分、派手な数値で人を惹く力がなく、SNS 拡散性(`project_f25_demo_polish` の採用ファネル先頭)としては弱い。guarantee-niche の純度 + feasibility 実証で勝負する。
+## ⑬ honest 留保(red-team が潰せなかった 5 リスク)
+
+1. **両立帯 ε>0 の存在は未証明**: per-row 不変条件で soundness は保てるが、非自明な進化価値を持つ admit が存在する帯が空(=死んだ unit でしか cert を保てない)可能性は Phase −1 scan まで不明。空なら width_grow は無進化操作に縮退。**枠組みはこの negative を測定して生存するが、VSOA という被験 method は空回り。**
+2. **transfer(賭け3)は本質的に未検証**: Stage-B tiny(~0.5M)→ SmolLM2-135M の load-bearing transfer は未検証領域。scope 限定(F10)で over-claim を防ぐのみ。
+3. **novelty の狭さは原理的に解消不能**: VSOA の STABLE との 2 点 delta は事実、corpus 空白象限は外部再現不能。need-side 証拠(F11)を出せねば「誰も困っていない問題」の疑いは残る(=評価枠組み主軸でも市場の問題は残る)。
+4. **coupling 盲点が原理的に soundness を崩す可能性**: F6 で第二存立条件に格上げするが、結合 cert に縮退すると賭け2(2^n 壁)と衝突。n=block 合計の feasibility 再判定が必要で、最悪「block を切る設計制約」自体が崩れる。Phase1 実測待ち。
+5. **評価枠組み主軸でも普及ファネルは空白になりうる**: E は honest だが地味。F11(consumer story + デモ + 需要側証拠)を満たさず capability(副線)も NULL なら、派手な軸は構造的に存在せず「研究 niche への賭け」をユーザーが受容するかに依存。red-team が解決できない戦略的トレードオフ。
+
+---
+
+## 付録: 一次照合済み実装事実 / 関連
+
+- `_infnorm_sup`(`backends.py:111-119`)= per-row sup の max, `ti∈{t_lo,1}` 端点 / `_t_min`(L96-98)/ `max_input_abs=1.0` ハードコード(L154/171, 較正対象)。
+- `_gate_admits` 4 モード + fallback `(0.5,0,0)` + `resample_cap=50`(`minimal_ga.py:223-308`)。
+- `changeop.py:160-193` = scalar 3 float のみ、`kernel_swap_mock` は mock(実構造手術は未実装)。
+- honest_eval 6 装置 / `paired_sign_delta`(教科書 Cliff's delta でないと明記)。
+- 関連 memory: `[[feedback_llcore_must_become_llm_relevant]]` / `[[project_llcore_gpu_3experiments_2026_06_06]]` / `[[feedback_benchmark_honest_disclosure]]` / `[[feedback_qwen_commercial_barrier]]` / `[[project_f25_demo_polish]]`。
+- audit trail: 本 v2 は (a) VSOA 主軸版を red-team(`EVOLVABLE_LLM_PLAN_REDTEAM_2026_06_09.md` F1-F13)+ ディレクター判断(フォーク (b))で全面改訂したもの。
