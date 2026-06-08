@@ -1,0 +1,272 @@
+{
+  "meta": {
+    "seed": 20260609,
+    "note": "full_true_rho は box sample 最大 = sup の下界 (blind-spot は下限)"
+  },
+  "per_n": {
+    "4": {
+      "n_rows": 3150,
+      "blind_spot_rate_overall": 0.4088888888888889,
+      "by_gamma": [
+        {
+          "gamma": 0.0,
+          "blind_spot_rate": 0.0,
+          "full_cert_admit_rate": 1.0,
+          "mean_true_rho": 0.9217360081461895
+        },
+        {
+          "gamma": 0.1,
+          "blind_spot_rate": 0.0,
+          "full_cert_admit_rate": 0.20666666666666667,
+          "mean_true_rho": 0.9219932010012774
+        },
+        {
+          "gamma": 0.2,
+          "blind_spot_rate": 0.0,
+          "full_cert_admit_rate": 0.04,
+          "mean_true_rho": 0.9229632133193544
+        },
+        {
+          "gamma": 0.30000000000000004,
+          "blind_spot_rate": 0.0,
+          "full_cert_admit_rate": 0.006666666666666667,
+          "mean_true_rho": 0.9247855856689022
+        },
+        {
+          "gamma": 0.4,
+          "blind_spot_rate": 0.0,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 0.9285184077577572
+        },
+        {
+          "gamma": 0.5,
+          "blind_spot_rate": 0.006666666666666667,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 0.9330872660259892
+        },
+        {
+          "gamma": 0.6000000000000001,
+          "blind_spot_rate": 0.04666666666666667,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 0.939073927120599
+        },
+        {
+          "gamma": 0.7000000000000001,
+          "blind_spot_rate": 0.06666666666666667,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 0.9488423747488436
+        },
+        {
+          "gamma": 0.8,
+          "blind_spot_rate": 0.11333333333333333,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 0.9599711909293998
+        },
+        {
+          "gamma": 0.9,
+          "blind_spot_rate": 0.22,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 0.9762808002414772
+        },
+        {
+          "gamma": 1.0,
+          "blind_spot_rate": 0.34,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 0.9949979437364914
+        },
+        {
+          "gamma": 1.1,
+          "blind_spot_rate": 0.43333333333333335,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 1.0170572451300155
+        },
+        {
+          "gamma": 1.2000000000000002,
+          "blind_spot_rate": 0.5733333333333334,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 1.0470274519905676
+        },
+        {
+          "gamma": 1.3,
+          "blind_spot_rate": 0.66,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 1.0747007386344762
+        },
+        {
+          "gamma": 1.4000000000000001,
+          "blind_spot_rate": 0.7533333333333333,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 1.1099424146108723
+        },
+        {
+          "gamma": 1.5,
+          "blind_spot_rate": 0.8,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 1.143969103813839
+        },
+        {
+          "gamma": 1.6,
+          "blind_spot_rate": 0.86,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 1.1816250556417056
+        },
+        {
+          "gamma": 1.7000000000000002,
+          "blind_spot_rate": 0.8866666666666667,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 1.2214065390896456
+        },
+        {
+          "gamma": 1.8,
+          "blind_spot_rate": 0.9333333333333333,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 1.265309787966494
+        },
+        {
+          "gamma": 1.9000000000000001,
+          "blind_spot_rate": 0.94,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 1.3083862373934212
+        },
+        {
+          "gamma": 2.0,
+          "blind_spot_rate": 0.9533333333333334,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 1.3507919880443717
+        }
+      ]
+    },
+    "8": {
+      "n_rows": 3150,
+      "blind_spot_rate_overall": 0.45396825396825397,
+      "by_gamma": [
+        {
+          "gamma": 0.0,
+          "blind_spot_rate": 0.0,
+          "full_cert_admit_rate": 1.0,
+          "mean_true_rho": 0.9507264712955174
+        },
+        {
+          "gamma": 0.1,
+          "blind_spot_rate": 0.0,
+          "full_cert_admit_rate": 0.02,
+          "mean_true_rho": 0.9508111860619094
+        },
+        {
+          "gamma": 0.2,
+          "blind_spot_rate": 0.0,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 0.9510162138489227
+        },
+        {
+          "gamma": 0.30000000000000004,
+          "blind_spot_rate": 0.0,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 0.951494952889823
+        },
+        {
+          "gamma": 0.4,
+          "blind_spot_rate": 0.0,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 0.9523631711852689
+        },
+        {
+          "gamma": 0.5,
+          "blind_spot_rate": 0.0,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 0.9538329119676291
+        },
+        {
+          "gamma": 0.6000000000000001,
+          "blind_spot_rate": 0.0,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 0.9560574972988402
+        },
+        {
+          "gamma": 0.7000000000000001,
+          "blind_spot_rate": 0.013333333333333334,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 0.9606950639485329
+        },
+        {
+          "gamma": 0.8,
+          "blind_spot_rate": 0.06666666666666667,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 0.9697072276112066
+        },
+        {
+          "gamma": 0.9,
+          "blind_spot_rate": 0.23333333333333334,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 0.9823767295702053
+        },
+        {
+          "gamma": 1.0,
+          "blind_spot_rate": 0.36666666666666664,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 1.0004184011205248
+        },
+        {
+          "gamma": 1.1,
+          "blind_spot_rate": 0.52,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 1.0246477473293494
+        },
+        {
+          "gamma": 1.2000000000000002,
+          "blind_spot_rate": 0.6666666666666666,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 1.0535133778022485
+        },
+        {
+          "gamma": 1.3,
+          "blind_spot_rate": 0.8266666666666667,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 1.0867908861766147
+        },
+        {
+          "gamma": 1.4000000000000001,
+          "blind_spot_rate": 0.92,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 1.1254253921217545
+        },
+        {
+          "gamma": 1.5,
+          "blind_spot_rate": 0.9533333333333334,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 1.1675723790106827
+        },
+        {
+          "gamma": 1.6,
+          "blind_spot_rate": 0.9866666666666667,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 1.2117616073779955
+        },
+        {
+          "gamma": 1.7000000000000002,
+          "blind_spot_rate": 0.9933333333333333,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 1.257601422806638
+        },
+        {
+          "gamma": 1.8,
+          "blind_spot_rate": 0.9933333333333333,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 1.303621071953344
+        },
+        {
+          "gamma": 1.9000000000000001,
+          "blind_spot_rate": 0.9933333333333333,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 1.3493250342050003
+        },
+        {
+          "gamma": 2.0,
+          "blind_spot_rate": 1.0,
+          "full_cert_admit_rate": 0.0,
+          "mean_true_rho": 1.3986424477325792
+        }
+      ]
+    }
+  }
+}

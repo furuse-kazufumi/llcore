@@ -49,13 +49,16 @@ def cert_inf_sup(decay, W, V, max_input_abs=1.0):
     return _infnorm_sup(decay, W, _t_min(decay, W, V, max_input_abs))
 
 
-def sample_admitted(rng, n, max_input_abs=1.0, w_scale=0.35, tries=3000):
+def sample_admitted(rng, n, max_input_abs=1.0, max_tries=60):
+    """W を admit するまで縮小して cert_inf PASS な (decay, W) を返す (任意 n で確実)。"""
     V = np.eye(n)
-    for _ in range(tries):
+    for _ in range(max_tries):
         decay = rng.uniform(0.0, 1.0, size=n)
-        W = rng.normal(0.0, w_scale, size=(n, n)) / np.sqrt(n)
-        if cert_inf_sup(decay, W, V, max_input_abs) < 1.0:
-            return decay, W
+        W = (rng.normal(0.0, 1.0, size=(n, n)) / np.sqrt(n)) * float(rng.uniform(0.2, 0.9))
+        for _ in range(50):
+            if cert_inf_sup(decay, W, V, max_input_abs) < 1.0:
+                return decay, W
+            W = W * 0.85
     return None
 
 
