@@ -94,18 +94,32 @@ def sample_admitted_base(rng, n, max_input_abs=1.0, max_tries=60):
 # --------------------------------------------------------------------------- #
 # width_grow: n -> n+1。新 unit の incoming(row n) / outgoing(col n) / self を ε でスケール
 # --------------------------------------------------------------------------- #
-def grow_one(decay, W, V, rng, eps, in_dir, out_dir, self_w, new_decay):
+def grow_one(decay, W, V, rng, eps, in_dir, out_dir, self_w, new_decay, mode="fresh", k=0):
+    """width_grow: n -> n+1。
+
+    mode="fresh"   : 新 unit の incoming/outgoing を両方 ε でスケール (新 state が O(ε)
+                     → 既存出力への影響 O(ε^2)。素朴な「無から新 unit 追加」)。
+    mode="net2net" : 計画の実スキーム近似。新 unit が活性既存 unit k の incoming を copy
+                     (新 state s_n が O(1) に駆動される)→ outgoing のみ ε で摂動
+                     (関数変化 O(ε)。Net2Net function-preserving の精神: 既存活性 unit を複製)。
+    """
     n = decay.shape[0]
     decay2 = np.empty(n + 1)
     decay2[:n] = decay
-    decay2[n] = new_decay
     W2 = np.zeros((n + 1, n + 1))
     W2[:n, :n] = W
-    # outgoing: 既存 row i <- 新 unit (col n) = 既存ダイナミクスを変える主因 (off-sum 増の主因)
-    W2[:n, n] = eps * out_dir
-    # incoming: 新 row n <- 既存 j (row n) = 新 state を駆動
-    W2[n, :n] = eps * in_dir
-    W2[n, n] = self_w
+    if mode == "fresh":
+        decay2[n] = new_decay
+        W2[:n, n] = eps * out_dir          # outgoing (既存 row の off 増)
+        W2[n, :n] = eps * in_dir           # incoming (新 state は ε で駆動 → O(ε))
+        W2[n, n] = self_w
+    elif mode == "net2net":
+        decay2[n] = decay[k]               # 活性 unit k の timescale を継承
+        W2[n, :n] = W[k, :n].copy()        # incoming を copy → s_n は s_k と同オーダー O(1)
+        W2[n, n] = 0.0                      # 新 self は 0 から
+        W2[:n, n] = eps * out_dir          # outgoing のみ ε 摂動 (既存への影響 O(ε))
+    else:
+        raise ValueError(mode)
     V2 = np.eye(n + 1)
     return decay2, W2, V2
 
