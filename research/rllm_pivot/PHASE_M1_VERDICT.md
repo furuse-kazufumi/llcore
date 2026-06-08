@@ -93,3 +93,28 @@ VSOA の width_grow は **存立条件 width_grow 自体(賭け1)では死なな
 **統合 verdict(width_grow + coupling)**: VSOA は **small-n・低 coupling・cert_two の regime で生存**(両立帯あり・per-block の代わりに full small-system cert)。だが (a) cert_two は 2^n で非スケール、(b) coupling は full-system 化で 2^(2n) に悪化。**唯一の活路 = navigability を保ったまま scale する vertex-free sound certifier**(体系化は候補 B2 が n=16 で cert_inf に収束=navigability 喪失を既示)。**現時点で「高次元で navigable かつ sound」な certifier の存在証拠はない = これが FW の最大の未解決の賭け**。
 
 正本データ = `phase_m1_coupling_results.json` / 実装 = `phase_m1_coupling_scan.py`。
+
+---
+
+## 7. B2 navigability-scale 測定(賭け2 直撃, vertex-free が navigability を scale で保つか)
+
+**問い**: navigable な cert_two は 2^n で非スケール。vertex-free **B2 = σ(|M|+R)**(paper §8.3, 単一 SVD, 高次元 feasible)は cert_two の navigability(両立帯を開く力)を高次元でも保つか、cert_inf に収束するか。`cert_b2_admits` を第3 certifier に追加し n={4,8,12,16} で測定。
+
+| n | cert_inf 両立帯 | **B2 両立帯** | cert_two 両立帯 | B2 ε_max 中央 |
+|---|---|---|---|---|
+| 4 | 0.033 / 0.108 | **0.100 / 0.258** | 0.575 / 0.667 | 0.385 / 0.269 |
+| 8 | 0.000 / 0.000 | **0.000 / 0.000** | 0.350 / 0.325 | 0.231 / 0.038 |
+| 12 | 0.000 / 0.000 | **0.000 / 0.000** | (2^n 不能) | 0.154 / 0.115 |
+| 16 | 0.000 / 0.000 | **0.000 / 0.000** | — | 0.231 / 0.308 |
+
+(各セル fresh / net2net。)
+
+**確定知見**:
+1. **B2 は n=4 でのみ部分的に navigable**(両立帯 0.10-0.26 = cert_inf ~0.03-0.11 と cert_two 0.58-0.67 の中間)、**n=8 で cert_inf に崩壊**(両立帯 0.000、ε_max も cert_inf 並み以下)、n=12/16 も空。
+2. **= 体系化 §8.5「vertex-free B2 coverage が n=8/12/16 で 87→77→60% と erode し n=16 で cert_inf に収束」を、構造成長の両立帯レベルで実証**。B2 は「navigability を保って scale する certifier」**ではない**。
+
+**★賭け2 の data-grounded 結論(make-or-break)**: **現存する sound certifier で「navigable かつ scalable」なものは存在しない** — cert_two(navigable)は 2^n 非スケール / cert_inf(scalable)は non-navigable / B2(唯一の vertex-free 架け橋候補)は n=8 で navigability 喪失。**∴ verified 構造進化(width_grow + coupling)は high-dim では成立せず、cert_two/B2 が navigable な small-n per-component(n≤4-6)regime に限定される。** VSOA は small-n method として生存。高次元 VSOA の成立には「未発見の navigable-かつ-scalable な sound certifier」が要る=現時点で存在証拠なし=FW の最大の未解決の賭けに **data-grounded な negative 寄りの答え**。
+
+**eval-framework(主軸)への含意**: 枠組みの最初の測定が「verified 構造進化は small-n に限定・高次元で navigable-sound certifier が無い」という第一級の研究知見を産んだ = (b) 主軸選択(機構に賭けず測る)が data で正当化された。capability(進化が勾配に勝つ)は M3 で既に NEGATIVE、本 Phase −1 で guarantee 側(verified 構造進化)も「high-dim では certifier 制約で成立しない」と判明 → **FW の正直な価値 = 「small-n verified 構造適応の安定性を測る評価枠組み + 高次元 navigable-sound certifier の不在という negative 知見」**。
+
+正本データ = `phase_m1_coviability_results.json`(B2 列含む) / 実装 = `phase_m1_coviability_scan.py`。
