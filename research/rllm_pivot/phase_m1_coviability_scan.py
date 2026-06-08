@@ -58,6 +58,39 @@ def cert_inf_sup(decay, W, V, max_input_abs=1.0) -> float:
     return _infnorm_sup(decay, W, _t_min(decay, W, V, max_input_abs))
 
 
+def cert_two_admits(decay, W, V, max_input_abs=1.0) -> bool:
+    """cert_two: achievable-t box 全頂点で σ_max(J)<1 (n<=8 で feasible; 2^n 頂点 SVD)。"""
+    t_lo = _t_min(decay, W, V, max_input_abs)
+    return all(float(np.linalg.svd(_jac_at_t(decay, W, v), compute_uv=False)[0]) < 1.0
+               for v in _box_vertices(t_lo))
+
+
+def _band_metrics(sound, change, eps_grid, tau):
+    """sound(bool array) と change(float array) から両立帯メトリクスを計算。"""
+    eps_max = 0.0
+    for k, eps in enumerate(eps_grid):
+        if sound[k]:
+            eps_max = eps
+        else:
+            break
+    alive_idx = np.where(change >= tau)[0]
+    eps_alive = float(eps_grid[alive_idx[0]]) if alive_idx.size else float("inf")
+    band_exists = eps_alive < eps_max
+    if band_exists:
+        in_band = (eps_grid >= eps_alive) & (eps_grid <= eps_max)
+        max_change_in_band = float(change[in_band].max())
+    else:
+        max_change_in_band = 0.0
+    return {
+        "eps_max": float(eps_max),
+        "eps_alive": eps_alive,
+        "band_exists": bool(band_exists),
+        "band_width": float(max(0.0, eps_max - eps_alive)),
+        "max_change_in_band": max_change_in_band,
+        "change_at_eps_max": float(np.interp(eps_max, eps_grid, change)),
+    }
+
+
 def row_bounds_at(decay, W, t_lo, ti_choice):
     """各 row i の bound を ti=ti_choice ('lo' or 'hi') で返す (box vs ti=1 分離用)。"""
     n = decay.shape[0]
