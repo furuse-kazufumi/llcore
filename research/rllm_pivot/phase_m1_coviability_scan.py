@@ -213,8 +213,9 @@ def main():
         print(f"[n={n}] 開始...", flush=True)
         Xs = [rng.normal(size=(L, n)) for _ in range(n_inputs)]  # |x|~N(0,1) (max_input_abs=1.0 と整合は別途留保)
         dom = ti1_dominance(rng, n, n_genes=300)
-        sweeps = []
         n_bases, n_dirs = 40, 3
+        modes = ("fresh", "net2net")
+        sweeps_by_mode = {m: [] for m in modes}
         got, attempts = 0, 0
         while got < n_bases and attempts < n_bases * 10:
             attempts += 1
@@ -224,41 +225,45 @@ def main():
             decay, W, V, sup0 = base
             headroom = 1.0 - sup0
             for _ in range(n_dirs):
-                s = sweep(decay, W, V, rng, Xs)
-                s["base_headroom"] = headroom
-                s["base_sup"] = sup0
-                sweeps.append(s)
+                for m in modes:
+                    s = sweep(decay, W, V, rng, Xs, mode=m)
+                    s["base_headroom"] = headroom
+                    s["base_sup"] = sup0
+                    sweeps_by_mode[m].append(s)
             got += 1
 
-        band = [s for s in sweeps if s["band_exists"]]
-        frac_band = len(band) / len(sweeps)
-        # headroom と band_width の関係 (3 分位)
-        hr = np.array([s["base_headroom"] for s in sweeps])
-        bw = np.array([s["band_width"] for s in sweeps])
-        be = np.array([1.0 if s["band_exists"] else 0.0 for s in sweeps])
-        order = np.argsort(hr)
-        thirds = np.array_split(order, 3)
-        by_headroom = []
-        for t in thirds:
-            by_headroom.append({
-                "headroom_mean": float(hr[t].mean()),
-                "frac_band": float(be[t].mean()),
-                "band_width_mean": float(bw[t].mean()),
-            })
-        max_change_band = np.array([s["max_change_in_band"] for s in sweeps if s["band_exists"]])
-        results["per_n"][str(n)] = {
-            "ti1_dominance_frac": float(dom),
-            "n_sweeps": len(sweeps),
-            "frac_coviability_band": float(frac_band),
-            "eps_max_median": float(np.median([s["eps_max"] for s in sweeps])),
-            "eps_alive_median_finite": float(np.median([s["eps_alive"] for s in sweeps if np.isfinite(s["eps_alive"])])) if any(np.isfinite(s["eps_alive"]) for s in sweeps) else None,
-            "band_width_median": float(np.median(bw)),
-            "max_change_in_band_median": float(np.median(max_change_band)) if max_change_band.size else 0.0,
-            "by_headroom_tercile": by_headroom,
-        }
-        print(f"[n={n}] ti=1 支配={dom:.3f}  両立帯あり={frac_band:.3f}  "
-              f"ε_max中央={np.median([s['eps_max'] for s in sweeps]):.3f}  "
-              f"band幅中央={np.median(bw):.3f}  帯内max変化中央={(np.median(max_change_band) if max_change_band.size else 0):.3f}", flush=True)
+        per_mode = {}
+        for m in modes:
+            sweeps = sweeps_by_mode[m]
+            frac_band = sum(1 for s in sweeps if s["band_exists"]) / len(sweeps)
+            hr = np.array([s["base_headroom"] for s in sweeps])
+            bw = np.array([s["band_width"] for s in sweeps])
+            be = np.array([1.0 if s["band_exists"] else 0.0 for s in sweeps])
+            order = np.argsort(hr)
+            by_headroom = []
+            for t in np.array_split(order, 3):
+                by_headroom.append({
+                    "headroom_mean": float(hr[t].mean()),
+                    "frac_band": float(be[t].mean()),
+                    "band_width_mean": float(bw[t].mean()),
+                })
+            mcb = np.array([s["max_change_in_band"] for s in sweeps if s["band_exists"]])
+            ce = np.array([s["change_at_eps_max"] for s in sweeps])
+            eps_alive_med = (float(np.median([s["eps_alive"] for s in sweeps if np.isfinite(s["eps_alive"])]))
+                             if any(np.isfinite(s["eps_alive"]) for s in sweeps) else None)
+            per_mode[m] = {
+                "n_sweeps": len(sweeps),
+                "frac_coviability_band": float(frac_band),
+                "eps_max_median": float(np.median([s["eps_max"] for s in sweeps])),
+                "eps_alive_median_finite": eps_alive_med,
+                "band_width_median": float(np.median(bw)),
+                "change_at_eps_max_median": float(np.median(ce)),
+                "max_change_in_band_median": float(np.median(mcb)) if mcb.size else 0.0,
+                "by_headroom_tercile": by_headroom,
+            }
+            print(f"[n={n}][{m:8s}] 両立帯あり={frac_band:.3f}  ε_max中央={np.median([s['eps_max'] for s in sweeps]):.3f}  "
+                  f"ε_alive中央={eps_alive_med}  ε_max時の関数変化中央={np.median(ce):.4f}  band幅中央={np.median(bw):.3f}", flush=True)
+        results["per_n"][str(n)] = {"ti1_dominance_frac": float(dom), "by_mode": per_mode}
 
     out = os.path.join(os.path.dirname(__file__), "phase_m1_coviability_results.json")
     with open(out, "w", encoding="utf-8") as f:
