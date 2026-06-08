@@ -1,0 +1,46 @@
+{
+ "8": {
+  "max": {
+   "mean_inf0": 1.5009859371248482,
+   "mean_cov": 0.125,
+   "mean_sat": 0.0
+  },
+  "logsumexp": {
+   "mean_inf0": 1.5009859371248482,
+   "mean_cov": 1.0,
+   "mean_sat": 0.0
+  },
+  "topk": {
+   "mean_inf0": 1.5009859371248482,
+   "mean_cov": 0.5,
+   "mean_sat": 0.0
+  },
+  "gated": {
+   "mean_inf0": 1.5009859371248482,
+   "mean_cov": 1.0,
+   "mean_sat": 0.0
+  }
+ },
+ "32": {
+  "max": {
+   "mean_inf0": 1.5301478603740895,
+   "mean_cov": 0.03125,
+   "mean_sat": 0.0
+  },
+  "logsumexp": {
+   "mean_inf0": 1.5301478603740895,
+   "mean_cov": 1.0,
+   "mean_sat": 0.0
+  },
+  "topk": {
+   "mean_inf0": 1.5301478603740895,
+   "mean_cov": 0.5,
+   "mean_sat": 0.0
+  },
+  "gated": {
+   "mean_inf0": 1.5301478603740895,
+   "mean_cov": 1.0,
+   "mean_sat": 0.0
+  }
+ }
+}

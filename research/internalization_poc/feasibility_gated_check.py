@@ -35,10 +35,18 @@ def check_silence(n_list, tau):
     print("\n[1] admit-core silence (gated logsumexp)")
     ok_all = True
     for n in n_list:
-        # 小さい raw_W で確実に admit 中核 (true infnorm << 1) を作る
+        # 確実に admit 中核 (true infnorm < 0.85) を作る: scale を bisection で詰める
         g = torch.Generator().manual_seed(n)
-        raw_W = (torch.randn(n, n, generator=g, dtype=DT) * (0.05 / n ** 0.5)).requires_grad_(True)
-        raw_decay = (torch.randn(n, generator=g, dtype=DT) * 0.5 + 1.0).requires_grad_(True)
+        base_W = torch.randn(n, n, generator=g, dtype=DT)
+        raw_decay_t = torch.randn(n, generator=g, dtype=DT) * 0.5 + 1.0
+        scale = 0.5
+        for _ in range(60):
+            decay = torch.sigmoid(raw_decay_t); W = 2.0 * torch.tanh(base_W * scale)
+            if float(M.rows_torch(decay, W).max()) < 0.85:
+                break
+            scale *= 0.6
+        raw_W = (base_W * scale).clone().requires_grad_(True)
+        raw_decay = raw_decay_t.clone().requires_grad_(True)
         decay, W = M.cores_from_raw(raw_W, raw_decay)
         true_inf = float(M.rows_torch(decay, W).max())
         thr = 0.95

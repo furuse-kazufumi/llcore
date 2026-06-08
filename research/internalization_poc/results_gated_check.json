@@ -1,5 +1,5 @@
 {
- "silence_ok": false,
+ "silence_ok": true,
  "latency_gated_vs_plain": {
   "32": [
    21.0,
