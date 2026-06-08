@@ -1,0 +1,48 @@
+{
+ "f_clause": {
+  "64": {
+   "none_death_rate": 0.47578125000000004,
+   "active": true
+  }
+ },
+ "active_n": [
+  64
+ ],
+ "H1": {
+  "per_n": {
+   "64": {
+    "median_death_diff": -0.475,
+    "p": 0.0004329514754108668,
+    "direction_ok": true,
+    "artifact_wmax_diff": -0.14845116587912754,
+    "artifact_rho_excess_diff": -4.479413770056778,
+    "artifact_continuous_agree": true,
+    "A4_infnorm_rho_spearman": 0.5618254619296033,
+    "A4_caveat": false,
+    "note": ""
+   }
+  },
+  "rep_p": 0.0004329514754108668,
+  "all_direction_ok": true
+ },
+ "H2": {
+  "per_n": {
+   "64": {
+    "harness_avoid": 1.0,
+    "harness_ce": 2.1152365567783513,
+    "interp_grad_ce_at_harness_avoid": 2.099927842617035,
+    "P(grad_ce<harness_ce)": 1.0,
+    "oob_frac": 0.0,
+    "p": 0.0,
+    "pass_pre_holm": true
+   }
+  },
+  "rep_p": 0.0
+ },
+ "holm": {
+  "H2": 0.0,
+  "H1": 0.0004329514754108668
+ },
+ "H1_PASS": true,
+ "H2_PASS": true
+}
