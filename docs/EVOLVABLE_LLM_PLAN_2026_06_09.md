@@ -220,7 +220,7 @@ recurrent adapter block(`CoupledNDGene` の `(decay∈[0,1]^n, W∈[-2,2]^{n×n}
 
 ## ⑬ honest 留保(red-team が潰せなかった 5 リスク)
 
-1. **両立帯 ε>0 の存在は未証明**: per-row 不変条件で soundness は保てるが、非自明な進化価値を持つ admit が存在する帯が空(=死んだ unit でしか cert を保てない)可能性は Phase −1 scan まで不明。空なら width_grow は無進化操作に縮退。**枠組みはこの negative を測定して生存するが、VSOA という被験 method は空回り。**
+1. **両立帯 ε>0 → cert_two・小 n で実証済(Phase −1 完了 2026-06-09)、scale が未解決**: per-row 不変条件 + cert_two・n≤4-6 で非自明な両立帯あり(n=4 で 58-67%, change@ε_max ~8.5%)。だが **cert_inf では空・cert_two は 2^n で非スケール・n=8 で既に borderline**。残る未解決 = **navigable な certifier を高次元へ scale できるか(賭け2 が本丸)**。net2net 近似は入力 copy なしで過小評価寄り、SDP/τ 感度・max_input_abs 較正は未測定。**枠組みはこの certifier-navigability×scalability トレードオフを第一級 negative として測定し生存するが、VSOA の高次元 width_grow が成立する保証はない。**
 2. **transfer(賭け3)は本質的に未検証**: Stage-B tiny(~0.5M)→ SmolLM2-135M の load-bearing transfer は未検証領域。scope 限定(F10)で over-claim を防ぐのみ。
 3. **novelty の狭さは原理的に解消不能**: VSOA の STABLE との 2 点 delta は事実、corpus 空白象限は外部再現不能。need-side 証拠(F11)を出せねば「誰も困っていない問題」の疑いは残る(=評価枠組み主軸でも市場の問題は残る)。
 4. **coupling 盲点が原理的に soundness を崩す可能性**: F6 で第二存立条件に格上げするが、結合 cert に縮退すると賭け2(2^n 壁)と衝突。n=block 合計の feasibility 再判定が必要で、最悪「block を切る設計制約」自体が崩れる。Phase1 実測待ち。
