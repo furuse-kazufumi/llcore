@@ -15,7 +15,9 @@
 
 **価値命題(評価枠組み = deliverable)**: 売りは「**provably-stable online structural adaptation を測る、再現可能で falsifiable な評価枠組み**」そのもの。既存 NAS が accuracy/latency/FLOPs で compete するのに対し、本枠組みは「発散しない・収縮する構造適応」を第一級指標にし、stability-plasticity の TRIZ 矛盾を **guarantee 側から測る**。**capability(perplexity 改善・進化が勾配に勝つ)は一切売りにしない**(M3 戒め)。被験 method が何を出しても(PASS でも第一級 negative でも)枠組みの妥当性が deliverable になる——これが脆弱な単一機構に賭けない設計。
 
-**最大の賭け(数理判定済)**: 枠組みの最初の被験 method VSOA の存立は「width_grow 後も cert_inf soundness が保たれる **非自明な進化価値を持つ両立帯 ε>0** が存在するか」に賭かる。red-team 数理判定 = **条件付き成立**(dead-on-arrival ではない: per-row 不変条件で soundness 保存可、EXP5b 0/2000。だが自明経路=死んだ unit では無進化)。両立帯の存否は **Phase -1 の純数値 scan(実装投資ゼロ)で最初に潰す**。空でも枠組みは「contraction-gate は動的構造成長と両立しない」という第一級 negative を産んで生存する。
+**最大の賭け(数理判定済)**: 枠組みの最初の被験 method VSOA の存立は「width_grow 後も cert soundness が保たれる **非自明な進化価値を持つ両立帯 ε>0** が存在するか」に賭かる。red-team 数理判定 = **条件付き成立**(dead-on-arrival ではない: per-row 不変条件で soundness 保存可、EXP5b 0/2000。だが自明経路=死んだ unit では無進化)。
+
+> **★【Phase −1 実測 完了 2026-06-09, $0/CPU → `research/rllm_pivot/PHASE_M1_VERDICT.md`】**: 両立帯は **dead-on-arrival でない** — *sound 緩和* certifier **cert_two**・**小 n** で実在(**n=4 で 58-67%**, change@ε_max ~8.5% ≫ τ=5%, band 幅 0.15-0.39 / **n=8 で 33-35%**, change@ε_max ~4% = borderline)。だが **唯一スケールする最保守 cert_inf では全 n で実質空**(change@ε_max <1%=sound 域では構造成長が関数をほぼ動かせない)。ti=1 支配 96-100% で **red-team F1(脅威は per-row off-sum 増、box 拡大でない)を実データ確認**。→ **make-or-break は賭け1(width_grow 自体)から賭け2(navigable な certifier を 2^n 壁を越えて scale できるか)へ collapse**(cert_two は navigable だが 2^n で非スケール / cert_inf はスケールするが navigable でない=体系化の L3 inf-trap/sound 緩和/次元の壁を構造成長レベルで再現)。**設計含意**: per-component block は cert_two が affordable な **n≤4-6 + cert_two gate** に小さく切る(cert_inf では band が開かないため per-component gate を cert_two に格上げ)。
 
 ---
 
