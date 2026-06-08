@@ -202,7 +202,7 @@ recurrent adapter block(`CoupledNDGene` の `(decay∈[0,1]^n, W∈[-2,2]^{n×n}
 | 賭け | 本計画 v2 の回答 | negative 時 |
 |---|---|---|
 | **賭け 1(存立条件 width_grow×cert)** **【実測済 → 緩和】** | Phase −1 純数値 scan 完了(PHASE_M1_VERDICT.md): 両立帯は **cert_two・小 n で実在**(n=4 で 58-67%)、**cert_inf では空**。→ **賭け1 は cert_two・small-n で PASS、make-or-break は賭け2 へ collapse** | cert_two・small-n でも非自明な進化価値が出ねば固定 topology / 経験 gate / Mamba 比較へ切替、枠組み生存 |
-| **賭け 2(2^n 壁)** | block を小 n(≤16)に切り cert_inf(O(n²)頂点フリー)で壁の*下*で動く。SDP rung は Mamba/対照の補助のみ | cert_inf 単独でも枠組みの測定は成立 |
+| **賭け 2(2^n 壁 = 本丸の make-or-break)** **【Phase −1 で昇格】** | Phase −1 実測: 両立帯は **cert_two(navigable)でのみ開き cert_inf では空**。cert_two は 2^n で非スケール。**∴ per-component を n≤4-6 + cert_two に小さく切る**(2^6=64 頂点 affordable、block 全体でなく小部品ごと)。vertex-free cert が cert_two 並み navigability を高次元で保てるかが未解決の本丸(体系化: B2 は n=16 で cert_inf に収束=navigability 喪失) | small-n per-component に留まる限り測定成立。scale 不可なら「VSOA は small-n per-component 限定」と開示、枠組みは他 method 比較で生存 |
 | **賭け 3(transfer tiny→実 LLM)** | 「実 LLM」修飾を adapter scope に限定(F10)。adapter の load-bearing を Phase2 必須測定 | 未達なら「実 LLM 寄与は未確立」と開示 |
 | **賭け 4(guarantee の scale 連結崩壊)** | L3「強い verifier が fitness 解放」を主軸に載せない。主軸は「成長操作下 + coupling 込みで 0 false-admit を保つか」の測定 | ladder 階梯が崩れても枠組みの soundness 測定は残る |
 
