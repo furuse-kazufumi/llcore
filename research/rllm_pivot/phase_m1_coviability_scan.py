@@ -174,7 +174,7 @@ def function_change(decay, W, V, decay2, W2, V2, Xs):
 # --------------------------------------------------------------------------- #
 # 1 base × 1 方向 で ε を sweep し両立帯を測る
 # --------------------------------------------------------------------------- #
-def sweep(decay, W, V, rng, Xs, max_input_abs=1.0, tau=0.05, n_eps=40, eps_hi=3.0, mode="fresh"):
+def sweep(decay, W, V, rng, Xs, max_input_abs=1.0, tau=0.05, n_eps=40, eps_hi=3.0, mode="fresh", do_two=True):
     n = decay.shape[0]
     in_dir = rng.normal(size=n); in_dir /= (np.linalg.norm(in_dir) + 1e-12)
     out_dir = rng.normal(size=n); out_dir /= (np.linalg.norm(out_dir) + 1e-12)
@@ -183,39 +183,19 @@ def sweep(decay, W, V, rng, Xs, max_input_abs=1.0, tau=0.05, n_eps=40, eps_hi=3.
     kunit = int(np.argmax(np.abs(W).sum(axis=1)))  # net2net で copy する活性既存 unit
 
     eps_grid = np.linspace(0.0, eps_hi, n_eps)
-    sound = np.zeros(n_eps, dtype=bool)
+    sound_inf = np.zeros(n_eps, dtype=bool)
+    sound_two = np.zeros(n_eps, dtype=bool)
     change = np.zeros(n_eps)
     for ke, eps in enumerate(eps_grid):
         d2, W2, V2 = grow_one(decay, W, V, rng, eps, in_dir, out_dir, self_w, new_decay, mode=mode, k=kunit)
-        sound[ke] = cert_inf_sup(d2, W2, V2, max_input_abs) < 1.0
+        sound_inf[ke] = cert_inf_sup(d2, W2, V2, max_input_abs) < 1.0
+        if do_two:
+            sound_two[ke] = cert_two_admits(d2, W2, V2, max_input_abs)
         change[ke] = function_change(decay, W, V, d2, W2, V2, Xs)
 
-    # ε_max = 最大の連続 sound 区間 (ε=0 から) の上端
-    eps_max = 0.0
-    for k, eps in enumerate(eps_grid):
-        if sound[k]:
-            eps_max = eps
-        else:
-            break
-    # ε_alive = change >= tau になる最小 ε
-    alive_idx = np.where(change >= tau)[0]
-    eps_alive = float(eps_grid[alive_idx[0]]) if alive_idx.size else float("inf")
-
-    band_exists = eps_alive < eps_max  # (a)∧(b) 両立帯が存在
-    # 両立帯内 (ε_alive..ε_max) での最大 function change (=どれだけ非自明に動けるか)
-    if band_exists:
-        in_band = (eps_grid >= eps_alive) & (eps_grid <= eps_max)
-        change_in_band = float(change[in_band].max())
-    else:
-        change_in_band = 0.0
-    return {
-        "eps_max": float(eps_max),
-        "eps_alive": eps_alive,
-        "band_exists": bool(band_exists),
-        "band_width": float(max(0.0, eps_max - eps_alive)),
-        "max_change_in_band": change_in_band,
-        "change_at_eps_max": float(np.interp(eps_max, eps_grid, change)),
-    }
+    out = {"inf": _band_metrics(sound_inf, change, eps_grid, tau)}
+    out["two"] = _band_metrics(sound_two, change, eps_grid, tau) if do_two else None
+    return out
 
 
 # --------------------------------------------------------------------------- #
