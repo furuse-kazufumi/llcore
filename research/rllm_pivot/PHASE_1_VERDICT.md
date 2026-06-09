@@ -106,8 +106,9 @@ per-op wall-time (μs, CPU 単独実行) と 30h 予算外挿。
 archive (4096 cells) メモリ = 0.6-6.6MB (無視可)。
 
 **確定知見**:
-1. **small-n per-component (n≤6) は計算上自明に feasible** — verified evolution ループ全体が **0.011-0.013h ≪ 30h** (予算の 0.04%)。cert/mutate/width_grow は μs オーダー、dominant は fitness forward (~0.7ms)。
-2. **2^n 壁は n≥10-12 で binding** — cert_two が n=8 で 8.5ms、n=12 で **1.3 秒/cert** (=18.6h)、n=14 で予算外。cert_inf は多項式 (38→119μs) で scale するが §2-3 通り navigable でない。**= feasibility 面からも small-n per-component 限定を裏付け**。
+1. **small-n per-component (n≤6) は計算上自明に feasible** — ループ主要 op (mutate+cert_two+fitness) が **0.011-0.013h ≪ 30h** (予算の 0.04%; width_grow は μs オーダーで外挿に未算入だが影響無視可)。cert/mutate/width_grow は μs オーダー、本外挿の dominant は **fitness 項 (~0.7ms)**。⚠ ただしこの fitness は `RotationNDObjective` の**合成 adapter proxy** であり、実 GPU 訓練では **base forward (CE) が dominant** になる (本 proxy は実 CE を過小に見せる; §7.7 / 5.3 参照)。外挿は per-eval ごとに cert を 1 回課金する**保守的上限**見積り (実際の cert は構造成長時のみ走る)。
+2. **2^n 壁は n≥10-12 で binding** — cert_two が n=8 で 8.5ms、n=12 で **1.3 秒/cert** (=18.6h, ただし少数反復 rc=15 由来の点推定でマージン薄)、n=14 で予算外 (cert_two 2^14 未測定=外挿 infeasible)。cert_inf は多項式 (38→119μs) で scale するが §2-3 通り navigable でない。**= feasibility 面からも small-n per-component 限定を裏付け**。
+3. **CPU→GPU 外挿の前提**: cert/mutate は numpy (CPU-bound) ゆえ GPU 環境でも同等コスト、fitness のみ GPU で base forward (CE) に置換される。この置換が per-eval を増やす方向 = small-n feasibility 結論 (≪30h) は保たれる見込みだが、実 GPU 実測は Phase 2 で要確認 (honest 留保)。
 
 ---
 
