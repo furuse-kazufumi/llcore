@@ -133,6 +133,9 @@ def main():
     print(f"\n外挿 (pop={cfg['pop']} gens={cfg['gens']} blocks={cfg['blocks']} gate=cert_two, budget={cfg['budget_h']}h):", flush=True)
     for n in ns:
         e = extr[str(n)]
+        if e["per_eval_us"] is None:
+            print(f"  n={n:2d}  cert_two 未測定 (n>{TWO_MAX_N}=2^n 外挿域)", flush=True)
+            continue
         print(f"  n={n:2d}  per-eval={e['per_eval_us']:.2f}μs  総時間={e['total_hours']:.4f}h  "
               f"30h 収まる={e['fits_budget']}", flush=True)
 

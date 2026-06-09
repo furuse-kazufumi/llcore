@@ -1,0 +1,133 @@
+{
+  "meta": {
+    "seed": 20260609,
+    "dim": 8,
+    "eval_noise": 0.0,
+    "note": "valley_fraction + n_optima を pos/neg control で校正。決定論的 eval。"
+  },
+  "fields": {
+    "multimodal_pos": {
+      "instances": [
+        {
+          "name": "multimodal_pos",
+          "valley_fraction_good_anchor": 0.0025,
+          "valley_fraction_random_anchor": 0.0,
+          "distinct_optima": 11,
+          "distinct_near_top": 2,
+          "fitness_spread": 0.3095784380037543
+        },
+        {
+          "name": "multimodal_pos",
+          "valley_fraction_good_anchor": 0.0025,
+          "valley_fraction_random_anchor": 0.0,
+          "distinct_optima": 17,
+          "distinct_near_top": 6,
+          "fitness_spread": 0.24077867526449448
+        },
+        {
+          "name": "multimodal_pos",
+          "valley_fraction_good_anchor": 0.0025,
+          "valley_fraction_random_anchor": 0.0,
+          "distinct_optima": 18,
+          "distinct_near_top": 12,
+          "fitness_spread": 0.23920837270185458
+        },
+        {
+          "name": "multimodal_pos",
+          "valley_fraction_good_anchor": 0.0,
+          "valley_fraction_random_anchor": 0.0,
+          "distinct_optima": 17,
+          "distinct_near_top": 11,
+          "fitness_spread": 0.3491876684097881
+        }
+      ],
+      "valley_fraction_good_mean": 0.001875,
+      "valley_fraction_good_std": 0.0010825317547305483,
+      "distinct_near_top_mean": 7.75
+    },
+    "unimodal_gauss_neg": {
+      "instances": [
+        {
+          "name": "unimodal_gauss_neg",
+          "valley_fraction_good_anchor": 0.0,
+          "valley_fraction_random_anchor": 0.0,
+          "distinct_optima": 8,
+          "distinct_near_top": 8,
+          "fitness_spread": 0.003185066534948211
+        },
+        {
+          "name": "unimodal_gauss_neg",
+          "valley_fraction_good_anchor": 0.0,
+          "valley_fraction_random_anchor": 0.0,
+          "distinct_optima": 3,
+          "distinct_near_top": 3,
+          "fitness_spread": 0.003934416989831213
+        },
+        {
+          "name": "unimodal_gauss_neg",
+          "valley_fraction_good_anchor": 0.0,
+          "valley_fraction_random_anchor": 0.0,
+          "distinct_optima": 7,
+          "distinct_near_top": 7,
+          "fitness_spread": 0.004493891232670855
+        },
+        {
+          "name": "unimodal_gauss_neg",
+          "valley_fraction_good_anchor": 0.0,
+          "valley_fraction_random_anchor": 0.0,
+          "distinct_optima": 5,
+          "distinct_near_top": 5,
+          "fitness_spread": 0.0035706145135131484
+        }
+      ],
+      "valley_fraction_good_mean": 0.0,
+      "valley_fraction_good_std": 0.0,
+      "distinct_near_top_mean": 5.75
+    },
+    "quadratic_bowl_neg": {
+      "instances": [
+        {
+          "name": "quadratic_bowl_neg",
+          "valley_fraction_good_anchor": 0.0,
+          "valley_fraction_random_anchor": 0.0,
+          "distinct_optima": 8,
+          "distinct_near_top": 1,
+          "fitness_spread": 0.002298177460951535
+        },
+        {
+          "name": "quadratic_bowl_neg",
+          "valley_fraction_good_anchor": 0.0,
+          "valley_fraction_random_anchor": 0.0,
+          "distinct_optima": 3,
+          "distinct_near_top": 1,
+          "fitness_spread": 0.002840408204491431
+        },
+        {
+          "name": "quadratic_bowl_neg",
+          "valley_fraction_good_anchor": 0.0,
+          "valley_fraction_random_anchor": 0.0,
+          "distinct_optima": 7,
+          "distinct_near_top": 1,
+          "fitness_spread": 0.0032444745811526423
+        },
+        {
+          "name": "quadratic_bowl_neg",
+          "valley_fraction_good_anchor": 0.0,
+          "valley_fraction_random_anchor": 0.0,
+          "distinct_optima": 5,
+          "distinct_near_top": 1,
+          "fitness_spread": 0.0025771965302793806
+        }
+      ],
+      "valley_fraction_good_mean": 0.0,
+      "valley_fraction_good_std": 0.0,
+      "distinct_near_top_mean": 1.0
+    }
+  },
+  "determinism": {
+    "same_seed_valley_v1": 0.0,
+    "same_seed_valley_v2": 0.0,
+    "identical": true
+  },
+  "calibration_pass": false
+}

@@ -1,0 +1,15 @@
+{
+  "meta": {
+    "model": "state-spaces/mamba-130m-hf",
+    "layer": 12,
+    "n": 6,
+    "seed": 20260609
+  },
+  "status": "deferred",
+  "error": "TypeError: _t_min() missing 1 required positional argument: 'max_input_abs'",
+  "trace_tail": [
+    "    if _infnorm_sup(decay, W, _t_min(decay, W, V)) < 1.0:",
+    "                              ^^^^^^^^^^^^^^^^^^^",
+    "TypeError: _t_min() missing 1 required positional argument: 'max_input_abs'"
+  ]
+}
