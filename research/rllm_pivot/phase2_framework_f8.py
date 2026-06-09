@@ -78,6 +78,55 @@ try:
 except Exception:  # pragma: no cover
     _HAVE_SCIPY = False
 
+
+# --------------------------------------------------------------------------- #
+# src GeneCodec protocol adapter (固定ボイラープレート; swap 対象ではない)
+#
+# coupled_nd.py の ``CoupledNDGeneCodec`` は古い ``evolvable_core.evolve`` 向け interface
+# (random/clip/to_gene/crossover/mutate) を持つ。一方 src ``minimal_ga.evolve`` の generic
+# codec path は :class:`llcore.kernel.protocol.GeneCodec` (dim/lower/upper/to_array/from_array
+# /clip) を要求する。両者は別 interface のため、src 進化ループに載せるには **薄い protocol
+# 適合層** が要る。これは src を一切触らない additive な adapter であり、3 plug-point の
+# 「1 オブジェクト差替」の swap 対象 (内部の CoupledNDGeneCodec) ではない (= 固定枠)。
+#
+# evolve が回す gene 型 = genotype ndarray (codec の dim 次元)。objective へ渡す際に
+# 内部 CoupledNDGeneCodec.to_gene で CoupledNDGene へ復元する。
+# --------------------------------------------------------------------------- #
+class SrcCodecAdapter:
+    """``CoupledNDGeneCodec`` を src ``GeneCodec`` protocol に適合させる固定 adapter。
+
+    gene 表現は genotype ndarray (shape (dim,))。clip は内部 codec の box clip に委譲。
+    """
+
+    def __init__(self, inner: "C.CoupledNDGeneCodec"):
+        self.inner = inner
+        self.n = inner.n
+
+    @property
+    def dim(self) -> int:
+        return self.inner.dim
+
+    @property
+    def lower(self) -> np.ndarray:
+        return self.inner._lo
+
+    @property
+    def upper(self) -> np.ndarray:
+        return self.inner._hi
+
+    def to_array(self, gene) -> np.ndarray:
+        return np.asarray(gene, dtype=np.float64)
+
+    def from_array(self, arr) -> np.ndarray:
+        return np.asarray(arr, dtype=np.float64)
+
+    def clip(self, gene) -> np.ndarray:
+        return self.inner.clip(gene)
+
+    def to_gene(self, arr) -> "C.CoupledNDGene":
+        """genotype ndarray → CoupledNDGene (objective / verifier 用)。"""
+        return self.inner.to_gene(self.inner.clip(arr))
+
 # --------------------------------------------------------------------------- #
 # 実験定数 (seed 固定; 既存スクリプト踏襲)
 # --------------------------------------------------------------------------- #
