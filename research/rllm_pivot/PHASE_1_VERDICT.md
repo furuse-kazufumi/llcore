@@ -27,7 +27,7 @@
 **確定知見**:
 1. **(S1) 全証明器が 0 観測 false-admit** — cert_inf/cert_two に加え **cert_sdp の soundness を初確認** (admit gene で真 ρ≥1 ゼロ)。証明器の数学的 sound 性と一致。
 2. **(S2) ∞-norm bound は健全かつタイト** — `infnorm_sup ≥ 真 ρ` が全 gene で成立 (違反 0)、最小マージン +0.0002〜0.0007 = ∞-bound は真 ρ をすぐ上から押さえる安価な sound 上界 (計画 Phase 1 step 1「cert_inf で ρ 上界を安く計算」を実証)。
-3. **(S3) 証明器格子 = cert_sdp が圧倒的に navigable** — 真に収縮する gene のうち cert_inf は 23-41%・cert_two は 40-51% しか admit しないが **cert_sdp は 91-95% admit**。`two⊆sdp` 包含は厳密 (違反 0)、`inf∧¬sdp`=0 (本 sample では cert_sdp が cert_inf∪cert_two を経験的に包含。理論的には ∞-norm と Lyapunov は非可比だが反例観測ゼロ)。
+3. **(S3) 証明器格子 = cert_sdp が圧倒的に navigable** — 真に収縮する gene のうち cert_inf は 22.5-41%・cert_two は 40-51% しか admit しないが **cert_sdp は 91-95% admit**。`two⊆sdp` (違反 0) は cert_sdp の cert_two fast-path (`coupled_nd.py:142`) により**構造的に保証**される (経験的発見でなく実装上自明=トートロジー)。`inf∧¬sdp`=0 (本 sample では cert_sdp が cert_inf も経験的に包含。理論的には ∞-norm と Lyapunov は非可比だが反例観測ゼロ)。
 
 ---
 
