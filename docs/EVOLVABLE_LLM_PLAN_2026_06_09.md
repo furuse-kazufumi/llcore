@@ -204,7 +204,12 @@ recurrent adapter block(`CoupledNDGene` の `(decay∈[0,1]^n, W∈[-2,2]^{n×n}
   - **capability 副線 = NULL_TIE(優位 未実証)**: 多峰(>1)+識別力(random 0.489)地形で MAP-Elites(gated/ungated)は同予算 gradient/random と held-out で統計的に区別不能(ME vs gradient mean_diff +0.028/p=0.39/sign_delta 0、逆向きも非有意=引き分け、n=20)。→ **H-EXISTS 支持されず(M3 と整合)。ただし非有意の引き分け=「capability 優位の未実証」であって decisive NEGATIVE でも powered 等価性 proof でもない**(power 未分析、absence≠evidence)。戦略含意は同じ=**capability 封印・guarantee 主軸が data で正当化**。meta-gate は moot。
   - **bonus**: ρ<1 gate は held-out で可塑性を有意に殺さない(p=0.61, NS)が、**train 側は 0.25 差で archive 探索を制約**(held-out が flat な regime ゆえ顕在化せず)。
   - **敵対的検証 2 実験並列 = MAJOR 0 / 全 MINOR**: framing 是正(NULL_TIE / 40-basin 過信 / gate train 差)を verdict §6 に反映済。結論不変。
-  - **未了(Phase 2 残り)**: 実 SmolLM2-CE 地形での capability 再測定 / framework 性 F8(3 plug-point 拡張性 + 汎化 load-bearing)/ Mamba SSM Lyapunov 正対照 / consumer story+デモ(確認必要)。
+  - **Phase 2 残り 完遂(2026-06-09 続き → `PHASE_2_VERDICT.md` §7)**:
+    - **実 SmolLM2-CE capability = ARTIFACT+NEGATIVE**(`phase2_capability_realce.py`): ME は finite-diff gradient を 20/20 で上回る(一見 EXISTS)が、**解析(torch exact)勾配 meta-gate が ME を 19/20 で逆転** → ME の勝ちは finite-diff の弱さの ARTIFACT。強い勾配では **gradient > evolution = 実地形でも capability NEGATIVE**(M3/synthetic と整合)。★honest-disclosure が false-positive を排除(meta-gate 無しなら「進化 20/20 勝利」と誤結論)。synthetic NULL_TIE も同じ弱 gradient ゆえ negative は過小評価だった可能性。
+    - **framework 性 F8**(`phase2_framework_f8.py`): (b) 3 plug-point swap **PASS**(src 無改変, pytest 17 green, admit ladder 整合)/ (a) 汎化 load-bearing **NULL**(多様性→汎化 は立たず=第一級 NULL)。
+    - **Mamba SSM Lyapunov 正対照**(`phase2_mamba_lyapunov.py`): 全 24 層 A=-exp(A_log)<0(589,824 ch)→ λ_max≤0 自明 PASS / SmolLM2 は SSM 不在=gate 必須 → **base-level 判別 PASS**。
+    - **動きで魅せるデモ**(`phase2_demo_gate_discrimination.py`): gate 判別力バーチャート SVG(経験 84% false-admit vs sound cert 0%、cert_sdp 最 navigable)+ 単一 gene evidence。★tanh 基質はノルム発散しない物理に基づき再設計(「経験は騙され certificate のみ見抜く」)。consumer story/市場判断はユーザー明示判断に deferred。
+    - **→ Phase 2 完遂。枠組み妥当(判別 PASS × base-level PASS × 3 plug-point PASS)× capability NEGATIVE(実地形確定)× 価値 GUARANTEE。**
 
 ---
 
