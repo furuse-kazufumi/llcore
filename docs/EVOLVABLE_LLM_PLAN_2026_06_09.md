@@ -199,7 +199,12 @@ recurrent adapter block(`CoupledNDGene` の `(decay∈[0,1]^n, W∈[-2,2]^{n×n}
 - **capability 副線(必須, F12)**: terrain family 上で MAP-Elites vs gradient vs random を honest_eval → meta-gate で EXISTS/NULL/ARTIFACT を 1 つ確定。
 - **framework 性(F8)**: topology 多様化の汎化 load-bearing + 3 plug-point 拡張性をテスト化。
 - adapter の実 LLM load-bearing(Stage-B B-G1「benefit が core dim と増大」)を SmolLM2 で再現(F10)。
-- **Decision gate 2**: H-discriminative + framework 性 PASS → 評価枠組みとして結実。capability EXISTS → 普及の派手な軸を追加。
+- **Decision gate 2 【一部実測完了 2026-06-09 → `research/rllm_pivot/PHASE_2_VERDICT.md`】**: 実装 = `phase2_discriminative.py` + `phase2_capability_terrain.py`。
+  - **H-discriminative = PASS**: 枠組みは 4 method を soundness で明確に判別。false-admit 順 = 無gate 95 > **STABLE 風経験 gate 80(発散の84%を誤許可!)** > sound certs 0。Mamba 風正対照 0 棄却。**★STABLE 風 gate が発散の 84% を通すのは、tanh 有界で有限ホライズンでは「忘却したように見える」が真 ρ≥1 = sound cert でないと見抜けない**(verified-plasticity の存在意義)。cert_sdp が sound+最 navigable。
+  - **capability 副線 = NULL_TIE(優位 未実証)**: 多峰(>1)+識別力(random 0.489)地形で MAP-Elites(gated/ungated)は同予算 gradient/random と held-out で統計的に区別不能(ME vs gradient mean_diff +0.028/p=0.39/sign_delta 0、逆向きも非有意=引き分け、n=20)。→ **H-EXISTS 支持されず(M3 と整合)。ただし非有意の引き分け=「capability 優位の未実証」であって decisive NEGATIVE でも powered 等価性 proof でもない**(power 未分析、absence≠evidence)。戦略含意は同じ=**capability 封印・guarantee 主軸が data で正当化**。meta-gate は moot。
+  - **bonus**: ρ<1 gate は held-out で可塑性を有意に殺さない(p=0.61, NS)が、**train 側は 0.25 差で archive 探索を制約**(held-out が flat な regime ゆえ顕在化せず)。
+  - **敵対的検証 2 実験並列 = MAJOR 0 / 全 MINOR**: framing 是正(NULL_TIE / 40-basin 過信 / gate train 差)を verdict §6 に反映済。結論不変。
+  - **未了(Phase 2 残り)**: 実 SmolLM2-CE 地形での capability 再測定 / framework 性 F8(3 plug-point 拡張性 + 汎化 load-bearing)/ Mamba SSM Lyapunov 正対照 / consumer story+デモ(確認必要)。
 
 ---
 
