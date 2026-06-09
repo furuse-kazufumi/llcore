@@ -278,12 +278,13 @@ def main():
     # seed ごとに 4 optimizer を同予算で走らせ held-out 比較
     res = {"random": [], "gradient": [], "mapelites": [], "mapelites_gate": []}
     train_res = {k: [] for k in res}
+    _name_off = {"random": 1, "gradient": 2, "mapelites": 3, "mapelites_gate": 4}  # 決定論的 seed offset
     for s in range(N_SEEDS):
         terr = Terrain(np.random.default_rng(SEED0 + 100 + s))
         for name, fn in (("random", opt_random), ("gradient", opt_gradient),
                          ("mapelites", lambda t, r, B: opt_mapelites(t, r, B, gate=False)),
                          ("mapelites_gate", lambda t, r, B: opt_mapelites(t, r, B, gate=True))):
-            r = np.random.default_rng(SEED0 + 1000 + s * 17 + hash(name) % 1000)
+            r = np.random.default_rng(SEED0 + 1000 + s * 17 + _name_off[name])
             best = fn(terr, r, BUDGET)
             res[name].append(terr.heldout(best))
             train_res[name].append(terr.train(best))
