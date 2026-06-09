@@ -37,7 +37,7 @@
 
 | セル (base真ρ中央) | gate | admit率 | false-admit | 非自明∧sound admit | maxΔfunc | gate3 |
 |---|---|---|---|---|---|---|
-| n4_hr0 (0.802) | per_row/cert_inf | 0.126 | **0** | 15 | 0.108 | **PASS** |
+| n4_hr0 (0.802) | per_row/cert_inf | 0.126 | **0** | 15 | 0.107 | **PASS** |
 | | cert_two | 0.255 | **0** | 162 | 0.203 | **PASS** |
 | | cert_sdp | 0.724 | **0** | **724** | **0.554** | **PASS** |
 | n4_hr2 (0.845) | per_row/cert_inf | 0.223 | **0** | 21 | 0.129 | **PASS** |
