@@ -322,13 +322,16 @@ def main():
     print(f"[H-multimodal] 地形の theta 空間 basin 数 = {n_basins} (>1 で多峰=capability 前提成立)", flush=True)
 
     # seed ごとに 4 optimizer を同予算で走らせ held-out 比較
-    res = {"random": [], "gradient": [], "gradient_strong": [], "mapelites": [], "mapelites_gate": []}
+    res = {"random": [], "gradient": [], "gradient_strong": [], "gradient_torch": [],
+           "mapelites": [], "mapelites_gate": []}
     train_res = {k: [] for k in res}
-    _name_off = {"random": 1, "gradient": 2, "gradient_strong": 5, "mapelites": 3, "mapelites_gate": 4}
+    _name_off = {"random": 1, "gradient": 2, "gradient_strong": 5, "gradient_torch": 6,
+                 "mapelites": 3, "mapelites_gate": 4}
     for s in range(N_SEEDS):
         terr = Terrain(np.random.default_rng(SEED0 + 100 + s))
         for name, fn in (("random", opt_random), ("gradient", opt_gradient),
                          ("gradient_strong", lambda t, r, B: opt_gradient(t, r, B, restarts=64)),  # meta-gate: 多 restart
+                         ("gradient_torch", opt_gradient_torch),  # ★解析勾配 cross-check (2026-06-10)
                          ("mapelites", lambda t, r, B: opt_mapelites(t, r, B, gate=False)),
                          ("mapelites_gate", lambda t, r, B: opt_mapelites(t, r, B, gate=True))):
             r = np.random.default_rng(SEED0 + 1000 + s * 17 + _name_off[name])
@@ -337,12 +340,14 @@ def main():
             train_res[name].append(terr.train(best))
         print(f"  seed {s+1}/{N_SEEDS}: held-out "
               f"rand={res['random'][-1]:.3f} grad={res['gradient'][-1]:.3f} "
-              f"grad+={res['gradient_strong'][-1]:.3f} "
+              f"grad+={res['gradient_strong'][-1]:.3f} gradT={res['gradient_torch'][-1]:.3f} "
               f"ME={res['mapelites'][-1]:.3f} ME+gate={res['mapelites_gate'][-1]:.3f}", flush=True)
 
     # honest_eval
     cmp_me_grad = honest_eval(res["mapelites"], res["gradient"])
     cmp_me_gradstrong = honest_eval(res["mapelites"], res["gradient_strong"])  # meta-gate(BG10)
+    cmp_me_gradtorch = honest_eval(res["mapelites"], res["gradient_torch"])    # ★解析勾配 cross-check
+    cmp_gradtorch_me = honest_eval(res["gradient_torch"], res["mapelites"])    # 逆向き(強勾配優位か)
     cmp_me_rand = honest_eval(res["mapelites"], res["random"])
     cmp_gate_ungate = honest_eval(res["mapelites_gate"], res["mapelites"])  # gate が可塑性を殺すか
     cmp_grad_me = honest_eval(res["gradient"], res["mapelites"])            # 逆向き(gradient 優位か)
