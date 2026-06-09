@@ -176,14 +176,16 @@ class RealCETerrain:
         self.test_idx = sorted(order[N_TRAIN_SENT:].tolist())
         # cluster は **train 文の射影 hidden のみ** で fit(held-out リークなし)
         train_concat = np.concatenate([self.Xs[i] for i in self.train_idx], 0)
-        self.centers, _ = tiny_kmeans(train_concat, K_CLUSTERS, rng)
+        self.centers, train_labels = tiny_kmeans(train_concat, K_CLUSTERS, rng)
         # 各文の target = 次位置の cluster(y_t = cluster(X[t+1]))。位置 0..seq-2 が有効。
         self.Y = [_assign(x, self.centers) for x in self.Xs]
-        # per-seed 固定 readout R: N->K
-        self.R = rng.normal(size=(K_CLUSTERS, N)) * READOUT_SCALE / np.sqrt(N)
+        # readout = centroid 最近傍分類器(GMM 事後)。β=1/(2σ²), σ²=train 内クラスタ平均分散。
+        resid2 = ((train_concat - self.centers[train_labels]) ** 2).sum(1)  # 各点の重心二乗距離
+        sigma2 = float(resid2.mean()) + 1e-9
+        self.beta = 1.0 / (2.0 * sigma2)
 
     def _ce_sentence(self, decay, W, i):
-        """文 i の mean CE(位置 t の状態 s_t で次 cluster y_t を予測)。"""
+        """文 i の mean CE(位置 t の状態 s_t で次 cluster y_t を centroid 最近傍で予測)。"""
         x = self.Xs[i]
         y = self.Y[i]
         seq = x.shape[0]
@@ -192,7 +194,7 @@ class RealCETerrain:
         cnt = 0
         for t in range(seq - 1):  # 最終位置は次が無い
             s = decay * s + (1.0 - decay) * np.tanh(W @ s + x[t])
-            logits = self.R @ s
+            logits = -self.beta * ((self.centers - s) ** 2).sum(1)  # (K,) = -β‖s-center_k‖²
             logits -= logits.max()
             p = np.exp(logits)
             p /= p.sum()
