@@ -252,12 +252,11 @@ def _family_fitness(gene, family):
     return float(np.mean([obj.fitness(gene) for obj in family]))
 
 
-def _topology_descriptor(codec, gene):
+def _topology_descriptor(codec, arr):
     """admit topology の descriptor (2D cell): (mean decay, tanh(mean|W|))。
 
-    構造多様性 = この descriptor 空間での archive の広がり。
+    構造多様性 = この descriptor 空間での archive の広がり。``arr`` は genotype ndarray。
     """
-    arr = codec.to_array(gene)
     n = codec.n
     decay = np.clip(arr[:n], 0.0, 1.0)
     W = arr[n:].reshape(n, n)
