@@ -186,7 +186,13 @@ recurrent adapter block(`CoupledNDGene` の `(decay∈[0,1]^n, W∈[-2,2]^{n×n}
 3. **存立条件 stress(per-row, F1)**: width_grow 1 回で**各既存行 abs-sum が `ti=1` sup を 1 超させない**ことを stress 検証(0 false-admit を成長操作下で再確認)。**PASS 条件に「非自明な進化価値を持つ admit ≥1」を AND**。
 4. **coupling stress(F6)**: 2 block residual 結合の真 ρ を独立 eigen で測り per-block AND の盲点を検定。
 5. mutation×gate の 1 ループを回し feasibility(変異1回+cert1回の秒/MB → 30h 外挿、成長 n で再計測)。
-- **Decision gate 1**: (3) PASS ∧ (4) PASS ∧ (5) feasibility PASS → Phase 2。いずれか FAIL → 枠組みが第一級 negative を記録し被験 method を切替(撤退でなく測定)。
+- **Decision gate 1 【実測完了 2026-06-09 → `research/rllm_pivot/PHASE_1_VERDICT.md`】**: **(3) PASS ∧ (4) PASS ∧ (5) PASS → Phase 2 (small-n per-component 域)**。実装 = `phase1_structural_surgery.py` (実 width_grow Net2Net + per-row/cert_two/cert_sdp gate) + `phase1_{cert_soundness,growth_stress,coupling_stress,feasibility}.py`。
+  - **(3) 成長下 soundness**: 実 width_grow 手術下で全 16 (セル×gate) 0 観測 false-admit (empirical_rho from-below)。cert_two/cert_sdp gate が小 n で非自明 sound admit を多数開く (cert_sdp maxΔfunc 0.68)。cheap gate (per_row/cert_inf) は sound だが n=6 edge で trivial=Phase −1 再現 → **per-component gate は cert_two/sdp 必須 (計画通り)**。
+  - **(4) coupling**: per-block AND は coupling 下で盲点 24-96% (γ↑) = 不 sound → 禁止。full-system cert (inf/two/sdp) は全 γ で 0 false-admit。
+  - **(5) feasibility**: small-n (n≤6) で verified evolution ループ主要 op が **0.013h ≪ 30h**。2^n 壁は n≥12 で binding (cert_two n=12=1.3s/cert)。
+  - **★SDP 知見 (Phase −1 留保解消)**: clarabel 在で cert_sdp を固定構造/成長/coupling の 3 面で初測定 → **cert_sdp が最 navigable な sound certifier (真ρ<1 集合の ~0.9-0.99 admit、cert_inf ~0.2-0.4 / cert_two ~0.4-0.5 を圧倒)**。ただし 2^n 頂点コストは不変 → **「navigable かつ scalable は依然不在 / verified 構造進化は small-n per-component 限定」結論は堅持** (navigability 天井のみ上昇)。
+  - **敵対的検証 (6 実験並列) = MAJOR 0 / 全 MINOR**: 丸め誤差・tautology・proxy 注記を verdict §9 に反映済。結論不変。
+  - **Phase 0 残り完了**: F9 多峰性 instrument **校正 PASS** (多峰 n_basins=5.5/valley=1.0 vs 単峰 1.0、決定論的)。Mamba-130M **CPU load + framework portable** (gate +0.287、固有安定性正対照は Phase 2 defer)。
 
 ### Phase 2 — 枠組み妥当性 + capability 必須副線 + framework 性
 - 4 method(VSOA / 無 gate / STABLE / Mamba)を枠組みで比較し **H-discriminative** を事前登録検定で示す。
