@@ -88,4 +88,19 @@ synthetic 多峰地形(K=6 basin max-of-Gaussian、behavior 空間)で、ρ<1-ga
 - **consumer story + 動きで魅せるデモ(F11, 確認必要=ユーザー明示判断)**: 無 gate ρ→1.95 発散 vs gate ρ<1 リアルタイム可視化。
 - **普及メタ記事**: 「verified-plasticity = ラングトンの蟻の幻(見かけの安定/進化)を sound cert で見抜く」= honest disclosure の集大成(STABLE 84% 危険 + capability NULL を題材)。
 
-正本データ = `phase2_discriminative_results.json` / `phase2_capability_terrain_results.json` / 実装 = 各 `.py`。
+---
+
+## 6. 敵対的検証(2 実験並列、2026-06-09)
+
+verdict の主張を 2 実験の `results.json` + `.py` に独立 agent で突合(workflow `phase2-verdict-adversarial-verify`)。**結果 = MAJOR 0 / 全 MINOR**。数値の mismatch はゼロ。検出された MINOR を本文に反映済 + 残りを以下に記録:
+- **(反映済) framing 是正**: 「capability decisive NEGATIVE / NULL / proper power で確証」→「**NULL_TIE = 非有意の引き分け = capability 優位の未実証**」へ(§0/§2/§3)。data は ME vs gradient 完全引き分け(sign_delta=0)で「勾配が進化に勝つ」証拠ではない。
+- **(反映済) 40 basin の過信**→「高次元 hillclimb 非収束アーティファクトの可能性、頑健には多峰(>1)まで」(§2)。
+- **(反映済) gate 中立性の片落ち**→ train 側 0.25 差(archive 探索制約)を明記(§2/§3)。
+- **(反映済) gradient_strong の退化**(restart64=幅優先で「強い勾配」でない)+ 4 条件 AND の保守性 + budget 収束未検証(§2)。
+- **(残留 low) gated MAP-Elites の予算非対称**: cert_inf 受理チェック(resample 含む)は budget 非計上。「予算=fitness 評価回数」定義としては defensible だが、総計算量・有効探索試行は非対称。
+- **(残留 low) STABLE 84% false-admit は設定依存**(EPS_FORGET=1e-2/T=64/K_PROBE=8 固定、感度未測定)。方向(STABLE 危険)は頑健だが「84%」を設定非依存の数値のように扱わない。
+- **(残留 low) empirical_rho from-below** ゆえ STABLE の false-admit はむしろ過小評価寄り(=判別力 PASS を弱めない方向)。per-seed 分散(§4 留保2)は JSON 未保存(stdout のみ)で再現性ギャップ。
+
+→ **検証後も Decision gate 2 の結論不変**: H-discriminative PASS / capability 優位 未実証(NULL_TIE)/ 価値 = GUARANTEE。指摘は全て framing と留保の精度向上で、機構的結論を覆すものは無かった(MAJOR 0)。
+
+正本データ = `phase2_discriminative_results.json` / `phase2_capability_terrain_results.json` / 実装 = 各 `.py` / 検証 = workflow transcript。
