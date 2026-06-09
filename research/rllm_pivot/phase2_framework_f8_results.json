@@ -16,9 +16,9 @@
     "all_swaps_ran": true,
     "verifier_admit_counts": {
       "none": 24,
-      "inf_norm": 4,
-      "two_norm": 6,
-      "sdp": 17
+      "inf_norm": 8,
+      "two_norm": 5,
+      "sdp": 15
     },
     "axes": {
       "axis_genecodec": [
@@ -68,7 +68,7 @@
         {
           "swap": "make_nd_verifier('none')",
           "verifier_name": "none",
-          "final_best_fitness": 0.2609031247063309,
+          "final_best_fitness": 0.2460061114553206,
           "n_admitted_final_pop": 24,
           "pop_size": 24,
           "ran": true
@@ -76,24 +76,24 @@
         {
           "swap": "make_nd_verifier('inf_norm')",
           "verifier_name": "inf_norm",
-          "final_best_fitness": 0.1513884481023573,
-          "n_admitted_final_pop": 4,
+          "final_best_fitness": 0.24941182207784518,
+          "n_admitted_final_pop": 8,
           "pop_size": 24,
           "ran": true
         },
         {
           "swap": "make_nd_verifier('two_norm')",
           "verifier_name": "two_norm",
-          "final_best_fitness": 0.19800147863245599,
-          "n_admitted_final_pop": 6,
+          "final_best_fitness": 0.33340281586501563,
+          "n_admitted_final_pop": 5,
           "pop_size": 24,
           "ran": true
         },
         {
           "swap": "make_nd_verifier('sdp')",
           "verifier_name": "sdp",
-          "final_best_fitness": 0.27949902805879134,
-          "n_admitted_final_pop": 17,
+          "final_best_fitness": 0.5987526859042187,
+          "n_admitted_final_pop": 15,
           "pop_size": 24,
           "ran": true
         }
@@ -144,6 +144,23 @@
       "paired_sign_delta": 0.0,
       "conditions": {
         "diff_positive": false,
+        "wilcoxon_p_lt_0.05": false,
+        "n_seeds_ge_15": true,
+        "abs_paired_sign_delta_ge_0.147": false
+      },
+      "all_pass": false
+    },
+    "diverse_generalization_gap_mean": 0.16245696535496087,
+    "paramshift_generalization_gap_mean": 0.20008195992989625,
+    "paramshift_overfits_more_than_diverse": {
+      "mean_diff": 0.03762499457493534,
+      "p_value": 0.21521663665771484,
+      "n_seeds": 20,
+      "wins": 11,
+      "losses": 9,
+      "paired_sign_delta": 0.1,
+      "conditions": {
+        "diff_positive": true,
         "wilcoxon_p_lt_0.05": false,
         "n_seeds_ge_15": true,
         "abs_paired_sign_delta_ge_0.147": false

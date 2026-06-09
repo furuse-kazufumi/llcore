@@ -187,10 +187,14 @@ class RealCETerrain:
         self.centers, train_labels = tiny_kmeans(train_concat, K_CLUSTERS, rng)
         # 各文の target = 次位置の cluster(y_t = cluster(X[t+1]))。位置 0..seq-2 が有効。
         self.Y = [_assign(x, self.centers) for x in self.Xs]
-        # readout = centroid 最近傍分類器(GMM 事後)。β=1/(2σ²), σ²=train 内クラスタ平均分散。
-        resid2 = ((train_concat - self.centers[train_labels]) ** 2).sum(1)  # 各点の重心二乗距離
-        sigma2 = float(resid2.mean()) + 1e-9
-        self.beta = 1.0 / (2.0 * sigma2)
+        # readout = centroid 最近傍分類器。temperature β = **クラスタ間分離スケール**(=1/平均ペア重心
+        # 二乗距離)。within-cluster σ² ベース(=GMM 事後)は射影空間でクラスタが密=β 巨大=softmax 鋭すぎ
+        # =held-out が floor を大きく下回る高分散・過学習(smoke3 で確認)。β を分離スケールに置くと
+        # logit gap が O(1)=smooth で学習可能な CE になる(事前原理的=結果非依存, p-hack でない)。
+        K = self.centers.shape[0]
+        cd2 = ((self.centers[:, None, :] - self.centers[None, :, :]) ** 2).sum(2)  # (K,K)
+        mean_pair = float(cd2.sum() / (K * (K - 1))) + 1e-12  # 異 centroid ペア平均二乗距離
+        self.beta = 1.0 / mean_pair
 
     def _ce_sentence(self, decay, W, i):
         """文 i の mean CE(位置 t の状態 s_t で次 cluster y_t を centroid 最近傍で予測)。"""
