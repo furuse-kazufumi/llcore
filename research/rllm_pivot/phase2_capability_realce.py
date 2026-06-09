@@ -60,6 +60,19 @@ try:
 except Exception:
     _HAVE_SCIPY = False
 
+
+def _json_native(o):
+    """numpy スカラー/bool/array を JSON ネイティブへ(np.bool_/np.float64 直書き防止)。"""
+    if isinstance(o, (np.bool_,)):
+        return bool(o)
+    if isinstance(o, (np.integer,)):
+        return int(o)
+    if isinstance(o, (np.floating,)):
+        return float(o)
+    if isinstance(o, np.ndarray):
+        return o.tolist()
+    raise TypeError(f"not JSON serializable: {type(o)}")
+
 MODEL = "HuggingFaceTB/SmolLM2-135M"
 LAYER = 15
 N = 6                  # small-n per-component (Phase −1: n≤6。実地形 signal 確保のため上限 6 を採用)
