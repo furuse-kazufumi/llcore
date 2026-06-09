@@ -273,8 +273,9 @@ def main():
                 "all_layers_strictly_stable_at_base_delta": all_layers_strictly_stable_base,  # λ_max < 0
                 "all_layers_stable_for_all_delta_sweep": all_layers_stable_all_dt,
                 "all_layers_strictly_stable_for_all_delta_sweep": all_layers_strictly_stable_all_dt,
-                "global_lambda_max_base": global_lam_max_base,        # 全層・全 channel での最大 λ(≤0 なら固有安定)
-                "global_max_abs_abar_base": global_max_abs_abar_base, # 全層での最大 |Ā 対角|(≤1 なら全層収縮)
+                "global_lambda_max_base": global_lam_max_base,        # 全層・全 channel での最大 λ(<0 = 固有安定, load-bearing)
+                "global_max_abs_abar_base": global_max_abs_abar_base, # 全層での最大 |Ā 対角|(float 上 1.0 へ丸まる)
+                "global_one_minus_max_abs_abar_base": float(-np.expm1(global_lam_max_base)),  # 1-max|Ā| > 0 = 厳密収縮余裕(丸め回避の正本)
                 "global_A_max_real_part": global_A_max,               # 最も弱い収縮(0 に最も近い A)
                 "global_A_min_real_part": global_A_min,               # 最も強い収縮
                 "n_marginal_base_delta": total_marginal,              # 代表 Δ で λ≈0(marginal)な (channel,state) 数
