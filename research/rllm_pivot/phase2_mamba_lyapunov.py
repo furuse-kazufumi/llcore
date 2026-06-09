@@ -327,14 +327,19 @@ def main():
         }
 
         s = results["mamba"]["summary"]
-        print(f"\n=== Mamba SSM 固有安定性 (全 {ext['n_layer']} 層) ===", flush=True)
-        print(f"  全層 A 実部 < 0:           {s['all_layers_A_real_part_negative']}", flush=True)
-        print(f"  全層 λ_max ≤ 0 (代表 Δ):   {s['all_layers_stable_at_base_delta']}", flush=True)
-        print(f"  全層 λ_max ≤ 0 (Δ スイープ): {s['all_layers_stable_for_all_delta_sweep']}", flush=True)
-        print(f"  global λ_max (代表 Δ):     {s['global_lambda_max_base']:.6g}  (≤0 = 固有安定)", flush=True)
-        print(f"  global max|Ā 対角|:        {s['global_max_abs_abar_base']:.6f}  (<1 = 収縮)", flush=True)
-        print(f"  A 実部 範囲:               [{s['global_A_min_real_part']:.4g}, {s['global_A_max_real_part']:.4g}]", flush=True)
-        print(f"  → 固有安定 (自明 PASS):    {s['intrinsically_stable']}", flush=True)
+        print(f"\n=== Mamba SSM 固有安定性 (全 {ext['n_layer']} 層, {s['n_total_channel_state']} ch×state) ===", flush=True)
+        print(f"  全層 A 実部 < 0:                  {s['all_layers_A_real_part_negative']} "
+              f"(100% of {s['n_total_channel_state']})", flush=True)
+        print(f"  全層 λ_max ≤ 0 (代表 Δ, 非正):    {s['all_layers_stable_at_base_delta']}", flush=True)
+        print(f"  全層 λ_max < 0 (代表 Δ, 厳密):    {s['all_layers_strictly_stable_at_base_delta']}  "
+              f"(marginal {s['n_marginal_base_delta']} entries: 代表 Δ≈0 由来)", flush=True)
+        print(f"  全層 λ_max < 0 (共通 Δ スイープ):  {s['all_layers_strictly_stable_for_all_delta_sweep']}  "
+              f"(Δ>0 なら必ず厳密収縮)", flush=True)
+        print(f"  global λ_max (代表 Δ):           {s['global_lambda_max_base']:.6g}  (≤0 = 固有安定)", flush=True)
+        print(f"  global max|Ā 対角| (代表 Δ):     {s['global_max_abs_abar_base']:.9f}  (≤1 = 収縮; 1.0 は marginal ch)", flush=True)
+        print(f"  A 実部 範囲:                     [{s['global_A_min_real_part']:.4g}, {s['global_A_max_real_part']:.4g}]", flush=True)
+        print(f"  → 固有安定 (自明 PASS, λ≤0):     {s['intrinsically_stable']}", flush=True)
+        print(f"  → Δ>0 で厳密収縮 (λ<0):          {s['intrinsically_strictly_stable_for_positive_delta']}", flush=True)
         print(f"\n=== SmolLM2 対比 ===", flush=True)
         print(f"  model_type = {smol['model_type']}  SSM 再帰キー数 = {len(smol['ssm_recurrence_keys'])}", flush=True)
         print(f"  固有安定 certificate を base に持つ: {smol['has_ssm_state_recurrence']}", flush=True)
