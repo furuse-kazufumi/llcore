@@ -178,7 +178,7 @@ recurrent adapter block(`CoupledNDGene` の `(decay∈[0,1]^n, W∈[-2,2]^{n×n}
 - SmolLM2-135M load + 数百 step fine-tune が T4 で回ることを確認。Mamba-130M を正の対照に。
 - 1 個の adapter block(n≤16)を特定。**トポロジー全探索はしない。**
 - **多峰性 instrument 校正(F9)**: 構成 fitness family が本当に多峰/欺瞞かを決定論化(eval_noise を機械 eps へ)し valley_fraction で検証(positive control=合成多峰、negative control=ESN 単峰)。
-- **Decision gate 0**: load+fine-tune が T4 で回る → GO。
+- **Decision gate 0 【一部実機実証済 2026-06-09 → `research/phase0_framework_harness.py` + `phase0_framework_results.json`】**: SmolLM2-135M を **CPU で frozen load(2.4s)+ forward + layer-15 hidden 抽出** に成功(生成も coherent=実 LM として機能)。**評価枠組みの動作 smoke 完了**: 実 hidden を n=6 へ射影 → small-n verified adapter + cert_two gate で **certified-stable 率=1.000 / 0 false-admit(sound)**、no-gate 0.680 → **gate が実 LLM hidden 上で load-bearing(+0.320)**を実証。GO。残り = Mamba 正の対照 / 多峰性 instrument 校正(F9)/ T4 での数百 step fine-tune(本格訓練は Kaggle)。**安定性指標 = 状態発散でなく echo-state 摂動忘却**(kernel は tanh で常時有界=収縮 ρ<1 は摂動を忘れる性質)と確定。
 
 ### Phase 1 — 被験 method 測定(soundness 主役)
 1. per-component cert_inf(`_infnorm_sup<1`)で ρ 上界を安く計算する関数を実装、固定構造で ρ が測れることを確認。
