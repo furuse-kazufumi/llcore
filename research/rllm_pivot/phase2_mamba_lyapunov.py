@@ -146,11 +146,13 @@ def analyze_layer_stability(A: np.ndarray, dt_base: np.ndarray) -> dict:
     dt_base_min = float(dt_base.min()); dt_base_max = float(dt_base.max())
 
     # --- Δ スイープ: Δ>0 の全域で λ_max ≤ 0(=A<0 ゆえ Δ に依らず安定)を論証 ---
+    # ここでは全 channel に **共通 Δ**(dt_base ではなくスカラー dt)を掛ける = A<0 の構造的帰結を直接示す。
+    # 共通 Δ>0 なら max(Δ·A) = Δ·A_max(A_max は最も 0 に近い負値)< 0 厳密。
     sweep = []
     for dt in DT_SWEEP:
         lam = float((dt * A).max())                   # max(Δ·A) over all (channel,state)
         sweep.append({"dt": float(dt), "lam_max": lam, "max_abs_abar": float(np.exp(lam)),
-                      "stable": bool(lam <= 0.0)})
+                      "stable": bool(lam <= 0.0), "strictly_stable": bool(lam < 0.0)})
 
     return {
         "d_inner": d_inner, "state_size": state_size,
