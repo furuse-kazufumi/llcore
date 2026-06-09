@@ -471,6 +471,11 @@ def main():
     print(f"diverse vs paramshift (held-out): diff={cd['mean_diff']:+.3f} "
           f"p={cd['p_value']:.3f} sign_delta={cd['paired_sign_delta']:+.3f} "
           f"→ 4条件AND={cd['all_pass']}", flush=True)
+    cg = gen["paramshift_overfits_more_than_diverse"]
+    print(f"汎化ギャップ(train−held): diverse={gen['diverse_generalization_gap_mean']:.3f} "
+          f"paramshift={gen['paramshift_generalization_gap_mean']:.3f} "
+          f"(二次観察, AND 不算入): ps が過学習大か diff={cg['mean_diff']:+.3f} p={cg['p_value']:.3f} "
+          f"→ 4条件AND={cg['all_pass']}", flush=True)
     print(f"地形識別力 discriminating={gen['terrain_discriminating']}", flush=True)
     print(f"VERDICT: {gen['verdict']}", flush=True)
 
