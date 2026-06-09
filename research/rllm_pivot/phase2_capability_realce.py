@@ -487,7 +487,7 @@ def main():
 
     out = os.path.join(os.path.dirname(__file__), "phase2_capability_realce_results.json")
     with open(out, "w", encoding="utf-8") as f:
-        json.dump(summary, f, ensure_ascii=False, indent=2)
+        json.dump(summary, f, ensure_ascii=False, indent=2, default=_json_native)
     print(f"\n結果: {out}", flush=True)
     return summary
 
