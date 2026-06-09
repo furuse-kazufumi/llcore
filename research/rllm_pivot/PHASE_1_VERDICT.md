@@ -130,8 +130,8 @@ archive (4096 cells) メモリ = 0.6-6.6MB (無視可)。
 ### 5.2 Mamba-130M 正対照 (`phase0_mamba_results.json`) — viable + framework portable
 
 - **Mamba-130M を CPU (HF slow path) で load 成功** (3.7s cached) + coherent 生成 ("The capital of France is in the city of Paris.") = 実 LM・第2 base。
-- **framework が第2 base へ portable**: Mamba hidden 上で cert_two gate = admit 0.023 / certified-stable率 **1.000** / false-admit **0** (sound)、no-gate 0.713 → **gate load-bearing +0.287** (SmolLM2 の +0.320 と整合) = F8 plug-point「新 base 載せ替え」を実証。
-- ⚠ honest: base-level の stable-by-construction (非正 Lyapunov 指数) は本実験では未検証 (gate は adapter に掛かり base 自体でない)。intrinsic hidden の摂動忘却 proxy (rel-step 中央 0.801) は判別力弱 → **Mamba 固有安定性の正対照は SSM Jacobian 測定として Phase 2 へ defer**。本 Phase の deliverable は「framework portability + Mamba CPU 動作確認」。
+- **framework が第2 base へ portable**: Mamba hidden 上で cert_two gate = admit 0.023 (**= 300 中 7 gene のみ**)/ certified-stable率 1.000 / false-admit 0、no-gate 0.713 → **gate load-bearing +0.287** (SmolLM2 の +0.320 と整合) = F8 plug-point「新 base 載せ替え」を実証。
+- ⚠ honest (敵対的検証反映): (1) §5.2 の soundness オラクルは §1-4 の empirical_rho (固有値 from-below 数千 sample) ではなく **perturbation_forgetting (単一摂動・1 軌道対) という弱オラクル**。検出力が §1-4 より明確に低い。 (2) certified-stable率 1.000 と false-admit 0 は**同一変数由来の冗長表記** (独立 2 根拠でない)、かつ **admit n=7 の小集団**ゆえ「sound」と断ずる統計的検出力は低い。 (3) base-level の stable-by-construction (非正 Lyapunov 指数) は未検証 (gate は adapter に掛かり base 自体でない)。intrinsic hidden 摂動忘却 proxy (rel-step 中央 0.801) は判別力弱 → **Mamba 固有安定性の正対照は SSM Jacobian 測定として Phase 2 へ defer**。本 Phase の deliverable は「**framework portability + Mamba CPU 動作確認**」に限定 (固有安定性正対照ではない)。
 
 ---
 
