@@ -327,9 +327,12 @@ def main():
         "heldout_means": {k: float(np.mean(v)) for k, v in res.items()},
         "train_means": {k: float(np.mean(v)) for k, v in train_res.items()},
         "ME_vs_gradient": cmp_me_grad,
+        "ME_vs_gradient_strong_metagate": cmp_me_gradstrong,
         "ME_vs_random": cmp_me_rand,
         "gradient_vs_ME": cmp_grad_me,
         "gate_vs_ungate": cmp_gate_ungate,
+        "random_heldout_mean": rand_mean,
+        "terrain_discriminating": discriminating,
         "verdict": verdict,
     }
     print("\n=== capability terrain-bet verdict ===", flush=True)
