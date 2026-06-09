@@ -159,8 +159,9 @@ def analyze_layer_stability(A: np.ndarray, dt_base: np.ndarray) -> dict:
         "A_min": A_min, "A_max": A_max, "A_mean": A_mean,
         "all_A_negative": all_A_negative, "frac_A_negative": frac_A_negative,
         "dt_base_min": dt_base_min, "dt_base_max": dt_base_max,
-        "lam_max_base": lam_max_base,                 # 代表 Δ での λ_max(≤0=非正/固有安定)
-        "max_abs_abar_base": max_abs_abar_base,       # 代表 Δ での max|Ā 対角|(≤1 なら収縮)
+        "lam_max_base": lam_max_base,                 # 代表 Δ での λ_max(≤0=非正/固有安定)— full-precision、load-bearing
+        "max_abs_abar_base": max_abs_abar_base,       # 代表 Δ での max|Ā 対角|(≤1 なら収縮)— float 上 1.0 へ丸まる
+        "one_minus_max_abs_abar_base": float(-np.expm1(lam_max_base)),  # = 1 - max|Ā|(> 0 = 厳密収縮余裕; 丸め回避)
         "stable_base": stable_base,                   # λ_max ≤ 0(非正=非厳密も安定)
         "strictly_stable_base": strictly_stable_base, # λ_max < 0(厳密収縮)か
         "n_marginal_base": n_marginal_base,           # λ≈0(marginal)な (channel,state) 数
