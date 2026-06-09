@@ -108,9 +108,11 @@ def main():
     for n in ns:
         rec = measure_n(rng, n)
         per_n.append(rec)
+        ct = f"{rec['t_cert_two_us']:.1f}" if rec['t_cert_two_us'] is not None else "—(2^n外挿)"
+        cs = f"{rec['t_cert_sdp_us']:.1f}" if rec['t_cert_sdp_us'] is not None else "—(2^n外挿)"
         print(f"  n={n:2d} dim={rec['dim']:3d}  mutate={rec['t_mutate_us']:.2f}  "
-              f"cert_inf={rec['t_cert_inf_us']:.2f}  cert_two={rec['t_cert_two_us']:.1f}  "
-              f"cert_sdp={rec['t_cert_sdp_us']:.1f}  fitness={rec['t_fitness_us']:.2f}  "
+              f"cert_inf={rec['t_cert_inf_us']:.2f}  cert_two={ct}  "
+              f"cert_sdp={cs}  fitness={rec['t_fitness_us']:.2f}  "
               f"width_grow={rec['t_width_grow_us']:.2f}", flush=True)
 
     # cert スケーリング比 (n に対する cert_two 増大 = 2^n 壁)
@@ -118,8 +120,11 @@ def main():
     print("\ncert_two コスト n スケーリング:", flush=True)
     prev = None
     for n in ns:
+        if two[n] is None:
+            print(f"  n={n:2d} cert_two=測定上限超 (2^{n} 頂点 = 外挿域)", flush=True)
+            continue
         ratio = (two[n] / prev) if prev else float("nan")
-        print(f"  n={n:2d} cert_two={two[n]:.1f}μs  ×前n={ratio:.2f} (理論 2^Δn={2**(n-(n-2)) if prev else 1})", flush=True)
+        print(f"  n={n:2d} cert_two={two[n]:.1f}μs  ×前測定={ratio:.2f}", flush=True)
         prev = two[n]
 
     # 代表 budget 外挿 (small-n per-component: n=6, cert_two gate)
