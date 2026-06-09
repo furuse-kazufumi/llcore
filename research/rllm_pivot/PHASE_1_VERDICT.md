@@ -49,8 +49,8 @@
 | | cert_two / cert_sdp | 0.329 / 0.771 | 0 / 0 | 114 / 675 | 0.167 / **0.681** | PASS / PASS |
 
 **確定知見**:
-1. **成長下 soundness = 完璧 (全 16 (セル×gate) で false-admit=0)** — width_grow 1 回ごとに証明器が ρ<1 を sound に保つ。成長ρ最大 1.85-2.20 (発散域) は正しく全 reject。**North Star #1 (成長操作下 0 false-admit) を実構造手術で確認**。
-2. **cheap gate (per_row/cert_inf) は sound だが小 n で trivial** — n6_hr0 で **非自明 admit=0 (maxΔfunc 0.047<τ=0.05) → gate3 FAIL**。= Phase −1 の「cert_inf 両立帯 trivial (change@ε_max<1%)」を**実構造手術レベルで再現**。
+1. **成長下 soundness = 全 16 (セル×gate) で 0 観測 false-admit** — width_grow 1 回ごとに証明器が ρ<1 を保つ (empirical_rho from-below オラクルでの 0 観測 = §7#2 の通り near-boundary を取りこぼしうる強い consistency 証拠であり絶対証明ではない)。成長ρ最大 1.85-2.21 (発散域) は正しく全 reject。**North Star #1 (成長操作下 0 観測 false-admit) を実構造手術で確認**。
+2. **cheap gate (per_row/cert_inf) は sound だが小 n で trivial/脆弱** — **n6_hr0 (最保守 edge=headroom 0) で非自明 admit=0 (maxΔfunc 0.047<τ=0.05) → gate3 FAIL**。同 n=6 でも hr2 (headroom あり) は PASS だが**非自明 admit わずか 3・maxΔfunc 0.067 と τ=0.05 ギリギリ=cheap gate の navigability は脆い**。= Phase −1 の「cert_inf 両立帯 trivial (change@ε_max<1%)」を**実構造手術レベルで再現**。なお per_row と cert_inf は本 sample で全数値一致 (ti=1 端点支配ゆえ偶然一致; 両者は scalability が異なる別 gate で、per_row の scalable 独立性は本実験では独立検証できていない)。
 3. **navigable gate (cert_two/cert_sdp) は全セル PASS** — cert_two は 114-168、cert_sdp は 673-733 の非自明 sound admit を開く (maxΔfunc 最大 0.68)。→ **計画 §⑩「per-component gate を cert_two/sdp に格上げ・small-n 限定」が data で正当化**。per_row 不変条件 (F1 訂正済 cheap-sound gate) は scalable だが trivial、cert_two/sdp は navigable だが 2^n = 賭け2 のトレードオフが成長手術レベルで再現。
 
 ---
