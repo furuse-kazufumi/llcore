@@ -8,7 +8,7 @@
 
 ## 0. 一行 verdict
 
-**Decision gate 2 = 枠組み妥当性 PASS / capability = NULL(確証的 negative)。** 評価枠組みは 4 method を soundness で**明確に判別**(無 gate=危険・STABLE 風経験 gate=危険・sound cert=安全・Mamba 風=安全)。一方 capability 副線は、**真に多峰(40 basin)かつ識別力ある地形で、進化(MAP-Elites, gated/ungated)が同予算の gradient/random を held-out で上回れない**(全方向 4 条件 AND 不成立、n=20)。→ **M3 の capability decisive NEGATIVE を多峰地形で proper power 再確認。枠組みの正直な価値は GUARANTEE 側に確定**(capability封印が data で正当化)。bonus: ρ<1 gate は可塑性を有意に殺さない。
+**Decision gate 2 = 枠組み妥当性 PASS / capability = NULL_TIE(進化の優位は未実証)。** 評価枠組みは 4 method を soundness で**明確に判別**(無 gate=危険・STABLE 風経験 gate=危険・sound cert=安全・Mamba 風=安全)。一方 capability 副線は、多峰かつ識別力ある地形で、**進化(MAP-Elites, gated/ungated)と gradient/random が held-out で統計的に区別不能**(全方向 4 条件 AND 不成立、ME vs gradient mean_diff=+0.028/p=0.39/sign_delta=0、逆向きも非有意=純粋な引き分け、n=20)。→ **「進化が capability で勾配に勝つ」という EXISTS は支持されず**(M3 の負と整合)。ただしこれは **非有意の引き分け = capability 優位の未実証**であって「進化が勾配に劣る」proof でも powered な等価性 proof でもない(absence of evidence ≠ evidence of absence)。**戦略含意は同じ: capability は売りにできず、枠組みの価値は GUARANTEE 側に確定**(capability封印が data で正当化)。bonus: ρ<1 gate は held-out では可塑性を有意に殺さない(ただし train 側では archive 探索を制約、§3/§4)。
 
 ---
 
