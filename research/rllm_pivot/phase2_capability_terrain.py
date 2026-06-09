@@ -370,6 +370,21 @@ def main():
     if not discriminating:
         verdict += f" [⚠地形 non-discriminating: random held-out 平均={rand_mean:.3f}=天井/床。verdict の証拠力低下]"
 
+    # ★解析勾配 cross-check (2026-06-10): 実 SmolLM2-CE 地形と同じ「ME vs 強い解析勾配」を synthetic でも検証。
+    # 実地形では torch 解析勾配が ME を逆転(=finite-diff の弱さ artifact)。synthetic も同様なら「NULL_TIE は
+    # 弱 finite-diff ゆえ過小評価、強い勾配では gradient ≥ evolution」を cross-terrain で確証。
+    torch_beats_me = cmp_gradtorch_me["all_pass"]
+    me_beats_torch = cmp_me_gradtorch["all_pass"]
+    if torch_beats_me:
+        cross_check = ("CONFIRMED: 解析 torch gradient が ME を有意に上回る → synthetic NULL_TIE も弱 finite-diff "
+                       "由来で、強い勾配では gradient > evolution。実 SmolLM2-CE 地形(ARTIFACT+NEGATIVE)と整合。")
+    elif me_beats_torch:
+        cross_check = ("DIVERGENT: synthetic では ME が解析 torch gradient も上回る(実地形と不一致) → synthetic 地形が "
+                       "evolution に固有有利な可能性。要内訳精査。")
+    else:
+        cross_check = ("TIE: synthetic では ME と解析 torch gradient に有意差なし(実地形では torch が ME を逆転) → "
+                       "synthetic NULL_TIE は弱 finite-diff の過小評価ではあるが torch でも引き分け。")
+
     summary = {
         "meta": {"n": N, "T": T, "K_basins": K_BASINS, "budget": BUDGET, "n_seeds": N_SEEDS,
                  "grid": GRID, "seed0": SEED0, "scipy": _HAVE_SCIPY,
@@ -379,12 +394,15 @@ def main():
         "train_means": {k: float(np.mean(v)) for k, v in train_res.items()},
         "ME_vs_gradient": cmp_me_grad,
         "ME_vs_gradient_strong_metagate": cmp_me_gradstrong,
+        "ME_vs_gradient_torch_analytic": cmp_me_gradtorch,
+        "gradient_torch_vs_ME": cmp_gradtorch_me,
         "ME_vs_random": cmp_me_rand,
         "gradient_vs_ME": cmp_grad_me,
         "gate_vs_ungate": cmp_gate_ungate,
         "random_heldout_mean": rand_mean,
         "terrain_discriminating": discriminating,
         "verdict": verdict,
+        "torch_cross_check": cross_check,
     }
     print("\n=== capability terrain-bet verdict ===", flush=True)
     print(f"held-out 平均: " + " ".join(f"{k}={np.mean(v):.3f}" for k, v in res.items()), flush=True)
