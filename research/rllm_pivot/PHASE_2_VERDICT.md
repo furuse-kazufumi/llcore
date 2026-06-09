@@ -138,8 +138,14 @@ gradient(fd) −1.483 ≈ mapelites_gate −1.483。
 実地形 data で正当化**。
 - ★**honest-disclosure の真価**([[feedback_benchmark_honest_disclosure]]): strong-gradient meta-gate が無ければ「進化が実地形で
   capability に勝つ(20/20!)」と **false-positive を誤結論**していた。「勝った気になる前に内訳を疑う」が機能。
-- ★**synthetic NULL_TIE への含意**: §2 の synthetic 実験も **同じ弱い finite-diff gradient** を使用 → そこでの「引き分け(NULL_TIE)」は
-  実は **強い勾配なら gradient 優位**で、capability negative は **synthetic でも過小評価**だった可能性が高い(実地形 torch meta-gate が露呈)。
+- ★**synthetic NULL_TIE への cross-check(2026-06-10、`phase2_capability_terrain.py` に torch 解析勾配 追加・再走で確証)**:
+  §2 の synthetic 実験も **同じ弱い finite-diff gradient** を使用していた。torch 解析勾配を synthetic にも適用すると
+  **gradient_torch が最高平均(held-out 0.575 > ME 0.535 > gradient_strong 0.549 > gradient 0.507 > random 0.489)** =
+  「強い勾配 ≥ 進化」は synthetic でも mean レベルで成立。ただし synthetic は **per-seed 分散が高く**(seed 間で ME が
+  0.004〜0.586 と乱高下)、ME vs torch の paired 4条件AND は **TIE**(diff −0.040, p=0.64=有意に達せず)。
+  → **capability NEGATIVE は cross-terrain で一貫**(torch 解析勾配が両地形で最高平均)。差は分散: 低分散の実地形では
+  torch が ME を **19/20 で paired 有意に逆転**(decisive)、高分散の synthetic では mean 優位だが paired は TIE。
+  **synthetic の旧 NULL_TIE は弱 finite-diff の産物で、強い勾配では gradient が最良**(capability 優位は両地形で立たず)。
 - **gate コスト(honest)**: 実地形では ρ<1 gate が held-out fitness を実測 −0.028 制約(ME+gate −1.483 < ME −1.454, 0/20)=
   synthetic の flat regime と違い、ここでは gate が可塑性を測定可能に削る。ただし進化に capability 優位が無い(gradient 勝利)ため
   capability 結論には影響せず。
