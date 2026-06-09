@@ -116,7 +116,7 @@ def run_harness(H, rng):
             decay = rng.uniform(0, 1, N)
             W = (rng.normal(0, 1, (N, N)) / np.sqrt(N)) * float(rng.uniform(0.3, 1.0))
             for _ in range(50):
-                if _infnorm_sup(decay, W, _t_min(decay, W, V)) < 1.0:
+                if _infnorm_sup(decay, W, _t_min(decay, W, V, 1.0)) < 1.0:
                     return decay, W
                 W = W * 0.85
         return rng.uniform(0, 1, N), np.zeros((N, N))
