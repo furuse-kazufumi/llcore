@@ -157,9 +157,12 @@ def analyze_layer_stability(A: np.ndarray, dt_base: np.ndarray) -> dict:
         "A_min": A_min, "A_max": A_max, "A_mean": A_mean,
         "all_A_negative": all_A_negative, "frac_A_negative": frac_A_negative,
         "dt_base_min": dt_base_min, "dt_base_max": dt_base_max,
-        "lam_max_base": lam_max_base,                 # 代表 Δ での λ_max
-        "max_abs_abar_base": max_abs_abar_base,       # 代表 Δ での max|Ā 対角|(< 1 なら収縮)
-        "stable_base": stable_base,
+        "lam_max_base": lam_max_base,                 # 代表 Δ での λ_max(≤0=非正/固有安定)
+        "max_abs_abar_base": max_abs_abar_base,       # 代表 Δ での max|Ā 対角|(≤1 なら収縮)
+        "stable_base": stable_base,                   # λ_max ≤ 0(非正=非厳密も安定)
+        "strictly_stable_base": strictly_stable_base, # λ_max < 0(厳密収縮)か
+        "n_marginal_base": n_marginal_base,           # λ≈0(marginal)な (channel,state) 数
+        "n_total": n_total,
         "dt_sweep": sweep,
         "stable_all_dt": bool(all(s["stable"] for s in sweep)),
     }
