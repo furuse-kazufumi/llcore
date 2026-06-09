@@ -415,7 +415,11 @@ def main():
     print(f"地形識別力: random held-out 平均={rand_mean:.3f} (0.05-0.95 で discriminating={discriminating})", flush=True)
     print(f"gate vs ungate (ρ<1 が可塑性を殺すか): diff={cmp_gate_ungate['mean_diff']:+.3f} "
           f"p={cmp_gate_ungate['p_value']:.3f}", flush=True)
+    print(f"★ME vs gradient_torch (解析勾配 cross-check): diff={cmp_me_gradtorch['mean_diff']:+.3f} "
+          f"p={cmp_me_gradtorch['p_value']:.3f} → ME 上回る={cmp_me_gradtorch['all_pass']} / "
+          f"torch 上回る={cmp_gradtorch_me['all_pass']}", flush=True)
     print(f"VERDICT: {verdict}", flush=True)
+    print(f"CROSS-CHECK: {cross_check}", flush=True)
 
     out = os.path.join(os.path.dirname(__file__), "phase2_capability_terrain_results.json")
     with open(out, "w", encoding="utf-8") as f:
