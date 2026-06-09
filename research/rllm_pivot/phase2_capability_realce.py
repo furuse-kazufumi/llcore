@@ -70,7 +70,6 @@ N_SEEDS = 20           # ≥15 (phase2 と同一)
 GRID = 12              # MAP-Elites archive grid
 SEED0 = 20260609
 N_TRAIN_SENT = 12      # train 文数 / 残りが held-out
-READOUT_SCALE = 1.5    # 固定 readout のスケール(識別力確保。結果に合わせ調整=p-hack ゆえ固定)
 
 CORPUS = [
     "The infinite monkey theorem is a probability statement about random typing.",
