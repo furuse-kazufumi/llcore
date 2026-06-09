@@ -395,6 +395,9 @@ def generalization_test(seed0: int = SEED0) -> dict:
         "paramshift_train_mean": float(np.mean(ps_train)),
         "diverse_vs_paramshift_heldout": cmp_div_ps,
         "paramshift_vs_diverse_heldout": cmp_ps_div,
+        "diverse_generalization_gap_mean": float(np.mean(div_gap)),
+        "paramshift_generalization_gap_mean": float(np.mean(ps_gap)),
+        "paramshift_overfits_more_than_diverse": cmp_gap,
         "terrain_discriminating": discriminating,
         "verdict": verdict,
     }
