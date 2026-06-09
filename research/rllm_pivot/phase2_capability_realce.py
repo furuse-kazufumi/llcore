@@ -16,9 +16,12 @@ honest 設計(phase2_capability_terrain.py の枠を踏襲、地形のみ実 LLM
   - **gene = small-n verified recurrent adapter** (CoupledNDGene, n≤6, Phase −1 確定の small-n per-component)。
     s_t = decay⊙s + (1-decay)⊙tanh(W s + x_t), x_t = X[t] (=H[t]@P^T 正規化)。
   - **CE 地形(実 LLM 由来)**: 目的 = 各位置 t で「次 hidden の cluster y_t = cluster(X[t+1])」を予測。
-    logits_t = R_s @ s_t、CE = -log softmax(logits_t)[y_t]。fitness = -mean CE。これは「モデル自身の
-    次内部表現クラスを予測する」実 LLM 由来の系列予測 CE(synthetic Gaussian でない)。cluster は
-    **train 文の射影 hidden のみ**で KMeans fit(held-out へのリークなし)。
+    readout = **centroid 最近傍分類器**(GMM 事後確率の原理的選択): logits_t[k] = -β‖s_t - center_k‖²
+    (β=1/(2σ²), σ²=train 内クラスタ分散)。CE = -log softmax(logits_t)[y_t]。fitness = -mean CE。
+    = 「adapter が次 hidden のクラスタ重心へ状態を寄せる」実 forecasting タスク。固定ランダム readout は
+    n=4 状態から 8 クラス予測が floor に張り付き non-discriminating だったため、原理的な centroid readout へ
+    (smoke で確認・修正、feedback_scenario_iterative)。cluster は **train 文の射影 hidden のみ**で
+    KMeans fit(held-out へのリークなし)。adapter (decay,W) のみ可変=verified adapter 思想を維持。
   - **train/held-out 分離**: train 文で fitness 最適化、held-out **文**(最適化中 未観測)で汎化 CE を評価。
   - 4+1 optimizer を **同予算 B (train-fitness 評価回数)** で: random / gradient(有限差分+restart) /
     gradient_strong(restart64=meta-gate) / MAP-Elites / MAP-Elites+gate(ρ<1 cert_inf gate)。
