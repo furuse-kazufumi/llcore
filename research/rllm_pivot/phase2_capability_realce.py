@@ -520,10 +520,14 @@ def main():
     if me_beats_grad and me_beats_torch:
         verdict = ("EXISTS (ME が finite-diff も 解析(torch Adam, exact grad)も 4条件AND で上回る = 実多峰地形で "
                    "genuine navigability 優位。M3/synthetic NULL を覆す驚き → honest: 内訳精査必須)")
+    elif me_beats_grad and torch_beats_me:
+        verdict = ("ARTIFACT+NEGATIVE (ME は finite-diff gradient を上回るが、解析 torch gradient(exact, 同予算)は "
+                   "ME を**逆に上回る** → ME の勝ちは finite-diff の弱さ(cold-start・dim+1 評価/step・~95 step)の "
+                   "ARTIFACT。強い勾配では gradient > evolution = 実 LLM 地形でも capability NEGATIVE(M3/synthetic と整合)。"
+                   "guarantee 主軸が data で正当化)")
     elif me_beats_grad and not me_beats_torch:
-        verdict = ("ARTIFACT (ME は finite-diff gradient を上回るが 解析 torch gradient が gap を埋める = "
-                   "finite-diff の弱さ(cold-start・dim+1 評価/step)の artifact; genuine capability でない → "
-                   "guarantee 主軸が正当・synthetic NULL と整合)")
+        verdict = ("ARTIFACT (ME は finite-diff gradient を上回るが 解析 torch gradient が gap を埋める(有意差消失) = "
+                   "finite-diff の弱さの artifact; genuine capability でない → guarantee 主軸が正当・synthetic NULL と整合)")
     elif torch_beats_me:
         verdict = "NULL (解析 torch gradient ≥ evolution = 実 LLM 地形で capability NEGATIVE)"
     else:
