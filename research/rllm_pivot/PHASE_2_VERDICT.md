@@ -174,6 +174,9 @@ Phase 1 で defer された正対照を実機完遂。Mamba-130M を load し全
   base レベルで明確分離 = North Star #3 を base レベルで補強。
 - honest: Δ 入力依存(代表値+スイープで近似)/ 対角 A 前提(この hf checkpoint で成立)/ ZOH 離散化 / **SSM 状態再帰の安定性のみ**
   (conv1d/SiLU/MLP の full Lipschitz でない)/ 代表 Δ で marginal な channel は Δ≈0 由来(A≈0 でない)=非厳密(≤0)を over-claim せず。
+  **★正対照は parameterization の自明性**: A=-exp(A_log)<0 は任意の(訓練済/ランダム)Mamba checkpoint で構造的に成立 = 学習結果でなく
+  パラメタライズを検定する(certificate は valid な Mamba では失敗し得ない)。これが「正の対照=自明 PASS」の意味であり over-claim でない
+  (枠組みが「安全な base を自明に PASS させる」健全性 = 偽陽性方向の判別力を base レベルで確認)。
 
 ### 7.4 動きで魅せるデモ (F11 技術成果物) (`phase2_demo_gate_discrimination.py` + `.svg` + `.json`)
 
