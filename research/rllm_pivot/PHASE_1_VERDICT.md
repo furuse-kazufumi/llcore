@@ -14,7 +14,7 @@
 
 ---
 
-## 1. Phase 1.1 — 固定構造 cert soundness + 証明器格子 (`phase1_cert_soundness_results.py`)
+## 1. Phase 1.1 — 固定構造 cert soundness + 証明器格子 (`phase1_cert_soundness_results.json`)
 
 収縮〜発散を跨ぐ gene を n={4,6,8} で各 600/600/400 個サンプルし、3 証明器の admit と真 ρ (empirical_rho 6000 sample) を測定。
 
