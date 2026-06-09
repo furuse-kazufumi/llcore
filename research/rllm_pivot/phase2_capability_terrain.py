@@ -222,6 +222,52 @@ def opt_mapelites(terrain, rng, B, gate=False, sigma=0.2, init=64, resample_cap=
     return max(archive.values(), key=lambda v: v[1])[0]
 
 
+def opt_gradient_torch(terrain, rng, B, restarts=4, lr=0.05):
+    """★cross-check (2026-06-10 追記): torch autograd 解析(exact)勾配 + Adam を synthetic 多峰地形にも適用。
+    実 SmolLM2-CE 地形(phase2_capability_realce.py)で「ME の finite-diff 勝利は弱ベースライン artifact、
+    強い解析勾配では gradient > evolution」が判明 → synthetic NULL_TIE も同じ弱 finite-diff ゆえ negative が
+    過小評価だった可能性を data で検証する。同予算 B = forward fitness 評価回数(1 Adam step=1 forward)。"""
+    import torch
+    Xtr = torch.tensor(terrain.X_train)        # (T,N)
+    Ct = torch.tensor(terrain.centers)         # (K,N)
+    sig2 = 2.0 * (SIGMA ** 2)
+    gtorch = torch.Generator().manual_seed(int(rng.integers(1 << 31)))
+
+    def _behavior(decay, W):
+        s = torch.zeros(N, dtype=torch.float64)
+        acc = torch.zeros(N, dtype=torch.float64)
+        for t in range(T):
+            s = decay * s + (1.0 - decay) * torch.tanh(W @ s + Xtr[t])
+            acc = acc + torch.abs(s)
+        return acc / T
+
+    def _theta(raw_decay, raw_W):
+        bd = torch.sigmoid(raw_decay).detach().numpy()
+        bW = (2.0 * torch.tanh(raw_W)).detach().numpy().reshape(-1)
+        return np.concatenate([bd, bW])
+
+    best_theta, best_f, used = None, -1e18, 0
+    steps_per = max(1, B // restarts)
+    for _ in range(restarts):
+        raw_decay = torch.randn(N, generator=gtorch, dtype=torch.float64, requires_grad=True)
+        raw_W = (0.3 * torch.randn(N, N, generator=gtorch, dtype=torch.float64)).clone().detach().requires_grad_(True)
+        opt = torch.optim.Adam([raw_decay, raw_W], lr=lr)
+        for _ in range(steps_per):
+            if used >= B:
+                break
+            opt.zero_grad()
+            b = _behavior(torch.sigmoid(raw_decay), 2.0 * torch.tanh(raw_W))
+            d2 = ((Ct - b.unsqueeze(0)) ** 2).sum(1)          # (K,)
+            fit = torch.exp(-d2 / sig2).max()                  # 多峰 max-of-Gaussian
+            (-fit).backward()
+            opt.step()
+            used += 1
+            f = float(fit.detach())
+            if f > best_f:
+                best_f, best_theta = f, _theta(raw_decay, raw_W)
+    return best_theta if best_theta is not None else _rand_theta(rng)
+
+
 # --------------------------------------------------------------------------- #
 # honest_eval 4 条件 AND
 # --------------------------------------------------------------------------- #
