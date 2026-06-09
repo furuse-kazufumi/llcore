@@ -1,0 +1,32 @@
+{
+  "meta": {
+    "source_population": "D:\\projects\\llcore\\research\\rllm_pivot\\phase2_discriminative_results.json",
+    "n_divergent": 95,
+    "n_contracting": 305,
+    "honest_note": "norm/forgetting/single-trajectory-sensitivity all FAIL to reveal rho>=1 (tanh saturation + direction misalignment); only the box-sup sound certificate distinguishes. This demo visualizes that discriminative power."
+  },
+  "false_admit_rate": {
+    "none": 1.0,
+    "stable_exp": 0.8421052631578947,
+    "cert_inf": 0.0,
+    "cert_two": 0.0,
+    "cert_sdp": 0.0
+  },
+  "over_reject_rate": {
+    "none": 0.0,
+    "stable_exp": 0.0,
+    "cert_inf": 0.7049180327868853,
+    "cert_two": 0.5278688524590164,
+    "cert_sdp": 0.04590163934426229
+  },
+  "single_gene_evidence": {
+    "empirical_rho": 2.9014626765811125,
+    "jac0_rho": 3.0711466623186467,
+    "trajectory_sensitivity_final": 2.2807657149716067e-14,
+    "certificate_box_sup_sigma_max": 4.871190697451122,
+    "cert_inf": false,
+    "cert_two": false,
+    "interpretation": "発散 gene(ρ≈2.90≥1)でも実軌道の摂動感度は 1→2.3e-14(減衰)=経験テストは『安全』と誤認。だが certificate の box-sup σ_max=4.87>1 ゆえsound cert は reject。状態/軌道は安全に見え、certificate のみが worst-case を見抜く。"
+  },
+  "verdict": "経験的判別(無 gate 100% / STABLE 風 84% 発散を false-admit)vs sound cert(0% false-admit)。cert_sdp は 0% 誤許可かつ 4.6% のみ過剰棄却=sound+最 navigable。状態ノルム・有限忘却・単一軌道感度はいずれも ρ≥1 を見逃す → certificate の box-sup のみが見抜く。"
+}
