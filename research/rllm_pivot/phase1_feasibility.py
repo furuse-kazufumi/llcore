@@ -45,6 +45,10 @@ def timeit(fn, reps):
     return (time.perf_counter() - t0) / reps
 
 
+TWO_MAX_N = 12   # cert_two は 2^n 頂点 SVD; n>12 は測定せず外挿 (ハング回避)
+SDP_MAX_N = 8    # cert_sdp は 2^n 頂点 LMI (cvxpy); n>8 は実用外 (genuine solve がハング)
+
+
 def measure_n(rng, n, reps_cheap=2000, reps_cert=200, L=48):
     codec = C.CoupledNDGeneCodec(n)
     g = S.sample_admitted_base(rng, n)
@@ -57,17 +61,17 @@ def measure_n(rng, n, reps_cheap=2000, reps_cert=200, L=48):
 
     t_mut = timeit(lambda: codec.mutate(gtype, 0.15, rng), reps_cheap)
     t_inf = timeit(lambda: C.cert_inf(g), reps_cert)
-    # cert_two/sdp は 2^n; 高 n では reps を絞る
-    rc = max(20, reps_cert // (2 ** max(0, n - 6)))
-    t_two = timeit(lambda: C.cert_two(g), rc)
-    t_sdp = timeit(lambda: C.cert_sdp(g), rc)
+    # cert_two/sdp は 2^n; 上限超は None (外挿) でハング回避
+    rc = max(15, reps_cert // (2 ** max(0, n - 6)))
+    t_two = timeit(lambda: C.cert_two(g), rc) * 1e6 if n <= TWO_MAX_N else None
+    t_sdp = timeit(lambda: C.cert_sdp(g), max(5, rc // 4)) * 1e6 if n <= SDP_MAX_N else None
     t_fit = timeit(lambda: obj.fitness(g), reps_cheap)
     t_grow = timeit(lambda: S.width_grow(g, eps=0.5, in_dir=d.in_dir, out_dir=d.out_dir,
                                          self_w=d.self_w, new_decay=d.new_decay, mode="net2net", k=d.k),
                     reps_cheap)
     return {"n": n, "dim": codec.dim,
             "t_mutate_us": t_mut * 1e6, "t_cert_inf_us": t_inf * 1e6,
-            "t_cert_two_us": t_two * 1e6, "t_cert_sdp_us": t_sdp * 1e6,
+            "t_cert_two_us": t_two, "t_cert_sdp_us": t_sdp,
             "t_fitness_us": t_fit * 1e6, "t_width_grow_us": t_grow * 1e6}
 
 
