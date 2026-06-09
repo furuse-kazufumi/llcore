@@ -1,0 +1,156 @@
+{
+  "meta": {
+    "title": "Phase 2 framework 性 (F8) — North Star #4",
+    "plan": "EVOLVABLE_LLM_PLAN_2026_06_09.md §⑥ L99",
+    "seed0": 20260609,
+    "src_evolve": "llcore.evolution.minimal_ga.evolve (src 無改変)",
+    "plug_points_source": "research/verified_evolution_sdp_gate/coupled_nd.py (CoupledNDGeneCodec / RotationNDObjective / make_nd_verifier)",
+    "honest_caveats": [
+      "synthetic task family (RotationNDObjective damped block-rotation); NOT real SmolLM2-CE loss terrain = clean probe",
+      "coupled-gene verifier gate は fitness wrapper proxy (src の scalar gate ではない)",
+      "paired_sign_delta = net-win-fraction (Cliff's delta ではない)",
+      "予算は train-family-fitness 評価回数で optimizer 間を厳密に揃えた"
+    ]
+  },
+  "part_b_swap_test": {
+    "all_swaps_ran": true,
+    "verifier_admit_counts": {
+      "none": 24,
+      "inf_norm": 4,
+      "two_norm": 6,
+      "sdp": 17
+    },
+    "axes": {
+      "axis_genecodec": [
+        {
+          "swap": "CoupledNDGeneCodec(n=2)",
+          "dim": 6,
+          "final_best_fitness": 0.9304438515880551,
+          "best_curve_improved": true,
+          "ran": true
+        },
+        {
+          "swap": "CoupledNDGeneCodec(n=3)",
+          "dim": 12,
+          "final_best_fitness": 0.5032130613935869,
+          "best_curve_improved": true,
+          "ran": true
+        },
+        {
+          "swap": "CoupledNDGeneCodec(n=4)",
+          "dim": 20,
+          "final_best_fitness": 0.5438621625964305,
+          "best_curve_improved": true,
+          "ran": true
+        }
+      ],
+      "axis_objective": [
+        {
+          "swap": "RotationNDObjective(period=10.0, radius=0.93, amp=0.4)",
+          "final_best_fitness": 0.6162754982898806,
+          "best_curve_improved": true,
+          "ran": true
+        },
+        {
+          "swap": "RotationNDObjective(period=8.0, radius=0.88, amp=0.3)",
+          "final_best_fitness": 0.4078034877562968,
+          "best_curve_improved": true,
+          "ran": true
+        },
+        {
+          "swap": "RotationNDObjective(period=13.0, radius=0.95, amp=0.45)",
+          "final_best_fitness": 0.43260401982370833,
+          "best_curve_improved": true,
+          "ran": true
+        }
+      ],
+      "axis_verifier": [
+        {
+          "swap": "make_nd_verifier('none')",
+          "verifier_name": "none",
+          "final_best_fitness": 0.2609031247063309,
+          "n_admitted_final_pop": 24,
+          "pop_size": 24,
+          "ran": true
+        },
+        {
+          "swap": "make_nd_verifier('inf_norm')",
+          "verifier_name": "inf_norm",
+          "final_best_fitness": 0.1513884481023573,
+          "n_admitted_final_pop": 4,
+          "pop_size": 24,
+          "ran": true
+        },
+        {
+          "swap": "make_nd_verifier('two_norm')",
+          "verifier_name": "two_norm",
+          "final_best_fitness": 0.19800147863245599,
+          "n_admitted_final_pop": 6,
+          "pop_size": 24,
+          "ran": true
+        },
+        {
+          "swap": "make_nd_verifier('sdp')",
+          "verifier_name": "sdp",
+          "final_best_fitness": 0.27949902805879134,
+          "n_admitted_final_pop": 17,
+          "pop_size": 24,
+          "ran": true
+        }
+      ]
+    },
+    "verdict": "PASS (3 plug-point すべて 1 オブジェクト差替で evolve に載り fitness/admit が出た = framework 約束として機能)"
+  },
+  "part_a_generalization": {
+    "meta": {
+      "n_dim": 3,
+      "pop": 24,
+      "gens": 30,
+      "n_seeds": 20,
+      "budget_evals_per_opt": 720,
+      "grid": 10,
+      "seed0": 20260609,
+      "n_train_tasks": 5,
+      "n_heldout_tasks": 3,
+      "task_family": "synthetic RotationNDObjective (damped block-rotation), NOT real SmolLM2-CE terrain = clean probe",
+      "scipy": true
+    },
+    "diverse_heldout_mean": 0.13242203173663897,
+    "diverse_train_mean": 0.2948789970915998,
+    "diverse_archive_cells_mean": 55.75,
+    "paramshift_heldout_mean": 0.12133625786667265,
+    "paramshift_train_mean": 0.3214182177965689,
+    "diverse_vs_paramshift_heldout": {
+      "mean_diff": 0.011085773869966249,
+      "p_value": 0.5508413314819336,
+      "n_seeds": 20,
+      "wins": 10,
+      "losses": 10,
+      "paired_sign_delta": 0.0,
+      "conditions": {
+        "diff_positive": true,
+        "wilcoxon_p_lt_0.05": false,
+        "n_seeds_ge_15": true,
+        "abs_paired_sign_delta_ge_0.147": false
+      },
+      "all_pass": false
+    },
+    "paramshift_vs_diverse_heldout": {
+      "mean_diff": -0.011085773869966249,
+      "p_value": 0.4636392593383789,
+      "n_seeds": 20,
+      "wins": 10,
+      "losses": 10,
+      "paired_sign_delta": 0.0,
+      "conditions": {
+        "diff_positive": false,
+        "wilcoxon_p_lt_0.05": false,
+        "n_seeds_ge_15": true,
+        "abs_paired_sign_delta_ge_0.147": false
+      },
+      "all_pass": false
+    },
+    "terrain_discriminating": true,
+    "verdict": "NULL (held-out 汎化に有意差なし = 多様性は load-bearing でない。第一級 NULL 知見; 多様性が汎化を助ける証拠は立たず)"
+  }
+}

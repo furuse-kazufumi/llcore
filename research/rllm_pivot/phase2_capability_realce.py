@@ -439,7 +439,7 @@ def main():
     summary = {
         "meta": {"model": MODEL, "layer": LAYER, "n": N, "k_clusters": K_CLUSTERS,
                  "budget": BUDGET, "n_seeds": N_SEEDS, "grid": GRID, "seed0": SEED0,
-                 "n_train_sent": N_TRAIN_SENT, "readout_scale": READOUT_SCALE,
+                 "n_train_sent": N_TRAIN_SENT, "readout": "centroid_nearest (GMM posterior, beta=1/2sigma2)",
                  "scipy": _HAVE_SCIPY, "elapsed_s": round(elapsed, 1),
                  "terrain": "REAL SmolLM2-135M hidden-derived next-cluster CE (synthetic でない=実地形 follow-up)"},
         "h_multimodal_basins": n_basins,
