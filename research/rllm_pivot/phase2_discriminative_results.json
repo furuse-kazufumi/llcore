@@ -1,0 +1,104 @@
+{
+  "meta": {
+    "seed": 20260609,
+    "n": 6,
+    "T": 64,
+    "eps_forget": 0.01,
+    "rho_samples": 6000,
+    "methods": [
+      "none",
+      "stable_exp",
+      "cert_inf",
+      "cert_two",
+      "cert_sdp"
+    ],
+    "note": "H-discriminative: 4 method を soundness で判別 (Decision gate 2 核)。"
+  },
+  "spanning": {
+    "n_genes": 400,
+    "n_divergent": 95,
+    "n_contracting": 305,
+    "per_method": {
+      "none": {
+        "admit_rate": 1.0,
+        "false_admit": 95,
+        "false_admit_rate": 1.0,
+        "reject_on_contracting_rate": 0.0
+      },
+      "stable_exp": {
+        "admit_rate": 0.9625,
+        "false_admit": 80,
+        "false_admit_rate": 0.8421052631578947,
+        "reject_on_contracting_rate": 0.0
+      },
+      "cert_inf": {
+        "admit_rate": 0.225,
+        "false_admit": 0,
+        "false_admit_rate": 0.0,
+        "reject_on_contracting_rate": 0.7049180327868853
+      },
+      "cert_two": {
+        "admit_rate": 0.36,
+        "false_admit": 0,
+        "false_admit_rate": 0.0,
+        "reject_on_contracting_rate": 0.5278688524590164
+      },
+      "cert_sdp": {
+        "admit_rate": 0.7275,
+        "false_admit": 0,
+        "false_admit_rate": 0.0,
+        "reject_on_contracting_rate": 0.04590163934426229
+      }
+    }
+  },
+  "mamba_synth": {
+    "n_genes": 200,
+    "n_divergent": 0,
+    "n_contracting": 200,
+    "per_method": {
+      "none": {
+        "admit_rate": 1.0,
+        "false_admit": 0,
+        "false_admit_rate": 0.0,
+        "reject_on_contracting_rate": 0.0
+      },
+      "stable_exp": {
+        "admit_rate": 1.0,
+        "false_admit": 0,
+        "false_admit_rate": 0.0,
+        "reject_on_contracting_rate": 0.0
+      },
+      "cert_inf": {
+        "admit_rate": 1.0,
+        "false_admit": 0,
+        "false_admit_rate": 0.0,
+        "reject_on_contracting_rate": 0.0
+      },
+      "cert_two": {
+        "admit_rate": 1.0,
+        "false_admit": 0,
+        "false_admit_rate": 0.0,
+        "reject_on_contracting_rate": 0.0
+      },
+      "cert_sdp": {
+        "admit_rate": 1.0,
+        "false_admit": 0,
+        "false_admit_rate": 0.0,
+        "reject_on_contracting_rate": 0.0
+      }
+    }
+  },
+  "verdict": {
+    "false_admit_spanning": {
+      "none": 95,
+      "stable_exp": 80,
+      "cert_inf": 0,
+      "cert_two": 0,
+      "cert_sdp": 0
+    },
+    "H3a_discriminative_pass": true,
+    "H3a_detail": "none=95 > stable_exp=80 > certs(max)=0=0",
+    "H3b_positive_control_pass": true,
+    "H3b_detail": "mamba_synth 上で cert_sdp の収縮棄却率=0.000 (<0.05 で正対照 PASS)"
+  }
+}
