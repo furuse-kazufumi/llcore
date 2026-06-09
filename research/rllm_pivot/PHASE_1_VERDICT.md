@@ -72,7 +72,7 @@
 **確定知見**:
 1. **per-block AND は coupling 下で genuinely 不 sound** — γ≥1.0 で per-block admit 済の **24-34% (γ=1.0) 〜 80-96% (γ=2.0) が合成真 ρ≥1**。**red-team F6 / North Star #2 を実構成+真 ρ で再確認** → per-block AND 禁止確定。
 2. **full-system cert (inf/two/sdp) は全 γ で 0 false-admit = sound** — coupling 込み full-system cert なら sound (North Star #2 充足)。
-3. **★cert_sdp が coupled 系で圧倒的に navigable** — γ=0.5-1.0 で full cert_inf は 1-10%・cert_two は 8-49% しか救えないが **cert_sdp は 98% 救済** (γ=2.0 でも 50-62%)。SDP/Lyapunov が ∞-norm/2-norm の過保守 (回転・非正規収縮の取りこぼし) を解消。**coupled_nd.py docstring の仮説「SDP 優位は次元と共に拡大」を coupling 下で実証**。
+3. **★cert_sdp が coupled 系で圧倒的に navigable** — **nb=2 (full=4)** では γ=0.5-1.0 で full cert_inf 1-10%・cert_two 8-49% に対し **cert_sdp 98% 救済** (γ=2.0 でも 62%)。**nb=3 (full=6)** では navigability が落ち γ=1.0 で inf=0%・two=0%・**sdp=75.8%**、γ=2.0 で sdp=50% (inf/two は 0%)。→ **cert_sdp は coupled 系でも最 navigable だが、次元 (nb 2→3) と coupling 強度で coverage は低下** (inf/two は n=6 coupled で完全無力 0%)。SDP/Lyapunov が ∞-norm/2-norm の過保守 (回転・非正規収縮の取りこぼし) を解消する一方、次元の壁は SDP でも効く。**coupled_nd.py docstring の仮説「SDP 優位」を coupling 下で実証**。
    - ⚠ nb=3 で clarabel が "Solution may be inaccurate" 警告を数件出した。**独立 eigen 再検査で soundness は保証 (full sdp false-admit=0)**。coverage の数値は近似解由来の僅かな揺れを含みうる (honest 留保)。
 
 ---
