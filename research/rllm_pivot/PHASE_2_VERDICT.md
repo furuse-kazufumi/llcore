@@ -152,7 +152,9 @@ gradient(fd) −1.483 ≈ mapelites_gate −1.483。
 North Star #4。src `llcore.evolution.minimal_ga.evolve()` を **無改変**で使用(`git diff src/` 空、固定 protocol adapter のみ additive)。
 - **(b) 3 plug-point 拡張性 = PASS**: GeneCodec(`CoupledNDGeneCodec` n=2/3/4)・Objective(`RotationNDObjective` period/radius 違い)・
   VerifierBackend(`make_nd_verifier` none/inf_norm/two_norm/sdp)を各々 **1 オブジェクト差替**で同一 evolve ループに載せ替え動作。
-  verifier admit ladder = none 24 ≥ **sdp 15** ≥ {inf_norm 8, two_norm 5}(cert_sdp が cert_two を fast-path 包含=整合)。**pytest 17 passed**。
+  final 集団 admit 数(決定論 seed)= none 24 / inf_norm 9 / two_norm 9 / **sdp 17**。**保証される関係は per-gene subset
+  (`cert_two(g)⟹cert_sdp(g)` の fast-path / `cert_inf(g)⟹cert_sdp(g)`、3000 gene で 0 違反=pytest が assert する核)**であり、
+  集団ごとの count-level ladder は per-sample 偶発(別 gate で進化した別集団の count 比較ゆえ)。**pytest 17 passed**。
   honest: verifier gate は fitness-wrapper proxy(src の scalar gate path は codec 併用で fail-loud ゆえ、plan §⑦ 方針=verifier backend が担う)・明記済。
 - **(a) 汎化 load-bearing = NULL**: 構造多様 archive(MAP-Elites over topology descriptor, cells≈56)vs param-shift-only baseline を
   task family(RotationNDObjective 8 task、train 5/held-out 3)・同予算 720・20 seed で比較。held-out diff=+0.011, p=0.55, sign_delta=0
