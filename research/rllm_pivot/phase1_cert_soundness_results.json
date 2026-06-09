@@ -1,0 +1,66 @@
+{
+  "meta": {
+    "seed": 20260609,
+    "oracle": "empirical_rho (s,x)~U[-1,1]^n from-below, 6000 samples",
+    "sdp_available": true
+  },
+  "per_n": {
+    "4": {
+      "n_genes": 600,
+      "n_contracting": 453,
+      "false_admit": {
+        "inf": 0,
+        "two": 0,
+        "sdp": 0
+      },
+      "s2_infnorm_bound_violations": 0,
+      "s2_min_margin_sup_minus_rho": 0.0004157264633213309,
+      "coverage_on_contracting": {
+        "inf": 0.4105960264900662,
+        "two": 0.5077262693156733,
+        "sdp": 0.9536423841059603
+      },
+      "two_admit_but_not_sdp": 0,
+      "sdp_admit_beyond_two": 202,
+      "inf_admit_but_not_sdp": 0
+    },
+    "6": {
+      "n_genes": 600,
+      "n_contracting": 426,
+      "false_admit": {
+        "inf": 0,
+        "two": 0,
+        "sdp": 0
+      },
+      "s2_infnorm_bound_violations": 0,
+      "s2_min_margin_sup_minus_rho": 0.00018437562323625478,
+      "coverage_on_contracting": {
+        "inf": 0.2863849765258216,
+        "two": 0.4295774647887324,
+        "sdp": 0.9389671361502347
+      },
+      "two_admit_but_not_sdp": 0,
+      "sdp_admit_beyond_two": 217,
+      "inf_admit_but_not_sdp": 0
+    },
+    "8": {
+      "n_genes": 400,
+      "n_contracting": 280,
+      "false_admit": {
+        "inf": 0,
+        "two": 0,
+        "sdp": 0
+      },
+      "s2_infnorm_bound_violations": 0,
+      "s2_min_margin_sup_minus_rho": 0.000697998208081807,
+      "coverage_on_contracting": {
+        "inf": 0.225,
+        "two": 0.3964285714285714,
+        "sdp": 0.9071428571428571
+      },
+      "two_admit_but_not_sdp": 0,
+      "sdp_admit_beyond_two": 143,
+      "inf_admit_but_not_sdp": 0
+    }
+  }
+}

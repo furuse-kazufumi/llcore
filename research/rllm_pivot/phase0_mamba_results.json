@@ -5,11 +5,35 @@
     "n": 6,
     "seed": 20260609
   },
-  "status": "deferred",
-  "error": "TypeError: _t_min() missing 1 required positional argument: 'max_input_abs'",
-  "trace_tail": [
-    "    if _infnorm_sup(decay, W, _t_min(decay, W, V)) < 1.0:",
-    "                              ^^^^^^^^^^^^^^^^^^^",
-    "TypeError: _t_min() missing 1 required positional argument: 'max_input_abs'"
-  ]
+  "status": "ok",
+  "load_seconds": 3.68701434135437,
+  "sample_generation": "The capital of France is in the city of Paris.\n\nThe city of Paris",
+  "hidden_shape": [
+    52,
+    768
+  ],
+  "x_info": {
+    "T": 52,
+    "x_abs_mean": 0.4608360893082441
+  },
+  "methods": {
+    "cert_two": {
+      "n_admitted": 7,
+      "admit_rate": 0.023333333333333334,
+      "certified_stable_rate": 1.0,
+      "false_admit_count": 0,
+      "forget_median": 2.624694208297536e-10
+    },
+    "none": {
+      "n_admitted": 300,
+      "admit_rate": 1.0,
+      "certified_stable_rate": 0.7133333333333334,
+      "false_admit_count": null,
+      "forget_median": 1.993016520934111e-05
+    }
+  },
+  "intrinsic_hidden": {
+    "rel_step_median": 0.8008677769127878,
+    "rel_step_p95": 1.0382352530729348
+  }
 }

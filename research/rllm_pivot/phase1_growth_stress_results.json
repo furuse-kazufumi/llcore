@@ -1,0 +1,204 @@
+{
+  "meta": {
+    "seed": 20260609,
+    "tau": 0.05,
+    "rho_samples": 1500,
+    "eps_grid": [
+      0.0,
+      0.2,
+      0.4,
+      0.6000000000000001,
+      0.8,
+      1.0,
+      1.2000000000000002,
+      1.4000000000000001,
+      1.6,
+      1.8,
+      2.0,
+      2.2,
+      2.4000000000000004,
+      2.6,
+      2.8000000000000003,
+      3.0
+    ],
+    "note": "実 width_grow + empirical_rho 真ρ。Decision gate 1 (3) 判定。"
+  },
+  "cells": {
+    "n4_hr0": {
+      "n_records": 1536,
+      "n_bases": 24,
+      "base_rho_median": 0.8024740200566418,
+      "rho_max_overall": 2.202654139136093,
+      "per_gate": {
+        "per_row": {
+          "n_admit": 193,
+          "admit_rate": 0.12565104166666666,
+          "false_admit": 0,
+          "n_nontrivial_admit": 15,
+          "n_nontrivial_sound_admit": 15,
+          "max_dfunc_among_sound_admit": 0.1074713411613435,
+          "gate3_pass": true
+        },
+        "cert_inf": {
+          "n_admit": 193,
+          "admit_rate": 0.12565104166666666,
+          "false_admit": 0,
+          "n_nontrivial_admit": 15,
+          "n_nontrivial_sound_admit": 15,
+          "max_dfunc_among_sound_admit": 0.1074713411613435,
+          "gate3_pass": true
+        },
+        "cert_two": {
+          "n_admit": 392,
+          "admit_rate": 0.2552083333333333,
+          "false_admit": 0,
+          "n_nontrivial_admit": 162,
+          "n_nontrivial_sound_admit": 162,
+          "max_dfunc_among_sound_admit": 0.20309041437321818,
+          "gate3_pass": true
+        },
+        "cert_sdp": {
+          "n_admit": 1112,
+          "admit_rate": 0.7239583333333334,
+          "false_admit": 0,
+          "n_nontrivial_admit": 724,
+          "n_nontrivial_sound_admit": 724,
+          "max_dfunc_among_sound_admit": 0.5542959184424328,
+          "gate3_pass": true
+        }
+      }
+    },
+    "n4_hr2": {
+      "n_records": 1536,
+      "n_bases": 24,
+      "base_rho_median": 0.8449823466728221,
+      "rho_max_overall": 2.21250252191186,
+      "per_gate": {
+        "per_row": {
+          "n_admit": 342,
+          "admit_rate": 0.22265625,
+          "false_admit": 0,
+          "n_nontrivial_admit": 21,
+          "n_nontrivial_sound_admit": 21,
+          "max_dfunc_among_sound_admit": 0.12909823140181628,
+          "gate3_pass": true
+        },
+        "cert_inf": {
+          "n_admit": 342,
+          "admit_rate": 0.22265625,
+          "false_admit": 0,
+          "n_nontrivial_admit": 21,
+          "n_nontrivial_sound_admit": 21,
+          "max_dfunc_among_sound_admit": 0.12909823140181628,
+          "gate3_pass": true
+        },
+        "cert_two": {
+          "n_admit": 516,
+          "admit_rate": 0.3359375,
+          "false_admit": 0,
+          "n_nontrivial_admit": 168,
+          "n_nontrivial_sound_admit": 168,
+          "max_dfunc_among_sound_admit": 0.22946475020196622,
+          "gate3_pass": true
+        },
+        "cert_sdp": {
+          "n_admit": 1165,
+          "admit_rate": 0.7584635416666666,
+          "false_admit": 0,
+          "n_nontrivial_admit": 733,
+          "n_nontrivial_sound_admit": 733,
+          "max_dfunc_among_sound_admit": 0.5311002253236929,
+          "gate3_pass": true
+        }
+      }
+    },
+    "n6_hr0": {
+      "n_records": 1536,
+      "n_bases": 24,
+      "base_rho_median": 0.8880010702195276,
+      "rho_max_overall": 1.8509110242885458,
+      "per_gate": {
+        "per_row": {
+          "n_admit": 178,
+          "admit_rate": 0.11588541666666667,
+          "false_admit": 0,
+          "n_nontrivial_admit": 0,
+          "n_nontrivial_sound_admit": 0,
+          "max_dfunc_among_sound_admit": 0.046738251592892306,
+          "gate3_pass": false
+        },
+        "cert_inf": {
+          "n_admit": 178,
+          "admit_rate": 0.11588541666666667,
+          "false_admit": 0,
+          "n_nontrivial_admit": 0,
+          "n_nontrivial_sound_admit": 0,
+          "max_dfunc_among_sound_admit": 0.046738251592892306,
+          "gate3_pass": false
+        },
+        "cert_two": {
+          "n_admit": 431,
+          "admit_rate": 0.2805989583333333,
+          "false_admit": 0,
+          "n_nontrivial_admit": 115,
+          "n_nontrivial_sound_admit": 115,
+          "max_dfunc_among_sound_admit": 0.15243936769189217,
+          "gate3_pass": true
+        },
+        "cert_sdp": {
+          "n_admit": 1159,
+          "admit_rate": 0.7545572916666666,
+          "false_admit": 0,
+          "n_nontrivial_admit": 673,
+          "n_nontrivial_sound_admit": 673,
+          "max_dfunc_among_sound_admit": 0.38346367347630533,
+          "gate3_pass": true
+        }
+      }
+    },
+    "n6_hr2": {
+      "n_records": 1536,
+      "n_bases": 24,
+      "base_rho_median": 0.875350174562857,
+      "rho_max_overall": 2.120323239025357,
+      "per_gate": {
+        "per_row": {
+          "n_admit": 332,
+          "admit_rate": 0.21614583333333334,
+          "false_admit": 0,
+          "n_nontrivial_admit": 3,
+          "n_nontrivial_sound_admit": 3,
+          "max_dfunc_among_sound_admit": 0.06700855840255422,
+          "gate3_pass": true
+        },
+        "cert_inf": {
+          "n_admit": 332,
+          "admit_rate": 0.21614583333333334,
+          "false_admit": 0,
+          "n_nontrivial_admit": 3,
+          "n_nontrivial_sound_admit": 3,
+          "max_dfunc_among_sound_admit": 0.06700855840255422,
+          "gate3_pass": true
+        },
+        "cert_two": {
+          "n_admit": 505,
+          "admit_rate": 0.3287760416666667,
+          "false_admit": 0,
+          "n_nontrivial_admit": 114,
+          "n_nontrivial_sound_admit": 114,
+          "max_dfunc_among_sound_admit": 0.16724498968916424,
+          "gate3_pass": true
+        },
+        "cert_sdp": {
+          "n_admit": 1184,
+          "admit_rate": 0.7708333333333334,
+          "false_admit": 0,
+          "n_nontrivial_admit": 675,
+          "n_nontrivial_sound_admit": 675,
+          "max_dfunc_among_sound_admit": 0.6810665523947003,
+          "gate3_pass": true
+        }
+      }
+    }
+  }
+}

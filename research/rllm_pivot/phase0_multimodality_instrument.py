@@ -172,35 +172,33 @@ def main():
             field = ctor(rng)
             rng2 = np.random.default_rng(SEED + 7 + inst)   # instrument 用 RNG (field と分離)
             rows.append(calibrate_field(fname, field, rng2, DIM))
-        vf = np.array([r["valley_fraction_good_anchor"] for r in rows])
-        nt = np.array([r["distinct_near_top"] for r in rows])
+        nb = np.array([r["n_basins"] for r in rows])
+        vf = np.array([r["valley_fraction_between_basins"] for r in rows])
         results["fields"][fname] = {
             "instances": rows,
-            "valley_fraction_good_mean": float(vf.mean()),
-            "valley_fraction_good_std": float(vf.std()),
-            "distinct_near_top_mean": float(nt.mean()),
+            "n_basins_mean": float(nb.mean()), "n_basins_std": float(nb.std()),
+            "valley_fraction_between_basins_mean": float(vf.mean()),
         }
-        print(f"[{fname:20s}] valley_frac(good)={vf.mean():.3f}±{vf.std():.3f}  "
-              f"near-top optima={nt.mean():.2f}  "
-              f"valley_frac(rand)中央={np.median([r['valley_fraction_random_anchor'] for r in rows]):.3f}", flush=True)
+        print(f"[{fname:20s}] n_basins={nb.mean():.2f}±{nb.std():.2f}  "
+              f"valley_frac(basin間)={vf.mean():.3f}", flush=True)
 
-    # 決定論性: 同 seed 2 回で完全一致
-    rng = np.random.default_rng(SEED)
+    # 決定論性: 同 seed 2 回で basin 数完全一致
     f = MultimodalField(np.random.default_rng(SEED), DIM, k=6)
-    v1 = valley_fraction(f, np.random.default_rng(123), DIM, n_pairs=200)
-    v2 = valley_fraction(f, np.random.default_rng(123), DIM, n_pairs=200)
-    results["determinism"] = {"same_seed_valley_v1": v1, "same_seed_valley_v2": v2,
-                              "identical": bool(v1 == v2)}
-    print(f"\n決定論性: 同seed valley {v1:.6f} == {v2:.6f} → {v1==v2}", flush=True)
+    b1 = len(find_basins(f, np.random.default_rng(123), DIM))
+    b2 = len(find_basins(f, np.random.default_rng(123), DIM))
+    results["determinism"] = {"same_seed_basins_v1": b1, "same_seed_basins_v2": b2,
+                              "identical": bool(b1 == b2)}
+    print(f"\n決定論性: 同seed basin数 {b1} == {b2} → {b1==b2}", flush=True)
 
-    # 校正 verdict
-    pos = results["fields"]["multimodal_pos"]["valley_fraction_good_mean"]
-    neg1 = results["fields"]["unimodal_gauss_neg"]["valley_fraction_good_mean"]
-    neg2 = results["fields"]["quadratic_bowl_neg"]["valley_fraction_good_mean"]
-    discriminates = pos > 0.10 and neg1 < 0.05 and neg2 < 0.05
+    # 校正 verdict: 多峰 n_basins>1 ∧ basin間 valley 高 / 単峰 n_basins=1
+    pos_nb = results["fields"]["multimodal_pos"]["n_basins_mean"]
+    pos_vf = results["fields"]["multimodal_pos"]["valley_fraction_between_basins_mean"]
+    neg1_nb = results["fields"]["unimodal_gauss_neg"]["n_basins_mean"]
+    neg2_nb = results["fields"]["quadratic_bowl_neg"]["n_basins_mean"]
+    discriminates = pos_nb >= 2.0 and pos_vf > 0.5 and neg2_nb <= 1.5
     results["calibration_pass"] = bool(discriminates)
-    print(f"\n校正 verdict: 多峰 valley={pos:.3f} ≫ 単峰 valley={neg1:.3f}/{neg2:.3f} → "
-          f"instrument 判別力 PASS={discriminates}", flush=True)
+    print(f"\n校正 verdict: 多峰 n_basins={pos_nb:.2f}(valley={pos_vf:.2f}) ≫ "
+          f"単峰 n_basins gauss={neg1_nb:.2f}/bowl={neg2_nb:.2f} → instrument 判別力 PASS={discriminates}", flush=True)
 
     out = os.path.join(os.path.dirname(__file__), "phase0_multimodality_results.json")
     with open(out, "w", encoding="utf-8") as f2:

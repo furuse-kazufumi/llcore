@@ -10,124 +10,154 @@
       "instances": [
         {
           "name": "multimodal_pos",
-          "valley_fraction_good_anchor": 0.0025,
-          "valley_fraction_random_anchor": 0.0,
-          "distinct_optima": 11,
-          "distinct_near_top": 2,
-          "fitness_spread": 0.3095784380037543
+          "n_basins": 6,
+          "valley_fraction_between_basins": 1.0,
+          "n_basin_pairs": 15,
+          "top_basin_counts": [
+            7,
+            1,
+            7,
+            2,
+            5,
+            18
+          ]
         },
         {
           "name": "multimodal_pos",
-          "valley_fraction_good_anchor": 0.0025,
-          "valley_fraction_random_anchor": 0.0,
-          "distinct_optima": 17,
-          "distinct_near_top": 6,
-          "fitness_spread": 0.24077867526449448
+          "n_basins": 6,
+          "valley_fraction_between_basins": 1.0,
+          "n_basin_pairs": 15,
+          "top_basin_counts": [
+            8,
+            5,
+            4,
+            13,
+            4,
+            6
+          ]
         },
         {
           "name": "multimodal_pos",
-          "valley_fraction_good_anchor": 0.0025,
-          "valley_fraction_random_anchor": 0.0,
-          "distinct_optima": 18,
-          "distinct_near_top": 12,
-          "fitness_spread": 0.23920837270185458
+          "n_basins": 5,
+          "valley_fraction_between_basins": 1.0,
+          "n_basin_pairs": 10,
+          "top_basin_counts": [
+            15,
+            10,
+            3,
+            8,
+            4
+          ]
         },
         {
           "name": "multimodal_pos",
-          "valley_fraction_good_anchor": 0.0,
-          "valley_fraction_random_anchor": 0.0,
-          "distinct_optima": 17,
-          "distinct_near_top": 11,
-          "fitness_spread": 0.3491876684097881
+          "n_basins": 5,
+          "valley_fraction_between_basins": 1.0,
+          "n_basin_pairs": 10,
+          "top_basin_counts": [
+            9,
+            12,
+            9,
+            9,
+            1
+          ]
         }
       ],
-      "valley_fraction_good_mean": 0.001875,
-      "valley_fraction_good_std": 0.0010825317547305483,
-      "distinct_near_top_mean": 7.75
+      "n_basins_mean": 5.5,
+      "n_basins_std": 0.5,
+      "valley_fraction_between_basins_mean": 1.0
     },
     "unimodal_gauss_neg": {
       "instances": [
         {
           "name": "unimodal_gauss_neg",
-          "valley_fraction_good_anchor": 0.0,
-          "valley_fraction_random_anchor": 0.0,
-          "distinct_optima": 8,
-          "distinct_near_top": 8,
-          "fitness_spread": 0.003185066534948211
+          "n_basins": 1,
+          "valley_fraction_between_basins": 0.0,
+          "n_basin_pairs": 0,
+          "top_basin_counts": [
+            40
+          ]
         },
         {
           "name": "unimodal_gauss_neg",
-          "valley_fraction_good_anchor": 0.0,
-          "valley_fraction_random_anchor": 0.0,
-          "distinct_optima": 3,
-          "distinct_near_top": 3,
-          "fitness_spread": 0.003934416989831213
+          "n_basins": 1,
+          "valley_fraction_between_basins": 0.0,
+          "n_basin_pairs": 0,
+          "top_basin_counts": [
+            40
+          ]
         },
         {
           "name": "unimodal_gauss_neg",
-          "valley_fraction_good_anchor": 0.0,
-          "valley_fraction_random_anchor": 0.0,
-          "distinct_optima": 7,
-          "distinct_near_top": 7,
-          "fitness_spread": 0.004493891232670855
+          "n_basins": 1,
+          "valley_fraction_between_basins": 0.0,
+          "n_basin_pairs": 0,
+          "top_basin_counts": [
+            40
+          ]
         },
         {
           "name": "unimodal_gauss_neg",
-          "valley_fraction_good_anchor": 0.0,
-          "valley_fraction_random_anchor": 0.0,
-          "distinct_optima": 5,
-          "distinct_near_top": 5,
-          "fitness_spread": 0.0035706145135131484
+          "n_basins": 1,
+          "valley_fraction_between_basins": 0.0,
+          "n_basin_pairs": 0,
+          "top_basin_counts": [
+            40
+          ]
         }
       ],
-      "valley_fraction_good_mean": 0.0,
-      "valley_fraction_good_std": 0.0,
-      "distinct_near_top_mean": 5.75
+      "n_basins_mean": 1.0,
+      "n_basins_std": 0.0,
+      "valley_fraction_between_basins_mean": 0.0
     },
     "quadratic_bowl_neg": {
       "instances": [
         {
           "name": "quadratic_bowl_neg",
-          "valley_fraction_good_anchor": 0.0,
-          "valley_fraction_random_anchor": 0.0,
-          "distinct_optima": 8,
-          "distinct_near_top": 1,
-          "fitness_spread": 0.002298177460951535
+          "n_basins": 1,
+          "valley_fraction_between_basins": 0.0,
+          "n_basin_pairs": 0,
+          "top_basin_counts": [
+            40
+          ]
         },
         {
           "name": "quadratic_bowl_neg",
-          "valley_fraction_good_anchor": 0.0,
-          "valley_fraction_random_anchor": 0.0,
-          "distinct_optima": 3,
-          "distinct_near_top": 1,
-          "fitness_spread": 0.002840408204491431
+          "n_basins": 1,
+          "valley_fraction_between_basins": 0.0,
+          "n_basin_pairs": 0,
+          "top_basin_counts": [
+            40
+          ]
         },
         {
           "name": "quadratic_bowl_neg",
-          "valley_fraction_good_anchor": 0.0,
-          "valley_fraction_random_anchor": 0.0,
-          "distinct_optima": 7,
-          "distinct_near_top": 1,
-          "fitness_spread": 0.0032444745811526423
+          "n_basins": 1,
+          "valley_fraction_between_basins": 0.0,
+          "n_basin_pairs": 0,
+          "top_basin_counts": [
+            40
+          ]
         },
         {
           "name": "quadratic_bowl_neg",
-          "valley_fraction_good_anchor": 0.0,
-          "valley_fraction_random_anchor": 0.0,
-          "distinct_optima": 5,
-          "distinct_near_top": 1,
-          "fitness_spread": 0.0025771965302793806
+          "n_basins": 1,
+          "valley_fraction_between_basins": 0.0,
+          "n_basin_pairs": 0,
+          "top_basin_counts": [
+            40
+          ]
         }
       ],
-      "valley_fraction_good_mean": 0.0,
-      "valley_fraction_good_std": 0.0,
-      "distinct_near_top_mean": 1.0
+      "n_basins_mean": 1.0,
+      "n_basins_std": 0.0,
+      "valley_fraction_between_basins_mean": 0.0
     }
   },
   "determinism": {
-    "same_seed_valley_v1": 0.0,
-    "same_seed_valley_v2": 0.0,
+    "same_seed_basins_v1": 5,
+    "same_seed_basins_v2": 5,
     "identical": true
   },
-  "calibration_pass": false
+  "calibration_pass": true
 }

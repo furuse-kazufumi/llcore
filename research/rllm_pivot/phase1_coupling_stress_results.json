@@ -1,0 +1,190 @@
+{
+  "meta": {
+    "seed": 20260609,
+    "rho_samples": 2500,
+    "gammas": [
+      0.0,
+      0.5,
+      1.0,
+      1.5,
+      2.0
+    ],
+    "note": "真ρ=empirical_rho + full cert_sdp 追加。Decision gate 1 (4)。"
+  },
+  "per_nb": {
+    "2": {
+      "0.0": {
+        "n_pairs": 80,
+        "rho_mean": 0.8719757882324692,
+        "pb_inf_admit": 80,
+        "blind_spot_count": 0,
+        "blind_spot_rate_of_pb_admit": 0.0,
+        "full_false_admit": {
+          "inf": 0,
+          "two": 0,
+          "sdp": 0
+        },
+        "full_coverage_on_contracting": {
+          "inf": 1.0,
+          "two": 0.775,
+          "sdp": 1.0
+        }
+      },
+      "0.5": {
+        "n_pairs": 80,
+        "rho_mean": 0.897029447271273,
+        "pb_inf_admit": 80,
+        "blind_spot_count": 4,
+        "blind_spot_rate_of_pb_admit": 0.05,
+        "full_false_admit": {
+          "inf": 0,
+          "two": 0,
+          "sdp": 0
+        },
+        "full_coverage_on_contracting": {
+          "inf": 0.10526315789473684,
+          "two": 0.4868421052631579,
+          "sdp": 0.9868421052631579
+        }
+      },
+      "1.0": {
+        "n_pairs": 80,
+        "rho_mean": 0.9280667696466252,
+        "pb_inf_admit": 80,
+        "blind_spot_count": 19,
+        "blind_spot_rate_of_pb_admit": 0.2375,
+        "full_false_admit": {
+          "inf": 0,
+          "two": 0,
+          "sdp": 0
+        },
+        "full_coverage_on_contracting": {
+          "inf": 0.01639344262295082,
+          "two": 0.08196721311475409,
+          "sdp": 0.9836065573770492
+        }
+      },
+      "1.5": {
+        "n_pairs": 80,
+        "rho_mean": 1.0937563087141846,
+        "pb_inf_admit": 80,
+        "blind_spot_count": 49,
+        "blind_spot_rate_of_pb_admit": 0.6125,
+        "full_false_admit": {
+          "inf": 0,
+          "two": 0,
+          "sdp": 0
+        },
+        "full_coverage_on_contracting": {
+          "inf": 0.0,
+          "two": 0.06451612903225806,
+          "sdp": 0.8064516129032258
+        }
+      },
+      "2.0": {
+        "n_pairs": 80,
+        "rho_mean": 1.2010963140549613,
+        "pb_inf_admit": 80,
+        "blind_spot_count": 64,
+        "blind_spot_rate_of_pb_admit": 0.8,
+        "full_false_admit": {
+          "inf": 0,
+          "two": 0,
+          "sdp": 0
+        },
+        "full_coverage_on_contracting": {
+          "inf": 0.0,
+          "two": 0.0,
+          "sdp": 0.625
+        }
+      }
+    },
+    "3": {
+      "0.0": {
+        "n_pairs": 50,
+        "rho_mean": 0.8904170011736194,
+        "pb_inf_admit": 50,
+        "blind_spot_count": 0,
+        "blind_spot_rate_of_pb_admit": 0.0,
+        "full_false_admit": {
+          "inf": 0,
+          "two": 0,
+          "sdp": 0
+        },
+        "full_coverage_on_contracting": {
+          "inf": 1.0,
+          "two": 0.7,
+          "sdp": 1.0
+        }
+      },
+      "0.5": {
+        "n_pairs": 50,
+        "rho_mean": 0.9114250918255569,
+        "pb_inf_admit": 50,
+        "blind_spot_count": 0,
+        "blind_spot_rate_of_pb_admit": 0.0,
+        "full_false_admit": {
+          "inf": 0,
+          "two": 0,
+          "sdp": 0
+        },
+        "full_coverage_on_contracting": {
+          "inf": 0.0,
+          "two": 0.16,
+          "sdp": 0.98
+        }
+      },
+      "1.0": {
+        "n_pairs": 50,
+        "rho_mean": 0.9869714218533485,
+        "pb_inf_admit": 50,
+        "blind_spot_count": 17,
+        "blind_spot_rate_of_pb_admit": 0.34,
+        "full_false_admit": {
+          "inf": 0,
+          "two": 0,
+          "sdp": 0
+        },
+        "full_coverage_on_contracting": {
+          "inf": 0.0,
+          "two": 0.0,
+          "sdp": 0.7575757575757576
+        }
+      },
+      "1.5": {
+        "n_pairs": 50,
+        "rho_mean": 1.1333910065051114,
+        "pb_inf_admit": 50,
+        "blind_spot_count": 40,
+        "blind_spot_rate_of_pb_admit": 0.8,
+        "full_false_admit": {
+          "inf": 0,
+          "two": 0,
+          "sdp": 0
+        },
+        "full_coverage_on_contracting": {
+          "inf": 0.0,
+          "two": 0.0,
+          "sdp": 0.6
+        }
+      },
+      "2.0": {
+        "n_pairs": 50,
+        "rho_mean": 1.346200673567048,
+        "pb_inf_admit": 50,
+        "blind_spot_count": 48,
+        "blind_spot_rate_of_pb_admit": 0.96,
+        "full_false_admit": {
+          "inf": 0,
+          "two": 0,
+          "sdp": 0
+        },
+        "full_coverage_on_contracting": {
+          "inf": 0.0,
+          "two": 0.0,
+          "sdp": 0.5
+        }
+      }
+    }
+  }
+}
