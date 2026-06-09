@@ -222,9 +222,10 @@ def swap_test(seed: int = SEED0) -> dict:
     codec = C.CoupledNDGeneCodec(N_DIM)
     adapter = SrcCodecAdapter(codec)
     obj = C.RotationNDObjective(n=N_DIM)
+    _vseed = {"none": 0, "inf_norm": 1, "two_norm": 2, "sdp": 3}  # 決定論 seed(hash() は per-process salt で非再現)
     for vname in ("none", "inf_norm", "two_norm", "sdp"):
         verifier = C.make_nd_verifier(vname)                    # ← 差替対象 (VerifierBackend)
-        rng = np.random.default_rng((seed + abs(hash(vname))) % 2_000_000_011)
+        rng = np.random.default_rng(seed + 700 + _vseed[vname])
         res = evolve(_wrap_fitness(adapter, obj, verifier), pop_size=POP, n_generations=GENS,
                      mutation_sigma=0.18, rng=rng, codec=adapter)
         fb = res.final_best
