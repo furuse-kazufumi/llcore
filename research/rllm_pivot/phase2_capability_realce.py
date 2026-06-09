@@ -473,14 +473,18 @@ def main():
     print(f"[H-multimodal] 実 CE 地形(seed0)の theta 空間 basin 数 = {n_basins} "
           f"(>1 で多峰。単峰なら capability さらに立たず=計画予告)", flush=True)
 
-    # --- seed ごとに 5 optimizer を同予算で走らせ held-out CE 比較 ---
-    res = {"random": [], "gradient": [], "gradient_strong": [], "mapelites": [], "mapelites_gate": []}
+    # --- seed ごとに 6 optimizer を同予算で走らせ held-out CE 比較 ---
+    # ★gradient_torch = 解析(exact)勾配 Adam = 決定的 meta-gate(finite-diff の弱さ artifact 排除用)
+    res = {"random": [], "gradient": [], "gradient_strong": [], "gradient_torch": [],
+           "mapelites": [], "mapelites_gate": []}
     train_res = {k: [] for k in res}
-    _name_off = {"random": 1, "gradient": 2, "gradient_strong": 5, "mapelites": 3, "mapelites_gate": 4}
+    _name_off = {"random": 1, "gradient": 2, "gradient_strong": 5, "gradient_torch": 6,
+                 "mapelites": 3, "mapelites_gate": 4}
     for s in range(N_SEEDS):
         terr = RealCETerrain(sents, np.random.default_rng(SEED0 + 100 + s))
         for name, fn in (("random", opt_random), ("gradient", opt_gradient),
                          ("gradient_strong", lambda t, r, B: opt_gradient(t, r, B, restarts=64)),
+                         ("gradient_torch", opt_gradient_torch),
                          ("mapelites", lambda t, r, B: opt_mapelites(t, r, B, gate=False)),
                          ("mapelites_gate", lambda t, r, B: opt_mapelites(t, r, B, gate=True))):
             r = np.random.default_rng(SEED0 + 1000 + s * 17 + _name_off[name])
@@ -489,32 +493,41 @@ def main():
             train_res[name].append(terr.train(best))
         print(f"  seed {s+1}/{N_SEEDS}: held-out fitness(=-CE) "
               f"rand={res['random'][-1]:.3f} grad={res['gradient'][-1]:.3f} "
-              f"grad+={res['gradient_strong'][-1]:.3f} "
+              f"grad+={res['gradient_strong'][-1]:.3f} gradT={res['gradient_torch'][-1]:.3f} "
               f"ME={res['mapelites'][-1]:.3f} ME+gate={res['mapelites_gate'][-1]:.3f}", flush=True)
 
     cmp_me_grad = honest_eval(res["mapelites"], res["gradient"])
     cmp_me_gradstrong = honest_eval(res["mapelites"], res["gradient_strong"])
+    cmp_me_gradtorch = honest_eval(res["mapelites"], res["gradient_torch"])   # ★決定的 meta-gate
+    cmp_gradtorch_me = honest_eval(res["gradient_torch"], res["mapelites"])   # 逆向き(強勾配優位か)
     cmp_me_rand = honest_eval(res["mapelites"], res["random"])
     cmp_gate_ungate = honest_eval(res["mapelites_gate"], res["mapelites"])
     cmp_grad_me = honest_eval(res["gradient"], res["mapelites"])
 
     # 識別力: random held-out が floor(-log K)/ceiling(0) に張り付いていないか
-    floor = -np.log(K_CLUSTERS)  # fitness=-CE, uniform 予測 CE=log K → fitness=-log K
+    floor = float(-np.log(K_CLUSTERS))  # fitness=-CE, uniform 予測 CE=log K → fitness=-log K
     rand_mean = float(np.mean(res["random"]))
-    # 正規化識別スコア: 0=floor(random相当), 1=ceiling(CE=0)
-    norm = (rand_mean - floor) / (0.0 - floor) if floor < 0 else 0.0
-    discriminating = 0.05 < norm < 0.95
+    norm = float((rand_mean - floor) / (0.0 - floor)) if floor < 0 else 0.0
+    discriminating = bool(0.05 < norm < 0.95)
 
+    # ★verdict ロジック(honest-disclosure: finite-diff の弱さ artifact を解析勾配 meta-gate で排除):
+    #   ME が finite-diff も 解析 torch 勾配も上回る → EXISTS(genuine navigability、M3/synthetic NULL を覆す驚き)
+    #   ME は finite-diff を上回るが torch 解析勾配が gap を埋める → ARTIFACT(finite-diff の弱さ; capability でない)
+    #   torch 解析勾配 ≥ ME → NULL(capability NEGATIVE)
     me_beats_grad = cmp_me_grad["all_pass"]
-    me_beats_gradstrong = cmp_me_gradstrong["all_pass"]
-    if me_beats_grad and me_beats_gradstrong:
-        verdict = "EXISTS (ME が gradient も meta-gate(restart64)も 4条件AND で上回る=実地形で genuine capability)"
-    elif me_beats_grad and not me_beats_gradstrong:
-        verdict = "ARTIFACT (ME は弱gradient を上回るが meta-gate で利得消失=navigability 現象 → guarantee 主軸が正当)"
-    elif cmp_grad_me["all_pass"]:
-        verdict = "NULL (gradient ≥ evolution = 実 LLM 地形で capability decisive NEGATIVE)"
+    me_beats_torch = cmp_me_gradtorch["all_pass"]
+    torch_beats_me = cmp_gradtorch_me["all_pass"]
+    if me_beats_grad and me_beats_torch:
+        verdict = ("EXISTS (ME が finite-diff も 解析(torch Adam, exact grad)も 4条件AND で上回る = 実多峰地形で "
+                   "genuine navigability 優位。M3/synthetic NULL を覆す驚き → honest: 内訳精査必須)")
+    elif me_beats_grad and not me_beats_torch:
+        verdict = ("ARTIFACT (ME は finite-diff gradient を上回るが 解析 torch gradient が gap を埋める = "
+                   "finite-diff の弱さ(cold-start・dim+1 評価/step)の artifact; genuine capability でない → "
+                   "guarantee 主軸が正当・synthetic NULL と整合)")
+    elif torch_beats_me:
+        verdict = "NULL (解析 torch gradient ≥ evolution = 実 LLM 地形で capability NEGATIVE)"
     else:
-        verdict = "NULL_TIE (有意差なし=進化は実 LLM 地形でも勾配/ランダムに勝てない; capability 立たず)"
+        verdict = "NULL_TIE (ME と 解析勾配で有意差なし; capability 優位 未実証)"
     if not discriminating:
         verdict += f" [⚠地形 non-discriminating: norm_score={norm:.3f} (0=floor/1=ceiling)。証拠力低下]"
 
