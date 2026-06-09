@@ -136,8 +136,13 @@ def analyze_layer_stability(A: np.ndarray, dt_base: np.ndarray) -> dict:
     lam_max_base = float(DtA.max())                   # 最大 Lyapunov 指数(全 channel×state)= max(Δ·A)
     abar_base = np.exp(DtA)                            # 離散対角要素 |Ā|(A<0 なので (0,1])
     max_abs_abar_base = float(abar_base.max())        # 状態再帰の spectral radius(対角系)
-    stable_base = bool(lam_max_base <= 0.0)           # λ_max ≤ 0 ⇒ 固有安定
-    # honest: Δ·A = 0 になるのは A=0(=A_log→-inf, 数値上は到達しない)。<0 が正常。
+    stable_base = bool(lam_max_base <= 0.0)           # λ_max ≤ 0 ⇒ 固有安定(非正=非厳密も含む)
+    # honest: lam_max_base が 0 に極めて近い(marginal)channel が出る。原因は A≈0 でなく
+    # **代表 Δ = softplus(dt_bias) が ≈0**(dt_bias が強い負)になる channel があるため。
+    # その channel では Δ·A ≈ 0 ⇒ |Ā| ≈ 1(marginal)。だが A<0 は厳密ゆえ Δ>0 なら必ず λ<0。
+    strictly_stable_base = bool(lam_max_base < 0.0)   # 厳密収縮(全 channel で λ<0)か
+    n_marginal_base = int((DtA > -1e-12).sum())       # λ が実質 0(marginal)な (channel,state) 数
+    n_total = int(DtA.size)
     dt_base_min = float(dt_base.min()); dt_base_max = float(dt_base.max())
 
     # --- Δ スイープ: Δ>0 の全域で λ_max ≤ 0(=A<0 ゆえ Δ に依らず安定)を論証 ---
