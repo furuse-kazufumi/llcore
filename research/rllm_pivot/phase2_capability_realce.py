@@ -545,6 +545,8 @@ def main():
         "heldout_raw": {k: [float(x) for x in v] for k, v in res.items()},
         "ME_vs_gradient": cmp_me_grad,
         "ME_vs_gradient_strong_metagate": cmp_me_gradstrong,
+        "ME_vs_gradient_torch_analytic_metagate": cmp_me_gradtorch,
+        "gradient_torch_vs_ME": cmp_gradtorch_me,
         "ME_vs_random": cmp_me_rand,
         "gradient_vs_ME": cmp_grad_me,
         "gate_vs_ungate": cmp_gate_ungate,
@@ -557,12 +559,15 @@ def main():
     print(f"held-out fitness(=-CE) 平均: " + " ".join(f"{k}={np.mean(v):.3f}" for k, v in res.items()), flush=True)
     print(f"CE floor(=-log K)={floor:.3f}  random norm_score={norm:.3f} "
           f"(0=floor/1=ceiling, discriminating={discriminating})", flush=True)
-    print(f"ME vs gradient: diff={cmp_me_grad['mean_diff']:+.3f} p={cmp_me_grad['p_value']:.3f} "
+    print(f"ME vs gradient (finite-diff): diff={cmp_me_grad['mean_diff']:+.3f} p={cmp_me_grad['p_value']:.3f} "
           f"sign_delta={cmp_me_grad['paired_sign_delta']:+.3f} → 4条件AND={cmp_me_grad['all_pass']}", flush=True)
-    print(f"ME vs gradient_strong (meta-gate restart64): diff={cmp_me_gradstrong['mean_diff']:+.3f} "
+    print(f"ME vs gradient_torch (★解析 meta-gate): diff={cmp_me_gradtorch['mean_diff']:+.3f} "
+          f"p={cmp_me_gradtorch['p_value']:.3f} sign_delta={cmp_me_gradtorch['paired_sign_delta']:+.3f} "
+          f"→ 4条件AND={cmp_me_gradtorch['all_pass']}", flush=True)
+    print(f"gradient_torch vs ME (逆向き): diff={cmp_gradtorch_me['mean_diff']:+.3f} "
+          f"p={cmp_gradtorch_me['p_value']:.3f} → 4条件AND={cmp_gradtorch_me['all_pass']}", flush=True)
+    print(f"ME vs gradient_strong (restart64 finite-diff): diff={cmp_me_gradstrong['mean_diff']:+.3f} "
           f"p={cmp_me_gradstrong['p_value']:.3f} → 4条件AND={cmp_me_gradstrong['all_pass']}", flush=True)
-    print(f"gradient vs ME: diff={cmp_grad_me['mean_diff']:+.3f} p={cmp_grad_me['p_value']:.3f} "
-          f"→ 4条件AND={cmp_grad_me['all_pass']}", flush=True)
     print(f"gate vs ungate (ρ<1 が可塑性を殺すか): diff={cmp_gate_ungate['mean_diff']:+.3f} "
           f"p={cmp_gate_ungate['p_value']:.3f}", flush=True)
     print(f"VERDICT: {verdict}", flush=True)
