@@ -162,17 +162,25 @@ class RealCETerrain:
 
     def __init__(self, sents, rng):
         d = sents[0].shape[1]
-        # per-seed 射影 576->N(地形の view を seed で振る)
-        self.P = rng.normal(size=(N, d)) / np.sqrt(d)
-        # 全文を射影 → スケール正規化(phase0_framework と整合: 入力 |x| を程よく)
-        Xs = [h @ self.P.T for h in sents]
-        allX = np.concatenate(Xs, 0)
-        self.scale = float(np.std(allX) + 1e-9)
-        self.Xs = [x / self.scale * 0.5 for x in Xs]
         # train/held-out 文分割(per-seed)
         order = rng.permutation(len(sents))
         self.train_idx = sorted(order[:N_TRAIN_SENT].tolist())
         self.test_idx = sorted(order[N_TRAIN_SENT:].tolist())
+        # --- 射影: train hidden の top-M PCA 部分空間 → per-seed ランダム M->N 射影 ---
+        # 純ランダム 576->N は分散をほぼ捨て floor に張り付く(smoke で確認)。高分散部分空間を
+        # 保持(signal 確保)しつつ per-seed ランダム回転で地形族の多様性を出す(honest 設計)。
+        train_h = np.concatenate([sents[i] for i in self.train_idx], 0)  # (M_tr, 576)
+        self.mu = train_h.mean(0)
+        # SVD で top-M_PCA 主成分(train のみ=リークなし)
+        _, _, Vt = np.linalg.svd(train_h - self.mu, full_matrices=False)
+        U = Vt[:M_PCA]                                   # (M_PCA, 576) 直交主方向
+        Rp = rng.normal(size=(N, M_PCA)) / np.sqrt(M_PCA)  # per-seed M->N ランダム射影
+        self.P = Rp @ U                                  # (N, 576) 合成射影
+        # 全文を射影(中心化)→ スケール正規化(phase0 と整合: 入力 |x| を程よく, cert max_input_abs=1.0)
+        Xs = [(h - self.mu) @ self.P.T for h in sents]
+        allX = np.concatenate(Xs, 0)
+        self.scale = float(np.std(allX) + 1e-9)
+        self.Xs = [x / self.scale * 0.5 for x in Xs]
         # cluster は **train 文の射影 hidden のみ** で fit(held-out リークなし)
         train_concat = np.concatenate([self.Xs[i] for i in self.train_idx], 0)
         self.centers, train_labels = tiny_kmeans(train_concat, K_CLUSTERS, rng)
