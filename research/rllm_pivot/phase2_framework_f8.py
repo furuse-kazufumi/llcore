@@ -156,16 +156,19 @@ def _make_family(params):
 #
 # 同一 evolve ループ (src 無改変) に対し 3 軸を 1 オブジェクト差替のみで載せ替える。
 # --------------------------------------------------------------------------- #
-def _wrap_fitness(objective, verifier, admit_penalty: float = 1.0):
+def _wrap_fitness(adapter, objective, verifier, admit_penalty: float = 1.0):
     """objective.fitness を verifier.certifies で篩う薄い wrapper。
 
     plan §⑦ の coupled-gene gating 方針 = verifier backend が担う。src の evolve() の
     scalar gate path は使わず (codec 併用で fail-loud)、fitness を 1 段包んで
     「admit されない gene を強く減点」する additive な gate proxy にする。
 
-    verifier=None / make_nd_verifier("none") は無条件 admit = 旧 fitness と一致。
+    evolve が渡す gene は genotype ndarray なので adapter.to_gene で CoupledNDGene に復元してから
+    objective / verifier に渡す。verifier=None / make_nd_verifier("none") は無条件 admit =
+    旧 fitness と一致。
     """
-    def f(gene, rng):  # evolve は (gene, rng) -> float を期待 (FitnessFunc)
+    def f(gtype, rng):  # evolve は (gene, rng) -> float を期待 (FitnessFunc)
+        gene = adapter.to_gene(gtype)
         base = objective.fitness(gene)
         if verifier is not None and not verifier.certifies(gene):
             return base - admit_penalty  # fail-closed: admit されない構造を減点
