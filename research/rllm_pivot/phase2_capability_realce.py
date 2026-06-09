@@ -62,8 +62,9 @@ except Exception:
 
 MODEL = "HuggingFaceTB/SmolLM2-135M"
 LAYER = 15
-N = 4                  # small-n per-component (Phase −1 確定, phase2 と同一)
-K_CLUSTERS = 8         # 次 hidden クラスタ数 (CE クラス数)
+N = 6                  # small-n per-component (Phase −1: n≤6。実地形 signal 確保のため上限 6 を採用)
+M_PCA = 32             # 射影前に保持する高分散部分空間次元(train PCA top-M)
+K_CLUSTERS = 6         # 次 hidden クラスタ数 (CE クラス数, phase2 K_BASINS=6 と整合)
 T_MAX = None           # 文ごとの最大トークン(None=全部)
 BUDGET = 2000          # 1 optimizer/seed あたりの train-fitness 評価予算 (phase2 と同一)
 N_SEEDS = 20           # ≥15 (phase2 と同一)
