@@ -247,12 +247,18 @@ def main():
 
         # 全層集約
         all_layers_A_neg = all(s["all_A_negative"] for s in per_layer)
-        all_layers_stable_base = all(s["stable_base"] for s in per_layer)
+        all_layers_stable_base = all(s["stable_base"] for s in per_layer)       # λ_max ≤ 0(非正)
+        all_layers_strictly_stable_base = all(s["strictly_stable_base"] for s in per_layer)  # λ_max < 0
         all_layers_stable_all_dt = all(s["stable_all_dt"] for s in per_layer)
+        # 共通 Δ スイープ(スカラー Δ): A<0 ゆえ Δ>0 なら全層で厳密 λ<0 のはず
+        all_layers_strictly_stable_all_dt = all(
+            all(sw["strictly_stable"] for sw in s["dt_sweep"]) for s in per_layer)
         global_lam_max_base = max(s["lam_max_base"] for s in per_layer)
         global_max_abs_abar_base = max(s["max_abs_abar_base"] for s in per_layer)
         global_A_max = max(s["A_max"] for s in per_layer)  # 最も 0 に近い A(最弱の収縮)
         global_A_min = min(s["A_min"] for s in per_layer)
+        total_marginal = sum(s["n_marginal_base"] for s in per_layer)
+        total_entries = sum(s["n_total"] for s in per_layer)
 
         results["mamba"] = {
             "n_layer": ext["n_layer"], "d_inner": ext["d_inner"], "state_size": ext["state_size"],
