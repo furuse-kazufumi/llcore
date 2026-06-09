@@ -264,9 +264,7 @@ def main():
     sys.path.insert(0, os.path.dirname(__file__))
     import phase0_multimodality_instrument as F9  # noqa: E402
     terr0 = Terrain(np.random.default_rng(SEED0))
-    field = lambda x: terr0._fit(np.concatenate([np.clip(x[:N], 0, 1), x[N:]]), terr0.X_train) \
-        if False else None  # placeholder (F9 は behavior 空間でなく theta 空間を見るため別途)
-    # theta 空間上の多峰性を F9 find_basins で(theta を [-1,1]^dim に正規化した proxy)
+    # theta 空間上の多峰性を F9 find_basins で検証(theta を [-1,1]^dim に正規化した proxy)
     dim = N + N * N
     def theta_field(z):  # z in [-1,1]^dim → theta
         th = np.empty(dim)
