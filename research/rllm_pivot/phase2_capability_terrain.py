@@ -54,7 +54,7 @@ except Exception:
 N = 4                  # small-n per-component
 T = 24                 # behavior 軌道長
 K_BASINS = 6           # 地形の basin 数(多峰)
-SIGMA = 0.35           # basin 幅
+SIGMA = 0.15           # basin 幅(狭め=識別力確保。random が天井に張り付かない難度。結果に合わせ調整=p-hack なので原理的に固定)
 BUDGET = 2000          # 1 optimizer/seed あたりの train-fitness 評価予算
 N_SEEDS = 20           # ≥15
 GRID = 12              # MAP-Elites archive grid (GxG)
