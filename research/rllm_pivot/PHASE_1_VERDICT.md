@@ -169,4 +169,20 @@ archive (4096 cells) メモリ = 0.6-6.6MB (無視可)。
 - **gate を cert_sdp に**: 本 Phase で cert_sdp が最 navigable と判明 → small-n per-component gate の第一候補は cert_sdp (n≤6 で cvxpy コスト許容)、scalable 近似が要る場面は cert_two。
 - **consumer story + 動きで魅せるデモ (F11)**: 無 gate ρ→1.95 発散 vs gate ρ<1 のリアルタイム可視化 = SNS 拡散素材 (確認必要: consumer story 確定 / 需要側証拠はユーザー明示判断)。
 
-正本データ = 各 `phase1_*_results.json` / `phase0_*_results.json` / 実装 = 各 `.py`。
+---
+
+## 9. 敵対的検証 (6 実験並列、2026-06-09)
+
+本 verdict の数値主張を、6 実験それぞれの `results.json` + `.py` 実装に対し独立な検証 agent で敵対的に突合した (workflow `phase1-verdict-adversarial-verify`, 6 agent 並列)。**結果 = MAJOR issue ゼロ (結論を覆す不一致なし)、全 MINOR**。検出された指摘は本文に反映済:
+- **転記丸め誤差 4 件 (§2)**: maxΔfunc 0.108→0.107 / 0.230→0.229 / 0.384→0.383、成長ρ最大 2.20→2.21。修正済。
+- **§1 tautology**: `two⊆sdp 違反0` は cert_sdp の cert_two fast-path による構造的保証 (経験的発見でない) と明記。`23-41%`→`22.5-41%`。
+- **§2 過度な一般化**: 「cheap gate は n=6 で trivial」→「n=6 最保守 edge のみ trivial、hr2 でも非自明 admit 3=脆弱」へ。per_row/cert_inf の偶然一致 (ti=1 支配) を注記。
+- **§3 nb 依存**: 「cert_sdp 98% 救済」は nb=2 限定、nb=3 では 75.8% / inf・two は 0% を明記。
+- **§4 proxy/外挿の透明化**: fitness は合成 adapter proxy (実 CE 非)、外挿は cert 毎 eval 課金の保守的上限、CPU→GPU 外挿前提、n=12 点推定マージン薄を明記。
+- **§5.2 Mamba**: 弱オラクル (perturbation_forgetting)・admit n=7 小集団・冗長メトリクスを明記。
+- **共通 (medium)**: empirical_rho は from-below = 0 観測 false-admit は強い consistency だが絶対 soundness 証明でない (§7#2 で既開示、本文の「完璧」表現を「0 観測」へ修正)。
+- **F9 = OK** (3 low: PASS gate が neg control を bowl のみで判定/同 family 校正、いずれも §5.1/§7.6 で開示済)。
+
+→ **検証後も Decision gate 1 = PASS、SDP navigability 知見、small-n 限定結論は不変**。指摘は全て honest-disclosure の精度向上であり、機構的結論を揺るがすものは無かった。
+
+正本データ = 各 `phase1_*_results.json` / `phase0_*_results.json` / 実装 = 各 `.py` / 検証 = workflow transcript。
