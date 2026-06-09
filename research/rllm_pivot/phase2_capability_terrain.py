@@ -276,12 +276,13 @@ def main():
     print(f"[H-multimodal] 地形の theta 空間 basin 数 = {n_basins} (>1 で多峰=capability 前提成立)", flush=True)
 
     # seed ごとに 4 optimizer を同予算で走らせ held-out 比較
-    res = {"random": [], "gradient": [], "mapelites": [], "mapelites_gate": []}
+    res = {"random": [], "gradient": [], "gradient_strong": [], "mapelites": [], "mapelites_gate": []}
     train_res = {k: [] for k in res}
-    _name_off = {"random": 1, "gradient": 2, "mapelites": 3, "mapelites_gate": 4}  # 決定論的 seed offset
+    _name_off = {"random": 1, "gradient": 2, "gradient_strong": 5, "mapelites": 3, "mapelites_gate": 4}
     for s in range(N_SEEDS):
         terr = Terrain(np.random.default_rng(SEED0 + 100 + s))
         for name, fn in (("random", opt_random), ("gradient", opt_gradient),
+                         ("gradient_strong", lambda t, r, B: opt_gradient(t, r, B, restarts=64)),  # meta-gate: 多 restart
                          ("mapelites", lambda t, r, B: opt_mapelites(t, r, B, gate=False)),
                          ("mapelites_gate", lambda t, r, B: opt_mapelites(t, r, B, gate=True))):
             r = np.random.default_rng(SEED0 + 1000 + s * 17 + _name_off[name])
