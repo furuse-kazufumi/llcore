@@ -79,45 +79,14 @@ class QuadraticBowl:
 
 
 # --------------------------------------------------------------------------- #
-# instrument: valley_fraction
+# instrument: hillclimb → 距離クラスタリングで basin 検出 → basin 間 valley 検定
 # --------------------------------------------------------------------------- #
-def valley_fraction(field, rng, dim, n_pairs=400, n_steps=24, margin_frac=0.02, anchor="good"):
-    """高 fitness 2 点を結ぶ線分上に **谷 (両端より低い dip)** が在る率。
-
-    anchor="good": ランダム多数点から fitness 上位を anchor に選び、その対で測る (最適間障壁)。
-    margin: dip が両端 min より (fitness range × margin_frac) 以上低いとき谷と判定。
-    """
-    # fitness range 推定 (margin 基準)
-    probe = np.array([field(rng.uniform(-1, 1, dim)) for _ in range(600)])
-    frange = float(probe.max() - probe.min()) + 1e-12
-    # anchor 群
-    if anchor == "good":
-        cand = rng.uniform(-1, 1, (max(2 * n_pairs, 300), dim))
-        fc = np.array([field(c) for c in cand])
-        order = np.argsort(-fc)
-        good = cand[order[:max(40, n_pairs)]]
-    else:
-        good = rng.uniform(-1, 1, (max(40, n_pairs), dim))
-    valleys = 0
-    for _ in range(n_pairs):
-        i, j = rng.integers(0, good.shape[0], size=2)
-        a, b = good[i], good[j]
-        if np.allclose(a, b):
-            continue
-        ts = np.linspace(0.0, 1.0, n_steps + 2)[1:-1]
-        seg = np.array([field((1 - t) * a + t * b) for t in ts])
-        endpoint_min = min(field(a), field(b))
-        if seg.min() < endpoint_min - margin_frac * frange:
-            valleys += 1
-    return valleys / n_pairs
-
-
-def hillclimb(field, x0, rng, dim, steps=200, sigma=0.15):
+def hillclimb(field, x0, rng, dim, steps=300, sigma=0.2):
     """決定論的 (1+1) greedy ascent。固定 seed の摂動列で局所最適へ。"""
     x = x0.copy()
     fx = field(x)
     for s in range(steps):
-        step = sigma * (0.5 ** (s / 60.0))   # 焼きなまし的に縮小
+        step = sigma * (0.5 ** (s / 80.0))   # 焼きなまし的に縮小
         cand = np.clip(x + step * rng.standard_normal(dim), -1, 1)
         fc = field(cand)
         if fc > fx:
@@ -125,30 +94,64 @@ def hillclimb(field, x0, rng, dim, steps=200, sigma=0.15):
     return x, fx
 
 
-def count_optima(field, rng, dim, n_starts=30, round_dec=1):
-    """multi-start hillclimb の到達点を粗グリッドで丸めて distinct 数を数える。"""
-    optima = []
-    fitn = []
+def find_basins(field, rng, dim, n_starts=40, merge_radius=0.4):
+    """multi-start hillclimb → 到達点を **Euclid 距離でクラスタリング** (grid 丸め非依存)。
+
+    各 cluster = 1 basin (内に最良点を代表に)。広い単峰 Gaussian は全 start が単一 center へ
+    収束 → cluster=1 (grid 丸めの膨張を回避)。返り値 = fitness 降順の cluster 代表 list。
+    """
+    opts = []
     for _ in range(n_starts):
         x0 = rng.uniform(-1, 1, dim)
         xo, fo = hillclimb(field, x0, rng, dim)
-        optima.append(np.round(xo, round_dec))
-        fitn.append(fo)
-    keys = set(tuple(o) for o in optima)
-    # fitness top に近い basin だけ数える (微小 basin の noise を除く)
-    fitn = np.array(fitn)
-    top = fitn.max()
-    near_top = [tuple(np.round(o, round_dec)) for o, f in zip(optima, fitn) if f >= top - 0.15 * (abs(top) + 1e-9)]
-    return {"distinct_optima": len(keys), "distinct_near_top": len(set(near_top)),
-            "fitness_spread": float(fitn.max() - fitn.min())}
+        opts.append((xo, float(fo)))
+    clusters: list[list] = []  # [center(np), best_f, count]
+    for xo, fo in sorted(opts, key=lambda t: -t[1]):
+        placed = False
+        for c in clusters:
+            if np.linalg.norm(xo - c[0]) < merge_radius:
+                c[2] += 1
+                placed = True
+                break
+        if not placed:
+            clusters.append([xo, fo, 1])
+    return clusters
+
+
+def valley_fraction_between_basins(field, clusters, dim, n_steps=24, margin_frac=0.03,
+                                   max_basins=8, frange=1.0):
+    """**distinct basin 間**の線分に谷 (両端より下の dip=障壁) が在る率。
+
+    basin が 1 個 (単峰) なら pair が無く 0.0 (= 障壁なし=単峰シグナル)。多峰なら真に分離した
+    basin 間に障壁が在るはずで高率。anchor を「最高峰 1 つ」でなく「異なる basin」にしたのが
+    旧版からの修正点。
+    """
+    cl = clusters[:max_basins]
+    if len(cl) < 2:
+        return 0.0, 0
+    pairs = 0
+    valleys = 0
+    ts = np.linspace(0.0, 1.0, n_steps + 2)[1:-1]
+    for i in range(len(cl)):
+        for j in range(i + 1, len(cl)):
+            a, b = cl[i][0], cl[j][0]
+            seg = np.array([field((1 - t) * a + t * b) for t in ts])
+            endpoint_min = min(field(a), field(b))
+            if seg.min() < endpoint_min - margin_frac * frange:
+                valleys += 1
+            pairs += 1
+    return (valleys / pairs if pairs else 0.0), pairs
 
 
 def calibrate_field(name, field, rng, dim):
-    vf_good = valley_fraction(field, rng, dim, anchor="good")
-    vf_rand = valley_fraction(field, rng, dim, anchor="random")
-    opt = count_optima(field, rng, dim)
-    return {"name": name, "valley_fraction_good_anchor": vf_good,
-            "valley_fraction_random_anchor": vf_rand, **opt}
+    probe = np.array([field(rng.uniform(-1, 1, dim)) for _ in range(800)])
+    frange = float(probe.max() - probe.min()) + 1e-12
+    clusters = find_basins(field, rng, dim)
+    n_basins = len(clusters)
+    vf, n_pairs = valley_fraction_between_basins(field, clusters, dim, frange=frange)
+    return {"name": name, "n_basins": n_basins,
+            "valley_fraction_between_basins": vf, "n_basin_pairs": n_pairs,
+            "top_basin_counts": [c[2] for c in clusters[:6]]}
 
 
 def main():
