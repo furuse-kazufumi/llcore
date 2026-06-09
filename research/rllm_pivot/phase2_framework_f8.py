@@ -278,9 +278,10 @@ def opt_diverse(codec, train_family, rng, budget, sigma=0.22, init=48):
 
     def _place(arr):
         nonlocal used
-        gene = codec.to_gene(codec.clip(arr))
+        arr = codec.clip(arr)
+        gene = codec.to_gene(arr)
         f = _family_fitness(gene, train_family); used += 1
-        cell = _topology_descriptor(codec, gene)
+        cell = _topology_descriptor(codec, arr)
         cur = archive.get(cell)
         if cur is None or f > cur[1]:
             archive[cell] = (arr, f, gene)
