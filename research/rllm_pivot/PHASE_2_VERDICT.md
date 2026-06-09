@@ -49,10 +49,12 @@ synthetic 多峰地形(K=6 basin max-of-Gaussian、behavior 空間)で、ρ<1-ga
 | gradient vs ME | −0.028 | 0.622 | — | **False** |
 | gate vs ungate(ρ<1 が可塑性を殺すか) | −0.022 | 0.608 | — | NS |
 
-**VERDICT = NULL_TIE**: **進化(MAP-Elites)は、真に多峰で識別力ある地形ですら、同予算の gradient/random を held-out で有意に上回れない**(どの向きも 4 条件 AND 不成立)。
-- **= M3 の capability decisive NEGATIVE を、多峰地形(40 basin)+ proper power(n=20)+ held-out + 4 条件 AND で再確認**。「最尤 NULL」(計画 §2.1)の予測が data で確証された。
-- meta-gate(BG10)は moot: ME が gradient を上回らないため ARTIFACT 判定の余地なし(NULL がクリーン)。
-- **bonus(North Star #6 副次)**: ρ<1 gate は可塑性を**有意に殺さない**(gate vs ungate diff=−0.022, p=0.61, NS)→「contraction gate が可塑性を殺す」は本データで**不支持**。verified-plasticity の「soundness を課しても可塑性コストは有意でない」を弱く支持(ただし下記留保)。
+**VERDICT = NULL_TIE**: **進化(MAP-Elites)は、多峰で識別力ある地形でも、同予算の gradient/random を held-out で上回れない**(どの向きも 4 条件 AND 不成立=純粋な引き分け)。
+- **「進化が capability で勾配に勝つ」(H-EXISTS)は支持されず** = M3 の負と整合。「最尤 NULL」(計画 §2.1)の予測通り。
+- **ただし NULL_TIE は「非有意の引き分け」**: ME vs gradient は wins=losses=10 / sign_delta=0 / p=0.39 で、+0.028 の小差を検出する power は実質ゼロ。**これは「進化が勾配に劣る decisive NEGATIVE」でも、powered な等価性 proof でもない**(power 分析/MDE 未実施)。honest には「capability 優位の**未実証**」。コードの verdict ラベルも NULL_TIE(差なし)で NULL(勾配≥進化)とは別物。
+- 4 条件 AND は保守的(sign_delta=0 で条件4が機構的に失敗)+ budget=2000 の収束十分性は未検証 → NULL が under-optimization 由来でない保証は弱い(honest)。
+- meta-gate(BG10)は moot: ME が gradient を上回らないため ARTIFACT 判定の余地なし。なお gradient_strong(restart64)は予算配分上「深さでなく幅」(各 restart ~1 step)に退化しており「より強い勾配」ではない=meta-gate 前提は本予算では部分的に崩れている(結論不変だが honest 留保)。
+- **bonus(North Star #6 副次)**: ρ<1 gate は **held-out では**可塑性を有意に殺さない(gate vs ungate diff=−0.022, p=0.61, NS)。**ただし train 側は mapelites=0.971 vs mapelites_gate=0.720 と 0.25 の差**= gate は archive 探索を顕著に制約しており、held-out が flat(全 method ~0.5)な regime ゆえ train 差が held-out に出ていないだけ。「可塑性を殺さない」は held-out 限定・capability flat 前提つきの弱い主張。
 
 ---
 
