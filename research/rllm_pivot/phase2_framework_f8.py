@@ -354,6 +354,12 @@ def generalization_test(seed0: int = SEED0) -> dict:
     cmp_div_ps = honest_eval(div_held, ps_held)              # 多様 archive が held-out で baseline 超か
     cmp_ps_div = honest_eval(ps_held, div_held)              # 逆向き (baseline 優位か)
 
+    # 汎化ギャップ (train − held-out): 小さいほど過学習が少ない。
+    # primary 判定 (held-out 直接比較) とは別の二次観察として記録 (over-claim 回避; AND 条件には不算入)。
+    div_gap = np.asarray(div_train) - np.asarray(div_held)
+    ps_gap = np.asarray(ps_train) - np.asarray(ps_held)
+    cmp_gap = honest_eval(ps_gap, div_gap)  # paramshift の方が gap 大 (= 過学習) か (a>b: ps_gap>div_gap)
+
     # 識別力 (held-out が天井/床でないか) — baseline held-out 平均で判定
     ps_held_mean = float(np.mean(ps_held))
     div_held_mean = float(np.mean(div_held))
