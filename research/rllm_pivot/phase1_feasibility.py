@@ -81,6 +81,10 @@ def extrapolate(per_n, pop, gens, blocks, gate, budget_h=30.0):
     for rec in per_n:
         n = rec["n"]
         gate_us = rec[f"t_cert_{gate}_us"]
+        if gate_us is None:
+            out[str(n)] = {"per_eval_us": None, "gate_us": None, "total_hours": None,
+                           "fits_budget": None, "note": f"cert_{gate} not measured (n>cap, 2^n 外挿)"}
+            continue
         per_eval = rec["t_mutate_us"] + gate_us + rec["t_fitness_us"]
         total_s = gens * pop * blocks * per_eval / 1e6
         out[str(n)] = {
