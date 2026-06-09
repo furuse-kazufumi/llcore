@@ -268,14 +268,28 @@ def main():
             "per_layer": per_layer,
             "summary": {
                 "all_layers_A_real_part_negative": all_layers_A_neg,
-                "all_layers_stable_at_base_delta": all_layers_stable_base,
+                "all_layers_stable_at_base_delta": all_layers_stable_base,            # λ_max ≤ 0(非正)
+                "all_layers_strictly_stable_at_base_delta": all_layers_strictly_stable_base,  # λ_max < 0
                 "all_layers_stable_for_all_delta_sweep": all_layers_stable_all_dt,
-                "global_lambda_max_base": global_lam_max_base,        # 全層・全 channel での最大 λ(<0 なら固有安定)
-                "global_max_abs_abar_base": global_max_abs_abar_base, # 全層での最大 |Ā 対角|(<1 なら全層収縮)
+                "all_layers_strictly_stable_for_all_delta_sweep": all_layers_strictly_stable_all_dt,
+                "global_lambda_max_base": global_lam_max_base,        # 全層・全 channel での最大 λ(≤0 なら固有安定)
+                "global_max_abs_abar_base": global_max_abs_abar_base, # 全層での最大 |Ā 対角|(≤1 なら全層収縮)
                 "global_A_max_real_part": global_A_max,               # 最も弱い収縮(0 に最も近い A)
                 "global_A_min_real_part": global_A_min,               # 最も強い収縮
+                "n_marginal_base_delta": total_marginal,              # 代表 Δ で λ≈0(marginal)な (channel,state) 数
+                "n_total_channel_state": total_entries,
+                "marginal_note": (
+                    "Marginal (lambda_max ~ 0) entries at base Delta arise NOT because A approaches 0 but "
+                    "because the representative Delta = softplus(dt_bias) approaches 0 for some channels "
+                    "(strongly-negative dt_bias). Since A < 0 is strict for ALL channels, lambda = Delta*A is "
+                    "strictly < 0 for ANY Delta > 0 (see all_layers_strictly_stable_for_all_delta_sweep). The "
+                    "non-positive (<=0) Lyapunov result matches arXiv:2406.00209 exactly; we do NOT overclaim "
+                    "uniform strict contraction at the input-dependent representative Delta."),
+                # 固有安定 = (A<0 全層) ∧ (λ_max≤0 = 非正, arXiv:2406.00209) — 非正で stable-by-construction 成立。
                 "intrinsically_stable": bool(all_layers_A_neg and all_layers_stable_base
                                              and all_layers_stable_all_dt),
+                "intrinsically_strictly_stable_for_positive_delta": bool(
+                    all_layers_A_neg and all_layers_strictly_stable_all_dt),
             },
         }
 
