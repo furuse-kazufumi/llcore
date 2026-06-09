@@ -184,15 +184,23 @@ class GrowDirections:
     k: int
 
 
-def sample_admitted_base(rng: np.random.Generator, n: int, mia: float = 1.0, max_tries: int = 60):
-    """W を 0.85 倍縮小しながら cert_inf PASS な (decay, W, V=I) gene を返す。失敗時 None。"""
+def sample_admitted_base(rng: np.random.Generator, n: int, mia: float = 1.0,
+                         max_tries: int = 60, headroom_steps: int = 0):
+    """W を 0.85 倍縮小しながら cert_inf PASS な (decay, W, V=I) gene を返す。失敗時 None。
+
+    ``headroom_steps`` > 0 で **最初に admit した後さらに W を縮小**し、cert_inf 境界から
+    余裕を持たせる (成長余地を確保し band scan の edge-bias を緩和)。0 (既定) は Phase −1 と
+    同一挙動 (境界ぎりぎり = 最も保守的・成長余地最小)。
+    """
     for _ in range(max_tries):
         decay = rng.uniform(0.0, 1.0, size=n)
         W = (rng.normal(0.0, 1.0, size=(n, n)) / np.sqrt(n)) * float(rng.uniform(0.2, 0.9))
         for _ in range(50):
             g = C.CoupledNDGene.make(decay=decay, W=W)
             if C.cert_inf(g, mia):
-                return g
+                for _ in range(headroom_steps):
+                    W = W * 0.85
+                return C.CoupledNDGene.make(decay=decay, W=W)
             W = W * 0.85
     return None
 
