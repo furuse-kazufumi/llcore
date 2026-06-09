@@ -363,6 +363,63 @@ def opt_mapelites(terrain, rng, B, gate=False, sigma=0.2, init=64, resample_cap=
     return max(archive.values(), key=lambda v: v[1])[0]
 
 
+def opt_gradient_torch(terrain, rng, B, restarts=4, lr=0.05):
+    """★強い meta-gate: torch autograd による **解析(exact)勾配** + Adam。同予算 B = forward CE 評価回数
+    (1 Adam step = 1 forward; backward は autograd で free = 実 LLM の backprop 勾配と同じ扱い)。
+    finite-diff gradient が弱い(dim+1 評価/step・cold-start)ために ME が勝つ artifact か、強い解析勾配でも
+    ME が勝つ genuine navigability かを判別する決定的ベースライン。param は decay=sigmoid/W=2tanh で box 内。"""
+    import torch
+    train = [(terrain.Xs[i], terrain.Y[i]) for i in terrain.train_idx]
+    maxL = max(x.shape[0] for (x, _) in train)
+    Bn = len(train)
+    Xpad = np.zeros((Bn, maxL, N)); Ypad = np.zeros((Bn, maxL), dtype=np.int64); mask = np.zeros((Bn, maxL))
+    for b, (x, y) in enumerate(train):
+        seq = x.shape[0]
+        Xpad[b, :seq] = x
+        Ypad[b, :seq - 1] = y[1:seq]   # 位置 t の target = 次 cluster y[t+1](numpy _ce_sentence と一致)
+        mask[b, :seq - 1] = 1.0
+    Xt = torch.tensor(Xpad); Yt = torch.tensor(Ypad); Mt = torch.tensor(mask)
+    Ct = torch.tensor(terrain.centers); beta = float(terrain.beta)
+    gtorch = torch.Generator().manual_seed(int(rng.integers(1 << 31)))
+
+    def _theta_from(raw_decay, raw_W):
+        bd = torch.sigmoid(raw_decay).detach().numpy()
+        bW = (2.0 * torch.tanh(raw_W)).detach().numpy().reshape(-1)
+        return np.concatenate([bd, bW])
+
+    best_theta, best_f, used = None, -1e18, 0
+    steps_per = max(1, B // restarts)
+    for _ in range(restarts):
+        raw_decay = torch.randn(N, generator=gtorch, dtype=torch.float64, requires_grad=True)
+        raw_W = (0.3 * torch.randn(N, N, generator=gtorch, dtype=torch.float64)).clone().detach().requires_grad_(True)
+        opt = torch.optim.Adam([raw_decay, raw_W], lr=lr)
+        for _ in range(steps_per):
+            if used >= B:
+                break
+            opt.zero_grad()
+            decay = torch.sigmoid(raw_decay)
+            W = 2.0 * torch.tanh(raw_W)
+            s = torch.zeros(Bn, N, dtype=torch.float64)
+            ce_sum = torch.zeros((), dtype=torch.float64)
+            cnt = torch.zeros((), dtype=torch.float64)
+            for t in range(maxL):
+                pre = (s @ W.T) + Xt[:, t, :]
+                s = decay * s + (1.0 - decay) * torch.tanh(pre)
+                d2 = ((Ct.unsqueeze(0) - s.unsqueeze(1)) ** 2).sum(-1)   # (Bn,K)
+                logp = (-beta * d2) - torch.logsumexp(-beta * d2, dim=1, keepdim=True)
+                ll = logp.gather(1, Yt[:, t:t + 1]).squeeze(1)
+                ce_sum = ce_sum - (ll * Mt[:, t]).sum()
+                cnt = cnt + Mt[:, t].sum()
+            loss = ce_sum / torch.clamp(cnt, min=1.0)
+            loss.backward()
+            opt.step()
+            used += 1
+            f = -float(loss.detach())
+            if f > best_f:
+                best_f, best_theta = f, _theta_from(raw_decay, raw_W)
+    return best_theta if best_theta is not None else _rand_theta(rng)
+
+
 # --------------------------------------------------------------------------- #
 # honest_eval 4 条件 AND (phase2_capability_terrain.py と同一)
 # --------------------------------------------------------------------------- #
