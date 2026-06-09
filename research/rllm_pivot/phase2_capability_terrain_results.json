@@ -1,0 +1,106 @@
+{
+  "meta": {
+    "n": 4,
+    "T": 24,
+    "K_basins": 6,
+    "budget": 2000,
+    "n_seeds": 20,
+    "grid": 12,
+    "seed0": 20260609,
+    "scipy": true,
+    "terrain": "synthetic K-basin max-of-Gaussian (実SmolLM2-CE地形ではない=clean probe)"
+  },
+  "h_multimodal_basins": 40,
+  "heldout_means": {
+    "random": 0.4887504415919297,
+    "gradient": 0.5066632974475552,
+    "gradient_strong": 0.5489707402718649,
+    "mapelites": 0.5345317322236565,
+    "mapelites_gate": 0.51294749587685
+  },
+  "train_means": {
+    "random": 0.8162143103309052,
+    "gradient": 0.8143661481136585,
+    "gradient_strong": 0.7880852186518835,
+    "mapelites": 0.9713681673685761,
+    "mapelites_gate": 0.719707340659769
+  },
+  "ME_vs_gradient": {
+    "mean_diff": 0.02786843477610132,
+    "p_value": 0.3920631408691406,
+    "n_seeds": 20,
+    "wins": 10,
+    "losses": 10,
+    "paired_sign_delta": 0.0,
+    "conditions": {
+      "diff_positive": true,
+      "wilcoxon_p_lt_0.05": false,
+      "n_seeds_ge_15": true,
+      "abs_paired_sign_delta_ge_0.147": false
+    },
+    "all_pass": false
+  },
+  "ME_vs_gradient_strong_metagate": {
+    "mean_diff": -0.014439008048208548,
+    "p_value": 0.5938224792480469,
+    "n_seeds": 20,
+    "wins": 10,
+    "losses": 10,
+    "paired_sign_delta": 0.0,
+    "conditions": {
+      "diff_positive": false,
+      "wilcoxon_p_lt_0.05": false,
+      "n_seeds_ge_15": true,
+      "abs_paired_sign_delta_ge_0.147": false
+    },
+    "all_pass": false
+  },
+  "ME_vs_random": {
+    "mean_diff": 0.04578129063172679,
+    "p_value": 0.23745250701904297,
+    "n_seeds": 20,
+    "wins": 11,
+    "losses": 9,
+    "paired_sign_delta": 0.1,
+    "conditions": {
+      "diff_positive": true,
+      "wilcoxon_p_lt_0.05": false,
+      "n_seeds_ge_15": true,
+      "abs_paired_sign_delta_ge_0.147": false
+    },
+    "all_pass": false
+  },
+  "gradient_vs_ME": {
+    "mean_diff": -0.02786843477610132,
+    "p_value": 0.6219167709350586,
+    "n_seeds": 20,
+    "wins": 10,
+    "losses": 10,
+    "paired_sign_delta": 0.0,
+    "conditions": {
+      "diff_positive": false,
+      "wilcoxon_p_lt_0.05": false,
+      "n_seeds_ge_15": true,
+      "abs_paired_sign_delta_ge_0.147": false
+    },
+    "all_pass": false
+  },
+  "gate_vs_ungate": {
+    "mean_diff": -0.021584236346806566,
+    "p_value": 0.6079368591308594,
+    "n_seeds": 20,
+    "wins": 10,
+    "losses": 10,
+    "paired_sign_delta": 0.0,
+    "conditions": {
+      "diff_positive": false,
+      "wilcoxon_p_lt_0.05": false,
+      "n_seeds_ge_15": true,
+      "abs_paired_sign_delta_ge_0.147": false
+    },
+    "all_pass": false
+  },
+  "random_heldout_mean": 0.4887504415919297,
+  "terrain_discriminating": true,
+  "verdict": "NULL_TIE (有意差なし=進化は勾配/ランダムに勝てない; capability 立たず)"
+}

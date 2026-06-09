@@ -339,8 +339,11 @@ def main():
     print(f"held-out 平均: " + " ".join(f"{k}={np.mean(v):.3f}" for k, v in res.items()), flush=True)
     print(f"ME vs gradient: diff={cmp_me_grad['mean_diff']:+.3f} p={cmp_me_grad['p_value']:.3f} "
           f"sign_delta={cmp_me_grad['paired_sign_delta']:+.3f} → 4条件AND={cmp_me_grad['all_pass']}", flush=True)
+    print(f"ME vs gradient_strong (meta-gate restart64): diff={cmp_me_gradstrong['mean_diff']:+.3f} "
+          f"p={cmp_me_gradstrong['p_value']:.3f} → 4条件AND={cmp_me_gradstrong['all_pass']}", flush=True)
     print(f"gradient vs ME: diff={cmp_grad_me['mean_diff']:+.3f} p={cmp_grad_me['p_value']:.3f} "
           f"→ 4条件AND={cmp_grad_me['all_pass']}", flush=True)
+    print(f"地形識別力: random held-out 平均={rand_mean:.3f} (0.05-0.95 で discriminating={discriminating})", flush=True)
     print(f"gate vs ungate (ρ<1 が可塑性を殺すか): diff={cmp_gate_ungate['mean_diff']:+.3f} "
           f"p={cmp_gate_ungate['p_value']:.3f}", flush=True)
     print(f"VERDICT: {verdict}", flush=True)
