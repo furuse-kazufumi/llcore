@@ -291,23 +291,33 @@ def main():
             train_res[name].append(terr.train(best))
         print(f"  seed {s+1}/{N_SEEDS}: held-out "
               f"rand={res['random'][-1]:.3f} grad={res['gradient'][-1]:.3f} "
+              f"grad+={res['gradient_strong'][-1]:.3f} "
               f"ME={res['mapelites'][-1]:.3f} ME+gate={res['mapelites_gate'][-1]:.3f}", flush=True)
 
-    # honest_eval: ME vs gradient, ME vs random, gate vs ungate
+    # honest_eval
     cmp_me_grad = honest_eval(res["mapelites"], res["gradient"])
+    cmp_me_gradstrong = honest_eval(res["mapelites"], res["gradient_strong"])  # meta-gate(BG10)
     cmp_me_rand = honest_eval(res["mapelites"], res["random"])
-    cmp_gate_ungate = honest_eval(res["mapelites_gate"], res["mapelites"])  # gate が可塑性を殺すか(両側的に見る)
+    cmp_gate_ungate = honest_eval(res["mapelites_gate"], res["mapelites"])  # gate が可塑性を殺すか
     cmp_grad_me = honest_eval(res["gradient"], res["mapelites"])            # 逆向き(gradient 優位か)
 
-    # meta-gate verdict
+    # 識別力チェック(地形が天井/床でないか)
+    rand_mean = float(np.mean(res["random"]))
+    discriminating = 0.05 < rand_mean < 0.95
+
+    # meta-gate verdict(BG10)
     me_beats_grad = cmp_me_grad["all_pass"]
-    grad_beats_me = cmp_grad_me["all_pass"]
-    if me_beats_grad:
-        verdict = "EXISTS_CANDIDATE (要 meta-gate: gradient-on-same-terrain で利得消失なら ARTIFACT)"
-    elif grad_beats_me:
+    me_beats_gradstrong = cmp_me_gradstrong["all_pass"]
+    if me_beats_grad and me_beats_gradstrong:
+        verdict = "EXISTS (ME が gradient も gradient_strong(meta-gate, restart64)も 4条件AND で上回る=genuine capability)"
+    elif me_beats_grad and not me_beats_gradstrong:
+        verdict = "ARTIFACT (ME は弱gradient を上回るが gradient_strong=多restart で利得消失=navigability 現象であり capability でない → guarantee 主軸が正当)"
+    elif cmp_grad_me["all_pass"]:
         verdict = "NULL (gradient ≥ evolution = capability decisive NEGATIVE; M3 を多峰地形で再確認)"
     else:
-        verdict = "NULL_TIE (有意差なし = 進化は勾配に勝てない; capability 立たず)"
+        verdict = "NULL_TIE (有意差なし=進化は勾配/ランダムに勝てない; capability 立たず)"
+    if not discriminating:
+        verdict += f" [⚠地形 non-discriminating: random held-out 平均={rand_mean:.3f}=天井/床。verdict の証拠力低下]"
 
     summary = {
         "meta": {"n": N, "T": T, "K_basins": K_BASINS, "budget": BUDGET, "n_seeds": N_SEEDS,
