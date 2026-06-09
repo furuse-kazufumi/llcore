@@ -307,16 +307,22 @@ def main():
                 "PASS" if (mamba_stable and not smol_has_ssm) else "REVIEW"),
             "statement": (
                 "Mamba is stable-by-construction: every Mamba layer's SSM state-recurrence has a "
-                "continuous diagonal A with strictly negative real part (A = -exp(A_log) < 0), so the "
-                "discrete A-bar = exp(Delta*A) has |diagonal| < 1 and the max Lyapunov exponent "
-                f"lambda_max = max(Delta*A) <= 0 for ALL Delta > 0 (global lambda_max_base = "
-                f"{global_lam_max_base:.4g}, global max|A-bar| = {global_max_abs_abar_base:.6f} < 1). "
-                "=> the contraction certificate is TRIVIALLY satisfied at base level, no adapter/gate needed. "
-                "SmolLM2-135M (standard Llama Transformer) has NO SSM state-recurrence A matrix at all; the "
-                "intrinsic-stability-certificate concept does not exist in its base, so stability must be "
-                "imposed by the bolted-on verified adapter + cert gate. This is the framework's base-level "
-                "discriminative power: it cleanly separates a stable-by-construction base (Mamba, trivial PASS) "
-                "from a base that requires the gate to be made safe (SmolLM2, gate-mandatory)."
+                "continuous diagonal A with strictly negative real part (A = -exp(A_log) < 0 for 100% of "
+                f"{total_entries} (channel,state) entries across all 24 layers), so the discrete "
+                "A-bar = exp(Delta*A) has |diagonal| <= 1 and the max Lyapunov exponent lambda_max = "
+                f"max(Delta*A) <= 0 for ALL Delta > 0 (global lambda_max at base Delta = {global_lam_max_base:.4g} "
+                f"<= 0; under a common scalar Delta sweep over [1e-4 .. 1e2] every layer is STRICTLY < 0). "
+                "=> the contraction certificate (non-positive Lyapunov, arXiv:2406.00209) is TRIVIALLY "
+                "satisfied at base level with NO adapter/gate needed. HONEST: at the input-dependent "
+                "representative Delta = softplus(dt_bias) a few channels are MARGINAL (lambda ~ 0) because "
+                "their representative Delta itself is near zero (not because A approaches 0); the certificate "
+                "is therefore non-strict (<=0) at base Delta but strictly contractive for any Delta>0. "
+                "SmolLM2-135M (standard Llama Transformer) has NO SSM state-recurrence A matrix at all "
+                "(0 SSM keys; only self_attn + mlp); the intrinsic-stability-certificate concept does not "
+                "exist in its base, so stability must be imposed by the bolted-on verified adapter + cert "
+                "gate. This is the framework's base-level discriminative power: it cleanly separates a "
+                "stable-by-construction base (Mamba, trivial PASS) from a base that requires the gate to be "
+                "made safe (SmolLM2, gate-mandatory)."
             ),
         }
 
