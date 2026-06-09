@@ -184,13 +184,14 @@ def swap_test(seed: int = SEED0) -> dict:
     out = {"axis_genecodec": [], "axis_objective": [], "axis_verifier": []}
 
     # ---- (i) GeneCodec swap: n / 基質を差し替え -------------------------------
-    # 1 オブジェクト (codec) を差し替えるだけで別次元 substrate に載る。
+    # 1 オブジェクト (CoupledNDGeneCodec) を差し替えるだけで別次元 substrate に載る。
     for n in (2, 3, 4):
         codec = C.CoupledNDGeneCodec(n)                         # ← 差替対象 (GeneCodec)
+        adapter = SrcCodecAdapter(codec)                        # 固定 protocol 適合層
         obj = C.RotationNDObjective(n=n)                         # objective は codec の n に整合
         rng = np.random.default_rng(seed + n)
-        res = evolve(_wrap_fitness(obj, None), pop_size=POP, n_generations=GENS,
-                     mutation_sigma=0.18, rng=rng, codec=codec)
+        res = evolve(_wrap_fitness(adapter, obj, None), pop_size=POP, n_generations=GENS,
+                     mutation_sigma=0.18, rng=rng, codec=adapter)
         fb = res.final_best
         out["axis_genecodec"].append({
             "swap": f"CoupledNDGeneCodec(n={n})", "dim": codec.dim,
@@ -202,11 +203,12 @@ def swap_test(seed: int = SEED0) -> dict:
     # ---- (ii) Objective swap: task を差し替え ---------------------------------
     # codec / verifier を固定し objective だけを差し替える (1 オブジェクト差替)。
     codec = C.CoupledNDGeneCodec(N_DIM)
+    adapter = SrcCodecAdapter(codec)
     for (period, radius, amp) in [(10.0, 0.93, 0.40), (8.0, 0.88, 0.30), (13.0, 0.95, 0.45)]:
         obj = C.RotationNDObjective(n=N_DIM, period=period, radius=radius, amp=amp)  # ← 差替対象
         rng = np.random.default_rng(seed + int(period * 10))
-        res = evolve(_wrap_fitness(obj, None), pop_size=POP, n_generations=GENS,
-                     mutation_sigma=0.18, rng=rng, codec=codec)
+        res = evolve(_wrap_fitness(adapter, obj, None), pop_size=POP, n_generations=GENS,
+                     mutation_sigma=0.18, rng=rng, codec=adapter)
         fb = res.final_best
         out["axis_objective"].append({
             "swap": f"RotationNDObjective(period={period}, radius={radius}, amp={amp})",
@@ -218,16 +220,17 @@ def swap_test(seed: int = SEED0) -> dict:
     # ---- (iii) VerifierBackend swap: none/inf_norm/two_norm/sdp を差し替え ------
     # codec / objective を固定し verifier だけを差し替える (1 オブジェクト差替)。
     codec = C.CoupledNDGeneCodec(N_DIM)
+    adapter = SrcCodecAdapter(codec)
     obj = C.RotationNDObjective(n=N_DIM)
     for vname in ("none", "inf_norm", "two_norm", "sdp"):
         verifier = C.make_nd_verifier(vname)                    # ← 差替対象 (VerifierBackend)
-        rng = np.random.default_rng(seed + hash(vname) % 9973)
-        res = evolve(_wrap_fitness(obj, verifier), pop_size=POP, n_generations=GENS,
-                     mutation_sigma=0.18, rng=rng, codec=codec)
+        rng = np.random.default_rng((seed + abs(hash(vname))) % 2_000_000_011)
+        res = evolve(_wrap_fitness(adapter, obj, verifier), pop_size=POP, n_generations=GENS,
+                     mutation_sigma=0.18, rng=rng, codec=adapter)
         fb = res.final_best
         # final 集団のうち何個が verifier に admit されるか (admit 状況が出ることの確認)
         n_admit = sum(1 for ind in res.generations[-1].individuals
-                      if verifier.certifies(ind.gene))
+                      if verifier.certifies(adapter.to_gene(ind.gene)))
         out["axis_verifier"].append({
             "swap": f"make_nd_verifier({vname!r})", "verifier_name": verifier.name,
             "final_best_fitness": float(fb.fitness),
