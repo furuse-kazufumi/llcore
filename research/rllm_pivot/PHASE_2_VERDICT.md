@@ -184,9 +184,18 @@ Phase 1 で defer された正対照を実機完遂。Mamba-130M を load し全
 - **単一 gene evidence**: ρ≈2.9 発散 gene の実軌道感度 1→2e-14(経験は『安全』と誤認)だが certificate box-sup σ_max=4.87>1 で reject。
 - matplotlib 非依存(FullSense 宣言的 SVG 方針)、SMIL アニメ、静止フレーム完成形。consumer story/市場判断はユーザー明示判断に deferred。
 
-### 7.5 敵対的検証 (workflow `phase2-rest-adversarial-verify`)
+### 7.5 敵対的検証 (workflow `phase2-rest-adversarial-verify`, 3 独立 skeptic 並列)
 
-3 実験を独立 skeptic agent が code+data で再導出・反証(torch meta-gate の独立再走含む)。**結果**: <!-- ADVERSARIAL_RESULT -->(workflow 完了後に反映)。
+3 実験を独立 skeptic agent が code+data で再導出・反証(数値再計算 + 実機再走)。**結果 = all_verdicts_hold=True / MAJOR 0 / 全 MINOR**。
+- **A 独立確認(load-bearing)**: 全 paired stats を json と 10 桁一致で再計算 + **実 SmolLM2 load して 3 seed 独立再走 → 全 seed で torch_beats_ME=True かつ ME_beats_finite_grad=True を決定論的に再現** = ARTIFACT+NEGATIVE 確証。beta はクラスタ幾何から最適化前に導出=p-hack でないと確認。
+- **MINOR(反映済 / 結論不変)**:
+  - (A) torch は token-pooled CE、numpy terrain は sentence-averaged CE で ~1e-4 差(全 optimizer は同一 sentence-avg `heldout()` で採点ゆえ apples-to-apples、1e-4 ≪ 0.008 の torch-ME gap、むしろ torch を僅かに handicap=ARTIFACT 結論は conservative)。
+  - (A) `self.scale=std(allX)` は全 20 文で計算(mu/PCA/centers は train-only)=軽微リーク。**単一 global scalar を全 optimizer・train/held-out に同一適用ゆえ符号不変**(verifier 確認)。honest 改善余地として記録(本 run の results.json は本実装、結論非影響)。
+  - (A) budget-parity は forward-eval 数の同一であって有効更新ステップ数は非対称(torch 2000 Adam 更新 vs finite-diff ~95 更新)= verdict が ARTIFACT 源として明示済。
+  - (B) verifier-axis seed が hash() で非再現だった → **決定論 seed に修正済 + 再走**(admit none=24/inf=9/two=9/sdp=17、pytest 17 passed、(b) PASS / (a) NULL 不変)。**保証される関係は per-gene subset(two⟹sdp / inf⟹sdp、3000 gene で 0 違反)** であり count-level ladder は per-sample 偶発(§7.2 訂正反映)。
+  - (B) verifier gate は fitness-wrapper proxy(disclosed)・synthetic task family(disclosed)。
+  - (C) 正対照は **parameterization の自明性**(A=-exp(A_log)<0 は任意 Mamba checkpoint で成立=学習でなくパラメタライズを検定)= verdict が "TRIVIALLY satisfied/stable-by-construction" と明示済。"marginal" は strict 閾値 count 0 と prose "λ~0" で scale が異なるだけ(矛盾でない)。SSM 状態再帰のみ(full Lipschitz でない)=disclosed。
+- **→ 検証後も §7.6 の結論不変(MAJOR 0)**: 指摘は全て reproducibility/framing/留保精度で、機構的結論を覆すものは無し。
 
 ### 7.6 Phase 2 完遂 統合判定
 
