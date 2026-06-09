@@ -38,7 +38,7 @@ mamba_synth(stable-by-construction, 0 発散)集団: 全 method admit 1.000 / 0 
 
 synthetic 多峰地形(K=6 basin max-of-Gaussian、behavior 空間)で、ρ<1-gate 付き/無し MAP-Elites・gradient(有限差分)・gradient_strong(restart64=meta-gate)・random を **同予算 B=2000 train 評価**で走らせ、**held-out fitness**(別入力)を n=20 seed で paired 比較。honest_eval 4 条件 AND(diff>0 ∧ 片側 Wilcoxon p<0.05 ∧ n_seeds≥15 ∧ |paired_sign_delta|≥0.147)。
 
-**前提検証(H-multimodal)**: theta 空間の basin 数 = **40**(>1=真に多峰、capability 前提成立)。地形識別力: random held-out 平均 = **0.489**(0.05-0.95=天井/床でない、discriminating)。
+**前提検証(H-multimodal)**: theta 空間 (20 次元) で F9 find_basins → cluster 数 = **40**。ただし n_starts=40 で 40 cluster = 高次元で hillclimb が収束しきらず全 start が別 cluster に落ちた可能性が高く、**「40 個の真の局所最適」の証拠ではない**(F9 instrument は 8 次元・merge_radius=0.4 で校正済、20 次元・radius=0.5 へは未校正)。**頑健に言えるのは「多峰(>1)」まで**。地形識別力: random held-out 平均 = **0.489**(0.05-0.95=天井/床でない、discriminating)= capability 前提(多峰 + 識別力)は成立。
 
 **held-out 平均**: random 0.489 / gradient 0.507 / gradient_strong 0.549 / **mapelites 0.535** / mapelites_gate 0.513(全て ~0.49-0.55 に密集)。
 
