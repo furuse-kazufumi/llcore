@@ -63,10 +63,10 @@ synthetic 多峰地形(K=6 basin max-of-Gaussian、behavior 空間)で、ρ<1-ga
 | 項目 | 結果 | 判定 |
 |---|---|---|
 | **H-discriminative**(枠組み妥当性, North Star #3) | none 95 > stable_exp 80 > certs 0、正対照 0 棄却 | **PASS** |
-| **capability 副線**(F12, EXISTS/NULL/ARTIFACT) | 多峰・識別力地形で進化 ≈ 勾配 ≈ random(全方向 AND 不成立) | **NULL**(確証的 negative) |
-| **gate 中立性**(North Star #6 副次) | ρ<1 gate は可塑性を有意に殺さない | gate-neutral(弱支持) |
+| **capability 副線**(F12, EXISTS/NULL/ARTIFACT) | 多峰・識別力地形で進化 ≈ 勾配 ≈ random(全方向 AND 不成立) | **NULL_TIE**(capability 優位 未実証・非有意) |
+| **gate 中立性**(North Star #6 副次) | held-out では gate は可塑性を有意に殺さない(train 側は制約あり) | gate-neutral(held-out 限定・弱支持) |
 
-**→ 枠組みは妥当(method を soundness で判別できる)、capability は data で NULL = 価値は GUARANTEE に確定。** これは脆い単一機構に賭けない (b) 主軸選択の正しさそのもの: **機構(進化)が capability を生まなくても、「枠組みの妥当性 + 測定された capability NEGATIVE + STABLE 風経験 gate の 84% 危険性」が第一級 deliverable として残る。**
+**→ 枠組みは妥当(method を soundness で判別できる)、capability 優位は data で未実証(NULL_TIE) = 価値は GUARANTEE に確定。** これは脆い単一機構に賭けない (b) 主軸選択の正しさそのもの: **機構(進化)が capability を生まなくても、「枠組みの妥当性 + 測定された capability 優位の不在(非有意)+ STABLE 風経験 gate の高 false-admit 危険性」が第一級 deliverable として残る。**
 
 ---
 
