@@ -119,8 +119,10 @@ def test_verifier_swap_runs(vname):
 def test_verifier_admit_ladder():
     """soundness ladder: none は全 admit、certifier は部分 admit (gate が篩として機能)。
 
-    none(無条件 admit) ⊇ {inf_norm, two_norm, sdp}。かつ two_norm ⊇ inf_norm
-    (two_norm は inf_norm の緩和 = inf_norm が admit する gene は two_norm も admit)。
+    honest 注記 (実測で確認, README 過剰主張回避): inf_norm と two_norm は **非比較**
+    (‖J‖_∞<1 は ‖J‖_2<1 を含意しない異なる norm なので、どちらかが他方の subset ではない)。
+    一方 ``cert_sdp`` は ``cert_two ⇒ True`` を fast-path に持ち + SDP 解で更に admit するため
+    **sdp ⊇ two_norm ∧ sdp ⊇ inf_norm** (sdp が最も緩い = sound 緩和の頂点)。
     """
     codec = C.CoupledNDGeneCodec(3)
     adapter = SrcCodecAdapter(codec)
@@ -136,12 +138,18 @@ def test_verifier_admit_ladder():
     # certifier は none 以下 (篩として機能)
     for vname in ("inf_norm", "two_norm", "sdp"):
         assert admit[vname] <= admit["none"]
-    # two_norm は inf_norm の緩和 (inf_norm ⊆ two_norm ⊆ sdp の admit 包含)
-    assert admit["inf_norm"] <= admit["two_norm"] <= admit["sdp"]
+    # sdp は inf_norm / two_norm の双方を含む (最も緩い sound 証明器)
+    assert admit["sdp"] >= admit["two_norm"]
+    assert admit["sdp"] >= admit["inf_norm"]
 
 
 def test_verifier_subset_relation_per_gene():
-    """per-gene: inf_norm が admit する gene は two_norm / sdp も admit する (sound 緩和)。"""
+    """per-gene sound 包含: two_norm / inf_norm が admit する gene は sdp も admit する。
+
+    honest 注記: inf_norm ⊆ two_norm は **成り立たない** (異なる norm; 実測で確認済)。
+    保証されるのは ``cert_sdp`` が ``cert_two`` を fast-path 包含する ⇒ sdp ⊇ two_norm、
+    かつ inf_norm admit ⇒ ρ<1 ⇒ (本 box では) sdp も admit という頂点関係のみ。
+    """
     codec = C.CoupledNDGeneCodec(3)
     adapter = SrcCodecAdapter(codec)
     rng = np.random.default_rng(SEED + 7)
@@ -150,11 +158,10 @@ def test_verifier_subset_relation_per_gene():
     v_sdp = C.make_nd_verifier("sdp")
     for _ in range(150):
         g = adapter.to_gene(codec.clip(codec.random(rng)))
-        if v_inf.certifies(g):
-            assert v_two.certifies(g)
-            assert v_sdp.certifies(g)
         if v_two.certifies(g):
-            assert v_sdp.certifies(g)
+            assert v_sdp.certifies(g)       # cert_sdp は cert_two を fast-path 包含
+        if v_inf.certifies(g):
+            assert v_sdp.certifies(g)       # inf admit ⇒ sdp admit (実測で確認)
 
 
 # --------------------------------------------------------------------------- #
