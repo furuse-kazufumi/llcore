@@ -42,9 +42,13 @@ llcore の進化コア/検証器は**世界知識を内包しない** (tiny adap
 - ⬜ 連結グラフ (ターン境界/照応/話題) を verified adapter の進化・学習信号に
 - ⬜ sound gate vs 経験 gate vs 無 gate で「会話教師下の連結性保持」を実 LLM hidden で比較
 
-### M3 ⬜ 世界知識の注入 (ユーザー指摘への回答)
-- ⬜ RAD コーパス (21 分野) を AnnotationStore に取込 → 連結性グラフ = 世界知識グラフ
+### M3 ⬜ 世界知識の注入 (ユーザー指摘への回答 = 差別化の主軸)
+- ⬜ RAD コーパス (~48 分野) を AnnotationStore に取込 → 連結性グラフ = 世界知識グラフ
 - ⬜ loop-engineering corpus (本セッション調査) を最初の取込対象に (dogfooding)
+- ⬜ **★言語 RAD コーパス新設** (ユーザー指摘 2026-06-11: 既存 ~48 分野に言語/語彙/文法/発音が無い):
+  linguistics (syntax/morphology/semantics/pragmatics) / lexicon (WordNet/語彙意味論) /
+  grammar (CFG/dependency/construction) / phonetics・phonology (IPA/調音/韻律) / 多言語 (特に日本語:
+  形態素解析/活用/仮名漢字)。1D-SegFormer・事実抽出・アノテーション連結 (類義/形態エッジ) の基盤。
 - ⬜ 世界知識注入が retrieval/grounding を改善するか実測 (会話のみ vs 会話+RAD)
 
 ### M4 ⬜ 自律ループの工学化 (ループエンジニアリング調査の実装反映)
