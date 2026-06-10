@@ -208,14 +208,29 @@ class AnnotationStore:
         return inv
 
     def embedding_matrix(self) -> "np.ndarray":
+        """有効行のみの連続 float32 行列ビュー (n, d)。query 毎の再構築コストなし。"""
+        if self._n_rows == 0:
+            raise ValueError("store is empty")
+        return self._matrix[: self._n_rows]
+
+    def int8_matrix(self) -> tuple["np.ndarray", float]:
+        """単位ノルム行列を int8 量子化した (Q, scale) を返す (大規模 cosine の省メモリ近似)。
+
+        行が単位ノルムなので各成分は [-1,1] → ``round(x*127)`` で int8 化。
+        cosine(a,b) ≈ (Qa·Qb) * scale, scale = 1/127² 。メモリは float32 の 1/4。
+        結果はキャッシュし、行追加で無効化する。
+        """
         import numpy as np
 
-        if not self._embeddings:
+        if self._n_rows == 0:
             raise ValueError("store is empty")
-        return np.vstack(self._embeddings)
+        if self._int8 is None:
+            M = self._matrix[: self._n_rows]
+            self._int8 = np.clip(np.round(M * 127.0), -127, 127).astype(np.int8)
+        return self._int8, 1.0 / (127.0 * 127.0)
 
     def neighbors(self, idx: int, k: int = 5) -> list[tuple[int, float]]:
-        """アノテーション idx の近傍 (cosine 降順, 自身を除く) — 連結性の最小クエリ。"""
+        """アノテーション行 idx の近傍 (cosine 降順, 自身を除く) — 連結性の最小クエリ。"""
         import numpy as np
 
         M = self.embedding_matrix()
@@ -223,13 +238,21 @@ class AnnotationStore:
         order = np.argsort(sims)[::-1]
         return [(int(j), float(sims[int(j)])) for j in order if int(j) != idx][:k]
 
-    def query(self, text: str, k: int = 5) -> list[tuple[int, float]]:
-        """自由テキスト 1 件でストアを cosine 検索 (符号化 1 回; キャッシュには入れない)。"""
+    def query(self, text: str, k: int = 5, *, quantized: bool = False) -> list[tuple[int, float]]:
+        """自由テキスト 1 件でストアを cosine 検索 (符号化 1 回; キャッシュには入れない)。
+
+        返り値は (行, cosine) の降順 top-k。``quantized=True`` で int8 近似経路
+        (大規模・省メモリ向け; 順位はほぼ不変、score は近似)。
+        """
         import numpy as np
 
-        q = self._encoder.encode_texts([text])[0]
-        M = self.embedding_matrix()
-        sims = M @ q
+        q = _l2_normalize(np.asarray(self._encoder.encode_texts([text])[0], dtype=np.float32))
+        if quantized:
+            Q, scale = self.int8_matrix()
+            qi = np.clip(np.round(q * 127.0), -127, 127).astype(np.int8)
+            sims = (Q.astype(np.int32) @ qi.astype(np.int32)) * scale
+        else:
+            sims = self.embedding_matrix() @ q
         order = np.argsort(sims)[::-1]
         return [(int(j), float(sims[int(j)])) for j in order][:k]
 
