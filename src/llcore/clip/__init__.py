@@ -24,7 +24,7 @@
     I = clip.encode_images(["photo.jpg"])           # (1, d)
     sim = I @ T.T                                   # cosine 類似度行列
 """
-from llcore.clip.annotations import AnnotationStore, split_annotations
+from llcore.clip.annotations import AnnotationStore, annotation_id, split_annotations
 from llcore.clip.backend import (
     DEFAULT_CLIP_MODEL,
     CLIP_MODEL_ENV_VAR,
