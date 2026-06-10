@@ -229,13 +229,18 @@ def build_svg(per_method: dict[str, list[dict]], n_turns: int, sdp_available: bo
         if m == "cert_sdp" and not sdp_available:
             continue
         rows = per_method[m]
-        pts = " ".join(f"{sx(r['turn']):.1f},{sy(r['true_rho']):.1f}" for r in rows)
+        xy = [(sx(r["turn"]), sy(r["true_rho"])) for r in rows]
+        pts = " ".join(f"{x:.1f},{y:.1f}" for x, y in xy)
         col = COLORS[m]
-        path_len = 900
+        # 実 polyline 長 + 余裕 (dasharray が実長より短いと最終フレームが破線化するため)
+        path_len = sum(
+            ((xy[i + 1][0] - xy[i][0]) ** 2 + (xy[i + 1][1] - xy[i][1]) ** 2) ** 0.5
+            for i in range(len(xy) - 1)
+        ) + 40
         parts.append(
             f'<polyline points="{pts}" fill="none" stroke="{col}" stroke-width="2.5" '
-            f'stroke-dasharray="{path_len}" stroke-dashoffset="0">'
-            f'<animate attributeName="stroke-dashoffset" from="{path_len}" to="0" dur="2.2s" fill="freeze"/></polyline>'
+            f'stroke-dasharray="{path_len:.0f}" stroke-dashoffset="0">'
+            f'<animate attributeName="stroke-dashoffset" from="{path_len:.0f}" to="0" dur="2.2s" fill="freeze"/></polyline>'
         )
         for r in rows:
             marker = "●" if r["accepted"] else "×"
