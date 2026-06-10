@@ -308,6 +308,64 @@ def test_int8_quantized_query_matches_float_ranking() -> None:
     assert len(set(top_float) & set(top_int8)) >= 4  # top5 ほぼ一致
 
 
+def test_is_question_detection() -> None:
+    """事実検索の除外用: 質問判定 (英 疑問詞/助動詞始まり, 日本語 末尾 か)。"""
+    assert is_question("what is my name")
+    assert is_question("where do i live")
+    assert is_question("is that dish served hot")
+    assert is_question("私の名前は何ですか")
+    assert not is_question("my name is kazufumi")
+    assert not is_question("i live in japan")
+    assert not is_question("東京に住んでいます")
+
+
+def test_query_excludes_questions_for_fact_retrieval() -> None:
+    """質問クエリが質問文でなく事実文を返す (生成前段の honest 問題への対策)。"""
+    vecs = {
+        "what is my name": [1.0, 0.0, 0.0],
+        "my name is kazufumi": [0.95, 0.3, 0.0],   # 事実 (質問にやや近い)
+        "what is your name": [0.98, 0.05, 0.0],     # 別の質問 (クエリに最も近い)
+    }
+    store = AnnotationStore(VecEncoder(vecs))
+    store.add_text("what is my name. my name is kazufumi. what is your name.")
+    ann = store.annotations
+    # 通常 query は質問文 ("what is your name") を最上位に拾う
+    top_all = ann[store.query("what is my name", k=1)[0][0]]
+    assert is_question(top_all)
+    # exclude_questions=True なら事実文のみ
+    facts = store.query("what is my name", k=3, exclude_questions=True)
+    fact_anns = [ann[i] for i, _ in facts]
+    assert "my name is kazufumi" in fact_anns
+    assert all(not is_question(a) for a in fact_anns)
+
+
+def test_query_role_filter() -> None:
+    enc = CountingEncoder()
+    store = AnnotationStore(enc)
+    store.add_text("my name is kazufumi.", role="user")
+    store.add_text("nice to meet you.", role="assistant")
+    ann = store.annotations
+    user_hits = store.query("name", k=5, role="user")
+    assert all(store.role_of_row(i) == "user" for i, _ in user_hits)
+    assert "my name is kazufumi" in [ann[i] for i, _ in user_hits]
+
+
+def test_roles_persist_roundtrip(tmp_path: Path) -> None:
+    enc = CountingEncoder()
+    path = tmp_path / "store.json"
+    store = AnnotationStore(enc, path=path)
+    store.add_text("my name is kazufumi.", role="user")
+    store.add_text("what is my name.", role="assistant")
+    store.save()
+    store2 = AnnotationStore(CountingEncoder(), path=path)
+    ann = store2.annotations
+    r_user = ann.index("my name is kazufumi")
+    r_q = ann.index("what is my name")
+    assert store2.role_of_row(r_user) == "user"
+    assert store2.is_question_row(r_q) is True
+    assert store2.is_question_row(r_user) is False
+
+
 def test_store_save_load_roundtrip(tmp_path: Path) -> None:
     enc = CountingEncoder()
     path = tmp_path / "store.json"
