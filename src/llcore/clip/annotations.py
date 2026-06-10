@@ -419,6 +419,46 @@ class AnnotationStore:
                 break
         return out
 
+    def cooccur_neighbors(self, row: int, k: int = 5) -> list[tuple[int, int]]:
+        """行の共起近傍 (会話隣接で一緒に出た行) を共起回数降順で返す。"""
+        hits = [
+            (b if a == row else a, c)
+            for (a, b), c in self._cooc.items()
+            if a == row or b == row
+        ]
+        hits.sort(key=lambda t: t[1], reverse=True)
+        return hits[:k]
+
+    def query_connected(
+        self, text: str, k: int = 5, *, seed_k: int = 3, want_facts: bool = True
+    ) -> list[tuple[int, float, str]]:
+        """連結性検索: cosine で seed (過去の質問でも可) を引き、**共起エッジで答え (事実) へホップ**。
+
+        cosine 単独では「質問」と「その答え」を繋げない (head-to-head で全 encoder R@1=0)。
+        会話隣接の共起グラフを 1 ホップ展開して橋渡しする = 差別化の核。
+        返り値: (行, スコア, 由来) の降順。由来 = "cosine" | "cooccur"。
+        want_facts=True なら最終結果から質問を除外。
+        """
+        seeds = self.query(text, k=seed_k)            # cosine seed (質問含む)
+        scored: dict[int, tuple[float, str]] = {}
+        for row, sim in seeds:
+            if not (want_facts and self._is_q[row]):
+                prev = scored.get(row)
+                if prev is None or sim > prev[0]:
+                    scored[row] = (sim, "cosine")
+            # 共起ホップ: seed の隣接 (= その質問の答え等)
+            total = sum(c for _, c in self.cooccur_neighbors(row, k=999)) or 1
+            for nb, c in self.cooccur_neighbors(row, k=k):
+                if want_facts and self._is_q[nb]:
+                    continue
+                # 共起スコア = seed cosine × 共起比率 (0..1)
+                s = float(sim) * (c / total)
+                prev = scored.get(nb)
+                if prev is None or s > prev[0]:
+                    scored[nb] = (s, "cooccur")
+        ranked = sorted(scored.items(), key=lambda t: t[1][0], reverse=True)
+        return [(row, sc, src) for row, (sc, src) in ranked][:k]
+
     def role_of_row(self, row: int) -> str | None:
         """行の発話者ロール (初出時に記録)。"""
         return self._roles[row]
