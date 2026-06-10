@@ -35,6 +35,24 @@ Transformer のコアアルゴリズム (state update / 学習則 / 認知駆動
 > と自己確認済み。これは後退ではなく設計上の長所 — 証明する性質を「ソルバ不要なほど単純な健全 contraction 条件」に絞った結果。
 > ソルバの真価は閉形式で書けない spectral/Lyapunov 不変量 (SDP rung + 将来の vertex-free robust-LMI) にあり、SMT 決定手続きではない。
 
+## 基本会話 (llcore.chat — Phase 0 baseline)
+
+EVOLVABLE_LLM_PLAN_2026_06_09 Phase 0「実在の小型オープン LLM を base に据え baseline 機能
+(coherent text / 基本 Q&A) を継承」の製品コード。**llcore は LLM としての基本会話が可能**:
+
+```powershell
+pip install "llmesh-llcore[chat]"        # torch + transformers (optional extra)
+py -3.11 -m llcore.chat                  # 対話 REPL (/exit /reset /history)
+py -3.11 -m llcore.chat --prompt "What is the capital of France?"
+```
+
+- base = **SmolLM2-Instruct** (Apache-2.0, CPU 完結 / on-prem)。default 135M、
+  `LLCORE_CHAT_MODEL` env または `--model` で 360M 等へ差し替え可。Qwen 系は商用障壁のため不採用。
+- 複数ターン履歴 + 文脈引継ぎ + context 予算内の対単位トリミング。torch/transformers 不在時は
+  `ChatDependencyError` で fail-closed (黙って劣化しない)。
+- 段階的会話スモーク (挨拶→事実 Q&A→文脈引継ぎ→話題転換): `scripts/chat_staged_smoke.py`
+  (結果 verbatim を `out/` に JSON 記録。honest: 135M は固有名想起等で誤ることがある)。
+
 ## llive との関係 (戦略)
 
 **llcore は llive 非依存の独立 project**。llive は参考実装 + 比較対象として扱う。
