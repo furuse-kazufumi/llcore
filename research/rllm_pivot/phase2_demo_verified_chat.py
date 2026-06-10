@@ -387,7 +387,17 @@ def main() -> int:
                 "empirical_rho は from-below 一致オラクル (絶対証明でない)",
                 "変異は上方圧バイアスつき adversarial stress (開示済)",
                 "射影入力は [-1,1] clip (cert の max_input_abs=1 と整合); clip 率は meta に記録",
-                "tanh 基質では ρ≥1 でも実軌道は発散して見えない — それこそが sound cert の存在理由",
+                "tanh 基質では ρ_sup≥1 でも軌道ノルムは発散しない (前方不変 [-1,1]^n) — "
+                "ρ_sup≥1 は『いかなるノルムでも一様収縮にならない=収縮証明可能領域の外』の意味であり、"
+                "『発散』ではない。それを見抜けるのが sound cert の存在理由",
+                "cert 系統の ρ≥1 違反 0 は cert soundness の演繹的帰結 (オラクルは cert と同一 box・"
+                "同一 Jacobian モデルを from-below サンプル) — 実装バグ検出の整合性チェックであり独立な経験的証拠ではない",
+                "cert_sdp は margin=1e-7 の feasibility 証明で率は定量化されない (本走行の証明済 P-norm 率は "
+                "1−O(1e-8)、ターン内 2-norm 上界は √cond(P)=1.43–2.84) — ターン内忘却の定量保証は cert_two (σ^T) のみ。"
+                "観測の 1e-5 級忘却は経験的挙動",
+                "none/cert_two/cert_sdp の gate はデータ非依存 (worst-case 証明) — これら 3 系統の gene 列・採否・"
+                "true_rho・cert_box_sigma は seed のみで決まり会話無しでも同一。会話が効くのは stable_emp 採否と忘却診断・state_norm",
+                "true_rho という命名は ρ_sup (収縮証明可能性指標) の略 — 非 cert 系統では ρ<1 を断定しない (from-below 推定)",
             ],
         },
         "conversation": transcript,
