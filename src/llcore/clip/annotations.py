@@ -218,7 +218,7 @@ class AnnotationStore:
             inv[i] = a
         return inv
 
-    def embedding_matrix(self) -> "np.ndarray":
+    def embedding_matrix(self) -> Any:
         """有効行のみの連続 float32 行列ビュー (n, d)。query 毎の再構築コストなし。"""
         if self._n_rows == 0:
             raise ValueError("store is empty")
