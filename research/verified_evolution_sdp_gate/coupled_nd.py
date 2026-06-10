@@ -46,6 +46,16 @@ except Exception:  # pragma: no cover
     _SOLVER = None
 
 
+def cvxpy_available() -> bool:
+    """True iff the genuine SDP path (cvxpy + CLARABEL) is runnable.
+
+    Fail-closed: a missing solver returns False, so callers degrade cert_sdp to the
+    cert_two fast-path only (never silently solve under SCS) and never record a false
+    ``sdp_available: true``.
+    """
+    return bool(_CVXPY and _CLARABEL_OK)
+
+
 # --------------------------------------------------------------------------- #
 # Gene + dynamics (n-dim).
 # --------------------------------------------------------------------------- #
