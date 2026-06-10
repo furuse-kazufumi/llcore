@@ -303,6 +303,7 @@ class AnnotationStore:
                 self._counts.append(0)
                 self._roles.append(role)
                 self._is_q.append(is_question(a))
+                self._non_fact.append(not is_fact(a))
             self._n_encoded += len(new)
             self._int8 = None  # 量子化キャッシュ無効化
         ids = []
