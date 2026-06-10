@@ -167,7 +167,7 @@ SmolLM2-135M の中間層 hidden を n=6 に射影し、「次に来る hidden �
 - ME vs finite-diff:diff **+0.029**、**20/20**、p=9.5e-7 → 4 条件 AND **成立**(一見 EXISTS)。
 - ME vs strong analytic gradient:diff **+0.008(勾配側)**、**19/20** で勾配が逆転、p=3.5e-4 → 4 条件 AND **不成立**。
 
-**∴ ME の勝ちは finite-diff の弱さ(cold-start / dim+1 評価/step / 予算内 ~95 step)の artifact。** 強い勾配では gradient > evolution = **実地形でも capability NEGATIVE**。synthetic 地形に強い解析勾配を足しても勾配が最高平均(分散が大きく paired 検定は引き分け止まり)であり、**capability NEGATIVE は両地形で一貫**(差は分散のみ)。
+**∴ ME の勝ちは finite-diff の弱さ(cold-start / dim+1 評価/step / 予算内 ~95 step)の artifact。** 強い勾配では gradient > evolution = **実地形でも capability NEGATIVE**。synthetic 地形に強い解析勾配を足しても勾配が最高平均(分散が大きく paired 検定は引き分け止まり)であり、**実地形は paired 19/20 で decisive、synthetic は torch vs ME の paired 4 条件 AND は TIE(mean のみ gradient 最良)— 両地形で「gradient が最高平均」が一貫**。
 
 **★ honest-disclosure の真価:** strong-gradient meta-gate が無ければ「進化が実地形で 20/20 capability 勝利」という false-positive を誤結論していた。「勝った気になる前に内訳を疑う」が、data の上で実際に false-positive を 1 件排除した実例である。これは負けの報告ではなく、**枠組みが機能した報告**である。
 
