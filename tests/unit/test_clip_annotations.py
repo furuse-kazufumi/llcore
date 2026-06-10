@@ -8,7 +8,12 @@ from typing import Any, Sequence
 import numpy as np
 import pytest
 
-from llcore.clip.annotations import AnnotationStore, split_annotations
+from llcore.clip.annotations import (
+    UINT64_MASK,
+    AnnotationStore,
+    annotation_id,
+    split_annotations,
+)
 
 
 class CountingEncoder:
