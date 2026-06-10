@@ -48,6 +48,9 @@ py -3.11 -m llcore.chat --prompt "What is the capital of France?"
 
 - base = **SmolLM2-Instruct** (Apache-2.0, CPU 完結 / on-prem)。default 135M、
   `LLCORE_CHAT_MODEL` env または `--model` で 360M 等へ差し替え可。Qwen 系は商用障壁のため不採用。
+- **日本語会話**は SmolLM2 では不可 (英語中心)。JA 推奨 =
+  `--model sbintuitions/sarashina2.2-0.5b-instruct-v0.1` (MIT, 要 `pip install sentencepiece`;
+  段階的 JA スモーク 5/5)。llm-jp-3-440m-instruct3 (Apache-2.0) は 3/5 (過剰拒否癖あり)。
 - 複数ターン履歴 + 文脈引継ぎ + context 予算内の対単位トリミング。torch/transformers 不在時は
   `ChatDependencyError` で fail-closed (黙って劣化しない)。
 - 段階的会話スモーク (挨拶→事実 Q&A→文脈引継ぎ→話題転換): `scripts/chat_staged_smoke.py`
