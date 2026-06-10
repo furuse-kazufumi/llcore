@@ -132,6 +132,29 @@ _WS = re.compile(r"\s+")
 _MIN_CHARS = 3
 
 
+# 疑問詞 (英) + 助動詞始まり。日本語は末尾 か/? で判定。
+_QUESTION_WORDS = (
+    "what", "where", "who", "whom", "whose", "when", "why", "which", "how",
+    "is", "are", "am", "was", "were", "do", "does", "did", "can", "could",
+    "will", "would", "should", "shall", "may", "might", "have", "has", "had",
+)
+
+
+def is_question(annotation_norm: str) -> bool:
+    """アノテーション (正規化短句) が疑問文か (= 事実でない) をヒューリスティック判定。
+
+    事実検索から質問を除外するための軽量判定 (LLM 不要)。英: 疑問詞/助動詞始まり、
+    日本語: 末尾 か / ? の有無。誤判定はありうる (PoC レベル) が、計算ゼロで効く。
+    """
+    s = annotation_norm.strip()
+    if not s:
+        return False
+    if s.endswith("?") or s.endswith("か") or "?" in s:
+        return True
+    first = s.split()[0] if s.split() else ""
+    return first in _QUESTION_WORDS
+
+
 def split_annotations(text: str) -> list[str]:
     """テキストを正規化済みアノテーション (短句) のリストに分割する。
 
