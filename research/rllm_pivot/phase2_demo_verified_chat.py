@@ -420,7 +420,8 @@ def main() -> int:
         print(f"  {METHOD_LABEL[m]:20s} 最終 真ρ={final[m]:.2f}  最大={peak:.2f}  "
               f"{'(経験的に騙された turn あり)' if fooled[m] and m in ('none', 'stable_emp') else ''}",
               flush=True)
-    print(f"  cert 系統の ρ≥1 違反: {cert_violations} (0 = 0 観測 false-admit)", flush=True)
+    print(f"  cert 系統の ρ≥1 違反: {cert_violations} "
+          f"(soundness ⇒ 必然的に 0; 非 0 = 実装バグ検出 — 整合性チェックであり経験的発見ではない)", flush=True)
     print(f"\nJSON: {out_json}\nSVG : {out_svg}", flush=True)
     return 0 if cert_violations == 0 else 1
 
