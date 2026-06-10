@@ -23,6 +23,7 @@ honest 留保:
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 from pathlib import Path
@@ -30,6 +31,23 @@ from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:  # pragma: no cover
     import numpy as np
+
+# アノテーション番号 (annotation id) の型上限 = 符号なし 64bit (ulonglong)。
+# 大量のユニーク語を扱うため content-addressed な 64bit ID を採用 (dense index ではない):
+# 同一アノテーションは store/シャードを跨いで常に同じ ID になる (分散・マージ可能)。
+UINT64_MASK = (1 << 64) - 1
+
+
+def annotation_id(annotation_norm: str) -> int:
+    """正規化済みアノテーション文字列 → 安定な符号なし 64bit ID (ulonglong 範囲)。
+
+    blake2b の先頭 8 バイトを uint64 に。content-addressed なので別プロセス・別ストアでも
+    同一文字列は同一 ID。誕生日衝突は ~2^32 (約 43 億) ユニークで ~50% — 実用域では無視できるが、
+    AnnotationStore は登録時に**異なる文字列が同一 ID になったら fail-closed で拒否**する。
+    """
+    h = hashlib.blake2b(annotation_norm.encode("utf-8"), digest_size=8).digest()
+    return int.from_bytes(h, "big") & UINT64_MASK
+
 
 def _char_bigrams(s: str) -> frozenset[str]:
     """表層類似用の文字 bigram 集合 (日本語にも有効 — 単語境界に依存しない)。"""
