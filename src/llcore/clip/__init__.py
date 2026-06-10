@@ -40,6 +40,7 @@ __all__ = [
     "AnnotationStore",
     "ClipBackend",
     "ClipDependencyError",
+    "annotation_id",
     "resolve_clip_model_id",
     "split_annotations",
     "zero_shot",
