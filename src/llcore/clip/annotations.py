@@ -27,10 +27,7 @@ import hashlib
 import json
 import re
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
-
-if TYPE_CHECKING:  # pragma: no cover
-    import numpy as np
+from typing import Any
 
 # アノテーション番号 (annotation id) の型上限 = 符号なし 64bit (ulonglong)。
 # 大量のユニーク語を扱うため content-addressed な 64bit ID を採用 (dense index ではない):
