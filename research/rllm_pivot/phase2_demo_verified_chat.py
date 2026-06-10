@@ -282,7 +282,8 @@ def main() -> int:
     args = parser.parse_args()
     turns = CONVERSATION[: max(1, min(args.turns, len(CONVERSATION)))]
 
-    sdp_available = C.cvxpy_available() if hasattr(C, "cvxpy_available") else True
+    # fail-closed: solver 不在なら cert_sdp 系統をスキップ (meta/SVG に虚偽の sdp_available を載せない)
+    sdp_available = bool(C.cvxpy_available())
 
     # 実会話セッション (frozen LLM)
     backend = TransformersBackend(model_id=args.model, seed=args.seed)
