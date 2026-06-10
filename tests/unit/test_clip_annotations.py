@@ -115,6 +115,40 @@ def test_id_to_unit_vector_extended_dim() -> None:
     assert np.isclose(np.linalg.norm(v), 1.0, atol=1e-6)
 
 
+def test_id_cosine_exact_matches_vector_dot() -> None:
+    """popcount 厳密コサインが ±1 ベクトルの内積と一致 (精度喪失なし)。"""
+    big = UINT64_MASK - 999
+    other = annotation_id("some other annotation")
+    for a, b in [(big, other), (big, big), (big, big ^ 0xF0F0)]:
+        exact = id_cosine(a, b, dim=64)
+        va, vb = id_to_unit_vector(a, 64), id_to_unit_vector(b, 64)
+        assert exact == pytest.approx(float(va @ vb), abs=1e-6)
+    # 同一 ID は厳密に 1.0 (float 誤差なし — 整数演算 + 2^6 除算)
+    assert id_cosine(big, big) == 1.0
+    # 1bit 違いは厳密に (64-2)/64
+    assert id_cosine(big, big ^ 1) == pytest.approx((64 - 2) / 64)
+
+
+def test_id_cosine_no_float_precision_loss_above_2e53() -> None:
+    """2^53 を超える 2 ID でも識別が潰れない (生 int→float の精度喪失を回避)。"""
+    a = (1 << 63) | 12345
+    b = (1 << 63) | 12344  # 下位 1bit のみ違う巨大 ID
+    assert a != b
+    assert id_cosine(a, b) == pytest.approx((64 - 2) / 64)  # 厳密に 1bit 差
+    assert id_cosine(a, b) < 1.0  # 潰れていない
+
+
+def test_store_id_neighbors_exact() -> None:
+    enc = CountingEncoder()
+    store = AnnotationStore(enc)
+    ids = store.add_text("alpha beta. gamma delta. epsilon zeta.")
+    nb = store.id_neighbors(ids[0], k=2)
+    assert len(nb) == 2
+    # スコアは全て厳密な popcount コサイン (i 番目の行 ID と突合)
+    for row, score in nb:
+        assert score == id_cosine(ids[0], store.id_of_row(row))
+
+
 def test_store_id_row_roundtrip() -> None:
     enc = CountingEncoder()
     store = AnnotationStore(enc)
