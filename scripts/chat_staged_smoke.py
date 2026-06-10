@@ -120,12 +120,36 @@ STAGES_JA: StageList = [
 STAGE_SETS: dict[str, StageList] = {"en": STAGES_EN, "ja": STAGES_JA}
 
 
+def _keyword_hit(reply_low: str, keyword: str) -> bool:
+    """ASCII キーワードは単語境界つきで照合 ('4' が '2024'、'paris' が 'comparison' に
+    誤マッチしない)。日本語等の非 ASCII は単語境界が無いため包含で判定。"""
+    k = keyword.lower()
+    if k.isascii():
+        return re.search(rf"(?<![a-z0-9]){re.escape(k)}(?![a-z0-9])", reply_low) is not None
+    return k in reply_low
+
+
 def check(reply: str, expect: list[str] | None) -> str:
     """ヒューリスティック判定: expected | unexpected | open_ended。"""
     if expect is None:
         return "open_ended"
     low = reply.lower()
-    return "expected" if any(k in low for k in expect) else "unexpected"
+    return "expected" if any(_keyword_hit(low, k) for k in expect) else "unexpected"
+
+
+# 終了コードの判定対象: 単純 Q&A と文脈引継ぎのみ (stage4 はキーワード幅が広く
+# 偶然ヒットしやすいため、exit code の信号には使わない — JSON には全記録)
+_CRITICAL_STAGES = ("stage2_simple_qa", "stage3_context_carryover")
+
+
+def exit_code(results: list[dict[str, object]]) -> int:
+    """stage2/3 の keyword check が全滅なら 1 (基本会話不成立)、1 つでも通れば 0。"""
+    critical = [
+        r
+        for r in results
+        if r["expected_keywords"] is not None and r["stage"] in _CRITICAL_STAGES
+    ]
+    return 0 if any(r["auto_check"] == "expected" for r in critical) else 1
 
 
 def main() -> int:
