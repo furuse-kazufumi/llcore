@@ -200,6 +200,8 @@ class AnnotationStore:
         self._matrix: Any = None                  # (capacity, d) float32 or None
         self._n_rows = 0
         self._counts: list[int] = []              # 行 -> 出現回数
+        self._roles: list[str | None] = []        # 行 -> 初出時の発話者ロール (user/assistant/None)
+        self._is_q: list[bool] = []               # 行 -> 質問か (事実検索の除外用)
         self._n_instances = 0                     # 観測したアノテーション延べ数
         self._n_encoded = 0                       # 実際に encoder を呼んだユニーク数
         # int8 量子化キャッシュ (大規模 cosine の省メモリ近似; 行追加で無効化)
