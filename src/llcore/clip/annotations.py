@@ -483,6 +483,7 @@ class AnnotationStore:
         seed_k: int = 5,
         want_facts: bool = True,
         boost: float = 1.0,
+        hub_suppression: bool = True,
     ) -> list[tuple[int, float, str]]:
         """連結性検索: cosine 事実検索を base に、**共起エッジで答え (事実) へホップ**して加点。
 
@@ -491,8 +492,14 @@ class AnnotationStore:
 
         **単調改善設計**: cosine 事実検索の結果を base スコアとして必ず保持し、共起ホップは
         加点 (max マージ) のみ — よって cosine 単独を下回らない。
+
+        ``hub_suppression=True`` (既定): 共起相手が多い hub ノード (例「new topic」が全 turn に
+        共起) の boost を **IDF** ``log((1+N)/(1+degree))`` で down-weight。特定的な答えを優先し、
+        フィラーが rank1 を占有する問題を解消する。
         返り値: (行, スコア, 由来) の降順。由来 = "cosine" | "cooccur"。
         """
+        import math
+
         import numpy as np
 
         # base: cosine 事実検索 (全行を score 付き; want_facts なら質問除外)
@@ -504,6 +511,10 @@ class AnnotationStore:
                 continue
             scored[row] = (float(sims[row]), "cosine")
 
+        deg = self._cooccur_degree() if hub_suppression else {}
+        # IDF 正規化: max degree でも >0 になるよう (1+N)/(1+deg)。1.0 で割り戻して [0,1] 近傍へ。
+        idf_max = math.log((1 + self._n_rows) / 1.0)
+
         # 共起ホップ: cosine 上位 seed (質問含む) の隣接事実を加点
         order = np.argsort(sims)[::-1][:seed_k]
         for srow in order:
@@ -514,7 +525,11 @@ class AnnotationStore:
             for nb, c in neigh[:k]:
                 if want_facts and self._non_fact[nb]:  # 質問 or 依頼を除外
                     continue
-                s = boost * sim * (c / denom)     # 0..boost*sim
+                idf = (
+                    math.log((1 + self._n_rows) / (1 + deg.get(nb, 0))) / idf_max
+                    if hub_suppression else 1.0
+                )
+                s = boost * sim * (c / denom) * idf   # hub ほど idf↓ で boost が下がる
                 prev = scored.get(nb)
                 if prev is None or s > prev[0]:
                     scored[nb] = (s, "cooccur")
