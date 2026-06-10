@@ -227,9 +227,7 @@ def main() -> int:
     print(f"\nsummary: expected={n_expected} unexpected={n_unexpected} "
           f"(load {backend.load_seconds:.1f}s, total {payload['total_seconds']}s)")
     print(f"results: {args.out}")
-    # 終了コード: 文脈引継ぎ (stage3) と単純 Q&A (stage2) が全滅なら 1 (基本会話不成立)
-    critical = [r for r in results if r["expected_keywords"] is not None]
-    return 0 if any(r["auto_check"] == "expected" for r in critical) else 1
+    return exit_code(results)
 
 
 if __name__ == "__main__":
