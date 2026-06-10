@@ -339,6 +339,59 @@ def test_query_excludes_questions_for_fact_retrieval() -> None:
     assert all(not is_question(a) for a in fact_anns)
 
 
+def test_cooccurrence_bridges_question_to_answer() -> None:
+    """連結性検索: cosine が繋げない『質問→その答え』を会話隣接の共起エッジで橋渡し。"""
+    # 質問とその答えを cosine 的に離す (質問は別の質問に近い)
+    vecs = {
+        "what is my name": [1.0, 0.0, 0.0],
+        "my name is kazufumi": [0.2, 1.0, 0.0],     # 答え (質問から cosine 遠い)
+        "what is your name": [0.98, 0.05, 0.0],      # 別の質問 (クエリに最も近い)
+        "thank you very much": [0.0, 0.0, 1.0],
+    }
+    store = AnnotationStore(VecEncoder(vecs))
+    # 会話: turn0 に答え、turn1 に質問 (隣接) → 共起エッジが張られる
+    store.add_text("my name is kazufumi.", role="user", group=0)
+    store.add_text("what is my name.", role="user", group=1)
+    store.add_text("what is your name.", role="assistant", group=5)  # 遠い group
+    store.add_text("thank you very much.", role="user", group=9)
+    ann = store.annotations
+
+    # 素の cosine: 質問クエリは別の質問を最上位に拾う (答えは下位)
+    plain = [ann[i] for i, _ in store.query("what is my name", k=2)]
+    assert "what is your name" in plain  # cosine は別質問を拾う
+
+    # 連結性検索: 過去の質問「what is my name」を seed に共起ホップ → 答えへ
+    connected = store.query_connected("what is my name", k=3, want_facts=True)
+    conn_anns = [ann[r] for r, _, _ in connected]
+    assert "my name is kazufumi" in conn_anns  # 共起で答えに到達
+    # 由来が cooccur のものが含まれる
+    assert any(src == "cooccur" for _, _, src in connected)
+
+
+def test_cooccur_neighbors_counts() -> None:
+    enc = CountingEncoder()
+    store = AnnotationStore(enc)
+    store.add_text("alpha. beta.", group=0)       # alpha-beta 共起
+    store.add_text("beta. gamma.", group=1)       # beta-gamma 共起 (group0 と隣接 → alpha とも)
+    ann = store.annotations
+    a = ann.index("alpha")
+    nbs = dict((j, c) for j, c in store.cooccur_neighbors(a, k=10))
+    assert ann.index("beta") in nbs  # alpha-beta 共起
+
+
+def test_cooccur_persist_roundtrip(tmp_path: Path) -> None:
+    enc = CountingEncoder()
+    path = tmp_path / "store.json"
+    store = AnnotationStore(enc, path=path)
+    store.add_text("alpha. beta.", group=0)
+    store.save()
+    store2 = AnnotationStore(CountingEncoder(), path=path)
+    ann = store2.annotations
+    a = ann.index("alpha")
+    nbs = [j for j, _ in store2.cooccur_neighbors(a, k=10)]
+    assert ann.index("beta") in nbs
+
+
 def test_query_role_filter() -> None:
     enc = CountingEncoder()
     store = AnnotationStore(enc)
