@@ -173,13 +173,18 @@ def write_transcript(session: ChatSession, model_id: str, path: Path) -> None:
 def main(argv: Sequence[str] | None = None) -> int:
     _ensure_utf8_stdout()
     args = build_parser().parse_args(argv)
+    try:
+        settings = settings_from_args(args)
+    except ValueError as exc:
+        # 生成パラメータの fail-closed 検証 (temperature=0 等) はロード前に拒否
+        print(f"error: {exc}", file=sys.stderr, flush=True)
+        return 2
     model_id = resolve_model_id(args.model)
     backend = TransformersBackend(model_id=model_id, seed=args.seed)
-    session = ChatSession(
-        backend, system_prompt=args.system, settings=settings_from_args(args)
-    )
+    session = ChatSession(backend, system_prompt=args.system, settings=settings)
 
     print(f"model: {model_id} (CPU)", flush=True)
+    exit_code = 0
     try:
         if args.prompt:
             run_prompts(session, args.prompt, show_timing=args.show_timing)
@@ -187,12 +192,25 @@ def main(argv: Sequence[str] | None = None) -> int:
             repl(session, show_timing=args.show_timing)
     except ChatDependencyError as exc:
         print(f"error: {exc}", file=sys.stderr, flush=True)
-        return 2
-    if args.show_timing and backend.load_seconds is not None:
-        print(f"(model load: {backend.load_seconds:.1f}s)", flush=True)
-    if args.transcript is not None:
-        write_transcript(session, model_id, args.transcript)
-    return 0
+        exit_code = 2
+    except KeyboardInterrupt:
+        print("\n(中断しました)", file=sys.stderr, flush=True)
+        exit_code = 130
+    except (ValueError, RuntimeError, OSError) as exc:
+        # モデル取得失敗 (HF 由来は OSError 系) / 生成エラー — traceback でなく要点のみ
+        print(f"error: {type(exc).__name__}: {exc}", file=sys.stderr, flush=True)
+        exit_code = 1
+    finally:
+        # Ctrl+C やエラーで中断しても、そこまでの会話を失わない
+        if args.show_timing and backend.load_seconds is not None:
+            print(f"(model load: {backend.load_seconds:.1f}s)", flush=True)
+        if args.transcript is not None and session.turn_count > 0:
+            try:
+                write_transcript(session, model_id, args.transcript)
+            except OSError as exc:
+                print(f"error: transcript 書込失敗: {exc}", file=sys.stderr, flush=True)
+                exit_code = exit_code or 1
+    return exit_code
 
 
 if __name__ == "__main__":
