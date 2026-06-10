@@ -51,10 +51,10 @@ llcore の進化コア/検証器は**世界知識を内包しない** (tiny adap
   形態素解析/活用/仮名漢字)。1D-SegFormer・事実抽出・アノテーション連結 (類義/形態エッジ) の基盤。
 - ⬜ 世界知識注入が retrieval/grounding を改善するか実測 (会話のみ vs 会話+RAD)
 
-### M4 🔄 RAD コーパス生成 (世界知識ギャップ + 環境設計の根拠)
-- 🔄 ループ手法調査 → RAD コーパス化 (workflow 進行中, 自律/制御/学習/運用 4 スコープ)
-- 🔄 言語学調査 → RAD コーパス化 (workflow 進行中, 統語/形態語彙/音声音韻/意味語用/多言語日本語 5 領域)
-- ⬜ 両 corpus を /corpus2skill で _corpus_v2 階層化し RAD 登録
+### M4 ✅ RAD コーパス生成 (世界知識ギャップ + 環境設計の根拠) — 完了
+- ✅ ループ手法調査 (50 手法, 4 スコープ) → corpus/loop_engineering (39 doc / 12 cluster) 登録済
+- ✅ 言語学調査 (67 トピック, 5 領域) → corpus/language (64 doc / 15 cluster) 登録済
+- ✅ /corpus2skill で skill 階層化し RAD 全体 INDEX に登録 (raptor/.claude/skills/corpus/)
 
 ### M5 ⬜ ループエンジニアリング環境の新規構築 (ユーザー指示 2026-06-11)
 - **★安全方針 (ユーザー明示)**: ccr (claude-auto.mjs / claude-loop / raptor-loop-queue) は**安全網として
