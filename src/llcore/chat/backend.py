@@ -93,6 +93,22 @@ class TransformersBackend:
 
     # -- ロード -------------------------------------------------------------
 
+    def ensure_loaded(self) -> None:
+        """モデル/トークナイザを明示的にロードする (research ハーネス向け公開 API)。"""
+        self._ensure_loaded()
+
+    @property
+    def tokenizer(self) -> Any:
+        """ロード済みトークナイザ (未ロードならロードを誘発)。"""
+        self._ensure_loaded()
+        return self._tok
+
+    @property
+    def model(self) -> Any:
+        """ロード済みモデル (未ロードならロードを誘発)。research 用途 (hidden 抽出等)。"""
+        self._ensure_loaded()
+        return self._model
+
     def _ensure_loaded(self) -> None:
         if self._model is not None:
             return
