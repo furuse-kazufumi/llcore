@@ -481,6 +481,8 @@ class AnnotationStore:
             # JSON の数値は安全に uint64 を表現できないため id は 10 進文字列で保存
             "ids": [str(i) for i in self._ids],
             "counts": self._counts,
+            "roles": self._roles,
+            "is_question": self._is_q,
             "n_instances": self._n_instances,
             "n_encoded": self._n_encoded,
         }
