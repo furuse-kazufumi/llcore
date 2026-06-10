@@ -493,13 +493,11 @@ class AnnotationStore:
         **単調改善設計**: cosine 事実検索の結果を base スコアとして必ず保持し、共起ホップは
         加点 (max マージ) のみ — よって cosine 単独を下回らない。
 
-        ``hub_suppression=True`` (既定): 共起相手が多い hub ノード (例「new topic」が全 turn に
-        共起) の boost を **IDF** ``log((1+N)/(1+degree))`` で down-weight。特定的な答えを優先し、
-        フィラーが rank1 を占有する問題を解消する。
+        ``hub_suppression=True`` (既定): **平均次数を超える hub ノードのみ** boost を down-weight
+        (例「new topic」が全 turn に共起)。``factor = min(1, avg_deg/(deg+1))`` ゆえ平均以下の
+        特定的な答えは無罰 (全 boost を一律縮小して答えを潰す naive IDF の弊害を回避)。
         返り値: (行, スコア, 由来) の降順。由来 = "cosine" | "cooccur"。
         """
-        import math
-
         import numpy as np
 
         # base: cosine 事実検索 (全行を score 付き; want_facts なら質問除外)
@@ -512,8 +510,7 @@ class AnnotationStore:
             scored[row] = (float(sims[row]), "cosine")
 
         deg = self._cooccur_degree() if hub_suppression else {}
-        # IDF 正規化: max degree でも >0 になるよう (1+N)/(1+deg)。1.0 で割り戻して [0,1] 近傍へ。
-        idf_max = math.log((1 + self._n_rows) / 1.0)
+        avg_deg = (sum(deg.values()) / len(deg)) if deg else 1.0
 
         # 共起ホップ: cosine 上位 seed (質問含む) の隣接事実を加点
         order = np.argsort(sims)[::-1][:seed_k]
@@ -525,11 +522,9 @@ class AnnotationStore:
             for nb, c in neigh[:k]:
                 if want_facts and self._non_fact[nb]:  # 質問 or 依頼を除外
                     continue
-                idf = (
-                    math.log((1 + self._n_rows) / (1 + deg.get(nb, 0))) / idf_max
-                    if hub_suppression else 1.0
-                )
-                s = boost * sim * (c / denom) * idf   # hub ほど idf↓ で boost が下がる
+                # hub 罰: 平均次数超のみ抑制 (平均以下=特定的な答えは factor 1.0 で無罰)
+                hub = min(1.0, avg_deg / (deg.get(nb, 0) + 1)) if hub_suppression else 1.0
+                s = boost * sim * (c / denom) * hub
                 prev = scored.get(nb)
                 if prev is None or s > prev[0]:
                     scored[nb] = (s, "cooccur")
