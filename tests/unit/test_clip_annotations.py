@@ -85,6 +85,35 @@ def test_annotation_id_stable_and_uint64() -> None:
     assert 0 <= a <= UINT64_MASK
 
 
+def test_id_to_unit_vector_is_cosine_ready() -> None:
+    """uint64 ID → 実数化: 単位ノルム + 値域有界 + 全ビット無損失 (精度落ちなし)。"""
+    big = UINT64_MASK - 12345  # 2^53 を遥かに超える ID
+    v = id_to_unit_vector(big, dim=64)
+    assert v.shape == (64,)
+    assert np.isclose(np.linalg.norm(v), 1.0, atol=1e-6)  # cosine 標準形 (単位ノルム)
+    assert np.all(np.abs(v) <= 1.0)  # 値域有界 (数値的に扱いやすい)
+    # 1bit だけ違う ID は別ベクトルになる (2^53 超でも潰れない=精度保持)
+    v2 = id_to_unit_vector(big ^ 1, dim=64)
+    assert not np.allclose(v, v2)
+    # 同一 ID は決定論的に同一
+    assert np.allclose(v, id_to_unit_vector(big, dim=64))
+
+
+def test_id_to_unit_vector_cosine_separates_ids() -> None:
+    """異なる ID 間の cosine は ~0 付近 (識別空間で互いにほぼ直交)、同一は 1。"""
+    a = annotation_id("alpha")
+    b = annotation_id("beta")
+    va, vb = id_to_unit_vector(a), id_to_unit_vector(b)
+    assert np.isclose(float(va @ va), 1.0, atol=1e-6)
+    assert abs(float(va @ vb)) < 0.6  # 別 ID は識別的に分離 (SimHash 的)
+
+
+def test_id_to_unit_vector_extended_dim() -> None:
+    v = id_to_unit_vector(annotation_id("gamma"), dim=128)
+    assert v.shape == (128,)
+    assert np.isclose(np.linalg.norm(v), 1.0, atol=1e-6)
+
+
 def test_store_id_row_roundtrip() -> None:
     enc = CountingEncoder()
     store = AnnotationStore(enc)
