@@ -554,6 +554,8 @@ class AnnotationStore:
             "counts": self._counts,
             "roles": self._roles,
             "is_question": self._is_q,
+            # 共起エッジ: "a,b" -> count (JSON キーは文字列)
+            "cooccur": {f"{a},{b}": c for (a, b), c in self._cooc.items()},
             "n_instances": self._n_instances,
             "n_encoded": self._n_encoded,
         }
