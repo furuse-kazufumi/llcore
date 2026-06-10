@@ -78,7 +78,10 @@ class ChatSession:
 
     Args:
         backend: 応答生成バックエンド (:class:`ChatBackend` 互換)。
-        system_prompt: system message。空文字なら system 無しで開始。
+        system_prompt: system message。空文字なら**履歴上は** system 無しで開始。
+            注意: バックエンドの chat template が system 不在時に独自 default system を
+            注入する場合がある (SmolLM2-Instruct は「...named SmolLM, trained by
+            Hugging Face」を注入する)。履歴と実プロンプトはその分乖離しうる。
         settings: 生成パラメータ。省略時は :class:`GenerationSettings` の default。
     """
 
