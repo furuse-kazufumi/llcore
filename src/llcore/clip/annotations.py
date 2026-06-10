@@ -108,21 +108,50 @@ class AnnotationStore:
         self._ann2idx: dict[str, int] = {}        # 正規化文字列 -> 行
         self._ids: list[int] = []                 # 行 -> uint64 アノテーション番号
         self._id2idx: dict[int, int] = {}         # uint64 id -> 行
-        self._embeddings: list[Any] = []          # 行 -> (d,) numpy 配列
+        # 埋め込みは **連続 float32 行列** (容量倍々で増やす) として保持する。
+        # 行は単位 L2 ノルムに正規化済 (不変条件) ⇒ cosine = 内積 = 単一 matmul。
+        # 大規模 (大きい桁数=多数の語) でも query 毎の vstack を避けられる。
+        self._matrix: Any = None                  # (capacity, d) float32 or None
+        self._n_rows = 0
         self._counts: list[int] = []              # 行 -> 出現回数
         self._n_instances = 0                     # 観測したアノテーション延べ数
         self._n_encoded = 0                       # 実際に encoder を呼んだユニーク数
+        # int8 量子化キャッシュ (大規模 cosine の省メモリ近似; 行追加で無効化)
+        self._int8: Any = None
         if path is not None and path.exists():
             self._load(path)
+
+    # -- 内部: 連続行列の確保 -------------------------------------------------
+
+    def _ensure_capacity(self, dim: int, need: int) -> None:
+        import numpy as np
+
+        if self._matrix is None:
+            cap = max(8, need)
+            self._matrix = np.zeros((cap, dim), dtype=np.float32)
+            return
+        cap = self._matrix.shape[0]
+        if self._n_rows + need > cap:
+            new_cap = cap
+            while self._n_rows + need > new_cap:
+                new_cap *= 2
+            grown = np.zeros((new_cap, self._matrix.shape[1]), dtype=np.float32)
+            grown[: self._n_rows] = self._matrix[: self._n_rows]
+            self._matrix = grown
 
     # -- 取り込み -------------------------------------------------------------
 
     def add_text(self, text: str, *, source: str | None = None) -> list[int]:
         """テキストを分割し、新規ユニークのみ符号化して、**アノテーション番号 (uint64) 列**を返す。"""
+        import numpy as np
+
         anns = split_annotations(text)
         new = [a for a in dict.fromkeys(anns) if a not in self._ann2idx]
         if new:
-            vecs = self._encoder.encode_texts(new)
+            vecs = np.asarray(self._encoder.encode_texts(new), dtype=np.float32)
+            # 単位ノルム不変条件を強制 (encoder のドリフト/数値誤差を吸収)
+            vecs = _l2_normalize(vecs).astype(np.float32)
+            self._ensure_capacity(vecs.shape[1], len(new))
             for a, v in zip(new, vecs):
                 aid = annotation_id(a)
                 existing = self._id2idx.get(aid)
@@ -132,13 +161,15 @@ class AnnotationStore:
                         f"annotation id collision (uint64) between "
                         f"{self._ids[existing]!r}={self.annotations[existing]!r} and {a!r}"
                     )
-                row = len(self._embeddings)
+                row = self._n_rows
                 self._ann2idx[a] = row
                 self._ids.append(aid)
                 self._id2idx[aid] = row
-                self._embeddings.append(v)
+                self._matrix[row] = v
+                self._n_rows += 1
                 self._counts.append(0)
             self._n_encoded += len(new)
+            self._int8 = None  # 量子化キャッシュ無効化
         ids = []
         for a in anns:
             row = self._ann2idx[a]
