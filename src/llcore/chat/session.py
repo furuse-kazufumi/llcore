@@ -39,6 +39,9 @@ class GenerationSettings:
 
     do_sample=False (greedy) は決定論的だが小型モデルでは反復ループしやすい。
     default は低温サンプリング + 軽い repetition_penalty。
+
+    構築時に fail-closed 検証する (temperature=0 等は transformers の generate 実行時
+    まで検出が遅延するため、ここで早期に拒否する)。
     """
 
     max_new_tokens: int = 256
@@ -46,6 +49,17 @@ class GenerationSettings:
     top_p: float = 0.9
     do_sample: bool = True
     repetition_penalty: float = 1.1
+
+    def __post_init__(self) -> None:
+        if self.max_new_tokens <= 0:
+            raise ValueError(f"max_new_tokens must be > 0, got {self.max_new_tokens}")
+        if self.do_sample and self.temperature <= 0.0:
+            raise ValueError(
+                f"temperature must be > 0 when do_sample=True, got {self.temperature}; "
+                "決定論的デコードには do_sample=False (--greedy) を使う"
+            )
+        if self.do_sample and not (0.0 < self.top_p <= 1.0):
+            raise ValueError(f"top_p must be in (0, 1], got {self.top_p}")
 
 
 class ChatBackend(Protocol):
