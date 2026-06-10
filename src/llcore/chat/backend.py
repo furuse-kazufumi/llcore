@@ -142,9 +142,12 @@ class TransformersBackend:
         while self._templated_token_count(out) > budget:
             # head の直後 = 最古の非 system ターン。末尾 user だけは残す。
             if len(out) - head <= 1:
+                # これ以上トリムできない = system prompt + 最新 user の固定部分だけで
+                # 予算超過 (どちらが主因かはケースによる — 帰責を断定しない)
                 raise ValueError(
-                    "最新の user メッセージ単体が context 予算を超えています "
-                    f"(budget={budget} tokens)"
+                    "履歴をこれ以上トリムできませんが context 予算を超えています "
+                    f"(budget={budget} tokens; system prompt または最新 user メッセージが"
+                    "大きすぎる、あるいは max_new_tokens が大きすぎます)"
                 )
             if (
                 len(out) - head >= 3
