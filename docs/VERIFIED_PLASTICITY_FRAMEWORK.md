@@ -36,7 +36,7 @@
 
 LLM の**構造**(重みだけでなく次元・トポロジーそのもの)を online に適応させる問題は、古典的な **stability-plasticity の矛盾**の上にある。構造の自由度を上げる(plasticity を増す)ほど、発散と破滅的忘却のリスクが上がる(stability を損なう)。逆に by-construction で構造を縛れば安定するが、表現力(plasticity)を犠牲にする。
 
-TRIZ の観点では、これは「**改善したい特性 = 構造適応の自由度** vs **悪化する特性 = 系の安定性/制御可能性**」という典型的な technical contradiction である。本研究の解は、両者を時間軸で分離する **prove-then-reject** にある。**探索(変異の提案)は自由**にし、**採用(次世代への組込み)だけを sound certificate で gate** する。すなわち「適応は許すが、発散・忘却は許さない」**homeostatic constraint** として矛盾を解消する。これは「by-construction で最初から縛る」設計(後述 §6)とは双対の設計軸である。
+TRIZ の観点では、これは「**改善したい特性 = 構造適応の自由度** vs **悪化する特性 = 系の安定性/制御可能性**」という典型的な technical contradiction である。本研究の解は、両者を時間軸で分離する **prove-then-reject** にある。**探索(変異の提案)は自由**にし、**採用(次世代への組込み)だけを sound certificate で gate** する。すなわち「適応は許すが、発散・忘却は許さない」**homeostatic constraint** として small-n per-component(n≤4-6)域で矛盾を解消する(高次元の navigable-sound certifier は §5 の通り未解決)。これは「by-construction で最初から縛る」設計(後述 §6)とは双対の設計軸である。
 
 ### 1.2 なぜ method でなく枠組みを deliverable にするか
 
