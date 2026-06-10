@@ -147,15 +147,24 @@ def main() -> int:
         "hard_corpus_size": len(hard_corpus), "models": {},
     }
 
+    def record(name: str, encode) -> None:  # type: ignore[no-untyped-def]
+        t0 = time.time()
+        cv = l2(np.asarray(encode(corpus), dtype=np.float64))
+        qv = l2(np.asarray(encode(queries), dtype=np.float64))
+        easy = evaluate(cv, qv, gold)
+        easy.pop("ranks", None)
+        easy["encode_seconds"] = round(time.time() - t0, 1)
+        hard = run_hard_benchmark(encode, hard_corpus) if hard_corpus else None
+        if hard:
+            hard.pop("ranks", None)
+        results["models"][name] = {"easy": easy, "hard": hard}
+        hs = f"hard MRR={hard['mrr']:.3f} R@1={hard['recall@1']:.3f}" if hard else "hard=n/a"
+        print(f"  [{name}] easy MRR={easy['mrr']:.3f} | {hs}", flush=True)
+
     # --- CLIP/SigLIP (AnnotationStore のエンコーダ) ---
     clip = ClipBackend()
-    t0 = time.time()
-    c_corpus = l2(np.asarray(clip.encode_texts(corpus), dtype=np.float64))
-    c_query = l2(np.asarray(clip.encode_texts(queries), dtype=np.float64))
-    m = evaluate(c_corpus, c_query, gold)
-    m["encode_seconds"] = round(time.time() - t0, 1)
-    results["models"][f"CLIP:{clip.model_id}"] = m
-    print(f"  [CLIP {clip.model_id}] R@1={m['recall@1']:.3f} R@3={m['recall@3']:.3f} MRR={m['mrr']:.3f}", flush=True)
+    clip_key = f"CLIP:{clip.model_id}"
+    record(clip_key, clip.encode_texts)
 
     # --- 専用テキスト埋め込み (sentence-transformers) ---
     try:
@@ -178,20 +187,21 @@ def main() -> int:
             print(f"  ({name} ロード失敗: {str(exc)[:60]} — skip)", flush=True)
             continue
         qpre, ppre = PREFIX_SCHEMES.get(name, ("", ""))
-        t0 = time.time()
-        sc_corpus = l2(np.asarray(model.encode([ppre + c for c in corpus]), dtype=np.float64))
-        sc_query = l2(np.asarray(model.encode([qpre + q for q in queries]), dtype=np.float64))
-        m = evaluate(sc_corpus, sc_query, gold)
-        m["encode_seconds"] = round(time.time() - t0, 1)
-        m["prefix_scheme"] = bool(qpre or ppre)
-        results["models"][name] = m
-        print(f"  [{name}] R@1={m['recall@1']:.3f} R@3={m['recall@3']:.3f} MRR={m['mrr']:.3f}", flush=True)
 
-    # --- verdict ---
-    clip_key = f"CLIP:{clip.model_id}"
-    clip_mrr = results["models"][clip_key]["mrr"]
+        def enc(texts: list[str], _m=model, _qp=qpre, _pp=ppre):  # type: ignore[no-untyped-def]
+            # corpus/query で prefix が異なるため、両者を試し問わず passage prefix を既定に
+            pref = _qp if all(t in queries for t in texts) else _pp
+            return _m.encode([pref + t for t in texts])
+
+        record(name, enc)
+
+    # --- verdict (hard ベンチで判定; easy は飽和して無情報) ---
+    def hard_mrr(v: dict) -> float:
+        return v["hard"]["mrr"] if v.get("hard") else -1.0
+
+    clip_mrr = hard_mrr(results["models"][clip_key])
     best_st = max(
-        ((k, v["mrr"]) for k, v in results["models"].items() if not k.startswith("CLIP:")),
+        ((k, hard_mrr(v)) for k, v in results["models"].items() if not k.startswith("CLIP:")),
         key=lambda t: t[1], default=(None, 0.0),
     )
     gap = clip_mrr - best_st[1]
