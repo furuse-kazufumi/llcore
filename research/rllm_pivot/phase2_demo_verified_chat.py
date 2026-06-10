@@ -291,7 +291,9 @@ def main() -> int:
         lineages[m] = {
             "gene": base,
             "state": np.zeros(N),
-            "rng": np.random.default_rng(args.seed + 7),  # 同一提案列 (系統間公平)
+            # 同一 seed の変異 RNG: gene が分岐する (最初の採否差が出る) までは
+            # 全系統が同一提案列を見る。分岐後は gene 依存で自然に異なる (開示)。
+            "rng": np.random.default_rng(args.seed + 7),
             "rows": [],
         }
 

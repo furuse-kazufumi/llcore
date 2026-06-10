@@ -1,0 +1,390 @@
+{
+  "meta": {
+    "model": "HuggingFaceTB/SmolLM2-360M-Instruct",
+    "layer": 16,
+    "n": 6,
+    "seed": 20260611,
+    "n_turns": 8,
+    "eps_stable": 0.001,
+    "n_proposals_per_turn": 6,
+    "rho_samples": 3000,
+    "sdp_available": true,
+    "input_clip_fraction": 0.0021,
+    "honest_notes": [
+      "LLM は frozen — アダプタは sidecar で応答品質に影響しない (capability 主張なし)",
+      "empirical_rho は from-below 一致オラクル (絶対証明でない)",
+      "変異は上方圧バイアスつき adversarial stress (開示済)",
+      "射影入力は [-1,1] clip (cert の max_input_abs=1 と整合); clip 率は meta に記録",
+      "tanh 基質では ρ≥1 でも実軌道は発散して見えない — それこそが sound cert の存在理由"
+    ]
+  },
+  "conversation": [
+    {
+      "turn": 1,
+      "user": "Hello! My name is Kazufumi. Nice to meet you.",
+      "assistant": "Nice to meet you too, Kazufumi.",
+      "n_new_tokens": 58,
+      "gen_seconds": 2.0
+    },
+    {
+      "turn": 2,
+      "user": "What is the capital of France?",
+      "assistant": "The capital of France is Paris.",
+      "n_new_tokens": 25,
+      "gen_seconds": 2.0
+    },
+    {
+      "turn": 3,
+      "user": "Let's talk about cooking. Suggest one simple pasta dish.",
+      "assistant": "One simple pasta dish is spaghetti carbonara. It's made with guanciale (Italian pancetta), eggs, parmesan cheese, and black pepper.",
+      "n_new_tokens": 56,
+      "gen_seconds": 4.7
+    },
+    {
+      "turn": 4,
+      "user": "What is my name?",
+      "assistant": "Your name is Kazufumi.",
+      "n_new_tokens": 23,
+      "gen_seconds": 2.6
+    },
+    {
+      "turn": 5,
+      "user": "New topic: space. Name one planet in our solar system.",
+      "assistant": "Our solar system has eight planets: Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune.",
+      "n_new_tokens": 48,
+      "gen_seconds": 4.3
+    },
+    {
+      "turn": 6,
+      "user": "Tell me one interesting fact about that planet.",
+      "assistant": "Mars is known for its reddish hue due to iron oxide on its surface.",
+      "n_new_tokens": 35,
+      "gen_seconds": 4.1
+    },
+    {
+      "turn": 7,
+      "user": "Switch to music: name one classical composer.",
+      "assistant": "Classical composers include Mozart, Beethoven, Bach, and Tchaikovsky.",
+      "n_new_tokens": 36,
+      "gen_seconds": 6.1
+    },
+    {
+      "turn": 8,
+      "user": "Thank you! Say goodbye in one short sentence.",
+      "assistant": "Goodbye, I'm glad we could have this conversation.",
+      "n_new_tokens": 33,
+      "gen_seconds": 5.6
+    }
+  ],
+  "per_method": {
+    "none": [
+      {
+        "turn": 1,
+        "accepted": true,
+        "n_rejected_before_accept": 0,
+        "true_rho": 0.9843284139821935,
+        "observed_forgetting_on_turn": 0.002794135747759051,
+        "cert_box_sigma": 1.0678125971599135,
+        "state_norm": 0.05747784396058765
+      },
+      {
+        "turn": 2,
+        "accepted": true,
+        "n_rejected_before_accept": 0,
+        "true_rho": 0.9350181533458772,
+        "observed_forgetting_on_turn": 0.0018182506592678766,
+        "cert_box_sigma": 1.1259269069281725,
+        "state_norm": 0.025535668576931504
+      },
+      {
+        "turn": 3,
+        "accepted": true,
+        "n_rejected_before_accept": 0,
+        "true_rho": 0.9771620530438739,
+        "observed_forgetting_on_turn": 0.002065690785136702,
+        "cert_box_sigma": 1.315557094480172,
+        "state_norm": 0.06944543407575335
+      },
+      {
+        "turn": 4,
+        "accepted": true,
+        "n_rejected_before_accept": 0,
+        "true_rho": 1.0563071595044922,
+        "observed_forgetting_on_turn": 0.0037830980715051156,
+        "cert_box_sigma": 1.448468573372016,
+        "state_norm": 0.3100684046611387
+      },
+      {
+        "turn": 5,
+        "accepted": true,
+        "n_rejected_before_accept": 0,
+        "true_rho": 1.1547945046799917,
+        "observed_forgetting_on_turn": 0.00028711350868700243,
+        "cert_box_sigma": 1.5966484286116767,
+        "state_norm": 1.1827855009860244
+      },
+      {
+        "turn": 6,
+        "accepted": true,
+        "n_rejected_before_accept": 0,
+        "true_rho": 1.170161795147415,
+        "observed_forgetting_on_turn": 0.0018520075385255296,
+        "cert_box_sigma": 1.6637404323285294,
+        "state_norm": 1.2820416533959282
+      },
+      {
+        "turn": 7,
+        "accepted": true,
+        "n_rejected_before_accept": 0,
+        "true_rho": 1.1945394997512728,
+        "observed_forgetting_on_turn": 0.004119149588925942,
+        "cert_box_sigma": 1.8027653637718302,
+        "state_norm": 1.3243492630137013
+      },
+      {
+        "turn": 8,
+        "accepted": true,
+        "n_rejected_before_accept": 0,
+        "true_rho": 1.3512215826616867,
+        "observed_forgetting_on_turn": 0.004518198274623901,
+        "cert_box_sigma": 2.1124999869175545,
+        "state_norm": 1.2242691558285619
+      }
+    ],
+    "stable_emp": [
+      {
+        "turn": 1,
+        "accepted": true,
+        "n_rejected_before_accept": 1,
+        "true_rho": 0.9349934647242477,
+        "observed_forgetting_on_turn": 0.0001373889159145618,
+        "cert_box_sigma": 1.0365148393290415,
+        "state_norm": 0.08736072896497343
+      },
+      {
+        "turn": 2,
+        "accepted": false,
+        "n_rejected_before_accept": 6,
+        "true_rho": 0.9375396704930485,
+        "observed_forgetting_on_turn": 0.0012772904733794467,
+        "cert_box_sigma": 1.0365148393290415,
+        "state_norm": 0.054021019013428824
+      },
+      {
+        "turn": 3,
+        "accepted": true,
+        "n_rejected_before_accept": 0,
+        "true_rho": 0.889664650531969,
+        "observed_forgetting_on_turn": 8.350848235475252e-06,
+        "cert_box_sigma": 1.062462857562154,
+        "state_norm": 0.07940168040221522
+      },
+      {
+        "turn": 4,
+        "accepted": false,
+        "n_rejected_before_accept": 6,
+        "true_rho": 0.888870175343696,
+        "observed_forgetting_on_turn": 0.0005654081425605898,
+        "cert_box_sigma": 1.062462857562154,
+        "state_norm": 0.07513723560042446
+      },
+      {
+        "turn": 5,
+        "accepted": true,
+        "n_rejected_before_accept": 0,
+        "true_rho": 1.1266536498488497,
+        "observed_forgetting_on_turn": 0.002001725136911109,
+        "cert_box_sigma": 1.4017230546769925,
+        "state_norm": 1.3152546045829878
+      },
+      {
+        "turn": 6,
+        "accepted": true,
+        "n_rejected_before_accept": 3,
+        "true_rho": 1.38363751376116,
+        "observed_forgetting_on_turn": 0.00034196055754287893,
+        "cert_box_sigma": 1.6850741912775893,
+        "state_norm": 1.7497697241141572
+      },
+      {
+        "turn": 7,
+        "accepted": true,
+        "n_rejected_before_accept": 0,
+        "true_rho": 1.5767160868926862,
+        "observed_forgetting_on_turn": 4.203316933718874e-05,
+        "cert_box_sigma": 1.9571855416014812,
+        "state_norm": 2.031325712201889
+      },
+      {
+        "turn": 8,
+        "accepted": true,
+        "n_rejected_before_accept": 0,
+        "true_rho": 1.8994186718416548,
+        "observed_forgetting_on_turn": 9.326170135952622e-06,
+        "cert_box_sigma": 2.2606782479348704,
+        "state_norm": 2.052290784534818
+      }
+    ],
+    "cert_two": [
+      {
+        "turn": 1,
+        "accepted": false,
+        "n_rejected_before_accept": 6,
+        "true_rho": 0.9526201507248304,
+        "observed_forgetting_on_turn": 0.000361561183627703,
+        "cert_box_sigma": 0.990022195373925,
+        "state_norm": 0.07077826748680038
+      },
+      {
+        "turn": 2,
+        "accepted": true,
+        "n_rejected_before_accept": 1,
+        "true_rho": 0.8939699399664954,
+        "observed_forgetting_on_turn": 0.00015005206091613053,
+        "cert_box_sigma": 0.9889154525919686,
+        "state_norm": 0.04165534866141403
+      },
+      {
+        "turn": 3,
+        "accepted": true,
+        "n_rejected_before_accept": 1,
+        "true_rho": 0.7969557037870395,
+        "observed_forgetting_on_turn": 2.439917927473622e-09,
+        "cert_box_sigma": 0.9572643610942557,
+        "state_norm": 0.07775766545747956
+      },
+      {
+        "turn": 4,
+        "accepted": false,
+        "n_rejected_before_accept": 6,
+        "true_rho": 0.7997095704258161,
+        "observed_forgetting_on_turn": 1.633955736156037e-05,
+        "cert_box_sigma": 0.9572643610942557,
+        "state_norm": 0.07820872932990525
+      },
+      {
+        "turn": 5,
+        "accepted": true,
+        "n_rejected_before_accept": 2,
+        "true_rho": 0.8264501124726399,
+        "observed_forgetting_on_turn": 2.995297894854534e-08,
+        "cert_box_sigma": 0.9997093082939873,
+        "state_norm": 0.06975871885554889
+      },
+      {
+        "turn": 6,
+        "accepted": false,
+        "n_rejected_before_accept": 6,
+        "true_rho": 0.8369319192167861,
+        "observed_forgetting_on_turn": 5.572959718678698e-07,
+        "cert_box_sigma": 0.9997093082939873,
+        "state_norm": 0.08481758559765865
+      },
+      {
+        "turn": 7,
+        "accepted": true,
+        "n_rejected_before_accept": 0,
+        "true_rho": 0.9011121761405482,
+        "observed_forgetting_on_turn": 1.4761304193906133e-05,
+        "cert_box_sigma": 0.9974659056308508,
+        "state_norm": 0.09432398880133452
+      },
+      {
+        "turn": 8,
+        "accepted": false,
+        "n_rejected_before_accept": 6,
+        "true_rho": 0.8976654146741301,
+        "observed_forgetting_on_turn": 1.7342023427867113e-05,
+        "cert_box_sigma": 0.9974659056308508,
+        "state_norm": 0.08906771531052295
+      }
+    ],
+    "cert_sdp": [
+      {
+        "turn": 1,
+        "accepted": true,
+        "n_rejected_before_accept": 0,
+        "true_rho": 0.9843284139821935,
+        "observed_forgetting_on_turn": 0.002794135747759051,
+        "cert_box_sigma": 1.0678125971599135,
+        "state_norm": 0.05747784396058765
+      },
+      {
+        "turn": 2,
+        "accepted": true,
+        "n_rejected_before_accept": 0,
+        "true_rho": 0.9350181533458772,
+        "observed_forgetting_on_turn": 0.0018182506592678766,
+        "cert_box_sigma": 1.1259269069281725,
+        "state_norm": 0.025535668576931504
+      },
+      {
+        "turn": 3,
+        "accepted": true,
+        "n_rejected_before_accept": 3,
+        "true_rho": 0.9078956392867454,
+        "observed_forgetting_on_turn": 2.1225105440187852e-05,
+        "cert_box_sigma": 1.1959788968154705,
+        "state_norm": 0.04431227752488488
+      },
+      {
+        "turn": 4,
+        "accepted": true,
+        "n_rejected_before_accept": 0,
+        "true_rho": 0.9168977621017043,
+        "observed_forgetting_on_turn": 0.0007790777362979772,
+        "cert_box_sigma": 1.2478026298785254,
+        "state_norm": 0.045957350312993125
+      },
+      {
+        "turn": 5,
+        "accepted": false,
+        "n_rejected_before_accept": 6,
+        "true_rho": 0.9123301988940973,
+        "observed_forgetting_on_turn": 3.399719606520432e-05,
+        "cert_box_sigma": 1.2478026298785254,
+        "state_norm": 0.04011163028257348
+      },
+      {
+        "turn": 6,
+        "accepted": true,
+        "n_rejected_before_accept": 5,
+        "true_rho": 0.9160987336123679,
+        "observed_forgetting_on_turn": 5.452846956477184e-05,
+        "cert_box_sigma": 1.3970445113737684,
+        "state_norm": 0.07906901550423703
+      },
+      {
+        "turn": 7,
+        "accepted": false,
+        "n_rejected_before_accept": 6,
+        "true_rho": 0.9142544587680254,
+        "observed_forgetting_on_turn": 0.00017218458919526157,
+        "cert_box_sigma": 1.3970445113737684,
+        "state_norm": 0.06242860321826713
+      },
+      {
+        "turn": 8,
+        "accepted": false,
+        "n_rejected_before_accept": 6,
+        "true_rho": 0.9078558667644353,
+        "observed_forgetting_on_turn": 0.00013225968194167966,
+        "cert_box_sigma": 1.3970445113737684,
+        "state_norm": 0.086373532448574
+      }
+    ]
+  },
+  "final_true_rho": {
+    "none": 1.3512215826616867,
+    "stable_emp": 1.8994186718416548,
+    "cert_two": 0.8976654146741301,
+    "cert_sdp": 0.9078558667644353
+  },
+  "empirical_gate_fooled": {
+    "none": true,
+    "stable_emp": true,
+    "cert_two": false,
+    "cert_sdp": false
+  },
+  "cert_lineage_rho_violations": 0
+}
