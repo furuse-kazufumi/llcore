@@ -179,7 +179,7 @@ SmolLM2-135M の中間層 hidden を n=6 に射影し、「次に来る hidden �
 
 ### 4.4 Mamba SSM Lyapunov 正対照(§7.3)
 
-Mamba-130M 全 24 層で `A = −exp(A_log) < 0`(589,824 ch)→ λ_max ≤ 0 自明 PASS。SmolLM2 は SSM 不在(Llama, self_attn + mlp のみ)= gate 必須 → **base-level 判別 PASS**。正対照は parameterization の自明性(任意の valid Mamba で構造的成立 = 学習でなくパラメタライズを検定)。
+Mamba-130M 全 24 層で `A = −exp(A_log) < 0`(589,824 ch)→ λ_max ≤ 0 自明 PASS。SmolLM2 は SSM 不在(Llama, self_attn + mlp のみ)= gate 必須 → **base-level 判別 PASS**。正対照は parameterization の自明性(任意の valid Mamba で構造的成立 = 学習でなくパラメタライズを検定)。**この PASS は SSM 状態再帰の安定性のみで conv1d / SiLU / MLP の full Lipschitz ではない。代表 Δ で marginal な channel は非厳密(≤0 を over-claim しない)。**
 
 ### 4.5 統合判定
 
