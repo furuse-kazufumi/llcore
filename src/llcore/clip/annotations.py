@@ -143,6 +143,67 @@ class AnnotationStore:
             "encode_saved_ratio": round(saved, 4),
         }
 
+    # -- 連結グラフ (二層リンク + 多義性保持) -----------------------------------
+
+    def build_links(
+        self,
+        k_sem: int = 5,
+        tau_sem: float = 0.75,
+        tau_surf: float = 0.45,
+    ) -> dict[str, list[dict[str, object]]]:
+        """アノテーション間の typed エッジを構築する (ユーザー要件 2026-06-11)。
+
+        - **semantic**: CLIP cosine ≥ tau_sem の近傍を **top-k 複数保持**
+          (argmax 1 本に潰さない = 多義性のエッジを残す)。
+        - **surface**: 文字 bigram Jaccard ≥ tau_surf (誤字・表記揺れの接続。
+          埋め込みが離れていても表層で繋がる)。
+        返り値: {"semantic": [...], "surface": [...]} 各 edge = {a, b, weight}。
+        """
+        import numpy as np
+
+        ann = self.annotations
+        n = len(ann)
+        edges_sem: list[dict[str, object]] = []
+        edges_surf: list[dict[str, object]] = []
+        if n < 2:
+            return {"semantic": edges_sem, "surface": edges_surf}
+        M = self.embedding_matrix()
+        S = M @ M.T
+        for i in range(n):
+            order = np.argsort(S[i])[::-1]
+            picked = 0
+            for j in order:
+                j = int(j)
+                if j == i:
+                    continue
+                if picked >= k_sem or S[i, j] < tau_sem:
+                    break
+                if j > i:  # 無向エッジの重複回避
+                    edges_sem.append({"a": i, "b": j, "weight": round(float(S[i, j]), 4)})
+                picked += 1
+        grams = [_char_bigrams(a) for a in ann]
+        for i in range(n):
+            for j in range(i + 1, n):
+                w = _jaccard(grams[i], grams[j])
+                if w >= tau_surf:
+                    edges_surf.append({"a": i, "b": j, "weight": round(w, 4)})
+        return {"semantic": edges_sem, "surface": edges_surf}
+
+    def ambiguity(self, idx: int, k: int = 5, tau: float = 0.75) -> float:
+        """多義性スコア: 自分の意味近傍同士の平均相互類似度の低さ (0=単義的, 1=多義的)。
+
+        近傍が互いに似ていない = このアノテーションが異なる意味クラスタを橋渡し
+        している、の素朴な定量化 (研究 PoC レベルの指標)。近傍 2 未満なら 0。
+        """
+        import numpy as np
+
+        nb = [j for j, s in self.neighbors(idx, k=k) if s >= tau]
+        if len(nb) < 2:
+            return 0.0
+        M = self.embedding_matrix()
+        sims = [float(M[a] @ M[b]) for ai, a in enumerate(nb) for b in nb[ai + 1:]]
+        return round(1.0 - float(np.mean(sims)), 4)
+
     # -- 永続化 ---------------------------------------------------------------
 
     def save(self) -> None:
