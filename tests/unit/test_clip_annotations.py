@@ -192,6 +192,56 @@ def test_ambiguity_detects_bridging_node() -> None:
     assert amb_mercury > amb_mars  # 橋渡しノードの方が多義的
 
 
+def test_embedding_matrix_is_contiguous_float32() -> None:
+    """大規模 cosine 用に連続 float32 行列で保持 (query 毎の vstack なし)。"""
+    enc = CountingEncoder(dim=16)
+    store = AnnotationStore(enc)
+    store.add_text("alpha beta. gamma delta. epsilon zeta.")
+    M = store.embedding_matrix()
+    assert M.dtype == np.float32
+    assert M.flags["C_CONTIGUOUS"]
+    assert M.shape == (3, 16)
+    # 単位ノルム不変条件
+    assert np.allclose(np.linalg.norm(M, axis=1), 1.0, atol=1e-5)
+
+
+def test_capacity_doubling_keeps_rows_intact() -> None:
+    """容量倍々で増えても既存行が壊れない (大量 add でも整合)。"""
+    enc = CountingEncoder(dim=8)
+    store = AnnotationStore(enc)
+    first_ids = store.add_text("a1 word. a2 word. a3 word.")  # 3 unique 句
+    M_before = store.embedding_matrix().copy()
+    for n in range(20):
+        store.add_text(f"filler{n} alpha. filler{n} beta.")  # 多数追加で再確保を誘発
+    M_after = store.embedding_matrix()
+    assert M_after.shape[0] > M_before.shape[0]
+    # 最初の 3 行は不変
+    assert np.allclose(M_after[:3], M_before)
+    # id も不変
+    assert store.ids[:3] == [store.id_of_row(store.row_of_id(i)) for i in first_ids[:3]]
+
+
+def test_int8_quantized_query_matches_float_ranking() -> None:
+    """int8 量子化 query の順位が float 経路とほぼ一致 (大規模・省メモリ近似)。"""
+    rng = np.random.default_rng(0)
+    vocab = {f"phrase number {i}": list(rng.normal(size=24)) for i in range(40)}
+
+    class V:
+        def encode_texts(self, texts: Sequence[str]) -> Any:
+            arr = np.array([vocab[t] for t in texts], dtype=float)
+            return arr / np.linalg.norm(arr, axis=1, keepdims=True)
+
+    store = AnnotationStore(V())
+    store.add_text(". ".join(vocab) + ".")
+    Q, scale = store.int8_matrix()
+    assert Q.dtype == np.int8
+    q = "phrase number 7"
+    top_float = [j for j, _ in store.query(q, k=5)]
+    top_int8 = [j for j, _ in store.query(q, k=5, quantized=True)]
+    assert top_float[0] == top_int8[0]  # top1 一致
+    assert len(set(top_float) & set(top_int8)) >= 4  # top5 ほぼ一致
+
+
 def test_store_save_load_roundtrip(tmp_path: Path) -> None:
     enc = CountingEncoder()
     path = tmp_path / "store.json"
