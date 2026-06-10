@@ -254,11 +254,11 @@ def build_svg(per_method: dict[str, list[dict]], n_turns: int, sdp_available: bo
 
     return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W_} {H_}" font-family="Segoe UI,Helvetica,Arial,sans-serif">
   <rect width="{W_}" height="{H_}" fill="#0f1320"/>
-  <text x="{W_/2}" y="30" fill="#e8ecf4" font-size="19" font-weight="700" text-anchor="middle">実会話中のオンライン適応 — sound certificate だけが真の安定度 ρ&lt;1 を守る</text>
+  <text x="{W_/2}" y="30" fill="#e8ecf4" font-size="19" font-weight="700" text-anchor="middle">実会話中のオンライン適応 — sound certificate だけが収縮証明可能領域 (ρ_sup&lt;1) を守る</text>
   {"".join(parts)}
-  <text x="{W_/2}" y="{H_-44}" fill="#ff9f43" font-size="12" text-anchor="middle">無 gate / 経験 gate は実会話データ上で「安全に見える」変異を通し、真の ρ≥1 (発散性) へ漂流する</text>
-  <text x="{W_/2}" y="{H_-26}" fill="#4ea1ff" font-size="12" text-anchor="middle">sound cert (cert_two / cert_sdp) は全採用変異に証明つき = 会話セッション記憶の摂動忘却 (再現性) を保証</text>
-  <text x="{W_/2}" y="{H_-9}" fill="#566075" font-size="10" text-anchor="middle">honest: LLM は frozen (アダプタは sidecar、応答品質への主張なし) / ρ は from-below オラクル / 上方圧変異は開示済ストレス / ● = 変異採用, × = 棄却 (現 gene 維持)</text>
+  <text x="{W_/2}" y="{H_-44}" fill="#ff9f43" font-size="12" text-anchor="middle">無 gate / 経験 gate は実会話データ上で「安全に見える」変異を通し、ρ_sup≥1 (一様収縮不能 = echo-state 保証の喪失) へ漂流する</text>
+  <text x="{W_/2}" y="{H_-26}" fill="#4ea1ff" font-size="12" text-anchor="middle">sound cert は全採用変異に漸近 echo-state (ρ&lt;1) の証明つき — ターン内忘却率の定量保証は cert_two のみ (σ^T)、cert_sdp は漸近保証</text>
+  <text x="{W_/2}" y="{H_-9}" fill="#566075" font-size="10" text-anchor="middle">honest: LLM frozen (sidecar, 応答品質主張なし) / none・cert 系 3 曲線はデータ非依存 (worst-case 証明の帰結) / 会話が効くのは経験 gate 採否と忘却診断 / ● 採用 × 棄却</text>
 </svg>'''
 
 
