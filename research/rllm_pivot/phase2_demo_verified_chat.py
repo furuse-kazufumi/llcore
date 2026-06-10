@@ -22,9 +22,20 @@ llcore.chat (実 SmolLM2-360M-Instruct, CPU) との **本物の段階的会話**
 honest 留保 (重要):
 - アダプタは sidecar であり **LLM の応答品質には一切影響しない** (LLM は frozen)。
   capability 主張はしない (Phase 2 で capability NEGATIVE 確定済)。これは GUARANTEE のデモ。
-- empirical_rho は from-below (見つけた最大値; 絶対証明でない)。cert の soundness とは独立。
-- 変異の上方圧バイアスは「最適化圧で結合が強まる」状況の模擬 (開示)。バイアス無しでも
-  漂流は同機構で起きるが遅い。
+- **ρ_sup の意味論**: empirical_rho は (s,x)∈[-1,1]^n box 上の点別 ρ(J) の from-below sup。
+  ρ_sup≥1 は「いかなるノルムでも一様収縮にならない=収縮証明可能領域の外」を意味する
+  (軌道ノルムの発散ではない — tanh+凸結合の前方不変性で状態は [-1,1]^n に閉じ込められ発散不能)。
+  「真の安定度」「発散」と呼ぶのは過大 → 本デモは「収縮証明可能性指標」と呼ぶ。
+- empirical_rho は from-below (絶対証明でない)。cert とは**計算経路のみ独立** (eigvals@サンプル点 vs
+  SVD/SDP@t-box 頂点)。同一 Jacobian モデル・同一 box を共有 → **cert 系統の違反 0 は soundness の
+  演繹的帰結 (整合性チェック) であり独立な経験的証拠ではない**。
+- **保証の射程**: cert_two は σ^T のターン内定量収縮を証明。cert_sdp は margin=1e-7 の feasibility
+  証明で**漸近的 (rate<1) のみ**、率は定量化されない (本走行の証明済 P-norm 率は 1−O(1e-8)、
+  ターン内 2-norm 上界は √cond(P)=1.43–2.84 = 増幅許容)。観測の 1e-5 級忘却は経験的挙動。
+  gene 切替を跨ぐセッション全体の echo-state は cert_sdp 系統では未証明。
+- **3/4 曲線はデータ非依存**: none/cert_two/cert_sdp の gate は X にも state にも依存しない worst-case
+  証明ゆえ、seed のみで決まり会話無しでも同一 (会話が効くのは stable_emp 採否と忘却診断・state_norm)。
+- 変異の上方圧バイアスは「最適化圧で結合が強まる」状況の模擬 (開示)。
 - 射影入力は [-1,1] に clip (cert の max_input_abs=1 と整合)。clip 率は記録する。
 - 会話は本物 (生成 LLM 出力 verbatim 記録) だが、ターン数 8 の小規模デモ。
 
