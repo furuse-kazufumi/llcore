@@ -101,6 +101,72 @@ def test_store_empty_fail_closed() -> None:
         store.save()
 
 
+class VecEncoder:
+    """指定ベクトル辞書をそのまま返す fake (多義性/リンク試験用)。"""
+
+    def __init__(self, vecs: dict[str, list[float]]) -> None:
+        self._vecs = vecs
+
+    def encode_texts(self, texts: Sequence[str]) -> Any:
+        arr = np.array([self._vecs[t] for t in texts], dtype=float)
+        return arr / np.linalg.norm(arr, axis=1, keepdims=True)
+
+
+def test_links_surface_connects_typos() -> None:
+    """誤字は表層 (bigram Jaccard) エッジで接続される — 埋め込みが離れていても繋がる。"""
+    vecs = {
+        "what is my name": [1.0, 0.0, 0.0],
+        "what is my nmae": [0.0, 1.0, 0.0],  # 故意に埋め込みを直交させる (誤字で意味が壊れた想定)
+        "a bowl of soup": [0.0, 0.0, 1.0],
+    }
+    store = AnnotationStore(VecEncoder(vecs))
+    store.add_text("what is my name. what is my nmae. a bowl of soup.")
+    links = store.build_links(tau_sem=0.9, tau_surf=0.45)
+    surf_pairs = {(e["a"], e["b"]) for e in links["surface"]}
+    ann = store.annotations
+    i, j = ann.index("what is my name"), ann.index("what is my nmae")
+    assert (min(i, j), max(i, j)) in surf_pairs  # 誤字ペアが表層で接続
+    # 無関係ペアは表層接続されない
+    k = ann.index("a bowl of soup")
+    assert not any(k in p for p in surf_pairs)
+
+
+def test_links_semantic_keeps_multiple_edges() -> None:
+    """意味エッジは argmax 1 本でなく閾値以上を複数保持 (多義性を潰さない)。"""
+    vecs = {
+        "mercury": [0.7, 0.7, 0.0],     # 惑星とも元素とも近い (多義)
+        "venus and mars": [1.0, 0.1, 0.0],
+        "thermometer metal": [0.1, 1.0, 0.0],
+        "a bowl of soup": [0.0, 0.0, 1.0],
+    }
+    store = AnnotationStore(VecEncoder(vecs))
+    store.add_text("mercury. venus and mars. thermometer metal. a bowl of soup.")
+    links = store.build_links(k_sem=3, tau_sem=0.6, tau_surf=0.99)
+    ann = store.annotations
+    m = ann.index("mercury")
+    sem_partners = {e["b"] if e["a"] == m else e["a"]
+                    for e in links["semantic"] if m in (e["a"], e["b"])}
+    assert ann.index("venus and mars") in sem_partners
+    assert ann.index("thermometer metal") in sem_partners  # 両義のエッジが共存
+
+
+def test_ambiguity_detects_bridging_node() -> None:
+    """多義ノード (互いに似ていない近傍を持つ) はスコアが高い。"""
+    vecs = {
+        "mercury": [0.7, 0.7, 0.0],
+        "venus and mars": [1.0, 0.05, 0.0],
+        "thermometer metal": [0.05, 1.0, 0.0],
+        "red planet mars": [0.99, 0.1, 0.0],
+        "liquid metal element": [0.1, 0.99, 0.0],
+    }
+    store = AnnotationStore(VecEncoder(vecs))
+    store.add_text("mercury. venus and mars. thermometer metal. red planet mars. liquid metal element.")
+    ann = store.annotations
+    amb_mercury = store.ambiguity(ann.index("mercury"), k=4, tau=0.6)
+    amb_mars = store.ambiguity(ann.index("venus and mars"), k=4, tau=0.6)
+    assert amb_mercury > amb_mars  # 橋渡しノードの方が多義的
+
+
 def test_store_save_load_roundtrip(tmp_path: Path) -> None:
     enc = CountingEncoder()
     path = tmp_path / "store.json"
