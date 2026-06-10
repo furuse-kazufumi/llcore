@@ -284,6 +284,8 @@ class AnnotationStore:
         self._path.parent.mkdir(parents=True, exist_ok=True)
         meta = {
             "annotations": self.annotations,
+            # JSON の数値は安全に uint64 を表現できないため id は 10 進文字列で保存
+            "ids": [str(i) for i in self._ids],
             "counts": self._counts,
             "n_instances": self._n_instances,
             "n_encoded": self._n_encoded,
@@ -296,9 +298,15 @@ class AnnotationStore:
 
         meta = json.loads(path.read_text(encoding="utf-8"))
         emb = np.load(path.with_suffix(".npz"))["embeddings"]
-        if emb.shape[0] != len(meta["annotations"]):
+        anns = meta["annotations"]
+        if emb.shape[0] != len(anns):
             raise ValueError("annotation store is corrupt: embeddings/annotations mismatch")
-        self._ann2idx = {a: i for i, a in enumerate(meta["annotations"])}
+        self._ann2idx = {a: i for i, a in enumerate(anns)}
+        # 後方互換: 旧形式 (ids 無し) は文字列から再生成
+        self._ids = [int(s) for s in meta["ids"]] if "ids" in meta else [
+            annotation_id(a) for a in anns
+        ]
+        self._id2idx = {aid: i for i, aid in enumerate(self._ids)}
         self._embeddings = [emb[i] for i in range(emb.shape[0])]
         self._counts = list(meta["counts"])
         self._n_instances = int(meta["n_instances"])
