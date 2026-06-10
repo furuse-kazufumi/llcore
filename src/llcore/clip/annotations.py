@@ -77,6 +77,30 @@ def id_to_unit_vector(annotation_id_: int, dim: int = 64) -> Any:
     return v / np.float32(np.sqrt(dim))
 
 
+def id_cosine(id_a: int, id_b: int, dim: int = 64) -> float:
+    """2 つのアノテーション番号 (uint64) 間のコサインを **float を介さず厳密計算**する。
+
+    :func:`id_to_unit_vector` の ±1 ビットベクトル表現に対するコサインは、
+    整数の popcount だけで閉じる:
+
+        cos(a, b) = (一致bit数 − 不一致bit数) / dim
+                  = (dim − 2·popcount(a XOR b)) / dim
+
+    - **精度を落とさない**: popcount は整数演算 (Python int は任意精度・誤差ゼロ)。
+      最後の除算のみだが、分子は整数 [−dim, dim]、dim=64=2^6 なので結果は float64 で**厳密**
+      (2^53 精度の壁にも掛からない)。生の int→float キャストの精度喪失を完全に回避。
+    - **速い**: 64bit XOR + ハードウェア popcount (int.bit_count) で O(1)。ベクトル展開不要。
+
+    dim≤64 のときに有効 (id_to_unit_vector の dim と一致させること)。dim>64 で
+    blake2b 展開を使う場合はこの式は適用外 (ベクトル経路を使う)。
+    """
+    if dim > 64:
+        raise ValueError("id_cosine は dim<=64 のビット表現専用 (dim>64 はベクトル経路を使う)")
+    mask = (1 << dim) - 1
+    disagree = ((id_a ^ id_b) & mask).bit_count()
+    return (dim - 2 * disagree) / dim
+
+
 def _l2_normalize(arr: Any) -> Any:
     """行ごとに L2 正規化 (cosine = 内積 の不変条件を保つ)。ゼロ行でも発散しない。"""
     import numpy as np
