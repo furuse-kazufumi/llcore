@@ -27,6 +27,7 @@
 from llcore.clip.annotations import (
     AnnotationStore,
     annotation_id,
+    id_cosine,
     id_to_unit_vector,
     split_annotations,
 )
