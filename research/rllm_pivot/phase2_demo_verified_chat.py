@@ -317,12 +317,12 @@ def main() -> int:
 
         for m, ln in lineages.items():
             rng = ln["rng"]
+            probe_rng = np.random.default_rng(args.seed + 1000 * ti)  # プローブ専用 (変異列と分離)
             accepted = False
             n_rej = 0
-            cand = None
             for _ in range(N_PROPOSALS):
                 cand = mutate(ln["gene"], rng)
-                if gate_admits(m, cand, X, ln["state"], rng):
+                if gate_admits(m, cand, X, ln["state"], probe_rng):
                     ln["gene"] = cand
                     accepted = True
                     break
