@@ -155,6 +155,32 @@ def is_question(annotation_norm: str) -> bool:
     return first in _QUESTION_WORDS
 
 
+# 命令・依頼の動詞始まり + 「let's/let me」。これらは答え (事実) ではない。
+_REQUEST_WORDS = (
+    "suggest", "name", "tell", "describe", "list", "give", "explain", "show",
+    "provide", "recommend", "switch", "say", "write", "find", "let's", "lets",
+    "let", "please",
+)
+
+
+def is_request(annotation_norm: str) -> bool:
+    """アノテーションが命令・依頼か (= 事実でない) を判定。
+
+    「suggest one pasta dish」「let's talk about cooking」「name one composer」等は
+    答えでなく依頼 → 事実検索から除外する (質問とは別カテゴリ、計算ゼロ)。
+    """
+    s = annotation_norm.strip().lower()
+    if not s:
+        return False
+    first = s.split()[0] if s.split() else ""
+    return first in _REQUEST_WORDS
+
+
+def is_fact(annotation_norm: str) -> bool:
+    """アノテーションが事実 (平叙文) か = 質問でも依頼でもない。"""
+    return not is_question(annotation_norm) and not is_request(annotation_norm)
+
+
 def split_annotations(text: str) -> list[str]:
     """テキストを正規化済みアノテーション (短句) のリストに分割する。
 
