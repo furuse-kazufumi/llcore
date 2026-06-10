@@ -46,8 +46,9 @@ py -3.11 -m llcore.chat                  # 対話 REPL (/exit /reset /history)
 py -3.11 -m llcore.chat --prompt "What is the capital of France?"
 ```
 
-- base = **SmolLM2-Instruct** (Apache-2.0, CPU 完結 / on-prem)。default 135M、
-  `LLCORE_CHAT_MODEL` env または `--model` で 360M 等へ差し替え可。Qwen 系は商用障壁のため不採用。
+- base = **SmolLM2-Instruct** (Apache-2.0, CPU 完結 / on-prem)。default 360M (段階的会話 5/5)、
+  `LLCORE_CHAT_MODEL` env または `--model` で 135M (軽量, 4/5) 等へ差し替え可。
+  Qwen 系は商用障壁のため不採用。
 - **日本語会話**は SmolLM2 では不可 (英語中心)。JA 推奨 =
   `--model sbintuitions/sarashina2.2-0.5b-instruct-v0.1` (MIT, 要 `pip install sentencepiece`;
   段階的 JA スモーク 5/5)。llm-jp-3-440m-instruct3 (Apache-2.0) は 3/5 (過剰拒否癖あり)。
