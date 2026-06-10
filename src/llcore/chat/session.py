@@ -119,10 +119,17 @@ class ChatSession:
         self._history.append(Message("user", text))
         try:
             reply = self._backend.generate(tuple(self._history), self.settings)
+            if not isinstance(reply, str):
+                raise TypeError(
+                    f"ChatBackend.generate must return str, got {type(reply).__name__}"
+                )
+            reply = reply.strip()
+            if not reply:
+                # 空応答も fail-closed (空 user の拒否と対称)。履歴を汚さない。
+                raise ValueError("backend returned an empty reply")
         except BaseException:
             self._history.pop()
             raise
-        reply = reply.strip()
         self._history.append(Message("assistant", reply))
         return reply
 
