@@ -109,6 +109,19 @@ def run_prompts(
     return exchanges
 
 
+def dispatch_command(session: ChatSession, line: str) -> tuple[bool, bool, str]:
+    """REPL コマンド処理。(handled, should_exit, output) を返す (純粋ロジック=テスト可能)。"""
+    if line in ("/exit", "/quit"):
+        return True, True, ""
+    if line == "/reset":
+        session.reset()
+        return True, False, "(履歴をクリアしました)"
+    if line == "/history":
+        lines = [f"  [{m.role}] {m.content}" for m in session.history]
+        return True, False, "\n".join(lines) if lines else "(履歴なし)"
+    return False, False, ""
+
+
 def repl(session: ChatSession, show_timing: bool = False) -> None:
     """対話 REPL。/exit /reset /history をサポート。"""
     print("llcore chat — /exit で終了, /reset で履歴クリア, /history で履歴表示", flush=True)
@@ -120,21 +133,20 @@ def repl(session: ChatSession, show_timing: bool = False) -> None:
             return
         if not line:
             continue
-        if line in ("/exit", "/quit"):
-            return
-        if line == "/reset":
-            session.reset()
-            print("(履歴をクリアしました)", flush=True)
-            continue
-        if line == "/history":
-            for msg in session.history:
-                print(f"  [{msg.role}] {msg.content}", flush=True)
+        handled, should_exit, output = dispatch_command(session, line)
+        if handled:
+            if output:
+                print(output, flush=True)
+            if should_exit:
+                return
             continue
         t0 = time.time()
         try:
             reply = session.ask(line)
         except ValueError as exc:
-            print(f"(入力エラー: {exc})", flush=True)
+            # 空入力は上で弾いているため、ここに来る ValueError は生成系
+            # (生成パラメータ / context 予算 / 空応答) のみ
+            print(f"(生成エラー: {exc})", flush=True)
             continue
         print(f"llcore> {reply}", flush=True)
         if show_timing:
