@@ -155,7 +155,7 @@ def exit_code(results: list[dict[str, object]]) -> int:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    parser.add_argument("--model", default=None, help="HF モデル ID (default: SmolLM2-135M-Instruct)")
+    parser.add_argument("--model", default=None, help="HF モデル ID (default: SmolLM2-360M-Instruct)")
     parser.add_argument(
         "--lang",
         choices=sorted(STAGE_SETS),
