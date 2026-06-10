@@ -45,6 +45,8 @@ sdp = ["cvxpy>=1.9"]
 # chat: 実在小型 LLM (SmolLM2-Instruct, Apache-2.0) との基本会話レイヤ (llcore.chat)。
 # CPU 完結 / on-prem。不在時は ChatDependencyError で fail-closed (黙って劣化しない)。
 chat = ["torch>=2.2", "transformers>=4.46"]
+# clip: text↔image 共有埋め込み (llcore.clip, default=SigLIP Apache-2.0)。連結性基盤。
+clip = ["torch>=2.2", "transformers>=4.46", "pillow>=10"]
 llive = ["llmesh-llive>=0.6"]
 # rad は stdlib のみで動くため optional-dep 不要 (RAD コーパスを path-based 参照)
 # LLCORE_RAD_DIR env で RAD 根ディレクトリを指定 (未設定時は graceful degrade = hint なし)
