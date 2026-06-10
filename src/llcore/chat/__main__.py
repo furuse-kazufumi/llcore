@@ -6,7 +6,7 @@
     py -3.11 -m llcore.chat                                 # 対話 REPL
     py -3.11 -m llcore.chat --prompt "Hello!"               # ワンショット
     py -3.11 -m llcore.chat --prompt "Q1" --prompt "Q2"     # 複数ターンを順に実行
-    py -3.11 -m llcore.chat --model HuggingFaceTB/SmolLM2-360M-Instruct
+    py -3.11 -m llcore.chat --model HuggingFaceTB/SmolLM2-135M-Instruct   # 軽量版
 
 REPL コマンド: /exit (終了) /reset (履歴クリア) /history (履歴表示)
 """
