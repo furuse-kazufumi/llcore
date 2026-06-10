@@ -116,7 +116,7 @@ class TransformersBackend:
             return
         torch, auto_tokenizer, auto_model = _import_transformers()
         t0 = time.time()
-        tok = auto_tokenizer.from_pretrained(self.model_id)
+        tok = self._tok if self._tok is not None else auto_tokenizer.from_pretrained(self.model_id)
         try:
             model = auto_model.from_pretrained(self.model_id, dtype=torch.float32)
         except TypeError:
