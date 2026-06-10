@@ -234,12 +234,20 @@ class AnnotationStore:
     # -- 取り込み -------------------------------------------------------------
 
     def add_text(
-        self, text: str, *, source: str | None = None, role: str | None = None
+        self,
+        text: str,
+        *,
+        source: str | None = None,
+        role: str | None = None,
+        group: int | None = None,
+        adjacency_window: int = 1,
     ) -> list[int]:
         """テキストを分割し、新規ユニークのみ符号化して、**アノテーション番号 (uint64) 列**を返す。
 
-        role は発話者 (例 "user"/"assistant") — 初出時に行へ記録し、事実検索の
-        ロールフィルタに使える (会話アノテーションを教師信号化する第一歩)。
+        role は発話者 (例 "user"/"assistant") — 初出時に行へ記録。
+        group は会話 turn 等のまとまり ID。同一/隣接 group (``adjacency_window`` ターン以内)
+        に出たアノテーション同士に**共起エッジ**を張る = cosine が繋げない「質問→その答え」を
+        会話の隣接構造で橋渡しする連結性グラフ (差別化の核)。group=None なら共起は張らない。
         """
         import numpy as np
 
