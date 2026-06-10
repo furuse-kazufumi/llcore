@@ -81,6 +81,45 @@ STAGES_EN: StageList = [
 ]
 
 
+STAGES_JA: StageList = [
+    (
+        "stage1_greeting",
+        [
+            ("こんにちは!あなたは誰ですか?", None),
+        ],
+    ),
+    (
+        "stage2_simple_qa",
+        [
+            ("日本の首都はどこですか?", ["東京", "tokyo"]),
+            ("2 たす 2 は いくつですか?", ["4", "四"]),
+        ],
+    ),
+    (
+        "stage3_context_carryover",
+        [
+            ("私の名前はカズです。覚えてください。", None),
+            ("私の名前は何ですか?", ["カズ", "kazu"]),
+        ],
+    ),
+    (
+        "stage4_topic_shift",
+        [
+            (
+                "話題を変えましょう。簡単なパスタ料理を一つ、一文で教えてください。",
+                ["パスタ", "スパゲ", "カルボナーラ", "ペペロン", "ナポリタン", "麺"],
+            ),
+            (
+                "次は宇宙の話です。太陽系の惑星を一つ挙げてください。",
+                ["水星", "金星", "地球", "火星", "木星", "土星", "天王星", "海王星"],
+            ),
+        ],
+    ),
+]
+
+STAGE_SETS: dict[str, StageList] = {"en": STAGES_EN, "ja": STAGES_JA}
+
+
 def check(reply: str, expect: list[str] | None) -> str:
     """ヒューリスティック判定: expected | unexpected | open_ended。"""
     if expect is None:
