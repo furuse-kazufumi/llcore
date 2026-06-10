@@ -51,9 +51,18 @@ llcore の進化コア/検証器は**世界知識を内包しない** (tiny adap
   形態素解析/活用/仮名漢字)。1D-SegFormer・事実抽出・アノテーション連結 (類義/形態エッジ) の基盤。
 - ⬜ 世界知識注入が retrieval/grounding を改善するか実測 (会話のみ vs 会話+RAD)
 
-### M4 ⬜ 自律ループの工学化 (ループエンジニアリング調査の実装反映)
+### M4 🔄 RAD コーパス生成 (世界知識ギャップ + 環境設計の根拠)
 - 🔄 ループ手法調査 → RAD コーパス化 (workflow 進行中, 自律/制御/学習/運用 4 スコープ)
-- ⬜ 調査結果から FullSense/Claude Code 自律マラソンに採用する手法を選別・実装
+- 🔄 言語学調査 → RAD コーパス化 (workflow 進行中, 統語/形態語彙/音声音韻/意味語用/多言語日本語 5 領域)
+- ⬜ 両 corpus を /corpus2skill で _corpus_v2 階層化し RAD 登録
+
+### M5 ⬜ ループエンジニアリング環境の新規構築 (ユーザー指示 2026-06-11)
+- **★安全方針 (ユーザー明示)**: ccr (claude-auto.mjs / claude-loop / raptor-loop-queue) は**安全網として
+  温存・無改変**。**別の「新しい形」で**ループエンジニアリング環境を構築する (ccr と並存)。
+- ⬜ 設計 (M4 調査コーパスを根拠に): MAPE-K/OODA 制御ループ + 自律エージェントループ + fail-closed 安全ゲート
+  + 人間 checkpoint + 観測可能性 (各反復ログ)。ループ戦略 (ReAct/Reflexion/plan-execute-verify) を実験可能に。
+- ⬜ 設計をマイルストン checkpoint として提示 → 承認後に skeleton 構築 (新規ディレクトリ, ccr 非依存)。
+- ⬜ 危険操作は人間確認必須 (削除/push/submodule 改変は constraints に無い限り行わない)。
 
 ## 直近の自走順 (上から実行)
 1. M4 ループ調査 workflow 完了 → RAD corpus2skill 化
