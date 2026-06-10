@@ -94,8 +94,8 @@ def main() -> int:
         if not src.exists():
             continue
         texts = extract_texts(src)
-        for text in texts:
-            store.add_text(text, source=src.name)
+        for text, role in texts:
+            store.add_text(text, source=src.name, role=role)
         n_texts += len(texts)
         sources_used.append(src.name)
     ingest_seconds = time.time() - t0
