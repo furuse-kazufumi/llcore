@@ -202,6 +202,10 @@ class AnnotationStore:
         self._counts: list[int] = []              # 行 -> 出現回数
         self._roles: list[str | None] = []        # 行 -> 初出時の発話者ロール (user/assistant/None)
         self._is_q: list[bool] = []               # 行 -> 質問か (事実検索の除外用)
+        # 共起連結: (行a, 行b) -> 共起回数 (同一 group= 会話 turn 窓 内で一緒に出た)。
+        # cosine が繋げない「質問→その答え」を会話の隣接構造で橋渡しする連結性グラフ。
+        self._cooc: dict[tuple[int, int], int] = {}
+        self._recent_group: list[tuple[int, int]] = []  # (group_id, 行) の直近履歴
         self._n_instances = 0                     # 観測したアノテーション延べ数
         self._n_encoded = 0                       # 実際に encoder を呼んだユニーク数
         # int8 量子化キャッシュ (大規模 cosine の省メモリ近似; 行追加で無効化)
