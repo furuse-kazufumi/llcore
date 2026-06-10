@@ -224,7 +224,7 @@ class AnnotationStore:
             raise ValueError("store is empty")
         return self._matrix[: self._n_rows]
 
-    def int8_matrix(self) -> tuple["np.ndarray", float]:
+    def int8_matrix(self) -> tuple[Any, float]:
         """単位ノルム行列を int8 量子化した (Q, scale) を返す (大規模 cosine の省メモリ近似)。
 
         行が単位ノルムなので各成分は [-1,1] → ``round(x*127)`` で int8 化。
