@@ -152,7 +152,7 @@ n=6、95 発散 / 305 収縮 gene の集団に対する、発散 gene の false-
 ### 4.2 capability:NULL_TIE → ARTIFACT+NEGATIVE(honest-disclosure の真価)
 
 **(A) synthetic 多峰地形(K=6 basin)= NULL_TIE。**
-MAP-Elites ≈ gradient ≈ random。ME vs gradient で mean_diff +0.028 / Wilcoxon p=0.39 / sign_delta=0(n=20)。全方向 4 条件 AND 不成立 = **純粋な引き分け**。capability 優位の未実証であり、「進化の敗北の decisive proof」でも「powered な等価性 proof」でもない(§5)。
+MAP-Elites ≈ gradient ≈ random。ME vs gradient で mean_diff +0.028 / Wilcoxon p=0.39 / sign_delta=0(n=20)。全方向 4 条件 AND 不成立 = **純粋な引き分け**。**+0.028 を検出する power は実質ゼロ(wins=losses=10, sign_delta=0)。NULL_TIE は decisive negative ではない。** capability 優位の未実証であり、「進化の敗北の decisive proof」でも「powered な等価性 proof」でもない(§5)。
 
 **(B) 実 SmolLM2-CE 地形(§7.1 of PHASE_2_VERDICT)= ARTIFACT+NEGATIVE。**
 SmolLM2-135M の中間層 hidden を n=6 に射影し、「次に来る hidden クラスタ」を当てる CE 地形(合成ガウスでなくモデル自身の内部ダイナミクス由来)を構築。同予算(forward CE 評価回数)で held-out 文の予測を 20 seed 比較。held-out 平均 fitness(= −CE、高いほど良い):
