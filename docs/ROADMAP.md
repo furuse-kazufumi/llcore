@@ -29,11 +29,14 @@ llcore の進化コア/検証器は**世界知識を内包しない** (tiny adap
 - ✅ 優先1 事実抽出 / 優先2 head-to-head (CLIP 反証・差別化は連結性グラフと判明) /
      優先3 連結性グラフ (MRR 0.056→0.389, R@1 0→1/3, IDF hub 抑制)
 
-### M1 🔄 連結性グラフの堅牢化 (優先3 続き)
-- 🔄 IDF hub 抑制 (log-IDF, 集約最良 MRR 0.389) — **3 probe では過剰適合域、確定調整は M1.2 後**
-- ⬜ **M1.2 評価ベンチ拡張**: hard probe を 3→20+ に増やし、hub 抑制強度を確信を持って調整 (現状の最大の制約)
-- ⬜ entity coref エッジ (共有実体 kazufumi 等で質問-答えを強連結, turn 隣接より強信号)
+### M1 ⚠️ 連結性グラフ — 22-probe で over-claim 判明・降格 (2026-06-11)
+- ✅ M1.2 評価ベンチ拡張 (3→22 probe, `scripts/connectivity_bench.py`)
+- ⚠️ **★honest 訂正**: 22 probe で **IDF 連結は cosine と完全一致 (0/22 差, MRR 0.727)**、IDF なし連結は
+  大半を害す (0.321)。「連結性が差別化」は 3 probe の過剰適合 + 弱い cosine baseline のアーティファクトだった。
+  **実の勝因は事実抽出 (質問/依頼除外)** = cosine を 0.727 に。詳細=CONNECTIVITY_BENCH_CORRECTION_2026_06_11.md。
+- ⬜ entity coref エッジ — 語彙不一致の難ケース (name 等) 用の**小改善に降格** (差別化の主軸にしない)
 - ⬜ encoder 差し替えオプション (MiniLM backend; CLIP は cross-modal 専用) — head-to-head で MiniLM 優位
+- → **差別化の主軸を M3 (世界知識) + M2 (cert×教師) に移す**。retrieval は事実抽出+cosine/MiniLM で大半解決。
 
 ### M2 ⬜ cert gate × 連結性教師の配線 (差別化の本命)
 - ⬜ 連結グラフ (ターン境界/照応/話題) を verified adapter の進化・学習信号に
