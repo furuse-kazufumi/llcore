@@ -227,7 +227,8 @@ class AnnotationStore:
         self._n_rows = 0
         self._counts: list[int] = []              # 行 -> 出現回数
         self._roles: list[str | None] = []        # 行 -> 初出時の発話者ロール (user/assistant/None)
-        self._is_q: list[bool] = []               # 行 -> 質問か (事実検索の除外用)
+        self._is_q: list[bool] = []               # 行 -> 質問か
+        self._non_fact: list[bool] = []           # 行 -> 非事実か (質問 or 依頼; 事実検索の除外用)
         # 共起連結: (行a, 行b) -> 共起回数 (同一 group= 会話 turn 窓 内で一緒に出た)。
         # cosine が繋げない「質問→その答え」を会話の隣接構造で橋渡しする連結性グラフ。
         self._cooc: dict[tuple[int, int], int] = {}
