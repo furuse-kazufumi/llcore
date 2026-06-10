@@ -349,11 +349,22 @@ class AnnotationStore:
         order = np.argsort(sims)[::-1]
         return [(int(j), float(sims[int(j)])) for j in order if int(j) != idx][:k]
 
-    def query(self, text: str, k: int = 5, *, quantized: bool = False) -> list[tuple[int, float]]:
+    def query(
+        self,
+        text: str,
+        k: int = 5,
+        *,
+        quantized: bool = False,
+        exclude_questions: bool = False,
+        role: str | None = None,
+    ) -> list[tuple[int, float]]:
         """自由テキスト 1 件でストアを cosine 検索 (符号化 1 回; キャッシュには入れない)。
 
-        返り値は (行, cosine) の降順 top-k。``quantized=True`` で int8 近似経路
-        (大規模・省メモリ向け; 順位はほぼ不変、score は近似)。
+        返り値は (行, cosine) の降順 top-k。
+        - ``quantized=True``: int8 近似経路 (大規模・省メモリ; 順位ほぼ不変、score 近似)。
+        - ``exclude_questions=True``: 質問アノテーションを除外し**事実 (平叙文) のみ**返す
+          (質問クエリが他の質問文ばかり拾う問題への対策)。
+        - ``role``: 指定ロール (例 "user") の行のみに絞る。
         """
         import numpy as np
 
@@ -365,7 +376,25 @@ class AnnotationStore:
         else:
             sims = self.embedding_matrix() @ q
         order = np.argsort(sims)[::-1]
-        return [(int(j), float(sims[int(j)])) for j in order][:k]
+        out: list[tuple[int, float]] = []
+        for j in order:
+            jj = int(j)
+            if exclude_questions and self._is_q[jj]:
+                continue
+            if role is not None and self._roles[jj] != role:
+                continue
+            out.append((jj, float(sims[jj])))
+            if len(out) >= k:
+                break
+        return out
+
+    def role_of_row(self, row: int) -> str | None:
+        """行の発話者ロール (初出時に記録)。"""
+        return self._roles[row]
+
+    def is_question_row(self, row: int) -> bool:
+        """行が質問アノテーションか。"""
+        return self._is_q[row]
 
     def stats(self) -> dict[str, float | int]:
         """実測の計算節約: encode_saved_ratio = 1 - (符号化回数 / 延べ出現数)。"""
