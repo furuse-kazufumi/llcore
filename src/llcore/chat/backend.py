@@ -9,8 +9,8 @@ research/rllm_pivot/phase0_framework_harness.py で実証済みの SmolLM2 CPU �
 ベースモデル選定の制約 (memory feedback_qwen_commercial_barrier / 計画 §Phase0):
 - Apache-2.0 / MIT 系のみ (FullSense の Apache-2.0 + Commercial dual-license と整合)。
 - Qwen 系は商用障壁のため避ける。
-- default = SmolLM2-135M-Instruct (Apache-2.0, CPU で数秒ロード)。
-  env ``LLCORE_CHAT_MODEL`` または引数で SmolLM2-360M-Instruct 等へ差し替え可。
+- default = SmolLM2-360M-Instruct (Apache-2.0, CPU で数秒ロード, 段階的会話 5/5)。
+  env ``LLCORE_CHAT_MODEL`` または引数で SmolLM2-135M-Instruct (軽量) 等へ差し替え可。
 """
 from __future__ import annotations
 
