@@ -95,12 +95,22 @@ class AnnotationStore:
     ``stats()['encode_saved_ratio']`` が実測の節約率。
     """
 
+    内部表現は二層:
+    - **行 (row, 0..n-1)**: 埋め込み行列の dense 添字。近傍/グラフ等の行列演算が使う。
+    - **アノテーション番号 (id, uint64)**: content-addressed の安定外部 ID。
+      ``add_text`` が返すのはこの id (大量語を扱うため ulonglong 範囲)。
+      行 ⇄ id ⇄ 文字列の相互変換は :meth:`row_of_id` / :meth:`id_of_row` /
+      :meth:`annotation_of_id` で行う。
+    """
+
     def __init__(self, encoder: Any, path: Path | None = None) -> None:
         self._encoder = encoder
         self._path = path
-        self._ann2idx: dict[str, int] = {}
-        self._embeddings: list[Any] = []          # idx -> (d,) numpy 配列
-        self._counts: list[int] = []              # idx -> 出現回数
+        self._ann2idx: dict[str, int] = {}        # 正規化文字列 -> 行
+        self._ids: list[int] = []                 # 行 -> uint64 アノテーション番号
+        self._id2idx: dict[int, int] = {}         # uint64 id -> 行
+        self._embeddings: list[Any] = []          # 行 -> (d,) numpy 配列
+        self._counts: list[int] = []              # 行 -> 出現回数
         self._n_instances = 0                     # 観測したアノテーション延べ数
         self._n_encoded = 0                       # 実際に encoder を呼んだユニーク数
         if path is not None and path.exists():
@@ -109,29 +119,59 @@ class AnnotationStore:
     # -- 取り込み -------------------------------------------------------------
 
     def add_text(self, text: str, *, source: str | None = None) -> list[int]:
-        """テキストを分割し、新規ユニークのみ符号化して、アノテーション id 列を返す。"""
+        """テキストを分割し、新規ユニークのみ符号化して、**アノテーション番号 (uint64) 列**を返す。"""
         anns = split_annotations(text)
         new = [a for a in dict.fromkeys(anns) if a not in self._ann2idx]
         if new:
             vecs = self._encoder.encode_texts(new)
             for a, v in zip(new, vecs):
-                self._ann2idx[a] = len(self._embeddings)
+                aid = annotation_id(a)
+                existing = self._id2idx.get(aid)
+                if existing is not None:
+                    # 異なる文字列が同一 uint64 に衝突 → fail-closed (黙って上書きしない)
+                    raise ValueError(
+                        f"annotation id collision (uint64) between "
+                        f"{self._ids[existing]!r}={self.annotations[existing]!r} and {a!r}"
+                    )
+                row = len(self._embeddings)
+                self._ann2idx[a] = row
+                self._ids.append(aid)
+                self._id2idx[aid] = row
                 self._embeddings.append(v)
                 self._counts.append(0)
             self._n_encoded += len(new)
         ids = []
         for a in anns:
-            idx = self._ann2idx[a]
-            self._counts[idx] += 1
-            ids.append(idx)
+            row = self._ann2idx[a]
+            self._counts[row] += 1
+            ids.append(self._ids[row])
         self._n_instances += len(anns)
         return ids
+
+    # -- id ⇄ 行 ⇄ 文字列 -----------------------------------------------------
+
+    def row_of_id(self, annotation_id_: int) -> int:
+        """アノテーション番号 (uint64) → dense 行。未登録なら KeyError。"""
+        return self._id2idx[annotation_id_]
+
+    def id_of_row(self, row: int) -> int:
+        """dense 行 → アノテーション番号 (uint64)。"""
+        return self._ids[row]
+
+    def annotation_of_id(self, annotation_id_: int) -> str:
+        """アノテーション番号 (uint64) → 正規化文字列。"""
+        return self.annotations[self._id2idx[annotation_id_]]
 
     # -- 参照 -----------------------------------------------------------------
 
     @property
+    def ids(self) -> list[int]:
+        """行順のアノテーション番号 (uint64) 一覧。"""
+        return list(self._ids)
+
+    @property
     def annotations(self) -> list[str]:
-        """idx 順のユニークアノテーション一覧。"""
+        """行順のユニークアノテーション一覧。"""
         inv = [""] * len(self._ann2idx)
         for a, i in self._ann2idx.items():
             inv[i] = a
