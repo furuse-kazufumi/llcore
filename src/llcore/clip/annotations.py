@@ -229,8 +229,14 @@ class AnnotationStore:
 
     # -- 取り込み -------------------------------------------------------------
 
-    def add_text(self, text: str, *, source: str | None = None) -> list[int]:
-        """テキストを分割し、新規ユニークのみ符号化して、**アノテーション番号 (uint64) 列**を返す。"""
+    def add_text(
+        self, text: str, *, source: str | None = None, role: str | None = None
+    ) -> list[int]:
+        """テキストを分割し、新規ユニークのみ符号化して、**アノテーション番号 (uint64) 列**を返す。
+
+        role は発話者 (例 "user"/"assistant") — 初出時に行へ記録し、事実検索の
+        ロールフィルタに使える (会話アノテーションを教師信号化する第一歩)。
+        """
         import numpy as np
 
         anns = split_annotations(text)
@@ -256,6 +262,8 @@ class AnnotationStore:
                 self._matrix[row] = v
                 self._n_rows += 1
                 self._counts.append(0)
+                self._roles.append(role)
+                self._is_q.append(is_question(a))
             self._n_encoded += len(new)
             self._int8 = None  # 量子化キャッシュ無効化
         ids = []
