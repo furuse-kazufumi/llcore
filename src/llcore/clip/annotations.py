@@ -49,6 +49,17 @@ def annotation_id(annotation_norm: str) -> int:
     return int.from_bytes(h, "big") & UINT64_MASK
 
 
+def _l2_normalize(arr: Any) -> Any:
+    """行ごとに L2 正規化 (cosine = 内積 の不変条件を保つ)。ゼロ行でも発散しない。"""
+    import numpy as np
+
+    a = np.asarray(arr, dtype=np.float32)
+    if a.ndim == 1:
+        return a / max(float(np.linalg.norm(a)), 1e-12)
+    norms = np.linalg.norm(a, axis=-1, keepdims=True)
+    return a / np.maximum(norms, 1e-12)
+
+
 def _char_bigrams(s: str) -> frozenset[str]:
     """表層類似用の文字 bigram 集合 (日本語にも有効 — 単語境界に依存しない)。"""
     t = f" {s} "
