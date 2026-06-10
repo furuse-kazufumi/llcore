@@ -220,7 +220,7 @@ def build_svg(per_method: dict[str, list[dict]], n_turns: int, sdp_available: bo
     for t in range(1, n_turns + 1):
         parts.append(f'<text x="{sx(t):.1f}" y="{y0+ph+20}" fill="#7a8294" font-size="11" text-anchor="middle">{t}</text>')
     parts.append(f'<text x="{x0+pw/2}" y="{y0+ph+42}" fill="#9aa3b2" font-size="12" text-anchor="middle">実会話ターン (挨拶 → Q&amp;A → 文脈 → 話題転換 …)</text>')
-    parts.append(f'<text x="24" y="{y0+ph/2}" fill="#9aa3b2" font-size="12" transform="rotate(-90 24 {y0+ph/2})" text-anchor="middle">真の安定度 ρ (empirical, from-below)</text>')
+    parts.append(f'<text x="24" y="{y0+ph/2}" fill="#9aa3b2" font-size="12" transform="rotate(-90 24 {y0+ph/2})" text-anchor="middle">ρ_sup (収縮証明可能性指標, empirical from-below)</text>')
 
     # 各系統の折れ線 (SMIL 描画アニメ + 静止完成形)
     legend_y = 56
