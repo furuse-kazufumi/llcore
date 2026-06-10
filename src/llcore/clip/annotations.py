@@ -233,6 +233,8 @@ class AnnotationStore:
         # cosine が繋げない「質問→その答え」を会話の隣接構造で橋渡しする連結性グラフ。
         self._cooc: dict[tuple[int, int], int] = {}
         self._recent_group: list[tuple[int, int]] = []  # (group_id, 行) の直近履歴
+        self._degree_cache: dict[int, int] | None = None  # hub 判定用の共起次数キャッシュ
+        self._degree_cache_size = -1
         self._n_instances = 0                     # 観測したアノテーション延べ数
         self._n_encoded = 0                       # 実際に encoder を呼んだユニーク数
         # int8 量子化キャッシュ (大規模 cosine の省メモリ近似; 行追加で無効化)
