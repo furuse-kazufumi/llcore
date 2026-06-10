@@ -364,7 +364,7 @@ def main() -> int:
         "cases": cases,
     }
     args.out.write_text(json.dumps(res, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"\n=== verdict ===", flush=True)
+    print("\n=== verdict ===", flush=True)
     print(f"  model boundary-F1   = {res['mean_boundary_f1_model']:.3f}", flush=True)
     print(f"  規則 baseline F1     = {res['mean_boundary_f1_baseline_chartype']:.3f}", flush=True)
     print(f"  → {res['verdict']}", flush=True)
