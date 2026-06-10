@@ -435,29 +435,45 @@ class AnnotationStore:
         return hits[:k]
 
     def query_connected(
-        self, text: str, k: int = 5, *, seed_k: int = 3, want_facts: bool = True
+        self,
+        text: str,
+        k: int = 5,
+        *,
+        seed_k: int = 5,
+        want_facts: bool = True,
+        boost: float = 1.0,
     ) -> list[tuple[int, float, str]]:
-        """連結性検索: cosine で seed (過去の質問でも可) を引き、**共起エッジで答え (事実) へホップ**。
+        """連結性検索: cosine 事実検索を base に、**共起エッジで答え (事実) へホップ**して加点。
 
         cosine 単独では「質問」と「その答え」を繋げない (head-to-head で全 encoder R@1=0)。
         会話隣接の共起グラフを 1 ホップ展開して橋渡しする = 差別化の核。
+
+        **単調改善設計**: cosine 事実検索の結果を base スコアとして必ず保持し、共起ホップは
+        加点 (max マージ) のみ — よって cosine 単独を下回らない。
         返り値: (行, スコア, 由来) の降順。由来 = "cosine" | "cooccur"。
-        want_facts=True なら最終結果から質問を除外。
         """
-        seeds = self.query(text, k=seed_k)            # cosine seed (質問含む)
+        import numpy as np
+
+        # base: cosine 事実検索 (全行を score 付き; want_facts なら質問除外)
+        q = _l2_normalize(np.asarray(self._encoder.encode_texts([text])[0], dtype=np.float32))
+        sims = self.embedding_matrix() @ q
         scored: dict[int, tuple[float, str]] = {}
-        for row, sim in seeds:
-            if not (want_facts and self._is_q[row]):
-                prev = scored.get(row)
-                if prev is None or sim > prev[0]:
-                    scored[row] = (sim, "cosine")
-            # 共起ホップ: seed の隣接 (= その質問の答え等)
-            total = sum(c for _, c in self.cooccur_neighbors(row, k=999)) or 1
-            for nb, c in self.cooccur_neighbors(row, k=k):
+        for row in range(self._n_rows):
+            if want_facts and self._is_q[row]:
+                continue
+            scored[row] = (float(sims[row]), "cosine")
+
+        # 共起ホップ: cosine 上位 seed (質問含む) の隣接事実を加点
+        order = np.argsort(sims)[::-1][:seed_k]
+        for srow in order:
+            srow = int(srow)
+            sim = float(sims[srow])
+            neigh = self.cooccur_neighbors(srow, k=999)
+            denom = max((c for _, c in neigh), default=1)  # seed の最大共起で正規化 (希釈しすぎない)
+            for nb, c in neigh[:k]:
                 if want_facts and self._is_q[nb]:
                     continue
-                # 共起スコア = seed cosine × 共起比率 (0..1)
-                s = float(sim) * (c / total)
+                s = boost * sim * (c / denom)     # 0..boost*sim
                 prev = scored.get(nb)
                 if prev is None or s > prev[0]:
                     scored[nb] = (s, "cooccur")
