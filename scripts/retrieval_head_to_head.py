@@ -208,14 +208,16 @@ def main() -> int:
     results["verdict"] = {
         "clip_mrr": clip_mrr, "best_text_embedder": best_st[0], "best_text_mrr": best_st[1],
         "clip_minus_best_text_mrr": round(gap, 4),
+        "benchmark": "hard (実会話アノテーション corpus, 質問→答えの実体を含む事実)",
         "conclusion": (
-            "短句で CLIP が専用埋め込みに拮抗/勝利 = 差別化主張① 成立寄り" if gap >= -0.05
-            else "CLIP が専用埋め込みに劣後 = 差別化は surface 補償のみに縮退 (falsify)"
+            "難ベンチでも CLIP が専用埋め込みに拮抗/勝利 = 差別化主張① 成立寄り" if gap >= -0.05
+            else "CLIP が専用埋め込みに劣後 = 差別化は surface 補償+専用埋め込み差し替えへ (falsify)"
         ),
     }
     results["honest_note"] = (
-        "gold は手作り少数 paraphrase (PoC, 汎化主張なし)。コーパス小。"
-        "Jina CLIP は一般文で CLIP≈SBERT の 1/3 と報告 — 本実験は短句限定で覆るかの確認。"
+        "easy ベンチ (12 独立事実 paraphrase) は全モデル飽和 (1.000) で無情報 → hard ベンチ "
+        "(実会話アノテーション corpus 上の質問→事実) で判定。gold は手作り少数 (PoC, 汎化主張なし)。"
+        "Jina CLIP は一般文で CLIP≈SBERT の 1/3 と報告。"
     )
     _write(args.out, results)
     print(f"\nverdict: CLIP MRR={clip_mrr:.3f} vs best text={best_st[0]} MRR={best_st[1]:.3f} "
