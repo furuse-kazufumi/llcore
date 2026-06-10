@@ -329,7 +329,9 @@ def main() -> int:
         print(f"\n[turn {ti}] you> {prompt}", flush=True)
         print(f"         llcore> {reply[:90]}{'…' if len(reply) > 90 else ''}", flush=True)
         transcript.append({"turn": ti, "user": prompt, "assistant": reply,
-                           "n_new_tokens": int(X.shape[0]),
+                           # 生成トークン数ではなく templated 新規トークン数 (turn 1 は system prompt 込み)
+                           "n_templated_new_tokens": int(X.shape[0]),
+                           "includes_system_prompt": ti == 1,
                            "gen_seconds": round(time.time() - t0, 1)})
 
         for m, ln in lineages.items():
