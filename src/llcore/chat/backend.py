@@ -51,9 +51,12 @@ def _import_transformers() -> tuple["ModuleType", Any, Any]:
 
 
 def resolve_model_id(explicit: str | None = None) -> str:
-    """モデル ID を解決する。優先順: 明示引数 > env LLCORE_CHAT_MODEL > default。"""
-    if explicit:
-        return explicit
+    """モデル ID を解決する。優先順: 明示引数 > env LLCORE_CHAT_MODEL > default。
+
+    明示引数・env とも空白を strip し、空白のみは「未指定」として次順位へ落とす。
+    """
+    if explicit and explicit.strip():
+        return explicit.strip()
     env = os.environ.get(MODEL_ENV_VAR, "").strip()
     if env:
         return env
