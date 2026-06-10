@@ -279,11 +279,30 @@ class AnnotationStore:
             self._n_encoded += len(new)
             self._int8 = None  # 量子化キャッシュ無効化
         ids = []
+        rows_here: list[int] = []
         for a in anns:
             row = self._ann2idx[a]
             self._counts[row] += 1
             ids.append(self._ids[row])
+            rows_here.append(row)
         self._n_instances += len(anns)
+
+        # 共起エッジ: group 指定時のみ。同一/隣接 group の行同士を連結。
+        if group is not None and rows_here:
+            # 隣接 group 内の既出行 (window 以内) を集める
+            neighbors = {
+                r for g, r in self._recent_group if abs(g - group) <= adjacency_window
+            }
+            for r in rows_here:
+                for nb in neighbors | set(rows_here):
+                    if nb != r:
+                        key = (min(r, nb), max(r, nb))
+                        self._cooc[key] = self._cooc.get(key, 0) + 1
+            self._recent_group.extend((group, r) for r in rows_here)
+            # 窓外の履歴を捨てる (メモリ抑制)
+            self._recent_group = [
+                (g, r) for g, r in self._recent_group if group - g <= adjacency_window
+            ]
         return ids
 
     # -- id ⇄ 行 ⇄ 文字列 -----------------------------------------------------
