@@ -585,6 +585,11 @@ class AnnotationStore:
             list(meta["is_question"]) if "is_question" in meta
             else [is_question(a) for a in anns]
         )
+        self._cooc = {}
+        for key, c in meta.get("cooccur", {}).items():
+            a_s, b_s = key.split(",")
+            self._cooc[(int(a_s), int(b_s))] = int(c)
+        self._recent_group = []
         self._n_instances = int(meta["n_instances"])
         self._n_encoded = int(meta["n_encoded"])
         self._int8 = None
