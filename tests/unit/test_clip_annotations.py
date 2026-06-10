@@ -71,8 +71,28 @@ def test_store_encodes_each_unique_annotation_once() -> None:
     assert stats["total_instances"] == 4
     assert stats["encoder_calls_texts"] == 3
     assert stats["encode_saved_ratio"] == pytest.approx(1 - 3 / 4)
-    # 同一アノテーションは同一 id
+    # 同一アノテーションは同一 uint64 id (content-addressed) で、ulonglong 範囲に収まる
     assert ids1[0] == ids2[0]
+    assert all(0 <= i <= UINT64_MASK for i in ids1 + ids2)
+
+
+def test_annotation_id_stable_and_uint64() -> None:
+    """アノテーション番号は content-addressed で安定、かつ符号なし 64bit 範囲。"""
+    a = annotation_id("my name is kazufumi")
+    assert a == annotation_id("my name is kazufumi")  # 安定 (プロセス間で再現)
+    assert a != annotation_id("my name is alice")
+    assert 0 <= a <= UINT64_MASK
+
+
+def test_store_id_row_roundtrip() -> None:
+    enc = CountingEncoder()
+    store = AnnotationStore(enc)
+    ids = store.add_text("alpha beta. gamma delta.")
+    for aid in ids:
+        row = store.row_of_id(aid)
+        assert store.id_of_row(row) == aid
+        assert store.annotation_of_id(aid) == store.annotations[row]
+    assert store.ids == [annotation_id(a) for a in store.annotations]
 
 
 def test_store_repeated_text_costs_zero_encodes() -> None:
