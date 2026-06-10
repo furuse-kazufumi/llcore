@@ -145,6 +145,8 @@ n=6、95 発散 / 305 収縮 gene の集団に対する、発散 gene の false-
 | `cert_sdp`(sound) | **0%** | **4.6%** | **sound かつ最 navigable** |
 | Mamba 風正対照(0 発散集団) | 全 method 0 false-admit | — | 安全 family を誤棄却しない |
 
+*脚注:「0 観測 false-admit」は真スペクトル半径を**下から**近似する独立オラクル `empirical_rho`(from-below)による監査結果であり、機械証明ではない — near-boundary を取りこぼしうる(§3.1 / §5)。*
+
 **STABLE 風 gate が 84% 見逃す理由(機構):** kernel は tanh で常時有界なため、有限ホライズン観測では「摂動忘却したように見える」が真 ρ≥1(echo-state property の失敗)。sound certificate でなければ見抜けない。
 
 **さらに強い反例:** ρ≈2.9 の発散 gene でも、**単一軌道の摂動感度すら発散しない**(実測 1 → 2e-14。tanh 飽和 + 方向ミスアラインのため)。状態ノルム監視も、有限忘却テストも、単一軌道感度も、ρ≥1 を見逃す。box-sup の sound certificate(σ_max = 4.87 > 1 で reject)のみが見抜く。これが「経験は騙され、sound cert だけが見抜く」の最も鋭い実例である。
