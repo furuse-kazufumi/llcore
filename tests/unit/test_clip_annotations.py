@@ -319,6 +319,21 @@ def test_is_question_detection() -> None:
     assert not is_question("東京に住んでいます")
 
 
+def test_is_request_and_is_fact() -> None:
+    """依頼・命令は事実でない (答えを押し出さないため除外)。"""
+    from llcore.clip.annotations import is_fact, is_request
+
+    assert is_request("suggest one simple pasta dish")
+    assert is_request("name one italian dish")
+    assert is_request("let's talk about cooking")
+    assert not is_request("my name is kazufumi")
+    # is_fact = 質問でも依頼でもない
+    assert is_fact("my name is kazufumi")
+    assert is_fact("i live in japan")
+    assert not is_fact("what is my name")          # 質問
+    assert not is_fact("suggest one pasta dish")   # 依頼
+
+
 def test_query_excludes_questions_for_fact_retrieval() -> None:
     """質問クエリが質問文でなく事実文を返す (生成前段の honest 問題への対策)。"""
     vecs = {
