@@ -178,7 +178,7 @@ def test_cli_run_prompts_with_fake_backend(capsys: pytest.CaptureFixture[str]) -
     assert "llcore> A2" in out
 
 
-def test_cli_transcript_roundtrip(tmp_path: Path) -> None:
+def test_cli_transcript_roundtrip(tmp_path) -> None:
     import json
 
     from llcore.chat.__main__ import write_transcript
