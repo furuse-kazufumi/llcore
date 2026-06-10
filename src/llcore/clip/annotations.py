@@ -292,6 +292,21 @@ class AnnotationStore:
             self._int8 = np.clip(np.round(M * 127.0), -127, 127).astype(np.int8)
         return self._int8, 1.0 / (127.0 * 127.0)
 
+    def id_neighbors(self, annotation_id_: int, k: int = 5, dim: int = 64) -> list[tuple[int, float]]:
+        """**ID 空間** (識別) の厳密コサイン近傍を popcount で返す (float 精度喪失なし)。
+
+        意味的近傍 (:meth:`neighbors`, CLIP 埋め込み) とは別物 — こちらは ID のビット一致度。
+        全 ID との XOR+popcount は整数演算なので誤差ゼロ。
+        """
+        target = self._ids[self._id2idx[annotation_id_]]
+        scored = [
+            (i, id_cosine(target, aid, dim))
+            for i, aid in enumerate(self._ids)
+            if aid != target
+        ]
+        scored.sort(key=lambda t: t[1], reverse=True)
+        return scored[:k]
+
     def neighbors(self, idx: int, k: int = 5) -> list[tuple[int, float]]:
         """アノテーション行 idx の近傍 (cosine 降順, 自身を除く) — 連結性の最小クエリ。"""
         import numpy as np
