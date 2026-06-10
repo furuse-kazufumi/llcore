@@ -54,7 +54,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--system",
         default=DEFAULT_SYSTEM_PROMPT,
-        help="system prompt (空文字で system 無し)",
+        help=(
+            "system prompt (空文字で履歴から system を外す。注意: SmolLM2 の "
+            "chat template は system 不在時に独自 default system を注入する)"
+        ),
     )
     parser.add_argument("--max-new-tokens", type=int, default=256)
     parser.add_argument("--temperature", type=float, default=0.3)
