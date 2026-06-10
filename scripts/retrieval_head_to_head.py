@@ -70,14 +70,50 @@ def evaluate(corpus_vecs: np.ndarray, query_vecs: np.ndarray, gold: list[int]) -
     sims = query_vecs @ corpus_vecs.T          # (n_query, n_corpus), 全て単位ノルム
     r1 = r3 = 0
     rr = 0.0
+    ranks = []
     for i, g in enumerate(gold):
         order = np.argsort(sims[i])[::-1]
         rank = int(np.where(order == g)[0][0]) + 1
+        ranks.append(rank)
         r1 += rank == 1
         r3 += rank <= 3
         rr += 1.0 / rank
     n = len(gold)
-    return {"recall@1": r1 / n, "recall@3": r3 / n, "mrr": round(rr / n, 4), "n_query": n}
+    return {"recall@1": r1 / n, "recall@3": r3 / n, "mrr": round(rr / n, 4),
+            "n_query": n, "ranks": ranks}
+
+
+# 難ベンチ: 実会話アノテーション (多数の似た短句) をコーパスに、
+# 質問→答えの実体を含む事実 を gold とする (SigLIP が苦戦した実際の難所)。
+HARD_GOLD: list[tuple[str, str]] = [
+    ("what is my name", "my name is kazufumi"),
+    ("where do i live", "i live in japan"),
+    ("what pasta dish did we discuss", "one simple pasta dish is spaghetti carbonara"),
+    ("which planet is reddish", "mars is known for its reddish hue"),
+    ("name a classical composer", "classical composers include mozart"),
+]
+
+
+def run_hard_benchmark(encode, corpus: list[str]) -> dict | None:
+    """実会話アノテーション corpus 上で HARD_GOLD の検索順位を測る (gold 不在はスキップ)。"""
+    gold_rows: list[int] = []
+    queries: list[str] = []
+    used: list[tuple[str, str]] = []
+    for q, fact in HARD_GOLD:
+        # gold 事実が corpus に部分一致で含まれるか (正規化済みアノテーション)
+        match = next((i for i, c in enumerate(corpus) if fact in c or c in fact), None)
+        if match is not None:
+            gold_rows.append(match)
+            queries.append(q)
+            used.append((q, corpus[match]))
+    if not queries:
+        return None
+    cv = l2(np.asarray(encode(corpus), dtype=np.float64))
+    qv = l2(np.asarray(encode(queries), dtype=np.float64))
+    res = evaluate(cv, qv, gold_rows)
+    res["pairs"] = [{"query": q, "gold_fact": f, "rank": r}
+                    for (q, f), r in zip(used, res["ranks"])]
+    return res
 
 
 def l2(a: np.ndarray) -> np.ndarray:
