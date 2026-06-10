@@ -181,6 +181,7 @@ def main() -> int:
 
     payload = {
         "model": backend.model_id,
+        "lang": args.lang,
         "seed": args.seed,
         "max_new_tokens": args.max_new_tokens,
         "load_seconds": backend.load_seconds,
