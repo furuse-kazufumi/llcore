@@ -99,8 +99,10 @@ class TransformersBackend:
 
     @property
     def tokenizer(self) -> Any:
-        """ロード済みトークナイザ (未ロードならロードを誘発)。"""
-        self._ensure_loaded()
+        """ロード済みトークナイザ (未ロードならトークナイザのみロード — モデル本体は読まない)。"""
+        if self._tok is None:
+            _, auto_tokenizer, _ = _import_transformers()
+            self._tok = auto_tokenizer.from_pretrained(self.model_id)
         return self._tok
 
     @property
