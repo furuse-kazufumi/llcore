@@ -93,7 +93,6 @@ class AnnotationStore:
 
     計算量の要: ``add_text`` は**新規ユニークのみ**を符号化する。
     ``stats()['encode_saved_ratio']`` が実測の節約率。
-    """
 
     内部表現は二層:
     - **行 (row, 0..n-1)**: 埋め込み行列の dense 添字。近傍/グラフ等の行列演算が使う。
