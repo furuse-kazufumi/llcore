@@ -38,7 +38,9 @@ if hasattr(sys.stdout, "reconfigure"):
 
 # (stage名, [(prompt, 期待キーワード list | None)…])
 # 期待キーワード None = open-ended (auto-check 対象外、coherence は人間/上位 LLM が判断)
-STAGES: list[tuple[str, list[tuple[str, list[str] | None]]]] = [
+StageList = list[tuple[str, list[tuple[str, list[str] | None]]]]
+
+STAGES_EN: StageList = [
     (
         "stage1_greeting",
         [
