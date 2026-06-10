@@ -487,7 +487,7 @@ class AnnotationStore:
         sims = self.embedding_matrix() @ q
         scored: dict[int, tuple[float, str]] = {}
         for row in range(self._n_rows):
-            if want_facts and self._is_q[row]:
+            if want_facts and self._non_fact[row]:  # 質問 or 依頼を除外
                 continue
             scored[row] = (float(sims[row]), "cosine")
 
