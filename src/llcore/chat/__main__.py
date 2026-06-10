@@ -42,7 +42,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--model",
         default=None,
-        help="HF モデル ID (default: env LLCORE_CHAT_MODEL または SmolLM2-135M-Instruct)",
+        help="HF モデル ID (default: env LLCORE_CHAT_MODEL または SmolLM2-360M-Instruct)",
     )
     parser.add_argument(
         "--prompt",
