@@ -419,6 +419,11 @@ class AnnotationStore:
                 break
         return out
 
+    @property
+    def n_cooccur_edges(self) -> int:
+        """共起エッジ数 (連結性グラフの規模)。"""
+        return len(self._cooc)
+
     def cooccur_neighbors(self, row: int, k: int = 5) -> list[tuple[int, int]]:
         """行の共起近傍 (会話隣接で一緒に出た行) を共起回数降順で返す。"""
         hits = [
