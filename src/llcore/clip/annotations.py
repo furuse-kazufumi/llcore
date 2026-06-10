@@ -635,6 +635,10 @@ class AnnotationStore:
             list(meta["is_question"]) if "is_question" in meta
             else [is_question(a) for a in anns]
         )
+        self._non_fact = (
+            list(meta["non_fact"]) if "non_fact" in meta
+            else [not is_fact(a) for a in anns]
+        )
         self._cooc = {}
         for key, c in meta.get("cooccur", {}).items():
             a_s, b_s = key.split(",")
