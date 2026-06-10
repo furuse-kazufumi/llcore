@@ -113,7 +113,7 @@ def main() -> int:
                         "connected_rank": r_conn, "cosine_top": cos[:5], "connected_top": conn[:5]})
 
     payload = {
-        "n_turns": n_turns, "n_annotations": len(ann), "n_cooccur_edges": len(store._cooc),
+        "n_turns": n_turns, "n_annotations": len(ann), "n_cooccur_edges": store.n_cooccur_edges,
         "summary": {"cosine_R@1": cos_hits, "connected_R@1": conn_hits, "n_probes": len(PROBES)},
         "verdict": ("連結性グラフが cosine 単独を上回る (共起ホップで答えへ到達)"
                     if conn_hits > cos_hits else
