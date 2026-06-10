@@ -210,7 +210,7 @@ def build_svg(per_method: dict[str, list[dict]], n_turns: int, sdp_available: bo
     parts.append(f'<line x1="{x0}" y1="{y0+ph}" x2="{x0+pw}" y2="{y0+ph}" stroke="#3a4152" stroke-width="1"/>')
     ty = sy(1.0)
     parts.append(f'<line x1="{x0}" y1="{ty:.1f}" x2="{x0+pw}" y2="{ty:.1f}" stroke="#e05561" stroke-width="1.5" stroke-dasharray="7,5"/>')
-    parts.append(f'<text x="{x0+pw+6}" y="{ty+4:.1f}" fill="#e05561" font-size="12">ρ = 1 (発散境界)</text>')
+    parts.append(f'<text x="{x0+pw+6}" y="{ty+4:.1f}" fill="#e05561" font-size="12">ρ = 1 (収縮証明可能性の境界)</text>')
     for rho in (0.5, 1.5):
         if rho < rho_max:
             yy = sy(rho)
