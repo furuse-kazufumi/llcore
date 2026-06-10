@@ -108,7 +108,7 @@ class ClipBackend:
         )
         with self._torch.no_grad():
             feats = self._model.get_text_features(**inputs)
-        return _l2_normalize(feats.numpy())
+        return _l2_normalize(self._feature_tensor(feats).numpy())
 
     def encode_images(self, images: Sequence[ImageLike]) -> Any:
         """画像列 (パス or PIL Image) を L2 正規化済み埋め込み (n, d) にする。"""
@@ -120,7 +120,25 @@ class ClipBackend:
         inputs = self._processor(images=pil_images, return_tensors="pt")
         with self._torch.no_grad():
             feats = self._model.get_image_features(**inputs)
-        return _l2_normalize(feats.numpy())
+        return _l2_normalize(self._feature_tensor(feats).numpy())
+
+    def _feature_tensor(self, out: Any) -> Any:
+        """get_*_features の戻りを tensor に正規化する。
+
+        transformers のバージョン/モデル系列により tensor 直 (CLIP 4.x) と
+        出力オブジェクト (SigLIP 5.x = BaseModelOutputWithPooling) の両方がある。
+        """
+        assert self._torch is not None
+        if self._torch.is_tensor(out):
+            return out
+        for attr in ("text_embeds", "image_embeds", "pooler_output"):
+            v = getattr(out, attr, None)
+            if v is not None and self._torch.is_tensor(v):
+                return v
+        raise ClipDependencyError(
+            f"{self.model_id} の get_*_features 戻り値から特徴 tensor を取り出せません "
+            f"(型: {type(out).__name__})"
+        )
 
     def _to_pil(self, im: ImageLike) -> Any:
         if isinstance(im, (str, Path)):

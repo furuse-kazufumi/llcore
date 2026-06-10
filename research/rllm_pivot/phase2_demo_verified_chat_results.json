@@ -24,56 +24,56 @@
       "user": "Hello! My name is Kazufumi. Nice to meet you.",
       "assistant": "Nice to meet you too, Kazufumi.",
       "n_new_tokens": 58,
-      "gen_seconds": 2.5
+      "gen_seconds": 1.7
     },
     {
       "turn": 2,
       "user": "What is the capital of France?",
       "assistant": "The capital of France is Paris.",
       "n_new_tokens": 25,
-      "gen_seconds": 3.3
+      "gen_seconds": 1.5
     },
     {
       "turn": 3,
       "user": "Let's talk about cooking. Suggest one simple pasta dish.",
       "assistant": "One simple pasta dish is spaghetti carbonara. It's made with guanciale (Italian pancetta), eggs, parmesan cheese, and black pepper.",
       "n_new_tokens": 56,
-      "gen_seconds": 7.2
+      "gen_seconds": 4.0
     },
     {
       "turn": 4,
       "user": "What is my name?",
       "assistant": "Your name is Kazufumi.",
       "n_new_tokens": 23,
-      "gen_seconds": 2.8
+      "gen_seconds": 2.6
     },
     {
       "turn": 5,
       "user": "New topic: space. Name one planet in our solar system.",
       "assistant": "Our solar system has eight planets: Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune.",
       "n_new_tokens": 48,
-      "gen_seconds": 5.4
+      "gen_seconds": 4.9
     },
     {
       "turn": 6,
       "user": "Tell me one interesting fact about that planet.",
       "assistant": "Mars is known for its reddish hue due to iron oxide on its surface.",
       "n_new_tokens": 35,
-      "gen_seconds": 5.6
+      "gen_seconds": 4.4
     },
     {
       "turn": 7,
       "user": "Switch to music: name one classical composer.",
       "assistant": "Classical composers include Mozart, Beethoven, Bach, and Tchaikovsky.",
       "n_new_tokens": 36,
-      "gen_seconds": 6.3
+      "gen_seconds": 5.2
     },
     {
       "turn": 8,
       "user": "Thank you! Say goodbye in one short sentence.",
       "assistant": "Goodbye, I'm glad we could have this conversation.",
       "n_new_tokens": 33,
-      "gen_seconds": 8.1
+      "gen_seconds": 5.7
     }
   ],
   "per_method": {
