@@ -29,6 +29,7 @@ from llcore.clip.annotations import (
     annotation_id,
     id_cosine,
     id_to_unit_vector,
+    is_question,
     split_annotations,
 )
 from llcore.clip.backend import (
