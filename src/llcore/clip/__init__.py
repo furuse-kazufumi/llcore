@@ -50,6 +50,7 @@ __all__ = [
     "annotation_id",
     "id_cosine",
     "id_to_unit_vector",
+    "is_question",
     "resolve_clip_model_id",
     "split_annotations",
     "zero_shot",
