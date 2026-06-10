@@ -33,5 +33,27 @@ SBERT の ~1/3」を**実会話データで再現**した形。
 - 事実抽出の次段 = **属性束縛つき事実** (subject-predicate-object) 抽出だが、これは
   rule-based では限界 (LLM 必要 → 計算削減目的と相反)。trade-off を要設計判断。
 
+## ★優先2 head-to-head 確定 (実会話 101 アノテーション corpus, hard ベンチ)
+easy ベンチ (12 独立事実) は全モデル飽和 1.000 で無情報 → hard ベンチ (質問→答えの実体を含む事実) で判定:
+
+| encoder | easy MRR | **hard MRR** | hard R@1 |
+|---|---|---|---|
+| CLIP:SigLIP-base | 1.000 | **0.189** | 0.000 |
+| MiniLM-L6-v2 (Apache-2.0) | 1.000 | **0.296** | 0.000 |
+| multilingual-e5-small | 1.000 | 0.228 | 0.000 |
+| bge-small-en-v1.5 | 1.000 | 0.230 | 0.000 |
+
+**2 つの確定知見:**
+1. **CLIP/SigLIP は専用テキスト埋め込みに劣後** (0.189 < MiniLM 0.296, gap −0.106) → 「CLIP をテキスト記憶に」は**反証**。
+   テキスト専用なら MiniLM 等に差し替え、CLIP は cross-modal が要る時のみ、が筋。
+2. **★最良の MiniLM すら hard R@1=0.000** — 似た短句 101 個から質問→答えを **cosine 単独で橋渡しするのは
+   原理的に困難** (「what is my name」は他の name 句・挨拶に cosine で近く、答え文に遠い)。
+
+## ★戦略結論: 差別化は encoder でなく「連結性グラフ」
+cosine 類似度は「質問」と「その答え」を繋げない。**会話の隣接構造** (質問とその答えが同じ会話で
+turn 隣接) を **グラフのエッジ**として持つことが鍵 = ユーザーの「連結性」直感の実証的裏付け。
+→ 優先3 (会話アノテーション教師 × 連結性) が**差別化の本命**。検索は「cosine で過去の質問を引く →
+隣接エッジでその答え (事実) へホップ」= グラフが load-bearing。encoder は MiniLM に差し替え可。
+
 正本データ: `out/annotation_generation_poc_results.json` (事実抽出版) +
-`out/retrieval_head_to_head.json` (優先2)。
+`out/retrieval_head_to_head.json` (優先2 hard ベンチ)。
