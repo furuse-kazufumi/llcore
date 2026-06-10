@@ -78,7 +78,8 @@ def test_store_repeated_text_costs_zero_encodes() -> None:
     for _ in range(10):
         store.add_text("the sky is blue.")
     assert enc.total_encoded == n_after_first  # 再出現は符号化ゼロ
-    assert store.stats()["encode_saved_ratio"] == pytest.approx(1 - 1 / 11)
+    # stats は 4 桁丸めのため abs 許容で比較
+    assert store.stats()["encode_saved_ratio"] == pytest.approx(1 - 1 / 11, abs=1e-4)
 
 
 def test_store_neighbors_and_query() -> None:
