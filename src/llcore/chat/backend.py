@@ -23,7 +23,9 @@ from llcore.chat.session import GenerationSettings, Message
 if TYPE_CHECKING:  # pragma: no cover - 型チェック時のみ (実行時は lazy import)
     from types import ModuleType
 
-DEFAULT_MODEL = "HuggingFaceTB/SmolLM2-135M-Instruct"
+# default は 360M: 段階的会話スモークで 5/5 (135M は名前想起=文脈引継ぎで 4/5)。
+# 軽さ優先なら --model / env で SmolLM2-135M-Instruct を指定。
+DEFAULT_MODEL = "HuggingFaceTB/SmolLM2-360M-Instruct"
 MODEL_ENV_VAR = "LLCORE_CHAT_MODEL"
 
 # 生成予算を context 窓に収める際の安全マージン (template 特殊トークン等の揺らぎ吸収)
