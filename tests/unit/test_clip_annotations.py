@@ -12,6 +12,7 @@ from llcore.clip.annotations import (
     UINT64_MASK,
     AnnotationStore,
     annotation_id,
+    id_cosine,
     id_to_unit_vector,
     split_annotations,
 )
