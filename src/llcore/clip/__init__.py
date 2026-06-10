@@ -46,6 +46,7 @@ __all__ = [
     "ClipBackend",
     "ClipDependencyError",
     "annotation_id",
+    "id_to_unit_vector",
     "resolve_clip_model_id",
     "split_annotations",
     "zero_shot",
