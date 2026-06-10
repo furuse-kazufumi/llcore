@@ -493,11 +493,15 @@ class AnnotationStore:
         **単調改善設計**: cosine 事実検索の結果を base スコアとして必ず保持し、共起ホップは
         加点 (max マージ) のみ — よって cosine 単独を下回らない。
 
-        ``hub_suppression=True`` (既定): **平均次数を超える hub ノードのみ** boost を down-weight
-        (例「new topic」が全 turn に共起)。``factor = min(1, avg_deg/(deg+1))`` ゆえ平均以下の
-        特定的な答えは無罰 (全 boost を一律縮小して答えを潰す naive IDF の弊害を回避)。
+        ``hub_suppression=True`` (既定): 共起相手が多い hub ノード (例「new topic」が全 turn に
+        共起) の boost を **IDF** ``log((1+N)/(1+degree))`` で down-weight。
+        注意: この強度は小規模ベンチ (3 probe) では確信を持って調整できない (probe ごとに最適が
+        入れ替わる過剰適合域)。既定 on は測定上の集約最良 (MRR 0.056→0.389) だが、確定的な
+        チューニングは benchmark 拡張後に行う (honest 留保)。
         返り値: (行, スコア, 由来) の降順。由来 = "cosine" | "cooccur"。
         """
+        import math
+
         import numpy as np
 
         # base: cosine 事実検索 (全行を score 付き; want_facts なら質問除外)
@@ -510,7 +514,7 @@ class AnnotationStore:
             scored[row] = (float(sims[row]), "cosine")
 
         deg = self._cooccur_degree() if hub_suppression else {}
-        avg_deg = (sum(deg.values()) / len(deg)) if deg else 1.0
+        idf_max = math.log(1 + self._n_rows) if self._n_rows else 1.0
 
         # 共起ホップ: cosine 上位 seed (質問含む) の隣接事実を加点
         order = np.argsort(sims)[::-1][:seed_k]
@@ -522,9 +526,12 @@ class AnnotationStore:
             for nb, c in neigh[:k]:
                 if want_facts and self._non_fact[nb]:  # 質問 or 依頼を除外
                     continue
-                # hub 罰: 平均次数超のみ抑制 (平均以下=特定的な答えは factor 1.0 で無罰)
-                hub = min(1.0, avg_deg / (deg.get(nb, 0) + 1)) if hub_suppression else 1.0
-                s = boost * sim * (c / denom) * hub
+                # hub 罰: 共起次数の多いノードほど idf↓ (新トピック等のフィラーを抑制)
+                idf = (
+                    math.log((1 + self._n_rows) / (1 + deg.get(nb, 0))) / idf_max
+                    if hub_suppression and idf_max > 0 else 1.0
+                )
+                s = boost * sim * (c / denom) * idf
                 prev = scored.get(nb)
                 if prev is None or s > prev[0]:
                     scored[nb] = (s, "cooccur")
