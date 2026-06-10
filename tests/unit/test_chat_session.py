@@ -178,7 +178,7 @@ def test_cli_run_prompts_with_fake_backend(capsys: pytest.CaptureFixture[str]) -
     assert "llcore> A2" in out
 
 
-def test_cli_transcript_roundtrip(tmp_path) -> None:
+def test_cli_transcript_roundtrip(tmp_path: Path) -> None:
     import json
 
     from llcore.chat.__main__ import write_transcript
@@ -190,3 +190,121 @@ def test_cli_transcript_roundtrip(tmp_path) -> None:
     data = json.loads(path.read_text(encoding="utf-8"))
     assert data["model"] == "org/model"
     assert data["messages"][-1] == {"role": "assistant", "content": "A1"}
+
+
+# -- 敵対的レビュー反映の回帰テスト (2026-06-10 workflow confirmed findings) ----
+
+
+def test_generation_settings_fail_closed_validation() -> None:
+    """temperature=0 等は transformers の generate 実行時まで検出が遅延する —
+    構築時に fail-closed で拒否する (confirmed finding #0)。"""
+    with pytest.raises(ValueError, match="temperature"):
+        GenerationSettings(do_sample=True, temperature=0.0)
+    with pytest.raises(ValueError, match="top_p"):
+        GenerationSettings(do_sample=True, top_p=0.0)
+    with pytest.raises(ValueError, match="max_new_tokens"):
+        GenerationSettings(max_new_tokens=0)
+    # greedy 時は temperature 不使用なので 0 を許容
+    settings = GenerationSettings(do_sample=False, temperature=0.0)
+    assert settings.do_sample is False
+
+
+def test_empty_assistant_reply_fails_closed_with_rollback() -> None:
+    """空応答は空 user の拒否と対称に fail-closed (confirmed finding #8)。"""
+    session = ChatSession(FakeBackend(replies=["   "]))
+    with pytest.raises(ValueError, match="empty reply"):
+        session.ask("Hello!")
+    assert [m.role for m in session.history] == ["system"]
+
+
+def test_non_str_reply_fails_closed_with_rollback() -> None:
+    """バックエンドの契約違反 (str 以外) も rollback 窓内で拒否 (confirmed finding #3)。"""
+
+    class BrokenBackend:
+        def generate(
+            self, messages: Sequence[Message], settings: GenerationSettings
+        ) -> str:
+            return None  # type: ignore[return-value]
+
+    session = ChatSession(BrokenBackend())
+    with pytest.raises(TypeError, match="must return str"):
+        session.ask("Hello!")
+    assert [m.role for m in session.history] == ["system"]
+
+
+def test_resolve_model_id_strips_whitespace(monkeypatch: pytest.MonkeyPatch) -> None:
+    """明示引数の空白 strip + 空白のみは未指定扱い (confirmed finding #5)。"""
+    monkeypatch.delenv(MODEL_ENV_VAR, raising=False)
+    assert resolve_model_id("  org/x  ") == "org/x"
+    assert resolve_model_id("   ") == DEFAULT_MODEL
+
+
+def test_repl_dispatch_command() -> None:
+    """REPL コマンド dispatch は純粋ロジックとして検証 (confirmed finding #16)。"""
+    from llcore.chat.__main__ import dispatch_command
+
+    session = ChatSession(FakeBackend(replies=["A1"]))
+    session.ask("Q1")
+
+    handled, should_exit, _ = dispatch_command(session, "/exit")
+    assert (handled, should_exit) == (True, True)
+    handled, should_exit, _ = dispatch_command(session, "/quit")
+    assert (handled, should_exit) == (True, True)
+
+    handled, should_exit, out = dispatch_command(session, "/history")
+    assert (handled, should_exit) == (True, False)
+    assert "[user] Q1" in out and "[assistant] A1" in out
+
+    handled, should_exit, out = dispatch_command(session, "/reset")
+    assert (handled, should_exit) == (True, False)
+    assert session.turn_count == 0
+
+    handled, _, _ = dispatch_command(session, "hello")
+    assert handled is False
+
+
+# -- scripts/chat_staged_smoke.py の判定ロジック -------------------------------
+
+
+def _load_smoke_module():  # type: ignore[no-untyped-def]
+    import importlib.util
+
+    root = Path(__file__).resolve().parents[2]
+    spec = importlib.util.spec_from_file_location(
+        "chat_staged_smoke", root / "scripts" / "chat_staged_smoke.py"
+    )
+    assert spec is not None and spec.loader is not None
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def test_smoke_keyword_hit_word_boundary() -> None:
+    """auto-check の偽陽性防止: ASCII は単語境界照合 (confirmed finding #13)。"""
+    smoke = _load_smoke_module()
+    assert smoke._keyword_hit("2 + 2 = 4.", "4")
+    assert not smoke._keyword_hit("in the year 2024", "4")
+    assert smoke._keyword_hit("the capital is paris.", "paris")
+    assert not smoke._keyword_hit("a comparison of methods", "paris")
+    assert not smoke._keyword_hit("fourteen items", "four")
+    # 日本語は包含判定
+    assert smoke._keyword_hit("首都は東京です", "東京")
+
+
+def test_smoke_exit_code_critical_stages_only() -> None:
+    """stage4 の偶然ヒットで stage2/3 全滅を隠さない (confirmed finding #2/#11)。"""
+    smoke = _load_smoke_module()
+
+    def turn(stage: str, verdict: str, expect: list[str] | None) -> dict[str, object]:
+        return {"stage": stage, "auto_check": verdict, "expected_keywords": expect}
+
+    # stage2/3 全滅 + stage4 ヒット → 1 (基本会話不成立)
+    results = [
+        turn("stage2_simple_qa", "unexpected", ["paris"]),
+        turn("stage3_context_carryover", "unexpected", ["kazufumi"]),
+        turn("stage4_topic_shift", "expected", ["mars"]),
+    ]
+    assert smoke.exit_code(results) == 1
+    # stage3 が 1 つ通れば 0
+    results[1] = turn("stage3_context_carryover", "expected", ["kazufumi"])
+    assert smoke.exit_code(results) == 0
