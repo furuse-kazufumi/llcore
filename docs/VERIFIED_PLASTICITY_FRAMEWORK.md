@@ -23,7 +23,7 @@
 `$0`/CPU の実験弧から、確定した知見は次の通りである。
 
 1. **GUARANTEE は立つ。** 実 Net2Net 構造手術(width_grow)の下で、sound certificate(cert_two / cert_sdp / cert_inf)は **0 観測 false-admit** を保つ。とりわけ cert_sdp は誤許可 0% かつ過剰棄却 4.6% で **sound かつ最も navigable** である。
-2. **経験ベースの gate は危険である。** STABLE 風経験 gate は真に発散する gene の **84.2%(80/95)を「安全」と誤許可**する。基質は tanh で常時有界なため、有限ホライズン観測では「摂動を忘れたように見える」が真 ρ≥1 であり、sound certificate でなければ見抜けない。
+2. **経験ベースの gate は危険である。** STABLE 風経験 gate は真に発散する gene の **84.2%(80/95)を「安全」と誤許可**する(EPS_FORGET=1e-2/T=64/K_PROBE=8 固定の設定依存値。方向=STABLE は危険は頑健だが 84% を設定非依存数値として扱わない)。基質は tanh で常時有界なため、有限ホライズン観測では「摂動を忘れたように見える」が真 ρ≥1 であり、sound certificate でなければ見抜けない。
 3. **CAPABILITY は NEGATIVE である。** 実 SmolLM2-135M 由来の交差エントロピー地形で、MAP-Elites は finite-difference 勾配を 20/20 で上回る(一見 EXISTS)が、**強い解析(autograd)勾配が同予算で 19/20 でこれを逆転**する。進化の見かけの勝ちは**弱いベースラインの artifact** であり、synthetic 地形でも(平均で)一貫する。
 
 結論として、本枠組みの価値は **capability ではなく guarantee** にある。そして本研究で最も意味のある方法論的成果は **negative-by-design かつ自己誘発的**である — 枠組みに組み込んだ strong-gradient meta-gate が、publish 前に capability の魅力的な false-positive を実際に 1 件排除した。
