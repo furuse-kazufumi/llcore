@@ -42,6 +42,9 @@ z3 = ["z3-solver>=4.13"]
 # certifier genuinely certifies more (Track D, +43% over closed-form 2-norm). Optional —
 # the certifier degrades gracefully (reports unavailable) when cvxpy is absent.
 sdp = ["cvxpy>=1.9"]
+# chat: 実在小型 LLM (SmolLM2-Instruct, Apache-2.0) との基本会話レイヤ (llcore.chat)。
+# CPU 完結 / on-prem。不在時は ChatDependencyError で fail-closed (黙って劣化しない)。
+chat = ["torch>=2.2", "transformers>=4.46"]
 llive = ["llmesh-llive>=0.6"]
 # rad は stdlib のみで動くため optional-dep 不要 (RAD コーパスを path-based 参照)
 # LLCORE_RAD_DIR env で RAD 根ディレクトリを指定 (未設定時は graceful degrade = hint なし)
