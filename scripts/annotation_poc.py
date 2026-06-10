@@ -58,18 +58,20 @@ CONNECTIVITY_QUERIES = [
 SHAPE_IMAGES = sorted((_ROOT / "out" / "clip_smoke_shapes").glob("*.png"))
 
 
-def extract_texts(path: Path) -> list[str]:
-    """各 transcript JSON 形式から user/assistant テキストを順序つきで取り出す。"""
+def extract_texts(path: Path) -> list[tuple[str, str]]:
+    """各 transcript JSON 形式から (text, role) を順序つきで取り出す。"""
     d = json.loads(path.read_text(encoding="utf-8"))
-    out: list[str] = []
+    out: list[tuple[str, str]] = []
     for turn in d.get("turns", []):  # smoke / endurance 形式
-        for key in ("prompt", "reply"):
-            if isinstance(turn.get(key), str):
-                out.append(turn[key])
+        if isinstance(turn.get("prompt"), str):
+            out.append((turn["prompt"], "user"))
+        if isinstance(turn.get("reply"), str):
+            out.append((turn["reply"], "assistant"))
     for turn in d.get("conversation", []):  # verified chat demo 形式
-        for key in ("user", "assistant"):
-            if isinstance(turn.get(key), str):
-                out.append(turn[key])
+        if isinstance(turn.get("user"), str):
+            out.append((turn["user"], "user"))
+        if isinstance(turn.get("assistant"), str):
+            out.append((turn["assistant"], "assistant"))
     return out
 
 
