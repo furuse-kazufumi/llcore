@@ -132,9 +132,20 @@ def main() -> int:
         for q in qs:
             queries.append(q)
             gold.append(ci)
-    print(f"corpus={len(corpus)} facts, queries={len(queries)} paraphrases", flush=True)
+    print(f"[easy] corpus={len(corpus)} facts, queries={len(queries)} paraphrases", flush=True)
 
-    results: dict[str, object] = {"corpus_size": len(corpus), "n_queries": len(queries), "models": {}}
+    # 難ベンチ用: 実会話アノテーション corpus をロード (あれば)
+    hard_corpus: list[str] = []
+    store_path = _ROOT / "out" / "annotation_store.json"
+    if store_path.exists():
+        meta = json.loads(store_path.read_text(encoding="utf-8"))
+        hard_corpus = [a for a in meta.get("annotations", []) if a]
+        print(f"[hard] 実会話アノテーション corpus={len(hard_corpus)} (多数の似た短句)", flush=True)
+
+    results: dict[str, object] = {
+        "easy_corpus_size": len(corpus), "n_easy_queries": len(queries),
+        "hard_corpus_size": len(hard_corpus), "models": {},
+    }
 
     # --- CLIP/SigLIP (AnnotationStore のエンコーダ) ---
     clip = ClipBackend()
