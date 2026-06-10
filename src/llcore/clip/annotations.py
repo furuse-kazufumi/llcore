@@ -31,6 +31,18 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:  # pragma: no cover
     import numpy as np
 
+def _char_bigrams(s: str) -> frozenset[str]:
+    """表層類似用の文字 bigram 集合 (日本語にも有効 — 単語境界に依存しない)。"""
+    t = f" {s} "
+    return frozenset(t[i : i + 2] for i in range(len(t) - 1))
+
+
+def _jaccard(a: frozenset[str], b: frozenset[str]) -> float:
+    if not a or not b:
+        return 0.0
+    return len(a & b) / len(a | b)
+
+
 # 文末 (. ! ? 。!?) + 接続的区切り (, ; : 、;) で短句に割る
 _SENT_SPLIT = re.compile(r"[.!?。!?]+[\s]*")
 _CLAUSE_SPLIT = re.compile(r"[,;:、;:]+[\s]*")
