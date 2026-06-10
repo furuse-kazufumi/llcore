@@ -150,10 +150,11 @@ def main() -> int:
     settings = GenerationSettings(max_new_tokens=args.max_new_tokens)
     session = ChatSession(backend, settings=settings)
 
+    stages = STAGE_SETS[args.lang]
     results: list[dict[str, object]] = []
     n_expected = n_unexpected = 0
     t_start = time.time()
-    for stage_name, turns in STAGES:
+    for stage_name, turns in stages:
         print(f"\n=== {stage_name} ===", flush=True)
         for prompt, expect in turns:
             print(f"you> {prompt}", flush=True)
