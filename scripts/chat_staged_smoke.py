@@ -32,9 +32,9 @@ if str(_SRC) not in sys.path:
     sys.path.insert(0, str(_SRC))
 
 from llcore.chat import ChatSession, GenerationSettings, TransformersBackend  # noqa: E402
+from llcore.chat.__main__ import _ensure_utf8_stdout  # noqa: E402
 
-if hasattr(sys.stdout, "reconfigure"):
-    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+_ensure_utf8_stdout()  # stdout + stderr とも UTF-8 (cp932 console 対策)
 
 # (stage名, [(prompt, 期待キーワード list | None)…])
 # 期待キーワード None = open-ended (auto-check 対象外、coherence は人間/上位 LLM が判断)
