@@ -118,7 +118,7 @@ soundness の監査には、真のスペクトル半径を**下から**近似す
 
 ### 3.3 Mamba SSM Lyapunov 正対照
 
-正対照は**学習でなく parameterization の自明性を検定**する。Mamba-130M は全 24 層の SSM が連続対角 `A = −exp(A_log) < 0`(589,824 channel,state エントリの 100%)であるため、任意の Δ>0 に対し `λ_max = max(Δ·A) ≤ 0` が**構造的に自明に成立**する。すなわち任意の valid Mamba が stable-by-construction である。
+正対照は**学習でなく parameterization の自明性を検定**する。Mamba-130M は全 24 層の SSM が連続対角 `A = −exp(A_log) < 0`(589,824 channel,state エントリの 100%)であるため、任意の Δ>0 に対し `λ_max = max(Δ·A) ≤ 0` が**構造的に自明に成立**する。すなわち任意の valid Mamba が stable-by-construction である。**ただしこの PASS は SSM 状態再帰の安定性のみであり、conv1d / SiLU / MLP を含む full Lipschitz ではない。代表 Δ で marginal な channel は非厳密(≤0 を over-claim しない)。**
 
 対して SmolLM2-135M(Llama 系)は SSM 状態再帰を持たない(self_attn + mlp のみ)。したがって安定性は**後付けの gate で初めて課される**。枠組みは「安全な土台(gate 不要)」と「gate が要る土台」を **base-level で分離**できる(base-level 判別 PASS)。
 
