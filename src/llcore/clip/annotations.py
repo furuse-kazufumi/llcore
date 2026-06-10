@@ -506,6 +506,12 @@ class AnnotationStore:
         self._matrix = emb
         self._n_rows = emb.shape[0]
         self._counts = list(meta["counts"])
+        # 後方互換: roles/is_question 無し旧形式は再生成
+        self._roles = list(meta["roles"]) if "roles" in meta else [None] * len(anns)
+        self._is_q = (
+            list(meta["is_question"]) if "is_question" in meta
+            else [is_question(a) for a in anns]
+        )
         self._n_instances = int(meta["n_instances"])
         self._n_encoded = int(meta["n_encoded"])
         self._int8 = None
