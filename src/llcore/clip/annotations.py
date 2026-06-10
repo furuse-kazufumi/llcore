@@ -49,6 +49,37 @@ def annotation_id(annotation_norm: str) -> int:
     return int.from_bytes(h, "big") & UINT64_MASK
 
 
+def id_to_unit_vector(annotation_id_: int, dim: int = 64) -> Any:
+    """アノテーション番号 (uint64) → コサイン計算に適した単位ノルム実数ベクトル。
+
+    なぜ単純キャストでないか (重要):
+    - uint64 は最大 ~1.8e19。float64 の仮数は 52bit ＝ 2^53 を超える整数は**精度が落ち、
+      異なる ID が同じ float に潰れうる**。生の int→float は禁止。
+    - 単一スカラに正規化 (id/2^64 等) しても、コサインは 1 次元では符号しか見ず退化する。
+
+    **採用 (適切な正規化)**: 64bit を各ビット {-1,+1} の 64 次元ベクトルへ**可逆展開**
+    (全 64bit の情報を無損失で保持・値域有界) し、**L2 正規化** (cosine = 内積 の標準形)。
+    dim<64 なら blake2b で dim*32bit を生成しビット展開 (任意長へ拡張可能)。
+    こうして得たベクトル間 cosine は 2 ID のビット一致度 (SimHash 的) に対応する。
+
+    注意: これは ID の**識別情報**を実数空間へ写すもので、意味的近さではない
+    (意味的近さは CLIP 埋め込み側で測る)。用途に応じて使い分けること。
+    """
+    import numpy as np
+
+    if dim <= 64:
+        bits = [(annotation_id_ >> i) & 1 for i in range(dim)]
+    else:
+        # dim>64: blake2b で必要バイト数を生成しビット展開
+        nbytes = (dim + 7) // 8
+        raw = hashlib.blake2b(
+            annotation_id_.to_bytes(8, "big"), digest_size=nbytes
+        ).digest()
+        bits = [(raw[b] >> (7 - (k % 8))) & 1 for k in range(dim) for b in [k // 8]][:dim]
+    v = np.where(np.array(bits, dtype=np.float32) > 0, 1.0, -1.0)
+    return v / np.float32(np.sqrt(dim))
+
+
 def _l2_normalize(arr: Any) -> Any:
     """行ごとに L2 正規化 (cosine = 内積 の不変条件を保つ)。ゼロ行でも発散しない。"""
     import numpy as np
