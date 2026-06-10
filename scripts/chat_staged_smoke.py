@@ -131,6 +131,12 @@ def check(reply: str, expect: list[str] | None) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--model", default=None, help="HF モデル ID (default: SmolLM2-135M-Instruct)")
+    parser.add_argument(
+        "--lang",
+        choices=sorted(STAGE_SETS),
+        default="en",
+        help="ステージセット言語 (ja は日本語対応モデルと併用: 例 llm-jp/llm-jp-3-440m-instruct3)",
+    )
     parser.add_argument("--seed", type=int, default=20260610)
     parser.add_argument("--max-new-tokens", type=int, default=128)
     parser.add_argument(
