@@ -499,7 +499,7 @@ class AnnotationStore:
             neigh = self.cooccur_neighbors(srow, k=999)
             denom = max((c for _, c in neigh), default=1)  # seed の最大共起で正規化 (希釈しすぎない)
             for nb, c in neigh[:k]:
-                if want_facts and self._is_q[nb]:
+                if want_facts and self._non_fact[nb]:  # 質問 or 依頼を除外
                     continue
                 s = boost * sim * (c / denom)     # 0..boost*sim
                 prev = scored.get(nb)
