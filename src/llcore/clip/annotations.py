@@ -351,7 +351,7 @@ class AnnotationStore:
         import numpy as np
 
         meta = json.loads(path.read_text(encoding="utf-8"))
-        emb = np.load(path.with_suffix(".npz"))["embeddings"]
+        emb = np.ascontiguousarray(np.load(path.with_suffix(".npz"))["embeddings"], dtype=np.float32)
         anns = meta["annotations"]
         if emb.shape[0] != len(anns):
             raise ValueError("annotation store is corrupt: embeddings/annotations mismatch")
@@ -361,7 +361,9 @@ class AnnotationStore:
             annotation_id(a) for a in anns
         ]
         self._id2idx = {aid: i for i, aid in enumerate(self._ids)}
-        self._embeddings = [emb[i] for i in range(emb.shape[0])]
+        self._matrix = emb
+        self._n_rows = emb.shape[0]
         self._counts = list(meta["counts"])
         self._n_instances = int(meta["n_instances"])
         self._n_encoded = int(meta["n_encoded"])
+        self._int8 = None
