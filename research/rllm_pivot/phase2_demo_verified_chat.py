@@ -171,11 +171,13 @@ def cert_box_sigma(g: C.CoupledNDGene) -> float:
 
 
 def gate_admits(method: str, g: C.CoupledNDGene, X: np.ndarray, s: np.ndarray,
-                rng: np.random.Generator) -> bool:
+                probe_rng: np.random.Generator) -> bool:
+    """採否判定。probe_rng は経験 gate の摂動プローブ専用 (変異 RNG と分離 —
+    プローブが変異提案列を消費して系統間の提案列を歪めないため)。"""
     if method == "none":
         return True
     if method == "stable_emp":
-        return twin_forgetting(g, X, s, rng) < EPS_STABLE
+        return twin_forgetting(g, X, s, probe_rng) < EPS_STABLE
     if method == "cert_two":
         return C.cert_two(g)
     if method == "cert_sdp":
