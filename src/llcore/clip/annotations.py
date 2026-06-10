@@ -438,7 +438,7 @@ class AnnotationStore:
         out: list[tuple[int, float]] = []
         for j in order:
             jj = int(j)
-            if exclude_questions and self._is_q[jj]:
+            if exclude_questions and self._non_fact[jj]:  # 質問 or 依頼を除外
                 continue
             if role is not None and self._roles[jj] != role:
                 continue
