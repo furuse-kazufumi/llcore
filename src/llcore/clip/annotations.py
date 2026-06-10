@@ -452,6 +452,17 @@ class AnnotationStore:
         """共起エッジ数 (連結性グラフの規模)。"""
         return len(self._cooc)
 
+    def _cooccur_degree(self) -> dict[int, int]:
+        """各行の共起次数 (繋がる異なる相手の数)。hub 判定に使う。キャッシュ。"""
+        if self._degree_cache is None or len(self._cooc) != self._degree_cache_size:
+            deg: dict[int, int] = {}
+            for a, b in self._cooc:
+                deg[a] = deg.get(a, 0) + 1
+                deg[b] = deg.get(b, 0) + 1
+            self._degree_cache = deg
+            self._degree_cache_size = len(self._cooc)
+        return self._degree_cache
+
     def cooccur_neighbors(self, row: int, k: int = 5) -> list[tuple[int, int]]:
         """行の共起近傍 (会話隣接で一緒に出た行) を共起回数降順で返す。"""
         hits = [
