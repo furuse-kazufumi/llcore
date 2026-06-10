@@ -95,7 +95,7 @@ def main() -> int:
     n_turns = ingest(store)
     ann = store.annotations
     print(f"ingested {n_turns} turns, {len(ann)} unique annotations, "
-          f"{len(store._cooc)} co-occurrence edges", flush=True)
+          f"{store.n_cooccur_edges} co-occurrence edges", flush=True)
 
     results = []
     cos_hits = conn_hits = 0
