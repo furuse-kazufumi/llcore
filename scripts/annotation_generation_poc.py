@@ -73,9 +73,11 @@ def main() -> int:
     n_base_ok = n_aug_ok = 0
     t0 = time.time()
     for question, expect in PROBES:
-        # 検索 (生成前段): 質問 1 件の符号化 + 内積のみ
+        # 検索 (生成前段): 質問 1 件の符号化 + 内積のみ。
+        # ★事実抽出: exclude_questions=True で質問文を除外し平叙文 (事実候補) のみ拾う
+        #   (質問クエリが他の質問文ばかり拾う honest 問題への対策)
         t_r = time.time()
-        hits = [(ann[i], s) for i, s in store.query(question, k=args.k)]
+        hits = [(ann[i], s) for i, s in store.query(question, k=args.k, exclude_questions=True)]
         retrieval_seconds = time.time() - t_r
         notes = "; ".join(a for a, _ in hits)
 
