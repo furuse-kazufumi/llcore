@@ -56,13 +56,13 @@ llcore の進化コア/検証器は**世界知識を内包しない** (tiny adap
 - ✅ 言語学調査 (67 トピック, 5 領域) → corpus/language (64 doc / 15 cluster) 登録済
 - ✅ /corpus2skill で skill 階層化し RAD 全体 INDEX に登録 (raptor/.claude/skills/corpus/)
 
-### M5 ⬜ ループエンジニアリング環境の新規構築 (ユーザー指示 2026-06-11)
-- **★安全方針 (ユーザー明示)**: ccr (claude-auto.mjs / claude-loop / raptor-loop-queue) は**安全網として
-  温存・無改変**。**別の「新しい形」で**ループエンジニアリング環境を構築する (ccr と並存)。
-- ⬜ 設計 (M4 調査コーパスを根拠に): MAPE-K/OODA 制御ループ + 自律エージェントループ + fail-closed 安全ゲート
-  + 人間 checkpoint + 観測可能性 (各反復ログ)。ループ戦略 (ReAct/Reflexion/plan-execute-verify) を実験可能に。
-- ⬜ 設計をマイルストン checkpoint として提示 → 承認後に skeleton 構築 (新規ディレクトリ, ccr 非依存)。
-- ⬜ 危険操作は人間確認必須 (削除/push/submodule 改変は constraints に無い限り行わない)。
+### M5 ✅ ループエンジニアリング環境 llloop v0.1.0a0 構築済 (ユーザー指示 2026-06-11)
+- ✅ ユーザー決定: 配置=**D:/projects/llloop** (新規proj) / 自律=**push まで** / ccr=**当面独立** /
+  初回タスク=**llcore テスト緑維持**。ccr は安全網として温存・無改変。
+- ✅ 構築: MAPE-K runner + ★fail-closed 安全層 (SafetyPolicy/CircuitBreaker/Budget/認証検知) +
+  差し替え戦略 (plan_execute_verify/reflexion) + green-keeper タスク。pytest 26 green/ruff/mypy clean。
+- ✅ 実証: green-keeper が llcore で goal_reached / ドリフト→ruff自己修復→検証緑 の閉ループ実機確認。
+- ⬜ 次: LLM actor 統合 (Plan を LLM 駆動に) / ccr claude-loop キュー連携 / 戦略比較実験。
 
 ## 直近の自走順 (上から実行)
 1. M4 ループ調査 workflow 完了 → RAD corpus2skill 化
