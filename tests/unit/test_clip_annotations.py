@@ -418,6 +418,42 @@ def test_query_role_filter() -> None:
     assert "my name is kazufumi" in [ann[i] for i, _ in user_hits]
 
 
+def test_query_exclude_roles_filter() -> None:
+    """M3 (iii) のスコープ絞り込み: corpus role を除外して会話のみ検索できる。"""
+    enc = CountingEncoder()
+    store = AnnotationStore(enc)
+    store.add_text("my name is kazufumi.", role="user")
+    store.add_text("the name annotation appears in corpus docs.", role="corpus")
+    store.add_text("nice name indeed.", role="assistant")
+    hits = store.query("name", k=5, exclude_roles={"corpus"})
+    roles = [store.role_of_row(i) for i, _ in hits]
+    assert "corpus" not in roles
+    assert {"user", "assistant"} <= set(roles)  # negative フィルタは複数 role を残す
+    # 除外なしなら corpus も返る (後方互換: 既定 None は全件)
+    all_hits = store.query("name", k=5)
+    assert "corpus" in [store.role_of_row(i) for i, _ in all_hits]
+
+
+def test_query_exclude_roles_multiple_and_none_role() -> None:
+    enc = CountingEncoder()
+    store = AnnotationStore(enc)
+    store.add_text("alpha fact one.", role="user")
+    store.add_text("alpha fact two.", role="corpus")
+    store.add_text("alpha fact three.")  # role=None の行
+    hits = store.query("alpha", k=5, exclude_roles={"corpus", "system"})
+    roles = [store.role_of_row(i) for i, _ in hits]
+    assert "corpus" not in roles
+    assert None in roles  # role=None の行は exclude_roles に該当せず残る
+
+
+def test_query_role_and_exclude_roles_contradiction_fails_closed() -> None:
+    enc = CountingEncoder()
+    store = AnnotationStore(enc)
+    store.add_text("my name is kazufumi.", role="user")
+    with pytest.raises(ValueError, match="contradictory role filter"):
+        store.query("name", k=5, role="user", exclude_roles={"user"})
+
+
 def test_roles_persist_roundtrip(tmp_path: Path) -> None:
     enc = CountingEncoder()
     path = tmp_path / "store.json"

@@ -68,9 +68,14 @@ llcore の進化コア/検証器は**世界知識を内包しない** (tiny adap
   直交 probe は不変。重複 23k ann の干渉 > 非重複 60k ann ((i) 比) = 規模より中身。
   corpus が rank 1 を取った事例は全て role="corpus" → **role フィルタで会話 R@1 全防衛可**。
   正本 = textseg1d/M3_TOPIC_OVERLAP_2026_06_12.md + out/rad_topic_overlap_poc.json
-- ⬜ RAD コーパス (~48 分野) 全量取込 → 連結性グラフ = 世界知識グラフ。(i) の知見より
-  フラット store では同主題食い合いが必至 → corpus/scope メタデータでの検索スコープ絞り込み
-  (group/role 活用) or ANN 化が前提
+- ✅ **role スコープ絞り込み実装 + 実証 (2026-06-12)**: `query(exclude_roles={"corpus"})` 追加
+  (negative・複数可・矛盾指定 fail-closed・既定 None 後方互換、unit +3)。(iii) +800 store で
+  会話 22 probe が **0.849 → 0.947 (R@1 0.909) = 注入前に完全復元**。限界 = corpus 間
+  (loop vs astro) の食い合いは role では防げない (loop 0.490 のまま)。
+  正本 = M3_TOPIC_OVERLAP 追記 + out/rad_role_filter_check.json
+- ⬜ RAD コーパス (~48 分野) 全量取込 → 連結性グラフ = 世界知識グラフ。残設計課題 =
+  **分野/corpus 単位のスコープ** (group 帯域 or 分野メタデータ — corpus 間食い合い対策) +
+  ANN 化 (10 万 annotations 級で総当たり cosine が限界)
 - ⬜ **★言語 RAD コーパス新設** (ユーザー指摘 2026-06-11: 既存 ~48 分野に言語/語彙/文法/発音が無い):
   linguistics (syntax/morphology/semantics/pragmatics) / lexicon (WordNet/語彙意味論) /
   grammar (CFG/dependency/construction) / phonetics・phonology (IPA/調音/韻律) / 多言語 (特に日本語:
@@ -94,8 +99,8 @@ llcore の進化コア/検証器は**世界知識を内包しない** (tiny adap
 1. ✅ M4 ループ調査 workflow 完了 → RAD corpus2skill 化
 2. ✅ M1.2 評価ベンチ拡張 (3→22 probe) → hub 抑制を確定調整 (honest 訂正で決着)
 3. ✅ M1 entity coref エッジ + encoder 差し替え (2026-06-12 クローズ)
-4. M3 RAD→AnnotationStore 取込 (世界知識注入) ← **進行中**。PoC + (i)(ii)(iii) ✅ (2026-06-12)。
-   残 = スコープ絞り込み設計 (role/group フィルタ — (iii) で有効性の構造を確認済) → 全量取込
+4. M3 RAD→AnnotationStore 取込 (世界知識注入) ← **進行中**。PoC + (i)(ii)(iii) + role 絞り込み
+   ✅ (2026-06-12)。残 = 分野単位スコープ設計 + ANN 化 → 全量取込
 5. M2 cert × 連結性教師 配線
 
 各完了で本 ROADMAP の ✅ 更新 + commit + 1 段報告。

@@ -100,11 +100,34 @@
 - corpus annotation が会話 gold 文字列を偶然含んで「正解扱い」になる方向の誤差は未補正
   (本測定の劣化幅はその分過小評価の可能性がある)。
 
+## 追記 (同日): role フィルタの防衛効果を実装 + 実証
+
+解釈 5(c) を実装に落とした: `AnnotationStore.query()` に `exclude_roles=` (negative・複数可)
+を追加 (既定 None = 後方互換、`role=` との矛盾指定は fail-closed で ValueError)。
+(iii) と同一の +800 docs store (23,169 annotations) で実測:
+
+| 条件 | R@1 | R@3 | MRR |
+|---|---|---|---|
+| conv 22, フィルタなし ((iii) +800 の in-run 再現) | 0.727 | 1.000 | 0.8485 |
+| conv 22, `exclude_roles={"corpus"}` | **0.909** | **1.000** | **0.9470** |
+| (参考) loop 18, `role="corpus"` (positive 絞り) | 0.444 | 0.444 | 0.4895 |
+
+- **会話 probe は注入前の値 (M1/M3.0 正本 0.9470) に per-metric 完全復元** — 「重複 corpus
+  をいくら入れても、会話検索のスコープを role で絞れば会話 retrieval は無傷」を実証。
+- **限界 (honest)**: loop 18 probe は `role="corpus"` に絞っても 0.4895 のまま — 当然で、
+  loop probe の正解も押し下げ犯も両方 corpus role だから。**corpus 間 (loop vs astro) の
+  食い合いは role では防げない**。分野/corpus 単位のスコープ (group 帯域 or 分野メタデータ)
+  が全量取込前の次の設計課題。
+- 正本 = `out/rad_role_filter_check.json`、スクリプト = `scripts/rad_role_filter_check.py`
+  (236.3s, exit 0)。unit テスト 3 件追加 (negative 複数 role / role=None 行の残存 /
+  矛盾指定の fail-closed)。
+
 ## 再現
 
 ```
 cd D:/projects/llcore
 py -3.11 scripts/rad_topic_overlap_poc.py    # -> out/rad_topic_overlap_poc.json (191.8s)
-py -3.11 -m pytest tests/unit -q             # src 変更なし
-py -3.11 -m ruff check scripts/rad_topic_overlap_poc.py
+py -3.11 scripts/rad_role_filter_check.py    # -> out/rad_role_filter_check.json (236.3s)
+py -3.11 -m pytest tests/unit -q             # 393 passed (exclude_roles テスト 3 件追加)
+py -3.11 -m ruff check scripts/rad_topic_overlap_poc.py scripts/rad_role_filter_check.py
 ```

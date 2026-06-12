@@ -26,6 +26,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+from collections.abc import Collection
 from pathlib import Path
 from typing import Any
 
@@ -454,6 +455,7 @@ class AnnotationStore:
         quantized: bool = False,
         exclude_questions: bool = False,
         role: str | None = None,
+        exclude_roles: Collection[str] | None = None,
     ) -> list[tuple[int, float]]:
         """自由テキスト 1 件でストアを cosine 検索 (符号化 1 回; キャッシュには入れない)。
 
@@ -461,10 +463,18 @@ class AnnotationStore:
         - ``quantized=True``: int8 近似経路 (大規模・省メモリ; 順位ほぼ不変、score 近似)。
         - ``exclude_questions=True``: 質問アノテーションを除外し**事実 (平叙文) のみ**返す
           (質問クエリが他の質問文ばかり拾う問題への対策)。
-        - ``role``: 指定ロール (例 "user") の行のみに絞る。
+        - ``role``: 指定ロール (例 "user") の行のみに絞る (positive・単一)。
+        - ``exclude_roles``: 指定ロール集合の行を除外する (negative・複数可)。M3 検証 (iii)
+          で実証したスコープ絞り込み: 会話検索時に ``{"corpus"}`` を除くと、トピック重複
+          corpus 由来の押し下げから会話 R@1 を防衛できる。``role`` との併用は矛盾指定
+          (role が exclude_roles に含まれる) を fail-closed で拒否する。
         """
         import numpy as np
 
+        if role is not None and exclude_roles is not None and role in exclude_roles:
+            raise ValueError(
+                f"contradictory role filter: role={role!r} is in exclude_roles={exclude_roles!r}"
+            )
         q = _l2_normalize(np.asarray(self._encoder.encode_texts([text])[0], dtype=np.float32))
         if quantized:
             Q, scale = self.int8_matrix()
@@ -479,6 +489,8 @@ class AnnotationStore:
             if exclude_questions and self._non_fact[jj]:  # 質問 or 依頼を除外
                 continue
             if role is not None and self._roles[jj] != role:
+                continue
+            if exclude_roles is not None and self._roles[jj] in exclude_roles:
                 continue
             out.append((jj, float(sims[jj])))
             if len(out) >= k:
