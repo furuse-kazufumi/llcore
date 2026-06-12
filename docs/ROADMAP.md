@@ -46,9 +46,15 @@ llcore の進化コア/検証器は**世界知識を内包しない** (tiny adap
 - ⬜ 連結グラフ (ターン境界/照応/話題) を verified adapter の進化・学習信号に
 - ⬜ sound gate vs 経験 gate vs 無 gate で「会話教師下の連結性保持」を実 LLM hidden で比較
 
-### M3 ⬜ 世界知識の注入 (ユーザー指摘への回答 = 差別化の主軸)
-- ⬜ RAD コーパス (~48 分野) を AnnotationStore に取込 → 連結性グラフ = 世界知識グラフ
-- ⬜ loop-engineering corpus (本セッション調査) を最初の取込対象に (dogfooding)
+### M3 🔄 世界知識の注入 (ユーザー指摘への回答 = 差別化の主軸)
+- ✅ **取込 PoC 成立 (2026-06-12)**: loop-engineering corpus 39 docs → MiniLM AnnotationStore。
+  世界知識 18 probe (事前登録) MRR **0 → 0.639** (11/18 が rank 1)、**会話 22 probe への干渉ゼロ**
+  (store 11 倍化 97→1,071 でも per-probe 完全一致 0.947)。取込 17.0s。失敗 5 問の主犯 =
+  gold の日英混在 + 断片化 (真の retrieval 失敗は 1 問のみ) → 0.639 は下限値。
+  正本 = textseg1d/M3_RAD_INGEST_POC_2026_06_12.md + out/rad_ingest_poc.json
+- ⬜ RAD コーパス (~48 分野) を AnnotationStore に取込 → 連結性グラフ = 世界知識グラフ。
+  次の検証 3 点: (i) 10 万 annotations 級での会話干渉再測 (ii) 多言語 encoder head-to-head
+  (日英混在 gold の undercount 解消) (iii) 会話トピックと重なる corpus での干渉測定
 - ⬜ **★言語 RAD コーパス新設** (ユーザー指摘 2026-06-11: 既存 ~48 分野に言語/語彙/文法/発音が無い):
   linguistics (syntax/morphology/semantics/pragmatics) / lexicon (WordNet/語彙意味論) /
   grammar (CFG/dependency/construction) / phonetics・phonology (IPA/調音/韻律) / 多言語 (特に日本語:
