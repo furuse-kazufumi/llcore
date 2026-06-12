@@ -90,10 +90,10 @@ llcore の進化コア/検証器は**世界知識を内包しない** (tiny adap
 - ⬜ RAD コーパス全量取込 (実測 49 分野 ~17.8k docs → ~50 万 ann 見込み) → 連結性グラフ =
   世界知識グラフ。encode ~87 分 (96 ann/s 実測) が支配項 → save/load 永続化で一度きり運用。
   取込後に ANN 速度メリット + recall を全量規模で再測
-- ⬜ **★言語 RAD コーパス新設** (ユーザー指摘 2026-06-11: 既存 ~48 分野に言語/語彙/文法/発音が無い):
-  linguistics (syntax/morphology/semantics/pragmatics) / lexicon (WordNet/語彙意味論) /
-  grammar (CFG/dependency/construction) / phonetics・phonology (IPA/調音/韻律) / 多言語 (特に日本語:
-  形態素解析/活用/仮名漢字)。1D-SegFormer・事実抽出・アノテーション連結 (類義/形態エッジ) の基盤。
+- ✅ **★言語 RAD コーパス = M4 で新設済み (重複記載を整理 2026-06-12)**: corpus/language
+  (D:/docs/language_corpus_src, 64 docs) が要求 5 領域と完全対応 — syntax-grammar /
+  morphology-lexicon / semantics-pragmatics / phonetics-phonology / multilingual-japanese
+  (各 12-13 docs)。全量取込 (51 corpora) に domain="language" で含まれる。
 - ⬜ 世界知識注入が retrieval/grounding を改善するか実測 (会話のみ vs 会話+RAD)
 
 ### M4 ✅ RAD コーパス生成 (世界知識ギャップ + 環境設計の根拠) — 完了
