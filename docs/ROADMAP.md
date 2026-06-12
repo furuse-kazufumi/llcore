@@ -42,9 +42,19 @@ llcore の進化コア/検証器は**世界知識を内包しない** (tiny adap
   追加知見: cooccur hop は強 encoder で微害 (0.947→0.902) — 単調改善主張を down-claim。
 - → **差別化の主軸を M3 (世界知識) + M2 (cert×教師) に移す**。retrieval は事実抽出+MiniLM cosine で大半解決。
 
-### M2 ⬜ cert gate × 連結性教師の配線 (差別化の本命)
-- ⬜ 連結グラフ (ターン境界/照応/話題) を verified adapter の進化・学習信号に
-- ⬜ sound gate vs 経験 gate vs 無 gate で「会話教師下の連結性保持」を実 LLM hidden で比較
+### M2 🔄 cert gate × 連結性教師の配線 (差別化の本命)
+- ✅ **設計 + RAD 接地 (2026-06-12)**: 3 軸交点 (sound cert × 会話グラフ × 連結性
+  objective) の先行例なしを 49 分野 grep で確認。教師 gold = 会話 JSON の turn 構造
+  (外部事実、circularity 回避)。正本 = docs/M2_CERT_CONNECTIVITY_DESIGN_2026_06_12.md
+- ✅ **M2.0 smoke (2026-06-12)**: T1 ターン境界 CE は SmolLM2 hidden 上で学習可能
+  (全 seed CE < floor)、**無 gate archive の ~92% が真に発散 (ρ≥1) / cert_inf は
+  false-admit 0 のまま学習成立** — 「学習できる×安全を選ばない」の同時観測。
+  罠 3 つ (readout floor 包含 / sdp resample 停滞 / inf 空転→known-safe fallback)
+  も知見として保全。正本 = rllm_pivot/M2_SMOKE_2026_06_12.md
+- 🔄 **M2.1 本測定実走中**: none/stable_exp/cert_inf 15 seed + cert_sdp 3 seed、
+  事前登録 G1 (sound 0 false-admit × stable_exp 分離) / G2 (best gene の発散率) /
+  C1 (学習可能性) / C2 (capability tax)。スクリプト = m2_gate_comparison.py
+- ⬜ M2.2 忘却測定 (前半→後半→前半の連結性保持) / T2 照応・T3 話題への拡張
 
 ### M3 🔄 世界知識の注入 (ユーザー指摘への回答 = 差別化の主軸)
 - ✅ **取込 PoC 成立 (2026-06-12)**: loop-engineering corpus 39 docs → MiniLM AnnotationStore。
