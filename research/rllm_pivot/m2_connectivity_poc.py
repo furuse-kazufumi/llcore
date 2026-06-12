@@ -120,7 +120,19 @@ def load_conversation_sequence() -> tuple[list[str], np.ndarray, int]:
 
 
 def get_annotation_hiddens(anns: list[str]) -> np.ndarray:
-    """各 annotation を SmolLM2 frozen forward → layer LAYER hidden の mean-pool (T, 576)。"""
+    """各 annotation を SmolLM2 frozen forward → layer LAYER hidden の mean-pool (T, 576)。
+
+    内容ハッシュをキーに npz キャッシュ (モデル/レイヤ固定の決定論的出力のため安全)。
+    """
+    import hashlib
+
+    key = hashlib.md5(("\x00".join(anns) + f"|{MODEL}|{LAYER}").encode()).hexdigest()
+    cache = os.path.join(_ROOT, "out", f"m2_hidden_cache_{key[:12]}.npz")
+    if os.path.exists(cache):
+        H = np.load(cache)["H"]
+        print(f"SmolLM2 hidden キャッシュ再利用 {cache} T={H.shape[0]}", flush=True)
+        return H
+
     import torch
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
@@ -138,7 +150,10 @@ def get_annotation_hiddens(anns: list[str]) -> np.ndarray:
         H.append(h.mean(0))
     print(f"SmolLM2 hidden 抽出 {time.time()-t0:.1f}s  T={len(H)} dim={H[0].shape[0]}",
           flush=True)
-    return np.asarray(H)
+    out = np.asarray(H)
+    os.makedirs(os.path.dirname(cache), exist_ok=True)
+    np.savez_compressed(cache, H=out)
+    return out
 
 
 # --------------------------------------------------------------------------- #
@@ -292,9 +307,16 @@ def mapelites_archive(terrain, rng, B, admit, sigma=0.2, init=64, resample_cap=2
     return archive
 
 
+# smoke の sound gate は cert_inf (閉形式 O(n²)、µs 判定)。実測の経緯 (honest):
+# 当初 cert_sdp を使ったが、random init の ~94% が発散側 (v2 seed 0 で rho>=1 が
+# 61/65) のため gate がほぼ全 reject → resample で SDP solve (数百 ms) が数千回 =
+# smoke が 1 時間級に停滞した。sound 性 (false-admit 0) は cert ladder 共通なので、
+# 配線確認の smoke は inf で行い、cert_sdp は M2.1 本測定で inf-first cascade
+# (inf admit → 即 admit、inf reject のみ sdp 再判定 — ladder の包含関係を利用) を
+# 設計して使う。
 GATES = {
     "none": lambda th: True,
-    "cert_sdp": lambda th: bool(C.cert_sdp(_to_gene(th))),
+    "cert_inf": lambda th: bool(C.cert_inf(_to_gene(th))),
 }
 
 
