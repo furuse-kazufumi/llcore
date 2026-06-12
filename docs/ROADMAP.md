@@ -73,8 +73,15 @@ llcore の進化コア/検証器は**世界知識を内包しない** (tiny adap
   会話 22 probe が **0.849 → 0.947 (R@1 0.909) = 注入前に完全復元**。限界 = corpus 間
   (loop vs astro) の食い合いは role では防げない (loop 0.490 のまま)。
   正本 = M3_TOPIC_OVERLAP 追記 + out/rad_role_filter_check.json
+- ✅ **分野単位スコープ実装 + 実証 (2026-06-12)**: per-row domain タグ (設計 (b)) —
+  `add_text(domain="loop")` + `query(domain=..., exclude_domains=...)` (role と直交・
+  fail-closed・後方互換、unit +6 = 399 PASS)。(iii) +800 store で loop 18 probe が
+  `domain="loop"` で **0.4895 → 0.6389 = astro 混入前に全 metric 一致で復元**
+  (role="corpus" は nofilter と同値 = role の限界を in-run 再現)。会話側回帰なし (0.947)。
+  honest: 復元は構造的必然 (スコープ = M3.0 と同一集合)、価値は実装確認 + 回帰なし証明。
+  限界 = クエリ→分野ルータ未設計 / per-row 単一値は初出優先。
+  正本 = textseg1d/M3_DOMAIN_SCOPE_2026_06_12.md + out/rad_domain_filter_check.json
 - ⬜ RAD コーパス (~48 分野) 全量取込 → 連結性グラフ = 世界知識グラフ。残設計課題 =
-  **分野/corpus 単位のスコープ** (group 帯域 or 分野メタデータ — corpus 間食い合い対策) +
   ANN 化 (10 万 annotations 級で総当たり cosine が限界)
 - ⬜ **★言語 RAD コーパス新設** (ユーザー指摘 2026-06-11: 既存 ~48 分野に言語/語彙/文法/発音が無い):
   linguistics (syntax/morphology/semantics/pragmatics) / lexicon (WordNet/語彙意味論) /
