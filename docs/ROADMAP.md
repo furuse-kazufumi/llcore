@@ -81,8 +81,15 @@ llcore の進化コア/検証器は**世界知識を内包しない** (tiny adap
   honest: 復元は構造的必然 (スコープ = M3.0 と同一集合)、価値は実装確認 + 回帰なし証明。
   限界 = クエリ→分野ルータ未設計 / per-row 単一値は初出優先。
   正本 = textseg1d/M3_DOMAIN_SCOPE_2026_06_12.md + out/rad_domain_filter_check.json
-- ⬜ RAD コーパス (~48 分野) 全量取込 → 連結性グラフ = 世界知識グラフ。残設計課題 =
-  ANN 化 (10 万 annotations 級で総当たり cosine が限界)
+- ✅ **ANN 化実装 + 実測 (2026-06-12)**: faiss HNSW (`query(ann=True)`, optional extra
+  `llcore[ann]`、不在時 ImportError = fail-closed・黙って exact 劣化しない)。フィルタとは
+  over-fetch で両立、quantized 併用は fail-closed。23k store 40 probe で **recall@10 0.9825
+  (min 0.8)・domain="loop" 併用 MRR 0.6389 = exact 完全一致**。honest: 23k では速度メリット
+  なし (19.6→16.9ms、支配項は query encode ~15ms) — ANN の本領は ~10 万行超。HNSW 構築
+  1.94s。unit +4 = 403 PASS。正本 = textseg1d/M3_ANN_HNSW_2026_06_12.md + out/rad_ann_check.json
+- ⬜ RAD コーパス全量取込 (実測 49 分野 ~17.8k docs → ~50 万 ann 見込み) → 連結性グラフ =
+  世界知識グラフ。encode ~87 分 (96 ann/s 実測) が支配項 → save/load 永続化で一度きり運用。
+  取込後に ANN 速度メリット + recall を全量規模で再測
 - ⬜ **★言語 RAD コーパス新設** (ユーザー指摘 2026-06-11: 既存 ~48 分野に言語/語彙/文法/発音が無い):
   linguistics (syntax/morphology/semantics/pragmatics) / lexicon (WordNet/語彙意味論) /
   grammar (CFG/dependency/construction) / phonetics・phonology (IPA/調音/韻律) / 多言語 (特に日本語:
@@ -107,7 +114,7 @@ llcore の進化コア/検証器は**世界知識を内包しない** (tiny adap
 2. ✅ M1.2 評価ベンチ拡張 (3→22 probe) → hub 抑制を確定調整 (honest 訂正で決着)
 3. ✅ M1 entity coref エッジ + encoder 差し替え (2026-06-12 クローズ)
 4. M3 RAD→AnnotationStore 取込 (世界知識注入) ← **進行中**。PoC + (i)(ii)(iii) + role 絞り込み
-   ✅ (2026-06-12)。残 = 分野単位スコープ設計 + ANN 化 → 全量取込
+   + 分野スコープ + ANN 化 ✅ (2026-06-12)。残 = 全量取込 (~50 万 ann) + 言語コーパス新設
 5. M2 cert × 連結性教師 配線
 
 各完了で本 ROADMAP の ✅ 更新 + commit + 1 段報告。

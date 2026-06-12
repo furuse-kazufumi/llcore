@@ -276,6 +276,9 @@ class AnnotationStore:
         self._n_encoded = 0                       # 実際に encoder を呼んだユニーク数
         # int8 量子化キャッシュ (大規模 cosine の省メモリ近似; 行追加で無効化)
         self._int8: Any = None
+        # faiss HNSW index キャッシュ (ann=True 経路; 行数変化で再構築)
+        self._ann_cache: Any = None
+        self._ann_cache_rows = -1
         if path is not None and path.exists():
             self._load(path)
 
@@ -455,12 +458,38 @@ class AnnotationStore:
         order = np.argsort(sims)[::-1]
         return [(int(j), float(sims[int(j)])) for j in order if int(j) != idx][:k]
 
+    def ann_index(self) -> Any:
+        """faiss HNSW index (METRIC_INNER_PRODUCT) を遅延構築して返す (ann=True 経路)。
+
+        - **optional extra**: faiss 不在なら ImportError で fail-closed —
+          黙って exact 検索に劣化しない (近似であることの明示が honest 要件)。
+        - 行は単位 L2 ノルム (不変条件) なので内積 = cosine。
+        - キャッシュは行数変化で再構築 (HNSW は逐次 add 可能だが、構築パラメータの
+          一貫性と実装の単純さを優先して全再構築 — 取込はバッチ前提の運用)。
+        """
+        try:
+            import faiss
+        except ImportError as exc:  # pragma: no cover - faiss 不在環境でのみ発火
+            raise ImportError(
+                "ann=True には faiss が必要です: pip install 'llcore[ann]' "
+                "(黙って exact 検索へ劣化させない fail-closed 設計)"
+            ) from exc
+        if self._ann_cache is None or self._ann_cache_rows != self._n_rows:
+            M = self.embedding_matrix()
+            index = faiss.IndexHNSWFlat(M.shape[1], 32, faiss.METRIC_INNER_PRODUCT)
+            index.hnsw.efConstruction = 80
+            index.add(M)
+            self._ann_cache = index
+            self._ann_cache_rows = self._n_rows
+        return self._ann_cache
+
     def query(
         self,
         text: str,
         k: int = 5,
         *,
         quantized: bool = False,
+        ann: bool = False,
         exclude_questions: bool = False,
         role: str | None = None,
         exclude_roles: Collection[str] | None = None,
@@ -471,6 +500,10 @@ class AnnotationStore:
 
         返り値は (行, cosine) の降順 top-k。
         - ``quantized=True``: int8 近似経路 (大規模・省メモリ; 順位ほぼ不変、score 近似)。
+        - ``ann=True``: faiss HNSW 近似最近傍経路 (10 万 annotations 級で総当たり cosine
+          の代替; optional extra ``llcore[ann]``)。**近似なので recall < 1.0 がありうる**
+          (実測開示は research/textseg1d/M3 系)。フィルタとは over-fetch (k を増やして
+          候補を取り直す) で両立する。``quantized`` との併用は未定義のため fail-closed。
         - ``exclude_questions=True``: 質問アノテーションを除外し**事実 (平叙文) のみ**返す
           (質問クエリが他の質問文ばかり拾う問題への対策)。
         - ``role``: 指定ロール (例 "user") の行のみに絞る (positive・単一)。
@@ -493,7 +526,41 @@ class AnnotationStore:
                 f"contradictory domain filter: domain={domain!r} is in "
                 f"exclude_domains={exclude_domains!r}"
             )
+        if ann and quantized:
+            raise ValueError("ann=True と quantized=True の併用は未定義 (どちらか一方を指定)")
+
+        def _passes(jj: int) -> bool:
+            if exclude_questions and self._non_fact[jj]:  # 質問 or 依頼を除外
+                return False
+            if role is not None and self._roles[jj] != role:
+                return False
+            if exclude_roles is not None and self._roles[jj] in exclude_roles:
+                return False
+            if domain is not None and self._domains[jj] != domain:
+                return False
+            if exclude_domains is not None and self._domains[jj] in exclude_domains:
+                return False
+            return True
+
         q = _l2_normalize(np.asarray(self._encoder.encode_texts([text])[0], dtype=np.float32))
+        out: list[tuple[int, float]] = []
+        if ann:
+            # ANN 経路: フィルタで間引かれても k 件を満たすまで候補幅を広げて取り直す
+            # (over-fetch)。候補幅が全行に達したら打ち切り = それが ANN での全数。
+            index = self.ann_index()
+            k_fetch = max(k * 4, k + 32)
+            while True:
+                n_f = min(k_fetch, self._n_rows)
+                index.hnsw.efSearch = max(2 * n_f, 64)
+                dists, idxs = index.search(q.reshape(1, -1).astype(np.float32), n_f)
+                out = [
+                    (int(j), float(s))
+                    for j, s in zip(idxs[0], dists[0])
+                    if int(j) >= 0 and _passes(int(j))
+                ][:k]
+                if len(out) >= k or n_f >= self._n_rows:
+                    return out
+                k_fetch *= 4
         if quantized:
             Q, scale = self.int8_matrix()
             qi = np.clip(np.round(q * 127.0), -127, 127).astype(np.int8)
@@ -501,18 +568,9 @@ class AnnotationStore:
         else:
             sims = self.embedding_matrix() @ q
         order = np.argsort(sims)[::-1]
-        out: list[tuple[int, float]] = []
         for j in order:
             jj = int(j)
-            if exclude_questions and self._non_fact[jj]:  # 質問 or 依頼を除外
-                continue
-            if role is not None and self._roles[jj] != role:
-                continue
-            if exclude_roles is not None and self._roles[jj] in exclude_roles:
-                continue
-            if domain is not None and self._domains[jj] != domain:
-                continue
-            if exclude_domains is not None and self._domains[jj] in exclude_domains:
+            if not _passes(jj):
                 continue
             out.append((jj, float(sims[jj])))
             if len(out) >= k:

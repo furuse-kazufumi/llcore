@@ -548,6 +548,59 @@ def test_domains_backward_compat_load(tmp_path: Path) -> None:
     assert store2.domain_of_row(0) is None  # fail せず None 既定で読める
 
 
+# -- ANN 経路 (faiss HNSW, optional extra llcore[ann]) ---------------------------
+
+
+def test_query_ann_matches_exact_on_small_store() -> None:
+    """小規模 store では ANN (HNSW) は exact と同一の top-k を返す。"""
+    pytest.importorskip("faiss")
+    enc = CountingEncoder()
+    store = AnnotationStore(enc)
+    store.add_text("the agent loop retries on failure. the budget gate halts runs.")
+    store.add_text("neutron stars spin rapidly. black holes bend light.")
+    exact = store.query("loop retries", k=3)
+    approx = store.query("loop retries", k=3, ann=True)
+    assert [r for r, _ in approx] == [r for r, _ in exact]
+    # score は内積 (= cosine) — exact と一致する (HNSW は訪問ノードの厳密内積を返す)
+    for (_, se), (_, sa) in zip(exact, approx):
+        assert abs(se - sa) < 1e-5
+
+
+def test_query_ann_respects_filters_via_overfetch() -> None:
+    """ANN 経路でも domain/role フィルタが効く (over-fetch で k 件まで取り直す)。"""
+    pytest.importorskip("faiss")
+    enc = CountingEncoder()
+    store = AnnotationStore(enc)
+    store.add_text("alpha loop fact.", role="corpus", domain="loop")
+    store.add_text("alpha astro fact.", role="corpus", domain="astro")
+    store.add_text("alpha user comment.", role="user")
+    hits = store.query("alpha", k=5, ann=True, domain="loop")
+    assert hits
+    assert all(store.domain_of_row(i) == "loop" for i, _ in hits)
+
+
+def test_query_ann_quantized_contradiction_fails_closed() -> None:
+    pytest.importorskip("faiss")
+    enc = CountingEncoder()
+    store = AnnotationStore(enc)
+    store.add_text("alpha beta.")
+    with pytest.raises(ValueError, match="ann=True と quantized=True"):
+        store.query("alpha", k=1, ann=True, quantized=True)
+
+
+def test_query_ann_index_rebuilds_on_growth() -> None:
+    """行追加後の ann=True は新行も検索対象 (行数変化で index 再構築)。"""
+    pytest.importorskip("faiss")
+    enc = CountingEncoder()
+    store = AnnotationStore(enc)
+    store.add_text("alpha beta gamma.")
+    store.query("alpha", k=1, ann=True)  # index 構築
+    store.add_text("delta epsilon zeta.")
+    hits = store.query("delta epsilon zeta", k=10, ann=True)
+    ann_texts = [store.annotations[i] for i, _ in hits]
+    assert "delta epsilon zeta" in ann_texts
+
+
 def test_store_save_load_roundtrip(tmp_path: Path) -> None:
     enc = CountingEncoder()
     path = tmp_path / "store.json"

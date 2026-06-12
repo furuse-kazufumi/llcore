@@ -50,6 +50,10 @@ clip = ["torch>=2.2", "transformers>=4.46", "pillow>=10"]
 # text: text-only 検索用 encoder 差し替え (llcore.clip.text_encoders,
 # default=all-MiniLM-L6-v2 Apache-2.0)。cross-modal は引き続き extra "clip" を使う。
 text = ["sentence-transformers>=3"]
+# ann: 大規模 (10 万 annotations 級) 向け近似最近傍 (faiss HNSW)。基本機能は numpy
+# 総当たりで完結し、query(ann=True) を明示した時のみ必要。不在時は ImportError で
+# fail-closed (黙って exact に劣化しない — 近似であることの明示が honest 要件)。
+ann = ["faiss-cpu>=1.8"]
 llive = ["llmesh-llive>=0.6"]
 # rad は stdlib のみで動くため optional-dep 不要 (RAD コーパスを path-based 参照)
 # LLCORE_RAD_DIR env で RAD 根ディレクトリを指定 (未設定時は graceful degrade = hint なし)
