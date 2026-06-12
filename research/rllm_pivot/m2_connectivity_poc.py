@@ -272,11 +272,20 @@ def mapelites_archive(terrain, rng, B, admit, sigma=0.2, init=64, resample_cap=2
                     ok = True
                     break
             if not ok:
-                # realce は縮小 fallback を無条件評価したが、M2 は fail-closed を徹底:
-                # 縮小後も admit を再チェックし、不合格 gene は archive に一切入れない。
-                th[N:] *= 0.3
-                if not admit(th):
-                    continue
+                # known-safe へ向かう反復縮小 fallback (evolve() の fallback 規律の
+                # MAP-Elites 版)。W→0 で J = diag(decay) となり decay<1 なら
+                # cert ladder は必ず admit する — random init が admit 領域に
+                # ほぼ入らない gate (cert_inf 実測: init 64 全滅で空転) でも
+                # archive を立ち上げられる。fail-closed は維持 (admit されない限り
+                # 評価しない)。honest 留保: gate が探索を W 縮小方向へ誘導する
+                # バイアスを持つ — gated 進化の挙動として明示的に受け入れる。
+                for _ in range(40):
+                    th[N:] *= 0.5
+                    if admit(th):
+                        ok = True
+                        break
+            if not ok:
+                continue
         _eval_and_place(th)
 
     while used < B:
@@ -301,6 +310,14 @@ def mapelites_archive(terrain, rng, B, admit, sigma=0.2, init=64, resample_cap=2
                 if admit(th):
                     admitted = True
                     break
+            if not admitted:
+                # init と同じ反復縮小 fallback (空転防止 — admit 領域が狭い gate でも
+                # used が単調に進むことを保証する)。
+                for _ in range(40):
+                    th[N:] *= 0.5
+                    if admit(th):
+                        admitted = True
+                        break
             if not admitted:
                 continue
         _eval_and_place(th)
