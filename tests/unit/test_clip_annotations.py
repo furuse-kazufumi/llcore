@@ -470,6 +470,84 @@ def test_roles_persist_roundtrip(tmp_path: Path) -> None:
     assert store2.is_question_row(r_user) is False
 
 
+def test_query_domain_filter() -> None:
+    """M3 分野スコープ: domain (positive・単一) で corpus 間の食い合いを防ぐ。"""
+    enc = CountingEncoder()
+    store = AnnotationStore(enc)
+    store.add_text("the agent loop retries on failure.", role="corpus", domain="loop")
+    store.add_text("the neutron star spins rapidly.", role="corpus", domain="astro")
+    ann = store.annotations
+    hits = store.query("loop", k=5, domain="loop")
+    assert all(store.domain_of_row(i) == "loop" for i, _ in hits)
+    assert "the agent loop retries on failure" in [ann[i] for i, _ in hits]
+
+
+def test_query_exclude_domains_filter() -> None:
+    enc = CountingEncoder()
+    store = AnnotationStore(enc)
+    store.add_text("alpha loop fact.", role="corpus", domain="loop")
+    store.add_text("alpha astro fact.", role="corpus", domain="astro")
+    store.add_text("alpha conversation fact.", role="user")  # domain=None の行
+    hits = store.query("alpha", k=5, exclude_domains={"astro"})
+    domains = [store.domain_of_row(i) for i, _ in hits]
+    assert "astro" not in domains
+    assert None in domains  # domain=None の行は exclude_domains に該当せず残る
+    # 除外なしなら astro も返る (後方互換: 既定 None は全件)
+    all_hits = store.query("alpha", k=5)
+    assert "astro" in [store.domain_of_row(i) for i, _ in all_hits]
+
+
+def test_query_domain_and_exclude_domains_contradiction_fails_closed() -> None:
+    enc = CountingEncoder()
+    store = AnnotationStore(enc)
+    store.add_text("alpha loop fact.", domain="loop")
+    with pytest.raises(ValueError, match="contradictory domain filter"):
+        store.query("alpha", k=5, domain="loop", exclude_domains={"loop"})
+
+
+def test_query_domain_combines_with_role_filter() -> None:
+    """role (誰が言ったか) と domain (どの分野か) は直交 — 同時指定で AND になる。"""
+    enc = CountingEncoder()
+    store = AnnotationStore(enc)
+    store.add_text("alpha loop corpus fact.", role="corpus", domain="loop")
+    store.add_text("alpha loop user comment.", role="user", domain="loop")
+    hits = store.query("alpha", k=5, role="corpus", domain="loop")
+    assert hits
+    assert all(
+        store.role_of_row(i) == "corpus" and store.domain_of_row(i) == "loop"
+        for i, _ in hits
+    )
+
+
+def test_domains_persist_roundtrip(tmp_path: Path) -> None:
+    enc = CountingEncoder()
+    path = tmp_path / "store.json"
+    store = AnnotationStore(enc, path=path)
+    store.add_text("the agent loop retries.", domain="loop")
+    store.add_text("my name is kazufumi.", role="user")
+    store.save()
+    store2 = AnnotationStore(CountingEncoder(), path=path)
+    ann = store2.annotations
+    assert store2.domain_of_row(ann.index("the agent loop retries")) == "loop"
+    assert store2.domain_of_row(ann.index("my name is kazufumi")) is None
+
+
+def test_domains_backward_compat_load(tmp_path: Path) -> None:
+    """domains キー無しの旧形式 JSON は全行 domain=None として読める (後方互換)。"""
+    import json as _json
+
+    enc = CountingEncoder()
+    path = tmp_path / "store.json"
+    store = AnnotationStore(enc, path=path)
+    store.add_text("alpha beta.", domain="loop")
+    store.save()
+    meta = _json.loads(path.read_text(encoding="utf-8"))
+    del meta["domains"]  # 旧形式を再現
+    path.write_text(_json.dumps(meta, ensure_ascii=False), encoding="utf-8")
+    store2 = AnnotationStore(CountingEncoder(), path=path)
+    assert store2.domain_of_row(0) is None  # fail せず None 既定で読める
+
+
 def test_store_save_load_roundtrip(tmp_path: Path) -> None:
     enc = CountingEncoder()
     path = tmp_path / "store.json"

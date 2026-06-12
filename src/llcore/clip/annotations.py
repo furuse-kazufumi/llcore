@@ -261,6 +261,7 @@ class AnnotationStore:
         self._n_rows = 0
         self._counts: list[int] = []              # 行 -> 出現回数
         self._roles: list[str | None] = []        # 行 -> 初出時の発話者ロール (user/assistant/None)
+        self._domains: list[str | None] = []      # 行 -> 初出時の分野タグ (loop/astro/.../None)
         self._is_q: list[bool] = []               # 行 -> 質問か
         self._non_fact: list[bool] = []           # 行 -> 非事実か (質問 or 依頼; 事実検索の除外用)
         # 共起連結: (行a, 行b) -> 共起回数 (同一 group= 会話 turn 窓 内で一緒に出た)。
@@ -304,12 +305,18 @@ class AnnotationStore:
         *,
         source: str | None = None,
         role: str | None = None,
+        domain: str | None = None,
         group: int | None = None,
         adjacency_window: int = 1,
     ) -> list[int]:
         """テキストを分割し、新規ユニークのみ符号化して、**アノテーション番号 (uint64) 列**を返す。
 
         role は発話者 (例 "user"/"assistant") — 初出時に行へ記録。
+        domain は分野タグ (例 "loop"/"astro") — 初出時に行へ記録。複数 corpus を混載した
+        store で検索スコープを分野単位に絞る (M3: corpus 間の食い合い対策)。role が
+        「誰が言ったか」、domain が「どの知識分野か」の直交軸。
+        honest 留保: role と同じく**初出時の値が勝つ** — 同一アノテーションが複数分野に
+        出る場合、後の分野は記録されない (per-row 単一値の既知の限界)。
         group は会話 turn 等のまとまり ID。同一/隣接 group (``adjacency_window`` ターン以内)
         に出たアノテーション同士に**共起エッジ**を張る = cosine が繋げない「質問→その答え」を
         会話の隣接構造で橋渡しする連結性グラフ (差別化の核)。group=None なら共起は張らない。
@@ -340,6 +347,7 @@ class AnnotationStore:
                 self._n_rows += 1
                 self._counts.append(0)
                 self._roles.append(role)
+                self._domains.append(domain)
                 self._is_q.append(is_question(a))
                 self._non_fact.append(not is_fact(a))
             self._n_encoded += len(new)
@@ -456,6 +464,8 @@ class AnnotationStore:
         exclude_questions: bool = False,
         role: str | None = None,
         exclude_roles: Collection[str] | None = None,
+        domain: str | None = None,
+        exclude_domains: Collection[str] | None = None,
     ) -> list[tuple[int, float]]:
         """自由テキスト 1 件でストアを cosine 検索 (符号化 1 回; キャッシュには入れない)。
 
@@ -468,12 +478,20 @@ class AnnotationStore:
           で実証したスコープ絞り込み: 会話検索時に ``{"corpus"}`` を除くと、トピック重複
           corpus 由来の押し下げから会話 R@1 を防衛できる。``role`` との併用は矛盾指定
           (role が exclude_roles に含まれる) を fail-closed で拒否する。
+        - ``domain`` / ``exclude_domains``: 分野タグの positive / negative 絞り込み
+          (role 系と同じ規則)。role が防げない **corpus 間の食い合い** (例 loop probe が
+          astro annotation に埋もれる) を、検索スコープを分野単位に絞って防ぐ。
         """
         import numpy as np
 
         if role is not None and exclude_roles is not None and role in exclude_roles:
             raise ValueError(
                 f"contradictory role filter: role={role!r} is in exclude_roles={exclude_roles!r}"
+            )
+        if domain is not None and exclude_domains is not None and domain in exclude_domains:
+            raise ValueError(
+                f"contradictory domain filter: domain={domain!r} is in "
+                f"exclude_domains={exclude_domains!r}"
             )
         q = _l2_normalize(np.asarray(self._encoder.encode_texts([text])[0], dtype=np.float32))
         if quantized:
@@ -491,6 +509,10 @@ class AnnotationStore:
             if role is not None and self._roles[jj] != role:
                 continue
             if exclude_roles is not None and self._roles[jj] in exclude_roles:
+                continue
+            if domain is not None and self._domains[jj] != domain:
+                continue
+            if exclude_domains is not None and self._domains[jj] in exclude_domains:
                 continue
             out.append((jj, float(sims[jj])))
             if len(out) >= k:
@@ -658,6 +680,10 @@ class AnnotationStore:
         """行の発話者ロール (初出時に記録)。"""
         return self._roles[row]
 
+    def domain_of_row(self, row: int) -> str | None:
+        """行の分野タグ (初出時に記録)。"""
+        return self._domains[row]
+
     def is_question_row(self, row: int) -> bool:
         """行が質問アノテーションか。"""
         return self._is_q[row]
@@ -748,6 +774,7 @@ class AnnotationStore:
             "ids": [str(i) for i in self._ids],
             "counts": self._counts,
             "roles": self._roles,
+            "domains": self._domains,
             "is_question": self._is_q,
             "non_fact": self._non_fact,
             # 共起エッジ: "a,b" -> count (JSON キーは文字列)
@@ -775,8 +802,9 @@ class AnnotationStore:
         self._matrix = emb
         self._n_rows = emb.shape[0]
         self._counts = list(meta["counts"])
-        # 後方互換: roles/is_question 無し旧形式は再生成
+        # 後方互換: roles/domains/is_question 無し旧形式は再生成
         self._roles = list(meta["roles"]) if "roles" in meta else [None] * len(anns)
+        self._domains = list(meta["domains"]) if "domains" in meta else [None] * len(anns)
         self._is_q = (
             list(meta["is_question"]) if "is_question" in meta
             else [is_question(a) for a in anns]
