@@ -73,6 +73,19 @@
 - **根拠**: rad_full_ingest.py (checkpoint/load_progress) / 実走ログ。
 - **側面**: 実装報告 / 教訓 / ユーザー体験 (家庭用 PC スペックでの研究)。
 
+### 15. fail-closed gate は「最初の admit」を設計しないと空転する
+- **気付き**: cert_inf (µs 判定) に切替えても MAP-Elites が空転した。実測で
+  **random init の cert_inf admit = 0/200** — admit 領域 (W の行絶対値和 < 1 ≒
+  W≈0 近傍) は一様 init からはほぼ確率ゼロ。gate を速くしても「最初の合格者」が
+  いなければ探索は永遠に始まらない。解 = **W→0 反復縮小 fallback** (W=0 で
+  J=diag(decay) は必ず admit、実測 200/200)。これは evolve() に既にあった
+  known-safe fallback 規律の MAP-Elites 移植漏れ — **安全機構は『規律』であって
+  個別実装の『最適化』ではない**から、新しい探索器に載せ替えるたびに規律ごと
+  移植する必要がある。#13 (実効コスト) と合わせ、「gated 探索の 2 大落とし穴 =
+  コスト爆発と空転」として記事 1 本になる。
+- **根拠**: m2_connectivity_poc.py の fallback commit / 検証 0/200 → 200/200。
+- **側面**: 技術設計 / 教訓 / TRIZ (事前対策原理)。
+
 ### 13. sound gate のコストは「判定 1 回の速さ」でなく「reject 率 × resample 構造」で決まる
 - **気付き**: cert_sdp (1 判定 ~数百 ms) を MAP-Elites の gate にしたら smoke が
   1 時間級に停滞 (13 分で seed 0 すら未完)。原因は判定単体でなく、**探索分布の
