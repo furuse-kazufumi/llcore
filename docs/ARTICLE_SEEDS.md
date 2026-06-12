@@ -73,6 +73,36 @@
 - **根拠**: rad_full_ingest.py (checkpoint/load_progress) / 実走ログ。
 - **側面**: 実装報告 / 教訓 / ユーザー体験 (家庭用 PC スペックでの研究)。
 
+### 12. run_in_background はセッションと運命を共にする — 長時間ジョブは detached へ
+- **気付き**: エージェント環境の「バックグラウンド実行」はセッション終了 = プロセス死。
+  3.5 時間の encode ジョブが**セッション切替で 2 回連続死亡** (計 ~25 分の encode 損失
+  + checkpoint 不発)。OS レベルの detached プロセス (PowerShell `Start-Process
+  -WindowStyle Hidden` + ログ/エラーのファイルリダイレクト) に切り替えて解決。
+  シェルの `&` やエージェントの background とは生存スコープが違う — 「ジョブの寿命 >
+  セッションの寿命」なら detached 一択。監視はログファイル経由で行う。
+- **根拠**: 2026-06-12 実損 2 回 (b73itrccl / btve2wjrh の死亡ログ)。
+- **側面**: 教訓 / 実装報告 / ユーザー体験 (AI 駆動開発の実務的罠)。
+
+### 11. 「floor を仮説族に包含させる」— 識別力設計の一般原理
+- **気付き**: M2.0 readout v1 (X 空間 centroid + 分離スケール β) は「定数予測 (クラス
+  事前)」を表現できない族で、**最適化しても train CE 0.9022 > floor 0.6269** という
+  病理を起こした。v2 で log-prior bias を加え「クラス重心が分離しない → 事前予測 =
+  floor」を族に包含させると、自明 gene (decay=1, s≡0) で **CE = floor 厳密一致
+  (Δ −0.0000)** を検証できた。床が踏めない仮説族は改善量を測れない —
+  「ベースラインを族に包含させてから最適化する」は識別力設計の一般原理。
+  realce の centroid readout 修正と対になる 2 例目で、パターンとして記事化できる。
+- **根拠**: m2_connectivity_poc.py v1→v2 (commit diff) / floor 包含の検証ログ。
+- **側面**: 技術設計 / 教訓 / 認知科学 (測定の妥当性)。
+
+### 10. 無 gate archive 69/69 全部 ρ≥1 — 会話教師の危険性の初観測 (要 v2 確定)
+- **気付き**: M2.0 smoke v1 seed 0 で、無 gate MAP-Elites archive の **69 gene 全部が
+  empirical_rho ≥ 1 (max 3.088)**。random init (W~U[-2,2]) の大半が発散側なのは
+  想定内だが、fitness 選択 (会話教師) がそれを**全く淘汰しない**ことの初観測。
+  「会話で賢くなる方向」と「力学的に安全な方向」が無相関 (または逆相関) なら、
+  M2 の guarantee 主張 (sound cert が要る) の核になる。v2 readout での再測で確定させる。
+- **根拠**: smoke v1 seed 0 ログ (rho_max 3.088, rho>=1: 69/69)。
+- **側面**: honest disclosure / ベンチ / 哲学 (capability と safety の直交性)。
+
 ### 9. checkpoint は「量」と「時間」の二軸で切る (実損から)
 - **気付き**: 全量取込の checkpoint を「200k 行ごと」のみにした結果、セッション死亡で
   2 corpus 分 (89.7k 行、~15 分の encode) を全損した。行数閾値は save コストの
