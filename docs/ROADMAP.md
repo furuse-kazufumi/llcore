@@ -62,8 +62,12 @@ llcore の進化コア/検証器は**世界知識を内包しない** (tiny adap
   conv −0.015 + レイテンシ 2 倍。prefix あり (公式推奨) は逆効果 (world 0.597)。
   **結論 = MiniLM 続投**、undercount は gold 判定の多言語化で解消する方が筋。
   正本 = 同上 + out/rad_scale_poc_ml.json
-- ⬜ 検証 (iii) 会話トピックと重なる corpus での干渉測定 (候補 = astrophysics_corpus_v2、
-  (i) の結果からトピック重複埋もれが会話 probe でも起きる可能性が高い — 直接実測する)
+- ✅ **検証 (iii) トピック重複干渉 (2026-06-12)**: astrophysics 100/400/800 docs 段階注入。
+  会話 MRR 0.947→0.849 だが **R@3 1.000 維持・天文 probe は rank 2 止まり = fail モードは
+  壊滅でなく漸進的押し下げ**。劣化 9 probe 中 7 はトピック/語彙重複で説明 (実ヒット目視)、
+  直交 probe は不変。重複 23k ann の干渉 > 非重複 60k ann ((i) 比) = 規模より中身。
+  corpus が rank 1 を取った事例は全て role="corpus" → **role フィルタで会話 R@1 全防衛可**。
+  正本 = textseg1d/M3_TOPIC_OVERLAP_2026_06_12.md + out/rad_topic_overlap_poc.json
 - ⬜ RAD コーパス (~48 分野) 全量取込 → 連結性グラフ = 世界知識グラフ。(i) の知見より
   フラット store では同主題食い合いが必至 → corpus/scope メタデータでの検索スコープ絞り込み
   (group/role 活用) or ANN 化が前提
@@ -90,8 +94,8 @@ llcore の進化コア/検証器は**世界知識を内包しない** (tiny adap
 1. ✅ M4 ループ調査 workflow 完了 → RAD corpus2skill 化
 2. ✅ M1.2 評価ベンチ拡張 (3→22 probe) → hub 抑制を確定調整 (honest 訂正で決着)
 3. ✅ M1 entity coref エッジ + encoder 差し替え (2026-06-12 クローズ)
-4. M3 RAD→AnnotationStore 取込 (世界知識注入) ← **進行中**。PoC ✅ + (i)(ii) ✅ (2026-06-12)。
-   残 = (iii) トピック重複干渉の直接測定 → スコープ絞り込み設計 → 全量取込
+4. M3 RAD→AnnotationStore 取込 (世界知識注入) ← **進行中**。PoC + (i)(ii)(iii) ✅ (2026-06-12)。
+   残 = スコープ絞り込み設計 (role/group フィルタ — (iii) で有効性の構造を確認済) → 全量取込
 5. M2 cert × 連結性教師 配線
 
 各完了で本 ROADMAP の ✅ 更新 + commit + 1 段報告。
