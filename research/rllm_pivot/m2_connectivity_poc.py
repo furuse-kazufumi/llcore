@@ -390,10 +390,11 @@ def main() -> int:
     floors = [r["floor_train_ce"] for r in results["runs"]]
     bests = [r["gates"]["none"]["best_train_ce"] for r in results["runs"]]
     discriminating = all(b < f - 0.02 for b, f in zip(bests, floors))
-    sdp_clean = all(r["gates"]["cert_sdp"]["n_admitted_rho_ge_1"] == 0
-                    for r in results["runs"])
+    sound_gates = [g for g in GATES if g != "none"]
+    sound_clean = all(r["gates"][g]["n_admitted_rho_ge_1"] == 0
+                      for r in results["runs"] for g in sound_gates)
     results["smoke_discriminating"] = discriminating
-    results["smoke_cert_sdp_zero_false_admit"] = sdp_clean
+    results["smoke_sound_gate_zero_false_admit"] = sound_clean
     results["total_seconds"] = round(time.time() - t_start, 1)
 
     out = os.path.join(_ROOT, "out", "m2_connectivity_poc.json")
@@ -401,7 +402,7 @@ def main() -> int:
     with open(out, "w", encoding="utf-8") as f:
         json.dump(results, f, ensure_ascii=False, indent=2, default=_json_native)
     print(f"\n[smoke] 識別力 (train CE < floor-0.02 全 seed): {discriminating}", flush=True)
-    print(f"[smoke] cert_sdp 採用 gene の rho>=1 ゼロ: {sdp_clean}", flush=True)
+    print(f"[smoke] sound gate 採用 gene の rho>=1 ゼロ: {sound_clean}", flush=True)
     print(f"total {results['total_seconds']}s\nresults: {out}", flush=True)
     return 0
 
