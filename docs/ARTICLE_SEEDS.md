@@ -73,6 +73,16 @@
 - **根拠**: rad_full_ingest.py (checkpoint/load_progress) / 実走ログ。
 - **側面**: 実装報告 / 教訓 / ユーザー体験 (家庭用 PC スペックでの研究)。
 
+### 9. checkpoint は「量」と「時間」の二軸で切る (実損から)
+- **気付き**: 全量取込の checkpoint を「200k 行ごと」のみにした結果、セッション死亡で
+  2 corpus 分 (89.7k 行、~15 分の encode) を全損した。行数閾値は save コストの
+  amortize を最適化するが、**失うものは時間に比例する**。「100k 行 OR 15 分の早い方」
+  の二軸に修正。長時間ジョブの checkpoint 設計は「コスト最適」でなく「損失上限」で
+  決める。
+- **根拠**: rad_full_ingest.py の CHECKPOINT_EVERY_SEC 追加 (2026-06-12)。
+  実損 = aerospace 513.8s + agents 380.6s の再 encode。
+- **側面**: 教訓 / 実装報告。
+
 ### 8. 「会話 35 turns = 122 annotations」の小ささ自体が設計を駆動する
 - **気付き**: M2 の会話教師はわずか 122 annotations (境界率 0.281)。この小ささゆえ
   (1) 統計は seed 族 (地形族) で稼ぐ realce 方式を踏襲、(2) 経験 gate の観測
