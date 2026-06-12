@@ -71,10 +71,13 @@ EXTRA_CORPORA = (
     DOCS_ROOT / "loop_engineering_corpus_src",
     DOCS_ROOT / "language_corpus_src",
 )
-# checkpoint は「行数」OR「経過時間」の早い方 (2026-06-12 教訓: 200k 行のみの閾値では
-# セッション死亡時に 2 corpus 分 (~15 分) の encode を全損した — 時間軸も切る)
+# checkpoint は「行数」OR「経過時間」の早い方 (2026-06-12 教訓 2 段:
+# ①200k 行のみの閾値 → セッション死亡で 2 corpus 分全損。②corpus 完了時のみの発火 →
+# 8.5 分の corpus 途中死亡でまた全損。→ doc ループ内でも時間で切る。resume は corpus
+# 先頭から再走するが、encode 済み annotation は store 全体 dedup でスキップされるため
+# 実質途中再開 (副作用 = counts/n_instances の二重計上のみ、query 挙動に影響なし)
 CHECKPOINT_EVERY_ANN = 100_000
-CHECKPOINT_EVERY_SEC = 900.0
+CHECKPOINT_EVERY_SEC = 600.0
 
 
 def corpus_domains() -> list[tuple[Path, str]]:
@@ -124,10 +127,16 @@ def ingest_full(
             continue
         t0 = time.perf_counter()
         n_ann = 0
-        for doc in docs:
+        for di, doc in enumerate(docs, 1):
             body = strip_markdown(doc.read_text(encoding="utf-8"))
             n_ann += len(store.add_text(body, source=str(doc), role="corpus",
                                         domain=dom))
+            if time.perf_counter() - last_saved_t >= CHECKPOINT_EVERY_SEC:
+                s = checkpoint(store, progress, progress_path)
+                last_saved_rows = len(store.annotations)
+                last_saved_t = time.perf_counter()
+                print(f"[checkpoint] {dom} {di}/{len(docs)} docs 時点 "
+                      f"{last_saved_rows} 行 save ({s}s, trigger=time)", flush=True)
         info = {
             "domain": dom,
             "docs": len(docs),

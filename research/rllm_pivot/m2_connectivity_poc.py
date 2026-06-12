@@ -17,10 +17,18 @@ M2.0 で答える smoke の問い (本測定 M2.1 の前提条件):
   会話 annotation 系列 x_1..x_T (SmolLM2-135M layer15 hidden の mean-pool を
   train-PCA top-M → per-seed ランダム射影 n=6) を adapter
   s' = decay ⊙ s + (1-decay) ⊙ tanh(W s + x_t) で流し、各位置 t で
-  「annotation t+1 が新しい turn の先頭か (y_t=1) 継続か (0)」を centroid readout
-  logits_k = -β‖s_t - c_k‖² で予測する CE。c_k = train 範囲の X[t+1] のクラス別平均
-  (gene 非依存・train のみで fit = リークなし)、β = 1/‖c0-c1‖² (分離スケール、
-  realce と同じ事前原理的選択)。
+  「annotation t+1 が新しい turn の先頭か (y_t=1) 継続か (0)」を予測する CE。
+
+readout の変更経緯 (honest, smoke が配線調整の場であることの記録):
+  v1 = X 空間クラス平均 centroid (gene 非依存) + 分離スケール β。smoke 1 回目
+  (seed 0) で **train CE 0.9022 > floor 0.6269** = readout 族に定数予測 (クラス
+  事前) すら含まれず non-discriminating と判明 (logits が s に強制依存するため)。
+  v2 (現行) = **s 空間 LDA centroid + within-class β + log-prior bias**:
+  c_k = train 範囲の状態 s_t のクラス別平均 (gene 依存・train のみで fit =
+  リークなし)、β = 1/(2·within-class 平均二乗距離)、logits_k = -β‖s_t-c_k‖² +
+  log prior_k。クラスが分離しない gene では c0≈c1 → logits ≈ log prior =
+  **floor (定数予測) を族が包含**し、分離した分だけ floor を下回れる。
+  判定基準 (CE < floor - 0.02) は v1/v2 共通で結果を見る前から不変。
 
 honest 留保 (事前):
   - 系列は 1 本 (3 会話連結 ~数百 annotations)。train/held-out は時系列分割
@@ -157,19 +165,22 @@ class ConnectivityTerrain:
         # y_t = flags[t+1] (有効 t = 0..T-2)
         self.y = flags[1:].astype(int)
         self.T = T
-        # readout centroid: train 範囲 (t+1 <= split-1) の X[t+1] クラス別平均 (gene 非依存)
-        tr_next = self.X[1: self.split]            # X[t+1] for t in [0, split-1)
         tr_y = self.y[: self.split - 1]
         if tr_y.min() == tr_y.max():  # 片クラスしか無い分割は使えない (fail-loud)
             raise ValueError("train range has a single class; adjust train_frac")
-        c0 = tr_next[tr_y == 0].mean(0)
-        c1 = tr_next[tr_y == 1].mean(0)
-        self.centers = np.stack([c0, c1])          # (2, N)
-        self.beta = 1.0 / (float(((c0 - c1) ** 2).sum()) + 1e-12)
-        # floor (定数予測 = クラス事前) CE — train / held-out 各範囲で開示
+        # floor (定数予測 = クラス事前) CE — train / held-out 各範囲で開示。
+        # v2 readout: train 範囲のクラス事前を log-prior bias として持つ (floor 包含)。
+        p1 = float(tr_y.mean())
+        self.log_prior = np.log(np.array([1.0 - p1, p1]) + 1e-12)
         self.floor_train = self._entropy(tr_y)
-        self.floor_heldout = self._entropy(self.y[self.split - 1:])
+        self.floor_heldout = self._ce_const_prior(self.y[self.split - 1:], p1)
         self.boundary_rate = float(self.y.mean())
+
+    @staticmethod
+    def _ce_const_prior(y: np.ndarray, p1: float) -> float:
+        """train クラス事前 p1 の定数予測を範囲 y に適用した CE (held-out floor の正定義)。"""
+        p1 = min(max(p1, 1e-12), 1 - 1e-12)
+        return float(-(y * np.log(p1) + (1 - y) * np.log(1 - p1)).mean())
 
     @staticmethod
     def _entropy(y: np.ndarray) -> float:
@@ -177,26 +188,38 @@ class ConnectivityTerrain:
         p1 = min(max(p1, 1e-12), 1 - 1e-12)
         return float(-(p1 * np.log(p1) + (1 - p1) * np.log(1 - p1)))
 
-    def _ce_range(self, decay: np.ndarray, W: np.ndarray, lo: int, hi: int) -> float:
-        """系列を頭から流し (状態連続)、t ∈ [lo, hi) のみ CE を集計。"""
+    def _states(self, decay: np.ndarray, W: np.ndarray) -> np.ndarray:
+        """系列を頭から流した状態列 S[t] = s_t (有効 t = 0..T-2、1 forward pass)。"""
+        S = np.zeros((self.T - 1, N))
         s = np.zeros(N)
-        tot = 0.0
-        cnt = 0
-        for t in range(hi):
+        for t in range(self.T - 1):
             s = decay * s + (1.0 - decay) * np.tanh(W @ s + self.X[t])
-            if t >= lo:
-                logits = -self.beta * ((self.centers - s) ** 2).sum(1)
-                logits -= logits.max()
-                p = np.exp(logits)
-                p /= p.sum()
-                tot += -np.log(p[self.y[t]] + 1e-12)
-                cnt += 1
-        return tot / max(cnt, 1)
+            S[t] = s
+        return S
 
     def _fit(self, theta: np.ndarray, lo: int, hi: int) -> float:
+        """t ∈ [lo, hi) の CE (fitness = -CE)。readout (v2) は **train 範囲のみ**で
+        fit する gene 依存 LDA centroid + within-class β + log-prior bias。
+        held-out 評価 (lo >= split-1) でも fit は train 範囲 = リークなし。"""
         decay = np.clip(theta[:N], 0.0, 1.0)
         W = np.clip(theta[N:].reshape(N, N), -2.0, 2.0)
-        return -self._ce_range(decay, W, lo, hi)
+        S = self._states(decay, W)
+        s_tr = S[: self.split - 1]
+        y_tr = self.y[: self.split - 1]
+        c0 = s_tr[y_tr == 0].mean(0)
+        c1 = s_tr[y_tr == 1].mean(0)
+        centers = np.stack([c0, c1])                      # (2, N)
+        within = float(((s_tr - centers[y_tr]) ** 2).sum(1).mean())
+        beta = 1.0 / (2.0 * within + 1e-12)
+        Se = S[lo:hi]
+        ye = self.y[lo:hi]
+        logits = -beta * ((Se[:, None, :] - centers[None, :, :]) ** 2).sum(2)
+        logits = logits + self.log_prior                   # floor 包含 (c0≈c1 → 事前予測)
+        logits -= logits.max(1, keepdims=True)
+        P = np.exp(logits)
+        P /= P.sum(1, keepdims=True)
+        ce = float(-np.log(P[np.arange(len(ye)), ye] + 1e-12).mean())
+        return -ce
 
     def train(self, theta: np.ndarray) -> float:
         return self._fit(theta, 0, self.split - 1)
