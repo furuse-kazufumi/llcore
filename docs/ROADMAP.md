@@ -52,9 +52,21 @@ llcore の進化コア/検証器は**世界知識を内包しない** (tiny adap
   (store 11 倍化 97→1,071 でも per-probe 完全一致 0.947)。取込 17.0s。失敗 5 問の主犯 =
   gold の日英混在 + 断片化 (真の retrieval 失敗は 1 問のみ) → 0.639 は下限値。
   正本 = textseg1d/M3_RAD_INGEST_POC_2026_06_12.md + out/rad_ingest_poc.json
-- ⬜ RAD コーパス (~48 分野) を AnnotationStore に取込 → 連結性グラフ = 世界知識グラフ。
-  次の検証 3 点: (i) 10 万 annotations 級での会話干渉再測 (ii) 多言語 encoder head-to-head
-  (日英混在 gold の undercount 解消) (iii) 会話トピックと重なる corpus での干渉測定
+- ✅ **検証 (i) 大規模化 (2026-06-12)**: 3 corpus 1,989 docs → 59,971 annotations (56 倍, cap 60k,
+  silent cap なし)。会話 22 probe MRR 0.947→**0.890** (軽微, rank 変化 2 probe のみ)、loop 18 probe
+  0.639→**0.306** (大幅埋もれ)。劣化はトピック重複 probe に集中 → **「干渉ゼロ」(M3.0) は
+  トピック非重複の条件付きと down-claim**。埋もれの主因 = 規模でなくトピック重複 ((iii) の部分的
+  先行回答)。正本 = textseg1d/M3_SCALE_MULTILINGUAL_2026_06_12.md + out/rad_scale_poc_scale.json
+- ✅ **検証 (ii) 多言語 encoder head-to-head (2026-06-12)**: multilingual-e5-small prefix なしは
+  world +0.034 (M3.0 失敗 5 問中 3 問を rank 1 救出 = 日英混在 undercount 説を実証) だが
+  conv −0.015 + レイテンシ 2 倍。prefix あり (公式推奨) は逆効果 (world 0.597)。
+  **結論 = MiniLM 続投**、undercount は gold 判定の多言語化で解消する方が筋。
+  正本 = 同上 + out/rad_scale_poc_ml.json
+- ⬜ 検証 (iii) 会話トピックと重なる corpus での干渉測定 (候補 = astrophysics_corpus_v2、
+  (i) の結果からトピック重複埋もれが会話 probe でも起きる可能性が高い — 直接実測する)
+- ⬜ RAD コーパス (~48 分野) 全量取込 → 連結性グラフ = 世界知識グラフ。(i) の知見より
+  フラット store では同主題食い合いが必至 → corpus/scope メタデータでの検索スコープ絞り込み
+  (group/role 活用) or ANN 化が前提
 - ⬜ **★言語 RAD コーパス新設** (ユーザー指摘 2026-06-11: 既存 ~48 分野に言語/語彙/文法/発音が無い):
   linguistics (syntax/morphology/semantics/pragmatics) / lexicon (WordNet/語彙意味論) /
   grammar (CFG/dependency/construction) / phonetics・phonology (IPA/調音/韻律) / 多言語 (特に日本語:
@@ -78,8 +90,8 @@ llcore の進化コア/検証器は**世界知識を内包しない** (tiny adap
 1. ✅ M4 ループ調査 workflow 完了 → RAD corpus2skill 化
 2. ✅ M1.2 評価ベンチ拡張 (3→22 probe) → hub 抑制を確定調整 (honest 訂正で決着)
 3. ✅ M1 entity coref エッジ + encoder 差し替え (2026-06-12 クローズ)
-4. M3 RAD→AnnotationStore 取込 (世界知識注入) ← **次**。最初の取込 = loop_engineering corpus
-   (dogfooding)。encoder は MiniLM (M1 確定)。大規模 store での MRR 保持も再測する
+4. M3 RAD→AnnotationStore 取込 (世界知識注入) ← **進行中**。PoC ✅ + (i)(ii) ✅ (2026-06-12)。
+   残 = (iii) トピック重複干渉の直接測定 → スコープ絞り込み設計 → 全量取込
 5. M2 cert × 連結性教師 配線
 
 各完了で本 ROADMAP の ✅ 更新 + commit + 1 段報告。
