@@ -73,6 +73,17 @@
 - **根拠**: rad_full_ingest.py (checkpoint/load_progress) / 実走ログ。
 - **側面**: 実装報告 / 教訓 / ユーザー体験 (家庭用 PC スペックでの研究)。
 
+### 16. 採用する「頂点」自体が発散境界上にいる (best_rho 1.000)
+- **気付き**: M2.1 seed 0 無 gate で、fitness 最良 gene (= 実運用なら採用する個体)
+  の empirical_rho がちょうど **1.000**。archive の 94% が発散というだけでなく、
+  **教師が選ぶ頂点そのものが安定境界上**にある。直感的解釈: 表現力 (CE を下げる
+  ダイナミクスの豊かさ) は収縮性の境界near傍で最大化される — 教師に従うほど危険に
+  近づく構造。cert_inf の採用 gene も rho_max 0.993-0.998 と境界に張り付く
+  (ただし証明付きで 1 未満) のが対になる観測で、「**進化は gate があってもなくても
+  境界を目指す。違いは『境界のどちら側か』だけ**」という記事の核になる一文が取れた。
+- **根拠**: out/m2_gate_cmp.log seed 0 / M2_SMOKE_2026_06_12.md の rho_max 行。
+- **側面**: 哲学 / honest disclosure / ベンチ / 認知科学 (探索と安全の幾何学)。
+
 ### 15. fail-closed gate は「最初の admit」を設計しないと空転する
 - **気付き**: cert_inf (µs 判定) に切替えても MAP-Elites が空転した。実測で
   **random init の cert_inf admit = 0/200** — admit 領域 (W の行絶対値和 < 1 ≒
