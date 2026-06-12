@@ -29,14 +29,18 @@ llcore の進化コア/検証器は**世界知識を内包しない** (tiny adap
 - ✅ 優先1 事実抽出 / 優先2 head-to-head (CLIP 反証・差別化は連結性グラフと判明) /
      優先3 連結性グラフ (MRR 0.056→0.389, R@1 0→1/3, IDF hub 抑制)
 
-### M1 ⚠️ 連結性グラフ — 22-probe で over-claim 判明・降格 (2026-06-11)
+### M1 ✅ 連結性グラフ — 降格のままクローズ (2026-06-12)
 - ✅ M1.2 評価ベンチ拡張 (3→22 probe, `scripts/connectivity_bench.py`)
 - ⚠️ **★honest 訂正**: 22 probe で **IDF 連結は cosine と完全一致 (0/22 差, MRR 0.727)**、IDF なし連結は
   大半を害す (0.321)。「連結性が差別化」は 3 probe の過剰適合 + 弱い cosine baseline のアーティファクトだった。
   **実の勝因は事実抽出 (質問/依頼除外)** = cosine を 0.727 に。詳細=CONNECTIVITY_BENCH_CORRECTION_2026_06_11.md。
-- ⬜ entity coref エッジ — 語彙不一致の難ケース (name 等) 用の**小改善に降格** (差別化の主軸にしない)
-- ⬜ encoder 差し替えオプション (MiniLM backend; CLIP は cross-modal 専用) — head-to-head で MiniLM 優位
-- → **差別化の主軸を M3 (世界知識) + M2 (cert×教師) に移す**。retrieval は事実抽出+cosine/MiniLM で大半解決。
+- ✅ entity coref エッジ (2026-06-12) — 加算マージン方式 (`query_connected(entity_hop=True)`, 既定 off)。
+  CLIP で 5 probe 改善/0 悪化 (MRR 0.727→0.797)、MiniLM では効果ゼロ・非破壊 (0.947 不変) =
+  **弱 encoder の補償としてのみ価値**。正本 = textseg1d/M1_ENTITY_ENCODER_RESULTS_2026_06_12.md
+- ✅ encoder 差し替えオプション (2026-06-12) — `SentenceEncoderBackend` (all-MiniLM-L6-v2, optional extra
+  `text`)。**MiniLM cosine 単独 MRR 0.947 (R@1 0.909)** = この規模の会話 retrieval はほぼ解決。
+  追加知見: cooccur hop は強 encoder で微害 (0.947→0.902) — 単調改善主張を down-claim。
+- → **差別化の主軸を M3 (世界知識) + M2 (cert×教師) に移す**。retrieval は事実抽出+MiniLM cosine で大半解決。
 
 ### M2 ⬜ cert gate × 連結性教師の配線 (差別化の本命)
 - ⬜ 連結グラフ (ターン境界/照応/話題) を verified adapter の進化・学習信号に
@@ -65,10 +69,11 @@ llcore の進化コア/検証器は**世界知識を内包しない** (tiny adap
 - ⬜ 次: LLM actor 統合 (Plan を LLM 駆動に) / ccr claude-loop キュー連携 / 戦略比較実験。
 
 ## 直近の自走順 (上から実行)
-1. M4 ループ調査 workflow 完了 → RAD corpus2skill 化
-2. M1.2 評価ベンチ拡張 (3→20 probe) → hub 抑制を確定調整
-3. M1 entity coref エッジ + encoder 差し替え
-4. M3 RAD→AnnotationStore 取込 (世界知識注入)
+1. ✅ M4 ループ調査 workflow 完了 → RAD corpus2skill 化
+2. ✅ M1.2 評価ベンチ拡張 (3→22 probe) → hub 抑制を確定調整 (honest 訂正で決着)
+3. ✅ M1 entity coref エッジ + encoder 差し替え (2026-06-12 クローズ)
+4. M3 RAD→AnnotationStore 取込 (世界知識注入) ← **次**。最初の取込 = loop_engineering corpus
+   (dogfooding)。encoder は MiniLM (M1 確定)。大規模 store での MRR 保持も再測する
 5. M2 cert × 連結性教師 配線
 
 各完了で本 ROADMAP の ✅ 更新 + commit + 1 段報告。

@@ -9,11 +9,15 @@
 honest 留保:
 - gold はキーワード包含 (verbatim が正)。会話に実在する事実のみを対象。
 - 小型 LLM 生成ゆえ事実誤り (kazuhiro 等) も混在 — 正答キーワードのみ gold とする。
-- encoder=CLIP のまま (head-to-head で MiniLM 優位だが本ベンチの主眼は連結性グラフ)。
+- encoder は --encoder で選択 (clip=SigLIP / minilm=all-MiniLM-L6-v2)。
+  head-to-head (out/retrieval_head_to_head.json) で MiniLM 優位の実測済。
+
+M1 追補 (2026-06-12): entity-coref エッジ (cosine base + 加算マージン) を比較対象に追加。
+22-probe 訂正の受入基準 = entity 変種が cosine MRR を下回らないこと (broad 非破壊)。
 
 使い方::
 
-    py -3.11 scripts/connectivity_bench.py [--out PATH]
+    py -3.11 scripts/connectivity_bench.py [--out PATH] [--encoder clip|minilm]
 """
 from __future__ import annotations
 
@@ -28,7 +32,7 @@ if str(_SRC) not in sys.path:
     sys.path.insert(0, str(_SRC))
 
 from llcore.chat.__main__ import _ensure_utf8_stdout  # noqa: E402
-from llcore.clip import AnnotationStore, ClipBackend  # noqa: E402
+from llcore.clip import AnnotationStore, ClipBackend, SentenceEncoderBackend  # noqa: E402
 
 _ensure_utf8_stdout()
 
@@ -98,10 +102,12 @@ def mrr(ranks: list[int]) -> float:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--out", type=Path, default=_ROOT / "out" / "connectivity_bench.json")
+    parser.add_argument("--encoder", choices=("clip", "minilm"), default="clip",
+                        help="clip=SigLIP (cross-modal) / minilm=all-MiniLM-L6-v2 (text-only)")
     args = parser.parse_args()
 
-    clip = ClipBackend()
-    store = AnnotationStore(clip)
+    encoder = ClipBackend() if args.encoder == "clip" else SentenceEncoderBackend()
+    store = AnnotationStore(encoder)
     n_turns = ingest(store)
     ann = store.annotations
     print(f"ingested {n_turns} turns, {len(ann)} annotations, {store.n_cooccur_edges} edges, "
@@ -113,8 +119,11 @@ def main() -> int:
                                       store.query_connected(q, k=10, hub_suppression=False)],
         "connected_IDF": lambda q: [ann[r] for r, _, _ in
                                     store.query_connected(q, k=10, hub_suppression=True)],
+        "entity": lambda q: [ann[r] for r, _, _ in
+                             store.query_connected(q, k=10, entity_hop=True)],
     }
-    results: dict[str, object] = {"n_turns": n_turns, "n_annotations": len(ann),
+    results: dict[str, object] = {"encoder": args.encoder,
+                                  "n_turns": n_turns, "n_annotations": len(ann),
                                   "n_edges": store.n_cooccur_edges, "n_probes": len(PROBES),
                                   "methods": {}, "per_probe": []}
     ranks_by_method: dict[str, list[int]] = {m: [] for m in methods}
@@ -137,17 +146,25 @@ def main() -> int:
     cos = results["methods"]["cosine"]["MRR"]
     idf = results["methods"]["connected_IDF"]["MRR"]
     noidf = results["methods"]["connected_noIDF"]["MRR"]
+    ent = results["methods"]["entity"]["MRR"]
     results["verdict"] = {
         "cosine_MRR": cos, "connected_noIDF_MRR": noidf, "connected_IDF_MRR": idf,
+        "entity_MRR": ent,
         "connectivity_helps": idf > cos or noidf > cos,
         "idf_helps": idf > noidf,
+        # 受入基準 (事前登録): entity は broad を壊さない (cosine 以上) こと
+        "entity_non_harmful": ent >= cos,
+        "entity_helps": ent > cos,
         "conclusion": (
-            f"連結性が cosine を上回る (MRR {cos:.3f}→{max(idf, noidf):.3f})。"
-            f"IDF hub 抑制は {'有効' if idf > noidf else 'noIDF 以下 (要再考)'} "
-            f"(IDF {idf:.3f} vs noIDF {noidf:.3f})。"
+            f"cosine {cos:.3f} / connected IDF {idf:.3f} / noIDF {noidf:.3f} / "
+            f"entity {ent:.3f}。entity-coref は "
+            f"{'改善' if ent > cos else ('非破壊 (同等)' if ent == cos else '★悪化 (受入基準 FAIL)')}。"
         ),
     }
-    results["honest_note"] = "20+ probe で 3 probe の過剰適合を脱した評価。gold=キーワード包含。encoder=CLIP。"
+    results["honest_note"] = (
+        f"20+ probe で 3 probe の過剰適合を脱した評価。gold=キーワード包含。encoder={args.encoder}。"
+        "entity マージンは entity_boost=0.1 固定 (probe での調整はしない — 過剰適合防止)。"
+    )
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"\nverdict: {results['verdict']['conclusion']}", flush=True)

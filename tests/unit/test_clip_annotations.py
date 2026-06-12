@@ -449,3 +449,100 @@ def test_store_save_load_roundtrip(tmp_path: Path) -> None:
     store2.add_text("alpha beta.")
     assert enc2.total_encoded == 0
     assert np.allclose(store2.embedding_matrix(), store.embedding_matrix())
+
+
+# -- entity-coref エッジ (M1 小改善: 語彙不一致の橋渡し) --------------------------
+
+
+def test_informative_tokens_filters_stopwords() -> None:
+    """entity 候補 = stopword (機能語/疑問/依頼語) を除いた内容語のみ。"""
+    from llcore.clip.annotations import informative_tokens
+
+    assert informative_tokens("what is my name") == frozenset({"name"})
+    assert informative_tokens("my name is kazufumi") == frozenset({"name", "kazufumi"})
+    assert informative_tokens("the a is of to") == frozenset()
+    # 1 文字トークンは捨てる
+    assert "i" not in informative_tokens("i live in japan")
+    assert informative_tokens("i live in japan") == frozenset({"live", "japan"})
+
+
+def test_entity_df_counts_rows() -> None:
+    enc = CountingEncoder()
+    store = AnnotationStore(enc)
+    store.add_text("my name is kazufumi. what is my name. tokyo is big.")
+    assert store.entity_df("name") == 2
+    assert store.entity_df("kazufumi") == 1
+    assert store.entity_df("missing") == 0
+
+
+def test_entity_hop_bridges_lexical_mismatch() -> None:
+    """entity hop: 共起エッジが無くても、希少トークン共有で質問→答えを橋渡しする。"""
+    vecs = {
+        "what is my name": [1.0, 0.0, 0.0],
+        "my name is kazufumi": [0.0, 1.0, 0.0],      # 答え (cosine 直交 = 最悪ケース)
+        "the weather is nice": [0.9, 0.3, 0.0],       # cosine ではこちらが上位の事実
+        "thank you very much": [0.1, 0.0, 1.0],       # 僅かに正の cos (tie 回避で決定的に)
+    }
+    store = AnnotationStore(VecEncoder(vecs))
+    # group なし = 共起エッジゼロ (entity 経路単独の効果を見る)
+    store.add_text("what is my name. my name is kazufumi. the weather is nice. thank you very much.")
+    assert store.n_cooccur_edges == 0
+    ann = store.annotations
+
+    # entity_hop なし: 答えは cosine 0 で最下位圏
+    base = [ann[r] for r, _, _ in store.query_connected("what is my name", k=2)]
+    assert "my name is kazufumi" not in base
+
+    # entity_hop あり: クエリの "name" → "my name is kazufumi" (df 内) に加算マージン
+    hits = store.query_connected("what is my name", k=2, entity_hop=True, entity_boost=1.0)
+    hit_anns = [ann[r] for r, _, _ in hits]
+    assert "my name is kazufumi" in hit_anns
+    assert any(src == "entity" for _, _, src in hits)
+
+
+def test_entity_hop_is_additive_margin_not_replacement() -> None:
+    """entity スコア = cosine base + マージン (乗算 boost でない) — broad を壊さない設計。"""
+    vecs = {
+        "what is my name": [1.0, 0.0, 0.0],
+        "my name is kazufumi": [0.5, 0.8, 0.0],
+        "irrelevant fact here": [0.0, 0.0, 1.0],
+    }
+    store = AnnotationStore(VecEncoder(vecs))
+    store.add_text("what is my name. my name is kazufumi. irrelevant fact here.")
+    ann = store.annotations
+    row = ann.index("my name is kazufumi")
+    hits = {r: s for r, s, _ in store.query_connected(
+        "what is my name", k=3, entity_hop=True, entity_boost=0.1)}
+    base = {r: s for r, s, _ in store.query_connected("what is my name", k=3)}
+    # マージンは entity_boost * idf * 源重み ≤ entity_boost — base から大きく動かない
+    assert hits[row] >= base[row]
+    assert hits[row] - base[row] <= 0.1 + 1e-9
+
+
+def test_entity_hop_ignores_hub_tokens() -> None:
+    """df cap を超える高頻度トークンは hub とみなし entity に使わない。"""
+    vecs: dict[str, list[float]] = {"what is my name": [1.0, 0.0, 0.0]}
+    # "common" を含む事実を多数 + 答え 1 件
+    for i in range(12):
+        vecs[f"common filler fact {i}"] = [0.0, 0.3 + 0.01 * i, 0.9]
+    vecs["my name is kazufumi"] = [0.0, 1.0, 0.0]
+    vecs["what is my name common fact"] = [1.0, 0.0, 0.0]  # クエリ文 (encoder 用)
+    store = AnnotationStore(VecEncoder(vecs))
+    store.add_text(". ".join(a for a in vecs if a != "what is my name common fact") + ".")
+    ann = store.annotations
+    # df_cap=4: "common"/"filler"/"fact" (df=12) は hub → "name" (df=2) だけが効く
+    hits = store.query_connected(
+        "what is my name common fact", k=3, entity_hop=True,
+        entity_boost=1.0, entity_df_cap=4)
+    entity_rows = [ann[r] for r, _, src in hits if src == "entity"]
+    assert entity_rows == ["my name is kazufumi"]
+
+
+def test_entity_hop_token_index_invalidated_on_add() -> None:
+    """行追加で token index が再構築される (stale index の防止)。"""
+    enc = CountingEncoder()
+    store = AnnotationStore(enc)
+    store.add_text("alpha beta.")
+    assert store.entity_df("gamma") == 0
+    store.add_text("gamma delta.")
+    assert store.entity_df("gamma") == 1

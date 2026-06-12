@@ -181,6 +181,39 @@ def is_fact(annotation_norm: str) -> bool:
     return not is_question(annotation_norm) and not is_request(annotation_norm)
 
 
+# entity トークン抽出用 stopword (機能語 + 疑問語)。
+# 注意: _REQUEST_WORDS は含めない — "name"/"list"/"give" は依頼動詞と内容語 (実体) を兼ね、
+# 依頼判定は文頭位置依存だが entity 抽出は位置非依存のため、内容語側を殺してしまう。
+# "please"/"let" 系のみ機能語として個別に足す。
+_ENTITY_STOPWORDS = frozenset(
+    _QUESTION_WORDS + ("please", "let", "lets", "let's") + (
+        "a", "an", "the", "be", "been", "being", "i", "my", "me", "mine", "we",
+        "our", "ours", "us", "you", "your", "yours", "he", "him", "his", "she",
+        "her", "hers", "it", "its", "they", "them", "their", "theirs", "this",
+        "that", "these", "those", "of", "in", "on", "at", "to", "for", "with",
+        "and", "or", "but", "not", "no", "yes", "one", "two", "also", "as",
+        "by", "from", "about", "into", "over", "under", "up", "down", "out",
+        "off", "than", "then", "there", "here", "so", "if", "because", "very",
+        "just", "some", "any", "all", "each", "more", "most", "other", "such",
+        "own", "same", "too", "s", "t", "don", "now", "many", "much", "like",
+    )
+)
+_TOKEN_RE = re.compile(r"[a-z0-9]+")
+
+
+def informative_tokens(annotation_norm: str) -> frozenset[str]:
+    """正規化アノテーションから entity 候補トークン (stopword 除外・2 文字以上) を抽出する。
+
+    entity-coref エッジ v0 の素材: 「同じ実体への言及 (mention) を共有する行同士を繋ぐ」
+    の言及検出を、希少な内容語の共有で近似する (rule-based, $0)。
+    honest 留保: 英語トークン正規表現ベース — 日本語の言及検出は未対応 (将来課題)。
+    """
+    return frozenset(
+        t for t in _TOKEN_RE.findall(annotation_norm)
+        if len(t) >= 2 and t not in _ENTITY_STOPWORDS
+    )
+
+
 def split_annotations(text: str) -> list[str]:
     """テキストを正規化済みアノテーション (短句) のリストに分割する。
 
@@ -235,6 +268,8 @@ class AnnotationStore:
         self._recent_group: list[tuple[int, int]] = []  # (group_id, 行) の直近履歴
         self._degree_cache: dict[int, int] | None = None  # hub 判定用の共起次数キャッシュ
         self._degree_cache_size = -1
+        # entity-coref エッジ用 token 転置 index (行追加で無効化)
+        self._token_index_cache: dict[str, list[int]] | None = None
         self._n_instances = 0                     # 観測したアノテーション延べ数
         self._n_encoded = 0                       # 実際に encoder を呼んだユニーク数
         # int8 量子化キャッシュ (大規模 cosine の省メモリ近似; 行追加で無効化)
@@ -308,6 +343,7 @@ class AnnotationStore:
                 self._non_fact.append(not is_fact(a))
             self._n_encoded += len(new)
             self._int8 = None  # 量子化キャッシュ無効化
+            self._token_index_cache = None  # token 転置 index 無効化
         ids = []
         rows_here: list[int] = []
         for a in anns:
@@ -475,6 +511,25 @@ class AnnotationStore:
         hits.sort(key=lambda t: t[1], reverse=True)
         return hits[:k]
 
+    def _token_index(self) -> dict[str, list[int]]:
+        """token → そのトークンを含む行のリスト (転置 index)。行追加で無効化・再構築。
+
+        entity-coref エッジの実体: 同じ希少トークン (≈ 同一実体への言及) を共有する行は
+        暗黙のエッジで繋がっているとみなす。エッジを陽に張らず index で遅延表現する
+        (メモリ O(延べトークン数)、構築 O(n))。
+        """
+        if self._token_index_cache is None:
+            idx: dict[str, list[int]] = {}
+            for row, a in enumerate(self.annotations):
+                for t in informative_tokens(a):
+                    idx.setdefault(t, []).append(row)
+            self._token_index_cache = idx
+        return self._token_index_cache
+
+    def entity_df(self, token: str) -> int:
+        """トークンの document frequency (含む行数)。entity 希少性判定に使う。"""
+        return len(self._token_index().get(token, ()))
+
     def query_connected(
         self,
         text: str,
@@ -484,6 +539,9 @@ class AnnotationStore:
         want_facts: bool = True,
         boost: float = 1.0,
         hub_suppression: bool = True,
+        entity_hop: bool = False,
+        entity_boost: float = 0.1,
+        entity_df_cap: int | None = None,
     ) -> list[tuple[int, float, str]]:
         """連結性検索: cosine 事実検索を base に、**共起エッジで答え (事実) へホップ**して加点。
 
@@ -498,7 +556,14 @@ class AnnotationStore:
         注意: この強度は小規模ベンチ (3 probe) では確信を持って調整できない (probe ごとに最適が
         入れ替わる過剰適合域)。既定 on は測定上の集約最良 (MRR 0.056→0.389) だが、確定的な
         チューニングは benchmark 拡張後に行う (honest 留保)。
-        返り値: (行, スコア, 由来) の降順。由来 = "cosine" | "cooccur"。
+
+        ``entity_hop=True`` (既定 off): **entity-coref エッジ** (M1 降格後の小改善) —
+        クエリ / seed 行と**希少トークン (≈ 同一実体への言及) を共有する事実行**に、
+        cosine base への**加算マージン** ``entity_boost * IDF(token) * 源重み`` を与える。
+        22-probe 訂正 (CONNECTIVITY_BENCH_CORRECTION_2026_06_11) の教訓により乗算 boost でなく
+        小さな加算マージン (既定 0.1) — cosine の大域順位を壊さず局所でのみ並べ替える。
+        ``entity_df_cap`` (既定 max(8, 5% of rows)) を超える高頻度トークンは hub とみなし不使用。
+        返り値: (行, スコア, 由来) の降順。由来 = "cosine" | "cooccur" | "entity"。
         """
         import math
 
@@ -535,6 +600,45 @@ class AnnotationStore:
                 prev = scored.get(nb)
                 if prev is None or s > prev[0]:
                     scored[nb] = (s, "cooccur")
+
+        # entity hop: クエリ/seed と希少トークンを共有する事実行へ加算マージン
+        if entity_hop:
+            tindex = self._token_index()
+            df_cap = (
+                entity_df_cap if entity_df_cap is not None
+                else max(8, int(0.05 * self._n_rows))
+            )
+            idf_norm_max = math.log(1 + self._n_rows) if self._n_rows else 1.0
+            ann = self.annotations
+            # 源 = (トークン集合, 源重み)。クエリ自身は重み 1.0、seed 行はその cosine。
+            sources: list[tuple[frozenset[str], float]] = [
+                (informative_tokens(_WS.sub(" ", text).strip().lower()), 1.0)
+            ]
+            for srow in order:
+                srow = int(srow)
+                sources.append((informative_tokens(ann[srow]), max(float(sims[srow]), 0.0)))
+            margins: dict[int, float] = {}
+            for tokens, w in sources:
+                if w <= 0.0:
+                    continue
+                for t in tokens:
+                    rows = tindex.get(t, ())
+                    df = len(rows)
+                    if df == 0 or df > df_cap:  # hub 語は entity とみなさない
+                        continue
+                    idf = math.log((1 + self._n_rows) / (1 + df)) / idf_norm_max
+                    for r in rows:
+                        if want_facts and self._non_fact[r]:
+                            continue
+                        m = entity_boost * idf * w
+                        if m > margins.get(r, 0.0):
+                            margins[r] = m
+            for r, m in margins.items():
+                base = float(sims[r])  # 加算は常に cosine base 起点 (cooccur 経路と独立)
+                s = base + m
+                prev = scored.get(r)
+                if prev is None or s > prev[0]:
+                    scored[r] = (s, "entity")
         ranked = sorted(scored.items(), key=lambda t: t[1][0], reverse=True)
         return [(row, sc, src) for row, (sc, src) in ranked][:k]
 

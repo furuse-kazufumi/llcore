@@ -47,6 +47,9 @@ sdp = ["cvxpy>=1.9"]
 chat = ["torch>=2.2", "transformers>=4.46"]
 # clip: text↔image 共有埋め込み (llcore.clip, default=SigLIP Apache-2.0)。連結性基盤。
 clip = ["torch>=2.2", "transformers>=4.46", "pillow>=10"]
+# text: text-only 検索用 encoder 差し替え (llcore.clip.text_encoders,
+# default=all-MiniLM-L6-v2 Apache-2.0)。cross-modal は引き続き extra "clip" を使う。
+text = ["sentence-transformers>=3"]
 llive = ["llmesh-llive>=0.6"]
 # rad は stdlib のみで動くため optional-dep 不要 (RAD コーパスを path-based 参照)
 # LLCORE_RAD_DIR env で RAD 根ディレクトリを指定 (未設定時は graceful degrade = hint なし)

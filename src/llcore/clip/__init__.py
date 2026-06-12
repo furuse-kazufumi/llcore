@@ -13,6 +13,12 @@
   不明のため不採用。Qwen 系回避の商用制約に従う。
 - 埋め込みは L2 正規化済 — 類似度 = 内積 = cosine。
 
+text-only 検索向けには :class:`SentenceEncoderBackend` (sentence-transformers /
+all-MiniLM-L6-v2, Apache-2.0) を差し替えオプションとして提供する。head-to-head 実測
+(out/retrieval_head_to_head.json) で短句 retrieval は MiniLM が hard MRR 0.2956 vs
+SigLIP 0.1893、encode 0.1s vs 14.6s と優位。cross-modal (text↔image) は引き続き
+:class:`ClipBackend` を使う — SentenceEncoderBackend は画像メソッドを持たない。
+
 使い方::
 
     py -3.11 -m llcore.clip --image photo.jpg --labels "a cat,a dog,a car"
@@ -42,13 +48,24 @@ from llcore.clip.backend import (
     resolve_clip_model_id,
     zero_shot,
 )
+from llcore.clip.text_encoders import (
+    DEFAULT_TEXT_ENCODER_MODEL,
+    TEXT_ENCODER_MODEL_ENV_VAR,
+    SentenceEncoderBackend,
+    TextEncoderDependencyError,
+    resolve_text_encoder_model_id,
+)
 
 __all__ = [
     "CLIP_MODEL_ENV_VAR",
     "DEFAULT_CLIP_MODEL",
+    "DEFAULT_TEXT_ENCODER_MODEL",
+    "TEXT_ENCODER_MODEL_ENV_VAR",
     "AnnotationStore",
     "ClipBackend",
     "ClipDependencyError",
+    "SentenceEncoderBackend",
+    "TextEncoderDependencyError",
     "annotation_id",
     "id_cosine",
     "id_to_unit_vector",
@@ -56,6 +73,7 @@ __all__ = [
     "is_question",
     "is_request",
     "resolve_clip_model_id",
+    "resolve_text_encoder_model_id",
     "split_annotations",
     "zero_shot",
 ]
