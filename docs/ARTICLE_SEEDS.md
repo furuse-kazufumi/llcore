@@ -73,6 +73,26 @@
 - **根拠**: rad_full_ingest.py (checkpoint/load_progress) / 実走ログ。
 - **側面**: 実装報告 / 教訓 / ユーザー体験 (家庭用 PC スペックでの研究)。
 
+### 13. sound gate のコストは「判定 1 回の速さ」でなく「reject 率 × resample 構造」で決まる
+- **気付き**: cert_sdp (1 判定 ~数百 ms) を MAP-Elites の gate にしたら smoke が
+  1 時間級に停滞 (13 分で seed 0 すら未完)。原因は判定単体でなく、**探索分布の
+  ~94% が発散側 → gate がほぼ全 reject → resample で判定回数が数千回に膨張**という
+  掛け算。µs 判定の cert_inf への切替で解決 (sound 性は ladder 共通)。本測定では
+  包含関係 (inf admit → sdp も admit) を使う inf-first cascade を設計する。
+  一般形: **gate の実効コスト = 判定コスト × 判定回数で、判定回数は探索分布と
+  通過率の関数** — gate 単体のマイクロベンチでは見えない。
+- **根拠**: m2_connectivity_poc.py v2→v3 (commit diff) / 実測 CPU 13.9 分停滞。
+- **側面**: 技術設計 / 実装報告 / 教訓。
+
+### 14. 「学習できる × 安全を選ばない」の同時観測 (M2 v2 seed 0)
+- **気付き**: readout v2 で T1 (turn 境界予測) は train CE 0.5186 < floor 0.6269、
+  held-out 0.4386 < floor 0.5495 と**初めて床を破り学習が成立**。同時に無 gate
+  archive は 65 gene 中 61 (94%) が ρ≥1 のまま。つまり**会話教師は「学習可能な
+  信号」だが「安全な gene を選ぶ圧」を全く持たない** — capability と guarantee の
+  直交性が 1 つの smoke で同時に観測された。M2 本測定の主張の縮図。
+- **根拠**: out/m2_poc.log (v2 seed 0) / m2_connectivity_poc.json (v3 完走後に確定)。
+- **側面**: honest disclosure / ベンチ / 哲学。
+
 ### 12. run_in_background はセッションと運命を共にする — 長時間ジョブは detached へ
 - **気付き**: エージェント環境の「バックグラウンド実行」はセッション終了 = プロセス死。
   3.5 時間の encode ジョブが**セッション切替で 2 回連続死亡** (計 ~25 分の encode 損失
