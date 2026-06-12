@@ -86,25 +86,35 @@ def make_admit(gate: str, gate_rng: np.random.Generator):
 
 
 def main() -> int:
+    import argparse
+
+    parser = argparse.ArgumentParser(description="M2.1 gate 比較")
+    parser.add_argument("--mode", choices=("main", "sdp"), default="main",
+                        help="main = none/stable_exp/cert_inf 15 seed / "
+                             "sdp = cert_sdp のみ seed 0-2 (分離サブ実験 — "
+                             "SDP 判定が seed 0 で 6 分超過したため本判定と分離。"
+                             "gate ごとに RNG 独立のため分離実行でも結果同一)")
+    args = parser.parse_args()
+
     t_start = time.time()
     anns, flags, n_turns = load_conversation_sequence()
     H = get_annotation_hiddens(anns)
-    print(f"M2.1: {len(anns)} annotations / {n_turns} turns / budget {BUDGET} / "
-          f"{N_SEEDS} seeds (cert_sdp は {N_SEEDS_SDP})", flush=True)
+    print(f"M2.1 ({args.mode}): {len(anns)} annotations / {n_turns} turns / "
+          f"budget {BUDGET} / {N_SEEDS} seeds (cert_sdp は {N_SEEDS_SDP})", flush=True)
 
     results: dict = {"n_annotations": len(anns), "n_turns": n_turns,
                      "budget": BUDGET, "n_seeds": N_SEEDS,
                      "n_seeds_sdp": N_SEEDS_SDP, "rho_samples": RHO_SAMPLES,
                      "eps_forget": EPS_FORGET, "runs": []}
-    for seed_i in range(N_SEEDS):
+    seed_range = range(N_SEEDS) if args.mode == "main" else range(N_SEEDS_SDP)
+    for seed_i in seed_range:
         terrain = ConnectivityTerrain(H, flags, np.random.default_rng(SEED0 + seed_i))
         info: dict = {"seed": SEED0 + seed_i, "split": terrain.split,
                       "floor_train_ce": round(terrain.floor_train, 4),
                       "floor_heldout_ce": round(terrain.floor_heldout, 4),
                       "gates": {}}
-        gates = ["none", "stable_exp", "cert_inf"]
-        if seed_i < N_SEEDS_SDP:
-            gates.append("cert_sdp")
+        gates = (["none", "stable_exp", "cert_inf"] if args.mode == "main"
+                 else ["cert_sdp"])
         for gate in gates:
             rng = np.random.default_rng(SEED0 + 1000 + seed_i)   # gate 間で同一系列
             gate_rng = np.random.default_rng(SEED0 + 2000 + seed_i)
@@ -139,30 +149,35 @@ def main() -> int:
     def _all_gate(gate: str, key: str) -> list:
         return [r["gates"][gate][key] for r in results["runs"] if gate in r["gates"]]
 
-    g1_inf = all(v == 0 for v in _all_gate("cert_inf", "n_admitted_rho_ge_1")) and \
-        all(v < 1.0 for v in _all_gate("cert_inf", "best_rho"))
-    g1_sdp = all(v == 0 for v in _all_gate("cert_sdp", "n_admitted_rho_ge_1")) and \
-        all(v < 1.0 for v in _all_gate("cert_sdp", "best_rho"))
-    g1_stable_unsafe = sum(_all_gate("stable_exp", "n_admitted_rho_ge_1")) > 0
-    g2_none_best_div = sum(v >= 1.0 for v in _all_gate("none", "best_rho"))
-    g2_stable_best_div = sum(v >= 1.0 for v in _all_gate("stable_exp", "best_rho"))
-    c1 = {g: all(ce < r["floor_train_ce"] - 0.02
-                 for r, ce in zip(results["runs"], _all_gate(g, "best_train_ce")))
-          for g in ("none", "stable_exp", "cert_inf")}
-    tax = [a - b for a, b in zip(_all_gate("cert_inf", "heldout_ce_of_best"),
-                                 _all_gate("none", "heldout_ce_of_best"))]
-    results["verdict"] = {
-        "G1_cert_inf_sound": g1_inf,
-        "G1_cert_sdp_sound_n3": g1_sdp,
-        "G1_stable_exp_admits_divergent": g1_stable_unsafe,
-        "G2_none_best_divergent_seeds": f"{g2_none_best_div}/{N_SEEDS}",
-        "G2_stable_best_divergent_seeds": f"{g2_stable_best_div}/{N_SEEDS}",
-        "C1_learnable_under_gate": c1,
-        "C2_cert_inf_heldout_tax_mean": round(float(np.mean(tax)), 4),
-    }
+    if args.mode == "main":
+        g1_inf = all(v == 0 for v in _all_gate("cert_inf", "n_admitted_rho_ge_1")) \
+            and all(v < 1.0 for v in _all_gate("cert_inf", "best_rho"))
+        g1_stable_unsafe = sum(_all_gate("stable_exp", "n_admitted_rho_ge_1")) > 0
+        g2_none_best_div = sum(v >= 1.0 for v in _all_gate("none", "best_rho"))
+        g2_stable_best_div = sum(v >= 1.0 for v in _all_gate("stable_exp", "best_rho"))
+        c1 = {g: all(ce < r["floor_train_ce"] - 0.02
+                     for r, ce in zip(results["runs"], _all_gate(g, "best_train_ce")))
+              for g in ("none", "stable_exp", "cert_inf")}
+        tax = [a - b for a, b in zip(_all_gate("cert_inf", "heldout_ce_of_best"),
+                                     _all_gate("none", "heldout_ce_of_best"))]
+        results["verdict"] = {
+            "G1_cert_inf_sound": g1_inf,
+            "G1_stable_exp_admits_divergent": g1_stable_unsafe,
+            "G2_none_best_divergent_seeds": f"{g2_none_best_div}/{N_SEEDS}",
+            "G2_stable_best_divergent_seeds": f"{g2_stable_best_div}/{N_SEEDS}",
+            "C1_learnable_under_gate": c1,
+            "C2_cert_inf_heldout_tax_mean": round(float(np.mean(tax)), 4),
+        }
+    else:
+        g1_sdp = all(v == 0 for v in _all_gate("cert_sdp", "n_admitted_rho_ge_1")) \
+            and all(v < 1.0 for v in _all_gate("cert_sdp", "best_rho"))
+        results["verdict"] = {"G1_cert_sdp_sound_n3": g1_sdp}
     results["total_seconds"] = round(time.time() - t_start, 1)
 
-    out = os.path.join(_ROOT, "out", "m2_gate_comparison.json")
+    out = os.path.join(
+        _ROOT, "out",
+        "m2_gate_comparison.json" if args.mode == "main"
+        else "m2_gate_comparison_sdp.json")
     with open(out, "w", encoding="utf-8") as f:
         json.dump(results, f, ensure_ascii=False, indent=2, default=_json_native)
     print("\n=== 事前登録判定 ===", flush=True)
