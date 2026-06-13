@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 360" font-family="Segoe UI, Hiragino Kaku Gothic ProN, Meiryo, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0d1117"/><stop offset="1" stop-color="#161b22"/>
+    </linearGradient>
+  </defs>
+  <rect width="760" height="360" fill="url(#bg)"/>
+  <text x="30" y="40" fill="#e6edf3" font-size="22" font-weight="700">echo-state: 摂動は減衰するか、発散するか</text>
+  <text x="30" y="64" fill="#8b949e" font-size="14">同じ「進化」でも、安定境界の どちら側 に着地したかで運命が分かれる</text>
+
+  <!-- axes -->
+  <line x1="80" y1="300" x2="720" y2="300" stroke="#30363d" stroke-width="2"/>
+  <line x1="80" y1="110" x2="80" y2="300" stroke="#30363d" stroke-width="2"/>
+  <text x="700" y="324" fill="#6e7681" font-size="12">time →</text>
+  <text x="30" y="120" fill="#6e7681" font-size="12">‖perturbation‖</text>
+  <line x1="80" y1="205" x2="720" y2="205" stroke="#21262d" stroke-width="1" stroke-dasharray="4 4"/>
+
+  <!-- divergent (rho >= 1) -->
+  <path d="M80,260 C 240,250 360,235 470,170 S 640,60 700,40" fill="none" stroke="#f85149" stroke-width="3.5" stroke-linecap="round"
+        stroke-dasharray="900" stroke-dashoffset="900">
+    <animate attributeName="stroke-dashoffset" from="900" to="0" dur="2.4s" begin="0.2s" fill="freeze"/>
+  </path>
+  <circle r="6" fill="#f85149">
+    <animateMotion dur="2.4s" begin="0.2s" fill="freeze" path="M80,260 C 240,250 360,235 470,170 S 640,60 700,40"/>
+  </circle>
+  <text x="540" y="92" fill="#f85149" font-size="15" font-weight="700" opacity="0">
+    ρ ≥ 1 : 発散（無gateの 92%）
+    <animate attributeName="opacity" from="0" to="1" dur="0.5s" begin="2.4s" fill="freeze"/>
+  </text>
+
+  <!-- stable (rho < 1) -->
+  <path d="M80,260 C 220,278 330,290 440,295 S 640,300 700,300" fill="none" stroke="#3fb950" stroke-width="3.5" stroke-linecap="round"
+        stroke-dasharray="760" stroke-dashoffset="760">
+    <animate attributeName="stroke-dashoffset" from="760" to="0" dur="2.4s" begin="0.2s" fill="freeze"/>
+  </path>
+  <circle r="6" fill="#3fb950">
+    <animateMotion dur="2.4s" begin="0.2s" fill="freeze" path="M80,260 C 220,278 330,290 440,295 S 640,300 700,300"/>
+  </circle>
+  <text x="470" y="285" fill="#3fb950" font-size="15" font-weight="700" opacity="0">
+    ρ &lt; 1 : 減衰（証明つきで採用）
+    <animate attributeName="opacity" from="0" to="1" dur="0.5s" begin="2.4s" fill="freeze"/>
+  </text>
+
+  <text x="80" y="345" fill="#6e7681" font-size="12.5">fail-closed gate は「ρ&lt;1 を証明できる候補」だけを通す。tanh 有界は“見かけの安全”の罠なので、ρ で測る。</text>
+</svg>

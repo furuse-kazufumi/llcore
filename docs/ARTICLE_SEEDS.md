@@ -165,3 +165,25 @@
   「弱点の隠蔽」でなく「設計の制約条件 + 主張の強化材」に変換する。
 - **根拠**: M2_CERT_CONNECTIVITY_DESIGN_2026_06_12.md §2.5。
 - **側面**: honest disclosure / 哲学 / 技術設計。
+
+## 2026-06-13 (セッション: RAD コーパス拡張ローテーション継続)
+
+### 17. API が全部死んでも corpus は「構造化 fallback」で前に進める
+- **気付き**: `corpus2skill` の要約器は ANTHROPIC org disabled で全滅、さらに今回は
+  `OPENAI_API_KEY` も未設定だった。それでも `SKILL.md` の frontmatter・子クラスタ・
+  docs title・頻出語だけで `Overview / Key Knowledge / When Useful / Navigation`
+  を**決定論的に再生成**すれば、少なくとも「辿れる corpus」は完成する。LLM 要約が
+  なくても探索導線は壊さずに済む、という運用上の保険が取れた。
+- **根拠**: `self_evolving_agents_corpus_v2.staging` の `_STAGING_META/DECISIONS.md`
+  (環境依存の別ドライブ staging 出力)、
+  `metadata.json` (`summaries_generated: 0`)。
+- **側面**: 実装報告 / 教訓 / AI 駆動研究ワークフロー。
+
+### 18. 広い topical query は recall を稼ぐが、leaf cluster にノイズとして返ってくる
+- **気付き**: `self-evolving` / `reflection` / `test-time training` 系で 16 クエリを広く張ると、
+  807 docs まで一気に集まる一方、少数の葉クラスタに材料・天文・VQA など周辺分野が混ざる。
+  つまり topical corpus 作成では「まず recall で広く拾い、人間レビューで precision を
+  戻す」二段運用が現実的。完全自動で precision まで仕上げようとすると再実行コストが高い。
+- **根拠**: `self_evolving_agents_corpus_v2.staging` の `_STAGING_META/queries.txt` と
+  `_STAGING_META/DECISIONS.md` (いずれも環境依存の別ドライブ staging 出力)。
+- **側面**: 教訓 / 実装報告 / honest disclosure。

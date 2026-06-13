@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 470" font-family="Segoe UI, Meiryo, sans-serif">
+  <defs>
+    <radialGradient id="peak" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#fde047"/><stop offset="35%" stop-color="#f97316"/>
+      <stop offset="70%" stop-color="#b91c1c" stop-opacity="0.7"/><stop offset="100%" stop-color="#b91c1c" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="safe" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#fb923c"/><stop offset="45%" stop-color="#16a34a" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#16a34a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="mid" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#3730a3" stop-opacity="0.7"/><stop offset="100%" stop-color="#3730a3" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- low-fitness base (pseudo-color: 低い=紫青) -->
+  <rect x="8" y="40" width="804" height="392" rx="8" fill="#14143a"/>
+  <ellipse cx="420" cy="300" rx="380" ry="200" fill="url(#mid)"/>
+  <!-- safe-zone local optimum (やや低い山, 橙) -->
+  <ellipse cx="300" cy="250" rx="230" ry="170" fill="url(#safe)"/>
+  <!-- global peak in DIVERGENT zone (最高, 黄) -->
+  <ellipse cx="650" cy="135" rx="190" ry="150" fill="url(#peak)"/>
+  <!-- topo contours around global peak -->
+  <g fill="none" stroke="#ffffff" stroke-opacity="0.10">
+    <ellipse cx="650" cy="135" rx="60" ry="48"/><ellipse cx="650" cy="135" rx="110" ry="88"/><ellipse cx="650" cy="135" rx="160" ry="125"/>
+  </g>
+
+  <text x="20" y="30" fill="#e6edf3" font-size="20" font-weight="700">適応度の山頂は“発散側”にある — gate 付きは安全境界の手前で止まる</text>
+
+  <!-- rho=1 boundary -->
+  <path d="M520,48 C 470,160 470,300 430,424" fill="none" stroke="#e6edf3" stroke-width="2.5" stroke-dasharray="7 6" stroke-opacity="0.85"/>
+  <text x="455" y="70" fill="#e6edf3" font-size="13" transform="rotate(78 455 70)">ρ = 1  安全境界</text>
+  <text x="120" y="420" fill="#9fe6b0" font-size="13">← ρ&lt;1 (安全・証明可)</text>
+  <text x="600" y="420" fill="#f3a08a" font-size="13">ρ≥1 (発散) →</text>
+
+  <!-- start point -->
+  <circle cx="150" cy="400" r="5" fill="#c9d1d9"/>
+  <text x="120" y="392" fill="#c9d1d9" font-size="12">start</text>
+
+  <!-- NONE: climbs across the boundary to the global (divergent) peak -->
+  <path id="pNone" d="M150,400 C 320,360 470,300 560,210 S 640,150 650,135" fill="none" stroke="#f0a04b" stroke-width="2.5" stroke-opacity="0.55" stroke-dasharray="3 5"/>
+  <circle r="8" fill="#f0a04b" stroke="#0b0f14" stroke-width="1.5">
+    <animateMotion dur="4s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="linear">
+      <mpath href="#pNone"/>
+    </animateMotion>
+  </circle>
+  <text x="610" y="118" fill="#f0a04b" font-size="13" font-weight="700">no gate → best_rho 1.85（賢いが暴走）</text>
+
+  <!-- CERT: climbs but halts hugging the safe side of rho=1 -->
+  <path id="pCert" d="M150,400 C 300,365 380,320 420,270 S 452,225 448,212" fill="none" stroke="#3fb950" stroke-width="2.5" stroke-opacity="0.6" stroke-dasharray="3 5"/>
+  <circle r="8" fill="#3fb950" stroke="#0b0f14" stroke-width="1.5">
+    <animateMotion dur="4s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.62;1" calcMode="linear">
+      <mpath href="#pCert"/>
+    </animateMotion>
+  </circle>
+  <text x="270" y="200" fill="#3fb950" font-size="13" font-weight="700">cert → best_rho 0.90（証明つき・安全）</text>
+
+  <!-- legend -->
+  <text x="20" y="452" fill="#8b949e" font-size="12.5">疑似カラー = 適応度（紫青=低 → 橙 → 黄=高）。実データ: 無gate最良は15/15で発散、cert_infのfalse-admitは0/15、安全税 −0.0526。</text>
+</svg>

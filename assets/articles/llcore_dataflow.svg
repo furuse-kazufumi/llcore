@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 420" font-family="Segoe UI, Meiryo, sans-serif">
+  <defs>
+    <linearGradient id="bgd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b1020"/><stop offset="1" stop-color="#10162b"/></linearGradient>
+    <linearGradient id="thread" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#58a6ff" stop-opacity="0.2"/><stop offset="0.5" stop-color="#7ee787"/><stop offset="1" stop-color="#58a6ff" stop-opacity="0.2"/>
+    </linearGradient>
+  </defs>
+  <rect width="880" height="420" fill="url(#bgd)"/>
+  <text x="28" y="38" fill="#e6edf3" font-size="20" font-weight="700">データの流れを“糸”で見る — llcore のパイプライン</text>
+
+  <!-- stage blocks -->
+  <g>
+    <rect x="170" y="92" width="120" height="236" rx="10" fill="#161b2e" stroke="#2a3350"/>
+    <text x="230" y="350" fill="#9aa7b4" font-size="13" text-anchor="middle">SmolLM2-135M</text>
+    <text x="230" y="368" fill="#5b6b86" font-size="12" text-anchor="middle">(凍結)</text>
+
+    <rect x="420" y="92" width="130" height="236" rx="10" fill="#1a1430" stroke="#5a3aa0"/>
+    <text x="485" y="350" fill="#c9a8ff" font-size="13" text-anchor="middle">recurrent adapter</text>
+    <text x="485" y="368" fill="#8a6fc0" font-size="12" text-anchor="middle">(進化する構造)</text>
+
+    <rect x="650" y="92" width="92" height="236" rx="10" fill="#13261a" stroke="#2f6b3f"/>
+    <text x="696" y="350" fill="#7ee787" font-size="13" text-anchor="middle">ρ&lt;1 gate</text>
+    <text x="696" y="368" fill="#4f8a5f" font-size="12" text-anchor="middle">(fail-closed)</text>
+  </g>
+  <text x="40" y="80" fill="#8b949e" font-size="13">会話トークン</text>
+  <text x="772" y="80" fill="#8b949e" font-size="13">ターン境界予測</text>
+
+  <!-- threads: 6 flowing bezier paths -->
+  <g fill="none" stroke-width="2.5" stroke-linecap="round">
+    <!-- five admitted (green-blue), one rejected (red, stops at gate) -->
+    <path d="M40,120 C 150,118 150,150 230,150 S 360,150 485,135 S 640,128 760,120" stroke="url(#thread)" stroke-dasharray="10 12">
+      <animate attributeName="stroke-dashoffset" from="220" to="0" dur="2.2s" repeatCount="indefinite"/></path>
+    <path d="M40,160 C 150,158 150,185 230,185 S 360,190 485,180 S 640,175 760,170" stroke="url(#thread)" stroke-dasharray="10 12">
+      <animate attributeName="stroke-dashoffset" from="220" to="0" dur="2.6s" repeatCount="indefinite"/></path>
+    <path d="M40,210 C 150,208 150,210 230,210 S 360,215 485,215 S 640,218 760,220" stroke="url(#thread)" stroke-dasharray="10 12">
+      <animate attributeName="stroke-dashoffset" from="220" to="0" dur="2.0s" repeatCount="indefinite"/></path>
+    <path d="M40,260 C 150,262 150,245 230,245 S 360,250 485,260 S 640,268 760,270" stroke="url(#thread)" stroke-dasharray="10 12">
+      <animate attributeName="stroke-dashoffset" from="220" to="0" dur="2.8s" repeatCount="indefinite"/></path>
+    <path d="M40,300 C 150,300 150,285 230,285 S 360,290 485,300 S 640,310 760,318" stroke="url(#thread)" stroke-dasharray="10 12">
+      <animate attributeName="stroke-dashoffset" from="220" to="0" dur="2.4s" repeatCount="indefinite"/></path>
+    <!-- rejected thread: enters adapter, reaches gate, blocked -->
+    <path d="M40,340 C 160,342 150,320 230,320 S 380,330 485,335 S 600,338 648,338" stroke="#f85149" stroke-dasharray="9 11" opacity="0.9">
+      <animate attributeName="stroke-dashoffset" from="200" to="0" dur="2.1s" repeatCount="indefinite"/></path>
+  </g>
+
+  <!-- flowing particles (animateMotion) -->
+  <circle r="4" fill="#aef0c0"><animateMotion dur="2.2s" repeatCount="indefinite" path="M40,120 C 150,118 150,150 230,150 S 360,150 485,135 S 640,128 760,120"/></circle>
+  <circle r="4" fill="#aef0c0"><animateMotion dur="2.0s" repeatCount="indefinite" path="M40,210 C 150,208 150,210 230,210 S 360,215 485,215 S 640,218 760,220"/></circle>
+  <circle r="4" fill="#aef0c0"><animateMotion dur="2.4s" repeatCount="indefinite" path="M40,300 C 150,300 150,285 230,285 S 360,290 485,300 S 640,310 760,318"/></circle>
+  <!-- rejected particle stops at gate -->
+  <circle r="4" fill="#ff8b82"><animateMotion dur="2.1s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.8;1" calcMode="linear" path="M40,340 C 160,342 150,320 230,320 S 380,330 485,335 S 600,338 648,338"/></circle>
+  <text x="556" y="332" fill="#f85149" font-size="12">✕ 証明不能 → reject</text>
+
+  <text x="28" y="406" fill="#8b949e" font-size="12.5">糸=データの流れ。凍結 LLM の隠れ状態(実装ではキャッシュ)を、進化する adapter が編み、ρ&lt;1 を証明できた流れだけが通る。</text>
+</svg>

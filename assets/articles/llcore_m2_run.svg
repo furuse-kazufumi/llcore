@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 520" font-family="Consolas, 'SF Mono', 'Cascadia Code', monospace">
+  <!-- terminal window -->
+  <rect x="8" y="8" width="844" height="504" rx="10" fill="#0b0f14" stroke="#222b36" stroke-width="1.5"/>
+  <rect x="8" y="8" width="844" height="34" rx="10" fill="#161b22"/>
+  <circle cx="32" cy="25" r="6" fill="#ff5f56"/><circle cx="52" cy="25" r="6" fill="#ffbd2e"/><circle cx="72" cy="25" r="6" fill="#27c93f"/>
+  <text x="430" y="29" fill="#7d8794" font-size="13" text-anchor="middle">llcore — M2 gate comparison (verified plasticity)</text>
+
+  <g font-size="14.5">
+    <!-- command -->
+    <text x="26" y="68" fill="#9aa7b4">$ <tspan fill="#e6edf3">py -3.11 scripts/m2_gate_comparison.py --seeds 15 --gates none,stable_exp,cert_inf</tspan>
+      <animate attributeName="opacity" values="0;1" dur="0.01s" begin="0.2s" fill="freeze"/>
+    </text>
+    <text x="26" y="92" fill="#7d8794" opacity="0">n_annotations=122  n_turns=35  rho_samples=2000  budget=2000
+      <animate attributeName="opacity" values="0;1" dur="0.01s" begin="0.6s" fill="freeze"/></text>
+
+    <!-- seed lines (real numbers from m2_gate_cmp.log) -->
+    <g>
+      <text x="26" y="124" fill="#f0a04b" opacity="0">[seed 7 none      ] trainCE 0.5244 (floor 0.6264) | best_rho 1.893 | rho≥1  68 | 6s
+        <animate attributeName="opacity" values="0;1" dur="0.01s" begin="1.0s" fill="freeze"/></text>
+      <text x="26" y="146" fill="#f0a04b" opacity="0">[seed 7 stable_exp] trainCE 0.5312 (floor 0.6264) | best_rho 1.000 | rho≥1  52 | 132s
+        <animate attributeName="opacity" values="0;1" dur="0.01s" begin="1.45s" fill="freeze"/></text>
+      <text x="26" y="168" fill="#3fb950" opacity="0">[seed 7 cert_inf  ] trainCE 0.5581 (floor 0.6264) | best_rho 0.903 | rho≥1   0 | 20s
+        <animate attributeName="opacity" values="0;1" dur="0.01s" begin="1.9s" fill="freeze"/></text>
+      <text x="26" y="190" fill="#f0a04b" opacity="0">[seed 8 none      ] trainCE 0.5309 (floor 0.6190) | best_rho 1.447 | rho≥1  65 | 5s
+        <animate attributeName="opacity" values="0;1" dur="0.01s" begin="2.35s" fill="freeze"/></text>
+      <text x="26" y="212" fill="#3fb950" opacity="0">[seed 8 cert_inf  ] trainCE 0.5550 (floor 0.6190) | best_rho 0.644 | rho≥1   0 | 20s
+        <animate attributeName="opacity" values="0;1" dur="0.01s" begin="2.8s" fill="freeze"/></text>
+      <text x="26" y="234" fill="#f0a04b" opacity="0">[seed 9 none      ] trainCE 0.5328 (floor 0.6237) | best_rho 1.849 | rho≥1  69 | 5s
+        <animate attributeName="opacity" values="0;1" dur="0.01s" begin="3.25s" fill="freeze"/></text>
+      <text x="26" y="256" fill="#3fb950" opacity="0">[seed 9 cert_inf  ] trainCE 0.5539 (floor 0.6237) | best_rho 0.836 | rho≥1   0 | 20s
+        <animate attributeName="opacity" values="0;1" dur="0.01s" begin="3.7s" fill="freeze"/></text>
+      <text x="26" y="278" fill="#5b6673" opacity="0">  ... (seed 5–14, 15 seeds total) ...
+        <animate attributeName="opacity" values="0;1" dur="0.01s" begin="4.15s" fill="freeze"/></text>
+    </g>
+
+    <!-- verdict block -->
+    <text x="26" y="318" fill="#e6edf3" font-weight="700" opacity="0">=== 事前登録判定 (pre-registered) ===
+      <animate attributeName="opacity" values="0;1" dur="0.01s" begin="4.7s" fill="freeze"/></text>
+    <text x="26" y="346" fill="#f0a04b" opacity="0">  G2  無gate 最良個体が発散したseed : 15/15   ← 進化は放っておくと暴走側に着地
+      <animate attributeName="opacity" values="0;1" dur="0.01s" begin="5.1s" fill="freeze"/></text>
+    <text x="26" y="372" fill="#3fb950" opacity="0">  G1  cert_inf の false-admit (ρ≥1) : 0/15   ✓  ← 証明つきは一度も誤許可なし
+      <animate attributeName="opacity" values="0;1" dur="0.01s" begin="5.6s" fill="freeze"/></text>
+    <text x="26" y="398" fill="#58a6ff" opacity="0">  C2  cert_inf の heldout 安全税(平均): -0.0526  ← 安全税はむしろマイナス
+      <animate attributeName="opacity" values="0;1" dur="0.01s" begin="6.1s" fill="freeze"/></text>
+    <text x="26" y="426" fill="#7d8794" opacity="0">total 2897.6s   results: out/m2_gate_comparison.json
+      <animate attributeName="opacity" values="0;1" dur="0.01s" begin="6.5s" fill="freeze"/></text>
+
+    <!-- honest caption -->
+    <text x="26" y="468" fill="#8b949e" font-size="12.5" opacity="0">honest: capability は NEGATIVE(進化は勾配に19/20で負ける)。価値は“賢さ”でなく“暴走しないと証明できる”こと。
+      <animate attributeName="opacity" values="0;1" dur="0.01s" begin="7.0s" fill="freeze"/></text>
+
+    <!-- blinking cursor -->
+    <rect x="26" y="480" width="10" height="18" fill="#3fb950">
+      <animate attributeName="opacity" values="1;1;0;0" dur="1s" repeatCount="indefinite" begin="7.2s"/>
+      <animate attributeName="opacity" values="0;1" dur="0.01s" begin="7.1s" fill="freeze"/>
+    </rect>
+  </g>
+</svg>

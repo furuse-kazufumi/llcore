@@ -1,0 +1,183 @@
+{"ts": "2026-06-12T06:20:30.543777+00:00", "event": "session_start", "cmd_id": "80c9e775-bc3b-4e87-97f4-5ab49580b4df", "action": "rotate", "detail": "session#1"}
+{"ts": "2026-06-12T06:23:20.123655+00:00", "event": "turn", "cmd_id": "80c9e775-bc3b-4e87-97f4-5ab49580b4df", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=cancelled"}
+{"ts": "2026-06-12T08:20:39.706254+00:00", "event": "session_start", "cmd_id": "f221d2de-a6ad-4da7-931f-c4749ec486c8", "action": "rotate", "detail": "session#1"}
+{"ts": "2026-06-12T08:54:28.534763+00:00", "event": "turn", "cmd_id": "f221d2de-a6ad-4da7-931f-c4749ec486c8", "action": "query-state", "detail": "ctx=211759 used=21% cost=17.6712 err=-"}
+{"ts": "2026-06-12T08:57:48.548131+00:00", "event": "turn", "cmd_id": "f221d2de-a6ad-4da7-931f-c4749ec486c8", "action": "query-state", "detail": "ctx=220781 used=22% cost=5.6912 err=-"}
+{"ts": "2026-06-12T09:01:34.196732+00:00", "event": "turn", "cmd_id": "f221d2de-a6ad-4da7-931f-c4749ec486c8", "action": "query-state", "detail": "ctx=232384 used=23% cost=6.4640 err=-"}
+{"ts": "2026-06-12T09:09:30.299664+00:00", "event": "turn", "cmd_id": "f221d2de-a6ad-4da7-931f-c4749ec486c8", "action": "query-state", "detail": "ctx=255907 used=26% cost=8.4636 err=-"}
+{"ts": "2026-06-12T09:21:23.034918+00:00", "event": "turn", "cmd_id": "f221d2de-a6ad-4da7-931f-c4749ec486c8", "action": "query-state", "detail": "ctx=275545 used=28% cost=8.3344 err=-"}
+{"ts": "2026-06-12T09:25:41.634803+00:00", "event": "turn", "cmd_id": "f221d2de-a6ad-4da7-931f-c4749ec486c8", "action": "query-state", "detail": "ctx=286539 used=29% cost=8.0253 err=-"}
+{"ts": "2026-06-12T09:29:51.894131+00:00", "event": "turn", "cmd_id": "f221d2de-a6ad-4da7-931f-c4749ec486c8", "action": "query-state", "detail": "ctx=298247 used=30% cost=8.6424 err=-"}
+{"ts": "2026-06-12T09:37:16.978306+00:00", "event": "turn", "cmd_id": "f221d2de-a6ad-4da7-931f-c4749ec486c8", "action": "query-state", "detail": "ctx=314381 used=31% cost=10.2638 err=-"}
+{"ts": "2026-06-12T09:42:27.250056+00:00", "event": "turn", "cmd_id": "f221d2de-a6ad-4da7-931f-c4749ec486c8", "action": "query-state", "detail": "ctx=330596 used=33% cost=10.7329 err=-"}
+{"ts": "2026-06-12T09:45:05.655129+00:00", "event": "turn", "cmd_id": "f221d2de-a6ad-4da7-931f-c4749ec486c8", "action": "query-state", "detail": "ctx=336561 used=34% cost=8.2290 err=-"}
+{"ts": "2026-06-12T09:46:39.248049+00:00", "event": "turn", "cmd_id": "f221d2de-a6ad-4da7-931f-c4749ec486c8", "action": "query-state", "detail": "ctx=339857 used=34% cost=7.1964 err=-"}
+{"ts": "2026-06-12T09:48:07.666716+00:00", "event": "turn", "cmd_id": "f221d2de-a6ad-4da7-931f-c4749ec486c8", "action": "query-state", "detail": "ctx=343588 used=34% cost=1.2210 err=-"}
+{"ts": "2026-06-12T09:49:47.600387+00:00", "event": "turn", "cmd_id": "f221d2de-a6ad-4da7-931f-c4749ec486c8", "action": "query-state", "detail": "ctx=348351 used=35% cost=1.6016 err=-"}
+{"ts": "2026-06-12T09:52:18.904060+00:00", "event": "turn", "cmd_id": "f221d2de-a6ad-4da7-931f-c4749ec486c8", "action": "query-state", "detail": "ctx=356432 used=36% cost=2.5840 err=-"}
+{"ts": "2026-06-12T09:53:20.091243+00:00", "event": "turn", "cmd_id": "f221d2de-a6ad-4da7-931f-c4749ec486c8", "action": "query-state", "detail": "ctx=358701 used=36% cost=7.1840 err=-"}
+{"ts": "2026-06-12T09:54:10.391406+00:00", "event": "turn", "cmd_id": "f221d2de-a6ad-4da7-931f-c4749ec486c8", "action": "query-state", "detail": "ctx=360557 used=36% cost=0.8022 err=-"}
+{"ts": "2026-06-12T09:54:57.296492+00:00", "event": "turn", "cmd_id": "f221d2de-a6ad-4da7-931f-c4749ec486c8", "action": "query-state", "detail": "ctx=361761 used=36% cost=0.7692 err=-"}
+{"ts": "2026-06-12T09:57:51.886858+00:00", "event": "turn", "cmd_id": "f221d2de-a6ad-4da7-931f-c4749ec486c8", "action": "query-state", "detail": "ctx=371776 used=37% cost=2.1165 err=-"}
+{"ts": "2026-06-12T09:59:00.622427+00:00", "event": "turn", "cmd_id": "f221d2de-a6ad-4da7-931f-c4749ec486c8", "action": "query-state", "detail": "ctx=374223 used=37% cost=7.5317 err=-"}
+{"ts": "2026-06-12T10:00:03.949838+00:00", "event": "turn", "cmd_id": "f221d2de-a6ad-4da7-931f-c4749ec486c8", "action": "query-state", "detail": "ctx=376219 used=38% cost=0.8726 err=-"}
+{"ts": "2026-06-12T10:00:17.054184+00:00", "event": "turn", "cmd_id": "f221d2de-a6ad-4da7-931f-c4749ec486c8", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=rate_limited"}
+{"ts": "2026-06-12T10:00:17.060234+00:00", "event": "rate_limited", "cmd_id": "f221d2de-a6ad-4da7-931f-c4749ec486c8", "action": "wait", "detail": "provider=claude resets_at=1781269200 status=rejected"}
+{"ts": "2026-06-12T10:00:17.066028+00:00", "event": "provider_switch", "cmd_id": "-", "action": "rotate", "detail": "claude → codex"}
+{"ts": "2026-06-12T10:00:17.073928+00:00", "event": "session_start", "cmd_id": "2e806193-ead8-4df9-8660-b93fca16a53c", "action": "rotate", "detail": "session#2"}
+{"ts": "2026-06-12T10:02:53.778929+00:00", "event": "turn", "cmd_id": "2e806193-ead8-4df9-8660-b93fca16a53c", "action": "query-state", "detail": "ctx=630585 used=315% cost=0.0000 err=-"}
+{"ts": "2026-06-12T10:02:54.216390+00:00", "event": "exit_prep", "cmd_id": "2e806193-ead8-4df9-8660-b93fca16a53c", "action": "rotate", "detail": "used=315% turns=1 → rotate"}
+{"ts": "2026-06-12T10:02:54.220420+00:00", "event": "session_start", "cmd_id": "8890e069-d60a-4b6d-ad70-da06688bc6e9", "action": "rotate", "detail": "session#3"}
+{"ts": "2026-06-12T10:03:56.947814+00:00", "event": "turn", "cmd_id": "8890e069-d60a-4b6d-ad70-da06688bc6e9", "action": "query-state", "detail": "ctx=135935 used=68% cost=0.0000 err=-"}
+{"ts": "2026-06-12T10:03:57.438652+00:00", "event": "turn", "cmd_id": "8890e069-d60a-4b6d-ad70-da06688bc6e9", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=other"}
+{"ts": "2026-06-12T10:03:57.919365+00:00", "event": "turn", "cmd_id": "8890e069-d60a-4b6d-ad70-da06688bc6e9", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=other"}
+{"ts": "2026-06-12T10:03:58.382442+00:00", "event": "turn", "cmd_id": "8890e069-d60a-4b6d-ad70-da06688bc6e9", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=other"}
+{"ts": "2026-06-12T10:03:58.384453+00:00", "event": "circuit_open", "cmd_id": "8890e069-d60a-4b6d-ad70-da06688bc6e9", "action": "shutdown", "detail": "3 consecutive errors"}
+{"ts": "2026-06-12T10:08:08.931538+00:00", "event": "session_start", "cmd_id": "a3343556-7814-4ead-bb3e-f58b293db798", "action": "rotate", "detail": "session#1"}
+{"ts": "2026-06-12T10:08:17.296612+00:00", "event": "turn", "cmd_id": "a3343556-7814-4ead-bb3e-f58b293db798", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=rate_limited"}
+{"ts": "2026-06-12T10:08:17.300649+00:00", "event": "rate_limited", "cmd_id": "a3343556-7814-4ead-bb3e-f58b293db798", "action": "wait", "detail": "provider=claude resets_at=1781269200 status=rejected"}
+{"ts": "2026-06-12T10:08:17.306712+00:00", "event": "provider_switch", "cmd_id": "-", "action": "rotate", "detail": "claude → codex"}
+{"ts": "2026-06-12T10:08:17.308481+00:00", "event": "session_start", "cmd_id": "67a36996-54f7-4c93-a438-828108e4c5a5", "action": "rotate", "detail": "session#2"}
+{"ts": "2026-06-12T10:11:02.376171+00:00", "event": "turn", "cmd_id": "67a36996-54f7-4c93-a438-828108e4c5a5", "action": "query-state", "detail": "ctx=978106 used=489% cost=0.0000 err=-"}
+{"ts": "2026-06-12T10:11:02.867208+00:00", "event": "exit_prep", "cmd_id": "67a36996-54f7-4c93-a438-828108e4c5a5", "action": "rotate", "detail": "used=489% turns=1 → rotate"}
+{"ts": "2026-06-12T10:11:02.869221+00:00", "event": "session_start", "cmd_id": "873ab339-06a3-4d4c-84fd-149f9d0b0ab6", "action": "rotate", "detail": "session#3"}
+{"ts": "2026-06-12T10:13:04.846666+00:00", "event": "turn", "cmd_id": "873ab339-06a3-4d4c-84fd-149f9d0b0ab6", "action": "query-state", "detail": "ctx=432774 used=216% cost=0.0000 err=-"}
+{"ts": "2026-06-12T10:13:05.299601+00:00", "event": "exit_prep", "cmd_id": "873ab339-06a3-4d4c-84fd-149f9d0b0ab6", "action": "rotate", "detail": "used=216% turns=1 → rotate"}
+{"ts": "2026-06-12T10:13:05.303626+00:00", "event": "session_start", "cmd_id": "e57345e3-b2fc-45fc-9fb7-4230b4489373", "action": "rotate", "detail": "session#4"}
+{"ts": "2026-06-12T10:13:53.940865+00:00", "event": "turn", "cmd_id": "e57345e3-b2fc-45fc-9fb7-4230b4489373", "action": "query-state", "detail": "ctx=157055 used=79% cost=0.0000 err=-"}
+{"ts": "2026-06-12T10:13:54.388018+00:00", "event": "exit_prep", "cmd_id": "e57345e3-b2fc-45fc-9fb7-4230b4489373", "action": "rotate", "detail": "used=79% turns=1 → rotate"}
+{"ts": "2026-06-12T10:13:54.390031+00:00", "event": "session_start", "cmd_id": "622ed0b3-a96c-4db4-98f7-e5bd767716e6", "action": "rotate", "detail": "session#5"}
+{"ts": "2026-06-12T10:15:11.325323+00:00", "event": "turn", "cmd_id": "622ed0b3-a96c-4db4-98f7-e5bd767716e6", "action": "query-state", "detail": "ctx=251095 used=126% cost=0.0000 err=-"}
+{"ts": "2026-06-12T10:15:11.790137+00:00", "event": "exit_prep", "cmd_id": "622ed0b3-a96c-4db4-98f7-e5bd767716e6", "action": "rotate", "detail": "used=126% turns=1 → rotate"}
+{"ts": "2026-06-12T10:15:11.794168+00:00", "event": "session_start", "cmd_id": "8a22fdeb-19c7-4d3a-8409-1112d388331f", "action": "rotate", "detail": "session#6"}
+{"ts": "2026-06-12T10:16:09.804787+00:00", "event": "turn", "cmd_id": "8a22fdeb-19c7-4d3a-8409-1112d388331f", "action": "query-state", "detail": "ctx=147358 used=74% cost=0.0000 err=-"}
+{"ts": "2026-06-12T10:16:10.266761+00:00", "event": "exit_prep", "cmd_id": "8a22fdeb-19c7-4d3a-8409-1112d388331f", "action": "rotate", "detail": "used=74% turns=1 → rotate"}
+{"ts": "2026-06-12T10:16:10.270790+00:00", "event": "session_start", "cmd_id": "2599f206-2b3b-4f82-9809-4e8001cae45e", "action": "rotate", "detail": "session#7"}
+{"ts": "2026-06-12T10:19:02.315051+00:00", "event": "turn", "cmd_id": "2599f206-2b3b-4f82-9809-4e8001cae45e", "action": "query-state", "detail": "ctx=853346 used=427% cost=0.0000 err=-"}
+{"ts": "2026-06-12T10:19:02.779400+00:00", "event": "exit_prep", "cmd_id": "2599f206-2b3b-4f82-9809-4e8001cae45e", "action": "rotate", "detail": "used=427% turns=1 → rotate"}
+{"ts": "2026-06-12T11:25:15.460709+00:00", "event": "session_start", "cmd_id": "361a831f-5126-4e1d-970e-9d6b71e22e7e", "action": "rotate", "detail": "session#1"}
+{"ts": "2026-06-12T11:25:24.170731+00:00", "event": "turn", "cmd_id": "361a831f-5126-4e1d-970e-9d6b71e22e7e", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=rate_limited"}
+{"ts": "2026-06-12T11:25:24.172925+00:00", "event": "rate_limited", "cmd_id": "361a831f-5126-4e1d-970e-9d6b71e22e7e", "action": "wait", "detail": "provider=claude resets_at=1781269200 status=rejected"}
+{"ts": "2026-06-12T11:25:24.177327+00:00", "event": "provider_switch", "cmd_id": "-", "action": "rotate", "detail": "claude → codex"}
+{"ts": "2026-06-12T11:25:24.180667+00:00", "event": "session_start", "cmd_id": "1d5e0c64-e020-4396-a378-5fd511c095da", "action": "rotate", "detail": "session#2"}
+{"ts": "2026-06-12T11:26:00.960105+00:00", "event": "turn", "cmd_id": "1d5e0c64-e020-4396-a378-5fd511c095da", "action": "query-state", "detail": "ctx=112241 used=56% cost=0.0000 err=-"}
+{"ts": "2026-06-12T11:26:01.276540+00:00", "event": "turn", "cmd_id": "1d5e0c64-e020-4396-a378-5fd511c095da", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=other"}
+{"ts": "2026-06-12T11:26:01.539415+00:00", "event": "turn", "cmd_id": "1d5e0c64-e020-4396-a378-5fd511c095da", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=other"}
+{"ts": "2026-06-12T11:26:01.735039+00:00", "event": "turn", "cmd_id": "1d5e0c64-e020-4396-a378-5fd511c095da", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=other"}
+{"ts": "2026-06-12T11:26:01.735039+00:00", "event": "circuit_open", "cmd_id": "1d5e0c64-e020-4396-a378-5fd511c095da", "action": "shutdown", "detail": "3 consecutive errors"}
+{"ts": "2026-06-12T11:28:53.450771+00:00", "event": "session_start", "cmd_id": "40d8b518-c5cf-49dc-ba54-655f7c74fd8d", "action": "rotate", "detail": "session#1"}
+{"ts": "2026-06-12T11:29:00.213717+00:00", "event": "turn", "cmd_id": "40d8b518-c5cf-49dc-ba54-655f7c74fd8d", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=rate_limited"}
+{"ts": "2026-06-12T11:29:00.215730+00:00", "event": "rate_limited", "cmd_id": "40d8b518-c5cf-49dc-ba54-655f7c74fd8d", "action": "wait", "detail": "provider=claude resets_at=1781269200 status=rejected"}
+{"ts": "2026-06-12T11:29:00.221780+00:00", "event": "provider_switch", "cmd_id": "-", "action": "rotate", "detail": "claude → codex"}
+{"ts": "2026-06-12T11:29:00.223799+00:00", "event": "session_start", "cmd_id": "0bd227d3-a112-4b94-9dce-1efd624adf92", "action": "rotate", "detail": "session#2"}
+{"ts": "2026-06-12T11:29:51.352313+00:00", "event": "turn", "cmd_id": "0bd227d3-a112-4b94-9dce-1efd624adf92", "action": "query-state", "detail": "ctx=121393 used=61% cost=0.0000 err=-"}
+{"ts": "2026-06-12T11:29:51.724110+00:00", "event": "turn", "cmd_id": "0bd227d3-a112-4b94-9dce-1efd624adf92", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=other"}
+{"ts": "2026-06-12T11:29:52.082476+00:00", "event": "turn", "cmd_id": "0bd227d3-a112-4b94-9dce-1efd624adf92", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=other"}
+{"ts": "2026-06-12T11:29:52.419635+00:00", "event": "turn", "cmd_id": "0bd227d3-a112-4b94-9dce-1efd624adf92", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=other"}
+{"ts": "2026-06-12T11:29:52.435427+00:00", "event": "circuit_open", "cmd_id": "0bd227d3-a112-4b94-9dce-1efd624adf92", "action": "shutdown", "detail": "3 consecutive errors"}
+{"ts": "2026-06-12T11:31:30.927654+00:00", "event": "session_start", "cmd_id": "1c22d41c-6177-4530-a93f-5095bf89ba5b", "action": "rotate", "detail": "session#1"}
+{"ts": "2026-06-12T11:31:38.100413+00:00", "event": "turn", "cmd_id": "1c22d41c-6177-4530-a93f-5095bf89ba5b", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=rate_limited"}
+{"ts": "2026-06-12T11:31:38.104187+00:00", "event": "rate_limited", "cmd_id": "1c22d41c-6177-4530-a93f-5095bf89ba5b", "action": "wait", "detail": "provider=claude resets_at=1781269200 status=rejected"}
+{"ts": "2026-06-12T11:31:38.108948+00:00", "event": "provider_switch", "cmd_id": "-", "action": "rotate", "detail": "claude → codex"}
+{"ts": "2026-06-12T11:31:38.110964+00:00", "event": "session_start", "cmd_id": "6b7da8ed-068f-4812-bb0f-1cf931ae77c2", "action": "rotate", "detail": "session#2"}
+{"ts": "2026-06-12T11:32:40.275656+00:00", "event": "turn", "cmd_id": "6b7da8ed-068f-4812-bb0f-1cf931ae77c2", "action": "query-state", "detail": "ctx=251635 used=126% cost=0.0000 err=-"}
+{"ts": "2026-06-12T11:32:40.707096+00:00", "event": "exit_prep", "cmd_id": "6b7da8ed-068f-4812-bb0f-1cf931ae77c2", "action": "rotate", "detail": "used=126% turns=1 → rotate"}
+{"ts": "2026-06-12T11:32:40.709107+00:00", "event": "session_start", "cmd_id": "f7e4eb9d-e2b0-4a03-a3a7-968167f15c45", "action": "rotate", "detail": "session#3"}
+{"ts": "2026-06-12T11:35:01.497923+00:00", "event": "turn", "cmd_id": "f7e4eb9d-e2b0-4a03-a3a7-968167f15c45", "action": "query-state", "detail": "ctx=478159 used=239% cost=0.0000 err=-"}
+{"ts": "2026-06-12T11:35:02.336475+00:00", "event": "exit_prep", "cmd_id": "f7e4eb9d-e2b0-4a03-a3a7-968167f15c45", "action": "rotate", "detail": "used=239% turns=1 → rotate"}
+{"ts": "2026-06-12T11:35:02.340499+00:00", "event": "session_start", "cmd_id": "e3f27bab-8792-4ee2-a9f3-d3723d3689fa", "action": "rotate", "detail": "session#4"}
+{"ts": "2026-06-12T11:36:10.528055+00:00", "event": "turn", "cmd_id": "e3f27bab-8792-4ee2-a9f3-d3723d3689fa", "action": "query-state", "detail": "ctx=132306 used=66% cost=0.0000 err=-"}
+{"ts": "2026-06-12T11:36:10.895578+00:00", "event": "turn", "cmd_id": "e3f27bab-8792-4ee2-a9f3-d3723d3689fa", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=other"}
+{"ts": "2026-06-12T11:36:11.358258+00:00", "event": "turn", "cmd_id": "e3f27bab-8792-4ee2-a9f3-d3723d3689fa", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=other"}
+{"ts": "2026-06-12T11:36:11.793983+00:00", "event": "turn", "cmd_id": "e3f27bab-8792-4ee2-a9f3-d3723d3689fa", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=other"}
+{"ts": "2026-06-12T11:36:11.796000+00:00", "event": "circuit_open", "cmd_id": "e3f27bab-8792-4ee2-a9f3-d3723d3689fa", "action": "shutdown", "detail": "3 consecutive errors"}
+{"ts": "2026-06-12T11:38:09.746983+00:00", "event": "session_start", "cmd_id": "b59051f1-c367-4e80-a27a-e7a52219a4d7", "action": "rotate", "detail": "session#1"}
+{"ts": "2026-06-12T11:38:19.729602+00:00", "event": "turn", "cmd_id": "b59051f1-c367-4e80-a27a-e7a52219a4d7", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=rate_limited"}
+{"ts": "2026-06-12T11:38:19.733633+00:00", "event": "rate_limited", "cmd_id": "b59051f1-c367-4e80-a27a-e7a52219a4d7", "action": "wait", "detail": "provider=claude resets_at=1781269200 status=rejected"}
+{"ts": "2026-06-12T11:38:19.739423+00:00", "event": "provider_switch", "cmd_id": "-", "action": "rotate", "detail": "claude → codex"}
+{"ts": "2026-06-12T11:38:19.741437+00:00", "event": "session_start", "cmd_id": "c9cf649d-42ac-407c-a157-209fea3f52cb", "action": "rotate", "detail": "session#2"}
+{"ts": "2026-06-12T11:39:41.213824+00:00", "event": "turn", "cmd_id": "c9cf649d-42ac-407c-a157-209fea3f52cb", "action": "query-state", "detail": "ctx=203948 used=102% cost=0.0000 err=-"}
+{"ts": "2026-06-12T11:39:41.752605+00:00", "event": "exit_prep", "cmd_id": "c9cf649d-42ac-407c-a157-209fea3f52cb", "action": "rotate", "detail": "used=102% turns=1 → rotate"}
+{"ts": "2026-06-12T11:39:41.757916+00:00", "event": "session_start", "cmd_id": "9dc9a392-e248-40b3-8394-f42564bcd799", "action": "rotate", "detail": "session#3"}
+{"ts": "2026-06-12T11:40:37.981867+00:00", "event": "turn", "cmd_id": "9dc9a392-e248-40b3-8394-f42564bcd799", "action": "query-state", "detail": "ctx=136434 used=68% cost=0.0000 err=-"}
+{"ts": "2026-06-12T11:40:38.401952+00:00", "event": "turn", "cmd_id": "9dc9a392-e248-40b3-8394-f42564bcd799", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=other"}
+{"ts": "2026-06-12T11:40:38.787898+00:00", "event": "turn", "cmd_id": "9dc9a392-e248-40b3-8394-f42564bcd799", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=other"}
+{"ts": "2026-06-12T11:40:39.140501+00:00", "event": "turn", "cmd_id": "9dc9a392-e248-40b3-8394-f42564bcd799", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=other"}
+{"ts": "2026-06-12T11:40:39.142793+00:00", "event": "circuit_open", "cmd_id": "9dc9a392-e248-40b3-8394-f42564bcd799", "action": "shutdown", "detail": "3 consecutive errors"}
+{"ts": "2026-06-12T11:45:18.136386+00:00", "event": "session_start", "cmd_id": "bd053ced-abe0-43bb-bb86-0f154df4a2ab", "action": "rotate", "detail": "session#1"}
+{"ts": "2026-06-12T11:45:25.837426+00:00", "event": "turn", "cmd_id": "bd053ced-abe0-43bb-bb86-0f154df4a2ab", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=rate_limited"}
+{"ts": "2026-06-12T11:45:25.841456+00:00", "event": "rate_limited", "cmd_id": "bd053ced-abe0-43bb-bb86-0f154df4a2ab", "action": "wait", "detail": "provider=claude resets_at=1781269200 status=rejected"}
+{"ts": "2026-06-12T11:45:25.847513+00:00", "event": "provider_switch", "cmd_id": "-", "action": "rotate", "detail": "claude → codex"}
+{"ts": "2026-06-12T11:45:25.849531+00:00", "event": "session_start", "cmd_id": "67ceb104-ec07-4ee2-9e27-7134d5e6dce2", "action": "rotate", "detail": "session#2"}
+{"ts": "2026-06-12T11:46:55.873216+00:00", "event": "turn", "cmd_id": "67ceb104-ec07-4ee2-9e27-7134d5e6dce2", "action": "query-state", "detail": "ctx=299868 used=150% cost=0.0000 err=-"}
+{"ts": "2026-06-12T11:46:56.274354+00:00", "event": "exit_prep", "cmd_id": "67ceb104-ec07-4ee2-9e27-7134d5e6dce2", "action": "rotate", "detail": "used=150% turns=1 → rotate"}
+{"ts": "2026-06-12T12:01:04.215226+00:00", "event": "session_start", "cmd_id": "5796b133-8d14-4d7d-b836-7b80fdb63551", "action": "rotate", "detail": "session#1"}
+{"ts": "2026-06-12T12:01:09.727747+00:00", "event": "turn", "cmd_id": "5796b133-8d14-4d7d-b836-7b80fdb63551", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=rate_limited"}
+{"ts": "2026-06-12T12:01:09.731764+00:00", "event": "rate_limited", "cmd_id": "5796b133-8d14-4d7d-b836-7b80fdb63551", "action": "wait", "detail": "provider=claude resets_at=1781269200 status=rejected"}
+{"ts": "2026-06-12T12:01:09.733773+00:00", "event": "provider_switch", "cmd_id": "-", "action": "rotate", "detail": "claude → codex"}
+{"ts": "2026-06-12T12:01:09.735781+00:00", "event": "session_start", "cmd_id": "b5eca7d6-be67-443a-86ee-76103e9f98a9", "action": "rotate", "detail": "session#2"}
+{"ts": "2026-06-12T12:02:00.335592+00:00", "event": "turn", "cmd_id": "b5eca7d6-be67-443a-86ee-76103e9f98a9", "action": "query-state", "detail": "ctx=189325 used=95% cost=0.0000 err=-"}
+{"ts": "2026-06-12T12:02:00.541438+00:00", "event": "exit_prep", "cmd_id": "b5eca7d6-be67-443a-86ee-76103e9f98a9", "action": "rotate", "detail": "used=95% turns=1 → rotate"}
+{"ts": "2026-06-12T12:02:00.541438+00:00", "event": "session_start", "cmd_id": "e6db6ab9-636d-46ac-91f7-2c4ff077a171", "action": "rotate", "detail": "session#3"}
+{"ts": "2026-06-12T12:03:09.143445+00:00", "event": "turn", "cmd_id": "e6db6ab9-636d-46ac-91f7-2c4ff077a171", "action": "query-state", "detail": "ctx=250414 used=125% cost=0.0000 err=-"}
+{"ts": "2026-06-12T12:03:09.317860+00:00", "event": "exit_prep", "cmd_id": "e6db6ab9-636d-46ac-91f7-2c4ff077a171", "action": "rotate", "detail": "used=125% turns=1 → rotate"}
+{"ts": "2026-06-12T12:03:09.317860+00:00", "event": "session_start", "cmd_id": "f415497b-2399-488f-8c79-ff6938c280a8", "action": "rotate", "detail": "session#4"}
+{"ts": "2026-06-12T12:03:49.388870+00:00", "event": "turn", "cmd_id": "f415497b-2399-488f-8c79-ff6938c280a8", "action": "query-state", "detail": "ctx=130335 used=65% cost=0.0000 err=-"}
+{"ts": "2026-06-12T12:03:49.597138+00:00", "event": "turn", "cmd_id": "f415497b-2399-488f-8c79-ff6938c280a8", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=other"}
+{"ts": "2026-06-12T12:03:49.771874+00:00", "event": "turn", "cmd_id": "f415497b-2399-488f-8c79-ff6938c280a8", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=other"}
+{"ts": "2026-06-12T12:03:49.977440+00:00", "event": "turn", "cmd_id": "f415497b-2399-488f-8c79-ff6938c280a8", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=other"}
+{"ts": "2026-06-12T12:03:49.977440+00:00", "event": "circuit_open", "cmd_id": "f415497b-2399-488f-8c79-ff6938c280a8", "action": "shutdown", "detail": "3 consecutive errors"}
+{"ts": "2026-06-12T12:07:23.567088+00:00", "event": "session_start", "cmd_id": "43225ef5-9a7a-4f4c-9f62-3ae94b522039", "action": "rotate", "detail": "session#1"}
+{"ts": "2026-06-12T12:07:27.502746+00:00", "event": "turn", "cmd_id": "43225ef5-9a7a-4f4c-9f62-3ae94b522039", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=rate_limited"}
+{"ts": "2026-06-12T12:07:27.502746+00:00", "event": "rate_limited", "cmd_id": "43225ef5-9a7a-4f4c-9f62-3ae94b522039", "action": "wait", "detail": "provider=claude resets_at=1781269200 status=rejected"}
+{"ts": "2026-06-12T12:07:27.513010+00:00", "event": "provider_switch", "cmd_id": "-", "action": "rotate", "detail": "claude → codex"}
+{"ts": "2026-06-12T12:07:27.514519+00:00", "event": "session_start", "cmd_id": "2e6e80d4-4634-4a68-b69a-70c11fa81748", "action": "rotate", "detail": "session#2"}
+{"ts": "2026-06-12T12:08:50.385724+00:00", "event": "turn", "cmd_id": "2e6e80d4-4634-4a68-b69a-70c11fa81748", "action": "query-state", "detail": "ctx=504952 used=252% cost=0.0000 err=-"}
+{"ts": "2026-06-12T12:08:50.558103+00:00", "event": "exit_prep", "cmd_id": "2e6e80d4-4634-4a68-b69a-70c11fa81748", "action": "rotate", "detail": "used=252% turns=1 → rotate"}
+{"ts": "2026-06-12T12:08:50.558103+00:00", "event": "session_start", "cmd_id": "af986659-84ae-48df-b015-701f1c503f1f", "action": "rotate", "detail": "session#3"}
+{"ts": "2026-06-12T12:09:47.723280+00:00", "event": "turn", "cmd_id": "af986659-84ae-48df-b015-701f1c503f1f", "action": "query-state", "detail": "ctx=194077 used=97% cost=0.0000 err=-"}
+{"ts": "2026-06-12T12:09:47.890686+00:00", "event": "exit_prep", "cmd_id": "af986659-84ae-48df-b015-701f1c503f1f", "action": "rotate", "detail": "used=97% turns=1 → rotate"}
+{"ts": "2026-06-12T12:09:47.898564+00:00", "event": "session_start", "cmd_id": "b9ac1bf9-4558-4965-8afb-4e150251f7fa", "action": "rotate", "detail": "session#4"}
+{"ts": "2026-06-12T12:10:50.586974+00:00", "event": "turn", "cmd_id": "b9ac1bf9-4558-4965-8afb-4e150251f7fa", "action": "query-state", "detail": "ctx=217927 used=109% cost=0.0000 err=-"}
+{"ts": "2026-06-12T12:10:50.931845+00:00", "event": "exit_prep", "cmd_id": "b9ac1bf9-4558-4965-8afb-4e150251f7fa", "action": "rotate", "detail": "used=109% turns=1 → rotate"}
+{"ts": "2026-06-12T12:10:50.933855+00:00", "event": "session_start", "cmd_id": "78f797a0-fc50-474b-a91a-25f0c8ab7e3e", "action": "rotate", "detail": "session#5"}
+{"ts": "2026-06-12T12:11:28.845377+00:00", "event": "turn", "cmd_id": "78f797a0-fc50-474b-a91a-25f0c8ab7e3e", "action": "query-state", "detail": "ctx=129828 used=65% cost=0.0000 err=-"}
+{"ts": "2026-06-12T12:11:29.008880+00:00", "event": "turn", "cmd_id": "78f797a0-fc50-474b-a91a-25f0c8ab7e3e", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=other"}
+{"ts": "2026-06-12T12:11:29.183462+00:00", "event": "turn", "cmd_id": "78f797a0-fc50-474b-a91a-25f0c8ab7e3e", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=other"}
+{"ts": "2026-06-12T12:11:29.345703+00:00", "event": "turn", "cmd_id": "78f797a0-fc50-474b-a91a-25f0c8ab7e3e", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=other"}
+{"ts": "2026-06-12T12:11:29.345703+00:00", "event": "circuit_open", "cmd_id": "78f797a0-fc50-474b-a91a-25f0c8ab7e3e", "action": "shutdown", "detail": "3 consecutive errors"}
+{"ts": "2026-06-12T21:58:17.743713+00:00", "event": "session_start", "cmd_id": "bc03d872-997f-43bf-9703-c550437b750b", "action": "rotate", "detail": "session#1"}
+{"ts": "2026-06-12T22:31:38.831404+00:00", "event": "turn", "cmd_id": "bc03d872-997f-43bf-9703-c550437b750b", "action": "query-state", "detail": "ctx=186662 used=19% cost=17.0979 err=-"}
+{"ts": "2026-06-12T22:33:02.483476+00:00", "event": "exit_prep", "cmd_id": "bc03d872-997f-43bf-9703-c550437b750b", "action": "shutdown", "detail": "handoff on stop"}
+{"ts": "2026-06-13T04:29:36.090794+00:00", "event": "session_start", "cmd_id": "99f4adfa-f5d5-425e-9660-760897b074a8", "action": "rotate", "detail": "session#1"}
+{"ts": "2026-06-13T04:34:49.510380+00:00", "event": "turn", "cmd_id": "99f4adfa-f5d5-425e-9660-760897b074a8", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=other"}
+{"ts": "2026-06-13T04:34:49.684886+00:00", "event": "turn", "cmd_id": "99f4adfa-f5d5-425e-9660-760897b074a8", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=other"}
+{"ts": "2026-06-13T04:34:49.853115+00:00", "event": "turn", "cmd_id": "99f4adfa-f5d5-425e-9660-760897b074a8", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=other"}
+{"ts": "2026-06-13T04:34:49.853115+00:00", "event": "circuit_open", "cmd_id": "99f4adfa-f5d5-425e-9660-760897b074a8", "action": "shutdown", "detail": "3 consecutive errors"}
+{"ts": "2026-06-13T04:39:09.193177+00:00", "event": "session_start", "cmd_id": "8ab82842-f17c-4a5c-9e80-cfd87d058535", "action": "rotate", "detail": "session#1"}
+{"ts": "2026-06-13T04:41:52.276859+00:00", "event": "turn", "cmd_id": "8ab82842-f17c-4a5c-9e80-cfd87d058535", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=other"}
+{"ts": "2026-06-13T04:41:52.438429+00:00", "event": "turn", "cmd_id": "8ab82842-f17c-4a5c-9e80-cfd87d058535", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=other"}
+{"ts": "2026-06-13T04:41:52.611990+00:00", "event": "turn", "cmd_id": "8ab82842-f17c-4a5c-9e80-cfd87d058535", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=other"}
+{"ts": "2026-06-13T04:41:52.611990+00:00", "event": "circuit_open", "cmd_id": "8ab82842-f17c-4a5c-9e80-cfd87d058535", "action": "shutdown", "detail": "3 consecutive errors"}
+{"ts": "2026-06-13T05:06:11.349001+00:00", "event": "session_start", "cmd_id": "5535f9d5-08f9-49d0-bb3b-bc8da2561605", "action": "rotate", "detail": "session#1"}
+{"ts": "2026-06-13T05:09:34.204337+00:00", "event": "turn", "cmd_id": "5535f9d5-08f9-49d0-bb3b-bc8da2561605", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=other"}
+{"ts": "2026-06-13T05:09:34.378816+00:00", "event": "turn", "cmd_id": "5535f9d5-08f9-49d0-bb3b-bc8da2561605", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=other"}
+{"ts": "2026-06-13T05:09:34.547212+00:00", "event": "turn", "cmd_id": "5535f9d5-08f9-49d0-bb3b-bc8da2561605", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=other"}
+{"ts": "2026-06-13T05:09:34.552045+00:00", "event": "circuit_open", "cmd_id": "5535f9d5-08f9-49d0-bb3b-bc8da2561605", "action": "shutdown", "detail": "3 consecutive errors"}
+{"ts": "2026-06-13T05:31:23.751799+00:00", "event": "session_start", "cmd_id": "a952acf8-f3a9-43f5-85fd-cc1e54138493", "action": "rotate", "detail": "session#1"}
+{"ts": "2026-06-13T05:38:57.206006+00:00", "event": "turn", "cmd_id": "a952acf8-f3a9-43f5-85fd-cc1e54138493", "action": "query-state", "detail": "ctx=1110429 used=555% cost=1.1985 err=-"}
+{"ts": "2026-06-13T05:40:56.214004+00:00", "event": "exit_prep", "cmd_id": "a952acf8-f3a9-43f5-85fd-cc1e54138493", "action": "rotate", "detail": "used=555% turns=1 → rotate"}
+{"ts": "2026-06-13T05:40:56.216015+00:00", "event": "session_start", "cmd_id": "0cd8cf55-7dc9-40ad-8781-4a95d00ce5d5", "action": "rotate", "detail": "session#2"}
+{"ts": "2026-06-13T05:50:30.008399+00:00", "event": "turn", "cmd_id": "0cd8cf55-7dc9-40ad-8781-4a95d00ce5d5", "action": "query-state", "detail": "ctx=2022636 used=1011% cost=1.3891 err=-"}
+{"ts": "2026-06-13T05:53:30.366364+00:00", "event": "exit_prep", "cmd_id": "0cd8cf55-7dc9-40ad-8781-4a95d00ce5d5", "action": "rotate", "detail": "used=1011% turns=1 → rotate"}
+{"ts": "2026-06-13T05:55:24.290997+00:00", "event": "session_start", "cmd_id": "7f041758-ac27-4889-b614-7b33057f8d6b", "action": "rotate", "detail": "session#1"}
+{"ts": "2026-06-13T06:14:26.579123+00:00", "event": "turn", "cmd_id": "7f041758-ac27-4889-b614-7b33057f8d6b", "action": "query-state", "detail": "ctx=4565476 used=2283% cost=1.5638 err=-"}
+{"ts": "2026-06-13T06:21:13.465804+00:00", "event": "exit_prep", "cmd_id": "7f041758-ac27-4889-b614-7b33057f8d6b", "action": "rotate", "detail": "used=2283% turns=1 → rotate"}
+{"ts": "2026-06-13T06:21:54.206081+00:00", "event": "session_start", "cmd_id": "0c740f74-b48a-49bf-ac72-28416d9ba5b5", "action": "rotate", "detail": "session#1"}
+{"ts": "2026-06-13T06:41:42.665751+00:00", "event": "turn", "cmd_id": "0c740f74-b48a-49bf-ac72-28416d9ba5b5", "action": "query-state", "detail": "ctx=3201454 used=1601% cost=2.2935 err=-"}
+{"ts": "2026-06-13T06:47:39.350926+00:00", "event": "exit_prep", "cmd_id": "0c740f74-b48a-49bf-ac72-28416d9ba5b5", "action": "rotate", "detail": "used=1601% turns=1 → rotate"}
+{"ts": "2026-06-13T06:48:28.153611+00:00", "event": "session_start", "cmd_id": "8382564a-eff5-41b9-8275-32c15748cd8c", "action": "rotate", "detail": "session#1"}
+{"ts": "2026-06-13T07:06:26.623919+00:00", "event": "turn", "cmd_id": "8382564a-eff5-41b9-8275-32c15748cd8c", "action": "query-state", "detail": "ctx=5097208 used=2549% cost=2.3448 err=-"}
+{"ts": "2026-06-13T07:12:30.590429+00:00", "event": "exit_prep", "cmd_id": "8382564a-eff5-41b9-8275-32c15748cd8c", "action": "rotate", "detail": "used=2549% turns=1 → rotate"}
+{"ts": "2026-06-13T07:12:30.600204+00:00", "event": "session_start", "cmd_id": "f9683e7a-6896-493c-9aeb-ff09810b97de", "action": "rotate", "detail": "session#2"}
+{"ts": "2026-06-13T07:14:23.644364+00:00", "event": "turn", "cmd_id": "f9683e7a-6896-493c-9aeb-ff09810b97de", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=cancelled"}
