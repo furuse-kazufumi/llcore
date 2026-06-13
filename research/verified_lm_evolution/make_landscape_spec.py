@@ -36,6 +36,21 @@ from pathlib import Path
 
 import numpy as np
 
+
+def _ensure_utf8_stdout() -> None:
+    """cp932 console でも em-dash / 日本語を化けさせない (Windows CLI の必須作法)."""
+    for name in ("stdout", "stderr"):
+        stream = getattr(sys, name, None)
+        reconf = getattr(stream, "reconfigure", None)
+        if callable(reconf):
+            try:
+                reconf(encoding="utf-8")
+            except (ValueError, OSError):
+                pass
+
+
+_ensure_utf8_stdout()
+
 HERE = Path(__file__).resolve().parent
 # Make lm_substrate (which itself wires up coupled_nd) importable.
 if str(HERE) not in sys.path:
