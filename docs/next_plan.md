@@ -228,3 +228,6 @@
   2. `strict gate` → `unigram floor` の文言整理で済まない実体の重複を是正
   3. 変更後に `py -3.11 -m pytest tests/unit -k lm -q && py -3.11 -m mypy src/llcore/lm/ && py -3.11 -m ruff check src/llcore/lm/` を再実行
 - 不承認なら、削除を伴わない範囲（文言・注記・将来方針）だけで整合を維持する
+- 2026-06-16 追記:
+  - `docs/LM_RECURRENT_PLAN.md` の到達点整理を commit しようとした時点では `git commit` が `.git/index.lock` で停止したが、再確認時には lock は消滅しており、削除承認は不要になった
+  - 次の local commit は **pathspec 限定**で行い、対象は `docs/LM_RECURRENT_PLAN.md` と `docs/next_plan.md` のみとする。`.llterm/loop_ledger.jsonl` は自動ログなので巻き込まない
