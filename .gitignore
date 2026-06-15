@@ -43,6 +43,7 @@ Thumbs.db
 out/
 experiments/
 scratch/
+docs/status/
 
 .planning/state/
 *.local

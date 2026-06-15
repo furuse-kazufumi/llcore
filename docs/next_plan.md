@@ -227,6 +227,9 @@
   1. 重複 SVG の tracked copy を削除し、summary/doc の参照先を共有 SVG へ統一
   2. `strict gate` → `unigram floor` の文言整理で済まない実体の重複を是正
   3. 変更後に `py -3.11 -m pytest tests/unit -k lm -q && py -3.11 -m mypy src/llcore/lm/ && py -3.11 -m ruff check src/llcore/lm/` を再実行
+- 削除前の参照確認（2026-06-16 実施）:
+  - duplicate SVG stem への現参照は `docs/next_plan.md`, `docs/artifacts/lm_recurrent_interim_summary.md`, `docs/artifacts/lm_recurrent_verdict.md`, `tests/unit/test_lm_artifacts.py`, `docs/LM_RECURRENT_PLAN.md` に存在
+  - したがって `git rm` 前に、少なくとも上記 docs/tests の参照先を共有 SVG へ張り替えた後で grep 再確認する
 - 不承認なら、削除を伴わない範囲（文言・注記・将来方針）だけで整合を維持する
 - 2026-06-16 追記:
   - `docs/LM_RECURRENT_PLAN.md` の到達点整理を commit しようとした時点では `git commit` が `.git/index.lock` で停止したが、再確認時には lock は消滅しており、**lock 解除の手動削除**は不要になった（duplicate SVG の物理削除承認は引き続き保留）
@@ -246,7 +249,8 @@
   - ただし GPT と Recurrent の相対順位は seed-sensitive のままで、full winner は未宣言
 - 未解決:
   - duplicate SVG の **物理削除 (`git rm`)** は承認待ち
-  - `.llterm/loop_ledger.jsonl` と `docs/status/` は無関係 dirty / untracked として継続除外
+  - `.llterm/loop_ledger.jsonl` は無関係 dirty として継続除外
+  - `docs/status/` は `llterm_status.svg` の生成物と判断し `.gitignore` へ退避
 - 自律継続の境界:
   - LM recurrent 本体では、verdict packet 完成以降に**承認なしで進めるべき必須タスクは残っていない**
   - 次に動くのは、(a) duplicate SVG の物理整理に承認が下りたとき、または (b) 追加 seed / 追加 budget / 比較基準変更の新要件が入ったとき
