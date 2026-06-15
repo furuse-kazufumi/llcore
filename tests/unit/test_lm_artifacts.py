@@ -7,14 +7,21 @@ import re
 from pathlib import Path
 from xml.etree import ElementTree
 
+from llcore.lm.compare import _render_ppl_table
+
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ARTIFACTS_DIR = REPO_ROOT / "docs" / "artifacts"
 SUMMARY_PATH = ARTIFACTS_DIR / "lm_recurrent_interim_summary.md"
 
 
+def _tracked_pilot_stems() -> list[str]:
+    return sorted(path.stem for path in ARTIFACTS_DIR.glob("lm_recurrent_pilot*.json"))
+
+
 def test_tracked_recurrent_svgs_are_well_formed_xml() -> None:
-    for svg_name in ("lm_recurrent_pilot120.svg", "lm_recurrent_pilot256_40.svg"):
+    for stem in _tracked_pilot_stems():
+        svg_name = f"{stem}.svg"
         svg_path = ARTIFACTS_DIR / svg_name
         svg_text = svg_path.read_text(encoding="utf-8")
         root = ElementTree.fromstring(svg_text)
@@ -47,23 +54,9 @@ def test_interim_summary_links_target_existing_tracked_artifacts() -> None:
 
 
 def test_tracked_recurrent_markdown_matches_json_summary_values() -> None:
-    for stem in ("lm_recurrent_pilot120", "lm_recurrent_pilot256_40"):
+    for stem in _tracked_pilot_stems():
         json_path = ARTIFACTS_DIR / f"{stem}.json"
         md_path = ARTIFACTS_DIR / f"{stem}.md"
         result = json.loads(json_path.read_text(encoding="utf-8"))
         md_text = md_path.read_text(encoding="utf-8")
-
-        reports = result["reports"]
-        verdict = result["verdict"]
-        for name in ("gpt", "recurrent", "rwkv"):
-            report = reports[name]
-            verdict_row = verdict[name]
-            expected_row = (
-                f"| {name} | {report['model_ppl']:.3f} | {report['unigram_ppl']:.3f} | "
-                f"{verdict_row['ppl_ratio_vs_gpt']:.3f} | "
-                f"{'yes' if verdict_row['passes_unigram_gate'] else 'no'} |"
-            )
-            assert expected_row in md_text
-
-        for caveat in result["caveats"]:
-            assert f"- {caveat}" in md_text
+        assert md_text == _render_ppl_table(result)
