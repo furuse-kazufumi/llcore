@@ -181,3 +181,13 @@
 {"ts": "2026-06-13T07:12:30.590429+00:00", "event": "exit_prep", "cmd_id": "8382564a-eff5-41b9-8275-32c15748cd8c", "action": "rotate", "detail": "used=2549% turns=1 → rotate"}
 {"ts": "2026-06-13T07:12:30.600204+00:00", "event": "session_start", "cmd_id": "f9683e7a-6896-493c-9aeb-ff09810b97de", "action": "rotate", "detail": "session#2"}
 {"ts": "2026-06-13T07:14:23.644364+00:00", "event": "turn", "cmd_id": "f9683e7a-6896-493c-9aeb-ff09810b97de", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=cancelled"}
+{"ts": "2026-06-15T12:14:19.214145+00:00", "event": "session_start", "cmd_id": "d994adcb-f018-4974-b15e-d9c1a6445d99", "action": "rotate", "detail": "session#1"}
+{"ts": "2026-06-15T12:23:53.023402+00:00", "event": "turn", "cmd_id": "d994adcb-f018-4974-b15e-d9c1a6445d99", "action": "query-state", "detail": "ctx=0 used=0% cost=0.9433 err=-"}
+{"ts": "2026-06-15T12:53:51.675505+00:00", "event": "turn", "cmd_id": "d994adcb-f018-4974-b15e-d9c1a6445d99", "action": "query-state", "detail": "ctx=0 used=0% cost=2.0598 err=-"}
+{"ts": "2026-06-15T13:08:04.859404+00:00", "event": "turn", "cmd_id": "d994adcb-f018-4974-b15e-d9c1a6445d99", "action": "query-state", "detail": "ctx=0 used=0% cost=1.3030 err=-"}
+{"ts": "2026-06-15T13:24:54.935504+00:00", "event": "turn", "cmd_id": "d994adcb-f018-4974-b15e-d9c1a6445d99", "action": "query-state", "detail": "ctx=0 used=0% cost=1.4061 err=-"}
+{"ts": "2026-06-15T13:37:08.574927+00:00", "event": "turn", "cmd_id": "d994adcb-f018-4974-b15e-d9c1a6445d99", "action": "query-state", "detail": "ctx=0 used=0% cost=1.2179 err=-"}
+{"ts": "2026-06-15T13:45:10.243815+00:00", "event": "turn", "cmd_id": "d994adcb-f018-4974-b15e-d9c1a6445d99", "action": "query-state", "detail": "ctx=0 used=0% cost=1.1966 err=-"}
+{"ts": "2026-06-15T13:53:31.781295+00:00", "event": "turn", "cmd_id": "d994adcb-f018-4974-b15e-d9c1a6445d99", "action": "query-state", "detail": "ctx=0 used=0% cost=1.1644 err=-"}
+{"ts": "2026-06-15T14:02:35.174458+00:00", "event": "turn", "cmd_id": "d994adcb-f018-4974-b15e-d9c1a6445d99", "action": "query-state", "detail": "ctx=0 used=0% cost=1.4483 err=-"}
+{"ts": "2026-06-15T14:10:57.792259+00:00", "event": "turn", "cmd_id": "d994adcb-f018-4974-b15e-d9c1a6445d99", "action": "query-state", "detail": "ctx=0 used=0% cost=1.2302 err=-"}

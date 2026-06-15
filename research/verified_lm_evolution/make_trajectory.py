@@ -46,8 +46,8 @@ _ensure_utf8_stdout()
 
 N = 8
 GA_SEED = 20260613      # locked GA seed (init + mutation + tournament) — reproducible.
-POP = 16
-GENS = 14
+POP = 12
+GENS = 12
 TOURNEY_K = 3
 SD_DECAY = 0.05
 SD_W = 0.08

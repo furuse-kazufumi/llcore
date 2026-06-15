@@ -18,10 +18,12 @@
 - marker 無し legacy summary の互換再読込、empty vocabulary fallback、0-score 語借用防止まで反映済み
 - 比較用 rerun `self_evolving_agents_corpus_v2_stopwordcheck` により top-level label は改善確認、ただし off-topic 混入は残存
 - `queries_refined_candidate.txt` を staging に追加し、`fetch_arxiv_topical.py` は今後 `Source Query` を paper markdown へ保存する
+- 2026-06-15 時点で `queries_refined_candidate.txt` はさらに精密化済み。ただし **効果は未検証** で、`ti:` 化により recall が落ちる可能性があるため、本実行前に「改善候補」として扱う
 - `Source Query` は本文メタ行だと TF-IDF 汚染になるため、source-query comment + loader 側メタ除去へ修正済み
 - temp fetch 検証では loader 後 top terms / `_make_label()` に `ti` `cat` `source` `query` は残らず、query 汚染遮断を確認
 - `runner._strip_skill_header()` は H1 限定へ補正し、`## Overview` 始まりの legacy summary も resume 対象に戻した
 - `libexec/raptor-rad-ingest` の `_ensure_utf8_io()` 追加は別筋の未記録差分として残存。rptr commit 時は分離要
 - 現在地点は「(b) precision 改善 rerun の準備 + 汚染是正完了」。最小 fetch 検証も完了済み
+- 既存 dirty の `assets/articles/llcore_landscape_real.svg` / `research/verified_lm_evolution/make_trajectory.py` / `.llterm/loop_ledger.jsonl` は今回作業の対象外。次回 commit するなら docs と query 候補だけを対象に分離する
 - 次は人間判断待ち項目を先に処理するか、人間判断なしで進めるなら `(b)` rerun の準備(材料確認まで)を再開する
 - 再開時は `next_plan.md` の「今回追加で進めた内容」と「次の具体的な一手」から続行

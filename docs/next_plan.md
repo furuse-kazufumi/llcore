@@ -1,6 +1,6 @@
 # next_plan (正本) — EXIT 時点の再開地点
 
-> 最終更新: 2026-06-13 (EXIT 準備完了・新規作業停止)
+> 最終更新: 2026-06-15 ((b) rerun 準備の query 精密化まで完了)
 > SESSION_SUMMARY.md は Stop hook で自動上書きされるため、**このファイルが再開の正本**。
 > hook 非管理の再開ポインタ: `docs/PROGRESS.md`
 
@@ -128,7 +128,7 @@
 3. 人間判断が未投入なら、新規実装ではなく `next_plan` の判断待ち項目から処理する
 4. 人間判断が `(a)` なら各 staging の `_STAGING_META/DECISIONS.md` にある publish / rename 手順から開始する
 5. 人間判断が `(b)` なら query 絞り込み rerun、`(c)` なら staging 側の手動除去へ進む
-6. 人間判断なしで自律継続する場合でも、この EXIT 時点では **最小検証済み** なので同じ確認を繰り返さず、そのまま `(b)` rerun の準備(材料確認まで)から再開する
+6. 人間判断なしで自律継続する場合でも、この EXIT 時点では **最小検証済みなのは query 汚染遮断まで**。`queries_refined_candidate.txt` の precision 改善効果は未検証なので、同じ確認を繰り返す必要はないが、本 rerun 後に before/after の混入率と recall 低下を必ず再評価する
 7. `D:\tools\raptor` 側の `git status` を確認し、`libexec/raptor-rad-ingest` の `_ensure_utf8_io()` 差分を fetch/corpus2skill 修正と分離コミットすべきか判断する
 
 ## 今回 repo 内で更新した記録
@@ -159,6 +159,10 @@
   2. `queries_refined_candidate.txt` を初期値に使い、`--per-query` は 60 のまま維持
   3. 生成された paper markdown の source-query comment と `Categories` を見て、なお broad な query だけ個別に再修正
   4. その後 `raptor_corpus2skill.py` を rerun し、top-level cluster の semantic drift を再評価
+- disclosure:
+  - `queries_refined_candidate.txt` は **改善候補** であり、まだ fetch rerun で検証していない
+  - 主な tightening は `all:` から `ti:` への変更と LLM/agent 条件追加なので、precision は上がる可能性がある一方、title に語を含めない正規論文を取りこぼす recall 低下リスクがある
+  - 改善判断は rerun 後の before/after 比較でのみ確定する
 - 想定効果:
   - `model merging` 由来の astro / medical 混入、
   - `prompt optimization` 由来の vision / geology 混入、
@@ -166,10 +170,32 @@
   - `recursive self-improvement` 周辺の数理系ノイズ
   を現在より追跡・除去しやすくする
 
+## 今回この再開セッションで追加したこと (2026-06-15)
+
+- `CLAUDE.md` は repo 内に存在せず、前回記録どおり `docs/next_plan.md` / `docs/PROGRESS.md` を再開起点として継続
+- RAD 研究接地を再確認:
+  - `D:\docs\self_evolving_agents_corpus_v2` の既存軸は引き続き prompt evolution / Reflexion / AI Scientist / model merging / memory evolution / recursive self-improvement に整理済み
+  - `D:\docs\hacker_corpus_v2` は今回の query 精密化には有効ヒット薄
+- `self_evolving_agents_corpus_v2_stopwordcheck` の off-topic 例を再点検し、query 汚染源を具体化:
+  - `Reflexion` 系 broad hit が `Superstructure reflexions in tilted perovskites` を混入
+  - `AI Scientist` 系 broad hit が `TianJi-Environ` のような domain-specific science agent を混入
+  - `prompt optimization` 系 broad hit が `Task-driven Prompt Evolution for Foundation Models` のような医療画像 prompt 最適化を混入
+  - `test-time training` 系 broad hit が `MiGrATe` / `FineMedLM-o1` / `CoTBox-TTT` / `HyperWalker` など広い domain adaptation を混入
+- `D:\docs\self_evolving_agents_corpus_v2.staging\_STAGING_META\queries_refined_candidate.txt` を追加修正:
+  - `verbal reinforcement learning` と `Reflexion` をそれぞれ `agent` / `language model` / `LLM` 条件付きで分離
+  - `prompt evolution` query を追加し、GEPA / Promptbreeder 系を残しつつ vision prompt 系を落としやすくした
+  - `test-time training` は `ti:` 化 + `agent` / `language model` / `LLM` 条件で絞っており、molecule / medical 側の混入抑制はこの tightening に依存する。効果は未検証
+  - `AI Scientist` は `agent` / `language model` / `LLM` 条件に加え、`research` / `discovery` の broad 条件を外して `autonomous` に限定
+  - `recursive self-improvement` から広すぎる `all:AI` を除去し、`open-ended` から広すぎる `all:self` を除去
+- まだ未実行:
+  - refined query での本 fetch rerun
+  - 新規 output dir 作成
+  - `papers/` 再生成
+
 ## 環境メモ
 
 - llcore ブランチ: `phase2a-trajectory-tube-gate` (本タスクとは独立)
-- リポジトリはもともと dirty。今回の repo 変更は記録ファイルのみ
+- リポジトリはもともと dirty。今回この repo で触ったのは `docs/next_plan.md` / `docs/PROGRESS.md` で、query 候補の編集は repo 外 `D:\docs\...`。`assets/articles/llcore_landscape_real.svg` / `research/verified_lm_evolution/make_trajectory.py` / `.llterm/loop_ledger.jsonl` は別件 dirty
 
 ## 統合修正指示の反映メモ (2026-06-13)
 
