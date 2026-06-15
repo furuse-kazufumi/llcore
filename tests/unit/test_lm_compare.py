@@ -61,7 +61,7 @@ def test_compare_on_text_creates_parent_output_dir(tmp_path: Path) -> None:
     assert out_path.exists()
     assert out_path.with_suffix(".md").exists()
     assert out_path.with_suffix(".svg").exists()
-    assert "| Model | PPL | Unigram PPL | Ratio vs GPT | Passes gate |" in out_path.with_suffix(
+    assert "| Model | PPL | Unigram PPL | Ratio vs GPT | Passes unigram floor |" in out_path.with_suffix(
         ".md"
     ).read_text(encoding="utf-8")
     svg_text = out_path.with_suffix(".svg").read_text(encoding="utf-8")

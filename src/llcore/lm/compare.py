@@ -159,11 +159,17 @@ def _measure_generate_tok_s(
     )
     decode_tok_per_s: float | None = None
     prefill_s: float | None = None
+    note = (
+        "warmup + min-of-repeats; decode_tok_per_s is marginal from N vs 2N new "
+        "tokens with torch.set_num_threads(1)"
+    )
     if total_short_s is not None and total_long_s is not None:
         decode_delta_s = total_long_s - total_short_s
         if decode_delta_s > 0:
             decode_tok_per_s = new_tokens / decode_delta_s
             prefill_s = max(0.0, total_short_s - (new_tokens / decode_tok_per_s))
+        else:
+            note += "; marginal decode estimate was unstable/non-positive, so prefill/decode were omitted"
     total_tok_per_s = None if total_short_s is None or total_short_s <= 0 else new_tokens / total_short_s
     return {
         "executable": True,
@@ -171,7 +177,7 @@ def _measure_generate_tok_s(
         "decode_tok_per_s": decode_tok_per_s,
         "total_tok_per_s": total_tok_per_s,
         "effective_prompt_len": prompt_len,
-        "note": "warmup + min-of-repeats; decode_tok_per_s is marginal from N vs 2N new tokens with torch.set_num_threads(1)",
+        "note": note,
     }
 
 
@@ -187,7 +193,7 @@ def _render_ppl_table(result: dict[str, object]) -> str:
     lines = [
         "# Recurrent LM Head-to-Head",
         "",
-        "| Model | PPL | Unigram PPL | Ratio vs GPT | Passes gate |",
+        "| Model | PPL | Unigram PPL | Ratio vs GPT | Passes unigram floor |",
         "| --- | ---: | ---: | ---: | :---: |",
     ]
     for name in ("gpt", "recurrent", "rwkv"):

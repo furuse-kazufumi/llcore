@@ -1,6 +1,6 @@
 # Recurrent LM Head-to-Head
 
-| Model | PPL | Unigram PPL | Ratio vs GPT | Passes gate |
+| Model | PPL | Unigram PPL | Ratio vs GPT | Passes unigram floor |
 | --- | ---: | ---: | ---: | :---: |
 | gpt | 180.897 | 215.459 | 1.000 | yes |
 | recurrent | 207.580 | 215.459 | 1.148 | no |

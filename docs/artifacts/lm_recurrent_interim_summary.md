@@ -24,11 +24,11 @@ This note consolidates the currently tracked head-to-head pilot artifacts for
 - [lm_recurrent_pilot256_40.md](./lm_recurrent_pilot256_40.md)
 - [lm_recurrent_pilot256_40.svg](./lm_recurrent_pilot256_40.svg)
 
-Note: the `64/160` memory SVG is seed-independent because it depends on config, not training trajectory. The existing per-seed SVG copies are kept for audit continuity, but future seed additions should prefer one shared `lm_recurrent_pilot160.svg` reference rather than tracking duplicate byte-identical files.
+Note: the `64/160` and `64/240` memory SVGs are config-dependent rather than seed-dependent, so byte-identical copies can occur across tracked runs. The existing tracked copies are kept for audit continuity, but future additions should prefer a shared SVG reference whenever the generated memory plot would be identical.
 
 ## Capability snapshot
 
-| Run | block_size | max_iters | batch_size | GPT PPL | Recurrent PPL | RWKV PPL | Unigram PPL | Raw order | Strict gate |
+| Run | block_size | max_iters | batch_size | GPT PPL | Recurrent PPL | RWKV PPL | Unigram PPL | Raw order | Unigram floor |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- |
 | pilot120 | 64 | 120 | 8 | 209.511 | 217.469 | 197.369 | 215.459 | RWKV < GPT < Recurrent | all fail |
 | pilot160 | 64 | 160 | 8 | 184.804 | 180.560 | 158.116 | 215.459 | RWKV < Recurrent < GPT | recurrent/rwkv pass |
@@ -39,11 +39,11 @@ Note: the `64/160` memory SVG is seed-independent because it depends on config, 
 
 ## Readout
 
-- `pilot120` is the strongest currently tracked sub-`160`-iteration run, but even there all three models fail the strict unigram gate. The raw PPL ordering is therefore provisional.
-- The three `pilot160*` runs improve enough to cross the strict unigram gate for a subset of models, but the ranking is still seed-sensitive in the GPT-vs-Recurrent slot: RWKV stays best on raw PPL in all three, while GPT and Recurrent swap order and gate status.
-- Across those three `64/160` seeds, RWKV is the only model that stays on the same side of the strict gate every time: RWKV passes `3/3`, GPT passes `2/3`, and Recurrent passes `1/3`.
-- `pilot240` shows the higher-budget direction more clearly: all three models now clear the loose strict-gate floor at the same seed (`1337`), and the raw ordering is `RWKV < Recurrent < GPT`. This is stronger evidence for RWKV under the tested budget, but it is still only one seed at `240` iterations.
-- That gate is only the deliberately loose `0.85 x unigram` floor used by the comparison harness. These pilots do not yet clear the stronger "genuinely learned char-LM" bar noted in `held_out_report_any`, so this remains an interim capability signal rather than a settled learning verdict.
+- `pilot120` is the strongest currently tracked sub-`160`-iteration run, but even there all three models fail the unigram floor. The raw PPL ordering is therefore provisional.
+- The three `pilot160*` runs improve enough to clear the unigram floor for a subset of models, but the ranking is still seed-sensitive in the GPT-vs-Recurrent slot: RWKV stays best on raw PPL in all three, while GPT and Recurrent swap order and floor status.
+- Across those three `64/160` seeds, RWKV is the only model that stays on the same side of the unigram floor every time: RWKV passes `3/3`, GPT passes `2/3`, and Recurrent passes `1/3`.
+- `pilot240` shows the higher-budget direction more clearly: all three models now clear the loose `0.85 x unigram` floor at the same seed (`1337`), and the raw ordering is `RWKV < Recurrent < GPT`. This is stronger evidence for RWKV under the tested budget, but it is still only one seed at `240` iterations.
+- That floor is only the deliberately loose `0.85 x unigram` threshold used by the comparison harness. These pilots do not yet clear the stronger "genuinely learned char-LM" bar noted in `held_out_report_any`, so this remains an interim capability signal rather than a settled learning verdict.
 - `pilot256_40` uses a different budget and is explicitly a low-fidelity proxy. It is useful only to show that the comparison harness still runs at `block_size=256`.
 - The raw ordering changes across runs and seeds, so ranking fidelity is not yet stable enough to claim a full winner.
 - The strongest supported claim remains structural rather than capability-based: `RecurrentLM` and `RWKVLM` run with constant-size recurrent state, while GPT memory grows linearly with prompt length.

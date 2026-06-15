@@ -64,7 +64,7 @@ y = W_o · (sigmoid(r) ⊙ wkv)
 
 同じ日本語コーパス（青空文庫「吾輩は猫である」000148）・同 tokenizer（full text から構築）・同 split（`train_val_split` val_frac=0.1 連続末尾）で:
 
-**(1) 能力**: `held_out_report_any` で GPT と再帰を**同一 val トークン**上で採点（`n_tokens` 一致を assert）。共有 `unigram_ppl` を基準線に、`model_ppl` と `passes_gate`（≤0.85×unigram）と `is_degenerate` を比較。`ppl_ratio = rnn_ppl/gpt_ppl`。block_size=64（smoke）と 256（p1）で。
+**(1) 能力**: `held_out_report_any` で GPT と再帰を**同一 val トークン**上で採点（`n_tokens` 一致を assert）。共有 `unigram_ppl` を基準線に、`model_ppl` と `passes_gate`（≤0.85×unigram の unigram floor）と `is_degenerate` を比較。`ppl_ratio = rnn_ppl/gpt_ppl`。block_size=64（smoke）と 256（p1）で。
 
 **(2) メモリ**: 
 - 解析式: `gpt_kv_bytes(T)=2·L·T·D·4`（傾き `2·L·D·4` B/token、p1 で ~18KB/char）vs `rnn_state_bytes=K·L·D·4`（**T 非依存・傾き 0**、p1 GRU で ~9KB 固定）。
@@ -76,7 +76,7 @@ y = W_o · (sigmoid(r) ⊙ wkv)
 
 **(4) Pareto 判定（事前登録）**:
 - x=能力(PPL, 共有 unigram 基準), y=memory@T と**傾き(B/token)**。再帰は水平線(傾き0)、GPT は上昇線。加えて **break-even prompt_len**（GPT の解析的 KV bytes と定数 state bytes の交点）を出し、「短文では GPT の絶対 bytes が小さい場合がある」ことを隠さない。
-- **「再帰が local-AI として優れる」= 両方成立**: ①能力が大きく劣らない（`rnn_ppl ≤ gpt_ppl·1.10` かつ unigram gate 通過かつ非崩壊）、②メモリ勝ちが構造的（実測で再帰状態が T で flat、GPT は線形、解析+Method1 で確認）。
+- **「再帰が local-AI として優れる」= 両方成立**: ①能力が大きく劣らない（`rnn_ppl ≤ gpt_ppl·1.10` かつ unigram floor 通過かつ非崩壊）、②メモリ勝ちが構造的（実測で再帰状態が T で flat、GPT は線形、解析+Method1 で確認）。
 - **「能力の代償に見合わない」**: block_size 以内で `rnn_ppl > gpt_ppl·1.10`。ただし用途が T≫block_size を要するなら別（そこでは GPT は動けない）。
 - **正直な決め台詞**: 「block_size(={64,256}) を超える文脈では GPT は不適用、再帰は定数 {~9KB} 状態で走る。block_size 以内の能力差は {X}%」。X を定量化、手を振らない。
 - 出力: `out/<run>/recurrent_vs_gpt.json`（capability/memory/throughput/pareto/verdict/caveats）に加え、同 stem で `*.md`（PPL 表 + caveats）と `*.svg`（memory@T 曲線）を自動生成する。`out_path` 契約は `.json` 固定で、他 suffix は sidecar 衝突防止のため明示拒否する。`libexec/raptor-run-lifecycle` 経由。
@@ -138,13 +138,13 @@ y = W_o · (sigmoid(r) ⊙ wkv)
   - 直近の throughput smoke も capability verdict ではなく、主目的は JSON schema と disclosure の確認
   - `out_path` を渡した compare 実行は、JSON の隣に `*.md` と `*.svg` も吐くようにした。前者は head-to-head PPL 表、後者は GPT 線形メモリ vs recurrent/RWKV 定数状態の memory@T 曲線
   - memory SVG では GPT の executable 区間と analytic projection 区間を視覚分離し、`prompt_len > block_size` 側の射影は破線で描く
-  - pilot120 (`docs/artifacts/lm_recurrent_pilot120.json`) では `rwkv_ppl≈197.4 < gpt_ppl≈209.5 < recurrent≈217.5` まで改善したが、3 モデルとも strict unigram gate は未通過。したがって **raw PPL の暫定順位は出たが publishable verdict ではない**
+  - pilot120 (`docs/artifacts/lm_recurrent_pilot120.json`) では `rwkv_ppl≈197.4 < gpt_ppl≈209.5 < recurrent≈217.5` まで改善したが、3 モデルとも unigram floor は未通過。したがって **raw PPL の暫定順位は出たが publishable verdict ではない**
   - 再現コマンド（pilot120）:
     - `@'`
     - `from pathlib import Path; from llcore.lm.compare import CompareConfig, compare_on_text; from llcore.lm.data import fetch_aozora_text`
     - `compare_on_text(fetch_aozora_text(), cfg=CompareConfig(block_size=64, n_layer=2, n_head=4, n_embd=64, state_size=64, max_iters=120, batch_size=8, eval_iters=4, throughput_new_tokens=4, throughput_repeats=1, seed=1337), out_path=Path("docs/artifacts/lm_recurrent_pilot120.json"))`
     - `'@ | py -3.11 -`
-  - `block_size=256` 側の軽量 pilot (`docs/artifacts/lm_recurrent_pilot256_40.json`, summary md=`docs/artifacts/lm_recurrent_pilot256_40.md`) は `max_iters=40, batch_size=4` の low-fidelity proxy として追加。結果は `gpt_ppl≈554.4 < recurrent≈666.5 < rwkv≈891.8`、`unigram≈215.1` で 3 モデルとも strict gate 未通過
+  - `block_size=256` 側の軽量 pilot (`docs/artifacts/lm_recurrent_pilot256_40.json`, summary md=`docs/artifacts/lm_recurrent_pilot256_40.md`) は `max_iters=40, batch_size=4` の low-fidelity proxy として追加。結果は `gpt_ppl≈554.4 < recurrent≈666.5 < rwkv≈891.8`、`unigram≈215.1` で 3 モデルとも unigram floor 未通過
   - 再現コマンド（pilot256_40）:
     - `@'`
     - `from pathlib import Path; from llcore.lm.compare import CompareConfig, compare_on_text; from llcore.lm.data import fetch_aozora_text`
@@ -153,10 +153,10 @@ y = W_o · (sigmoid(r) ⊙ wkv)
   - この `256/40` は `64/120` と学習予算が非対称で、長文窓の有利不利を結論づける用途には使えない。現時点で言えるのは「比較ハーネスは `block_size=256` でも動くが、同 budget ではなお undertrained」ということだけ
   - honest 中間結論:
     - `64/120` では raw PPL は `RWKV < GPT < Recurrent` まで改善したが gate 未通過
-    - `64/160` を 3 seed で見ると、`seed=1337` では `RWKV < Recurrent < GPT` かつ `RWKV/Recurrent` が strict gate 通過、`seed=2026` と `seed=7` では `RWKV < GPT < Recurrent` かつ `RWKV/GPT` が strict gate 通過
-    - `64/240, seed=1337` では `RWKV < Recurrent < GPT` となり、3 モデルすべてが strict gate を通過した (`gpt≈142.6`, `recurrent≈129.4`, `rwkv≈110.4` vs `unigram≈215.5`)
+    - `64/160` を 3 seed で見ると、`seed=1337` では `RWKV < Recurrent < GPT` かつ `RWKV/Recurrent` が unigram floor 通過、`seed=2026` と `seed=7` では `RWKV < GPT < Recurrent` かつ `RWKV/GPT` が unigram floor 通過
+    - `64/240, seed=1337` では `RWKV < Recurrent < GPT` となり、3 モデルすべてが unigram floor を通過した (`gpt≈142.6`, `recurrent≈129.4`, `rwkv≈110.4` vs `unigram≈215.5`)
     - `256/40` では全体に未収束で `GPT < Recurrent < RWKV`
-    - よって **勝者はまだ確定していない**。ただし `RWKV` は `64/160` の 3 seed と `64/240, seed=1337` で raw PPL 最良を維持しており、現時点では最も再現性の高い候補である。一方で、この gate 自体は比較用の緩い `0.85 x unigram` フロアであり、`64/240` でも `unigram/model_ppl` は `GPT≈1.51x`, `Recurrent≈1.66x`, `RWKV≈1.95x` に留まるため、「genuinely learned char-LM」の強い基準を満たしたとはまだ言わない
+    - よって **勝者はまだ確定していない**。ただし `RWKV` は `64/160` の 3 seed と `64/240, seed=1337` で raw PPL 最良を維持しており、現時点では最も再現性の高い候補である。一方で、この unigram floor 自体は比較用の緩い `0.85 x unigram` フロアであり、`64/240` でも `unigram/model_ppl` は `GPT≈1.51x`, `Recurrent≈1.66x`, `RWKV≈1.95x` に留まるため、「genuinely learned char-LM」の強い基準を満たしたとはまだ言わない
     - それでも strongest claim は保守的に留める: 「再帰 2 系統は定数状態メモリで動作し、能力比較は学習予算と seed に敏感で完全には収束していない」
   - tracked pilot を横断した監査用サマリは `docs/artifacts/lm_recurrent_interim_summary.md` に集約
-  - seed を変えても memory SVG は config 依存で byte 同一になりうるため、今後の seed 追加では可能なら既存の共有 SVG（例: `lm_recurrent_pilot160.svg`）を参照し、seed ごとの重複 SVG 追跡は増やさない
+  - memory SVG は config 依存で byte 同一になりうるため、既存 tracked copy は監査継続性のため保持するが、今後は seed/budget を変えても identical な場合は可能なら既存の共有 SVG（例: `lm_recurrent_pilot160.svg`）を参照し、重複 SVG 追跡は増やさない
