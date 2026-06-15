@@ -1,6 +1,6 @@
 {
   "verdict": "整合済み — LM recurrent canonical化/cleanup と rerun準備メモ更新まで完了。残る人間ゲートは verified_safe_learning publish と self_evolving_agents precision rerun/publish 判断。",
-  "last_activity_jst": "2026-06-16 07:24 JST",
+  "last_activity_jst": "2026-06-16 07:43 JST",
   "roadmap": [
     {"stage": "P0", "label": "de-risk: 自前GPT-2 nano (CPU)", "state": "done", "note": "held-out PPL<unigram 両コーパスPASS (shakespeare 0.238× / aozora 0.169×)。48 tests green。"},
     {"stage": "P1", "label": "合格線到達 + 3Dで歩く", "state": "in_progress", "note": "dropout=0.1で過学習抑制(gap 0.99→0.57)、aozora PPL 32.40(0.150×)最良。残=PPL更改善 + 3Dビューア未着手。"},
