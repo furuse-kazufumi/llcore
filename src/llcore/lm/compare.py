@@ -254,6 +254,21 @@ def _render_memory_curve_svg(result: dict[str, object]) -> str:
     def polyline(values: list[int]) -> str:
         return " ".join(f"{sx(t):.1f},{sy(v):.1f}" for t, v in zip(widths, values, strict=True))
 
+    throughput = cast(dict[str, object], result["throughput"])
+    gpt_throughput = cast(dict[str, dict[str, object]], throughput["gpt"])
+    executable_widths = [
+        prompt_len
+        for prompt_len in widths
+        if prompt_len in {int(key) for key in gpt_throughput}
+        and cast(bool, gpt_throughput[str(prompt_len)]["executable"])
+    ]
+    measured_limit = max(executable_widths) if executable_widths else widths[-1]
+    measured_pairs = [(t, v) for t, v in zip(widths, gpt_values, strict=True) if t <= measured_limit]
+    projected_pairs = [(t, v) for t, v in zip(widths, gpt_values, strict=True) if t >= measured_limit]
+
+    def polyline_pairs(pairs: list[tuple[int, int]]) -> str:
+        return " ".join(f"{sx(t):.1f},{sy(v):.1f}" for t, v in pairs)
+
     y_ticks = [0, max_y // 4, max_y // 2, (3 * max_y) // 4, max_y]
     x_labels = "".join(
         f'<text x="{sx(t):.1f}" y="{height - 20}" text-anchor="middle">{t}</text>' for t in widths
@@ -274,12 +289,14 @@ def _render_memory_curve_svg(result: dict[str, object]) -> str:
 <line x1="{left}" y1="{height - bottom}" x2="{width - right}" y2="{height - bottom}" stroke="#111827" />
 {y_labels}
 {x_labels}
-<polyline fill="none" stroke="#2563eb" stroke-width="3" points="{polyline(gpt_values)}" />
+<polyline fill="none" stroke="#2563eb" stroke-width="3" points="{polyline_pairs(measured_pairs)}" />
+<polyline fill="none" stroke="#2563eb" stroke-width="3" stroke-dasharray="8 6" points="{polyline_pairs(projected_pairs)}" />
 <polyline fill="none" stroke="#059669" stroke-width="3" points="{polyline(recurrent_values)}" />
 <polyline fill="none" stroke="#dc2626" stroke-width="3" points="{polyline(rwkv_values)}" />
-<text x="{width - 140}" y="26" font-family="Segoe UI, sans-serif" font-size="12" fill="#2563eb">GPT KV</text>
-<text x="{width - 140}" y="44" font-family="Segoe UI, sans-serif" font-size="12" fill="#059669">Recurrent state</text>
-<text x="{width - 140}" y="62" font-family="Segoe UI, sans-serif" font-size="12" fill="#dc2626">RWKV state</text>
+<text x="{width - 140}" y="26" font-family="Segoe UI, sans-serif" font-size="12" fill="#2563eb">GPT KV (measured)</text>
+<text x="{width - 140}" y="44" font-family="Segoe UI, sans-serif" font-size="12" fill="#2563eb">GPT KV (projection)</text>
+<text x="{width - 140}" y="62" font-family="Segoe UI, sans-serif" font-size="12" fill="#059669">Recurrent state</text>
+<text x="{width - 140}" y="80" font-family="Segoe UI, sans-serif" font-size="12" fill="#dc2626">RWKV state</text>
 </svg>
 """
 

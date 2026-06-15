@@ -137,6 +137,7 @@ y = W_o · (sigmoid(r) ⊙ wkv)
   - smoke (`max_iters=20`, `throughput_new_tokens=8`) では、速度は prompt が短い範囲で `RecurrentLM > GPT > RWKV`。長文側で見える低下は decode 律速ではなく **prefill 起因** として分離表示し、GPT は `block_size` 超を exact には測れない
   - 直近の throughput smoke も capability verdict ではなく、主目的は JSON schema と disclosure の確認
   - `out_path` を渡した compare 実行は、JSON の隣に `*.md` と `*.svg` も吐くようにした。前者は head-to-head PPL 表、後者は GPT 線形メモリ vs recurrent/RWKV 定数状態の memory@T 曲線
+  - memory SVG では GPT の executable 区間と analytic projection 区間を視覚分離し、`prompt_len > block_size` 側の射影は破線で描く
   - pilot120 (`docs/artifacts/lm_recurrent_pilot120.json`) では `rwkv_ppl≈197.4 < gpt_ppl≈209.5 < recurrent≈217.5` まで改善したが、3 モデルとも strict unigram gate は未通過。したがって **raw PPL の暫定順位は出たが publishable verdict ではない**
   - 再現コマンド（pilot120）:
     - `@'`

@@ -63,7 +63,9 @@ def test_compare_on_text_creates_parent_output_dir(tmp_path: Path) -> None:
     assert "| Model | PPL | Unigram PPL | Ratio vs GPT | Passes gate |" in out_path.with_suffix(
         ".md"
     ).read_text(encoding="utf-8")
-    assert "<svg" in out_path.with_suffix(".svg").read_text(encoding="utf-8")
+    svg_text = out_path.with_suffix(".svg").read_text(encoding="utf-8")
+    assert "<svg" in svg_text
+    assert "stroke-dasharray=\"8 6\"" in svg_text
 
 
 def test_compare_config_validates_head_divisibility() -> None:
