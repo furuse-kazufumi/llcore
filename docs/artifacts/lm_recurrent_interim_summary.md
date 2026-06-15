@@ -5,9 +5,9 @@ This note consolidates the currently tracked head-to-head pilot artifacts for
 
 ## Tracked artifacts
 
-- [lm_recurrent_pilot120.json](/D:/projects/llcore/docs/artifacts/lm_recurrent_pilot120.json)
-- [lm_recurrent_pilot256_40.json](/D:/projects/llcore/docs/artifacts/lm_recurrent_pilot256_40.json)
-- [lm_recurrent_pilot256_40.md](/D:/projects/llcore/docs/artifacts/lm_recurrent_pilot256_40.md)
+- [lm_recurrent_pilot120.json](./lm_recurrent_pilot120.json)
+- [lm_recurrent_pilot256_40.json](./lm_recurrent_pilot256_40.json)
+- [lm_recurrent_pilot256_40.md](./lm_recurrent_pilot256_40.md)
 
 ## Capability snapshot
 
@@ -28,12 +28,54 @@ This note consolidates the currently tracked head-to-head pilot artifacts for
 - Formal gate command:
   `py -3.11 -m pytest tests/unit -k lm -q && py -3.11 -m mypy src/llcore/lm/ && py -3.11 -m ruff check src/llcore/lm/`
 - `pilot120`:
-  `@'`
-  `from pathlib import Path; from llcore.lm.compare import CompareConfig, compare_on_text; from llcore.lm.data import fetch_aozora_text`
-  `compare_on_text(fetch_aozora_text(), cfg=CompareConfig(block_size=64, n_layer=2, n_head=4, n_embd=64, state_size=64, max_iters=120, batch_size=8, eval_iters=4, throughput_new_tokens=4, throughput_repeats=1, seed=1337), out_path=Path("out/lm_recurrent_pilot120.json"))`
-  `'@ | py -3.11 -`
+```powershell
+@'
+from pathlib import Path
+from llcore.lm.compare import CompareConfig, compare_on_text
+from llcore.lm.data import fetch_aozora_text
+
+compare_on_text(
+    fetch_aozora_text(),
+    cfg=CompareConfig(
+        block_size=64,
+        n_layer=2,
+        n_head=4,
+        n_embd=64,
+        state_size=64,
+        max_iters=120,
+        batch_size=8,
+        eval_iters=4,
+        throughput_new_tokens=4,
+        throughput_repeats=1,
+        seed=1337,
+    ),
+    out_path=Path("docs/artifacts/lm_recurrent_pilot120.json"),
+)
+'@ | py -3.11 -
+```
 - `pilot256_40`:
-  `@'`
-  `from pathlib import Path; from llcore.lm.compare import CompareConfig, compare_on_text; from llcore.lm.data import fetch_aozora_text`
-  `compare_on_text(fetch_aozora_text(), cfg=CompareConfig(block_size=256, n_layer=2, n_head=4, n_embd=64, state_size=64, max_iters=40, batch_size=4, eval_iters=2, throughput_new_tokens=4, throughput_repeats=1, seed=1337), out_path=Path("out/lm_recurrent_pilot256_40.json"))`
-  `'@ | py -3.11 -`
+```powershell
+@'
+from pathlib import Path
+from llcore.lm.compare import CompareConfig, compare_on_text
+from llcore.lm.data import fetch_aozora_text
+
+compare_on_text(
+    fetch_aozora_text(),
+    cfg=CompareConfig(
+        block_size=256,
+        n_layer=2,
+        n_head=4,
+        n_embd=64,
+        state_size=64,
+        max_iters=40,
+        batch_size=4,
+        eval_iters=2,
+        throughput_new_tokens=4,
+        throughput_repeats=1,
+        seed=1337,
+    ),
+    out_path=Path("docs/artifacts/lm_recurrent_pilot256_40.json"),
+)
+'@ | py -3.11 -
+```
