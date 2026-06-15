@@ -178,6 +178,7 @@
   (環境依存の別ドライブ staging 出力)、
   `metadata.json` (`summaries_generated: 0`)。
 - **側面**: 実装報告 / 教訓 / AI 駆動研究ワークフロー。
+- **2026-06-16 追記**: その後の指揮者セッション実測では `ANTHROPIC_API_KEY` は present かつ valid と確認済み。ここでの `ANTHROPIC org disabled` は 2026-06-13 時点の観測であり、現在状態の正本は `docs/next_plan.md` を参照する。fallback を保険として持つ教訓自体は維持。
 
 ### 18. 広い topical query は recall を稼ぐが、leaf cluster にノイズとして返ってくる
 - **気付き**: `self-evolving` / `reflection` / `test-time training` 系で 16 クエリを広く張ると、
