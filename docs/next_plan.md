@@ -358,3 +358,13 @@
     - 不採用指摘:
       - 「byte-identical 不変条件の test が diff に無い」は **既に `tests/unit/test_lm_artifacts.py` に guard test を追加済み** のため不採用
       - 既存 commit `153c0f7` のメッセージ scope を広げる案は妥当だが、**amend が必要**になるため今回は未実施
+
+
+---
+
+## ★ユーザー判断 (2026-06-16, ccr 経由) — 人間ゲート回答
+
+- **self_evolving_agents staging**: 採用 = **(b) stopword 除去 + query 絞りで再生成**（ユーザー承認・選択肢②）。そのまま publish / 手動除去 ではなく **再生成**方針。
+  - **★ブロッカー**: corpus2skill 要約器は直近の試行で失敗しており、現時点でも高品質 summary へ置換できる状態か未確認。現セッションの環境観測では `ANTHROPIC_API_KEY` は **存在**する一方、`OPENAI_API_KEY` は未設定のまま。要約器の実可用性確認が先決。
+  - 手順: API 実可用性確認 → stopword/query 調整で corpus2skill 再生成 → off-topic 混入を再確認 → publish 判断。
+- 他の人間ゲート（verified_safe_learning publish / precision rerun 本実行 / API キー復旧）は **ccr 側バッファで保留中**（ユーザー未回答）。
