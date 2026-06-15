@@ -282,7 +282,7 @@
 
 ## 再開メモ (2026-06-16, 現セッション)
 
-- `docs/SESSION_SUMMARY.md` / 本ファイルを再読し、再開地点は前回記録どおり **LM recurrent 本体は完了、残る承認待ちは duplicate SVG 物理削除 1 件のみ** と確認
+- `docs/SESSION_SUMMARY.md` / 本ファイルを再読し、再開地点は **LM recurrent canonical 化まで完了済み、残る人間ゲートは `verified_safe_learning` / `self_evolving_agents` 側** と確認
 - repo 直下には `CLAUDE.md` / `AGENTS.md` は存在しないため、再開時は `docs/next_plan.md` / `docs/PROGRESS.md` を主に参照する。ただし上位指示は引き続き優先し、global `C:\Users\puruy\.claude\CLAUDE.md` の規約も有効
 - 統合修正指示の反映:
   - `.git/hooks` に有効フックはなく、repo 内検索でも `.llterm/loop_ledger.jsonl` を `git add` する自動再 tracked 経路は未検出。`tools/llterm_status.py` は ledger を読むだけで stage しない
@@ -309,13 +309,13 @@
     - 削除を実行するなら canonical shared SVG は **`lm_recurrent_pilot160.svg` に統一**する。理由は `lm_recurrent_verdict.md` が既にこれを共有参照先として使っており、`pilot240_seed7` index 行も同じ canonical へ張り替えるのが最小差分だから
     - `tests/unit/test_lm_artifacts.py` は現時点では各 stem の物理 SVG を個別検証する状態を維持する。削除を実行する場合は、**同一コミット内で** test の canonical 許容化、interim index の共有参照統一、duplicate 6 枚の `git rm`、`lm_recurrent_verdict.md` の共有参照確認、LM gate 再確認を順に行う
     - 不可逆削除は個別・明示の承認が必要であり、包括的な「確認不要」指示では自動承認しない
-    - 2026-06-16 追記: 承認質問は `pilot120` を含む block_size=64 の同一 SVG 7 枚を対象とする形へ再発行済み。現在はその選択回答待ちであり、回答受領までは削除・参照更新・gate 再実行のいずれも開始しない
-    - 2026-06-16 追記: 上の巻き戻しにより、選択肢 2 / 3 でも repo 状態は矛盾しない。option 1 が選ばれた場合のみ、削除専用の参照更新・note 更新・test 更新を単一コミットへ束ねる
+    - 2026-06-16 追記: この承認待ちフローはその後ユーザーが **選択肢 1** を選び、`13bcc26` で canonical 化まで完了した。以下の bullet は、実施前にどの論点を潰したかを残す監査ログとして保持する
+    - 2026-06-16 追記: 現在の repo 状態は canonical 化・test 改修・LM gate 再確認まで反映済みであり、選択肢 2 / 3 の分岐は **履歴上の検討過程** である
     - 2026-06-16 追記: canonical shared SVG の候補は `lm_recurrent_pilot160.svg` に統一した。これは**削除または将来の共有参照化を行う場合の候補**であり、現 tracked state を即座に共有参照へ変えるものではない
     - 2026-06-16 追記: docs に書いた「全 block_size=64 SVG が byte 同一、`pilot256_40` のみ別」という**観測事実**は、drift 防止のため `tests/unit/test_lm_artifacts.py` の guard test で固定した。一方、seed / `max_iters` / `batch_size` / `eval_iters` が SVG に効かない理由は **renderer のコード読解にもとづく説明**であり、guard test が直接その因果まで証明しているわけではない
     - 2026-06-16 追記: `interim_summary.md` の保持理由は、旧版を「撤回」したというより、**より honest な文言へ整理した** と捉えるのが正確。現在は「tracked のまま残しつつ、将来 duplicate tracked SVG は canonical 化候補とする」という位置づけで、`verdict.md` が shared family reference、`interim_summary.md` が run ごとの artifact inventory という役割差を明記している
-    - 2026-06-16 追記: 現 working tree の差分は **docs のみ**で、内容は **選択肢 3（保持方針維持 + 注記整理）に対応する記録更新** に留まる。現 tracked state では **全 run が各自の `.svg` を参照したまま**であり、canonical 共有参照への統一や test 改修はまだ実施していない。`git rm` を伴う選択肢 1 はこの差分に混ぜず、承認後に **別コミット** で `test canonical 許容化 → duplicate SVG 削除 → LM gate 再確認` の順で行う
-    - 2026-06-16 追記: `py -3.11 -m pytest tests/unit/test_lm_artifacts.py -q` は `10 passed` を再確認済み。これは **現行の docs-only 状態**に対する green であり、canonical 名統一や test 改修の完了を意味しない
+    - 2026-06-16 追記: 上の「docs-only / 選択肢 3 相当」は **`13bcc26` 実施前** の状態メモである。現 HEAD では canonical 共有参照への統一・test 改修・duplicate SVG 削除はすべて実施済み
+    - 2026-06-16 追記: `py -3.11 -m pytest tests/unit/test_lm_artifacts.py -q` の `10 passed` は、canonical 名統一と test 改修を含む **削除後状態** でも再確認済み
     - 2026-06-16 追記: 追加統合指示により、**test 改修を伴わない素朴版の選択肢 1 は非推奨** と整理した。主因は、JSON を残したまま SVG だけ削除する計画が `tests/unit/test_lm_artifacts.py` の JSON↔SVG カップリングと構造衝突するため
     - 選択肢 1 を再開するなら、削除前に plan とコミット説明で次の分岐を先に確定する必要がある:
       - `(A)` test を decouple し、JSON stem ごとの SVG 実在要求を外す
@@ -368,4 +368,4 @@
   - 2026-06-16 追記: 現セッションの疎通確認で `ANTHROPIC_API_KEY` は **存在かつ有効**、`OPENAI_API_KEY` は未設定と確認した。したがって API 復旧は現時点の主ブロッカーではない。
   - **現ブロッカー**: rerun 方針そのものは承認済みだが、`papers/` 作り直しを伴う **precision rerun 本実行** は ccr 側バッファの保留項目に残っている。実行前にこの点の人間判断を明示的に回収する。
   - 手順: precision rerun 本実行の人間判断回収 → stopword/query 調整で corpus2skill 再生成 → off-topic 混入を再確認 → publish 判断。
-- 他の人間ゲート（verified_safe_learning publish / precision rerun 本実行 / API キー復旧）は **ccr 側バッファで保留中**（ユーザー未回答）。
+- 他の人間ゲート（verified_safe_learning publish / precision rerun 本実行）は **ccr 側バッファで保留中**（ユーザー未回答）。API キー疎通自体は 2026-06-16 の指揮者セッション実測で確認済み。

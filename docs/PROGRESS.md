@@ -40,6 +40,6 @@
 - `runner._strip_skill_header()` は H1 限定へ補正し、`## Overview` 始まりの legacy summary も resume 対象に戻した
 - `libexec/raptor-rad-ingest` の `_ensure_utf8_io()` 追加は別筋の未記録差分として残存。rptr commit 時は分離要
 - 現在地点は「`self_evolving_agents` の (b) rerun 方針は承認済み、Anthropic 要約器の疎通確認も通過済み、残る主ブロッカーは rerun 本実行の人間判断待ち」という状態。最小 fetch 検証と query 汚染是正までは完了済み
-- 現在の既存 dirty は `docs/next_plan.md` の ccr 経由メモ追記と、別件の未追跡 `research/highdim_evolution/make_hd1_null_viz.py`。後者は今回作業の対象外
-- 次は `verified_safe_learning` / `self_evolving_agents` の人間判断待ちを処理するか、人間判断なしで進めるなら API 可用性の確認と `(b)` rerun の準備再開へ進む
+- 現在の既存 dirty は、別件の未追跡 `research/highdim_evolution/make_hd1_null_viz.py` のみ。これは今回作業の対象外
+- 次は `verified_safe_learning` / `self_evolving_agents` の人間判断待ちを処理するか、人間判断なしで進めるなら `(b)` rerun 本実行の判断回収と準備再開へ進む
 - 再開時は `next_plan.md` の「今回追加で進めた内容」と「次の具体的な一手」から続行
