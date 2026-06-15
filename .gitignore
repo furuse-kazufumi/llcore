@@ -44,6 +44,7 @@ out/
 experiments/
 scratch/
 docs/status/
+.llterm/
 
 .planning/state/
 *.local
