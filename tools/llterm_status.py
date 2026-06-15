@@ -179,7 +179,7 @@ def build():
         P.append(f'<text x="{RX+14}" y="{ry+1}" font-size="13" fill="#fff" text-anchor="middle" font-weight="bold">{esc(mark)}</text>')
         P.append(f'<text x="{RX+36}" y="{ry}" font-size="15.5" fill="#222"><tspan font-weight="bold">{esc(r.get("stage",""))}</tspan>  {esc(r.get("label",""))}</text>')
         ry += 21
-        for nl in wrap(r.get("note", ""), 36):
+        for nl in wrap(r.get("note", ""), 74):
             if not nl:
                 continue
             P.append(f'<text x="{RX+36}" y="{ry}" font-size="12.5" fill="#666">{esc(nl)}</text>')
