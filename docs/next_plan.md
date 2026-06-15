@@ -109,6 +109,7 @@
    - `D:\tools\raptor\packages\corpus2skill\embedder.py` / `clusterer.py` の stopword 修正は適用済みなので、そのまま使う
    - rerun 前提の最小 runtime 検証は完了済み。追加の確認を重複させず、まず `queries` / 記録 / 既存成果の読み合わせまで進めてよい
    - `_STAGING_META/queries_refined_candidate.txt` は準備済み。まずこれを採用候補として使い、必要なら title 制約や category 制約の微調整だけを追加する
+   - 入力固定メモ: `queries_refined_candidate.txt` の現スナップショットは SHA256 `0E6CCB7A91C74E4728098EA92B98BD5E07889A320537EEC724F1D44795B9C042`。rerun 本実行前に同一性を再確認する
    - **ここから先の本実行 (`papers/` 作り直し、別 output dir への fetch、`fetch_arxiv_topical.py` → `raptor-corpus2skill` 実行) は人間承認後**
    - rerun コマンドの骨子は既に固定できる:
      - `py -3.11 D:\tools\raptor\fetch_arxiv_topical.py --query-file D:\docs\self_evolving_agents_corpus_v2.staging\_STAGING_META\queries_refined_candidate.txt --output <new_papers_dir> --per-query 60 --since 2019-01-01`
@@ -127,7 +128,7 @@
 4. 人間判断が `(a)` なら各 staging の `_STAGING_META/DECISIONS.md` にある publish / rename 手順から開始する
 5. 人間判断が `(b)` なら query 絞り込み rerun、`(c)` なら staging 側の手動除去へ進む
 6. 人間判断なしで自律継続する場合でも、この EXIT 時点では **最小検証済みなのは query 汚染遮断まで**。`queries_refined_candidate.txt` の precision 改善効果は未検証なので、同じ確認を繰り返す必要はないが、本 rerun 後に before/after の混入率と recall 低下を必ず再評価する
-7. `D:\tools\raptor` 側の `git status` を確認し、`libexec/raptor-rad-ingest` の `_ensure_utf8_io()` 差分を fetch/corpus2skill 修正と分離コミットすべきか判断する
+7. `D:\tools\raptor` 側の `git status` は `_bazue_*` 3 件削除のみ。self_evolving_agents rerun とは無関係なので、次の rerun / commit 束には混ぜない
 
 ## 今回 repo 内で更新した記録 (2026-06-13 時点)
 
@@ -193,7 +194,7 @@
 ## 環境メモ
 
 - llcore ブランチ: `phase2a-trajectory-tube-gate` (過去タスク時点の環境メモ。本ファイル内の現在地は後段「LM recurrent 現在地」を正本とする)
-- リポジトリはもともと dirty。今回この repo で触ったのは `docs/next_plan.md` / `docs/PROGRESS.md` で、query 候補の編集は repo 外 `D:\docs\...`。`assets/articles/llcore_landscape_real.svg` / `research/verified_lm_evolution/make_trajectory.py` / `.llterm/loop_ledger.jsonl` は別件 dirty
+- リポジトリの現 dirty は `research/highdim_evolution/make_hd1_null_viz.py` の未追跡のみ。query 候補の編集は repo 外 `D:\docs\...` で行っており、この repo の rerun 準備メモとは別管理
 
 ## 統合修正指示の反映メモ (2026-06-13)
 
@@ -203,8 +204,8 @@
   - `DECISIONS.md` には source-query 追跡の制約 (`fp.exists()` skip で旧 papers に遡及しない / 複数 query 命中時は最初の保存分のみ残る) を追記
   - rerun 前の最小ランタイム確認として「1 query fetch → 1件目視 → 検索式語がラベルに出ないこと確認」を追加し、実施済み
 - 来歴確認:
-  - `D:\tools\raptor\libexec\raptor-rad-ingest` の `_ensure_utf8_io()` 追加は今回タスクとは別筋の未記録差分として現存。relevant ではないため巻き戻さず、raptor 側でコミット分離が必要
-  - `D:\tools\raptor` は llcore 外の別リポジトリで、ここで独立コミットまでは実施していない。コミット時は fetch/corpus2skill 修正と `libexec/raptor-rad-ingest` を分離すべき
+  - `D:\tools\raptor\libexec\raptor-rad-ingest` の `_ensure_utf8_io()` 差分は現 `git status` には存在しない。現在の外部 dirty は `_bazue_*` 3 件削除のみで、この rerun 準備メモからは対象外とする
+  - `D:\tools\raptor` は llcore 外の別リポジトリで、ここで独立コミットまでは実施していない。次に raptor 側を触るときも、現存する `_bazue_*` 削除差分は self_evolving_agents rerun 束へ混ぜない
 - 最小ランタイム確認:
   - temp dir `C:\Users\puruy\AppData\Local\Temp\rad_query_sanity` に 1 query だけ fetch して markdown 生成を確認
   - 生成物には `<!-- source-query: ... -->` comment が入る一方、loader 後の TF-IDF top terms から `ti` / `cat` / `source` / `query` / `authors` / `categories` は消えることを確認
