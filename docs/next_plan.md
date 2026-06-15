@@ -193,7 +193,7 @@
 
 ## 環境メモ
 
-- llcore ブランチ: `phase2a-trajectory-tube-gate` (過去タスク時点の環境メモ。本ファイル内の現在地は後段「LM recurrent 現在地」を正本とする)
+- llcore ブランチ: `feat/lm-recurrent` (本ファイル内の現在地は後段「LM recurrent 現在地」を正本とする)
 - リポジトリの現 dirty はなし（作業木 clean）。query 候補の編集は repo 外 `D:\docs\...` で行っており、この repo の rerun 準備メモとは別管理
 
 ## 統合修正指示の反映メモ (2026-06-13)
@@ -360,3 +360,6 @@
   - **現ブロッカー**: rerun 方針そのものは承認済みだが、`papers/` 作り直しを伴う **precision rerun 本実行** は ccr 側バッファの保留項目に残っている。実行前にこの点の人間判断を明示的に回収する。
   - 手順: precision rerun 本実行の人間判断回収 → stopword/query 調整で corpus2skill 再生成 → off-topic 混入を再確認 → publish 判断。
 - 他の人間ゲート（verified_safe_learning publish / precision rerun 本実行）は **ccr 側バッファで保留中**（ユーザー未回答）。API キー疎通自体は 2026-06-16 の指揮者セッション実測で確認済み。
+
+
+> 訂正 (2026-06-16, ccr): 先の『self_evolving_agents 再生成は API キー復旧が先決』は誤り。ANTHROPIC_API_KEY は 06-16 に valid 確認済。唯一のゲートは rerun 本実行の人間承認。
