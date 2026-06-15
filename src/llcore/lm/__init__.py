@@ -33,6 +33,7 @@ from llcore.lm.model import (
     NewGELU,
 )
 from llcore.lm.recurrent import RecurrentConfig, RecurrentLM
+from llcore.lm.rwkv import RWKVConfig, RWKVLM
 from llcore.lm.tokenizer import CharTokenizer
 from llcore.lm.trainer import TrainConfig, Trainer
 
@@ -45,6 +46,8 @@ __all__ = [
     "NewGELU",
     "RecurrentConfig",
     "RecurrentLM",
+    "RWKVConfig",
+    "RWKVLM",
     "TrainConfig",
     "Trainer",
     "encode_corpus",
