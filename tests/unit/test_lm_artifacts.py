@@ -23,6 +23,12 @@ def _summary_run_name(stem: str) -> str:
     return stem.removeprefix("lm_recurrent_")
 
 
+def _summary_svg_target(stem: str) -> str:
+    if stem == "lm_recurrent_pilot240_seed7":
+        return "./lm_recurrent_pilot240.svg"
+    return f"./{stem}.svg"
+
+
 def _strict_gate_summary_label(result: dict[str, object]) -> str:
     verdict = result["verdict"]
     passed = [
@@ -68,8 +74,8 @@ def test_tracked_recurrent_svgs_are_well_formed_xml() -> None:
 def test_interim_summary_links_target_existing_tracked_artifacts() -> None:
     text = SUMMARY_PATH.read_text(encoding="utf-8")
     for stem in _tracked_pilot_stems():
-        for suffix in (".json", ".md", ".svg"):
-            target = f"./{stem}{suffix}"
+        targets = [f"./{stem}.json", f"./{stem}.md", _summary_svg_target(stem)]
+        for target in targets:
             assert target in text
             resolved = (SUMMARY_PATH.parent / target.removeprefix("./")).resolve()
             assert resolved.exists()

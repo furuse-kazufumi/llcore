@@ -25,12 +25,12 @@ This note consolidates the currently tracked head-to-head pilot artifacts for
 - [lm_recurrent_pilot240_seed2026.svg](./lm_recurrent_pilot240_seed2026.svg)
 - [lm_recurrent_pilot240_seed7.json](./lm_recurrent_pilot240_seed7.json)
 - [lm_recurrent_pilot240_seed7.md](./lm_recurrent_pilot240_seed7.md)
-- [lm_recurrent_pilot240_seed7.svg](./lm_recurrent_pilot240_seed7.svg)
+- [lm_recurrent_pilot240_seed7.svg](./lm_recurrent_pilot240.svg)
 - [lm_recurrent_pilot256_40.json](./lm_recurrent_pilot256_40.json)
 - [lm_recurrent_pilot256_40.md](./lm_recurrent_pilot256_40.md)
 - [lm_recurrent_pilot256_40.svg](./lm_recurrent_pilot256_40.svg)
 
-Note: the `64/160` and `64/240` memory SVGs are config-dependent rather than seed-dependent, so byte-identical copies can occur across tracked runs. The existing tracked copies are kept for audit continuity, but future additions should prefer a shared SVG reference whenever the generated memory plot would be identical.
+Note: the `64/160` and `64/240` memory SVGs are config-dependent rather than seed-dependent, so byte-identical copies can occur across tracked runs. The existing tracked copies are kept for audit continuity, but future additions should prefer a shared SVG reference whenever the generated memory plot would be identical. `pilot240_seed7.svg` already reuses the shared `pilot240.svg` reference in this index for that reason.
 
 ## Capability snapshot
 

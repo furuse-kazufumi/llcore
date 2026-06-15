@@ -213,3 +213,18 @@
   - 同じ 2 docs に対する `_make_label(...)` は `soundnessbench / soundness / atmospheric` となり、検索式語がラベルに残らないことを確認
 - 見送り:
   - `_is_informative_label_term()` の `3d/2d/5g` まで落とし得る regex 指摘は妥当だが、この corpus の直近 blocker ではないため今回は未着手
+
+## 承認待ちメモ (2026-06-16)
+
+- LM recurrent 比較の統合修正指示 #1 は、tracked artifact の重複 SVG を `git rm` で整理する削除操作を含むため、人間承認が必要
+- 実測確認:
+  - `docs/artifacts/lm_recurrent_pilot160.svg`
+  - `docs/artifacts/lm_recurrent_pilot240.svg`
+  - `docs/artifacts/lm_recurrent_pilot240_seed2026.svg`
+  - `docs/artifacts/lm_recurrent_pilot240_seed7.svg`
+  は `git hash-object` が全て `2cb4574abc14ed8fcd3eeac471a3cb45bdee7af7` で byte 同一
+- 承認された場合の実施内容:
+  1. 重複 SVG の tracked copy を削除し、summary/doc の参照先を共有 SVG へ統一
+  2. `strict gate` → `unigram floor` の文言整理で済まない実体の重複を是正
+  3. 変更後に `py -3.11 -m pytest tests/unit -k lm -q && py -3.11 -m mypy src/llcore/lm/ && py -3.11 -m ruff check src/llcore/lm/` を再実行
+- 不承認なら、削除を伴わない範囲（文言・注記・将来方針）だけで整合を維持する
