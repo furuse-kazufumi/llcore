@@ -191,7 +191,7 @@ def build():
     if not gates:
         P.append(f'<text x="{RX+4}" y="{ry}" font-size="14.5" fill="#888">（なし）</text>'); ry += 22
     for g in gates:
-        for k, gl in enumerate(wrap(g, 33)):
+        for k, gl in enumerate(wrap(g, 66)):
             P.append(f'<text x="{RX+4}" y="{ry}" font-size="14" fill="#b26a00">{esc(("⏸ " if k == 0 else "    ") + gl)}</text>')
             ry += 20
         ry += 4
