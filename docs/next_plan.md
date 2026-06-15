@@ -224,9 +224,10 @@
   - `docs/artifacts/lm_recurrent_pilot240_seed7.svg`
   は `git hash-object` が全て `2cb4574abc14ed8fcd3eeac471a3cb45bdee7af7` で byte 同一
 - 承認された場合の実施内容:
-  1. 重複 SVG の tracked copy を削除し、summary/doc の参照先を共有 SVG へ統一
-  2. `strict gate` → `unigram floor` の文言整理で済まない実体の重複を是正
-  3. 変更後に `py -3.11 -m pytest tests/unit -k lm -q && py -3.11 -m mypy src/llcore/lm/ && py -3.11 -m ruff check src/llcore/lm/` を再実行
+  1. 削除対象 SVG への参照を Markdown / tests / docs 全体で grep し、共有 SVG への切替済みを確認する
+  2. 重複 SVG の tracked copy を削除し、summary/doc の参照先を共有 SVG へ統一する
+  3. `strict gate` → `unigram floor` の文言整理で済まない実体の重複を是正
+  4. 変更後に `py -3.11 -m pytest tests/unit -k lm -q && py -3.11 -m mypy src/llcore/lm/ && py -3.11 -m ruff check src/llcore/lm/` を再実行
 - 削除前の参照確認（2026-06-16 実施）:
   - duplicate SVG stem への現参照は `docs/next_plan.md`, `docs/artifacts/lm_recurrent_interim_summary.md`, `docs/artifacts/lm_recurrent_verdict.md`, `tests/unit/test_lm_artifacts.py`, `docs/LM_RECURRENT_PLAN.md` に存在
   - したがって `git rm` 前に、少なくとも上記 docs/tests の参照先を共有 SVG へ張り替えた後で grep 再確認する
@@ -256,7 +257,7 @@
   - 次に動くのは、(a) duplicate SVG の物理整理に承認が下りたとき、または (b) 追加 seed / 追加 budget / 比較基準変更の新要件が入ったとき
   - `.llterm/loop_ledger.jsonl` の tracking 方針変更（`.gitignore` + `git rm --cached` 等）は LM recurrent 本体とは別件の repo 衛生タスクとして扱い、必要なら別途承認付きで処理する
   - 2026-06-16 追記: `.llterm/loop_ledger.jsonl` は tracked のまま append-only dirty を再発させるため、方針候補は「ignore + `git rm --cached` で追跡解除」に収束している。これは index からの削除操作を含むため、人間承認後に別コミットで実施する
-  - 2026-06-16 追記: 承認要求は 2 件を同時に束ねてよい
+  - 2026-06-16 追記: 承認要求は **別々に扱う**
     1. duplicate SVG の tracked copy 削除 + 共有 SVG 参照への統一
     2. `.llterm/loop_ledger.jsonl` の追跡解除（`.gitignore` + `git rm --cached`、runtime append を今後の commit から分離）
-    どちらも削除系/追跡解除系のため fail-closed で人間承認後にだけ実施する
+    どちらも削除系/追跡解除系のため fail-closed で人間承認後にだけ実施し、**承認もコミットも分離する**
