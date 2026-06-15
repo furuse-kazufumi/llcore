@@ -162,5 +162,5 @@ y = W_o · (sigmoid(r) ⊙ wkv)
     - それでも strongest claim は保守的に留める: 「再帰 2 系統は定数状態メモリで動作し、能力比較は学習予算と seed に敏感で完全には収束していない」
   - tracked pilot を横断した監査用サマリは `docs/artifacts/lm_recurrent_interim_summary.md` に集約
   - 暫定 head-to-head verdict packet は `docs/artifacts/lm_recurrent_verdict.md` に集約。現時点の strongest claim / [non-claims](docs/artifacts/lm_recurrent_verdict.md#non-claims) / memory@T 参照先を 1 枚で確認できる
-  - memory SVG は実測上 `block_size=64` で byte 同一になりうるため、既存 tracked copy は当面保持する。将来 `pilot120/160/240` 系のような identical な SVG を canonical 化するなら、shared target は `lm_recurrent_pilot160.svg` に統一し、重複 SVG 追跡は増やさない
+  - memory SVG は実測上 `block_size=64` で byte 同一になりうるため、tracked duplicate SVG は canonical shared target `lm_recurrent_pilot160.svg` へ統一した。以後 `pilot120/160/240` 系のような identical な memory plot は shared target を再利用し、重複 SVG 追跡は増やさない
   - 現時点では **head-to-head verdict packet（PPL 表 + memory@T 曲線 + adversarial review 反映済みの caveat）までは完成**。ここでいう stop 条件は「verdict packet を監査可能な形で揃える」ことを指し、**full winner 宣言までを要件には含めない**。結論はあくまで「RWKV が最も再現性の高い候補」で止め、full winner 宣言は保留する

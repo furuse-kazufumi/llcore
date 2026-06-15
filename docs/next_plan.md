@@ -297,8 +297,10 @@
     - commit `3d1f6ab` (`Stop tracking llterm runtime artifacts`) で `.gitignore` に `.llterm/` を追加し、`git rm --cached -f .llterm/loop_ledger.jsonl` を単独コミットで実施
     - コミット範囲は `.gitignore` と ledger の index 解除だけに限定し、`docs/next_plan.md` は未ステージのまま維持
     - 実ファイルの ledger は作業木に残しつつ ignore 下へ移し、以後の append-only 追記を commit ノイズから分離した
-  - 次の承認待ち:
-    - 残る不可逆操作は **duplicate SVG の tracked copy 物理削除** のみ
+  - 承認済み・実施結果:
+    - 2026-06-16 承認受領: ユーザーは **選択肢 1** を選び、`lm_recurrent_pilot160.svg` を canonical として残し、byte 同一の block_size=64 duplicate SVG 6 枚を削除して共有参照へ統一する方針を承認した。実施は option A（JSON は保持、test / docs / `git rm` を同一コミットで原子的に更新）とし、option B（JSON 同時削除）は一次データ破棄のため採らない
+    - 2026-06-16 実施完了: `lm_recurrent_pilot120.svg`, `lm_recurrent_pilot160_seed2026.svg`, `lm_recurrent_pilot160_seed7.svg`, `lm_recurrent_pilot240.svg`, `lm_recurrent_pilot240_seed2026.svg`, `lm_recurrent_pilot240_seed7.svg` を削除し、`interim_summary.md` / `tests/unit/test_lm_artifacts.py` / `docs/LM_RECURRENT_PLAN.md` を canonical shared SVG 前提へ更新した。検証は `py -3.11 -m pytest tests/unit/test_lm_artifacts.py -q` = `10 passed`, `py -3.11 -m pytest tests/unit -k lm -q` = `91 passed, 401 deselected`, `py -3.11 -m mypy src/llcore/lm/` = success, `py -3.11 -m ruff check src/llcore/lm/` = success
+    - 残る不可逆操作は **現時点では無し**。以下は今回実施前の検討メモ / 監査ログとして保持する
     - `docs/artifacts/lm_recurrent_interim_summary.md` では、byte 同一 SVG の tracked copy は **現時点では tracked のまま残しつつ、将来は canonical 化候補**として扱っている。今回の diff で追加したのは主に renderer 由来の説明部分であり、保持 / canonical 化方針そのものはそれ以前から置かれていた。削除するなら、この現状維持方針を撤回するかどうかを先に人間判断で確定する必要がある
     - 実測では tracked SVG 8 枚のうち **7 枚が byte 同一**。同一集合は `lm_recurrent_pilot120.svg`, `lm_recurrent_pilot160.svg`, `lm_recurrent_pilot160_seed2026.svg`, `lm_recurrent_pilot160_seed7.svg`, `lm_recurrent_pilot240.svg`, `lm_recurrent_pilot240_seed2026.svg`, `lm_recurrent_pilot240_seed7.svg` で、`lm_recurrent_pilot256_40.svg` のみ別 hash
     - fail-closed 整合のため、承認前に一度入れていた「interim index の全面共有参照化」と「test の canonical 解決」は巻き戻した。現時点の tracked artifacts は **全 run が各自の `.svg` を参照**し、保持路線（選択肢 2 / 3）でも自然に読める状態へ戻してある

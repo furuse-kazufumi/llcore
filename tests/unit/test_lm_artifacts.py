@@ -24,6 +24,11 @@ _BLOCK64_IDENTICAL_SVG_STEMS = (
     "lm_recurrent_pilot240_seed2026",
     "lm_recurrent_pilot240_seed7",
 )
+_CANONICAL_BLOCK64_SVG_STEM = "lm_recurrent_pilot160"
+_SURVIVING_SVG_STEMS = (
+    _CANONICAL_BLOCK64_SVG_STEM,
+    "lm_recurrent_pilot256_40",
+)
 
 
 def _tracked_pilot_stems() -> list[str]:
@@ -35,6 +40,8 @@ def _summary_run_name(stem: str) -> str:
 
 
 def _summary_svg_target(stem: str) -> str:
+    if stem in _BLOCK64_IDENTICAL_SVG_STEMS:
+        return f"./{_CANONICAL_BLOCK64_SVG_STEM}.svg"
     return f"./{stem}.svg"
 
 
@@ -67,7 +74,7 @@ def _reproduction_block(text: str, stem: str) -> str:
 
 
 def test_tracked_recurrent_svgs_are_well_formed_xml() -> None:
-    for stem in _tracked_pilot_stems():
+    for stem in _SURVIVING_SVG_STEMS:
         json_path = ARTIFACTS_DIR / f"{stem}.json"
         svg_path = ARTIFACTS_DIR / f"{stem}.svg"
         svg_text = svg_path.read_text(encoding="utf-8")
@@ -88,10 +95,12 @@ def test_tracked_recurrent_svgs_are_well_formed_xml() -> None:
 
 
 def test_block64_memory_svg_hashes_match_and_256_proxy_differs() -> None:
-    canonical_bytes = (ARTIFACTS_DIR / "lm_recurrent_pilot160.svg").read_bytes()
+    canonical_svg_text = (ARTIFACTS_DIR / f"{_CANONICAL_BLOCK64_SVG_STEM}.svg").read_text(encoding="utf-8")
     for stem in _BLOCK64_IDENTICAL_SVG_STEMS:
-        assert (ARTIFACTS_DIR / f"{stem}.svg").read_bytes() == canonical_bytes
-    assert (ARTIFACTS_DIR / "lm_recurrent_pilot256_40.svg").read_bytes() != canonical_bytes
+        result = json.loads((ARTIFACTS_DIR / f"{stem}.json").read_text(encoding="utf-8"))
+        assert _render_memory_curve_svg(result) == canonical_svg_text
+    proxy_result = json.loads((ARTIFACTS_DIR / "lm_recurrent_pilot256_40.json").read_text(encoding="utf-8"))
+    assert _render_memory_curve_svg(proxy_result) != canonical_svg_text
 
 def test_interim_summary_links_target_existing_tracked_artifacts() -> None:
     text = SUMMARY_PATH.read_text(encoding="utf-8")

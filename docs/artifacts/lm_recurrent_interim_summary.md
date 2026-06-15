@@ -7,30 +7,30 @@ This note consolidates the currently tracked head-to-head pilot artifacts for
 
 - [lm_recurrent_pilot120.json](./lm_recurrent_pilot120.json)
 - [lm_recurrent_pilot120.md](./lm_recurrent_pilot120.md)
-- [lm_recurrent_pilot120.svg](./lm_recurrent_pilot120.svg)
+- [lm_recurrent_pilot120.svg (shared via lm_recurrent_pilot160.svg)](./lm_recurrent_pilot160.svg)
 - [lm_recurrent_pilot160.json](./lm_recurrent_pilot160.json)
 - [lm_recurrent_pilot160.md](./lm_recurrent_pilot160.md)
 - [lm_recurrent_pilot160.svg](./lm_recurrent_pilot160.svg)
 - [lm_recurrent_pilot160_seed2026.json](./lm_recurrent_pilot160_seed2026.json)
 - [lm_recurrent_pilot160_seed2026.md](./lm_recurrent_pilot160_seed2026.md)
-- [lm_recurrent_pilot160_seed2026.svg](./lm_recurrent_pilot160_seed2026.svg)
+- [lm_recurrent_pilot160_seed2026.svg (shared via lm_recurrent_pilot160.svg)](./lm_recurrent_pilot160.svg)
 - [lm_recurrent_pilot160_seed7.json](./lm_recurrent_pilot160_seed7.json)
 - [lm_recurrent_pilot160_seed7.md](./lm_recurrent_pilot160_seed7.md)
-- [lm_recurrent_pilot160_seed7.svg](./lm_recurrent_pilot160_seed7.svg)
+- [lm_recurrent_pilot160_seed7.svg (shared via lm_recurrent_pilot160.svg)](./lm_recurrent_pilot160.svg)
 - [lm_recurrent_pilot240.json](./lm_recurrent_pilot240.json)
 - [lm_recurrent_pilot240.md](./lm_recurrent_pilot240.md)
-- [lm_recurrent_pilot240.svg](./lm_recurrent_pilot240.svg)
+- [lm_recurrent_pilot240.svg (shared via lm_recurrent_pilot160.svg)](./lm_recurrent_pilot160.svg)
 - [lm_recurrent_pilot240_seed2026.json](./lm_recurrent_pilot240_seed2026.json)
 - [lm_recurrent_pilot240_seed2026.md](./lm_recurrent_pilot240_seed2026.md)
-- [lm_recurrent_pilot240_seed2026.svg](./lm_recurrent_pilot240_seed2026.svg)
+- [lm_recurrent_pilot240_seed2026.svg (shared via lm_recurrent_pilot160.svg)](./lm_recurrent_pilot160.svg)
 - [lm_recurrent_pilot240_seed7.json](./lm_recurrent_pilot240_seed7.json)
 - [lm_recurrent_pilot240_seed7.md](./lm_recurrent_pilot240_seed7.md)
-- [lm_recurrent_pilot240_seed7.svg](./lm_recurrent_pilot240_seed7.svg)
+- [lm_recurrent_pilot240_seed7.svg (shared via lm_recurrent_pilot160.svg)](./lm_recurrent_pilot160.svg)
 - [lm_recurrent_pilot256_40.json](./lm_recurrent_pilot256_40.json)
 - [lm_recurrent_pilot256_40.md](./lm_recurrent_pilot256_40.md)
 - [lm_recurrent_pilot256_40.svg](./lm_recurrent_pilot256_40.svg)
 
-Note: all currently tracked same-architecture `block_size=64` memory SVGs (`lm_recurrent_pilot120.svg`, `lm_recurrent_pilot160.svg`, `lm_recurrent_pilot160_seed2026.svg`, `lm_recurrent_pilot160_seed7.svg`, `lm_recurrent_pilot240.svg`, `lm_recurrent_pilot240_seed2026.svg`, `lm_recurrent_pilot240_seed7.svg`) are byte-identical, while `lm_recurrent_pilot256_40.svg` is distinct. These tracked copies remain in place for now, and this index remains the per-run inventory. That byte-identity is first an observed property of the currently tracked artifacts. At the renderer layer, `_render_memory_curve_svg` is a deterministic function of the memory payload (`gpt_kv_bytes`, `recurrent_state_bytes`, `rwkv_state_bytes`) plus `result["config"]["block_size"]`: the prompt-length grid comes from the `gpt_kv_bytes` keys, and `block_size` only determines the measured/projection split. The same-architecture story explains why the upstream memory payloads match across these tracked `block_size=64` runs: the relevant architecture dimensions feed the memory bytes, while run-to-run differences such as PPL, seed, `max_iters`, `batch_size`, and `eval_iters` live in the paired JSON/Markdown artifacts and are not part of the renderer input set. `lm_recurrent_pilot256_40.svg` is distinct because this tracked run uses `block_size=256`; it also differs in `batch_size` and `eval_iters`, but those knobs likewise do not enter the renderer input. This explanation is premised on the current renderer remaining unchanged; today the byte-identity is guarded by a test that pins the tracked on-disk SVG bytes, which is an observational guard rather than a causal proof. Future cleanup or new tracked additions should canonicalize identical memory plots rather than add more duplicate tracked SVGs. If that canonicalization happens, the shared target should be `lm_recurrent_pilot160.svg`. The verdict packet already uses that representative shared family reference.
+Note: all currently tracked same-architecture `block_size=64` memory SVGs (`lm_recurrent_pilot120.svg`, `lm_recurrent_pilot160.svg`, `lm_recurrent_pilot160_seed2026.svg`, `lm_recurrent_pilot160_seed7.svg`, `lm_recurrent_pilot240.svg`, `lm_recurrent_pilot240_seed2026.svg`, `lm_recurrent_pilot240_seed7.svg`) are byte-identical, while `lm_recurrent_pilot256_40.svg` is distinct. The per-run JSON/Markdown artifacts remain tracked, while the byte-identical `block_size=64` memory plots now reuse the shared canonical SVG `lm_recurrent_pilot160.svg`. That byte-identity is first an observed property of the currently tracked artifacts. At the renderer layer, `_render_memory_curve_svg` is a deterministic function of the memory payload (`gpt_kv_bytes`, `recurrent_state_bytes`, `rwkv_state_bytes`) plus `result["config"]["block_size"]`: the prompt-length grid comes from the `gpt_kv_bytes` keys, and `block_size` only determines the measured/projection split. The same-architecture story explains why the upstream memory payloads match across these tracked `block_size=64` runs: the relevant architecture dimensions feed the memory bytes, while run-to-run differences such as PPL, seed, `max_iters`, `batch_size`, and `eval_iters` live in the paired JSON/Markdown artifacts and are not part of the renderer input set. `lm_recurrent_pilot256_40.svg` is distinct because this tracked run uses `block_size=256`; it also differs in `batch_size` and `eval_iters`, but those knobs likewise do not enter the renderer input. This explanation is premised on the current renderer remaining unchanged; today the byte-identity is guarded by a test that pins the tracked on-disk SVG bytes, which is an observational guard rather than a causal proof. Historical on-disk bytes for the deleted duplicate SVG paths are no longer tracked individually; after this cleanup, the regression guard shifts to the shared canonical SVG plus JSON-driven render checks. Future cleanup or new tracked additions should reuse the same canonical target rather than add more duplicate tracked SVGs. The verdict packet already uses that representative shared family reference.
 
 ## Capability snapshot
 
