@@ -1,6 +1,6 @@
 {
-  "verdict": "順調 — 直近2hで実質25コミット(recurrent LM比較+整合性検証)。最終コミット23:33/ループ生存。最新ターンはinjection直後のcost=0立ち上がり→実作業継続は次1〜2ターン(~23:44)で確定。",
-  "last_activity_jst": "2026-06-15 23:35 JST",
+  "verdict": "整合済み — LM recurrent canonical化/cleanup と rerun準備メモ更新まで完了。残る人間ゲートは verified_safe_learning publish と self_evolving_agents precision rerun/publish 判断。",
+  "last_activity_jst": "2026-06-16 07:24 JST",
   "roadmap": [
     {"stage": "P0", "label": "de-risk: 自前GPT-2 nano (CPU)", "state": "done", "note": "held-out PPL<unigram 両コーパスPASS (shakespeare 0.238× / aozora 0.169×)。48 tests green。"},
     {"stage": "P1", "label": "合格線到達 + 3Dで歩く", "state": "in_progress", "note": "dropout=0.1で過学習抑制(gap 0.99→0.57)、aozora PPL 32.40(0.150×)最良。残=PPL更改善 + 3Dビューア未着手。"},
@@ -10,16 +10,14 @@
   ],
   "human_gates": [
     "verified_safe_learning staging の publish 判断 (818 docs/64 clusters, live未作成)",
-    "self_evolving_agents staging の publish 判断 (807 docs。再生成 or 手動除去の3択)",
-    "★ANTHROPIC_API_KEY org disabled の復旧 (corpus2skill 要約器が両staging全失敗中)",
-    "precision改善rerun の本実行承認 (fetch/再生成/push/削除=不可逆は人間承認必須)"
+    "self_evolving_agents precision rerun 本実行の判断 (queries_refined_candidate.txt は準備済み、fetch/再生成は不可逆)",
+    "self_evolving_agents staging の publish 判断 (rerun 後または現状維持での publish 可否)"
   ],
   "open_issues": [
-    "recurrent verdict 未確定: 3モデルとも strict unigram gate 未通過。確言できるのは『定数状態メモリで動作・能力は予算敏感で未収束』のみ",
-    "branch feat/lm-recurrent に LM無関係 dirty 残存 → push前に分離要",
-    "loop最新ターンが cost=0 の inject立ち上がり → 実タスク消化かは~23:44のledgerで判定",
-    "corpus2skill off-topic混入残存 + SKILL.md は API全失敗で決定論補完(意味要約未置換)",
+    "recurrent verdict は strongest claim が RWKV 再現性優位まで。full winner は未宣言",
+    "self_evolving_agents は stopword 修正後も off-topic 混入が残存し、queries_refined_candidate.txt の効果は未検証",
+    "llcore 側の現 dirty は別件の未追跡 research/highdim_evolution/make_hd1_null_viz.py のみ",
     "raptor側 dirty は _bazue_* 3件削除のみ → self_evolving_agents rerun束には混ぜない",
-    "PROGRESS.md/SESSION_SUMMARY.md が06-13付で2日古い(next_plan.mdは最新)"
+    "status SVG は seed からの再生成物で、tracked 成果物ではなく docs/status/ 配下の補助可視化"
   ]
 }

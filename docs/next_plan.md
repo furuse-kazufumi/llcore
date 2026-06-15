@@ -215,6 +215,8 @@
 
 ## 承認待ちメモ (2026-06-16)
 
+> ✅ 完了済み (`13bcc26`) — 本節は duplicate SVG canonical 化の**実施前に潰した論点を残す監査ログ**。現 HEAD では SVG 共有参照統一・test 改修・`git rm` まで完了している。
+
 - LM recurrent 比較の統合修正指示 #1 は、tracked artifact の重複 SVG を `git rm` で整理する削除操作を含むため、人間承認が必要
 - 実測確認:
   - `docs/artifacts/lm_recurrent_pilot120.svg`
