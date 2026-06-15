@@ -4,6 +4,33 @@
 > SESSION_SUMMARY.md は Stop hook で自動上書きされるため、**このファイルが再開の正本**。
 > hook 非管理の再開ポインタ: `docs/PROGRESS.md`
 
+## ★★ 再起動時の最優先指示 (2026-06-16, 古瀬さん→ccr 経由) — このブロックを最初に実行
+
+**方針: 人間ゲート待ちで「待機」して idle 停止せず、ゲート不要の可逆作業を自律で前進させる**（「動いてるのか分からん」を避ける）。下の EXIT 節の「記録更新のみ」は前回 EXIT ターン向けで、本セッション(再起動)は新規作業を進めてよい。
+
+### 状況の正本（古い記述に惑わされない）
+- `ANTHROPIC_API_KEY` は **valid**（2026-06-16 確認済）。「org disabled」は 06-13 の旧観測で**解消済** → API はブロッカーでない。
+- `self_evolving_agents` staging = **(b) stopword 除去 + query 絞りで再生成**方針（ユーザー承認済）。ただし本実行は下記の人間ゲート。
+
+### いま自律で進めてよい（人間ゲート不要・可逆）— この順で
+1. **recurrent LM スレッド継続（現主戦場）**: RWKV-4 / GatedRNN / gpt の head-to-head を詰める。verdict は『定数状態メモリで動作・能力は学習予算に敏感で未収束』を**超えて強く主張しない**（strict unigram gate 未通過のため）。measured/projected 分離・artifact↔json 整合・drift テストの規律を維持。
+2. **P1: held-out PPL 改善**（block_size 拡大 / `--config p1` / データ追加）。過学習は dropout で抑える既知教訓を踏襲。
+3. **P1: 3D で歩く** — 学習済みモデルの clean-room 3D ビューア（`model_viz.json` を自前 Apache-2.0 ローダで。bbycroft コード非依存で再実装）。
+4. テスト緑 / mypy strict / ruff の維持。honest disclosure（異常に良い数字は内訳を疑う）。
+
+### 人間ゲート — 明示 GO が来るまで絶対にやらない
+- ❌ `self_evolving_agents` / `verified_safe_learning` の staging→live **publish**
+- ❌ `self_evolving_agents` precision rerun の**本実行**（本フェッチ / `papers/` 作り直し / 新規 output dir / rename / 削除）
+- ❌ **push** 全般（no-push 既定）/ submodule 改変 / DB drop / force-push / `--no-verify`
+- ❌ 再ログイン・認証要求が出たら**継続せず停止**（人間待ち）
+  → 上記を進めてよいのは next_plan に「**C4=承認**」等の明示 GO が入った時のみ。迷ったら **fail-closed（やらない側）**。
+
+### 衛生・可視化
+- `feat/lm-recurrent` の LM 無関係 dirty（loop_ledger / *.svg / PROGRESS / next_plan / make_trajectory.py）と raptor 側差分は commit 時に**別件として分離**。
+- 各ループ末に `py -3.11 tools/llterm_status.py` で自走ステータスを SVG 化（`docs/status/llterm_status.svg`・seed=`tools/llterm_status_seed.json`）すると進捗が一目で見える。
+
+---
+
 ## EXIT 時点の現在地
 
 - **コア作業 (`corpus2skill` 修正 + 比較 rerun) は完了済み**。この EXIT 整形ターンでは **新規作業を開始せず、記録更新のみ** 実施
