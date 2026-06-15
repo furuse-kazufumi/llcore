@@ -299,18 +299,59 @@
     - 実ファイルの ledger は作業木に残しつつ ignore 下へ移し、以後の append-only 追記を commit ノイズから分離した
   - 次の承認待ち:
     - 残る不可逆操作は **duplicate SVG の tracked copy 物理削除** のみ
-    - `docs/artifacts/lm_recurrent_interim_summary.md` では、byte 同一 SVG の tracked copy は **「監査継続性のため保持」** と既に明記されている。削除するなら、この保持方針を撤回するかどうかを先に人間判断で確定する必要がある
-    - 実測では tracked SVG 8 枚のうち **7 枚が byte 同一**。同一集合は `pilot120`, `pilot160`, `pilot160_seed2026`, `pilot160_seed7`, `pilot240`, `pilot240_seed2026`, `pilot240_seed7` で、`pilot256_40.svg` のみ別 hash
+    - `docs/artifacts/lm_recurrent_interim_summary.md` では、byte 同一 SVG の tracked copy は **現時点では tracked のまま残しつつ、将来は canonical 化候補**として扱っている。今回の diff で追加したのは主に renderer 由来の説明部分であり、保持 / canonical 化方針そのものはそれ以前から置かれていた。削除するなら、この現状維持方針を撤回するかどうかを先に人間判断で確定する必要がある
+    - 実測では tracked SVG 8 枚のうち **7 枚が byte 同一**。同一集合は `lm_recurrent_pilot120.svg`, `lm_recurrent_pilot160.svg`, `lm_recurrent_pilot160_seed2026.svg`, `lm_recurrent_pilot160_seed7.svg`, `lm_recurrent_pilot240.svg`, `lm_recurrent_pilot240_seed2026.svg`, `lm_recurrent_pilot240_seed7.svg` で、`lm_recurrent_pilot256_40.svg` のみ別 hash
     - fail-closed 整合のため、承認前に一度入れていた「interim index の全面共有参照化」と「test の canonical 解決」は巻き戻した。現時点の tracked artifacts は **全 run が各自の `.svg` を参照**し、保持路線（選択肢 2 / 3）でも自然に読める状態へ戻してある
-    - `pilotXXX.md` 本体に SVG 参照は存在しないため、削除時の整合対象は **interim index + `lm_recurrent_verdict.md` + 物理 SVG 群** に限定する
+    - `pilotXXX.md` 本体に SVG 参照は存在しないため、削除時の**主たる整合対象**は **interim index + `lm_recurrent_verdict.md` + `docs/LM_RECURRENT_PLAN.md` + 物理 SVG 群**。加えて `tests/unit/test_lm_artifacts.py` には各 stem の `.svg` 実在前提があるため、test 側の SVG カップリング改修も別途要する。特に `docs/LM_RECURRENT_PLAN.md` の保持方針文言（tracked copy を当面保持し、将来 canonical 化するなら `lm_recurrent_pilot160.svg` に統一する旨）は option 1 実施時に更新/撤回が必要
     - 削除を実行するなら canonical shared SVG は **`lm_recurrent_pilot160.svg` に統一**する。理由は `lm_recurrent_verdict.md` が既にこれを共有参照先として使っており、`pilot240_seed7` index 行も同じ canonical へ張り替えるのが最小差分だから
     - `tests/unit/test_lm_artifacts.py` は現時点では各 stem の物理 SVG を個別検証する状態を維持する。削除を実行する場合は、**同一コミット内で** test の canonical 許容化、interim index の共有参照統一、duplicate 6 枚の `git rm`、`lm_recurrent_verdict.md` の共有参照確認、LM gate 再確認を順に行う
     - 不可逆削除は個別・明示の承認が必要であり、包括的な「確認不要」指示では自動承認しない
     - 2026-06-16 追記: 承認質問は `pilot120` を含む block_size=64 の同一 SVG 7 枚を対象とする形へ再発行済み。現在はその選択回答待ちであり、回答受領までは削除・参照更新・gate 再実行のいずれも開始しない
     - 2026-06-16 追記: 上の巻き戻しにより、選択肢 2 / 3 でも repo 状態は矛盾しない。option 1 が選ばれた場合のみ、削除専用の参照更新・note 更新・test 更新を単一コミットへ束ねる
     - 2026-06-16 追記: canonical shared SVG の候補は `lm_recurrent_pilot160.svg` に統一した。これは**削除または将来の共有参照化を行う場合の候補**であり、現 tracked state を即座に共有参照へ変えるものではない
-    - 2026-06-16 追記: docs に書いた「全 block_size=64 SVG が byte 同一、`pilot256_40` のみ別」は drift 防止のため `tests/unit/test_lm_artifacts.py` に guard test を追加して固定した
-    - 2026-06-16 追記: `interim_summary.md` の保持理由は「監査継続性のため保持」から一段 honest に寄せ、**今は per-run inventory を保つが、今後 duplicate tracked SVG は canonical 化を優先する** という文言へ整理した。`verdict.md` が shared family reference、`interim_summary.md` が per-run inventory という役割差も明記
-    - 2026-06-16 追記: 現 working tree の doc/test 差分は **選択肢 3（保持方針維持 + 注記/参照整理）に対応する内容** として扱う。`git rm` を伴う選択肢 1 はこの差分に混ぜず、承認後に **別コミット** で `test canonical 許容化 → duplicate SVG 削除 → LM gate 再確認` の順で行う
+    - 2026-06-16 追記: docs に書いた「全 block_size=64 SVG が byte 同一、`pilot256_40` のみ別」という**観測事実**は、drift 防止のため `tests/unit/test_lm_artifacts.py` の guard test で固定した。一方、seed / `max_iters` / `batch_size` / `eval_iters` が SVG に効かない理由は **renderer のコード読解にもとづく説明**であり、guard test が直接その因果まで証明しているわけではない
+    - 2026-06-16 追記: `interim_summary.md` の保持理由は、旧版を「撤回」したというより、**より honest な文言へ整理した** と捉えるのが正確。現在は「tracked のまま残しつつ、将来 duplicate tracked SVG は canonical 化候補とする」という位置づけで、`verdict.md` が shared family reference、`interim_summary.md` が run ごとの artifact inventory という役割差を明記している
+    - 2026-06-16 追記: 現 working tree の差分は **docs のみ**で、内容は **選択肢 3（保持方針維持 + 注記整理）に対応する記録更新** に留まる。現 tracked state では **全 run が各自の `.svg` を参照したまま**であり、canonical 共有参照への統一や test 改修はまだ実施していない。`git rm` を伴う選択肢 1 はこの差分に混ぜず、承認後に **別コミット** で `test canonical 許容化 → duplicate SVG 削除 → LM gate 再確認` の順で行う
+    - 2026-06-16 追記: `py -3.11 -m pytest tests/unit/test_lm_artifacts.py -q` は `10 passed` を再確認済み。これは **現行の docs-only 状態**に対する green であり、canonical 名統一や test 改修の完了を意味しない
+    - 2026-06-16 追記: 追加統合指示により、**test 改修を伴わない素朴版の選択肢 1 は非推奨** と整理した。主因は、JSON を残したまま SVG だけ削除する計画が `tests/unit/test_lm_artifacts.py` の JSON↔SVG カップリングと構造衝突するため
+    - 選択肢 1 を再開するなら、削除前に plan とコミット説明で次の分岐を先に確定する必要がある:
+      - `(A)` test を decouple し、JSON stem ごとの SVG 実在要求を外す
+      - `(B)` JSON も同時削除し、summary row / reproduction block / verdict json-link 系 test まで含めて直す
+      現時点の推奨は `(A)`。いずれにせよ **別コミット** での実施が必要
+    - リスクの非対称性:
+      - `(A)` は byte 同一の duplicate SVG を削るだけで、**情報損失は限定的だがゼロではない**。canonical SVG は JSON から `_render_memory_curve_svg` で再生成できる一方、物理削除で失われるのは **その時点の renderer 実装が出した歴史的 on-disk バイト列**であり、再生成一致は renderer 実装が不変な限りでのみ期待できる
+      - `(B)` は一次データ JSON の破棄を含み、seed 比較証拠を失うため非推奨
+    - `(A)` を採る場合の必須要件:
+      - render 等価性ガードは失わない。`test_tracked_recurrent_svgs_are_well_formed_xml` は **生存 SVG（canonical `pilot160` + `pilot256_40`）に対象を絞る形で維持**し、`svg_text == _render_memory_curve_svg(result)` の検証を残す
+      - byte 同一性ガードの**性質は変わる**。現 `test_block64_memory_svg_hashes_match_and_256_proxy_differs` は tracked on-disk SVG 同士の直接比較で drift を検知しているが、option A では **各 block_size=64 JSON を再描画し、canonical SVG と文字列等価で一致すること**を検証する形へ作り替える。そのため `_BLOCK64_IDENTICAL_SVG_STEMS` の 7 stem タプル定義も更新対象に含める
+      - `interim_summary.md` の 6 枚分 markdown SVG リンクは、test 緩和とは別に **張替または削除を独立タスクとして実施**する。dangling link を test 緩和で隠さない
+      - duplicate SVG の `git rm` と `interim_summary.md` の 6 リンク張替は **同一コミットで原子的に行う**。`test_interim_summary_links_target_existing_tracked_artifacts` は markdown target の `.resolve().exists()` まで検証するため、分離すると gate が赤になる
+      - `test_interim_summary_links_target_existing_tracked_artifacts` は各 stem の `./{stem}.svg` **文字列の本文存在自体も assert** しているため、option A では summary 本文のリンク張替/削除だけでなく **`_summary_svg_target` ヘルパ（または同等の test ロジック）を canonical 解決へ改修**する必要がある
+      - option A で `test_tracked_recurrent_svgs_are_well_formed_xml` の対象を生存 2 枚へ絞ると、削除 stem 分の per-seed render 等価検証は直接は消える。その分は `test_block64_memory_svg_hashes_match_and_256_proxy_differs` を **各 block64 JSON の再描画が canonical SVG と文字列等価で一致する** 形へ作り替えることで回収する
+    - 選択肢 1 の削除コミットで最低限同時改修が必要な test は 3 本:
+      - `test_block64_memory_svg_hashes_match_and_256_proxy_differs`
+      - `test_tracked_recurrent_svgs_are_well_formed_xml`
+      - `test_interim_summary_links_target_existing_tracked_artifacts`
+      1 本でも漏れると suite が赤になる
+      - 詳細:
+        - `test_tracked_recurrent_svgs_are_well_formed_xml` は `_tracked_pilot_stems()` が JSON glob 基準のため、削除 stem の `.svg` を読みに行って `FileNotFoundError` になる。option A では SVG 実在を前提に回す反復ソース自体を **生存 stem (`pilot160` / `pilot256_40`) に絞る** 必要がある
+        - `test_block64_memory_svg_hashes_match_and_256_proxy_differs` は削除 stem を `read_bytes()` するため、`_BLOCK64_IDENTICAL_SVG_STEMS` の更新も必要
+        - `test_interim_summary_links_target_existing_tracked_artifacts` は `_summary_svg_target` が `./{stem}.svg` 実在を前提にしており、index 張替と canonical 解決を同時に行わないと落ちる
+    - `(B)` を採る場合の追加影響 test:
+      - `test_tracked_recurrent_markdown_matches_json_summary_values`
+      - `test_verdict_doc_recomputes_rwkv_claims_from_tracked_json`
+      - `test_verdict_doc_representative_rows_match_tracked_json`
+      既記の summary row / reproduction block / verdict json-link 系に加えて上記 3 本も落ちるため、影響範囲へ含める
+    - `(B)` は **SVG の重複削除ではなく一次データ(JSON)の破棄**に踏み込む。seed 比較証拠の喪失を伴うため、honest disclosure の観点で **非推奨** と扱う
+    - 2026-06-16 追記: `test_block64_memory_svg_hashes_match_and_256_proxy_differs` は **block_size=64 の memory curve が seed/max_iters に依らず byte 同一** であることの回帰ガードでもある。選択肢 1 で 6 枚削除する場合は、tracked on-disk bytes の直接比較という監査価値は後退する。その代わり、望ましくは **JSON 再生成ベースの同一性検証へ作り替えて保全**し、何が残り何が失われるかを honest disclosure で明記する
+    - 2026-06-16 追記: option A でも、`assert svg_text == _render_memory_curve_svg(result)` が担保していた **削除 stem ごとの render 等価性ガード**は直接には後退する。JSON は残るため必要時に再生成・再検証はできるが、保持方針を撤回する理由（重複 tracked SVG を減らす）と、この監査継続性トレードオフはセットで記録する
+    - 2026-06-16 追記: option 3 では `interim_summary.md` の canonical 表記を実ファイル名 `lm_recurrent_pilot160.svg` に揃えることを **本作業に含める**。verdict の shared family 参照が run 固有図ではなく block_size=64 共通図である旨の補足も、必要なら同系統の doc 整理として後続で別コミット化できる
+    - 2026-06-16 追記: option 1 実施時は `interim_summary.md` の **index だけでなく Note 段落本文**（"These tracked copies remain in place for now" を含む保持文言）も更新対象に含める。`docs/LM_RECURRENT_PLAN.md` の保持方針文言と同様、撤回/更新が必要
+    - 2026-06-16 追記: 承認質問側の前提も現行文言に合わせる。つまり、撤回対象は旧「監査継続性のため保持」ではなく、**per-run inventory として当面保持する方針**である
+    - 2026-06-16 追記: 承認質問の分岐 A に含める原子的コミット対象は `interim_summary.md` / `tests/unit/test_lm_artifacts.py` / duplicate SVG 6 枚の `git rm` だけでは不足で、**`docs/LM_RECURRENT_PLAN.md` の保持方針文言の更新/撤回も必須** とする
+    - 現時点の推奨:
+      - 即時リスク回避なら **選択肢 3**（保持方針維持 + 注記/参照整理のみ）
+      - 選択肢 1 は、上記 `(A)/(B)` 分岐と回帰ガード保全策を plan に織り込んだうえで、承認後に別コミットで実施
     - 不採用指摘:
       - 「byte-identical 不変条件の test が diff に無い」は **既に `tests/unit/test_lm_artifacts.py` に guard test を追加済み** のため不採用
+      - 既存 commit `153c0f7` のメッセージ scope を広げる案は妥当だが、**amend が必要**になるため今回は未実施
