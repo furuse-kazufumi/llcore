@@ -136,3 +136,9 @@ y = W_o · (sigmoid(r) ⊙ wkv)
   - 直近の throughput smoke も capability verdict ではなく、主目的は JSON schema と disclosure の確認
   - `out_path` を渡した compare 実行は、JSON の隣に `*.md` と `*.svg` も吐くようにした。前者は head-to-head PPL 表、後者は GPT 線形メモリ vs recurrent/RWKV 定数状態の memory@T 曲線
   - pilot120 (`out/lm_recurrent_pilot120.json`) では `rwkv_ppl≈197.4 < gpt_ppl≈209.5 < recurrent_ppl≈217.5` まで改善したが、3 モデルとも strict unigram gate は未通過。したがって **raw PPL の暫定順位は出たが publishable verdict ではない**
+  - `block_size=256` 側の軽量 pilot (`out/lm_recurrent_pilot256_40.json`) は `max_iters=40, batch_size=4` の low-fidelity proxy として追加。結果は `gpt_ppl≈554.4 < recurrent≈666.5 < rwkv≈891.8`、`unigram≈215.1` で 3 モデルとも strict gate 未通過
+  - この `256/40` は `64/120` と学習予算が非対称で、長文窓の有利不利を結論づける用途には使えない。現時点で言えるのは「比較ハーネスは `block_size=256` でも動くが、同 budget ではなお undertrained」ということだけ
+  - honest 中間結論:
+    - `64/120` では raw PPL は `RWKV < GPT < Recurrent` まで改善したが gate 未通過
+    - `256/40` では全体に未収束で `GPT < Recurrent < RWKV`
+    - よって **勝者はまだ確定していない**。現段階の strongest claim は「再帰 2 系統は定数状態メモリで動作し、能力比較は学習予算に敏感で未収束」という一点に限る
