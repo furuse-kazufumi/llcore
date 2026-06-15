@@ -127,6 +127,7 @@ y = W_o · (sigmoid(r) ⊙ wkv)
   - `compare.py` には `gpt_kv_bytes` の解析投影注記、出力先親ディレクトリ作成、`n_head` 明示 config を追加
   - PowerShell の検証コマンドは glob が展開されないため、実際に通る形は `py -3.11 -m pytest tests/unit -k lm -q` を使う
   - branch 上には今回の 3 commit と無関係な既存 dirty (`.llterm/loop_ledger.jsonl`, `assets/articles/llcore_landscape_real.svg`, `docs/PROGRESS.md`, `docs/next_plan.md`, `research/verified_lm_evolution/make_trajectory.py`) が残っている。push 前に別件として分離が必要
+  - review 提示時は working tree diff ではなく対象 commit 本体を `git show <hash>` / `git show --stat <hash>` で切り出す。例: `386ec2e` は recurrent pilot sidecar 4 ファイルのみで、同時期に残っていた `assets/articles/llcore_landscape_real.svg` と `research/verified_lm_evolution/make_trajectory.py` の dirty は verified-landscape 別ストリームであり LM recurrent 作業の副作用ではない
 - 2026-06-15 compare 出力拡張:
   - `src/llcore/lm/compare.py` は `throughput` / `pareto` / `caveats` を JSON に追加
   - throughput は `torch.set_num_threads(1)` + warmup + min-of-repeats で収集し、`prefill_s` と `decode_tok_per_s` を分離して出力する
