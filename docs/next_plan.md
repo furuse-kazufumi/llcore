@@ -247,3 +247,6 @@
 - 未解決:
   - duplicate SVG の **物理削除 (`git rm`)** は承認待ち
   - `.llterm/loop_ledger.jsonl` と `docs/status/` は無関係 dirty / untracked として継続除外
+- 自律継続の境界:
+  - LM recurrent 本体では、verdict packet 完成以降に**承認なしで進めるべき必須タスクは残っていない**
+  - 次に動くのは、(a) duplicate SVG の物理整理に承認が下りたとき、または (b) 追加 seed / 追加 budget / 比較基準変更の新要件が入ったとき
