@@ -201,7 +201,7 @@ def build():
     if not issues:
         P.append(f'<text x="{RX+4}" y="{ry}" font-size="14.5" fill="#888">（なし）</text>'); ry += 22
     for s in issues:
-        for k, sl in enumerate(wrap(s, 33)):
+        for k, sl in enumerate(wrap(s, 66)):
             P.append(f'<text x="{RX+4}" y="{ry}" font-size="14" fill="#555">{esc(("• " if k == 0 else "   ") + sl)}</text>')
             ry += 20
         ry += 4
