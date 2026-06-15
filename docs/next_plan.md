@@ -256,3 +256,7 @@
   - 次に動くのは、(a) duplicate SVG の物理整理に承認が下りたとき、または (b) 追加 seed / 追加 budget / 比較基準変更の新要件が入ったとき
   - `.llterm/loop_ledger.jsonl` の tracking 方針変更（`.gitignore` + `git rm --cached` 等）は LM recurrent 本体とは別件の repo 衛生タスクとして扱い、必要なら別途承認付きで処理する
   - 2026-06-16 追記: `.llterm/loop_ledger.jsonl` は tracked のまま append-only dirty を再発させるため、方針候補は「ignore + `git rm --cached` で追跡解除」に収束している。これは index からの削除操作を含むため、人間承認後に別コミットで実施する
+  - 2026-06-16 追記: 承認要求は 2 件を同時に束ねてよい
+    1. duplicate SVG の tracked copy 削除 + 共有 SVG 参照への統一
+    2. `.llterm/loop_ledger.jsonl` の追跡解除（`.gitignore` + `git rm --cached`、runtime append を今後の commit から分離）
+    どちらも削除系/追跡解除系のため fail-closed で人間承認後にだけ実施する
