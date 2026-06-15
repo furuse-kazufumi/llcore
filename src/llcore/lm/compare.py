@@ -6,7 +6,7 @@ import json
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import TypeAlias
+from typing import TypeAlias, cast
 
 import torch
 
@@ -175,6 +175,120 @@ def _measure_generate_tok_s(
     }
 
 
+def _format_metric(value: object) -> str:
+    if isinstance(value, float):
+        return f"{value:.3f}"
+    return str(value)
+
+
+def _render_ppl_table(result: dict[str, object]) -> str:
+    reports = cast(dict[str, dict[str, object]], result["reports"])
+    verdict = cast(dict[str, dict[str, object]], result["verdict"])
+    lines = [
+        "# Recurrent LM Head-to-Head",
+        "",
+        "| Model | PPL | Unigram PPL | Ratio vs GPT | Passes gate |",
+        "| --- | ---: | ---: | ---: | :---: |",
+    ]
+    for name in ("gpt", "recurrent", "rwkv"):
+        report = reports[name]
+        verdict_row = verdict[name]
+        lines.append(
+            "| "
+            + " | ".join(
+                [
+                    name,
+                    _format_metric(report["model_ppl"]),
+                    _format_metric(report["unigram_ppl"]),
+                    _format_metric(verdict_row["ppl_ratio_vs_gpt"]),
+                    "yes" if verdict_row["passes_unigram_gate"] else "no",
+                ]
+            )
+            + " |"
+        )
+    lines.extend(
+        [
+            "",
+            "## Caveats",
+            "",
+        ]
+    )
+    for caveat in cast(list[str], result["caveats"]):
+        lines.append(f"- {caveat}")
+    return "\n".join(lines) + "\n"
+
+
+def _render_memory_curve_svg(result: dict[str, object]) -> str:
+    memory = cast(dict[str, object], result["memory"])
+    gpt_kv_bytes_by_t = cast(dict[str, int], memory["gpt_kv_bytes"])
+    points = sorted((int(t), int(v)) for t, v in gpt_kv_bytes_by_t.items())
+    widths = [t for t, _ in points]
+    gpt_values = [v for _, v in points]
+    recurrent_state_bytes = cast(int, memory["recurrent_state_bytes"])
+    rwkv_state_bytes = cast(int, memory["rwkv_state_bytes"])
+    recurrent_values = [recurrent_state_bytes] * len(points)
+    rwkv_values = [rwkv_state_bytes] * len(points)
+    all_values = gpt_values + recurrent_values + rwkv_values
+    max_x = max(widths)
+    max_y = max(all_values)
+
+    width = 640
+    height = 360
+    left = 64
+    right = 20
+    top = 24
+    bottom = 48
+    plot_width = width - left - right
+    plot_height = height - top - bottom
+
+    def sx(value: int) -> float:
+        if max_x <= 1:
+            return float(left)
+        return left + (value - 1) * plot_width / (max_x - 1)
+
+    def sy(value: int) -> float:
+        if max_y <= 0:
+            return float(height - bottom)
+        return top + plot_height - (value * plot_height / max_y)
+
+    def polyline(values: list[int]) -> str:
+        return " ".join(f"{sx(t):.1f},{sy(v):.1f}" for t, v in zip(widths, values, strict=True))
+
+    y_ticks = [0, max_y // 4, max_y // 2, (3 * max_y) // 4, max_y]
+    x_labels = "".join(
+        f'<text x="{sx(t):.1f}" y="{height - 20}" text-anchor="middle">{t}</text>' for t in widths
+    )
+    y_labels = "".join(
+        f'<text x="{left - 8}" y="{sy(v) + 4:.1f}" text-anchor="end">{v}</text>'
+        f'<line x1="{left}" y1="{sy(v):.1f}" x2="{width - right}" y2="{sy(v):.1f}" stroke="#e5e7eb" />'
+        for v in y_ticks
+    )
+
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-labelledby="title desc">
+<title id="title">LM memory at prompt length T</title>
+<desc id="desc">GPT KV bytes rise linearly with prompt length while recurrent and RWKV stay constant.</desc>
+<rect width="{width}" height="{height}" fill="#ffffff" />
+<text x="{left}" y="16" font-family="Segoe UI, sans-serif" font-size="14" fill="#111827">Memory at prompt length T (bytes)</text>
+<text x="{left}" y="{height - 4}" font-family="Segoe UI, sans-serif" font-size="11" fill="#6b7280">GPT beyond block_size is analytic projection only</text>
+<line x1="{left}" y1="{top}" x2="{left}" y2="{height - bottom}" stroke="#111827" />
+<line x1="{left}" y1="{height - bottom}" x2="{width - right}" y2="{height - bottom}" stroke="#111827" />
+{y_labels}
+{x_labels}
+<polyline fill="none" stroke="#2563eb" stroke-width="3" points="{polyline(gpt_values)}" />
+<polyline fill="none" stroke="#059669" stroke-width="3" points="{polyline(recurrent_values)}" />
+<polyline fill="none" stroke="#dc2626" stroke-width="3" points="{polyline(rwkv_values)}" />
+<text x="{width - 140}" y="26" font-family="Segoe UI, sans-serif" font-size="12" fill="#2563eb">GPT KV</text>
+<text x="{width - 140}" y="44" font-family="Segoe UI, sans-serif" font-size="12" fill="#059669">Recurrent state</text>
+<text x="{width - 140}" y="62" font-family="Segoe UI, sans-serif" font-size="12" fill="#dc2626">RWKV state</text>
+</svg>
+"""
+
+
+def _write_compare_sidecars(result: dict[str, object], out_path: Path) -> None:
+    out_path.with_suffix(".md").write_text(_render_ppl_table(result), encoding="utf-8")
+    out_path.with_suffix(".svg").write_text(_render_memory_curve_svg(result), encoding="utf-8")
+
+
 def compare_on_text(
     text: str,
     *,
@@ -314,4 +428,5 @@ def compare_on_text(
     if out_path is not None:
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+        _write_compare_sidecars(result, out_path)
     return result

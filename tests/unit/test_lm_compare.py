@@ -58,6 +58,12 @@ def test_compare_on_text_creates_parent_output_dir(tmp_path: Path) -> None:
         out_path=out_path,
     )
     assert out_path.exists()
+    assert out_path.with_suffix(".md").exists()
+    assert out_path.with_suffix(".svg").exists()
+    assert "| Model | PPL | Unigram PPL | Ratio vs GPT | Passes gate |" in out_path.with_suffix(
+        ".md"
+    ).read_text(encoding="utf-8")
+    assert "<svg" in out_path.with_suffix(".svg").read_text(encoding="utf-8")
 
 
 def test_compare_config_validates_head_divisibility() -> None:

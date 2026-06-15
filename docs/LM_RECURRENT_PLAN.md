@@ -79,7 +79,7 @@ y = W_o · (sigmoid(r) ⊙ wkv)
 - **「再帰が local-AI として優れる」= 両方成立**: ①能力が大きく劣らない（`rnn_ppl ≤ gpt_ppl·1.10` かつ unigram gate 通過かつ非崩壊）、②メモリ勝ちが構造的（実測で再帰状態が T で flat、GPT は線形、解析+Method1 で確認）。
 - **「能力の代償に見合わない」**: block_size 以内で `rnn_ppl > gpt_ppl·1.10`。ただし用途が T≫block_size を要するなら別（そこでは GPT は動けない）。
 - **正直な決め台詞**: 「block_size(={64,256}) を超える文脈では GPT は不適用、再帰は定数 {~9KB} 状態で走る。block_size 以内の能力差は {X}%」。X を定量化、手を振らない。
-- 出力: `out/<run>/recurrent_vs_gpt.json`（capability/memory/throughput/pareto/verdict/caveats）+ 表 + Pareto 図。`libexec/raptor-run-lifecycle` 経由。
+- 出力: `out/<run>/recurrent_vs_gpt.json`（capability/memory/throughput/pareto/verdict/caveats）に加え、同 stem で `*.md`（PPL 表 + caveats）と `*.svg`（memory@T 曲線）を自動生成する。`libexec/raptor-run-lifecycle` 経由。
 
 ## 5. フェーズ / DoD
 
@@ -134,3 +134,5 @@ y = W_o · (sigmoid(r) ⊙ wkv)
   - `pareto` には slope 基準 winner と、GPT KV bytes 対 constant-state bytes の break-even prompt_len を追加
   - smoke (`max_iters=20`, `throughput_new_tokens=8`) では、速度は prompt が短い範囲で `RecurrentLM > GPT > RWKV`。長文側で見える低下は decode 律速ではなく **prefill 起因** として分離表示し、GPT は `block_size` 超を exact には測れない
   - 直近の throughput smoke も capability verdict ではなく、主目的は JSON schema と disclosure の確認
+  - `out_path` を渡した compare 実行は、JSON の隣に `*.md` と `*.svg` も吐くようにした。前者は head-to-head PPL 表、後者は GPT 線形メモリ vs recurrent/RWKV 定数状態の memory@T 曲線
+  - pilot120 (`out/lm_recurrent_pilot120.json`) では `rwkv_ppl≈197.4 < gpt_ppl≈209.5 < recurrent_ppl≈217.5` まで改善したが、3 モデルとも strict unigram gate は未通過。したがって **raw PPL の暫定順位は出たが publishable verdict ではない**
