@@ -15,6 +15,15 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 ARTIFACTS_DIR = REPO_ROOT / "docs" / "artifacts"
 SUMMARY_PATH = ARTIFACTS_DIR / "lm_recurrent_interim_summary.md"
 VERDICT_PATH = ARTIFACTS_DIR / "lm_recurrent_verdict.md"
+_BLOCK64_IDENTICAL_SVG_STEMS = (
+    "lm_recurrent_pilot120",
+    "lm_recurrent_pilot160",
+    "lm_recurrent_pilot160_seed2026",
+    "lm_recurrent_pilot160_seed7",
+    "lm_recurrent_pilot240",
+    "lm_recurrent_pilot240_seed2026",
+    "lm_recurrent_pilot240_seed7",
+)
 
 
 def _tracked_pilot_stems() -> list[str]:
@@ -26,8 +35,6 @@ def _summary_run_name(stem: str) -> str:
 
 
 def _summary_svg_target(stem: str) -> str:
-    if stem == "lm_recurrent_pilot240_seed7":
-        return "./lm_recurrent_pilot240.svg"
     return f"./{stem}.svg"
 
 
@@ -61,9 +68,8 @@ def _reproduction_block(text: str, stem: str) -> str:
 
 def test_tracked_recurrent_svgs_are_well_formed_xml() -> None:
     for stem in _tracked_pilot_stems():
-        svg_name = f"{stem}.svg"
         json_path = ARTIFACTS_DIR / f"{stem}.json"
-        svg_path = ARTIFACTS_DIR / svg_name
+        svg_path = ARTIFACTS_DIR / f"{stem}.svg"
         svg_text = svg_path.read_text(encoding="utf-8")
         result = json.loads(json_path.read_text(encoding="utf-8"))
         root = ElementTree.fromstring(svg_text)
@@ -80,6 +86,12 @@ def test_tracked_recurrent_svgs_are_well_formed_xml() -> None:
         assert len(projected_points) >= 1
         assert measured_points[-1] == projected_points[0]
 
+
+def test_block64_memory_svg_hashes_match_and_256_proxy_differs() -> None:
+    canonical_bytes = (ARTIFACTS_DIR / "lm_recurrent_pilot160.svg").read_bytes()
+    for stem in _BLOCK64_IDENTICAL_SVG_STEMS:
+        assert (ARTIFACTS_DIR / f"{stem}.svg").read_bytes() == canonical_bytes
+    assert (ARTIFACTS_DIR / "lm_recurrent_pilot256_40.svg").read_bytes() != canonical_bytes
 
 def test_interim_summary_links_target_existing_tracked_artifacts() -> None:
     text = SUMMARY_PATH.read_text(encoding="utf-8")

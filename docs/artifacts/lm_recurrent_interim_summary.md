@@ -25,12 +25,12 @@ This note consolidates the currently tracked head-to-head pilot artifacts for
 - [lm_recurrent_pilot240_seed2026.svg](./lm_recurrent_pilot240_seed2026.svg)
 - [lm_recurrent_pilot240_seed7.json](./lm_recurrent_pilot240_seed7.json)
 - [lm_recurrent_pilot240_seed7.md](./lm_recurrent_pilot240_seed7.md)
-- [lm_recurrent_pilot240_seed7.svg](./lm_recurrent_pilot240.svg)
+- [lm_recurrent_pilot240_seed7.svg](./lm_recurrent_pilot240_seed7.svg)
 - [lm_recurrent_pilot256_40.json](./lm_recurrent_pilot256_40.json)
 - [lm_recurrent_pilot256_40.md](./lm_recurrent_pilot256_40.md)
 - [lm_recurrent_pilot256_40.svg](./lm_recurrent_pilot256_40.svg)
 
-Note: the `64/160` and `64/240` memory SVGs are config-dependent rather than seed-dependent, so byte-identical copies can occur across tracked runs. The existing tracked copies are kept for audit continuity, but future additions should prefer a shared SVG reference whenever the generated memory plot would be identical. `pilot240_seed7.svg` already reuses the shared `pilot240.svg` reference in this index for that reason.
+Note: all tracked `block_size=64` memory SVGs (`pilot120`, `pilot160`, `pilot160_seed2026`, `pilot160_seed7`, `pilot240`, `pilot240_seed2026`, `pilot240_seed7`) are byte-identical, while `pilot256_40.svg` is distinct. These tracked copies remain in place for now, and this index remains the per-run inventory. Future cleanup or new tracked additions should canonicalize identical memory plots rather than add more duplicate tracked SVGs. If that canonicalization happens, the shared target should be `pilot160.svg`. The verdict packet already uses that representative shared family reference.
 
 ## Capability snapshot
 

@@ -16,7 +16,7 @@ It is based only on tracked artifacts in this directory.
 - low-fidelity long-window proxy:
   - [pilot256_40](./lm_recurrent_pilot256_40.json)
 - memory curves:
-  - [shared 64/160 and 64/240 memory@T](./lm_recurrent_pilot160.svg)
+  - [shared block_size=64 memory@T family](./lm_recurrent_pilot160.svg)
   - [256/40 memory@T](./lm_recurrent_pilot256_40.svg)
 
 ## Capability Table
@@ -42,10 +42,11 @@ Representative tracked rows:
 
 - `RecurrentLM` and `RWKVLM` use constant-size recurrent state.
 - GPT memory grows linearly with prompt length via analytic KV projection.
+- These memory@T curves are structural, config-determined plots for the comparison harness, not independent per-run empirical samples.
 - The tracked memory curves already show the decisive structural split:
   - recurrent/RWKV: flat state bytes
   - GPT: linear bytes/token slope
-- `64/160` and `64/240` share the same memory-footprint curve because the config is identical.
+- All tracked `block_size=64` runs (`pilot120`, `pilot160`, `pilot160_seed2026`, `pilot160_seed7`, `pilot240`, `pilot240_seed2026`, `pilot240_seed7`) share the same memory-footprint curve; `pilot256_40` is the distinct case.
 
 ## Current Verdict
 

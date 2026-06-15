@@ -218,7 +218,10 @@
 
 - LM recurrent 比較の統合修正指示 #1 は、tracked artifact の重複 SVG を `git rm` で整理する削除操作を含むため、人間承認が必要
 - 実測確認:
+  - `docs/artifacts/lm_recurrent_pilot120.svg`
   - `docs/artifacts/lm_recurrent_pilot160.svg`
+  - `docs/artifacts/lm_recurrent_pilot160_seed2026.svg`
+  - `docs/artifacts/lm_recurrent_pilot160_seed7.svg`
   - `docs/artifacts/lm_recurrent_pilot240.svg`
   - `docs/artifacts/lm_recurrent_pilot240_seed2026.svg`
   - `docs/artifacts/lm_recurrent_pilot240_seed7.svg`
@@ -276,3 +279,38 @@
   3. 上記のみを単独コミット
 - その次に duplicate SVG 物理削除の承認確認へ進む
 - 直近 gate は `py -3.11 -m pytest tests/unit -k lm -q && py -3.11 -m mypy src/llcore/lm/ && py -3.11 -m ruff check src/llcore/lm/` で exit `0`（`90 passed, 401 deselected` / `mypy success` / `ruff success`）
+
+## 再開メモ (2026-06-16, 現セッション)
+
+- `docs/SESSION_SUMMARY.md` / 本ファイルを再読し、再開地点は前回記録どおり **LM recurrent 本体は完了、残る承認待ちは duplicate SVG 物理削除 1 件のみ** と確認
+- repo 直下には `CLAUDE.md` / `AGENTS.md` は存在しないため、再開時は `docs/next_plan.md` / `docs/PROGRESS.md` を主に参照する。ただし上位指示は引き続き優先し、global `C:\Users\puruy\.claude\CLAUDE.md` の規約も有効
+- 統合修正指示の反映:
+  - `.git/hooks` に有効フックはなく、repo 内検索でも `.llterm/loop_ledger.jsonl` を `git add` する自動再 tracked 経路は未検出。`tools/llterm_status.py` は ledger を読むだけで stage しない
+  - ignore 粒度は単一ファイルではなく **`.llterm/` 単位** を採用する。将来 tracked に戻す設定ファイルが要る場合のみ negate パターンで例外化する
+  - `docs/status/` は **既に `.gitignore` 済み** のため、今回の解除コミットに追加反映は不要
+  - `.llterm/loop_ledger.jsonl` の監査上の扱いは、将来の誤解を避けるため **ユーザー判断待ちの分類** とする。今回の実施理由は「tracked append ノイズの分離」であり、「監査証跡として不要」とまでは断定しない
+  - 現在ブランチは `feat/lm-recurrent`。`.gitignore` 変更が他ブランチへ merge されるまでは、未反映ブランチで同種 dirty が再発しうる
+  - 不要指摘の扱い:
+    - 「`docs/status/` の ignore 取りこぼし」は **既に `.gitignore` 済み** のため不採用
+    - 「JSONL 末尾の `(truncated)` 由来の整合性懸念」は **diff 表示上の切り詰めであり実ファイル破損ではない** ため不採用
+  - 実施結果:
+    - commit `3d1f6ab` (`Stop tracking llterm runtime artifacts`) で `.gitignore` に `.llterm/` を追加し、`git rm --cached -f .llterm/loop_ledger.jsonl` を単独コミットで実施
+    - コミット範囲は `.gitignore` と ledger の index 解除だけに限定し、`docs/next_plan.md` は未ステージのまま維持
+    - 実ファイルの ledger は作業木に残しつつ ignore 下へ移し、以後の append-only 追記を commit ノイズから分離した
+  - 次の承認待ち:
+    - 残る不可逆操作は **duplicate SVG の tracked copy 物理削除** のみ
+    - `docs/artifacts/lm_recurrent_interim_summary.md` では、byte 同一 SVG の tracked copy は **「監査継続性のため保持」** と既に明記されている。削除するなら、この保持方針を撤回するかどうかを先に人間判断で確定する必要がある
+    - 実測では tracked SVG 8 枚のうち **7 枚が byte 同一**。同一集合は `pilot120`, `pilot160`, `pilot160_seed2026`, `pilot160_seed7`, `pilot240`, `pilot240_seed2026`, `pilot240_seed7` で、`pilot256_40.svg` のみ別 hash
+    - fail-closed 整合のため、承認前に一度入れていた「interim index の全面共有参照化」と「test の canonical 解決」は巻き戻した。現時点の tracked artifacts は **全 run が各自の `.svg` を参照**し、保持路線（選択肢 2 / 3）でも自然に読める状態へ戻してある
+    - `pilotXXX.md` 本体に SVG 参照は存在しないため、削除時の整合対象は **interim index + `lm_recurrent_verdict.md` + 物理 SVG 群** に限定する
+    - 削除を実行するなら canonical shared SVG は **`lm_recurrent_pilot160.svg` に統一**する。理由は `lm_recurrent_verdict.md` が既にこれを共有参照先として使っており、`pilot240_seed7` index 行も同じ canonical へ張り替えるのが最小差分だから
+    - `tests/unit/test_lm_artifacts.py` は現時点では各 stem の物理 SVG を個別検証する状態を維持する。削除を実行する場合は、**同一コミット内で** test の canonical 許容化、interim index の共有参照統一、duplicate 6 枚の `git rm`、`lm_recurrent_verdict.md` の共有参照確認、LM gate 再確認を順に行う
+    - 不可逆削除は個別・明示の承認が必要であり、包括的な「確認不要」指示では自動承認しない
+    - 2026-06-16 追記: 承認質問は `pilot120` を含む block_size=64 の同一 SVG 7 枚を対象とする形へ再発行済み。現在はその選択回答待ちであり、回答受領までは削除・参照更新・gate 再実行のいずれも開始しない
+    - 2026-06-16 追記: 上の巻き戻しにより、選択肢 2 / 3 でも repo 状態は矛盾しない。option 1 が選ばれた場合のみ、削除専用の参照更新・note 更新・test 更新を単一コミットへ束ねる
+    - 2026-06-16 追記: canonical shared SVG の候補は `lm_recurrent_pilot160.svg` に統一した。これは**削除または将来の共有参照化を行う場合の候補**であり、現 tracked state を即座に共有参照へ変えるものではない
+    - 2026-06-16 追記: docs に書いた「全 block_size=64 SVG が byte 同一、`pilot256_40` のみ別」は drift 防止のため `tests/unit/test_lm_artifacts.py` に guard test を追加して固定した
+    - 2026-06-16 追記: `interim_summary.md` の保持理由は「監査継続性のため保持」から一段 honest に寄せ、**今は per-run inventory を保つが、今後 duplicate tracked SVG は canonical 化を優先する** という文言へ整理した。`verdict.md` が shared family reference、`interim_summary.md` が per-run inventory という役割差も明記
+    - 2026-06-16 追記: 現 working tree の doc/test 差分は **選択肢 3（保持方針維持 + 注記/参照整理）に対応する内容** として扱う。`git rm` を伴う選択肢 1 はこの差分に混ぜず、承認後に **別コミット** で `test canonical 許容化 → duplicate SVG 削除 → LM gate 再確認` の順で行う
+    - 不採用指摘:
+      - 「byte-identical 不変条件の test が diff に無い」は **既に `tests/unit/test_lm_artifacts.py` に guard test を追加済み** のため不採用
