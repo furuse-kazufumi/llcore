@@ -35,6 +35,14 @@ def _strict_gate_summary_label(result: dict[str, object]) -> str:
     return f"{'/'.join(passed)} pass"
 
 
+def _reproduction_block(text: str, stem: str) -> str:
+    run_name = _summary_run_name(stem)
+    pattern = rf"- `{re.escape(run_name)}`:\r?\n```powershell\r?\n(.*?)\r?\n```"
+    match = re.search(pattern, text, re.DOTALL)
+    assert match is not None
+    return match.group(1)
+
+
 def test_tracked_recurrent_svgs_are_well_formed_xml() -> None:
     for stem in _tracked_pilot_stems():
         svg_name = f"{stem}.svg"
@@ -102,8 +110,9 @@ def test_interim_summary_reproduction_blocks_reference_tracked_outputs() -> None
     for stem in _tracked_pilot_stems():
         result = json.loads((ARTIFACTS_DIR / f"{stem}.json").read_text(encoding="utf-8"))
         cfg = result["config"]
-        assert f'out_path=Path("docs/artifacts/{stem}.json")' in text
-        assert f"block_size={cfg['block_size']}" in text
-        assert f"max_iters={cfg['max_iters']}" in text
-        assert f"batch_size={cfg['batch_size']}" in text
-        assert f"seed={cfg['seed']}" in text
+        block = _reproduction_block(text, stem)
+        assert f'out_path=Path("docs/artifacts/{stem}.json")' in block
+        assert f"block_size={cfg['block_size']}" in block
+        assert f"max_iters={cfg['max_iters']}" in block
+        assert f"batch_size={cfg['batch_size']}" in block
+        assert f"seed={cfg['seed']}" in block

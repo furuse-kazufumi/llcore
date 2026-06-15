@@ -29,8 +29,9 @@ This note consolidates the currently tracked head-to-head pilot artifacts for
 
 ## Readout
 
-- `pilot120` is the strongest current low-cost run, but even there all three models fail the strict unigram gate. The raw PPL ordering is therefore provisional.
+- `pilot120` is the strongest currently tracked sub-`160`-iteration run, but even there all three models fail the strict unigram gate. The raw PPL ordering is therefore provisional.
 - `pilot160` and `pilot160_seed2026` improve enough to cross the strict unigram gate for a subset of models, but the ranking is still seed-sensitive: RWKV stays best on raw PPL in both, while GPT and Recurrent swap order and gate status.
+- That gate is only the deliberately loose `0.85 x unigram` floor used by the comparison harness. These pilots do not yet clear the stronger "genuinely learned char-LM" bar noted in `held_out_report_any`, so this remains an interim capability signal rather than a settled learning verdict.
 - `pilot256_40` uses a different budget and is explicitly a low-fidelity proxy. It is useful only to show that the comparison harness still runs at `block_size=256`.
 - The raw ordering changes across runs and seeds, so ranking fidelity is not yet stable enough to claim a full winner.
 - The strongest supported claim remains structural rather than capability-based: `RecurrentLM` and `RWKVLM` run with constant-size recurrent state, while GPT memory grows linearly with prompt length.
