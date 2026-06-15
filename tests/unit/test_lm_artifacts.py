@@ -5,9 +5,10 @@ from __future__ import annotations
 import json
 import re
 from pathlib import Path
+from typing import cast
 from xml.etree import ElementTree
 
-from llcore.lm.compare import _render_memory_curve_svg, _render_ppl_table
+from llcore.lm.compare import _render_memory_curve_svg, _render_ppl_table  # type: ignore[import-untyped]
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -31,15 +32,23 @@ def _summary_svg_target(stem: str) -> str:
 
 
 def _strict_gate_summary_label(result: dict[str, object]) -> str:
-    verdict = result["verdict"]
+    verdict = cast(dict[str, dict[str, object]], result["verdict"])
     passed = [
         name
         for name in ("gpt", "recurrent", "rwkv")
-        if verdict[name]["passes_unigram_gate"]
+        if bool(verdict[name]["passes_unigram_gate"])
     ]
     if not passed:
         return "all fail"
     return f"{'/'.join(passed)} pass"
+
+
+def _tracked_seeded_stems(prefix: str) -> list[str]:
+    return sorted(
+        stem
+        for stem in _tracked_pilot_stems()
+        if stem == prefix or stem.startswith(f"{prefix}_seed")
+    )
 
 
 def _reproduction_block(text: str, stem: str) -> str:
@@ -127,18 +136,11 @@ def test_interim_summary_reproduction_blocks_reference_tracked_outputs() -> None
 
 def test_verdict_doc_links_target_existing_artifacts() -> None:
     text = VERDICT_PATH.read_text(encoding="utf-8")
-    for target in (
-        "./lm_recurrent_pilot160.json",
-        "./lm_recurrent_pilot160_seed2026.json",
-        "./lm_recurrent_pilot160_seed7.json",
-        "./lm_recurrent_pilot240.json",
-        "./lm_recurrent_pilot240_seed2026.json",
-        "./lm_recurrent_pilot240_seed7.json",
-        "./lm_recurrent_pilot256_40.json",
-        "./lm_recurrent_pilot160.svg",
-        "./lm_recurrent_pilot240.svg",
-        "./lm_recurrent_pilot256_40.svg",
-    ):
+    json_targets = [f"./{stem}.json" for stem in _tracked_seeded_stems("lm_recurrent_pilot160")]
+    json_targets += [f"./{stem}.json" for stem in _tracked_seeded_stems("lm_recurrent_pilot240")]
+    json_targets.append("./lm_recurrent_pilot256_40.json")
+    svg_targets = ("./lm_recurrent_pilot160.svg", "./lm_recurrent_pilot256_40.svg")
+    for target in (*json_targets, *svg_targets):
         assert target in text
         resolved = (VERDICT_PATH.parent / target.removeprefix("./")).resolve()
         assert resolved.exists()
@@ -149,3 +151,54 @@ def test_verdict_doc_states_current_rwkv_claims() -> None:
     assert "RWKV is the most reproducible current candidate" in text
     assert "raw PPL best in `6/6` tracked seeds" in text
     assert "unigram-floor pass in `6/6` tracked seeds" in text
+
+
+def test_verdict_doc_recomputes_rwkv_claims_from_tracked_json() -> None:
+    grouped_stems = _tracked_seeded_stems("lm_recurrent_pilot160") + _tracked_seeded_stems(
+        "lm_recurrent_pilot240"
+    )
+    total = len(grouped_stems)
+    rwkv_best = 0
+    rwkv_floor = 0
+    for stem in grouped_stems:
+        result = json.loads((ARTIFACTS_DIR / f"{stem}.json").read_text(encoding="utf-8"))
+        reports = result["reports"]
+        verdict = result["verdict"]
+        ordered = sorted(
+            ("gpt", "recurrent", "rwkv"),
+            key=lambda name: reports[name]["model_ppl"],
+        )
+        if ordered[0] == "rwkv":
+            rwkv_best += 1
+        if verdict["rwkv"]["passes_unigram_gate"]:
+            rwkv_floor += 1
+    assert total == 6
+    assert rwkv_best == 6
+    assert rwkv_floor == 6
+
+
+def test_verdict_doc_representative_rows_match_tracked_json() -> None:
+    text = VERDICT_PATH.read_text(encoding="utf-8")
+    representative_stems = (
+        "lm_recurrent_pilot160",
+        "lm_recurrent_pilot160_seed2026",
+        "lm_recurrent_pilot160_seed7",
+        "lm_recurrent_pilot240",
+        "lm_recurrent_pilot240_seed2026",
+        "lm_recurrent_pilot240_seed7",
+    )
+    model_labels = {"gpt": "GPT", "recurrent": "Recurrent", "rwkv": "RWKV"}
+    for stem in representative_stems:
+        result = json.loads((ARTIFACTS_DIR / f"{stem}.json").read_text(encoding="utf-8"))
+        reports = result["reports"]
+        ordered = sorted(
+            ("gpt", "recurrent", "rwkv"),
+            key=lambda name: reports[name]["model_ppl"],
+        )
+        raw_order = " < ".join(model_labels[name] for name in ordered)
+        expected_row = (
+            f"| `{_summary_run_name(stem)}` | {reports['gpt']['model_ppl']:.3f} | "
+            f"{reports['recurrent']['model_ppl']:.3f} | {reports['rwkv']['model_ppl']:.3f} | "
+            f"`{raw_order}` | `{_strict_gate_summary_label(result)}` |"
+        )
+        assert expected_row in text

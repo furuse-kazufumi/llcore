@@ -88,6 +88,7 @@ y = W_o · (sigmoid(r) ⊙ wkv)
 - **Phase 3（任意）**: 勝者を量子化+mmap（重みの効率表現）で「RAM 超え」へ。clean-room 3D で歩く。
 - **DoD**: recurrent.py + tests green / mypy strict / ruff / 既存 P0 緑。日本語で GPT vs 再帰の PPL + メモリ@T 表 + Pareto を本 doc に記録。敵対レビューで比較公平性・実装正当性（因果性 / 定数メモリ / 数値安定 / 並列=逐次一致）確認。honest 留保明記。
 - **正式 gate コマンド**: PowerShell で glob 非展開のため、継続検証は `py -3.11 -m pytest tests/unit -k lm -q && py -3.11 -m mypy src/llcore/lm/ && py -3.11 -m ruff check src/llcore/lm/` を採用する。
+- **artifact/verdict テストを触った回**は追加で `py -3.11 -m mypy tests/unit/test_lm_artifacts.py && py -3.11 -m ruff check tests/unit/test_lm_artifacts.py` も回し、tracked artifact の回帰保護自体が静的解析でも壊れていないことを確認する。
 
 ## 6. 出典（一次ソース）
 

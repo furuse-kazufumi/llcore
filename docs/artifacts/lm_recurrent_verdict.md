@@ -16,8 +16,7 @@ It is based only on tracked artifacts in this directory.
 - low-fidelity long-window proxy:
   - [pilot256_40](./lm_recurrent_pilot256_40.json)
 - memory curves:
-  - [64/160 memory@T](./lm_recurrent_pilot160.svg)
-  - [64/240 memory@T](./lm_recurrent_pilot240.svg)
+  - [shared 64/160 and 64/240 memory@T](./lm_recurrent_pilot160.svg)
   - [256/40 memory@T](./lm_recurrent_pilot256_40.svg)
 
 ## Capability Table
@@ -34,8 +33,10 @@ Representative tracked rows:
 | --- | ---: | ---: | ---: | --- | --- |
 | `pilot160` | 184.804 | 180.560 | 158.116 | `RWKV < Recurrent < GPT` | `recurrent/rwkv pass` |
 | `pilot160_seed2026` | 180.897 | 207.580 | 161.650 | `RWKV < GPT < Recurrent` | `gpt/rwkv pass` |
+| `pilot160_seed7` | 171.710 | 187.037 | 152.733 | `RWKV < GPT < Recurrent` | `gpt/rwkv pass` |
 | `pilot240` | 142.577 | 129.430 | 110.355 | `RWKV < Recurrent < GPT` | `gpt/recurrent/rwkv pass` |
 | `pilot240_seed2026` | 137.109 | 144.936 | 109.534 | `RWKV < GPT < Recurrent` | `gpt/recurrent/rwkv pass` |
+| `pilot240_seed7` | 130.051 | 138.675 | 107.578 | `RWKV < GPT < Recurrent` | `gpt/recurrent/rwkv pass` |
 
 ## Memory Verdict
 
@@ -44,7 +45,7 @@ Representative tracked rows:
 - The tracked memory curves already show the decisive structural split:
   - recurrent/RWKV: flat state bytes
   - GPT: linear bytes/token slope
-- `64/160` and `64/240` share the same memory curve because the config is identical.
+- `64/160` and `64/240` share the same memory-footprint curve because the config is identical.
 
 ## Current Verdict
 
@@ -55,7 +56,7 @@ Representative tracked rows:
   - GPT and Recurrent continue to swap second place, so the non-RWKV ranking is not stable
 - The strongest supported systems claim is: **recurrent models buy the intended memory property**.
   - constant-size recurrent state for `RecurrentLM` and `RWKVLM`
-  - GPT remains structurally bounded by `block_size` for exact execution and linear KV projection beyond that
+  - GPT remains structurally bounded by `block_size` for exact execution, with linear projected KV-cache bytes beyond that for memory-footprint comparison
 
 ## Non-Claims
 
