@@ -153,3 +153,4 @@ y = W_o · (sigmoid(r) ⊙ wkv)
     - `64/120` では raw PPL は `RWKV < GPT < Recurrent` まで改善したが gate 未通過
     - `256/40` では全体に未収束で `GPT < Recurrent < RWKV`
     - よって **勝者はまだ確定していない**。現段階の strongest claim は「再帰 2 系統は定数状態メモリで動作し、能力比較は学習予算に敏感で未収束」という一点に限る
+  - tracked pilot を横断した監査用サマリは `docs/artifacts/lm_recurrent_interim_summary.md` に集約
