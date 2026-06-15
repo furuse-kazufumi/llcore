@@ -82,11 +82,11 @@
 
 ## 重要インシデント / 制約
 
-1. **ANTHROPIC_API_KEY org disabled は未解決**
-   - `corpus2skill` の要約器は verified_safe_learning に続いて self_evolving_agents でも全失敗
-   - `--resume-summaries` の marker round-trip 自体は修正済み。ただし現 staging は決定論的補完主体で、API 復旧なしに高品質 summary へ置換はできない
-2. **self_evolving_agents 実行時は `OPENAI_API_KEY` も環境未設定**
-   - API 代替が使えず、今回は docs title / 子クラスタ / 頻出語ベースの決定論的補完で `SKILL.md` を完成
+1. **Anthropic 要約器は直近セッションで疎通確認済み**
+   - 2026-06-16 の指揮者セッション実測で `ANTHROPIC_API_KEY` は present かつ valid と確認済み
+   - したがって現時点の主ブロッカーは API 復旧ではなく、rerun 本実行の人間判断待ち
+2. **self_evolving_agents 実行時は `OPENAI_API_KEY` が未設定**
+   - ただし corpus2skill の rerun 自体は Anthropic 経路で進められるため、OpenAI 未設定は補助情報に留まる
 3. **self_evolving_agents は recall 優先で query を広く張っている**
    - 元 staging では少数 leaf どころかトップレベルから stopword 主導ラベル (`the / and / of` など) が残り、最大クラスタにも off-topic 混在がある
    - `self_evolving_agents_corpus_v2_stopwordcheck` では top-level label は改善したが、query 由来の off-topic 混入は依然残る
@@ -98,26 +98,21 @@
 1. **【人間】verified_safe_learning staging の publish 判断**
    - `D:\docs\verified_safe_learning_corpus_v2.staging`
    - rename 手順は `..._STAGING_META/DECISIONS.md` の publish 節
-2. **【人間】self_evolving_agents staging の publish 判断**
+2. **【人間】self_evolving_agents rerun 本実行の判断**
    - `D:\docs\self_evolving_agents_corpus_v2.staging`
-   - 次の 3 択を判断:
-     - (a) このまま publish
-     - (b) stopword 除去 + query を絞って staging 再生成
-     - (c) off-topic docs / clusters を手動で除去
+   - 3 択のうち **(b) stopword 除去 + query を絞って staging 再生成** は既にユーザー承認済み
+   - 残る判断は、`papers/` 作り直しと新規 output dir 生成を伴う **precision rerun 本実行に着手してよいか** の 1 点
    - 追加材料:
      - stopword 修正後の比較 rerun では top-level label quality は明確に改善
-     - ただし source query 起因の off-topic 混入は残るため、現時点の推奨は **(b)** 
-3. **【人間】API キー対処**
-   - `ANTHROPIC_API_KEY` org disabled の復旧
-   - 必要なら `OPENAI_API_KEY` も環境投入
-4. **【Claude・次セッション】人間判断が (b) precision 改善 rerun の場合**
+     - source query 起因の off-topic 混入は残るため、本実行の推奨方針は引き続き **(b)** 
+3. **【Claude・次セッション】人間判断が (b) precision 改善 rerun の場合**
    - `D:\tools\raptor\packages\corpus2skill\embedder.py` / `clusterer.py` の stopword 修正は適用済みなので、そのまま使う
    - rerun 前提の最小 runtime 検証は完了済み。追加の確認を重複させず、まず `queries` / 記録 / 既存成果の読み合わせまで進めてよい
    - `_STAGING_META/queries.txt` を絞る
    - **ここから先の本実行 (`papers/` 作り直し、別 output dir への fetch、`fetch_arxiv_topical.py` → `raptor-corpus2skill` 実行) は人間承認後**
    - broad query 由来の off-topic cluster を主に削る
    - 必要なら学術 stopword (`fig`, `et`, `al`) は rerun 前に小さく追加検証する。ただし過剰除去リスクがあるので後回し
-5. **【Claude・次セッション】人間判断が (c) 手動除去の場合**
+4. **【Claude・次セッション】人間判断が (c) 手動除去の場合**
    - staging 内で off-topic docs / clusters の候補を列挙
    - 影響範囲を確認してから staging 側だけ編集
 
@@ -272,12 +267,8 @@
 
 - 新セッションは `docs/SESSION_SUMMARY.md` と本節から再開する
 - LM recurrent 本体では承認なしに進める必須タスクは残っていない
-- 次の具体的な一手は **`.llterm/loop_ledger.jsonl` 追跡解除の承認可否を確認すること**
-- 承認が下りたら:
-  1. `.gitignore` に `.llterm/loop_ledger.jsonl`（または `.llterm/`）を追加
-  2. `git rm --cached .llterm/loop_ledger.jsonl`
-  3. 上記のみを単独コミット
-- その次に duplicate SVG 物理削除の承認確認へ進む
+- 次の具体的な一手は **`verified_safe_learning` publish 判断または `self_evolving_agents` precision rerun 本実行の判断を回収すること**
+- `loop_ledger` 追跡解除と duplicate SVG 物理削除は **どちらも完了済み** なので、この再開ポインタでは新たな承認対象ではない
 - 直近 gate は `py -3.11 -m pytest tests/unit -k lm -q && py -3.11 -m mypy src/llcore/lm/ && py -3.11 -m ruff check src/llcore/lm/` で exit `0`（`90 passed, 401 deselected` / `mypy success` / `ruff success`）
 
 ## 再開メモ (2026-06-16, 現セッション)
