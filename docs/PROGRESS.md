@@ -10,6 +10,19 @@
 
 ## 現在の要点
 
+- **現在の主作業ブランチは `feat/lm-recurrent`**。`docs/LM_RECURRENT_PLAN.md` が進捗の正本で、tracked artifact は `docs/artifacts/lm_recurrent_*` を参照
+- LM recurrent 比較は **verdict packet 完成** まで到達:
+  - `docs/artifacts/lm_recurrent_verdict.md` に PPL 表 / memory@T 曲線 / caveat を集約
+  - strongest claim は「**RWKV が最も再現性の高い候補**」。`64/160` の 3 seed と `64/240` の 3 seed で raw PPL 最良と unigram floor 通過を維持
+  - ただし full winner は未宣言。GPT と Recurrent の相対順位は seed-sensitive のまま
+- artifact/verdict 回帰保護は実装済み:
+  - `tests/unit/test_lm_artifacts.py` が tracked JSON から verdict row / `6/6` claim / md / svg を再計算して照合
+  - 正式 gate は `py -3.11 -m pytest tests/unit -k lm -q && py -3.11 -m mypy src/llcore/lm/ && py -3.11 -m ruff check src/llcore/lm/`
+- 承認待ちは **削除を伴う duplicate SVG 整理**のみ。文言・共有参照・監査リスト更新までは反映済みで、物理削除 (`git rm`) は未実行
+- 無関係 dirty は引き続き対象外:
+  - tracked: `.llterm/loop_ledger.jsonl`
+  - untracked: `docs/status/`
+
 - `verified_safe_learning` staging は完了、人間ゲート待ち
 - `self_evolving_agents` staging も完了、人間ゲート待ち
 - `self_evolving_agents` は `INDEX.md` 件数補正と `/` リンク修正まで反映済み
