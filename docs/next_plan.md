@@ -1,16 +1,22 @@
 # next_plan (正本) — EXIT 時点の再開地点
 
-> 最終更新: 2026-06-16 (LM recurrent の canonical 化と loop_ledger 追跡解除は完了済み。残る人間ゲートは corpus staging 側)
+> 最終更新: 2026-06-16 (作業木 clean。LM recurrent の canonical 化、loop_ledger 追跡解除、HD-1 viz 追加、rerun 準備メモ更新まで完了。残る人間ゲートは corpus staging 側)
 > SESSION_SUMMARY.md は Stop hook で自動上書きされるため、**このファイルが再開の正本**。
 > hook 非管理の再開ポインタ: `docs/PROGRESS.md`
 
 ## EXIT 時点の現在地
 
-- **コア作業 (`corpus2skill` 修正 + 比較 rerun) は本セッション前半で完了済み**。この EXIT 整形ターンでは **新規作業を開始せず、記録更新のみ** 実施
+- **コア作業 (`corpus2skill` 修正 + 比較 rerun) は完了済み**。この EXIT 整形ターンでは **新規作業を開始せず、記録更新のみ** 実施
 - `Source Query` 汚染是正、legacy summary resume 修正、最小 runtime 検証までは完了
-- 次セッションの最初の判断点は **人間判断待ち項目を先に処理するか**、または人間判断なしで進めるなら **(b) rerun の準備(材料確認まで)だけ進めるか** の 2 択
+- 次セッションの最初の判断点は **`verified_safe_learning` publish** と **`self_evolving_agents` precision rerun 本実行** のどちらの人間ゲートを先に回収するか
 - 不可逆操作 (`publish` / rename / push / 削除) は引き続き人間承認なしに実行しない
 - **(b) precision 改善 rerun は、準備(queries 確認・記録確認・既存成果の読取り)までは自律可だが、本フェッチ実行・`papers/` 作り直し・新規 output dir 生成は人間承認必須** とする
+
+### 次セッションの最短一手
+
+1. `★ユーザー判断 (2026-06-16, ccr 経由)` を開き、人間ゲートの未回答を確認
+2. `verified_safe_learning` publish か `self_evolving_agents` precision rerun 本実行のどちらを先に進めるか、人間判断を回収
+3. rerun 実行が承認された場合のみ、`queries_refined_candidate.txt` の SHA256 `0E6CCB7A91C74E4728098EA92B98BD5E07889A320537EEC724F1D44795B9C042` を再確認して fetch / 再生成へ着手
 
 ## 今セッションまでに完了したこと (重複作業禁止)
 
