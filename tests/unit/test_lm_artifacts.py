@@ -7,7 +7,7 @@ import re
 from pathlib import Path
 from xml.etree import ElementTree
 
-from llcore.lm.compare import _render_ppl_table
+from llcore.lm.compare import _render_memory_curve_svg, _render_ppl_table
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -22,10 +22,13 @@ def _tracked_pilot_stems() -> list[str]:
 def test_tracked_recurrent_svgs_are_well_formed_xml() -> None:
     for stem in _tracked_pilot_stems():
         svg_name = f"{stem}.svg"
+        json_path = ARTIFACTS_DIR / f"{stem}.json"
         svg_path = ARTIFACTS_DIR / svg_name
         svg_text = svg_path.read_text(encoding="utf-8")
+        result = json.loads(json_path.read_text(encoding="utf-8"))
         root = ElementTree.fromstring(svg_text)
         assert root.tag.endswith("svg")
+        assert svg_text == _render_memory_curve_svg(result)
         assert 'stroke-dasharray="8 6"' in svg_text
         assert "GPT KV (measured)" in svg_text
         assert "GPT KV (projection)" in svg_text
