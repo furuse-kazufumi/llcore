@@ -65,7 +65,8 @@
   - stopword 除去、empty vocabulary fallback、generic label 除去、doc-type fallback、resume round-trip、legacy summary 再利用、fallback 誤検知防止の回帰テスト追加
 - 検証
   - `pytest D:\tools\raptor\packages\corpus2skill\tests\test_corpus2skill.py -q` → `31 passed`
-  - 上記の編集・テスト・rerun 出力は **`D:\tools\raptor` 側の別リポジトリ管理物**。llcore 側 diff には含まれず、未コミットの可能性がある
+  - 上記の編集・テスト・rerun 出力は **`D:\tools\raptor` 側の別リポジトリ管理物**。llcore 側 diff には含まれず、現時点の `git -C D:\tools\raptor status --short` では `_bazue_article.json`, `_bazue_body_numbered.txt`, `_bazue_patch.py` の削除差分が残っている
+  - 上記 `_bazue_*` 差分は self_evolving_agents rerun とは無関係なので、次の rerun / commit 束には混ぜない
 - 比較用 rerun
   - コマンド: `py -3.11 D:\tools\raptor\raptor_corpus2skill.py --source D:\docs\self_evolving_agents_corpus_v2.staging\papers --name self_evolving_agents_corpus_v2_stopwordcheck --max-depth 2 --min-cluster-size 5 --max-clusters 8`
   - 出力: `D:\tools\raptor\.claude\skills\corpus\self_evolving_agents_corpus_v2_stopwordcheck`
@@ -107,8 +108,11 @@
 3. **【Claude・次セッション】人間判断が (b) precision 改善 rerun の場合**
    - `D:\tools\raptor\packages\corpus2skill\embedder.py` / `clusterer.py` の stopword 修正は適用済みなので、そのまま使う
    - rerun 前提の最小 runtime 検証は完了済み。追加の確認を重複させず、まず `queries` / 記録 / 既存成果の読み合わせまで進めてよい
-   - `_STAGING_META/queries.txt` を絞る
+   - `_STAGING_META/queries_refined_candidate.txt` は準備済み。まずこれを採用候補として使い、必要なら title 制約や category 制約の微調整だけを追加する
    - **ここから先の本実行 (`papers/` 作り直し、別 output dir への fetch、`fetch_arxiv_topical.py` → `raptor-corpus2skill` 実行) は人間承認後**
+   - rerun コマンドの骨子は既に固定できる:
+     - `py -3.11 D:\tools\raptor\fetch_arxiv_topical.py --query-file D:\docs\self_evolving_agents_corpus_v2.staging\_STAGING_META\queries_refined_candidate.txt --output <new_papers_dir> --per-query 60 --since 2019-01-01`
+     - その後 `py -3.11 D:\tools\raptor\raptor_corpus2skill.py --source <new_papers_dir> --name <new_staging_name> --max-depth 2 --min-cluster-size 5 --max-clusters 8`
    - broad query 由来の off-topic cluster を主に削る
    - 必要なら学術 stopword (`fig`, `et`, `al`) は rerun 前に小さく追加検証する。ただし過剰除去リスクがあるので後回し
 4. **【Claude・次セッション】人間判断が (c) 手動除去の場合**
