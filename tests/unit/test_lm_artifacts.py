@@ -14,8 +14,12 @@ SUMMARY_PATH = ARTIFACTS_DIR / "lm_recurrent_interim_summary.md"
 def test_tracked_recurrent_svgs_are_well_formed_xml() -> None:
     for svg_name in ("lm_recurrent_pilot120.svg", "lm_recurrent_pilot256_40.svg"):
         svg_path = ARTIFACTS_DIR / svg_name
-        root = ElementTree.fromstring(svg_path.read_text(encoding="utf-8"))
+        svg_text = svg_path.read_text(encoding="utf-8")
+        root = ElementTree.fromstring(svg_text)
         assert root.tag.endswith("svg")
+        assert 'stroke-dasharray="8 6"' in svg_text
+        assert "GPT KV (measured)" in svg_text
+        assert "GPT KV (projection)" in svg_text
 
 
 def test_interim_summary_links_target_existing_tracked_artifacts() -> None:
