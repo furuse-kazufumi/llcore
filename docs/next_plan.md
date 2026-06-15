@@ -267,7 +267,7 @@
 - LM recurrent 本体では承認なしに進める必須タスクは残っていない
 - 次の具体的な一手は **`verified_safe_learning` publish 判断または `self_evolving_agents` precision rerun 本実行の判断を回収すること**
 - `loop_ledger` 追跡解除と duplicate SVG 物理削除は **どちらも完了済み** なので、この再開ポインタでは新たな承認対象ではない
-- 直近 gate は `py -3.11 -m pytest tests/unit -k lm -q && py -3.11 -m mypy src/llcore/lm/ && py -3.11 -m ruff check src/llcore/lm/` で exit `0`（`90 passed, 401 deselected` / `mypy success` / `ruff success`）
+- 直近 gate は `py -3.11 -m pytest tests/unit -k lm -q && py -3.11 -m mypy src/llcore/lm/ && py -3.11 -m ruff check src/llcore/lm/` で exit `0`（`91 passed, 401 deselected` / `mypy success` / `ruff success`）
 
 ## 再開メモ (2026-06-16, 現セッション)
 
