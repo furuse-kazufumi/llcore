@@ -21,6 +21,8 @@ This note consolidates the currently tracked head-to-head pilot artifacts for
 - [lm_recurrent_pilot256_40.md](./lm_recurrent_pilot256_40.md)
 - [lm_recurrent_pilot256_40.svg](./lm_recurrent_pilot256_40.svg)
 
+Note: the `64/160` memory SVG is seed-independent because it depends on config, not training trajectory. The existing per-seed SVG copies are kept for audit continuity, but future seed additions should prefer one shared `lm_recurrent_pilot160.svg` reference rather than tracking duplicate byte-identical files.
+
 ## Capability snapshot
 
 | Run | block_size | max_iters | batch_size | GPT PPL | Recurrent PPL | RWKV PPL | Unigram PPL | Raw order | Strict gate |

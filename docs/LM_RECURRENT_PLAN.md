@@ -158,3 +158,4 @@ y = W_o · (sigmoid(r) ⊙ wkv)
     - よって **勝者はまだ確定していない**。ただし `RWKV` は少なくとも `64/160` の 3 seed で raw PPL 最良かつ strict gate 通過を再現しており、現時点では最も再現性の高い候補である。一方で、この gate 自体は比較用の緩い `0.85 x unigram` フロアであり、「genuinely learned char-LM」の強い基準を満たしたとはまだ言わない
     - それでも strongest claim は保守的に留める: 「再帰 2 系統は定数状態メモリで動作し、能力比較は学習予算と seed に敏感で完全には収束していない」
   - tracked pilot を横断した監査用サマリは `docs/artifacts/lm_recurrent_interim_summary.md` に集約
+  - seed を変えても memory SVG は config 依存で byte 同一になりうるため、今後の seed 追加では可能なら既存の共有 SVG（例: `lm_recurrent_pilot160.svg`）を参照し、seed ごとの重複 SVG 追跡は増やさない
