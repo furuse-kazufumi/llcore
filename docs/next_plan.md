@@ -223,6 +223,7 @@
   - `docs/artifacts/lm_recurrent_pilot240_seed2026.svg`
   - `docs/artifacts/lm_recurrent_pilot240_seed7.svg`
   は `git hash-object` が全て `2cb4574abc14ed8fcd3eeac471a3cb45bdee7af7` で byte 同一
+- duplicate 判定はファイルサイズではなく **内容ハッシュ一致** を正本とする。物理削除時に対象一覧を出す場合も、この hash 一致を基準に列挙する
 - 承認された場合の実施内容:
   1. 削除対象 SVG への参照を Markdown / tests / docs 全体で grep し、共有 SVG への切替済みを確認する
   2. 重複 SVG の tracked copy を削除し、summary/doc の参照先を共有 SVG へ統一する
@@ -262,3 +263,4 @@
     2. `.llterm/loop_ledger.jsonl` の追跡解除（`.gitignore` + `git rm --cached`、runtime append を今後の commit から分離）
     どちらも削除系/追跡解除系のため fail-closed で人間承認後にだけ実施し、**承認もコミットも分離する**
   - 2026-06-16 追記: 上位承認を仰ぐ優先順位は `loop_ledger` 追跡解除を先、duplicate SVG 物理削除を後とする。理由は前者が毎ターン working tree を dirty にし続けるため
+  - 2026-06-16 追記: 今後の状態報告では「コード変更ゼロ」と「planning/doc 更新は別途あり得る」を分けて書く。working tree に `.llterm/loop_ledger.jsonl` の自動追記 dirty がある場合は、それを明示して誤読を避ける
