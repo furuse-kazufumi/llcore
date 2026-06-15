@@ -1,0 +1,194 @@
+{
+  "config": {
+    "block_size": 64,
+    "n_layer": 2,
+    "n_head": 4,
+    "n_embd": 64,
+    "state_size": 64,
+    "max_iters": 160,
+    "batch_size": 8,
+    "eval_iters": 4,
+    "throughput_prompt_lens": null,
+    "throughput_new_tokens": 4,
+    "throughput_repeats": 1,
+    "seed": 1337
+  },
+  "reports": {
+    "gpt": {
+      "model_nll": 5.21929665144808,
+      "unigram_nll": 5.372771181969541,
+      "model_ppl": 184.80415661278934,
+      "unigram_ppl": 215.45911758612988,
+      "n_tokens": 32064.0
+    },
+    "recurrent": {
+      "model_nll": 5.1960615359856455,
+      "unigram_nll": 5.372771181969541,
+      "model_ppl": 180.55971173192262,
+      "unigram_ppl": 215.45911758612988,
+      "n_tokens": 32064.0
+    },
+    "rwkv": {
+      "model_nll": 5.0633274923541585,
+      "unigram_nll": 5.372771181969541,
+      "model_ppl": 158.1157709672828,
+      "unigram_ppl": 215.45911758612988,
+      "n_tokens": 32064.0
+    }
+  },
+  "memory": {
+    "notes": {
+      "gpt_kv_bytes": "Analytic projection 2*L*T*D*4 bytes. Values for T > block_size are not executable for this GPT config; they are counterfactual projection points only."
+    },
+    "gpt_kv_bytes": {
+      "1": 1024,
+      "16": 16384,
+      "64": 65536,
+      "256": 262144
+    },
+    "gpt_kv_slope_bytes_per_token": 1024,
+    "recurrent_state_bytes": 512,
+    "rwkv_state_bytes": 2560,
+    "recurrent_state_slope_bytes_per_token": 0,
+    "rwkv_state_slope_bytes_per_token": 0
+  },
+  "throughput": {
+    "notes": {
+      "method": "warmup + min-of-repeats with torch.set_num_threads(1)",
+      "new_tokens": 4,
+      "decode_estimator": "difference of total generate() time for N vs 2N new tokens on the same prompt"
+    },
+    "gpt": {
+      "1": {
+        "executable": true,
+        "prefill_s": 0.0,
+        "decode_tok_per_s": 423.5986818706958,
+        "total_tok_per_s": 531.5685242761041,
+        "effective_prompt_len": 1,
+        "note": "warmup + min-of-repeats; decode_tok_per_s is marginal from N vs 2N new tokens with torch.set_num_threads(1)"
+      },
+      "16": {
+        "executable": true,
+        "prefill_s": 0.0,
+        "decode_tok_per_s": 352.2087899764633,
+        "total_tok_per_s": 457.7130361588392,
+        "effective_prompt_len": 16,
+        "note": "warmup + min-of-repeats; decode_tok_per_s is marginal from N vs 2N new tokens with torch.set_num_threads(1)"
+      },
+      "64": {
+        "executable": true,
+        "prefill_s": 0.0008035999489948153,
+        "decode_tok_per_s": 355.87505160797195,
+        "total_tok_per_s": 332.12936521813697,
+        "effective_prompt_len": 64,
+        "note": "warmup + min-of-repeats; decode_tok_per_s is marginal from N vs 2N new tokens with torch.set_num_threads(1)"
+      },
+      "256": {
+        "executable": false,
+        "prefill_s": null,
+        "decode_tok_per_s": null,
+        "total_tok_per_s": null,
+        "effective_prompt_len": 64,
+        "note": "prompt_len exceeds block_size; GPT would crop context in generate(), so exact throughput is omitted"
+      }
+    },
+    "recurrent": {
+      "1": {
+        "executable": true,
+        "prefill_s": 0.0009864000021480024,
+        "decode_tok_per_s": 1320.7422523424134,
+        "total_tok_per_s": 996.2640066949683,
+        "effective_prompt_len": 1,
+        "note": "warmup + min-of-repeats; decode_tok_per_s is marginal from N vs 2N new tokens with torch.set_num_threads(1)"
+      },
+      "16": {
+        "executable": true,
+        "prefill_s": 0.007623199955560267,
+        "decode_tok_per_s": 1187.295918760144,
+        "total_tok_per_s": 363.894397931234,
+        "effective_prompt_len": 16,
+        "note": "warmup + min-of-repeats; decode_tok_per_s is marginal from N vs 2N new tokens with torch.set_num_threads(1)"
+      },
+      "64": {
+        "executable": true,
+        "prefill_s": 0.033590000006370246,
+        "decode_tok_per_s": 4968.326800979763,
+        "total_tok_per_s": 116.29563504956384,
+        "effective_prompt_len": 64,
+        "note": "warmup + min-of-repeats; decode_tok_per_s is marginal from N vs 2N new tokens with torch.set_num_threads(1)"
+      },
+      "256": {
+        "executable": true,
+        "prefill_s": null,
+        "decode_tok_per_s": null,
+        "total_tok_per_s": 37.628961508888864,
+        "effective_prompt_len": 256,
+        "note": "warmup + min-of-repeats; decode_tok_per_s is marginal from N vs 2N new tokens with torch.set_num_threads(1)"
+      }
+    },
+    "rwkv": {
+      "1": {
+        "executable": true,
+        "prefill_s": 0.0001569000305607915,
+        "decode_tok_per_s": 690.4766026524069,
+        "total_tok_per_s": 672.2689052269911,
+        "effective_prompt_len": 1,
+        "note": "warmup + min-of-repeats; decode_tok_per_s is marginal from N vs 2N new tokens with torch.set_num_threads(1)"
+      },
+      "16": {
+        "executable": true,
+        "prefill_s": 0.017522300011478364,
+        "decode_tok_per_s": 1071.9262489158987,
+        "total_tok_per_s": 188.20075356352706,
+        "effective_prompt_len": 16,
+        "note": "warmup + min-of-repeats; decode_tok_per_s is marginal from N vs 2N new tokens with torch.set_num_threads(1)"
+      },
+      "64": {
+        "executable": true,
+        "prefill_s": 0.06234149995725602,
+        "decode_tok_per_s": 993.788812195536,
+        "total_tok_per_s": 60.27137186233155,
+        "effective_prompt_len": 64,
+        "note": "warmup + min-of-repeats; decode_tok_per_s is marginal from N vs 2N new tokens with torch.set_num_threads(1)"
+      },
+      "256": {
+        "executable": true,
+        "prefill_s": null,
+        "decode_tok_per_s": null,
+        "total_tok_per_s": 15.80137669462016,
+        "effective_prompt_len": 256,
+        "note": "warmup + min-of-repeats; decode_tok_per_s is marginal from N vs 2N new tokens with torch.set_num_threads(1)"
+      }
+    }
+  },
+  "pareto": {
+    "x_axis": "model_ppl",
+    "y_axis": "memory_bytes_and_slope",
+    "gpt_kv_slope_bytes_per_token": 1024,
+    "recurrent_state_slope_bytes_per_token": 0,
+    "rwkv_state_slope_bytes_per_token": 0,
+    "memory_winner_by_slope": "recurrent/rwkv",
+    "recurrent_break_even_prompt_len_vs_gpt": 1,
+    "rwkv_break_even_prompt_len_vs_gpt": 3,
+    "capability_reference": "gpt",
+    "capability_reference_note": "reference axis only; if unigram gate fails, this is not a publishable capability winner"
+  },
+  "caveats": [
+    "At least one model fails the unigram gate; treat this run as undertrained unless a longer schedule confirms the ranking.",
+    "GPT KV bytes beyond block_size are analytic projection only; recurrent state bytes are executable constant-state measurements."
+  ],
+  "verdict": {
+    "gpt": {
+      "passes_unigram_gate": false,
+      "ppl_ratio_vs_gpt": 1.0
+    },
+    "recurrent": {
+      "passes_unigram_gate": true,
+      "ppl_ratio_vs_gpt": 0.9770327412615514
+    },
+    "rwkv": {
+      "passes_unigram_gate": true,
+      "ppl_ratio_vs_gpt": 0.8555855769985448
+    }
+  }
+}

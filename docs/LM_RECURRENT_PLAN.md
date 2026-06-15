@@ -153,6 +153,8 @@ y = W_o · (sigmoid(r) ⊙ wkv)
   - この `256/40` は `64/120` と学習予算が非対称で、長文窓の有利不利を結論づける用途には使えない。現時点で言えるのは「比較ハーネスは `block_size=256` でも動くが、同 budget ではなお undertrained」ということだけ
   - honest 中間結論:
     - `64/120` では raw PPL は `RWKV < GPT < Recurrent` まで改善したが gate 未通過
+    - `64/160` を 2 seed で追加すると、`seed=1337` では `RWKV < Recurrent < GPT` かつ `RWKV/Recurrent` が strict gate 通過、`seed=2026` では `RWKV < GPT < Recurrent` かつ `RWKV/GPT` が strict gate 通過
     - `256/40` では全体に未収束で `GPT < Recurrent < RWKV`
-    - よって **勝者はまだ確定していない**。現段階の strongest claim は「再帰 2 系統は定数状態メモリで動作し、能力比較は学習予算に敏感で未収束」という一点に限る
+    - よって **勝者はまだ確定していない**。ただし `RWKV` は少なくとも `64/160` の 2 seed で raw PPL 最良かつ strict gate 通過を再現しており、現時点の最有力候補ではある
+    - それでも strongest claim は保守的に留める: 「再帰 2 系統は定数状態メモリで動作し、能力比較は学習予算と seed に敏感で完全には収束していない」
   - tracked pilot を横断した監査用サマリは `docs/artifacts/lm_recurrent_interim_summary.md` に集約

@@ -23,6 +23,18 @@ def _summary_run_name(stem: str) -> str:
     return stem.removeprefix("lm_recurrent_")
 
 
+def _strict_gate_summary_label(result: dict[str, object]) -> str:
+    verdict = result["verdict"]
+    passed = [
+        name
+        for name in ("gpt", "recurrent", "rwkv")
+        if verdict[name]["passes_unigram_gate"]
+    ]
+    if not passed:
+        return "all fail"
+    return f"{'/'.join(passed)} pass"
+
+
 def test_tracked_recurrent_svgs_are_well_formed_xml() -> None:
     for stem in _tracked_pilot_stems():
         svg_name = f"{stem}.svg"
@@ -80,7 +92,7 @@ def test_interim_summary_snapshot_rows_match_tracked_json() -> None:
             f"| {_summary_run_name(stem)} | {cfg['block_size']} | {cfg['max_iters']} | {cfg['batch_size']} | "
             f"{reports['gpt']['model_ppl']:.3f} | {reports['recurrent']['model_ppl']:.3f} | "
             f"{reports['rwkv']['model_ppl']:.3f} | {reports['gpt']['unigram_ppl']:.3f} | "
-            f"{raw_order} | all fail |"
+            f"{raw_order} | {_strict_gate_summary_label(result)} |"
         )
         assert expected_row in text
 
