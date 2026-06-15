@@ -17,6 +17,9 @@ This note consolidates the currently tracked head-to-head pilot artifacts for
 - [lm_recurrent_pilot160_seed7.json](./lm_recurrent_pilot160_seed7.json)
 - [lm_recurrent_pilot160_seed7.md](./lm_recurrent_pilot160_seed7.md)
 - [lm_recurrent_pilot160_seed7.svg](./lm_recurrent_pilot160_seed7.svg)
+- [lm_recurrent_pilot240.json](./lm_recurrent_pilot240.json)
+- [lm_recurrent_pilot240.md](./lm_recurrent_pilot240.md)
+- [lm_recurrent_pilot240.svg](./lm_recurrent_pilot240.svg)
 - [lm_recurrent_pilot256_40.json](./lm_recurrent_pilot256_40.json)
 - [lm_recurrent_pilot256_40.md](./lm_recurrent_pilot256_40.md)
 - [lm_recurrent_pilot256_40.svg](./lm_recurrent_pilot256_40.svg)
@@ -31,6 +34,7 @@ Note: the `64/160` memory SVG is seed-independent because it depends on config, 
 | pilot160 | 64 | 160 | 8 | 184.804 | 180.560 | 158.116 | 215.459 | RWKV < Recurrent < GPT | recurrent/rwkv pass |
 | pilot160_seed2026 | 64 | 160 | 8 | 180.897 | 207.580 | 161.650 | 215.459 | RWKV < GPT < Recurrent | gpt/rwkv pass |
 | pilot160_seed7 | 64 | 160 | 8 | 171.710 | 187.037 | 152.733 | 215.459 | RWKV < GPT < Recurrent | gpt/rwkv pass |
+| pilot240 | 64 | 240 | 8 | 142.577 | 129.430 | 110.355 | 215.459 | RWKV < Recurrent < GPT | gpt/recurrent/rwkv pass |
 | pilot256_40 | 256 | 40 | 4 | 554.407 | 666.469 | 891.822 | 215.058 | GPT < Recurrent < RWKV | all fail |
 
 ## Readout
@@ -38,6 +42,7 @@ Note: the `64/160` memory SVG is seed-independent because it depends on config, 
 - `pilot120` is the strongest currently tracked sub-`160`-iteration run, but even there all three models fail the strict unigram gate. The raw PPL ordering is therefore provisional.
 - The three `pilot160*` runs improve enough to cross the strict unigram gate for a subset of models, but the ranking is still seed-sensitive in the GPT-vs-Recurrent slot: RWKV stays best on raw PPL in all three, while GPT and Recurrent swap order and gate status.
 - Across those three `64/160` seeds, RWKV is the only model that stays on the same side of the strict gate every time: RWKV passes `3/3`, GPT passes `2/3`, and Recurrent passes `1/3`.
+- `pilot240` shows the higher-budget direction more clearly: all three models now clear the loose strict-gate floor at the same seed (`1337`), and the raw ordering is `RWKV < Recurrent < GPT`. This is stronger evidence for RWKV under the tested budget, but it is still only one seed at `240` iterations.
 - That gate is only the deliberately loose `0.85 x unigram` floor used by the comparison harness. These pilots do not yet clear the stronger "genuinely learned char-LM" bar noted in `held_out_report_any`, so this remains an interim capability signal rather than a settled learning verdict.
 - `pilot256_40` uses a different budget and is explicitly a low-fidelity proxy. It is useful only to show that the comparison harness still runs at `block_size=256`.
 - The raw ordering changes across runs and seeds, so ranking fidelity is not yet stable enough to claim a full winner.
@@ -174,6 +179,32 @@ compare_on_text(
         seed=7,
     ),
     out_path=Path("docs/artifacts/lm_recurrent_pilot160_seed7.json"),
+)
+'@ | py -3.11 -
+```
+- `pilot240`:
+```powershell
+@'
+from pathlib import Path
+from llcore.lm.compare import CompareConfig, compare_on_text
+from llcore.lm.data import fetch_aozora_text
+
+compare_on_text(
+    fetch_aozora_text(),
+    cfg=CompareConfig(
+        block_size=64,
+        n_layer=2,
+        n_head=4,
+        n_embd=64,
+        state_size=64,
+        max_iters=240,
+        batch_size=8,
+        eval_iters=4,
+        throughput_new_tokens=4,
+        throughput_repeats=1,
+        seed=1337,
+    ),
+    out_path=Path("docs/artifacts/lm_recurrent_pilot240.json"),
 )
 '@ | py -3.11 -
 ```
