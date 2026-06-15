@@ -38,7 +38,7 @@
 - `Source Query` は本文メタ行だと TF-IDF 汚染になるため、source-query comment + loader 側メタ除去へ修正済み
 - temp fetch 検証では loader 後 top terms / `_make_label()` に `ti` `cat` `source` `query` は残らず、query 汚染遮断を確認
 - `runner._strip_skill_header()` は H1 限定へ補正し、`## Overview` 始まりの legacy summary も resume 対象に戻した
-- `libexec/raptor-rad-ingest` の `_ensure_utf8_io()` 追加は別筋の未記録差分として残存。rptr commit 時は分離要
+- `D:\tools\raptor` 側の現 dirty は `_bazue_*` 3 件削除のみで、self_evolving_agents rerun 束には混ぜない
 - 現在地点は「`self_evolving_agents` の (b) rerun 方針は承認済み、Anthropic 要約器の疎通確認も通過済み、残る主ブロッカーは rerun 本実行の人間判断待ち」という状態。最小 fetch 検証と query 汚染是正までは完了済み
 - 現在の既存 dirty は、別件の未追跡 `research/highdim_evolution/make_hd1_null_viz.py` のみ。これは今回作業の対象外
 - 次は `verified_safe_learning` / `self_evolving_agents` の人間判断待ちを処理するか、人間判断なしで進めるなら `(b)` rerun 本実行の判断回収と準備再開へ進む
