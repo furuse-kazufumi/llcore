@@ -10,11 +10,13 @@ from llcore.lm.eval import (
     held_out_nll,
     held_out_perplexity,
     held_out_report,
+    held_out_report_any,
     passes_gate,
     unigram_nll,
     unigram_perplexity,
 )
 from llcore.lm.model import CharGPT, GPTConfig
+from llcore.lm.recurrent import RecurrentConfig, RecurrentLM
 
 
 def test_unigram_nll_matches_hand_computation() -> None:
@@ -73,6 +75,26 @@ def test_held_out_report_scores_same_token_count() -> None:
     # aligned unigram ~ full-set unigram (unigram is position-independent / i.i.d.)
     full = unigram_nll(train, val, vocab_size=8)
     assert abs(r["unigram_nll"] - full) < 0.15
+
+
+def test_held_out_report_any_matches_gpt_specific_report() -> None:
+    cfg = GPTConfig(vocab_size=8, block_size=8, n_layer=1, n_head=2, n_embd=16)
+    model = CharGPT(cfg)
+    train = torch.randint(0, 8, (400,))
+    val = torch.randint(0, 8, (200,))
+    specific = held_out_report(model, train, val, vocab_size=8, block_size=8)
+    generic = held_out_report_any(model, train, val, vocab_size=8, block_size=8)
+    assert specific == generic
+
+
+def test_held_out_report_any_supports_recurrent_lm() -> None:
+    cfg = RecurrentConfig(vocab_size=8, block_size=8, n_layer=1, n_embd=16, state_size=12)
+    model = RecurrentLM(cfg)
+    train = torch.randint(0, 8, (400,))
+    val = torch.randint(0, 8, (200,))
+    report = held_out_report_any(model, train, val, vocab_size=8, block_size=8)
+    assert report["n_tokens"] > 0
+    assert math.isfinite(report["model_nll"])
 
 
 def test_held_out_report_model_beats_unigram_on_pattern() -> None:

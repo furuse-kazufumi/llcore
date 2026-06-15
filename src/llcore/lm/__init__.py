@@ -18,6 +18,7 @@ from llcore.lm.eval import (
     held_out_nll,
     held_out_perplexity,
     held_out_report,
+    held_out_report_any,
     passes_gate,
     unigram_nll,
     unigram_perplexity,
@@ -31,6 +32,7 @@ from llcore.lm.model import (
     GPTConfig,
     NewGELU,
 )
+from llcore.lm.recurrent import RecurrentConfig, RecurrentLM
 from llcore.lm.tokenizer import CharTokenizer
 from llcore.lm.trainer import TrainConfig, Trainer
 
@@ -41,6 +43,8 @@ __all__ = [
     "CharTokenizer",
     "GPTConfig",
     "NewGELU",
+    "RecurrentConfig",
+    "RecurrentLM",
     "TrainConfig",
     "Trainer",
     "encode_corpus",
@@ -51,6 +55,7 @@ __all__ = [
     "held_out_nll",
     "held_out_perplexity",
     "held_out_report",
+    "held_out_report_any",
     "is_degenerate",
     "passes_gate",
     "save_viz_json",

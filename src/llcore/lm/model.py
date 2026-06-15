@@ -240,6 +240,9 @@ class CharGPT(nn.Module):
             )
         return logits, loss
 
+    def forward_logits(self, idx: torch.Tensor) -> torch.Tensor:
+        return cast(torch.Tensor, self(idx)[0])
+
     @torch.no_grad()
     def generate(
         self,

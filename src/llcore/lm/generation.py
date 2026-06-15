@@ -7,14 +7,25 @@ non-degeneracy check on a generated sample (:func:`is_degenerate`).
 """
 from __future__ import annotations
 
+from typing import Protocol
+
 import torch
 
-from llcore.lm.model import CharGPT
 from llcore.lm.tokenizer import CharTokenizer
 
 
+class SupportsGenerate(Protocol):
+    def generate(
+        self,
+        idx: torch.Tensor,
+        max_new_tokens: int,
+        temperature: float = 1.0,
+        top_k: int | None = None,
+    ) -> torch.Tensor: ...
+
+
 def generate_text(
-    model: CharGPT,
+    model: SupportsGenerate,
     tokenizer: CharTokenizer,
     prompt: str,
     max_new_tokens: int,

@@ -7,14 +7,21 @@ CPU-only. The LR schedule and optimizer parameter grouping follow nanoGPT: matmu
 from __future__ import annotations
 
 import math
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from dataclasses import dataclass
+from typing import Any, Protocol
 
 import torch
 
 from llcore.lm.data import get_batch
+from llcore.lm.eval import TrainableLM as EvalTrainableLM
 from llcore.lm.eval import estimate_loss
-from llcore.lm.model import CharGPT
+
+
+class TrainableLM(EvalTrainableLM, Protocol):
+    config: Any
+
+    def parameters(self) -> Iterator[torch.Tensor]: ...
 
 
 @dataclass
@@ -43,7 +50,7 @@ EvalHook = Callable[[int, float, float], None]
 class Trainer:
     """Trains a :class:`CharGPT` on a 1-D id tensor, tracking held-out loss."""
 
-    def __init__(self, model: CharGPT, config: TrainConfig | None = None) -> None:
+    def __init__(self, model: TrainableLM, config: TrainConfig | None = None) -> None:
         self.model = model
         self.cfg = config or TrainConfig()
         self.optimizer = self._configure_optimizer()
@@ -96,9 +103,9 @@ class Trainer:
                 group["lr"] = lr
             x, y = get_batch(train_ids, block, cfg.batch_size, self.batch_gen)
             _, loss = self.model(x, y)
-            assert loss is not None
+            assert isinstance(loss, torch.Tensor)
             self.optimizer.zero_grad(set_to_none=True)
-            loss.backward()
+            loss.backward()  # type: ignore[no-untyped-call]
             if cfg.grad_clip > 0:
                 torch.nn.utils.clip_grad_norm_(self.model.parameters(), cfg.grad_clip)
             self.optimizer.step()

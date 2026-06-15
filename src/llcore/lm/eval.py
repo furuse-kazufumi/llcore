@@ -9,12 +9,28 @@ the unigram baseline by a clear margin (see :func:`passes_gate`).
 from __future__ import annotations
 
 import math
+from typing import Protocol
 
 import torch
 from torch.nn import functional as F
 
 from llcore.lm.data import get_batch
-from llcore.lm.model import CharGPT
+
+
+class SupportsForwardLogits(Protocol):
+    training: bool
+
+    def eval(self) -> SupportsForwardLogits: ...
+
+    def train(self, mode: bool = True) -> SupportsForwardLogits: ...
+
+    def forward_logits(self, idx: torch.Tensor) -> torch.Tensor: ...
+
+
+class TrainableLM(SupportsForwardLogits, Protocol):
+    def __call__(
+        self, idx: torch.Tensor, targets: torch.Tensor | None = None
+    ) -> tuple[torch.Tensor, torch.Tensor | None]: ...
 
 
 def unigram_nll(
@@ -46,7 +62,7 @@ def unigram_perplexity(
 
 @torch.no_grad()
 def held_out_nll(
-    model: CharGPT,
+    model: TrainableLM,
     val_ids: torch.Tensor,
     block_size: int,
     batch_size: int = 32,
@@ -81,7 +97,7 @@ def held_out_nll(
 
 
 def held_out_perplexity(
-    model: CharGPT,
+    model: TrainableLM,
     val_ids: torch.Tensor,
     block_size: int,
     batch_size: int = 32,
@@ -92,7 +108,7 @@ def held_out_perplexity(
 
 @torch.no_grad()
 def estimate_loss(
-    model: CharGPT,
+    model: TrainableLM,
     data: torch.Tensor,
     block_size: int,
     batch_size: int,
@@ -115,7 +131,7 @@ def estimate_loss(
 
 @torch.no_grad()
 def held_out_report(
-    model: CharGPT,
+    model: TrainableLM,
     train_ids: torch.Tensor,
     val_ids: torch.Tensor,
     vocab_size: int,
@@ -156,6 +172,52 @@ def held_out_report(
         total_tok += int(flat_y.numel())
     if was_training:
         model.train()
+    model_nll = total_model / total_tok
+    unigram_nll_aligned = total_unigram / total_tok
+    return {
+        "model_nll": model_nll,
+        "unigram_nll": unigram_nll_aligned,
+        "model_ppl": math.exp(model_nll),
+        "unigram_ppl": math.exp(unigram_nll_aligned),
+        "n_tokens": float(total_tok),
+    }
+
+
+@torch.no_grad()
+def held_out_report_any(
+    model: SupportsForwardLogits,
+    train_ids: torch.Tensor,
+    val_ids: torch.Tensor,
+    vocab_size: int,
+    block_size: int,
+    batch_size: int = 32,
+    alpha: float = 1.0,
+) -> dict[str, float]:
+    """Protocol-based variant of :func:`held_out_report` for GPT and recurrent LMs."""
+    was_training = model.training
+    model.eval()
+    counts = torch.bincount(train_ids, minlength=vocab_size).double()
+    probs = (counts + alpha) / (train_ids.numel() + alpha * vocab_size)
+    logp = torch.log(probs)
+    n = val_ids.size(0)
+    starts = list(range(0, n - block_size, block_size))
+    if not starts:
+        raise ValueError(f"val length {n} too small for block_size {block_size}")
+    total_model = 0.0
+    total_unigram = 0.0
+    total_tok = 0
+    for s in range(0, len(starts), batch_size):
+        idxs = starts[s : s + batch_size]
+        x = torch.stack([val_ids[i : i + block_size] for i in idxs])
+        y = torch.stack([val_ids[i + 1 : i + 1 + block_size] for i in idxs])
+        logits = model.forward_logits(x)
+        flat_y = y.reshape(-1)
+        total_model += float(
+            F.cross_entropy(logits.view(-1, logits.size(-1)), flat_y, reduction="sum").item()
+        )
+        total_unigram += float(-logp[flat_y].sum().item())
+        total_tok += int(flat_y.numel())
+    model.train(was_training)
     model_nll = total_model / total_tok
     unigram_nll_aligned = total_unigram / total_tok
     return {
