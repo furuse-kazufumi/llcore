@@ -56,9 +56,9 @@ for rho in [0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0]:
 # boundary rho=1 (bold)
 p.append(f'<line x1="{x0}" y1="{yb:.1f}" x2="{x1}" y2="{yb:.1f}" stroke="#b00020" stroke-width="3" stroke-dasharray="2 0"/>')
 p.append(f'<text x="{x1-8}" y="{yb-10:.1f}" font-size="16" fill="#b00020" text-anchor="end" font-weight="bold">安定の境界 ρ = 1</text>')
-# zone labels
-p.append(f'<text x="{x0+14}" y="{y0+26}" font-size="16" fill="#c0392b" font-weight="bold">暴走帯（ρ ≥ 1：エコーが発散）</text>')
-p.append(f'<text x="{x0+14}" y="{y1-14}" font-size="16" fill="#278a3d" font-weight="bold">安全帯（ρ &lt; 1：記憶が減衰＝安定）</text>')
+# zone labels (placed in verified-empty areas: 暴走帯 top-right, 安全帯 bottom-left)
+p.append(f'<text x="{x1-12}" y="{y0+24}" font-size="16" fill="#c0392b" text-anchor="end" font-weight="bold">暴走帯（ρ ≥ 1：エコーが発散）</text>')
+p.append(f'<text x="{x0+12}" y="{y1-12}" font-size="16" fill="#278a3d" font-weight="bold">安全帯（ρ &lt; 1：記憶が減衰＝安定）</text>')
 # x ticks
 for i, n in enumerate(NS):
     xx = X(i)
