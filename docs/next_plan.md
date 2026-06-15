@@ -1,6 +1,6 @@
 # next_plan (正本) — EXIT 時点の再開地点
 
-> 最終更新: 2026-06-16 (LM recurrent は verdict packet 完成・loop_ledger 追跡解除を上位承認として優先)
+> 最終更新: 2026-06-16 (LM recurrent の canonical 化と loop_ledger 追跡解除は完了済み。残る人間ゲートは corpus staging 側)
 > SESSION_SUMMARY.md は Stop hook で自動上書きされるため、**このファイルが再開の正本**。
 > hook 非管理の再開ポインタ: `docs/PROGRESS.md`
 
@@ -40,12 +40,11 @@
   - `INDEX.md` の Document Types 件数を 2421 → 807 に補正
   - `INDEX.md` のトップレベルリンクを `\` → `/` に修正
   - `D:\tools\raptor\packages\corpus2skill\writer.py` も同修正を反映し再発防止
-  - `D:\docs\self_evolving_agents_corpus_v2.staging\_STAGING_META\DECISIONS.md` に semantic quality 低下、`OPENAI_API_KEY` 未設定、外部パス配置理由、人間ゲート 3 択を追記
+  - `D:\docs\self_evolving_agents_corpus_v2.staging\_STAGING_META\DECISIONS.md` に semantic quality 低下、`OPENAI_API_KEY` 未設定、外部パス配置理由、当時の人間ゲート候補を追記
   - `docs/SESSION_SUMMARY.md` は正本ポインタのみに縮退
 - 未着手:
   - `self_evolving_agents` の semantic quality 改善 rerun を staging 名で本実行
   - 2 つの staging の publish
-  - API キー復旧
 
 ### 今回追加で進めた内容 (2026-06-13 継続)
 
@@ -232,7 +231,7 @@
   - したがって `git rm` 前に、少なくとも上記 docs/tests の参照先を共有 SVG へ張り替えた後で grep 再確認する
 - 不承認なら、削除を伴わない範囲（文言・注記・将来方針）だけで整合を維持する
 - 2026-06-16 追記:
-  - `docs/LM_RECURRENT_PLAN.md` の到達点整理を commit しようとした時点では `git commit` が `.git/index.lock` で停止したが、再確認時には lock は消滅しており、**lock 解除の手動削除**は不要になった（duplicate SVG の物理削除承認は引き続き保留）
+  - `docs/LM_RECURRENT_PLAN.md` の到達点整理を commit しようとした時点では `git commit` が `.git/index.lock` で停止したが、再確認時には lock は消滅しており、**lock 解除の手動削除**は不要になった（これは duplicate SVG 物理削除がまだ保留だった時点の監査ログ）
   - 次の local commit は **pathspec 限定**で行い、対象は `docs/LM_RECURRENT_PLAN.md` と `docs/next_plan.md` のみとする。`.llterm/loop_ledger.jsonl` は自動ログなので巻き込まない
 
 ## LM recurrent 現在地 (2026-06-16)
@@ -247,20 +246,14 @@
   - strongest claim は **「RWKV が最も再現性の高い候補」**
   - 根拠は `64/160` の 3 seed と `64/240` の 3 seed で raw PPL best / unigram floor pass を維持したこと
   - ただし GPT と Recurrent の相対順位は seed-sensitive のままで、full winner は未宣言
-- 未解決:
-  - duplicate SVG の **物理削除 (`git rm`)** は承認待ち
-  - `.llterm/loop_ledger.jsonl` は無関係 dirty として継続除外
-  - `docs/status/` は `llterm_status.svg` の生成物と判断し `.gitignore` へ退避
+- 現状態:
+  - duplicate SVG の **物理削除 (`git rm`)** は `13bcc26` で完了済み
+  - `.llterm/loop_ledger.jsonl` の追跡解除は `3d1f6ab` で完了済み
+  - `docs/status/` は `llterm_status.svg` の生成物と判断し `.gitignore` へ退避済み
 - 自律継続の境界:
   - LM recurrent 本体では、verdict packet 完成以降に**承認なしで進めるべき必須タスクは残っていない**
-  - 次に動くのは、(a) duplicate SVG の物理整理に承認が下りたとき、または (b) 追加 seed / 追加 budget / 比較基準変更の新要件が入ったとき
-  - `.llterm/loop_ledger.jsonl` の tracking 方針変更（`.gitignore` + `git rm --cached` 等）は LM recurrent 本体とは別件の repo 衛生タスクとして扱い、必要なら別途承認付きで処理する
-  - 2026-06-16 追記: `.llterm/loop_ledger.jsonl` は tracked のまま append-only dirty を再発させるため、方針候補は「ignore + `git rm --cached` で追跡解除」に収束している。これは index からの削除操作を含むため、人間承認後に別コミットで実施する
-  - 2026-06-16 追記: 承認要求は **別々に扱う**
-    1. duplicate SVG の tracked copy 削除 + 共有 SVG 参照への統一
-    2. `.llterm/loop_ledger.jsonl` の追跡解除（`.gitignore` + `git rm --cached`、runtime append を今後の commit から分離）
-    どちらも削除系/追跡解除系のため fail-closed で人間承認後にだけ実施し、**承認もコミットも分離する**
-  - 2026-06-16 追記: 上位承認を仰ぐ優先順位は `loop_ledger` 追跡解除を先、duplicate SVG 物理削除を後とする。理由は前者が毎ターン working tree を dirty にし続けるため
+  - 次に動くのは、追加 seed / 追加 budget / 比較基準変更の新要件が入ったとき
+  - `.llterm/loop_ledger.jsonl` の tracking 方針変更は LM recurrent 本体とは別件の repo 衛生タスクとして扱われ、現在は実施済み
   - 2026-06-16 追記: 今後の状態報告では「コード変更ゼロ」と「planning/doc 更新は別途あり得る」を分けて書く。working tree に `.llterm/loop_ledger.jsonl` の自動追記 dirty がある場合は、それを明示して誤読を避ける
 
 ## EXIT 再開ポインタ (2026-06-16)
