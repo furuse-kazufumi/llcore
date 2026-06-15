@@ -194,7 +194,7 @@
 
 ## 環境メモ
 
-- llcore ブランチ: `phase2a-trajectory-tube-gate` (本タスクとは独立)
+- llcore ブランチ: `phase2a-trajectory-tube-gate` (過去タスク時点の環境メモ。本ファイル内の現在地は後段「LM recurrent 現在地」を正本とする)
 - リポジトリはもともと dirty。今回この repo で触ったのは `docs/next_plan.md` / `docs/PROGRESS.md` で、query 候補の編集は repo 外 `D:\docs\...`。`assets/articles/llcore_landscape_real.svg` / `research/verified_lm_evolution/make_trajectory.py` / `.llterm/loop_ledger.jsonl` は別件 dirty
 
 ## 統合修正指示の反映メモ (2026-06-13)
@@ -229,7 +229,7 @@
   3. 変更後に `py -3.11 -m pytest tests/unit -k lm -q && py -3.11 -m mypy src/llcore/lm/ && py -3.11 -m ruff check src/llcore/lm/` を再実行
 - 不承認なら、削除を伴わない範囲（文言・注記・将来方針）だけで整合を維持する
 - 2026-06-16 追記:
-  - `docs/LM_RECURRENT_PLAN.md` の到達点整理を commit しようとした時点では `git commit` が `.git/index.lock` で停止したが、再確認時には lock は消滅しており、削除承認は不要になった
+  - `docs/LM_RECURRENT_PLAN.md` の到達点整理を commit しようとした時点では `git commit` が `.git/index.lock` で停止したが、再確認時には lock は消滅しており、**lock 解除の手動削除**は不要になった（duplicate SVG の物理削除承認は引き続き保留）
   - 次の local commit は **pathspec 限定**で行い、対象は `docs/LM_RECURRENT_PLAN.md` と `docs/next_plan.md` のみとする。`.llterm/loop_ledger.jsonl` は自動ログなので巻き込まない
 
 ## LM recurrent 現在地 (2026-06-16)
