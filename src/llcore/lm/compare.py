@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import TypeAlias
@@ -33,6 +34,9 @@ class CompareConfig:
     max_iters: int = 120
     batch_size: int = 12
     eval_iters: int = 4
+    throughput_prompt_lens: tuple[int, ...] = (1, 16, 64, 256)
+    throughput_new_tokens: int = 16
+    throughput_repeats: int = 3
     seed: int = 1337
 
     def __post_init__(self) -> None:
@@ -86,6 +90,42 @@ def constant_state_bytes(model: ConstantStateLM) -> int:
     return model.state_bytes(rwkv_state)
 
 
+def _measure_generate_tok_s(
+    model: CharGPT | RecurrentLM | RWKVLM,
+    prompt_len: int,
+    *,
+    new_tokens: int,
+    repeats: int,
+    seed: int,
+) -> dict[str, float | int | bool | str | None]:
+    if isinstance(model, CharGPT) and prompt_len > model.config.block_size:
+        return {
+            "executable": False,
+            "tok_per_s": None,
+            "effective_prompt_len": model.config.block_size,
+            "note": "prompt_len exceeds block_size; GPT would crop context in generate(), so exact throughput is omitted",
+        }
+    prompt = torch.zeros((1, prompt_len), dtype=torch.long)
+    old_threads = torch.get_num_threads()
+    try:
+        torch.set_num_threads(1)
+        best = float("inf")
+        for rep in range(repeats):
+            torch.manual_seed(seed + rep)
+            start = time.perf_counter()
+            _ = model.generate(prompt.clone(), max_new_tokens=new_tokens)
+            elapsed = time.perf_counter() - start
+            best = min(best, elapsed)
+    finally:
+        torch.set_num_threads(old_threads)
+    return {
+        "executable": True,
+        "tok_per_s": new_tokens / best if best > 0 else None,
+        "effective_prompt_len": prompt_len,
+        "note": "min-of-repeats, torch.set_num_threads(1)",
+    }
+
+
 def compare_on_text(
     text: str,
     *,
@@ -120,6 +160,7 @@ def compare_on_text(
     }
 
     lengths = [1, 16, recipe.block_size, recipe.block_size * 4]
+    gpt_slope = 2 * recipe.n_layer * recipe.n_embd * 4
     memory = {
         "notes": {
             "gpt_kv_bytes": (
@@ -128,13 +169,76 @@ def compare_on_text(
             )
         },
         "gpt_kv_bytes": {str(t): gpt_kv_bytes(gpt, t) for t in lengths},
+        "gpt_kv_slope_bytes_per_token": gpt_slope,
         "recurrent_state_bytes": constant_state_bytes(recurrent),
         "rwkv_state_bytes": constant_state_bytes(rwkv),
+        "recurrent_state_slope_bytes_per_token": 0,
+        "rwkv_state_slope_bytes_per_token": 0,
+    }
+    throughput = {
+        "notes": {
+            "method": "generate() min-of-repeats with torch.set_num_threads(1)",
+            "new_tokens": recipe.throughput_new_tokens,
+        },
+        "gpt": {
+            str(t): _measure_generate_tok_s(
+                gpt,
+                t,
+                new_tokens=recipe.throughput_new_tokens,
+                repeats=recipe.throughput_repeats,
+                seed=recipe.seed,
+            )
+            for t in recipe.throughput_prompt_lens
+        },
+        "recurrent": {
+            str(t): _measure_generate_tok_s(
+                recurrent,
+                t,
+                new_tokens=recipe.throughput_new_tokens,
+                repeats=recipe.throughput_repeats,
+                seed=recipe.seed,
+            )
+            for t in recipe.throughput_prompt_lens
+        },
+        "rwkv": {
+            str(t): _measure_generate_tok_s(
+                rwkv,
+                t,
+                new_tokens=recipe.throughput_new_tokens,
+                repeats=recipe.throughput_repeats,
+                seed=recipe.seed,
+            )
+            for t in recipe.throughput_prompt_lens
+        },
+    }
+    caveats = []
+    if any(not passes_gate(report["model_ppl"], report["unigram_ppl"]) for report in reports.values()):
+        caveats.append(
+            "At least one model fails the unigram gate; treat this run as undertrained unless a longer schedule confirms the ranking."
+        )
+    if all(not passes_gate(report["model_ppl"], report["unigram_ppl"]) for report in reports.values()):
+        caveats.append(
+            "All compared models fail the unigram gate; the capability ranking is not yet a publishable head-to-head verdict."
+        )
+    caveats.append(
+        "GPT KV bytes beyond block_size are analytic projection only; recurrent state bytes are executable constant-state measurements."
+    )
+    pareto = {
+        "x_axis": "model_ppl",
+        "y_axis": "memory_bytes_and_slope",
+        "gpt_kv_slope_bytes_per_token": gpt_slope,
+        "recurrent_state_slope_bytes_per_token": 0,
+        "rwkv_state_slope_bytes_per_token": 0,
+        "memory_winner": "recurrent/rwkv",
+        "capability_reference": "gpt",
     }
     result: dict[str, object] = {
         "config": asdict(recipe),
         "reports": reports,
         "memory": memory,
+        "throughput": throughput,
+        "pareto": pareto,
+        "caveats": caveats,
         "verdict": {
             name: {
                 "passes_unigram_gate": passes_gate(report["model_ppl"], report["unigram_ppl"]),

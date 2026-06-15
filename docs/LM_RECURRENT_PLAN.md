@@ -126,3 +126,8 @@ y = W_o · (sigmoid(r) ⊙ wkv)
   - `compare.py` には `gpt_kv_bytes` の解析投影注記、出力先親ディレクトリ作成、`n_head` 明示 config を追加
   - PowerShell の検証コマンドは glob が展開されないため、実際に通る形は `py -3.11 -m pytest tests/unit -k lm -q` を使う
   - branch 上には今回の 3 commit と無関係な既存 dirty (`.llterm/loop_ledger.jsonl`, `assets/articles/llcore_landscape_real.svg`, `docs/PROGRESS.md`, `docs/next_plan.md`, `research/verified_lm_evolution/make_trajectory.py`) が残っている。push 前に別件として分離が必要
+- 2026-06-15 compare 出力拡張:
+  - `src/llcore/lm/compare.py` は `throughput` / `pareto` / `caveats` を JSON に追加
+  - throughput は `torch.set_num_threads(1)` + min-of-repeats で収集し、`prompt_len > block_size` の GPT は **non-executable** と明示
+  - smoke (`max_iters=20`, `throughput_new_tokens=8`) では、速度は prompt が短い範囲で `RecurrentLM > GPT > RWKV`、長文では全再帰モデルが線形劣化する一方、GPT は `block_size` 超を exact には測れない
+  - この throughput smoke も capability verdict ではなく、主目的は JSON schema と disclosure の確認
