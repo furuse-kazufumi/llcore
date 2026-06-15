@@ -24,7 +24,6 @@
   - したがって duplicate SVG は承認待ちの最小単位の 1 つであり、唯一の承認待ちではない
 - 無関係 dirty は引き続き対象外:
   - tracked: `.llterm/loop_ledger.jsonl`
-  - untracked: `docs/status/`
 
 - `verified_safe_learning` staging は完了、人間ゲート待ち
 - `self_evolving_agents` staging も完了、人間ゲート待ち
@@ -40,6 +39,6 @@
 - `runner._strip_skill_header()` は H1 限定へ補正し、`## Overview` 始まりの legacy summary も resume 対象に戻した
 - `libexec/raptor-rad-ingest` の `_ensure_utf8_io()` 追加は別筋の未記録差分として残存。rptr commit 時は分離要
 - 現在地点は「(b) precision 改善 rerun の準備 + 汚染是正完了」。最小 fetch 検証も完了済み
-- 既存 dirty の `assets/articles/llcore_landscape_real.svg` / `research/verified_lm_evolution/make_trajectory.py` / `.llterm/loop_ledger.jsonl` は今回作業の対象外。次回 commit するなら docs と query 候補だけを対象に分離する
+- 現在の既存 dirty は `.llterm/loop_ledger.jsonl` のみで、今回作業の対象外。次回 commit するなら docs / query 候補と混ぜずに分離する
 - 次は人間判断待ち項目を先に処理するか、人間判断なしで進めるなら `(b)` rerun の準備(材料確認まで)を再開する
 - 再開時は `next_plan.md` の「今回追加で進めた内容」と「次の具体的な一手」から続行
