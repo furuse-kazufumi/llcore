@@ -19,6 +19,10 @@ def _tracked_pilot_stems() -> list[str]:
     return sorted(path.stem for path in ARTIFACTS_DIR.glob("lm_recurrent_pilot*.json"))
 
 
+def _summary_run_name(stem: str) -> str:
+    return stem.removeprefix("lm_recurrent_")
+
+
 def test_tracked_recurrent_svgs_are_well_formed_xml() -> None:
     for stem in _tracked_pilot_stems():
         svg_name = f"{stem}.svg"
@@ -43,17 +47,12 @@ def test_tracked_recurrent_svgs_are_well_formed_xml() -> None:
 
 def test_interim_summary_links_target_existing_tracked_artifacts() -> None:
     text = SUMMARY_PATH.read_text(encoding="utf-8")
-    for target in (
-        "./lm_recurrent_pilot120.json",
-        "./lm_recurrent_pilot120.md",
-        "./lm_recurrent_pilot120.svg",
-        "./lm_recurrent_pilot256_40.json",
-        "./lm_recurrent_pilot256_40.md",
-        "./lm_recurrent_pilot256_40.svg",
-    ):
-        assert target in text
-        resolved = (SUMMARY_PATH.parent / target.removeprefix("./")).resolve()
-        assert resolved.exists()
+    for stem in _tracked_pilot_stems():
+        for suffix in (".json", ".md", ".svg"):
+            target = f"./{stem}{suffix}"
+            assert target in text
+            resolved = (SUMMARY_PATH.parent / target.removeprefix("./")).resolve()
+            assert resolved.exists()
 
 
 def test_tracked_recurrent_markdown_matches_json_summary_values() -> None:
@@ -63,3 +62,36 @@ def test_tracked_recurrent_markdown_matches_json_summary_values() -> None:
         result = json.loads(json_path.read_text(encoding="utf-8"))
         md_text = md_path.read_text(encoding="utf-8")
         assert md_text == _render_ppl_table(result)
+
+
+def test_interim_summary_snapshot_rows_match_tracked_json() -> None:
+    text = SUMMARY_PATH.read_text(encoding="utf-8")
+    model_labels = {"gpt": "GPT", "recurrent": "Recurrent", "rwkv": "RWKV"}
+    for stem in _tracked_pilot_stems():
+        result = json.loads((ARTIFACTS_DIR / f"{stem}.json").read_text(encoding="utf-8"))
+        cfg = result["config"]
+        reports = result["reports"]
+        ordered = sorted(
+            ("gpt", "recurrent", "rwkv"),
+            key=lambda name: reports[name]["model_ppl"],
+        )
+        raw_order = " < ".join(model_labels[name] for name in ordered)
+        expected_row = (
+            f"| {_summary_run_name(stem)} | {cfg['block_size']} | {cfg['max_iters']} | {cfg['batch_size']} | "
+            f"{reports['gpt']['model_ppl']:.3f} | {reports['recurrent']['model_ppl']:.3f} | "
+            f"{reports['rwkv']['model_ppl']:.3f} | {reports['gpt']['unigram_ppl']:.3f} | "
+            f"{raw_order} | all fail |"
+        )
+        assert expected_row in text
+
+
+def test_interim_summary_reproduction_blocks_reference_tracked_outputs() -> None:
+    text = SUMMARY_PATH.read_text(encoding="utf-8")
+    for stem in _tracked_pilot_stems():
+        result = json.loads((ARTIFACTS_DIR / f"{stem}.json").read_text(encoding="utf-8"))
+        cfg = result["config"]
+        assert f'out_path=Path("docs/artifacts/{stem}.json")' in text
+        assert f"block_size={cfg['block_size']}" in text
+        assert f"max_iters={cfg['max_iters']}" in text
+        assert f"batch_size={cfg['batch_size']}" in text
+        assert f"seed={cfg['seed']}" in text
