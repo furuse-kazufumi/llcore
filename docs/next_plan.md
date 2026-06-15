@@ -261,3 +261,4 @@
     1. duplicate SVG の tracked copy 削除 + 共有 SVG 参照への統一
     2. `.llterm/loop_ledger.jsonl` の追跡解除（`.gitignore` + `git rm --cached`、runtime append を今後の commit から分離）
     どちらも削除系/追跡解除系のため fail-closed で人間承認後にだけ実施し、**承認もコミットも分離する**
+  - 2026-06-16 追記: 上位承認を仰ぐ優先順位は `loop_ledger` 追跡解除を先、duplicate SVG 物理削除を後とする。理由は前者が毎ターン working tree を dirty にし続けるため
