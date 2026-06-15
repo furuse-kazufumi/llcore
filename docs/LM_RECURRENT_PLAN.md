@@ -160,4 +160,5 @@ y = W_o · (sigmoid(r) ⊙ wkv)
     - よって **勝者はまだ確定していない**。ただし `RWKV` は `64/160` の 3 seed と `64/240` の 3 seed で raw PPL 最良を維持しており、現時点では最も再現性の高い候補である。一方で、この unigram floor 自体は比較用の緩い `0.85 x unigram` フロアであり、`64/240` でも `unigram/model_ppl` は `GPT≈1.51x/1.57x/1.66x`, `Recurrent≈1.66x/1.49x/1.55x`, `RWKV≈1.95x/1.97x/2.00x` に留まるため、「genuinely learned char-LM」の強い基準を満たしたとはまだ言わない
     - それでも strongest claim は保守的に留める: 「再帰 2 系統は定数状態メモリで動作し、能力比較は学習予算と seed に敏感で完全には収束していない」
   - tracked pilot を横断した監査用サマリは `docs/artifacts/lm_recurrent_interim_summary.md` に集約
+  - 暫定 head-to-head verdict packet は `docs/artifacts/lm_recurrent_verdict.md` に集約。現時点の strongest claim / non-claims / memory@T 参照先を 1 枚で確認できる
   - memory SVG は config 依存で byte 同一になりうるため、既存 tracked copy は監査継続性のため保持するが、今後は seed/budget を変えても identical な場合は可能なら既存の共有 SVG（例: `lm_recurrent_pilot160.svg`）を参照し、重複 SVG 追跡は増やさない

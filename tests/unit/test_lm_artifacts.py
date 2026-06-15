@@ -13,6 +13,7 @@ from llcore.lm.compare import _render_memory_curve_svg, _render_ppl_table
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ARTIFACTS_DIR = REPO_ROOT / "docs" / "artifacts"
 SUMMARY_PATH = ARTIFACTS_DIR / "lm_recurrent_interim_summary.md"
+VERDICT_PATH = ARTIFACTS_DIR / "lm_recurrent_verdict.md"
 
 
 def _tracked_pilot_stems() -> list[str]:
@@ -122,3 +123,29 @@ def test_interim_summary_reproduction_blocks_reference_tracked_outputs() -> None
         assert f"max_iters={cfg['max_iters']}" in block
         assert f"batch_size={cfg['batch_size']}" in block
         assert f"seed={cfg['seed']}" in block
+
+
+def test_verdict_doc_links_target_existing_artifacts() -> None:
+    text = VERDICT_PATH.read_text(encoding="utf-8")
+    for target in (
+        "./lm_recurrent_pilot160.json",
+        "./lm_recurrent_pilot160_seed2026.json",
+        "./lm_recurrent_pilot160_seed7.json",
+        "./lm_recurrent_pilot240.json",
+        "./lm_recurrent_pilot240_seed2026.json",
+        "./lm_recurrent_pilot240_seed7.json",
+        "./lm_recurrent_pilot256_40.json",
+        "./lm_recurrent_pilot160.svg",
+        "./lm_recurrent_pilot240.svg",
+        "./lm_recurrent_pilot256_40.svg",
+    ):
+        assert target in text
+        resolved = (VERDICT_PATH.parent / target.removeprefix("./")).resolve()
+        assert resolved.exists()
+
+
+def test_verdict_doc_states_current_rwkv_claims() -> None:
+    text = VERDICT_PATH.read_text(encoding="utf-8")
+    assert "RWKV is the most reproducible current candidate" in text
+    assert "raw PPL best in `6/6` tracked seeds" in text
+    assert "unigram-floor pass in `6/6` tracked seeds" in text
