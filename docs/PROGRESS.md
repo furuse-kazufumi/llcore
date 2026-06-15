@@ -1,6 +1,6 @@
 # PROGRESS — セッション再開ポインタ
 
-このファイルは **Stop hook 非管理** の再開ポインタ。**詳細の正本は `next_plan.md` であり、本ファイルは再開地点の要約に限定する。**
+このファイルは **Stop hook 非管理** の再開ポインタ。**再開フローの正本は `next_plan.md`** であり、本ファイルは再開地点の要約に限定する。
 
 ## 再開手順
 
@@ -10,7 +10,7 @@
 
 ## 現在の要点
 
-- **現在の主作業ブランチは `feat/lm-recurrent`**。`docs/LM_RECURRENT_PLAN.md` が進捗の正本で、tracked artifact は `docs/artifacts/lm_recurrent_*` を参照
+- **現在の主作業ブランチは `feat/lm-recurrent`**。LM recurrent 実験の正本は `docs/LM_RECURRENT_PLAN.md` と tracked artifact `docs/artifacts/lm_recurrent_*` で、再開フロー自体の正本は引き続き `next_plan.md`
 - LM recurrent 比較は **verdict packet 完成** まで到達:
   - `docs/artifacts/lm_recurrent_verdict.md` に PPL 表 / memory@T 曲線 / caveat を集約
   - strongest claim は「**RWKV が最も再現性の高い候補**」。`64/160` の 3 seed と `64/240` の 3 seed で raw PPL 最良と unigram floor 通過を維持
@@ -18,7 +18,10 @@
 - artifact/verdict 回帰保護は実装済み:
   - `tests/unit/test_lm_artifacts.py` が tracked JSON から verdict row / `6/6` claim / md / svg を再計算して照合
   - 正式 gate は `py -3.11 -m pytest tests/unit -k lm -q && py -3.11 -m mypy src/llcore/lm/ && py -3.11 -m ruff check src/llcore/lm/`
-- 承認待ちは **削除を伴う duplicate SVG 整理**のみ。文言・共有参照・監査リスト更新までは反映済みで、物理削除 (`git rm`) は未実行
+- 承認待ちは複数ある:
+  - LM recurrent では **削除を伴う duplicate SVG 整理**が未承認のまま
+  - 別ストリームでは `verified_safe_learning` / `self_evolving_agents` staging の人間ゲート待ちも継続中
+  - したがって duplicate SVG は承認待ちの最小単位の 1 つであり、唯一の承認待ちではない
 - 無関係 dirty は引き続き対象外:
   - tracked: `.llterm/loop_ledger.jsonl`
   - untracked: `docs/status/`
