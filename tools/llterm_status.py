@@ -161,7 +161,7 @@ def build():
     ly = card(LX, ly, LW, "直近の活動（コミット）")
     for it in pulse:
         P.append(f'<text x="{LX+4}" y="{ly}" font-size="13.5" fill="#1565c0" font-family="Consolas,monospace">{esc(it["time"])}</text>')
-        seg = wrap(it["summary"], 28)
+        seg = wrap(it["summary"], 54)
         P.append(f'<text x="{LX+92}" y="{ly}" font-size="14.5" fill="#333">{esc(seg[0])}</text>')
         ly += 21
         for extra in seg[1:]:
