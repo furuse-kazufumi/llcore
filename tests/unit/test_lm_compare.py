@@ -67,6 +67,8 @@ def test_compare_on_text_creates_parent_output_dir(tmp_path: Path) -> None:
     svg_text = out_path.with_suffix(".svg").read_text(encoding="utf-8")
     assert "<svg" in svg_text
     assert "stroke-dasharray=\"8 6\"" in svg_text
+    assert "GPT KV (measured)" in svg_text
+    assert "GPT KV (projection)" in svg_text
     gpt_polylines = re.findall(r'<polyline fill="none" stroke="#2563eb"[^>]* points="([^"]+)"', svg_text)
     assert len(gpt_polylines) >= 2
     measured_points = gpt_polylines[0].split()

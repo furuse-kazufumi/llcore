@@ -2,6 +2,7 @@
 """Lightweight integrity checks for tracked LM comparison artifacts."""
 from __future__ import annotations
 
+import re
 from pathlib import Path
 from xml.etree import ElementTree
 
@@ -20,6 +21,13 @@ def test_tracked_recurrent_svgs_are_well_formed_xml() -> None:
         assert 'stroke-dasharray="8 6"' in svg_text
         assert "GPT KV (measured)" in svg_text
         assert "GPT KV (projection)" in svg_text
+        gpt_polylines = re.findall(r'<polyline fill="none" stroke="#2563eb"[^>]* points="([^"]+)"', svg_text)
+        assert len(gpt_polylines) >= 2
+        measured_points = gpt_polylines[0].split()
+        projected_points = gpt_polylines[1].split()
+        assert len(measured_points) >= 2
+        assert len(projected_points) >= 1
+        assert measured_points[-1] == projected_points[0]
 
 
 def test_interim_summary_links_target_existing_tracked_artifacts() -> None:
