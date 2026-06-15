@@ -132,7 +132,7 @@ y = W_o · (sigmoid(r) ⊙ wkv)
   - `src/llcore/lm/compare.py` は `throughput` / `pareto` / `caveats` を JSON に追加
   - throughput は `torch.set_num_threads(1)` + warmup + min-of-repeats で収集し、`prefill_s` と `decode_tok_per_s` を分離して出力する
   - `decode_tok_per_s` は同一 prompt に対する `N` vs `2N` トークン生成時間の差分で推定し、prompt_len 依存の一回きり prefill コストを throughput 本体から切り離す
-  - tracked pilot artifact の多くは初期に `throughput_repeats=1` で採っているため、長文側の marginal decode estimate は capability/PPL ほど強くは読まない。実際、`64/240, seed=2026` の recurrent `prompt_len=256` は repeat=1 では破綻気味だったが、repeat=3 に上げると `decode_tok_per_s≈8.75`, `total_tok_per_s≈7.93` へ落ち着いた
+  - tracked pilot artifact の多くは初期に `throughput_repeats=1` で採っているため、長文側の marginal decode estimate は capability/PPL ほど強くは読まない。実際、`64/240, seed=2026` の recurrent `prompt_len=256` は repeat=1 では N vs 2N 差分推定の割り算ノイズで pathological estimate を出したが、one-off の untracked rerun で `throughput_repeats=3` に上げると `decode_tok_per_s≈8.75`, `total_tok_per_s≈7.93` へ落ち着いた。これは tracked artifact ではないため、debugging sanity check としてのみ扱う
   - `prompt_len > block_size` の GPT は **non-executable** と明示
   - `pareto` には slope 基準 winner と、GPT KV bytes 対 constant-state bytes の break-even prompt_len を追加
   - smoke (`max_iters=20`, `throughput_new_tokens=8`) では、速度は prompt が短い範囲で `RecurrentLM > GPT > RWKV`。長文側で見える低下は decode 律速ではなく **prefill 起因** として分離表示し、GPT は `block_size` 超を exact には測れない
