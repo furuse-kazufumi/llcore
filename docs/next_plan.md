@@ -264,3 +264,15 @@
     どちらも削除系/追跡解除系のため fail-closed で人間承認後にだけ実施し、**承認もコミットも分離する**
   - 2026-06-16 追記: 上位承認を仰ぐ優先順位は `loop_ledger` 追跡解除を先、duplicate SVG 物理削除を後とする。理由は前者が毎ターン working tree を dirty にし続けるため
   - 2026-06-16 追記: 今後の状態報告では「コード変更ゼロ」と「planning/doc 更新は別途あり得る」を分けて書く。working tree に `.llterm/loop_ledger.jsonl` の自動追記 dirty がある場合は、それを明示して誤読を避ける
+
+## EXIT 再開ポインタ (2026-06-16)
+
+- 新セッションは `docs/SESSION_SUMMARY.md` と本節から再開する
+- LM recurrent 本体では承認なしに進める必須タスクは残っていない
+- 次の具体的な一手は **`.llterm/loop_ledger.jsonl` 追跡解除の承認可否を確認すること**
+- 承認が下りたら:
+  1. `.gitignore` に `.llterm/loop_ledger.jsonl`（または `.llterm/`）を追加
+  2. `git rm --cached .llterm/loop_ledger.jsonl`
+  3. 上記のみを単独コミット
+- その次に duplicate SVG 物理削除の承認確認へ進む
+- 直近 gate は `py -3.11 -m pytest tests/unit -k lm -q && py -3.11 -m mypy src/llcore/lm/ && py -3.11 -m ruff check src/llcore/lm/` で exit `0`（`90 passed, 401 deselected` / `mypy success` / `ruff success`）
