@@ -142,13 +142,13 @@ y = W_o · (sigmoid(r) ⊙ wkv)
   - 再現コマンド（pilot120）:
     - `@'`
     - `from pathlib import Path; from llcore.lm.compare import CompareConfig, compare_on_text; from llcore.lm.data import fetch_aozora_text`
-    - `compare_on_text(fetch_aozora_text(), cfg=CompareConfig(block_size=64, n_layer=2, n_head=4, n_embd=64, state_size=64, max_iters=120, batch_size=8, eval_iters=4, throughput_new_tokens=4, throughput_repeats=1, seed=1337), out_path=Path("out/lm_recurrent_pilot120.json"))`
+    - `compare_on_text(fetch_aozora_text(), cfg=CompareConfig(block_size=64, n_layer=2, n_head=4, n_embd=64, state_size=64, max_iters=120, batch_size=8, eval_iters=4, throughput_new_tokens=4, throughput_repeats=1, seed=1337), out_path=Path("docs/artifacts/lm_recurrent_pilot120.json"))`
     - `'@ | py -3.11 -`
   - `block_size=256` 側の軽量 pilot (`docs/artifacts/lm_recurrent_pilot256_40.json`, summary md=`docs/artifacts/lm_recurrent_pilot256_40.md`) は `max_iters=40, batch_size=4` の low-fidelity proxy として追加。結果は `gpt_ppl≈554.4 < recurrent≈666.5 < rwkv≈891.8`、`unigram≈215.1` で 3 モデルとも strict gate 未通過
   - 再現コマンド（pilot256_40）:
     - `@'`
     - `from pathlib import Path; from llcore.lm.compare import CompareConfig, compare_on_text; from llcore.lm.data import fetch_aozora_text`
-    - `compare_on_text(fetch_aozora_text(), cfg=CompareConfig(block_size=256, n_layer=2, n_head=4, n_embd=64, state_size=64, max_iters=40, batch_size=4, eval_iters=2, throughput_new_tokens=4, throughput_repeats=1, seed=1337), out_path=Path("out/lm_recurrent_pilot256_40.json"))`
+    - `compare_on_text(fetch_aozora_text(), cfg=CompareConfig(block_size=256, n_layer=2, n_head=4, n_embd=64, state_size=64, max_iters=40, batch_size=4, eval_iters=2, throughput_new_tokens=4, throughput_repeats=1, seed=1337), out_path=Path("docs/artifacts/lm_recurrent_pilot256_40.json"))`
     - `'@ | py -3.11 -`
   - この `256/40` は `64/120` と学習予算が非対称で、長文窓の有利不利を結論づける用途には使えない。現時点で言えるのは「比較ハーネスは `block_size=256` でも動くが、同 budget ではなお undertrained」ということだけ
   - honest 中間結論:
