@@ -92,16 +92,21 @@ def cmd_train(args: argparse.Namespace) -> int:
     )
 
     preset = MODEL_PRESETS[args.config]
+    dropout = args.dropout if args.dropout is not None else float(preset["dropout"])
     model_cfg = GPTConfig(
         vocab_size=tok.vocab_size,
         block_size=int(preset["block_size"]),
         n_layer=int(preset["n_layer"]),
         n_head=int(preset["n_head"]),
         n_embd=int(preset["n_embd"]),
-        dropout=float(preset["dropout"]),
+        dropout=dropout,
     )
     model = CharGPT(model_cfg)
-    print(f"[model] {args.config}: {model.num_params(False):,} params  cfg={preset}")
+    print(
+        f"[model] {args.config}: {model.num_params(False):,} params  "
+        f"L{model_cfg.n_layer} H{model_cfg.n_head} D{model_cfg.n_embd} "
+        f"ctx{model_cfg.block_size} dropout{model_cfg.dropout}"
+    )
 
     train_cfg = TrainConfig(
         max_iters=args.max_iters,
@@ -239,6 +244,7 @@ def build_parser() -> argparse.ArgumentParser:
     t.add_argument("--corpus", choices=["shakespeare", "aozora"], default="shakespeare")
     t.add_argument("--corpus-file", default=None, help="local UTF-8 corpus (overrides --corpus)")
     t.add_argument("--config", choices=list(MODEL_PRESETS), default="smoke")
+    t.add_argument("--dropout", type=float, default=None, help="override preset dropout")
     t.add_argument("--out", default="out/lm_run")
     t.add_argument("--max-iters", type=int, default=2000)
     t.add_argument("--batch-size", type=int, default=12)

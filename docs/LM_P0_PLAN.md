@@ -106,6 +106,20 @@ tests/unit/test_lm_*.py
 
 ## 7. 次（P1）
 
-- P1: 日本語で PPL をさらに下げる（dropout 付き・iters/モデル拡大、`--config p1`）+ **学習済みモデルを
-  clean-room 3D で歩く**（`model_viz.json` を自前 Apache-2.0 ビューアでロード。bbycroft コードは非依存）。
-- P2: 進化 = NAS（アーキ/ハイパーを proxy 短学習で探索）。P3: クラウド GPU + BPE。
+### P1 ablation（2026-06-15, 日本語コーパス・honest disclosure）
+
+| 設定 | train_loss | val_loss | gap | model PPL (=exp val) |
+|---|---|---|---|---|
+| smoke dropout=0, 2000 iters | 3.24 | 3.61 | 0.37 | 36.43 |
+| smoke dropout=0, 3500 iters | 2.55 | 3.54 | 0.99（過学習） | 34.85 |
+| **smoke dropout=0.1, 3500 iters** | 2.89 | 3.46 | 0.57 | **32.40 (0.150×)** |
+
+- **教訓**: 小コーパス（289K字）では **iters を増やすだけだと train のみ下がり held-out 頭打ち＝過学習**。
+  **dropout=0.1 で過学習を抑制（gap 0.99→0.57）→ held-out 最良**。ボトルネックは反復数でなく
+  正則化/データ量（リコンの nano 予測どおり）。CLI に `--dropout` 追加。生成も改善（迷亭先生/寒月君/令嬢など漱石登場人物再現）。
+
+### P1 残り / P2 / P3
+
+- P1 残: さらなる PPL 改善（block_size 拡大・`--config p1`・データ追加）+ **学習済みモデルを clean-room
+  3D で歩く**（`model_viz.json` を自前 Apache-2.0 ビューアでロード。bbycroft コードは無ライセンス＝非依存で再実装）。
+- P2: 進化 = NAS（アーキ/ハイパーを proxy 短学習で探索）。P3: クラウド GPU + BPE + 大コーパスで質問応答級。
