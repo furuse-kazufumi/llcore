@@ -254,15 +254,8 @@ def _render_memory_curve_svg(result: dict[str, object]) -> str:
     def polyline(values: list[int]) -> str:
         return " ".join(f"{sx(t):.1f},{sy(v):.1f}" for t, v in zip(widths, values, strict=True))
 
-    throughput = cast(dict[str, object], result["throughput"])
-    gpt_throughput = cast(dict[str, dict[str, object]], throughput["gpt"])
-    executable_widths = [
-        prompt_len
-        for prompt_len in widths
-        if prompt_len in {int(key) for key in gpt_throughput}
-        and cast(bool, gpt_throughput[str(prompt_len)]["executable"])
-    ]
-    measured_limit = max(executable_widths) if executable_widths else widths[-1]
+    block_size = cast(int, cast(dict[str, object], result["config"])["block_size"])
+    measured_limit = block_size
     measured_pairs = [(t, v) for t, v in zip(widths, gpt_values, strict=True) if t <= measured_limit]
     projected_pairs = [(t, v) for t, v in zip(widths, gpt_values, strict=True) if t >= measured_limit]
 

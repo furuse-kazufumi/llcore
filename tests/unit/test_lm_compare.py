@@ -2,6 +2,7 @@
 """Tests for :mod:`llcore.lm.compare`."""
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 from llcore.lm.compare import CompareConfig, compare_on_text, gpt_kv_bytes
@@ -66,6 +67,39 @@ def test_compare_on_text_creates_parent_output_dir(tmp_path: Path) -> None:
     svg_text = out_path.with_suffix(".svg").read_text(encoding="utf-8")
     assert "<svg" in svg_text
     assert "stroke-dasharray=\"8 6\"" in svg_text
+    gpt_polylines = re.findall(r'<polyline fill="none" stroke="#2563eb"[^>]* points="([^"]+)"', svg_text)
+    assert len(gpt_polylines) >= 2
+    measured_points = gpt_polylines[0].split()
+    projected_points = gpt_polylines[1].split()
+    assert len(measured_points) == 2
+    assert len(projected_points) == 2
+    assert measured_points[-1] == projected_points[0]
+
+
+def test_compare_svg_boundary_uses_block_size_not_throughput_sweep(tmp_path: Path) -> None:
+    text = ("0123456789" * 60) + "\n"
+    out_path = tmp_path / "boundary" / "result.json"
+    compare_on_text(
+        text,
+        cfg=CompareConfig(
+            block_size=16,
+            max_iters=2,
+            eval_iters=1,
+            batch_size=4,
+            throughput_prompt_lens=(32,),
+            throughput_new_tokens=2,
+            throughput_repeats=1,
+        ),
+        out_path=out_path,
+    )
+    svg_text = out_path.with_suffix(".svg").read_text(encoding="utf-8")
+    gpt_polylines = re.findall(r'<polyline fill="none" stroke="#2563eb"[^>]* points="([^"]+)"', svg_text)
+    assert len(gpt_polylines) >= 2
+    measured_points = gpt_polylines[0].split()
+    projected_points = gpt_polylines[1].split()
+    assert len(measured_points) == 2
+    assert len(projected_points) == 2
+    assert measured_points[-1] == projected_points[0]
 
 
 def test_compare_config_validates_head_divisibility() -> None:
