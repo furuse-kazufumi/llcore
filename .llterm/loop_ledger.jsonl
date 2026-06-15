@@ -191,3 +191,8 @@
 {"ts": "2026-06-15T13:53:31.781295+00:00", "event": "turn", "cmd_id": "d994adcb-f018-4974-b15e-d9c1a6445d99", "action": "query-state", "detail": "ctx=0 used=0% cost=1.1644 err=-"}
 {"ts": "2026-06-15T14:02:35.174458+00:00", "event": "turn", "cmd_id": "d994adcb-f018-4974-b15e-d9c1a6445d99", "action": "query-state", "detail": "ctx=0 used=0% cost=1.4483 err=-"}
 {"ts": "2026-06-15T14:10:57.792259+00:00", "event": "turn", "cmd_id": "d994adcb-f018-4974-b15e-d9c1a6445d99", "action": "query-state", "detail": "ctx=0 used=0% cost=1.2302 err=-"}
+{"ts": "2026-06-15T14:19:03.545745+00:00", "event": "turn", "cmd_id": "d994adcb-f018-4974-b15e-d9c1a6445d99", "action": "query-state", "detail": "ctx=0 used=0% cost=0.9508 err=-"}
+{"ts": "2026-06-15T14:26:32.852041+00:00", "event": "turn", "cmd_id": "d994adcb-f018-4974-b15e-d9c1a6445d99", "action": "query-state", "detail": "ctx=0 used=0% cost=0.9641 err=-"}
+{"ts": "2026-06-15T14:34:00.965821+00:00", "event": "turn", "cmd_id": "d994adcb-f018-4974-b15e-d9c1a6445d99", "action": "query-state", "detail": "ctx=0 used=0% cost=1.0942 err=interrupted"}
+{"ts": "2026-06-15T14:34:00.967577+00:00", "event": "interrupted", "cmd_id": "d994adcb-f018-4974-b15e-d9c1a6445d99", "action": "inject", "detail": "emergency injection — continue with injected task"}
+{"ts": "2026-06-15T14:35:44.640375+00:00", "event": "turn", "cmd_id": "d994adcb-f018-4974-b15e-d9c1a6445d99", "action": "query-state", "detail": "ctx=0 used=0% cost=0.0000 err=-"}

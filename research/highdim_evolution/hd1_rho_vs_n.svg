@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 640" font-family="Segoe UI, Hiragino Sans, Meiryo, sans-serif">
+<rect x="0" y="0" width="1000" height="640" fill="#ffffff"/>
+<rect x="120" y="100" width="640" height="326.7" fill="#fdecea"/>
+<rect x="120" y="426.7" width="640" height="93.3" fill="#e8f5e9"/>
+<line x1="120" y1="488.9" x2="760" y2="488.9" stroke="#dddddd" stroke-width="1"/>
+<text x="108" y="493.9" font-size="15" fill="#555" text-anchor="end">0.8</text>
+<line x1="120" y1="426.7" x2="760" y2="426.7" stroke="#dddddd" stroke-width="1"/>
+<text x="108" y="431.7" font-size="15" fill="#555" text-anchor="end">1.0</text>
+<line x1="120" y1="364.4" x2="760" y2="364.4" stroke="#dddddd" stroke-width="1"/>
+<text x="108" y="369.4" font-size="15" fill="#555" text-anchor="end">1.2</text>
+<line x1="120" y1="302.2" x2="760" y2="302.2" stroke="#dddddd" stroke-width="1"/>
+<text x="108" y="307.2" font-size="15" fill="#555" text-anchor="end">1.4</text>
+<line x1="120" y1="240.0" x2="760" y2="240.0" stroke="#dddddd" stroke-width="1"/>
+<text x="108" y="245.0" font-size="15" fill="#555" text-anchor="end">1.6</text>
+<line x1="120" y1="177.8" x2="760" y2="177.8" stroke="#dddddd" stroke-width="1"/>
+<text x="108" y="182.8" font-size="15" fill="#555" text-anchor="end">1.8</text>
+<line x1="120" y1="115.6" x2="760" y2="115.6" stroke="#dddddd" stroke-width="1"/>
+<text x="108" y="120.6" font-size="15" fill="#555" text-anchor="end">2.0</text>
+<line x1="120" y1="426.7" x2="760" y2="426.7" stroke="#b00020" stroke-width="3" stroke-dasharray="2 0"/>
+<text x="752" y="416.7" font-size="16" fill="#b00020" text-anchor="end" font-weight="bold">安定の境界 ρ = 1</text>
+<text x="748" y="124" font-size="16" fill="#c0392b" text-anchor="end" font-weight="bold">暴走帯（ρ ≥ 1：エコーが発散）</text>
+<text x="132" y="508" font-size="16" fill="#278a3d" font-weight="bold">安全帯（ρ &lt; 1：記憶が減衰＝安定）</text>
+<line x1="120.0" y1="520" x2="120.0" y2="526" stroke="#888" stroke-width="1.5"/>
+<text x="120.0" y="548" font-size="17" fill="#333" text-anchor="middle">8</text>
+<line x1="280.0" y1="520" x2="280.0" y2="526" stroke="#888" stroke-width="1.5"/>
+<text x="280.0" y="548" font-size="17" fill="#333" text-anchor="middle">32</text>
+<line x1="440.0" y1="520" x2="440.0" y2="526" stroke="#888" stroke-width="1.5"/>
+<text x="440.0" y="548" font-size="17" fill="#333" text-anchor="middle">64</text>
+<line x1="600.0" y1="520" x2="600.0" y2="526" stroke="#888" stroke-width="1.5"/>
+<text x="600.0" y="548" font-size="17" fill="#333" text-anchor="middle">128</text>
+<line x1="760.0" y1="520" x2="760.0" y2="526" stroke="#888" stroke-width="1.5"/>
+<text x="760.0" y="548" font-size="17" fill="#333" text-anchor="middle">256</text>
+<line x1="120" y1="100" x2="120" y2="520" stroke="#333" stroke-width="2"/>
+<line x1="120" y1="520" x2="760" y2="520" stroke="#333" stroke-width="2"/>
+<polyline points="120.0,405.9 280.0,363.5 440.0,359.3 600.0,296.5 760.0,130.2" fill="none" stroke="#d62728" stroke-width="3.5" stroke-linejoin="round"/>
+<circle cx="120.0" cy="405.9" r="5.5" fill="#d62728" stroke="#fff" stroke-width="1.5"/>
+<circle cx="280.0" cy="363.5" r="5.5" fill="#d62728" stroke="#fff" stroke-width="1.5"/>
+<circle cx="440.0" cy="359.3" r="5.5" fill="#d62728" stroke="#fff" stroke-width="1.5"/>
+<circle cx="600.0" cy="296.5" r="5.5" fill="#d62728" stroke="#fff" stroke-width="1.5"/>
+<circle cx="760.0" cy="130.2" r="5.5" fill="#d62728" stroke="#fff" stroke-width="1.5"/>
+<polyline points="120.0,458.9 280.0,434.8 440.0,432.2 600.0,348.0 760.0,149.3" fill="none" stroke="#ff7f0e" stroke-width="3.5" stroke-linejoin="round"/>
+<circle cx="120.0" cy="458.9" r="5.5" fill="#ff7f0e" stroke="#fff" stroke-width="1.5"/>
+<circle cx="280.0" cy="434.8" r="5.5" fill="#ff7f0e" stroke="#fff" stroke-width="1.5"/>
+<circle cx="440.0" cy="432.2" r="5.5" fill="#ff7f0e" stroke="#fff" stroke-width="1.5"/>
+<circle cx="600.0" cy="348.0" r="5.5" fill="#ff7f0e" stroke="#fff" stroke-width="1.5"/>
+<circle cx="760.0" cy="149.3" r="5.5" fill="#ff7f0e" stroke="#fff" stroke-width="1.5"/>
+<polyline points="120.0,488.4 280.0,466.8 440.0,460.7 600.0,454.0 760.0,451.4" fill="none" stroke="#1f77b4" stroke-width="3.5" stroke-dasharray="6 4" stroke-linejoin="round"/>
+<circle cx="120.0" cy="488.4" r="5.5" fill="#1f77b4" stroke="#fff" stroke-width="1.5"/>
+<circle cx="280.0" cy="466.8" r="5.5" fill="#1f77b4" stroke="#fff" stroke-width="1.5"/>
+<circle cx="440.0" cy="460.7" r="5.5" fill="#1f77b4" stroke="#fff" stroke-width="1.5"/>
+<circle cx="600.0" cy="454.0" r="5.5" fill="#1f77b4" stroke="#fff" stroke-width="1.5"/>
+<circle cx="760.0" cy="451.4" r="5.5" fill="#1f77b4" stroke="#fff" stroke-width="1.5"/>
+<polyline points="120.0,471.6 280.0,470.3 440.0,467.3 600.0,458.4 760.0,453.0" fill="none" stroke="#2ca02c" stroke-width="3.5" stroke-dasharray="6 4" stroke-linejoin="round"/>
+<circle cx="120.0" cy="471.6" r="5.5" fill="#2ca02c" stroke="#fff" stroke-width="1.5"/>
+<circle cx="280.0" cy="470.3" r="5.5" fill="#2ca02c" stroke="#fff" stroke-width="1.5"/>
+<circle cx="440.0" cy="467.3" r="5.5" fill="#2ca02c" stroke="#fff" stroke-width="1.5"/>
+<circle cx="600.0" cy="458.4" r="5.5" fill="#2ca02c" stroke="#fff" stroke-width="1.5"/>
+<circle cx="760.0" cy="453.0" r="5.5" fill="#2ca02c" stroke="#fff" stroke-width="1.5"/>
+<line x1="760.0" y1="130.2" x2="774" y2="128.2" stroke="#d62728" stroke-width="1.2"/>
+<text x="778" y="133.2" font-size="15" fill="#d62728" font-weight="bold">勾配・なし → ρ≈1.95</text>
+<line x1="760.0" y1="149.3" x2="774" y2="167.3" stroke="#ff7f0e" stroke-width="1.2"/>
+<text x="778" y="172.3" font-size="15" fill="#ff7f0e" font-weight="bold">進化・なし → ρ≈1.89</text>
+<line x1="760.0" y1="451.4" x2="774" y2="449.4" stroke="#1f77b4" stroke-width="1.2"/>
+<text x="778" y="454.4" font-size="15" fill="#1f77b4" font-weight="bold">ゲートあり → ρ≈0.91</text>
+<text x="500" y="40" font-size="26" fill="#1a1a1a" text-anchor="middle" font-weight="bold">高次元で「安定」から外れていく — HD-1 実測</text>
+<text x="500" y="66" font-size="15" fill="#666" text-anchor="middle">記憶コアの ρ（縮約係数）vs 次元 n ／ シェイクスピア・4 seed 平均（result_hd1_full.json）</text>
+<text x="440" y="576" font-size="17" fill="#333" text-anchor="middle">記憶コアの次元 n （大きいほど高次元）→</text>
+<text x="34" y="310" font-size="17" fill="#333" text-anchor="middle" transform="rotate(-90 34 310)">ρ（縮約係数）— 1 未満で安定</text>
+<rect x="134" y="114" width="252" height="120" rx="8" fill="#ffffff" fill-opacity="0.9" stroke="#cccccc" stroke-width="1"/>
+<line x1="148" y1="132" x2="180" y2="132" stroke="#d62728" stroke-width="3.5"/>
+<circle cx="164" cy="132" r="5" fill="#d62728" stroke="#fff" stroke-width="1.2"/>
+<text x="190" y="137" font-size="15" fill="#333">勾配・ゲートなし</text>
+<line x1="148" y1="158" x2="180" y2="158" stroke="#ff7f0e" stroke-width="3.5"/>
+<circle cx="164" cy="158" r="5" fill="#ff7f0e" stroke="#fff" stroke-width="1.2"/>
+<text x="190" y="163" font-size="15" fill="#333">進化・ゲートなし</text>
+<line x1="148" y1="184" x2="180" y2="184" stroke="#1f77b4" stroke-width="3.5" stroke-dasharray="6 4"/>
+<circle cx="164" cy="184" r="5" fill="#1f77b4" stroke="#fff" stroke-width="1.2"/>
+<text x="190" y="189" font-size="15" fill="#333">勾配・ゲートあり(inf)</text>
+<line x1="148" y1="210" x2="180" y2="210" stroke="#2ca02c" stroke-width="3.5" stroke-dasharray="6 4"/>
+<circle cx="164" cy="210" r="5" fill="#2ca02c" stroke="#fff" stroke-width="1.2"/>
+<text x="190" y="215" font-size="15" fill="#333">進化・ゲートあり(inf)</text>
+</svg>
