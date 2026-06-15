@@ -6,8 +6,11 @@ This note consolidates the currently tracked head-to-head pilot artifacts for
 ## Tracked artifacts
 
 - [lm_recurrent_pilot120.json](./lm_recurrent_pilot120.json)
+- [lm_recurrent_pilot120.md](./lm_recurrent_pilot120.md)
+- [lm_recurrent_pilot120.svg](./lm_recurrent_pilot120.svg)
 - [lm_recurrent_pilot256_40.json](./lm_recurrent_pilot256_40.json)
 - [lm_recurrent_pilot256_40.md](./lm_recurrent_pilot256_40.md)
+- [lm_recurrent_pilot256_40.svg](./lm_recurrent_pilot256_40.svg)
 
 ## Capability snapshot
 
