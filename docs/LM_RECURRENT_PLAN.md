@@ -96,3 +96,23 @@ y = W_o · (sigmoid(r) ⊙ wkv)
 
 ## 7. 状態
 - 2026-06-15 計画確定（branch `feat/lm-recurrent`）。実装は llterm へ委譲可（本 doc を grounding に自走）。本書 = 進捗の正本。
+- 2026-06-15 Phase 1 実装完了:
+  - `src/llcore/lm/recurrent.py` に `RecurrentLM` / `RecurrentConfig` を追加
+  - `held_out_report_any` を追加し、既存 `Trainer` / `generation` ハーネスで再帰 LM が動作
+  - 因果性・定数状態・shared harness の unit test を追加済み
+- 2026-06-15 Phase 2 実装完了:
+  - `src/llcore/lm/rwkv.py` に running-max 安定化付き `RWKVLM` / `RWKVConfig` を追加
+  - step scan と teacher-forced forward の一致、因果性、定数状態の unit test を追加済み
+- 2026-06-15 head-to-head smoke 追加:
+  - `src/llcore/lm/compare.py` で GPT / Recurrent / RWKV の同一 split 比較とメモリ集計 JSON を出力可能にした
+  - smoke 出力: `out/lm_recurrent_smoke.json`
+  - smoke 条件は `block_size=64, n_layer=2, n_embd=64, max_iters=40` の短時間版で、**3 モデルとも unigram baseline に敗北** (`gpt_ppl≈586`, `recurrent≈698`, `rwkv≈921`, `unigram≈215`)
+  - したがって現時点の smoke は **能力 verdict ではなく**、「比較 API が動く」「再帰状態が GPT の `gpt_kv_bytes(T)` と異なり T 非依存である」ことの確認に留まる
+  - 確認済みメモリ定数:
+    - `RecurrentLM` state = `512 B`
+    - `RWKVLM` state = `2560 B`
+    - 同条件 GPT の解析的 KV cache は `T={1,16,64,256}` で `{1024,16384,65536,262144} B`
+  - 次の honest 課題:
+    - 学習反復を増やした本比較 (`block_size=64` と `256`) を実施
+    - `passes_gate` と `ppl_ratio_vs_gpt` が意味を持つ水準までまず GPT 自体を unigram 下へ落とす
+    - その後に Pareto verdict を更新する

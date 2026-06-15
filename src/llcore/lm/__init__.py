@@ -14,6 +14,7 @@ from llcore.lm.data import (
     get_batch,
     train_val_split,
 )
+from llcore.lm.compare import CompareConfig, compare_on_text, gpt_kv_bytes
 from llcore.lm.eval import (
     held_out_nll,
     held_out_perplexity,
@@ -42,6 +43,7 @@ __all__ = [
     "CausalSelfAttention",
     "CharGPT",
     "CharTokenizer",
+    "CompareConfig",
     "GPTConfig",
     "NewGELU",
     "RecurrentConfig",
@@ -54,7 +56,9 @@ __all__ = [
     "fetch_aozora_text",
     "fetch_tinyshakespeare",
     "generate_text",
+    "compare_on_text",
     "get_batch",
+    "gpt_kv_bytes",
     "held_out_nll",
     "held_out_perplexity",
     "held_out_report",
