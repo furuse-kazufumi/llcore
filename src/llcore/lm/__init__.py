@@ -17,6 +17,7 @@ from llcore.lm.data import (
 from llcore.lm.eval import (
     held_out_nll,
     held_out_perplexity,
+    held_out_report,
     passes_gate,
     unigram_nll,
     unigram_perplexity,
@@ -49,6 +50,7 @@ __all__ = [
     "get_batch",
     "held_out_nll",
     "held_out_perplexity",
+    "held_out_report",
     "is_degenerate",
     "passes_gate",
     "save_viz_json",

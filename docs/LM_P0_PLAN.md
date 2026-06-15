@@ -83,6 +83,29 @@ tests/unit/test_lm_*.py
 3. 本番: 日本語コーパスで `model_ppl ≤ 0.85 × unigram_ppl` + 非崩壊生成 → 4 数値 + サンプルを verdict に記録。
 4. export した JSON を再ロードしキー集合/shape がサンプルと構造一致することを確認。
 
-## 6. 状態
+## 6. 状態 / 結果
 
-- 2026-06-15 着手（branch `feat/lm-p0-char-transformer`）。本書 = 進捗の正本。
+- 2026-06-15 着手・**P0 完遂**（branch `feat/lm-p0-char-transformer`、commit fdb66fd）。
+- 実装: `src/llcore/lm/` 9 モジュール + `tests/unit/test_lm_*.py` 7 ファイル（48 tests green）/ ruff /
+  mypy strict すべてクリーン。
+- **検証結果（held-out PPL < unigram、両コーパスで PASS）**:
+
+  | コーパス | vocab | params | unigram PPL | model PPL | 比 | gate | 崩壊 |
+  |---|---|---|---|---|---|---|---|
+  | tiny-shakespeare (smoke) | 65 | 0.81M | 28.43 | 6.78 | 0.238× | PASS | False |
+  | 青空文庫「吾輩は猫である」 | 3044 | 1.19M | 215.38 | 36.43 | 0.169× | PASS | False |
+
+  - smoke は nanoGPT 既知挙動（val_loss ~1.9）と一致＝トレーナの正しさを実証。
+  - 日本語生成は「」会話・漱石語彙（主人/鼻/不平）・と云う/でしょう調を再現＝「最低限 LLM=それっぽい生成」達成。
+  - viz export: 両モデルとも tensor 57 キー・per-block スキーマが実 viz サンプルと一致、weight tying
+    （wte==lm_head バイト一致）込みで正しく出力（shakespeare 4.3MB / aozora 8.16MB の `model_viz.json`）。
+  - honest 留保: 意味的整合（QA/なぞなぞ）は未到達＝P3（クラウド GPU + BPE + 大コーパス）。CPU-nano の範囲内。
+  - held-out 評価は非重複窓（境界で文脈リセット）= モデルに**保守的**（実力より低めに出る）方向のバイアス。
+  - 敵対レビュー（gem-critic）で eval/比較の健全性を確認: critical バグ無し・全非対称性がモデルに不利方向。
+    推奨に従い `held_out_report` で **unigram をモデルと同一トークンで採点**（airtight 化）→ verdict 不変。
+
+## 7. 次（P1）
+
+- P1: 日本語で PPL をさらに下げる（dropout 付き・iters/モデル拡大、`--config p1`）+ **学習済みモデルを
+  clean-room 3D で歩く**（`model_viz.json` を自前 Apache-2.0 ビューアでロード。bbycroft コードは非依存）。
+- P2: 進化 = NAS（アーキ/ハイパーを proxy 短学習で探索）。P3: クラウド GPU + BPE。

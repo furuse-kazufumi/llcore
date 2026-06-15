@@ -9,6 +9,7 @@ import torch
 from llcore.lm.eval import (
     held_out_nll,
     held_out_perplexity,
+    held_out_report,
     passes_gate,
     unigram_nll,
     unigram_perplexity,
@@ -56,6 +57,45 @@ def test_held_out_eval_does_not_leave_model_in_eval_mode() -> None:
     model.train()
     held_out_nll(model, torch.randint(0, 8, (200,)), block_size=8)
     assert model.training is True
+
+
+def test_held_out_report_scores_same_token_count() -> None:
+    cfg = GPTConfig(vocab_size=8, block_size=8, n_layer=1, n_head=2, n_embd=16)
+    model = CharGPT(cfg)
+    train = torch.randint(0, 8, (400,))
+    val = torch.randint(0, 8, (200,))
+    r = held_out_report(model, train, val, vocab_size=8, block_size=8)
+    # model and unigram are scored on the *same* number of tokens
+    n_windows = len(range(0, 200 - 8, 8))
+    assert r["n_tokens"] == n_windows * 8
+    assert math.isclose(r["model_ppl"], math.exp(r["model_nll"]), rel_tol=1e-9)
+    assert math.isclose(r["unigram_ppl"], math.exp(r["unigram_nll"]), rel_tol=1e-9)
+    # aligned unigram ~ full-set unigram (unigram is position-independent / i.i.d.)
+    full = unigram_nll(train, val, vocab_size=8)
+    assert abs(r["unigram_nll"] - full) < 0.15
+
+
+def test_held_out_report_model_beats_unigram_on_pattern() -> None:
+    from llcore.lm.data import encode_corpus, train_val_split
+    from llcore.lm.tokenizer import CharTokenizer
+    from llcore.lm.trainer import Trainer, TrainConfig
+
+    torch.manual_seed(0)
+    text = ("0123456789" * 300) + "\n"
+    tok = CharTokenizer.from_text(text)
+    ids = encode_corpus(text, tok)
+    train_ids, val_ids = train_val_split(ids)
+    model = CharGPT(
+        GPTConfig(vocab_size=tok.vocab_size, block_size=16, n_layer=2, n_head=2, n_embd=32)
+    )
+    Trainer(
+        model,
+        TrainConfig(max_iters=250, warmup_iters=25, lr_decay_iters=250, batch_size=16,
+                    eval_interval=250, eval_iters=5),
+    ).train(train_ids, val_ids)
+    r = held_out_report(model, train_ids, val_ids, tok.vocab_size, 16)
+    assert r["model_ppl"] < r["unigram_ppl"]
+    assert passes_gate(r["model_ppl"], r["unigram_ppl"])
 
 
 def test_passes_gate() -> None:
