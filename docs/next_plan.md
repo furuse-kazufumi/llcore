@@ -231,3 +231,19 @@
 - 2026-06-16 追記:
   - `docs/LM_RECURRENT_PLAN.md` の到達点整理を commit しようとした時点では `git commit` が `.git/index.lock` で停止したが、再確認時には lock は消滅しており、削除承認は不要になった
   - 次の local commit は **pathspec 限定**で行い、対象は `docs/LM_RECURRENT_PLAN.md` と `docs/next_plan.md` のみとする。`.llterm/loop_ledger.jsonl` は自動ログなので巻き込まない
+
+## LM recurrent 現在地 (2026-06-16)
+
+- 主作業ブランチは `feat/lm-recurrent`
+- 進捗の正本:
+  - 再開フロー = `docs/next_plan.md`
+  - LM recurrent 実験内容 = `docs/LM_RECURRENT_PLAN.md`
+  - tracked artifact / verdict = `docs/artifacts/lm_recurrent_*`
+- 到達点:
+  - head-to-head verdict packet (`docs/artifacts/lm_recurrent_verdict.md`) は完成
+  - strongest claim は **「RWKV が最も再現性の高い候補」**
+  - 根拠は `64/160` の 3 seed と `64/240` の 3 seed で raw PPL best / unigram floor pass を維持したこと
+  - ただし GPT と Recurrent の相対順位は seed-sensitive のままで、full winner は未宣言
+- 未解決:
+  - duplicate SVG の **物理削除 (`git rm`)** は承認待ち
+  - `.llterm/loop_ledger.jsonl` と `docs/status/` は無関係 dirty / untracked として継続除外
