@@ -34,6 +34,11 @@ def test_compare_on_text_returns_reports_and_memory() -> None:
     assert "throughput" in result
     assert "pareto" in result
     assert isinstance(result["caveats"], list)
+    assert "decode_tok_per_s" in result["throughput"]["gpt"]["1"]
+    assert result["pareto"]["memory_winner_by_slope"] == "recurrent/rwkv"
+    recurrent_be = result["pareto"]["recurrent_break_even_prompt_len_vs_gpt"]
+    recurrent_bytes = result["memory"]["recurrent_state_bytes"]
+    assert gpt_kv_bytes(CharGPT(GPTConfig(vocab_size=8, block_size=16, n_layer=2, n_head=4, n_embd=64)), recurrent_be) >= recurrent_bytes
 
 
 def test_compare_on_text_creates_parent_output_dir(tmp_path: Path) -> None:
@@ -79,3 +84,35 @@ def test_compare_marks_gpt_prompt_above_block_size_as_non_executable() -> None:
         ),
     )
     assert result["throughput"]["gpt"]["32"]["executable"] is False
+
+
+def test_compare_uses_block_size_relative_default_prompt_lengths() -> None:
+    text = ("0123456789" * 60) + "\n"
+    result = compare_on_text(
+        text,
+        cfg=CompareConfig(
+            block_size=12,
+            max_iters=2,
+            eval_iters=1,
+            batch_size=4,
+            throughput_prompt_lens=None,
+            throughput_new_tokens=2,
+            throughput_repeats=1,
+        ),
+    )
+    assert set(result["throughput"]["gpt"]) == {"1", "16", "12", "48"}
+
+
+def test_compare_config_rejects_invalid_throughput_settings() -> None:
+    invalid_cfgs = (
+        dict(throughput_new_tokens=0),
+        dict(throughput_repeats=0),
+        dict(throughput_prompt_lens=(0,)),
+    )
+    for kwargs in invalid_cfgs:
+        try:
+            CompareConfig(**kwargs)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(f"expected ValueError for {kwargs}")

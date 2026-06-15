@@ -72,10 +72,10 @@ y = W_o · (sigmoid(r) ⊙ wkv)
 - 実測（**主**=Method 1, allocator 非依存, `@torch.no_grad()`）: `tensor_bytes(*state)` を T ステップ後に測る（再帰=定数 / GPT KV キャッシュ=増大）。補助に tracemalloc/RSS（warmup→測定、`gc.collect()`、T ごと別プロセス、ノイズ注意）。
 - **罠（必ず log）**: 必ず `no_grad`（grad 有だと全モデルが O(T) に見える偽陽性）/ PyTorch CPU allocator は解放しない→ Method 1 優先 / パラメータ重みは状態でない（別計上）/ 同能力に幅 D を要したら定数が増える（matched-width で再計算）。
 
-**(3) throughput（任意・決定的）**: `torch.set_num_threads(1)`、min-of-repeats で tok/s を `prompt_len∈{1,16,64,256,1024}` で。GPT は block_size で頭打ち、再帰は flat。
+**(3) throughput（任意・決定的）**: `torch.set_num_threads(1)`、warmup 後の min-of-repeats で測る。**prefill latency** と **marginal decode tok/s** を分離し、decode は同一 prompt に対する `N` vs `2N` トークン生成時間の差分で推定する。`prompt_len∈{1,16,block_size,4·block_size}`。GPT は `block_size` 超を exact には測らず non-executable と明記する。
 
 **(4) Pareto 判定（事前登録）**:
-- x=能力(PPL, 共有 unigram 基準), y=memory@T と**傾き(B/token)**。再帰は水平線(傾き0)、GPT は上昇線。
+- x=能力(PPL, 共有 unigram 基準), y=memory@T と**傾き(B/token)**。再帰は水平線(傾き0)、GPT は上昇線。加えて **break-even prompt_len**（GPT の解析的 KV bytes と定数 state bytes の交点）を出し、「短文では GPT の絶対 bytes が小さい場合がある」ことを隠さない。
 - **「再帰が local-AI として優れる」= 両方成立**: ①能力が大きく劣らない（`rnn_ppl ≤ gpt_ppl·1.10` かつ unigram gate 通過かつ非崩壊）、②メモリ勝ちが構造的（実測で再帰状態が T で flat、GPT は線形、解析+Method1 で確認）。
 - **「能力の代償に見合わない」**: block_size 以内で `rnn_ppl > gpt_ppl·1.10`。ただし用途が T≫block_size を要するなら別（そこでは GPT は動けない）。
 - **正直な決め台詞**: 「block_size(={64,256}) を超える文脈では GPT は不適用、再帰は定数 {~9KB} 状態で走る。block_size 以内の能力差は {X}%」。X を定量化、手を振らない。
@@ -128,6 +128,9 @@ y = W_o · (sigmoid(r) ⊙ wkv)
   - branch 上には今回の 3 commit と無関係な既存 dirty (`.llterm/loop_ledger.jsonl`, `assets/articles/llcore_landscape_real.svg`, `docs/PROGRESS.md`, `docs/next_plan.md`, `research/verified_lm_evolution/make_trajectory.py`) が残っている。push 前に別件として分離が必要
 - 2026-06-15 compare 出力拡張:
   - `src/llcore/lm/compare.py` は `throughput` / `pareto` / `caveats` を JSON に追加
-  - throughput は `torch.set_num_threads(1)` + min-of-repeats で収集し、`prompt_len > block_size` の GPT は **non-executable** と明示
-  - smoke (`max_iters=20`, `throughput_new_tokens=8`) では、速度は prompt が短い範囲で `RecurrentLM > GPT > RWKV`、長文では全再帰モデルが線形劣化する一方、GPT は `block_size` 超を exact には測れない
-  - この throughput smoke も capability verdict ではなく、主目的は JSON schema と disclosure の確認
+  - throughput は `torch.set_num_threads(1)` + warmup + min-of-repeats で収集し、`prefill_s` と `decode_tok_per_s` を分離して出力する
+  - `decode_tok_per_s` は同一 prompt に対する `N` vs `2N` トークン生成時間の差分で推定し、prompt_len 依存の一回きり prefill コストを throughput 本体から切り離す
+  - `prompt_len > block_size` の GPT は **non-executable** と明示
+  - `pareto` には slope 基準 winner と、GPT KV bytes 対 constant-state bytes の break-even prompt_len を追加
+  - smoke (`max_iters=20`, `throughput_new_tokens=8`) では、速度は prompt が短い範囲で `RecurrentLM > GPT > RWKV`。長文側で見える低下は decode 律速ではなく **prefill 起因** として分離表示し、GPT は `block_size` 超を exact には測れない
+  - 直近の throughput smoke も capability verdict ではなく、主目的は JSON schema と disclosure の確認

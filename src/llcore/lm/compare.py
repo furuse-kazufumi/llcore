@@ -34,7 +34,7 @@ class CompareConfig:
     max_iters: int = 120
     batch_size: int = 12
     eval_iters: int = 4
-    throughput_prompt_lens: tuple[int, ...] = (1, 16, 64, 256)
+    throughput_prompt_lens: tuple[int, ...] | None = None
     throughput_new_tokens: int = 16
     throughput_repeats: int = 3
     seed: int = 1337
@@ -46,6 +46,18 @@ class CompareConfig:
             raise ValueError(
                 f"n_embd ({self.n_embd}) must be divisible by n_head ({self.n_head})"
             )
+        if self.throughput_new_tokens < 1:
+            raise ValueError(
+                f"throughput_new_tokens must be >= 1, got {self.throughput_new_tokens}"
+            )
+        if self.throughput_repeats < 1:
+            raise ValueError(
+                f"throughput_repeats must be >= 1, got {self.throughput_repeats}"
+            )
+        if self.throughput_prompt_lens is not None and any(
+            prompt_len < 1 for prompt_len in self.throughput_prompt_lens
+        ):
+            raise ValueError("throughput_prompt_lens must contain only positive lengths")
 
 
 def build_models(vocab_size: int, cfg: CompareConfig) -> tuple[CharGPT, RecurrentLM, RWKVLM]:
@@ -90,6 +102,37 @@ def constant_state_bytes(model: ConstantStateLM) -> int:
     return model.state_bytes(rwkv_state)
 
 
+def _default_prompt_lens(block_size: int) -> tuple[int, ...]:
+    return (1, 16, block_size, block_size * 4)
+
+
+def _measure_generate_seconds(
+    model: CharGPT | RecurrentLM | RWKVLM,
+    prompt: torch.Tensor,
+    *,
+    new_tokens: int,
+    repeats: int,
+    seed: int,
+) -> float | None:
+    old_threads = torch.get_num_threads()
+    try:
+        torch.set_num_threads(1)
+        torch.manual_seed(seed)
+        _ = model.generate(prompt.clone(), max_new_tokens=new_tokens)
+        best = float("inf")
+        for rep in range(repeats):
+            torch.manual_seed(seed + rep + 1)
+            start = time.perf_counter()
+            _ = model.generate(prompt.clone(), max_new_tokens=new_tokens)
+            elapsed = time.perf_counter() - start
+            best = min(best, elapsed)
+    finally:
+        torch.set_num_threads(old_threads)
+    if best == float("inf"):
+        return None
+    return best
+
+
 def _measure_generate_tok_s(
     model: CharGPT | RecurrentLM | RWKVLM,
     prompt_len: int,
@@ -101,28 +144,34 @@ def _measure_generate_tok_s(
     if isinstance(model, CharGPT) and prompt_len > model.config.block_size:
         return {
             "executable": False,
-            "tok_per_s": None,
+            "prefill_s": None,
+            "decode_tok_per_s": None,
+            "total_tok_per_s": None,
             "effective_prompt_len": model.config.block_size,
             "note": "prompt_len exceeds block_size; GPT would crop context in generate(), so exact throughput is omitted",
         }
     prompt = torch.zeros((1, prompt_len), dtype=torch.long)
-    old_threads = torch.get_num_threads()
-    try:
-        torch.set_num_threads(1)
-        best = float("inf")
-        for rep in range(repeats):
-            torch.manual_seed(seed + rep)
-            start = time.perf_counter()
-            _ = model.generate(prompt.clone(), max_new_tokens=new_tokens)
-            elapsed = time.perf_counter() - start
-            best = min(best, elapsed)
-    finally:
-        torch.set_num_threads(old_threads)
+    total_short_s = _measure_generate_seconds(
+        model, prompt, new_tokens=new_tokens, repeats=repeats, seed=seed
+    )
+    total_long_s = _measure_generate_seconds(
+        model, prompt, new_tokens=new_tokens * 2, repeats=repeats, seed=seed + 1000
+    )
+    decode_tok_per_s: float | None = None
+    prefill_s: float | None = None
+    if total_short_s is not None and total_long_s is not None:
+        decode_delta_s = total_long_s - total_short_s
+        if decode_delta_s > 0:
+            decode_tok_per_s = new_tokens / decode_delta_s
+            prefill_s = max(0.0, total_short_s - (new_tokens / decode_tok_per_s))
+    total_tok_per_s = None if total_short_s is None or total_short_s <= 0 else new_tokens / total_short_s
     return {
         "executable": True,
-        "tok_per_s": new_tokens / best if best > 0 else None,
+        "prefill_s": prefill_s,
+        "decode_tok_per_s": decode_tok_per_s,
+        "total_tok_per_s": total_tok_per_s,
         "effective_prompt_len": prompt_len,
-        "note": "min-of-repeats, torch.set_num_threads(1)",
+        "note": "warmup + min-of-repeats; decode_tok_per_s is marginal from N vs 2N new tokens with torch.set_num_threads(1)",
     }
 
 
@@ -159,8 +208,10 @@ def compare_on_text(
         "rwkv": held_out_report_any(rwkv, train_ids, val_ids, tok.vocab_size, block_size=recipe.block_size),
     }
 
-    lengths = [1, 16, recipe.block_size, recipe.block_size * 4]
-    gpt_slope = 2 * recipe.n_layer * recipe.n_embd * 4
+    lengths = list(_default_prompt_lens(recipe.block_size))
+    gpt_slope = gpt_kv_bytes(gpt, 2) - gpt_kv_bytes(gpt, 1)
+    recurrent_bytes = constant_state_bytes(recurrent)
+    rwkv_bytes = constant_state_bytes(rwkv)
     memory = {
         "notes": {
             "gpt_kv_bytes": (
@@ -170,15 +221,21 @@ def compare_on_text(
         },
         "gpt_kv_bytes": {str(t): gpt_kv_bytes(gpt, t) for t in lengths},
         "gpt_kv_slope_bytes_per_token": gpt_slope,
-        "recurrent_state_bytes": constant_state_bytes(recurrent),
-        "rwkv_state_bytes": constant_state_bytes(rwkv),
+        "recurrent_state_bytes": recurrent_bytes,
+        "rwkv_state_bytes": rwkv_bytes,
         "recurrent_state_slope_bytes_per_token": 0,
         "rwkv_state_slope_bytes_per_token": 0,
     }
+    throughput_prompt_lens = (
+        recipe.throughput_prompt_lens
+        if recipe.throughput_prompt_lens is not None
+        else _default_prompt_lens(recipe.block_size)
+    )
     throughput = {
         "notes": {
-            "method": "generate() min-of-repeats with torch.set_num_threads(1)",
+            "method": "warmup + min-of-repeats with torch.set_num_threads(1)",
             "new_tokens": recipe.throughput_new_tokens,
+            "decode_estimator": "difference of total generate() time for N vs 2N new tokens on the same prompt",
         },
         "gpt": {
             str(t): _measure_generate_tok_s(
@@ -188,7 +245,7 @@ def compare_on_text(
                 repeats=recipe.throughput_repeats,
                 seed=recipe.seed,
             )
-            for t in recipe.throughput_prompt_lens
+            for t in throughput_prompt_lens
         },
         "recurrent": {
             str(t): _measure_generate_tok_s(
@@ -198,7 +255,7 @@ def compare_on_text(
                 repeats=recipe.throughput_repeats,
                 seed=recipe.seed,
             )
-            for t in recipe.throughput_prompt_lens
+            for t in throughput_prompt_lens
         },
         "rwkv": {
             str(t): _measure_generate_tok_s(
@@ -208,29 +265,36 @@ def compare_on_text(
                 repeats=recipe.throughput_repeats,
                 seed=recipe.seed,
             )
-            for t in recipe.throughput_prompt_lens
+            for t in throughput_prompt_lens
         },
     }
     caveats = []
-    if any(not passes_gate(report["model_ppl"], report["unigram_ppl"]) for report in reports.values()):
+    any_fail = any(not passes_gate(report["model_ppl"], report["unigram_ppl"]) for report in reports.values())
+    all_fail = all(not passes_gate(report["model_ppl"], report["unigram_ppl"]) for report in reports.values())
+    if any_fail and not all_fail:
         caveats.append(
             "At least one model fails the unigram gate; treat this run as undertrained unless a longer schedule confirms the ranking."
         )
-    if all(not passes_gate(report["model_ppl"], report["unigram_ppl"]) for report in reports.values()):
+    if all_fail:
         caveats.append(
             "All compared models fail the unigram gate; the capability ranking is not yet a publishable head-to-head verdict."
         )
     caveats.append(
         "GPT KV bytes beyond block_size are analytic projection only; recurrent state bytes are executable constant-state measurements."
     )
+    recurrent_break_even_prompt_len = max(1, (recurrent_bytes + gpt_slope - 1) // gpt_slope)
+    rwkv_break_even_prompt_len = max(1, (rwkv_bytes + gpt_slope - 1) // gpt_slope)
     pareto = {
         "x_axis": "model_ppl",
         "y_axis": "memory_bytes_and_slope",
         "gpt_kv_slope_bytes_per_token": gpt_slope,
         "recurrent_state_slope_bytes_per_token": 0,
         "rwkv_state_slope_bytes_per_token": 0,
-        "memory_winner": "recurrent/rwkv",
+        "memory_winner_by_slope": "recurrent/rwkv",
+        "recurrent_break_even_prompt_len_vs_gpt": recurrent_break_even_prompt_len,
+        "rwkv_break_even_prompt_len_vs_gpt": rwkv_break_even_prompt_len,
         "capability_reference": "gpt",
+        "capability_reference_note": "reference axis only; if unigram gate fails, this is not a publishable capability winner",
     }
     result: dict[str, object] = {
         "config": asdict(recipe),
