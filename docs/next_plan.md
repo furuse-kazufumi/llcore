@@ -1,6 +1,6 @@
 # next_plan (正本) — EXIT 時点の再開地点
 
-> 最終更新: 2026-06-15 ((b) rerun 準備の query 精密化まで完了)
+> 最終更新: 2026-06-16 (LM recurrent は verdict packet 完成・loop_ledger 追跡解除を上位承認として優先)
 > SESSION_SUMMARY.md は Stop hook で自動上書きされるため、**このファイルが再開の正本**。
 > hook 非管理の再開ポインタ: `docs/PROGRESS.md`
 
@@ -131,7 +131,7 @@
 6. 人間判断なしで自律継続する場合でも、この EXIT 時点では **最小検証済みなのは query 汚染遮断まで**。`queries_refined_candidate.txt` の precision 改善効果は未検証なので、同じ確認を繰り返す必要はないが、本 rerun 後に before/after の混入率と recall 低下を必ず再評価する
 7. `D:\tools\raptor` 側の `git status` を確認し、`libexec/raptor-rad-ingest` の `_ensure_utf8_io()` 差分を fetch/corpus2skill 修正と分離コミットすべきか判断する
 
-## 今回 repo 内で更新した記録
+## 今回 repo 内で更新した記録 (2026-06-13 時点)
 
 - `docs/SESSION_SUMMARY.md`
 - `docs/next_plan.md`
