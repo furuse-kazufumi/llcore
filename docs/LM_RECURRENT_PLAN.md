@@ -154,9 +154,9 @@ y = W_o · (sigmoid(r) ⊙ wkv)
   - honest 中間結論:
     - `64/120` では raw PPL は `RWKV < GPT < Recurrent` まで改善したが gate 未通過
     - `64/160` を 3 seed で見ると、`seed=1337` では `RWKV < Recurrent < GPT` かつ `RWKV/Recurrent` が unigram floor 通過、`seed=2026` と `seed=7` では `RWKV < GPT < Recurrent` かつ `RWKV/GPT` が unigram floor 通過
-    - `64/240, seed=1337` では `RWKV < Recurrent < GPT` となり、3 モデルすべてが unigram floor を通過した (`gpt≈142.6`, `recurrent≈129.4`, `rwkv≈110.4` vs `unigram≈215.5`)
+    - `64/240` を 2 seed で見ると、`seed=1337` では `RWKV < Recurrent < GPT`、`seed=2026` では `RWKV < GPT < Recurrent` となり、どちらも 3 モデルすべてが unigram floor を通過した (`gpt≈142.6/137.1`, `recurrent≈129.4/144.9`, `rwkv≈110.4/109.5` vs `unigram≈215.5`)
     - `256/40` では全体に未収束で `GPT < Recurrent < RWKV`
-    - よって **勝者はまだ確定していない**。ただし `RWKV` は `64/160` の 3 seed と `64/240, seed=1337` で raw PPL 最良を維持しており、現時点では最も再現性の高い候補である。一方で、この unigram floor 自体は比較用の緩い `0.85 x unigram` フロアであり、`64/240` でも `unigram/model_ppl` は `GPT≈1.51x`, `Recurrent≈1.66x`, `RWKV≈1.95x` に留まるため、「genuinely learned char-LM」の強い基準を満たしたとはまだ言わない
+    - よって **勝者はまだ確定していない**。ただし `RWKV` は `64/160` の 3 seed と `64/240` の 2 seed で raw PPL 最良を維持しており、現時点では最も再現性の高い候補である。一方で、この unigram floor 自体は比較用の緩い `0.85 x unigram` フロアであり、`64/240` でも `unigram/model_ppl` は `GPT≈1.51x/1.57x`, `Recurrent≈1.66x/1.49x`, `RWKV≈1.95x/1.97x` に留まるため、「genuinely learned char-LM」の強い基準を満たしたとはまだ言わない
     - それでも strongest claim は保守的に留める: 「再帰 2 系統は定数状態メモリで動作し、能力比較は学習予算と seed に敏感で完全には収束していない」
   - tracked pilot を横断した監査用サマリは `docs/artifacts/lm_recurrent_interim_summary.md` に集約
   - memory SVG は config 依存で byte 同一になりうるため、既存 tracked copy は監査継続性のため保持するが、今後は seed/budget を変えても identical な場合は可能なら既存の共有 SVG（例: `lm_recurrent_pilot160.svg`）を参照し、重複 SVG 追跡は増やさない
