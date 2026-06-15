@@ -10,7 +10,7 @@
 - LM recurrent 実装・verdict packet・tracked artifacts は完成済み
 - strongest claim は **「RWKV が最も再現性の高い候補」**、full winner は未宣言
 - LM recurrent の duplicate SVG canonical 化と `.llterm/loop_ledger.jsonl` 追跡解除はどちらも完了済み
-- 現在の repo dirty は別件の未追跡 `research/highdim_evolution/make_hd1_null_viz.py` のみ
+- 現在の repo dirty はなし（作業木 clean）
 
 未解決:
 - `verified_safe_learning` staging の publish 判断

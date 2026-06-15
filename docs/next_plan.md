@@ -194,7 +194,7 @@
 ## 環境メモ
 
 - llcore ブランチ: `phase2a-trajectory-tube-gate` (過去タスク時点の環境メモ。本ファイル内の現在地は後段「LM recurrent 現在地」を正本とする)
-- リポジトリの現 dirty は `research/highdim_evolution/make_hd1_null_viz.py` の未追跡のみ。query 候補の編集は repo 外 `D:\docs\...` で行っており、この repo の rerun 準備メモとは別管理
+- リポジトリの現 dirty はなし（作業木 clean）。query 候補の編集は repo 外 `D:\docs\...` で行っており、この repo の rerun 準備メモとは別管理
 
 ## 統合修正指示の反映メモ (2026-06-13)
 

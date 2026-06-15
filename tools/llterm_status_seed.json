@@ -16,7 +16,7 @@
   "open_issues": [
     "recurrent verdict は strongest claim が RWKV 再現性優位まで。full winner は未宣言",
     "self_evolving_agents は stopword 修正後も off-topic 混入が残存し、queries_refined_candidate.txt の効果は未検証",
-    "llcore 側の現 dirty は別件の未追跡 research/highdim_evolution/make_hd1_null_viz.py のみ",
+    "llcore 側の現 dirty は解消済みで作業木 clean",
     "raptor側 dirty は _bazue_* 3件削除のみ → self_evolving_agents rerun束には混ぜない",
     "status SVG は seed からの再生成物で、tracked 成果物ではなく docs/status/ 配下の補助可視化"
   ]
