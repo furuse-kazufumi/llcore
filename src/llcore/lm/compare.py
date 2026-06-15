@@ -295,6 +295,8 @@ def compare_on_text(
     cfg: CompareConfig | None = None,
     out_path: Path | None = None,
 ) -> dict[str, object]:
+    if out_path is not None and out_path.suffix != ".json":
+        raise ValueError(f"out_path must end with .json, got {out_path}")
     recipe = cfg or CompareConfig()
     torch.manual_seed(recipe.seed)
     tok = CharTokenizer.from_text(text)

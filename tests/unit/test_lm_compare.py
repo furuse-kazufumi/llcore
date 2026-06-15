@@ -122,3 +122,25 @@ def test_compare_config_rejects_invalid_throughput_settings() -> None:
             pass
         else:
             raise AssertionError(f"expected ValueError for {kwargs}")
+
+
+def test_compare_rejects_non_json_output_suffix(tmp_path: Path) -> None:
+    text = ("0123456789" * 60) + "\n"
+    try:
+        compare_on_text(
+            text,
+            cfg=CompareConfig(
+                block_size=16,
+                max_iters=2,
+                eval_iters=1,
+                batch_size=4,
+                throughput_prompt_lens=(1,),
+                throughput_new_tokens=2,
+                throughput_repeats=1,
+            ),
+            out_path=tmp_path / "result.svg",
+        )
+    except ValueError as exc:
+        assert ".json" in str(exc)
+    else:
+        raise AssertionError("expected compare_on_text to reject non-json out_path")

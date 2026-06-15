@@ -79,7 +79,7 @@ y = W_o · (sigmoid(r) ⊙ wkv)
 - **「再帰が local-AI として優れる」= 両方成立**: ①能力が大きく劣らない（`rnn_ppl ≤ gpt_ppl·1.10` かつ unigram gate 通過かつ非崩壊）、②メモリ勝ちが構造的（実測で再帰状態が T で flat、GPT は線形、解析+Method1 で確認）。
 - **「能力の代償に見合わない」**: block_size 以内で `rnn_ppl > gpt_ppl·1.10`。ただし用途が T≫block_size を要するなら別（そこでは GPT は動けない）。
 - **正直な決め台詞**: 「block_size(={64,256}) を超える文脈では GPT は不適用、再帰は定数 {~9KB} 状態で走る。block_size 以内の能力差は {X}%」。X を定量化、手を振らない。
-- 出力: `out/<run>/recurrent_vs_gpt.json`（capability/memory/throughput/pareto/verdict/caveats）に加え、同 stem で `*.md`（PPL 表 + caveats）と `*.svg`（memory@T 曲線）を自動生成する。`libexec/raptor-run-lifecycle` 経由。
+- 出力: `out/<run>/recurrent_vs_gpt.json`（capability/memory/throughput/pareto/verdict/caveats）に加え、同 stem で `*.md`（PPL 表 + caveats）と `*.svg`（memory@T 曲線）を自動生成する。`out_path` 契約は `.json` 固定で、他 suffix は sidecar 衝突防止のため明示拒否する。`libexec/raptor-run-lifecycle` 経由。
 
 ## 5. フェーズ / DoD
 
