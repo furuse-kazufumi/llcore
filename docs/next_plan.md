@@ -365,6 +365,7 @@
 ## ★ユーザー判断 (2026-06-16, ccr 経由) — 人間ゲート回答
 
 - **self_evolving_agents staging**: 採用 = **(b) stopword 除去 + query 絞りで再生成**（ユーザー承認・選択肢②）。そのまま publish / 手動除去 ではなく **再生成**方針。
-  - **★ブロッカー**: corpus2skill 要約器は直近の試行で失敗しており、現時点でも高品質 summary へ置換できる状態か未確認。現セッションの環境観測では `ANTHROPIC_API_KEY` は **存在**する一方、`OPENAI_API_KEY` は未設定のまま。要約器の実可用性確認が先決。
-  - 手順: API 実可用性確認 → stopword/query 調整で corpus2skill 再生成 → off-topic 混入を再確認 → publish 判断。
+  - 2026-06-16 追記: 現セッションの疎通確認で `ANTHROPIC_API_KEY` は **存在かつ有効**、`OPENAI_API_KEY` は未設定と確認した。したがって API 復旧は現時点の主ブロッカーではない。
+  - **現ブロッカー**: rerun 方針そのものは承認済みだが、`papers/` 作り直しを伴う **precision rerun 本実行** は ccr 側バッファの保留項目に残っている。実行前にこの点の人間判断を明示的に回収する。
+  - 手順: precision rerun 本実行の人間判断回収 → stopword/query 調整で corpus2skill 再生成 → off-topic 混入を再確認 → publish 判断。
 - 他の人間ゲート（verified_safe_learning publish / precision rerun 本実行 / API キー復旧）は **ccr 側バッファで保留中**（ユーザー未回答）。
