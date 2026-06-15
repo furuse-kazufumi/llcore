@@ -19,7 +19,7 @@
     "branch feat/lm-recurrent に LM無関係 dirty 残存 → push前に分離要",
     "loop最新ターンが cost=0 の inject立ち上がり → 実タスク消化かは~23:44のledgerで判定",
     "corpus2skill off-topic混入残存 + SKILL.md は API全失敗で決定論補完(意味要約未置換)",
-    "raptor側 未記録差分(raptor-rad-ingest _ensure_utf8_io) → commit時に分離要",
+    "raptor側 dirty は _bazue_* 3件削除のみ → self_evolving_agents rerun束には混ぜない",
     "PROGRESS.md/SESSION_SUMMARY.md が06-13付で2日古い(next_plan.mdは最新)"
   ]
 }
