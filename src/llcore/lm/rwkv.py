@@ -72,8 +72,8 @@ class RWKVTimeMix(nn.Module):
         r = torch.sigmoid(self.receptance(xr))
         decay = -torch.exp(self.time_decay)
 
-        q = torch.maximum(p + decay, self.time_first + k)
-        e1 = torch.exp(p + decay - q)
+        q = torch.maximum(p, self.time_first + k)
+        e1 = torch.exp(p - q)
         e2 = torch.exp(self.time_first + k - q)
         wkv = (e1 * a + e2 * v) / (e1 * b + e2)
 
@@ -242,6 +242,8 @@ class RWKVLM(nn.Module):
             raise ValueError(f"temperature must be > 0, got {temperature}")
         if idx.ndim != 2:
             raise ValueError(f"idx must be 2-D [B,T], got shape {tuple(idx.shape)}")
+        if idx.size(1) == 0:
+            raise ValueError("idx must contain at least one prompt token")
         was_training = self.training
         self.eval()
         state = self.init_state(idx.size(0), device=idx.device)

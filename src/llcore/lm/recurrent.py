@@ -172,6 +172,8 @@ class RecurrentLM(nn.Module):
             raise ValueError(f"temperature must be > 0, got {temperature}")
         if idx.ndim != 2:
             raise ValueError(f"idx must be 2-D [B,T], got shape {tuple(idx.shape)}")
+        if idx.size(1) == 0:
+            raise ValueError("idx must contain at least one prompt token")
         was_training = self.training
         self.eval()
         batch, prompt_len = idx.shape

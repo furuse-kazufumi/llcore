@@ -134,6 +134,13 @@ def test_generate_handles_context_overflow() -> None:
     assert out.shape == (1, 11)
 
 
+def test_generate_rejects_empty_prompt() -> None:
+    cfg = GPTConfig(vocab_size=8, block_size=4, n_layer=1, n_head=2, n_embd=16)
+    model = CharGPT(cfg)
+    with pytest.raises(ValueError, match="at least one prompt token"):
+        model.generate(torch.zeros((1, 0), dtype=torch.long), max_new_tokens=1)
+
+
 def test_config_validation() -> None:
     with pytest.raises(ValueError, match="divisible"):
         GPTConfig(vocab_size=8, block_size=4, n_head=3, n_embd=16)

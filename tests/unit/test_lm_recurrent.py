@@ -70,6 +70,12 @@ def test_recurrent_generate_text_works_with_shared_harness() -> None:
     assert len(sample) == 9
 
 
+def test_recurrent_generate_rejects_empty_prompt() -> None:
+    model = RecurrentLM(RecurrentConfig(vocab_size=8, block_size=8, n_layer=1, n_embd=16, state_size=12))
+    with pytest.raises(ValueError, match="at least one prompt token"):
+        model.generate(torch.zeros((1, 0), dtype=torch.long), max_new_tokens=1)
+
+
 def test_recurrent_report_any_and_trainer_integration() -> None:
     torch.manual_seed(0)
     text = ("0123456789" * 150) + "\n"

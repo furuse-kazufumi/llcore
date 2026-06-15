@@ -131,7 +131,7 @@ def estimate_loss(
 
 @torch.no_grad()
 def held_out_report(
-    model: TrainableLM,
+    model: SupportsForwardLogits,
     train_ids: torch.Tensor,
     val_ids: torch.Tensor,
     vocab_size: int,
@@ -139,48 +139,8 @@ def held_out_report(
     batch_size: int = 32,
     alpha: float = 1.0,
 ) -> dict[str, float]:
-    """Score the model and the unigram baseline on the *exact same* target tokens.
-
-    The model is evaluated over non-overlapping windows of ``val``; this function
-    scores the train-fit unigram on the identical set of target tokens (the windows'
-    ``y`` positions), so the two perplexities are an airtight apples-to-apples
-    comparison with no "different position set" caveat. Returns a dict with
-    ``model_nll``, ``unigram_nll`` (nats), their perplexities, and ``n_tokens``.
-    """
-    was_training = model.training
-    model.eval()
-    counts = torch.bincount(train_ids, minlength=vocab_size).double()
-    probs = (counts + alpha) / (train_ids.numel() + alpha * vocab_size)
-    logp = torch.log(probs)
-    n = val_ids.size(0)
-    starts = list(range(0, n - block_size, block_size))
-    if not starts:
-        raise ValueError(f"val length {n} too small for block_size {block_size}")
-    total_model = 0.0
-    total_unigram = 0.0
-    total_tok = 0
-    for s in range(0, len(starts), batch_size):
-        idxs = starts[s : s + batch_size]
-        x = torch.stack([val_ids[i : i + block_size] for i in idxs])
-        y = torch.stack([val_ids[i + 1 : i + 1 + block_size] for i in idxs])
-        logits, _ = model(x)
-        flat_y = y.reshape(-1)
-        total_model += float(
-            F.cross_entropy(logits.view(-1, logits.size(-1)), flat_y, reduction="sum").item()
-        )
-        total_unigram += float(-logp[flat_y].sum().item())
-        total_tok += int(flat_y.numel())
-    if was_training:
-        model.train()
-    model_nll = total_model / total_tok
-    unigram_nll_aligned = total_unigram / total_tok
-    return {
-        "model_nll": model_nll,
-        "unigram_nll": unigram_nll_aligned,
-        "model_ppl": math.exp(model_nll),
-        "unigram_ppl": math.exp(unigram_nll_aligned),
-        "n_tokens": float(total_tok),
-    }
+    """Backward-compatible alias of :func:`held_out_report_any`."""
+    return held_out_report_any(model, train_ids, val_ids, vocab_size, block_size, batch_size, alpha)
 
 
 @torch.no_grad()
@@ -193,7 +153,7 @@ def held_out_report_any(
     batch_size: int = 32,
     alpha: float = 1.0,
 ) -> dict[str, float]:
-    """Protocol-based variant of :func:`held_out_report` for GPT and recurrent LMs."""
+    """Score a model and the unigram baseline on the exact same held-out tokens."""
     was_training = model.training
     model.eval()
     counts = torch.bincount(train_ids, minlength=vocab_size).double()

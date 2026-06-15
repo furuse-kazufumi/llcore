@@ -54,6 +54,57 @@ def test_rwkv_forward_matches_step_scan() -> None:
     assert torch.allclose(logits, stepped, atol=1e-6)
 
 
+def test_rwkv_wkv_matches_reference_formula_without_extra_decay() -> None:
+    cfg = RWKVConfig(vocab_size=8, block_size=4, n_layer=1, n_embd=3, bias=True)
+    model = RWKVLM(cfg).eval()
+    block = model.blocks[0]
+    with torch.no_grad():
+        block.time_mixer.mix_k.fill_(1.0)
+        block.time_mixer.mix_v.fill_(1.0)
+        block.time_mixer.mix_r.fill_(1.0)
+        block.time_mixer.time_decay.fill_(0.0)
+        block.time_mixer.time_first.fill_(0.0)
+        for layer in (
+            block.time_mixer.key,
+            block.time_mixer.value,
+            block.time_mixer.receptance,
+            block.time_mixer.output,
+        ):
+            layer.weight.zero_()
+            layer.bias.zero_()
+            for i in range(cfg.n_embd):
+                layer.weight[i, i] = 1.0
+
+    x = torch.tensor([[0.1, -0.2, 0.3]])
+    prev_x = torch.zeros_like(x)
+    a = torch.tensor([[0.8, 0.4, -0.3]])
+    b = torch.tensor([[1.5, 1.2, 0.9]])
+    p = torch.tensor([[0.7, -0.1, 0.2]])
+    out, next_a, next_b, next_p = block.time_mixer.step(x, prev_x, a, b, p)
+
+    k = x
+    v = x
+    r = torch.sigmoid(x)
+    u = torch.zeros_like(x)
+    decay = -torch.exp(torch.zeros_like(x))
+    q = torch.maximum(p, u + k)
+    e1 = torch.exp(p - q)
+    e2 = torch.exp(u + k - q)
+    expected_wkv = (e1 * a + e2 * v) / (e1 * b + e2)
+    expected_out = r * expected_wkv
+
+    q2 = torch.maximum(p + decay, k)
+    e1n = torch.exp(p + decay - q2)
+    e2n = torch.exp(k - q2)
+    expected_a = e1n * a + e2n * v
+    expected_b = e1n * b + e2n
+
+    assert torch.allclose(out, expected_out, atol=1e-6)
+    assert torch.allclose(next_a, expected_a, atol=1e-6)
+    assert torch.allclose(next_b, expected_b, atol=1e-6)
+    assert torch.allclose(next_p, q2, atol=1e-6)
+
+
 def test_rwkv_state_bytes_are_constant() -> None:
     cfg = RWKVConfig(vocab_size=8, block_size=4, n_layer=3, n_embd=10)
     model = RWKVLM(cfg)
@@ -72,6 +123,12 @@ def test_rwkv_generate_text_works_with_shared_harness() -> None:
     sample = generate_text(model, tok, prompt="a", max_new_tokens=8, temperature=0.8, seed=0)
     assert sample.startswith("a")
     assert len(sample) == 9
+
+
+def test_rwkv_generate_rejects_empty_prompt() -> None:
+    model = RWKVLM(RWKVConfig(vocab_size=8, block_size=8, n_layer=1, n_embd=16))
+    with pytest.raises(ValueError, match="at least one prompt token"):
+        model.generate(torch.zeros((1, 0), dtype=torch.long), max_new_tokens=1)
 
 
 def test_rwkv_trainer_and_report_any_integration() -> None:

@@ -2,6 +2,8 @@
 """Tests for :mod:`llcore.lm.compare`."""
 from __future__ import annotations
 
+from pathlib import Path
+
 from llcore.lm.compare import CompareConfig, compare_on_text, gpt_kv_bytes
 from llcore.lm.model import CharGPT, GPTConfig
 
@@ -19,3 +21,24 @@ def test_compare_on_text_returns_reports_and_memory() -> None:
     assert set(result["reports"]) == {"gpt", "recurrent", "rwkv"}
     assert result["memory"]["recurrent_state_bytes"] > 0
     assert result["memory"]["rwkv_state_bytes"] > 0
+    assert "counterfactual projection points only" in result["memory"]["notes"]["gpt_kv_bytes"]
+
+
+def test_compare_on_text_creates_parent_output_dir(tmp_path: Path) -> None:
+    text = ("0123456789" * 60) + "\n"
+    out_path = tmp_path / "nested" / "result.json"
+    compare_on_text(
+        text,
+        cfg=CompareConfig(block_size=16, max_iters=2, eval_iters=1, batch_size=4),
+        out_path=out_path,
+    )
+    assert out_path.exists()
+
+
+def test_compare_config_validates_head_divisibility() -> None:
+    try:
+        CompareConfig(n_embd=65, n_head=4)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("expected CompareConfig to reject non-divisible n_embd")

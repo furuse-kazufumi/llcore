@@ -254,6 +254,10 @@ class CharGPT(nn.Module):
         """Autoregressively sample ``max_new_tokens`` ids, appended to ``idx``."""
         if temperature <= 0:
             raise ValueError(f"temperature must be > 0, got {temperature}")
+        if idx.ndim != 2:
+            raise ValueError(f"idx must be 2-D [B,T], got shape {tuple(idx.shape)}")
+        if idx.size(1) == 0:
+            raise ValueError("idx must contain at least one prompt token")
         was_training = self.training
         self.eval()
         for _ in range(max_new_tokens):

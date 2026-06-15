@@ -68,6 +68,7 @@ y = W_o · (sigmoid(r) ⊙ wkv)
 
 **(2) メモリ**: 
 - 解析式: `gpt_kv_bytes(T)=2·L·T·D·4`（傾き `2·L·D·4` B/token、p1 で ~18KB/char）vs `rnn_state_bytes=K·L·D·4`（**T 非依存・傾き 0**、p1 GRU で ~9KB 固定）。
+- `gpt_kv_bytes(T)` は **解析投影値**。`T > block_size` ではこの GPT 実装は構造的に実行不能であり、比較図では「反実仮想の延長線」と明記する。
 - 実測（**主**=Method 1, allocator 非依存, `@torch.no_grad()`）: `tensor_bytes(*state)` を T ステップ後に測る（再帰=定数 / GPT KV キャッシュ=増大）。補助に tracemalloc/RSS（warmup→測定、`gc.collect()`、T ごと別プロセス、ノイズ注意）。
 - **罠（必ず log）**: 必ず `no_grad`（grad 有だと全モデルが O(T) に見える偽陽性）/ PyTorch CPU allocator は解放しない→ Method 1 優先 / パラメータ重みは状態でない（別計上）/ 同能力に幅 D を要したら定数が増える（matched-width で再計算）。
 
@@ -112,7 +113,16 @@ y = W_o · (sigmoid(r) ⊙ wkv)
     - `RecurrentLM` state = `512 B`
     - `RWKVLM` state = `2560 B`
     - 同条件 GPT の解析的 KV cache は `T={1,16,64,256}` で `{1024,16384,65536,262144} B`
+    - ただし `T=256 > block_size=64` は **実行値ではなく解析投影**。この GPT 実装は `block_size` 超を実際には走れない
   - 次の honest 課題:
     - 学習反復を増やした本比較 (`block_size=64` と `256`) を実施
     - `passes_gate` と `ppl_ratio_vs_gpt` が意味を持つ水準までまず GPT 自体を unigram 下へ落とす
     - その後に Pareto verdict を更新する
+- 2026-06-15 review 反映:
+  - RWKV-4 の WKV 出力式から誤って入っていた decay 二重適用を除去し、BlinkDL 参照式へ補正
+  - 1-step 数値テストを追加し、state 更新と出力式の両方を独立参照値で回帰保護
+  - `held_out_report` / `held_out_report_any` は `forward_logits` 版へ一本化
+  - 空プロンプト `generate` は GPT / Recurrent / RWKV の 3 モデルで `ValueError` に統一
+  - `compare.py` には `gpt_kv_bytes` の解析投影注記、出力先親ディレクトリ作成、`n_head` 明示 config を追加
+  - PowerShell の検証コマンドは glob が展開されないため、実際に通る形は `py -3.11 -m pytest tests/unit -k lm -q` を使う
+  - branch 上には今回の 3 commit と無関係な既存 dirty (`.llterm/loop_ledger.jsonl`, `assets/articles/llcore_landscape_real.svg`, `docs/PROGRESS.md`, `docs/next_plan.md`, `research/verified_lm_evolution/make_trajectory.py`) が残っている。push 前に別件として分離が必要

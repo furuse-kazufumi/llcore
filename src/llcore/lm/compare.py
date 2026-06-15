@@ -27,12 +27,21 @@ class CompareConfig:
 
     block_size: int = 64
     n_layer: int = 2
+    n_head: int = 4
     n_embd: int = 64
     state_size: int = 64
     max_iters: int = 120
     batch_size: int = 12
     eval_iters: int = 4
     seed: int = 1337
+
+    def __post_init__(self) -> None:
+        if self.n_head <= 0:
+            raise ValueError(f"n_head must be > 0, got {self.n_head}")
+        if self.n_embd % self.n_head != 0:
+            raise ValueError(
+                f"n_embd ({self.n_embd}) must be divisible by n_head ({self.n_head})"
+            )
 
 
 def build_models(vocab_size: int, cfg: CompareConfig) -> tuple[CharGPT, RecurrentLM, RWKVLM]:
@@ -41,7 +50,7 @@ def build_models(vocab_size: int, cfg: CompareConfig) -> tuple[CharGPT, Recurren
             vocab_size=vocab_size,
             block_size=cfg.block_size,
             n_layer=cfg.n_layer,
-            n_head=max(1, cfg.n_embd // 32),
+            n_head=cfg.n_head,
             n_embd=cfg.n_embd,
         )
     )
@@ -112,6 +121,12 @@ def compare_on_text(
 
     lengths = [1, 16, recipe.block_size, recipe.block_size * 4]
     memory = {
+        "notes": {
+            "gpt_kv_bytes": (
+                "Analytic projection 2*L*T*D*4 bytes. Values for T > block_size are not executable "
+                "for this GPT config; they are counterfactual projection points only."
+            )
+        },
         "gpt_kv_bytes": {str(t): gpt_kv_bytes(gpt, t) for t in lengths},
         "recurrent_state_bytes": constant_state_bytes(recurrent),
         "rwkv_state_bytes": constant_state_bytes(rwkv),
@@ -129,5 +144,6 @@ def compare_on_text(
         },
     }
     if out_path is not None:
+        out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
     return result
