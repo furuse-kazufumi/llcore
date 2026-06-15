@@ -90,14 +90,17 @@ p.append(f'<text x="{W/2:.0f}" y="40" font-size="26" fill="#1a1a1a" text-anchor=
 p.append(f'<text x="{W/2:.0f}" y="66" font-size="15" fill="#666" text-anchor="middle">記憶コアの ρ（縮約係数）vs 次元 n ／ シェイクスピア・4 seed 平均（result_hd1_full.json）</text>')
 p.append(f'<text x="{(x0+x1)/2:.0f}" y="{y1+56}" font-size="17" fill="#333" text-anchor="middle">記憶コアの次元 n （大きいほど高次元）→</text>')
 p.append(f'<text x="34" y="{(y0+y1)/2:.0f}" font-size="17" fill="#333" text-anchor="middle" transform="rotate(-90 34 {(y0+y1)/2:.0f})">ρ（縮約係数）— 1 未満で安定</text>')
-# legend (horizontal strip)
-lx, ly = x0, H - 26
-for label, _, color, dash in series:
+# legend (vertical box, top-left inside plot — verified empty area for result_hd1_full.json)
+# Width is pinned for the current 4 Japanese labels; update if labels/series change materially.
+lbx, lby = x0 + 14, y0 + 14
+lbw, lbh = 252, 26 * len(series) + 16
+p.append(f'<rect x="{lbx}" y="{lby}" width="{lbw}" height="{lbh}" rx="8" fill="#ffffff" fill-opacity="0.9" stroke="#cccccc" stroke-width="1"/>')
+for j, (label, _, color, dash) in enumerate(series):
+    ry = lby + 18 + j * 26
     da = "" if dash is None else f' stroke-dasharray="{dash}"'
-    p.append(f'<line x1="{lx}" y1="{ly}" x2="{lx+34}" y2="{ly}" stroke="{color}" stroke-width="3.5"{da}/>')
-    p.append(f'<circle cx="{lx+17}" cy="{ly}" r="5" fill="{color}" stroke="#fff" stroke-width="1.2"/>')
-    p.append(f'<text x="{lx+42}" y="{ly+5}" font-size="15" fill="#333">{label}</text>')
-    lx += 42 + len(label) * 16 + 24
+    p.append(f'<line x1="{lbx+14}" y1="{ry}" x2="{lbx+46}" y2="{ry}" stroke="{color}" stroke-width="3.5"{da}/>')
+    p.append(f'<circle cx="{lbx+30}" cy="{ry}" r="5" fill="{color}" stroke="#fff" stroke-width="1.2"/>')
+    p.append(f'<text x="{lbx+56}" y="{ry+5}" font-size="15" fill="#333">{label}</text>')
 p.append('</svg>')
 
 open(OUT, "w", encoding="utf-8").write("\n".join(p))
