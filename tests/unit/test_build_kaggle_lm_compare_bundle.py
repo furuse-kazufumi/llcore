@@ -22,6 +22,16 @@ def _load_builder() -> Any:
     return module
 
 
+def _load_script(script_name: str) -> Any:
+    script = Path(__file__).resolve().parents[2] / "scripts" / script_name
+    spec = importlib.util.spec_from_file_location(script_name.replace(".py", ""), script)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"unable to load {script}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def test_build_bundle_writes_metadata_and_copies_inputs(tmp_path: Path) -> None:
     builder = _load_builder()
     corpus = tmp_path / "corpus.txt"
@@ -63,13 +73,25 @@ def test_build_bundle_writes_metadata_and_copies_inputs(tmp_path: Path) -> None:
     assert len(manifest["source_sha256"]) == 64
     assert len(manifest["runner_sha256"]) == 64
     assert len(manifest["config_sha256"]) == 64
+    assert len(manifest["license_sha256"]) == 64
+    assert len(manifest["notice_sha256"]) == 64
     assert manifest["is_private"] == "true"
     assert manifest["enable_internet"] == "false"
     assert manifest["enable_gpu"] == "false"
     assert manifest["enable_tpu"] == "false"
     assert manifest["title"] == "test-lm-compare"
-    assert set(manifest["copied_files"]) == {"corpus", "config", "metadata", "src_llcore"}
+    assert set(manifest["copied_files"]) == {
+        "corpus",
+        "config",
+        "metadata",
+        "src_llcore",
+        "license",
+        "notice",
+    }
     assert (bundle_dir / "input_corpus.txt").read_text(encoding="utf-8") == "abcabc\n"
+    assert (bundle_dir / "LICENSE").is_file()
+    assert (bundle_dir / "NOTICE").is_file()
+    assert "LICENSE-COMMERCIAL" not in (bundle_dir / "NOTICE").read_text(encoding="utf-8")
     assert (bundle_dir / "runner.py").is_file()
     assert (bundle_dir / "README.md").is_file()
     assert (bundle_dir / "bundle_manifest.json").is_file()
@@ -253,7 +275,10 @@ def test_build_bundle_rejects_weak_bundle_sentinel_directory(
             "config": "config.json",
             "metadata": "kernel-metadata.json",
             "src_llcore": "src/llcore",
+            "license": "LICENSE",
+            "notice": "NOTICE",
         },
+        "source_sha256": "0" * 64,
     }
     (bundle_dir / "bundle_manifest.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
@@ -271,6 +296,37 @@ def test_build_bundle_rejects_weak_bundle_sentinel_directory(
 
     assert rc == 2
     assert "not a recognized Kaggle bundle" in capsys.readouterr().err
+
+
+def test_preflight_rejects_tampered_license_or_notice(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    builder = _load_builder()
+    preflight = _load_script("kaggle_bundle_preflight.py")
+    corpus = tmp_path / "corpus.txt"
+    corpus.write_text("abcabc\n", encoding="utf-8")
+    bundle_dir = tmp_path / "bundle"
+
+    rc = builder.main(
+        [
+            "--bundle-dir",
+            str(bundle_dir),
+            "--corpus-file",
+            str(corpus),
+            "--kernel-id",
+            "furusekazufumi/test-lm-compare",
+            "--title",
+            "test-lm-compare",
+        ]
+    )
+    assert rc == 0
+
+    (bundle_dir / "NOTICE").write_text("tampered notice\n", encoding="utf-8")
+
+    rc = preflight.main(["--bundle-dir", str(bundle_dir)])
+
+    assert rc == 2
+    assert "NOTICE sha256 does not match" in capsys.readouterr().err
 
 
 def test_build_bundle_rejects_empty_existing_directory(
@@ -375,6 +431,18 @@ def test_generated_runner_executes_locally_on_tiny_corpus(tmp_path: Path) -> Non
     out_json = bundle_dir / "artifacts" / "lm_compare.json"
     payload = json.loads(out_json.read_text(encoding="utf-8"))
     assert set(payload["reports"]) == {"gpt", "recurrent", "rwkv"}
+
+
+def test_bundle_notice_text_rejects_unsanitized_notice(monkeypatch: Any) -> None:
+    builder = _load_builder()
+    monkeypatch.setattr(
+        builder.Path,
+        "read_text",
+        lambda self, encoding="utf-8": "Commercial licenses are also available; see LICENSE-COMMERCIALX.\n",
+    )
+
+    with pytest.raises(ValueError, match="NOTICE sanitize failed"):
+        builder._bundle_notice_text()
 
 
 def test_build_bundle_invalid_compare_config_returns_rc2(

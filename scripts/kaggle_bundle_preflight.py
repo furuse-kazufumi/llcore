@@ -25,10 +25,12 @@ REQUIRED_FILES = (
     "config.json",
     "bundle_manifest.json",
     "input_corpus.txt",
+    "LICENSE",
+    "NOTICE",
     "runner.py",
     "README.md",
 )
-REQUIRED_COPIED_FILE_KEYS = ("corpus", "config", "metadata", "src_llcore")
+REQUIRED_COPIED_FILE_KEYS = ("corpus", "config", "metadata", "src_llcore", "license", "notice")
 _BOOL_TEXT_VALUES = {"true", "false"}
 
 
@@ -86,6 +88,8 @@ def _validate_bundle_dir(bundle_dir: Path) -> dict[str, object]:
     manifest_source_sha256 = manifest.get("source_sha256")
     manifest_runner_sha256 = manifest.get("runner_sha256")
     manifest_config_sha256 = manifest.get("config_sha256")
+    manifest_license_sha256 = manifest.get("license_sha256")
+    manifest_notice_sha256 = manifest.get("notice_sha256")
     manifest_is_private = manifest.get("is_private")
     manifest_enable_internet = manifest.get("enable_internet")
     manifest_enable_gpu = manifest.get("enable_gpu")
@@ -101,6 +105,10 @@ def _validate_bundle_dir(bundle_dir: Path) -> dict[str, object]:
         raise ValueError("bundle_manifest.json.runner_sha256 must be a 64-char sha256 hex string")
     if not isinstance(manifest_config_sha256, str) or len(manifest_config_sha256) != 64:
         raise ValueError("bundle_manifest.json.config_sha256 must be a 64-char sha256 hex string")
+    if not isinstance(manifest_license_sha256, str) or len(manifest_license_sha256) != 64:
+        raise ValueError("bundle_manifest.json.license_sha256 must be a 64-char sha256 hex string")
+    if not isinstance(manifest_notice_sha256, str) or len(manifest_notice_sha256) != 64:
+        raise ValueError("bundle_manifest.json.notice_sha256 must be a 64-char sha256 hex string")
 
     try:
         CompareConfig(**compare_config)
@@ -110,6 +118,8 @@ def _validate_bundle_dir(bundle_dir: Path) -> dict[str, object]:
     corpus_path = bundle_dir / "input_corpus.txt"
     actual_corpus_sha256 = _sha256_text(corpus_path)
     actual_config_sha256 = _sha256_text(bundle_dir / "config.json")
+    actual_license_sha256 = _sha256_text(bundle_dir / "LICENSE")
+    actual_notice_sha256 = _sha256_text(bundle_dir / "NOTICE")
     if actual_corpus_sha256 != corpus_sha256:
         raise ValueError("input_corpus.txt sha256 does not match config.json.corpus_sha256")
     if corpus_sha256 != manifest_corpus_sha256:
@@ -119,6 +129,10 @@ def _validate_bundle_dir(bundle_dir: Path) -> dict[str, object]:
         raise ValueError("src/llcore sha256 does not match bundle_manifest.json.source_sha256")
     if actual_config_sha256 != manifest_config_sha256:
         raise ValueError("config.json sha256 does not match bundle_manifest.json.config_sha256")
+    if actual_license_sha256 != manifest_license_sha256:
+        raise ValueError("LICENSE sha256 does not match bundle_manifest.json.license_sha256")
+    if actual_notice_sha256 != manifest_notice_sha256:
+        raise ValueError("NOTICE sha256 does not match bundle_manifest.json.notice_sha256")
 
     metadata_id = metadata.get("id")
     manifest_kernel_id = manifest.get("kernel_id")

@@ -24,7 +24,7 @@ import os
 import time
 from typing import Any, Sequence
 
-# default = all-MiniLM-L6-v2 (Apache-2.0 — FullSense の dual-license と整合)。
+# default = all-MiniLM-L6-v2 (Apache-2.0 — 公開 bundle の Apache-2.0 系配布方針に整合)。
 # sentence-transformers ライブラリ自体も Apache-2.0。
 DEFAULT_TEXT_ENCODER_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 TEXT_ENCODER_MODEL_ENV_VAR = "LLCORE_TEXT_ENCODER_MODEL"

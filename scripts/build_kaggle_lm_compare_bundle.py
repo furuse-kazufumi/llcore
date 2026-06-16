@@ -5,6 +5,7 @@ The generated directory is intentionally self-contained:
 
 - `input_corpus.txt` is copied in so the run does not depend on remote fetches.
 - `src/llcore/` is snapshotted into the bundle.
+- `LICENSE` + `NOTICE` are copied in for redistribution review.
 - `runner.py` reads `config.json` and writes compare artifacts under `artifacts/`.
 
 Publishing the bundle via `kaggle kernels push -p ...` remains a human-gated step.
@@ -34,7 +35,7 @@ REPO_ROOT = HERE.parent
 SRC_ROOT = REPO_ROOT / "src"
 DEFAULT_KERNEL_ID = "furusekazufumi/llcore-lm-compare"
 RUNNER_NAME = "runner.py"
-REQUIRED_COPIED_FILE_KEYS = ("corpus", "config", "metadata", "src_llcore")
+REQUIRED_COPIED_FILE_KEYS = ("corpus", "config", "metadata", "src_llcore", "license", "notice")
 _KERNEL_ID_RE = re.compile(r"^[a-z0-9][a-z0-9-]*/[a-z0-9][a-z0-9-]*$")
 
 RUNNER_TEMPLATE = """# SPDX-License-Identifier: Apache-2.0
@@ -89,6 +90,7 @@ This folder is a local, deterministic Kaggle kernel bundle for `llcore.lm.compar
 - `runner.py`: kernel entrypoint
 - `config.json`: pinned compare configuration and corpus metadata
 - `input_corpus.txt`: copied UTF-8 corpus
+- `LICENSE` / `NOTICE`: distribution documents included in the candidate bundle
 - `artifacts/`: expected output directory (`lm_compare.json`, `.md`, `.svg`)
 
 ## Human-gated publish
@@ -110,6 +112,20 @@ pinned here.
 
 def _sha256_text(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _bundle_notice_text() -> str:
+    notice = (REPO_ROOT / "NOTICE").read_text(encoding="utf-8")
+    # This sanitize step relies on an exact root-NOTICE sentence match. If the
+    # upstream NOTICE wording changes, the post-check below must continue to
+    # fail closed until this replacement target is updated.
+    sanitized = notice.replace(
+        "Commercial licenses are also available; see LICENSE-COMMERCIAL.",
+        "Commercial licenses are also available separately from this bundle.",
+    )
+    if "LICENSE-COMMERCIAL" in sanitized or "Commercial dual-license" in sanitized:
+        raise ValueError("NOTICE sanitize failed: commercial-license wording remains after rewrite")
+    return sanitized
 
 
 def _is_ignored_source_path(path: Path) -> bool:
@@ -228,6 +244,8 @@ def _is_builder_bundle_dir(bundle_dir: Path) -> bool:
         "kernel-metadata.json",
         "config.json",
         "input_corpus.txt",
+        "LICENSE",
+        "NOTICE",
         "README.md",
         RUNNER_NAME,
         "src/llcore",
@@ -301,6 +319,8 @@ def build_bundle(
         (staging_dir / "artifacts").mkdir(parents=True, exist_ok=True)
         corpus_target = staging_dir / "input_corpus.txt"
         shutil.copyfile(corpus_file, corpus_target)
+        shutil.copyfile(REPO_ROOT / "LICENSE", staging_dir / "LICENSE")
+        (staging_dir / "NOTICE").write_text(_bundle_notice_text(), encoding="utf-8")
         src_target = staging_dir / "src" / "llcore"
         shutil.copytree(SRC_ROOT / "llcore", src_target, ignore=_ignore_source_noise)
         (staging_dir / RUNNER_NAME).write_text(RUNNER_TEMPLATE, encoding="utf-8")
@@ -337,11 +357,15 @@ def build_bundle(
                 "config": "config.json",
                 "metadata": "kernel-metadata.json",
                 "src_llcore": "src/llcore",
+                "license": "LICENSE",
+                "notice": "NOTICE",
             },
             "corpus_sha256": config_payload["corpus_sha256"],
             "source_sha256": source_sha256,
             "runner_sha256": runner_sha256,
             "config_sha256": config_sha256,
+            "license_sha256": _sha256_text(staging_dir / "LICENSE"),
+            "notice_sha256": _sha256_text(staging_dir / "NOTICE"),
         }
         _write_json(staging_dir / "bundle_manifest.json", manifest_payload)
 

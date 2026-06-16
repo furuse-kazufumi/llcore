@@ -22,7 +22,7 @@ if TYPE_CHECKING:  # pragma: no cover - 型チェック時のみ
 else:
     ImageLike = Any
 
-# default = SigLIP (Apache-2.0, FullSense の dual-license と整合)。
+# default = SigLIP (Apache-2.0, 公開 bundle の Apache-2.0 系配布方針に整合)。
 # 代替 = laion/CLIP-ViT-B-32-laion2B-s34B-b79K (MIT)。openai/clip はライセンスタグ無しのため不採用。
 DEFAULT_CLIP_MODEL = "google/siglip-base-patch16-224"
 CLIP_MODEL_ENV_VAR = "LLCORE_CLIP_MODEL"
