@@ -24,23 +24,10 @@
 ## 現在の git status
 
 ```text
-M docs/LM_RECURRENT_PLAN.md
-M docs/PROGRESS.md
-M docs/SESSION_SUMMARY.md
-M docs/next_plan.md
-M scripts/memory_footprint_harness.py
-?? scripts/build_kaggle_lm_compare_bundle.py
-?? scripts/kaggle_bundle_preflight.py
-?? scripts/kaggle_push_readiness.py
-?? scripts/prepare_kaggle_lm_compare_bundle.py
-?? tests/unit/test_build_kaggle_lm_compare_bundle.py
-?? tests/unit/test_kaggle_bundle_preflight.py
-?? tests/unit/test_kaggle_push_readiness.py
-?? tests/unit/test_memory_footprint_harness.py
-?? tests/unit/test_prepare_kaggle_lm_compare_bundle.py
+(clean after local commits `af90dd6` and `1d1234a`)
 ```
 
-- 再開後の現物確認では、`docs/LM_RECURRENT_PLAN.md` も **dirty** だった。もし他の記録でこのファイルが脱落していたら、その記述は stale とみなす。
+- 再開時点では `docs/LM_RECURRENT_PLAN.md` も **dirty** だった。もし他の記録でこのファイルが脱落していたら、その記述は stale とみなす。現在は local commit 済み。
 
 ## Kaggle 導線の現契約
 
@@ -56,10 +43,10 @@ M scripts/memory_footprint_harness.py
 
 ## 次の具体的な一手
 
-1. commit 束を分ける。
-   - Kaggle 4 スクリプト + 対応テスト + docs
-   - memory harness + そのテスト + docs
-2. `docs/next_plan.md` の再開追記を正本として、fresh auth failure 実測済みの状態から次の人間ゲート準備へ進む。
+1. ローカル整理は完了。
+   - `af90dd6` = memory harness
+   - `1d1234a` = Kaggle 導線 + docs
+2. `docs/next_plan.md` の再開追記を正本として、CPU ready path `rc=0` と GPU quota live path の CLI 2.2.1 failure を前提に次の人間ゲート準備へ進む。
 3. ここまでは自律で可。`kaggle kernels push` に進む段になったら、直前に `docs/next_plan.md` を更新してから **`⟦LLTERM_CHOICE⟧`** で人間確認へ切り替える。
 
 ## 補足
