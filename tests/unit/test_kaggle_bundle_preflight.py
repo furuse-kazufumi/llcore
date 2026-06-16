@@ -57,6 +57,45 @@ def _build_bundle(tmp_path: Path) -> Path:
     return bundle_dir
 
 
+def _build_dataset_bundle(tmp_path: Path) -> Path:
+    builder = _load_script("build_kaggle_lm_compare_bundle.py")
+    corpus = tmp_path / "corpus.txt"
+    corpus.write_text(("abcde " * 80).strip() + "\n", encoding="utf-8")
+    bundle_dir = tmp_path / "bundle"
+    rc = builder.main(
+        [
+            "--bundle-dir",
+            str(bundle_dir),
+            "--corpus-file",
+            str(corpus),
+            "--dataset-source",
+            "furusekazufumi/llcore-lm-compare-support",
+            "--block-size",
+            "16",
+            "--n-layer",
+            "1",
+            "--n-head",
+            "1",
+            "--n-embd",
+            "16",
+            "--state-size",
+            "8",
+            "--max-iters",
+            "1",
+            "--batch-size",
+            "2",
+            "--eval-iters",
+            "1",
+            "--throughput-new-tokens",
+            "1",
+            "--throughput-repeats",
+            "1",
+        ]
+    )
+    assert rc == 0
+    return bundle_dir
+
+
 def test_preflight_validates_bundle_and_writes_json(tmp_path: Path) -> None:
     preflight = _load_script("kaggle_bundle_preflight.py")
     bundle_dir = _build_bundle(tmp_path)
@@ -95,6 +134,21 @@ def test_preflight_runner_smoke_passes(tmp_path: Path) -> None:
     assert runner["output_exists"] is True
     assert (bundle_dir / "artifacts" / "lm_compare.md").is_file()
     assert (bundle_dir / "artifacts" / "lm_compare.svg").is_file()
+
+
+def test_preflight_dataset_mode_runner_smoke_passes(tmp_path: Path) -> None:
+    preflight = _load_script("kaggle_bundle_preflight.py")
+    bundle_dir = _build_dataset_bundle(tmp_path)
+
+    report = preflight.preflight_bundle(bundle_dir, run_runner=True, runner_timeout=60)
+
+    runner = report["runner"]
+    assert isinstance(runner, dict)
+    assert runner["returncode"] == 0
+    checks = report["checks"]
+    assert checks["manifest"]["data_mode"] == "dataset"
+    assert checks["manifest"]["dataset_source"] == "furusekazufumi/llcore-lm-compare-support"
+    assert (bundle_dir / "artifacts" / "lm_compare.json").is_file()
 
 
 def test_preflight_runner_smoke_can_be_repeated_without_false_sha_drift(tmp_path: Path) -> None:

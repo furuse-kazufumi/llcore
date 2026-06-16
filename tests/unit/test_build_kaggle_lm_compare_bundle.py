@@ -102,6 +102,48 @@ def test_build_bundle_writes_metadata_and_copies_inputs(tmp_path: Path) -> None:
     assert not (bundle_dir / "llcore" / "__pycache__").exists()
 
 
+def test_build_bundle_dataset_mode_writes_dataset_payload(tmp_path: Path) -> None:
+    builder = _load_builder()
+    corpus = tmp_path / "corpus.txt"
+    corpus.write_text("abcabc\n", encoding="utf-8")
+    bundle_dir = tmp_path / "bundle"
+
+    rc = builder.main(
+        [
+            "--bundle-dir",
+            str(bundle_dir),
+            "--corpus-file",
+            str(corpus),
+            "--dataset-source",
+            "furusekazufumi/llcore-lm-compare-support",
+            "--kernel-id",
+            "furusekazufumi/test-lm-compare",
+            "--title",
+            "test-lm-compare",
+            "--block-size",
+            "96",
+            "--max-iters",
+            "40",
+        ]
+    )
+
+    assert rc == 0
+    metadata = json.loads((bundle_dir / "kernel-metadata.json").read_text(encoding="utf-8"))
+    assert metadata["dataset_sources"] == ["furusekazufumi/llcore-lm-compare-support"]
+    assert not (bundle_dir / "config.json").exists()
+    assert not (bundle_dir / "input_corpus.txt").exists()
+    manifest = json.loads((bundle_dir / "bundle_manifest.json").read_text(encoding="utf-8"))
+    assert manifest["data_mode"] == "dataset"
+    assert manifest["dataset_source"] == "furusekazufumi/llcore-lm-compare-support"
+    assert manifest["dataset_mount_name"] == "llcore-lm-compare-support"
+    dataset_dir = bundle_dir / "dataset_payload"
+    assert (dataset_dir / "dataset-metadata.json").is_file()
+    assert (dataset_dir / "config.json").is_file()
+    assert (dataset_dir / "input_corpus.txt").is_file()
+    assert (dataset_dir / "src" / "llcore" / "lm" / "compare.py").is_file()
+    assert (dataset_dir / "llcore" / "lm" / "compare.py").is_file()
+
+
 def test_build_bundle_rejects_missing_corpus(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:

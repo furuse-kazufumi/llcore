@@ -45,6 +45,11 @@ def _parser() -> argparse.ArgumentParser:
     ap.add_argument("--bundle-dir", required=True, help="output directory for the Kaggle bundle")
     ap.add_argument("--corpus-file", required=True, help="UTF-8 corpus file to embed")
     ap.add_argument("--kernel-id", default="furusekazufumi/llcore-lm-compare")
+    ap.add_argument(
+        "--dataset-source",
+        default=None,
+        help="optional Kaggle dataset owner/slug that will supply llcore/config/corpus at runtime",
+    )
     ap.add_argument("--title", default="llcore-lm-compare")
     ap.add_argument("--machine-shape", default="NvidiaTeslaT4")
     ap.add_argument("--enable-gpu", action="store_true", help="emit GPU-enabled Kaggle metadata")
@@ -114,6 +119,8 @@ def prepare_bundle(argv: list[str] | None = None) -> int:
         "--seed",
         str(args.seed),
     ]
+    if args.dataset_source:
+        build_argv.extend(["--dataset-source", args.dataset_source])
     if args.enable_gpu:
         build_argv.append("--enable-gpu")
     if args.enable_internet:
@@ -139,6 +146,12 @@ def prepare_bundle(argv: list[str] | None = None) -> int:
         "bundle_dir": str(Path(args.bundle_dir).resolve()),
         "kernel_id": args.kernel_id,
         "push_command": f'kaggle kernels push -p "{Path(args.bundle_dir).resolve()}"',
+        "dataset_source": args.dataset_source,
+        "dataset_push_command": (
+            None
+            if not args.dataset_source
+            else f'kaggle datasets create -p "{Path(args.bundle_dir).resolve() / "dataset_payload"}"'
+        ),
         "preflight": preflight_report,
     }
     if args.json:
@@ -158,6 +171,8 @@ def prepare_bundle(argv: list[str] | None = None) -> int:
             "runner smoke uses local CPU training and may still require a larger "
             "--runner-timeout for heavier configs.",
         )
+    if combined_report["dataset_push_command"]:
+        print("[dataset-next]", combined_report["dataset_push_command"])
     print("[next]", combined_report["push_command"])
     return 0
 

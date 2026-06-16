@@ -22,15 +22,13 @@ from llcore.lm.compare import CompareConfig  # type: ignore[import-untyped]
 
 REQUIRED_FILES = (
     "kernel-metadata.json",
-    "config.json",
     "bundle_manifest.json",
-    "input_corpus.txt",
     "LICENSE",
     "NOTICE",
     "runner.py",
     "README.md",
 )
-REQUIRED_COPIED_FILE_KEYS = (
+EMBEDDED_COPIED_FILE_KEYS = (
     "corpus",
     "config",
     "metadata",
@@ -39,6 +37,16 @@ REQUIRED_COPIED_FILE_KEYS = (
     "license",
     "notice",
 )
+DATASET_COPIED_FILE_KEYS = (
+    "metadata",
+    "runner",
+    "license",
+    "notice",
+    "dataset_payload",
+)
+DATASET_PAYLOAD_DIRNAME = "dataset_payload"
+DATASET_METADATA_NAME = "dataset-metadata.json"
+DATASET_PAYLOAD_MANIFEST_NAME = "dataset_payload_manifest.json"
 _BOOL_TEXT_VALUES = {"true", "false"}
 
 
@@ -73,76 +81,34 @@ def _require_bool_text(value: object, *, field_name: str) -> str:
 
 def _validate_bundle_dir(bundle_dir: Path) -> dict[str, object]:
     missing = [name for name in REQUIRED_FILES if not (bundle_dir / name).is_file()]
-    src_llcore = bundle_dir / "src" / "llcore"
-    if not src_llcore.is_dir():
-        missing.append("src/llcore")
-    pkg_llcore = bundle_dir / "llcore"
-    if not pkg_llcore.is_dir():
-        missing.append("llcore")
     if missing:
         raise ValueError(f"bundle is missing required paths: {', '.join(missing)}")
 
     metadata = json.loads((bundle_dir / "kernel-metadata.json").read_text(encoding="utf-8"))
-    config = json.loads((bundle_dir / "config.json").read_text(encoding="utf-8"))
     manifest = json.loads((bundle_dir / "bundle_manifest.json").read_text(encoding="utf-8"))
 
     if not isinstance(metadata, dict):
         raise ValueError("kernel-metadata.json must contain an object")
-    if not isinstance(config, dict):
-        raise ValueError("config.json must contain an object")
     if not isinstance(manifest, dict):
         raise ValueError("bundle_manifest.json must contain an object")
+    data_mode = manifest.get("data_mode", "embedded")
+    if data_mode not in {"embedded", "dataset"}:
+        raise ValueError("bundle_manifest.json.data_mode must be 'embedded' or 'dataset'")
 
-    compare_config = config.get("compare_config")
-    corpus_sha256 = config.get("corpus_sha256")
-    manifest_corpus_sha256 = manifest.get("corpus_sha256")
-    manifest_source_sha256 = manifest.get("source_sha256")
     manifest_runner_sha256 = manifest.get("runner_sha256")
-    manifest_config_sha256 = manifest.get("config_sha256")
     manifest_license_sha256 = manifest.get("license_sha256")
     manifest_notice_sha256 = manifest.get("notice_sha256")
     manifest_is_private = manifest.get("is_private")
     manifest_enable_internet = manifest.get("enable_internet")
     manifest_enable_gpu = manifest.get("enable_gpu")
-    if not isinstance(compare_config, dict):
-        raise ValueError("config.json.compare_config must contain an object")
-    if not isinstance(corpus_sha256, str) or len(corpus_sha256) != 64:
-        raise ValueError("config.json.corpus_sha256 must be a 64-char sha256 hex string")
-    if not isinstance(manifest_corpus_sha256, str) or len(manifest_corpus_sha256) != 64:
-        raise ValueError("bundle_manifest.json.corpus_sha256 must be a 64-char sha256 hex string")
-    if not isinstance(manifest_source_sha256, str) or len(manifest_source_sha256) != 64:
-        raise ValueError("bundle_manifest.json.source_sha256 must be a 64-char sha256 hex string")
     if not isinstance(manifest_runner_sha256, str) or len(manifest_runner_sha256) != 64:
         raise ValueError("bundle_manifest.json.runner_sha256 must be a 64-char sha256 hex string")
-    if not isinstance(manifest_config_sha256, str) or len(manifest_config_sha256) != 64:
-        raise ValueError("bundle_manifest.json.config_sha256 must be a 64-char sha256 hex string")
     if not isinstance(manifest_license_sha256, str) or len(manifest_license_sha256) != 64:
         raise ValueError("bundle_manifest.json.license_sha256 must be a 64-char sha256 hex string")
     if not isinstance(manifest_notice_sha256, str) or len(manifest_notice_sha256) != 64:
         raise ValueError("bundle_manifest.json.notice_sha256 must be a 64-char sha256 hex string")
-
-    try:
-        CompareConfig(**compare_config)
-    except Exception as exc:
-        raise ValueError(f"config.json.compare_config is invalid: {exc}") from exc
-
-    corpus_path = bundle_dir / "input_corpus.txt"
-    actual_corpus_sha256 = _sha256_text(corpus_path)
-    actual_config_sha256 = _sha256_text(bundle_dir / "config.json")
     actual_license_sha256 = _sha256_text(bundle_dir / "LICENSE")
     actual_notice_sha256 = _sha256_text(bundle_dir / "NOTICE")
-    if actual_corpus_sha256 != corpus_sha256:
-        raise ValueError("input_corpus.txt sha256 does not match config.json.corpus_sha256")
-    if corpus_sha256 != manifest_corpus_sha256:
-        raise ValueError("config.json.corpus_sha256 does not match bundle_manifest.json.corpus_sha256")
-    actual_source_sha256 = _sha256_tree(src_llcore)
-    actual_pkg_source_sha256 = _sha256_tree(pkg_llcore)
-    if actual_source_sha256 != manifest_source_sha256:
-        raise ValueError("src/llcore sha256 does not match bundle_manifest.json.source_sha256")
-    if actual_pkg_source_sha256 != manifest_source_sha256:
-        raise ValueError("llcore sha256 does not match bundle_manifest.json.source_sha256")
-    if actual_config_sha256 != manifest_config_sha256:
-        raise ValueError("config.json sha256 does not match bundle_manifest.json.config_sha256")
     if actual_license_sha256 != manifest_license_sha256:
         raise ValueError("LICENSE sha256 does not match bundle_manifest.json.license_sha256")
     if actual_notice_sha256 != manifest_notice_sha256:
@@ -167,9 +133,6 @@ def _validate_bundle_dir(bundle_dir: Path) -> dict[str, object]:
     actual_runner_sha256 = _sha256_text(bundle_dir / "runner.py")
     if actual_runner_sha256 != manifest_runner_sha256:
         raise ValueError("runner.py sha256 does not match bundle_manifest.json.runner_sha256")
-    corpus_file_name = config.get("corpus_file_name")
-    if not isinstance(corpus_file_name, str) or not corpus_file_name:
-        raise ValueError("config.json.corpus_file_name must be a non-empty string")
     metadata_enable_gpu = metadata.get("enable_gpu")
     metadata_enable_internet = metadata.get("enable_internet")
     metadata_is_private = metadata.get("is_private")
@@ -210,10 +173,11 @@ def _validate_bundle_dir(bundle_dir: Path) -> dict[str, object]:
     copied_files = manifest.get("copied_files")
     if not isinstance(copied_files, dict):
         raise ValueError("bundle_manifest.json.copied_files must contain an object")
-    if set(copied_files) != set(REQUIRED_COPIED_FILE_KEYS):
+    expected_keys = EMBEDDED_COPIED_FILE_KEYS if data_mode == "embedded" else DATASET_COPIED_FILE_KEYS
+    if set(copied_files) != set(expected_keys):
         raise ValueError(
             "bundle_manifest.json.copied_files must contain exactly: "
-            + ", ".join(REQUIRED_COPIED_FILE_KEYS)
+            + ", ".join(expected_keys)
         )
     for logical_name, relative_path in copied_files.items():
         if not isinstance(relative_path, str) or not relative_path:
@@ -228,6 +192,171 @@ def _validate_bundle_dir(bundle_dir: Path) -> dict[str, object]:
                 f"bundle_manifest.json copied_files[{logical_name!r}] points to a missing path: {relative_path}"
             )
 
+    if data_mode == "embedded":
+        src_llcore = bundle_dir / "src" / "llcore"
+        pkg_llcore = bundle_dir / "llcore"
+        config = json.loads((bundle_dir / "config.json").read_text(encoding="utf-8"))
+        if not isinstance(config, dict):
+            raise ValueError("config.json must contain an object")
+        compare_config = config.get("compare_config")
+        corpus_sha256 = config.get("corpus_sha256")
+        manifest_corpus_sha256 = manifest.get("corpus_sha256")
+        manifest_source_sha256 = manifest.get("source_sha256")
+        manifest_config_sha256 = manifest.get("config_sha256")
+        if not src_llcore.is_dir():
+            raise ValueError("bundle is missing required path: src/llcore")
+        if not pkg_llcore.is_dir():
+            raise ValueError("bundle is missing required path: llcore")
+        if not isinstance(compare_config, dict):
+            raise ValueError("config.json.compare_config must contain an object")
+        if not isinstance(corpus_sha256, str) or len(corpus_sha256) != 64:
+            raise ValueError("config.json.corpus_sha256 must be a 64-char sha256 hex string")
+        if not isinstance(manifest_corpus_sha256, str) or len(manifest_corpus_sha256) != 64:
+            raise ValueError("bundle_manifest.json.corpus_sha256 must be a 64-char sha256 hex string")
+        if not isinstance(manifest_source_sha256, str) or len(manifest_source_sha256) != 64:
+            raise ValueError("bundle_manifest.json.source_sha256 must be a 64-char sha256 hex string")
+        if not isinstance(manifest_config_sha256, str) or len(manifest_config_sha256) != 64:
+            raise ValueError("bundle_manifest.json.config_sha256 must be a 64-char sha256 hex string")
+        try:
+            CompareConfig(**compare_config)
+        except Exception as exc:
+            raise ValueError(f"config.json.compare_config is invalid: {exc}") from exc
+        corpus_path = bundle_dir / "input_corpus.txt"
+        actual_corpus_sha256 = _sha256_text(corpus_path)
+        actual_config_sha256 = _sha256_text(bundle_dir / "config.json")
+        if actual_corpus_sha256 != corpus_sha256:
+            raise ValueError("input_corpus.txt sha256 does not match config.json.corpus_sha256")
+        if corpus_sha256 != manifest_corpus_sha256:
+            raise ValueError("config.json.corpus_sha256 does not match bundle_manifest.json.corpus_sha256")
+        actual_source_sha256 = _sha256_tree(src_llcore)
+        actual_pkg_source_sha256 = _sha256_tree(pkg_llcore)
+        if actual_source_sha256 != manifest_source_sha256:
+            raise ValueError("src/llcore sha256 does not match bundle_manifest.json.source_sha256")
+        if actual_pkg_source_sha256 != manifest_source_sha256:
+            raise ValueError("llcore sha256 does not match bundle_manifest.json.source_sha256")
+        if actual_config_sha256 != manifest_config_sha256:
+            raise ValueError("config.json sha256 does not match bundle_manifest.json.config_sha256")
+        corpus_file_name = config.get("corpus_file_name")
+        if not isinstance(corpus_file_name, str) or not corpus_file_name:
+            raise ValueError("config.json.corpus_file_name must be a non-empty string")
+        config_summary = {
+            "block_size": compare_config.get("block_size"),
+            "max_iters": compare_config.get("max_iters"),
+            "corpus_sha256": corpus_sha256,
+        }
+        manifest_summary: dict[str, object] = {
+            "kernel_id": manifest_kernel_id,
+            "runner": manifest.get("runner"),
+            "copied_files": copied_files,
+            "source_sha256": manifest_source_sha256,
+            "data_mode": data_mode,
+        }
+    else:
+        dataset_sources = metadata.get("dataset_sources")
+        dataset_payload_rel = manifest.get("dataset_payload_rel")
+        dataset_payload_manifest_sha256 = manifest.get("dataset_payload_manifest_sha256")
+        dataset_source = manifest.get("dataset_source")
+        dataset_mount_name = manifest.get("dataset_mount_name")
+        if not isinstance(dataset_sources, list) or len(dataset_sources) != 1 or not all(
+            isinstance(item, str) and item for item in dataset_sources
+        ):
+            raise ValueError("kernel-metadata.json dataset_sources must contain exactly one non-empty string")
+        if dataset_sources[0] != dataset_source:
+            raise ValueError("kernel-metadata.json dataset_sources[0] must match bundle_manifest.json.dataset_source")
+        if not isinstance(dataset_payload_rel, str) or not dataset_payload_rel:
+            raise ValueError("bundle_manifest.json.dataset_payload_rel must be a non-empty string")
+        if not isinstance(dataset_payload_manifest_sha256, str) or len(dataset_payload_manifest_sha256) != 64:
+            raise ValueError("bundle_manifest.json.dataset_payload_manifest_sha256 must be a 64-char sha256 hex string")
+        if not isinstance(dataset_source, str) or not dataset_source:
+            raise ValueError("bundle_manifest.json.dataset_source must be a non-empty string")
+        if not isinstance(dataset_mount_name, str) or not dataset_mount_name:
+            raise ValueError("bundle_manifest.json.dataset_mount_name must be a non-empty string")
+        dataset_payload_dir = bundle_dir / dataset_payload_rel
+        dataset_manifest_path = dataset_payload_dir / DATASET_PAYLOAD_MANIFEST_NAME
+        dataset_metadata_path = dataset_payload_dir / DATASET_METADATA_NAME
+        config_path = dataset_payload_dir / "config.json"
+        corpus_path = dataset_payload_dir / "input_corpus.txt"
+        src_llcore = dataset_payload_dir / "src" / "llcore"
+        pkg_llcore = dataset_payload_dir / "llcore"
+        missing_dataset = [
+            rel
+            for rel in (
+                dataset_payload_rel,
+                f"{dataset_payload_rel}/{DATASET_PAYLOAD_MANIFEST_NAME}",
+                f"{dataset_payload_rel}/{DATASET_METADATA_NAME}",
+                f"{dataset_payload_rel}/config.json",
+                f"{dataset_payload_rel}/input_corpus.txt",
+                f"{dataset_payload_rel}/src/llcore",
+                f"{dataset_payload_rel}/llcore",
+                f"{dataset_payload_rel}/LICENSE",
+                f"{dataset_payload_rel}/NOTICE",
+            )
+            if not (bundle_dir / rel).exists()
+        ]
+        if missing_dataset:
+            raise ValueError("bundle is missing required dataset payload paths: " + ", ".join(missing_dataset))
+        if _sha256_text(dataset_manifest_path) != dataset_payload_manifest_sha256:
+            raise ValueError(
+                "dataset payload manifest sha256 does not match bundle_manifest.json.dataset_payload_manifest_sha256"
+            )
+        dataset_manifest = json.loads(dataset_manifest_path.read_text(encoding="utf-8"))
+        dataset_metadata = json.loads(dataset_metadata_path.read_text(encoding="utf-8"))
+        config = json.loads(config_path.read_text(encoding="utf-8"))
+        if not isinstance(dataset_manifest, dict):
+            raise ValueError("dataset_payload_manifest.json must contain an object")
+        if not isinstance(dataset_metadata, dict):
+            raise ValueError("dataset-metadata.json must contain an object")
+        if not isinstance(config, dict):
+            raise ValueError("dataset payload config.json must contain an object")
+        compare_config = config.get("compare_config")
+        corpus_sha256 = config.get("corpus_sha256")
+        if not isinstance(compare_config, dict):
+            raise ValueError("dataset payload config.json.compare_config must contain an object")
+        if not isinstance(corpus_sha256, str) or len(corpus_sha256) != 64:
+            raise ValueError("dataset payload config.json.corpus_sha256 must be a 64-char sha256 hex string")
+        try:
+            CompareConfig(**compare_config)
+        except Exception as exc:
+            raise ValueError(f"dataset payload config.json.compare_config is invalid: {exc}") from exc
+        if dataset_metadata.get("id") != dataset_source:
+            raise ValueError("dataset-metadata.json id must match bundle_manifest.json.dataset_source")
+        if dataset_metadata.get("title") != dataset_mount_name:
+            raise ValueError("dataset-metadata.json title must match bundle_manifest.json.dataset_mount_name")
+        actual_corpus_sha256 = _sha256_text(corpus_path)
+        if actual_corpus_sha256 != corpus_sha256:
+            raise ValueError("dataset payload input_corpus.txt sha256 does not match config.json.corpus_sha256")
+        if dataset_manifest.get("corpus_sha256") != corpus_sha256:
+            raise ValueError("dataset payload manifest corpus_sha256 does not match config.json.corpus_sha256")
+        actual_source_sha256 = _sha256_tree(src_llcore)
+        actual_pkg_source_sha256 = _sha256_tree(pkg_llcore)
+        if dataset_manifest.get("source_sha256") != actual_source_sha256:
+            raise ValueError("dataset payload src/llcore sha256 does not match dataset manifest source_sha256")
+        if dataset_manifest.get("source_sha256") != actual_pkg_source_sha256:
+            raise ValueError("dataset payload llcore sha256 does not match dataset manifest source_sha256")
+        if dataset_manifest.get("config_sha256") != _sha256_text(config_path):
+            raise ValueError("dataset payload config.json sha256 does not match dataset manifest config_sha256")
+        if dataset_manifest.get("license_sha256") != _sha256_text(dataset_payload_dir / "LICENSE"):
+            raise ValueError("dataset payload LICENSE sha256 does not match dataset manifest license_sha256")
+        if dataset_manifest.get("notice_sha256") != _sha256_text(dataset_payload_dir / "NOTICE"):
+            raise ValueError("dataset payload NOTICE sha256 does not match dataset manifest notice_sha256")
+        if dataset_manifest.get("dataset_metadata_sha256") != _sha256_text(dataset_metadata_path):
+            raise ValueError("dataset-metadata.json sha256 does not match dataset payload manifest")
+        config_summary = {
+            "block_size": compare_config.get("block_size"),
+            "max_iters": compare_config.get("max_iters"),
+            "corpus_sha256": corpus_sha256,
+            "dataset_source": dataset_source,
+        }
+        manifest_summary = {
+            "kernel_id": manifest_kernel_id,
+            "runner": manifest.get("runner"),
+            "copied_files": copied_files,
+            "data_mode": data_mode,
+            "dataset_source": dataset_source,
+            "dataset_mount_name": dataset_mount_name,
+            "dataset_payload_rel": dataset_payload_rel,
+        }
+
     metadata_summary = {
         "kernel_id": metadata_id,
         "enable_gpu": metadata.get("enable_gpu"),
@@ -238,17 +367,8 @@ def _validate_bundle_dir(bundle_dir: Path) -> dict[str, object]:
     }
     return {
         "metadata": metadata_summary,
-        "config": {
-            "block_size": compare_config.get("block_size"),
-            "max_iters": compare_config.get("max_iters"),
-            "corpus_sha256": corpus_sha256,
-        },
-        "manifest": {
-            "kernel_id": manifest_kernel_id,
-            "runner": manifest.get("runner"),
-            "copied_files": copied_files,
-            "source_sha256": manifest_source_sha256,
-        },
+        "config": config_summary,
+        "manifest": manifest_summary,
     }
 
 
@@ -259,6 +379,12 @@ def _run_runner(bundle_dir: Path, *, timeout_s: int) -> dict[str, object]:
     out_json.unlink(missing_ok=True)
     out_md.unlink(missing_ok=True)
     out_svg.unlink(missing_ok=True)
+    manifest = json.loads((bundle_dir / "bundle_manifest.json").read_text(encoding="utf-8"))
+    env = {**os.environ, "PYTHONUTF8": "1", "PYTHONDONTWRITEBYTECODE": "1"}
+    if manifest.get("data_mode") == "dataset":
+        dataset_payload_rel = manifest.get("dataset_payload_rel")
+        if isinstance(dataset_payload_rel, str) and dataset_payload_rel:
+            env["LLCORE_KAGGLE_DATA_ROOT"] = str((bundle_dir / dataset_payload_rel).resolve())
     proc = subprocess.run(
         [sys.executable, str(bundle_dir / "runner.py")],
         cwd=bundle_dir,
@@ -267,7 +393,7 @@ def _run_runner(bundle_dir: Path, *, timeout_s: int) -> dict[str, object]:
         text=True,
         encoding="utf-8",
         errors="replace",
-        env={**os.environ, "PYTHONUTF8": "1", "PYTHONDONTWRITEBYTECODE": "1"},
+        env=env,
         timeout=timeout_s,
     )
     payload: dict[str, object] = {

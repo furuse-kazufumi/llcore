@@ -8,7 +8,15 @@ The generated directory is intentionally self-contained:
 - `llcore/` is also copied at the bundle root so Kaggle runtime import-path
   differences do not strand the package behind `src/`.
 - `LICENSE` + `NOTICE` are copied in for redistribution review.
-- `runner.py` reads `config.json` and writes compare artifacts under `artifacts/`.
+- `runner.py` writes compare artifacts under `artifacts/`.
+
+When `--dataset-source` is used, the kernel bundle switches to a dataset-backed
+layout:
+
+- runtime inputs move under `dataset_payload/`
+- `kernel-metadata.json.dataset_sources` points at the declared dataset slug
+- `runner.py` reads from `/kaggle/input/<mount>/...` (or a local override during
+  preflight smoke)
 
 Publishing the bundle via `kaggle kernels push -p ...` remains a human-gated step.
 """
@@ -25,8 +33,6 @@ import sys
 import tempfile
 from dataclasses import asdict
 from pathlib import Path
-from typing import cast
-
 sys.path.insert(0, str((Path(__file__).resolve().parent.parent / "src")))
 
 from llcore.lm.compare import CompareConfig  # type: ignore[import-untyped]
@@ -36,8 +42,12 @@ HERE = Path(__file__).resolve().parent
 REPO_ROOT = HERE.parent
 SRC_ROOT = REPO_ROOT / "src"
 DEFAULT_KERNEL_ID = "furusekazufumi/llcore-lm-compare"
+DEFAULT_DATASET_SOURCE = "furusekazufumi/llcore-lm-compare-support"
 RUNNER_NAME = "runner.py"
-REQUIRED_COPIED_FILE_KEYS = (
+DATASET_PAYLOAD_DIRNAME = "dataset_payload"
+DATASET_METADATA_NAME = "dataset-metadata.json"
+DATASET_PAYLOAD_MANIFEST_NAME = "dataset_payload_manifest.json"
+EMBEDDED_COPIED_FILE_KEYS = (
     "corpus",
     "config",
     "metadata",
@@ -46,9 +56,16 @@ REQUIRED_COPIED_FILE_KEYS = (
     "license",
     "notice",
 )
+DATASET_COPIED_FILE_KEYS = (
+    "metadata",
+    "runner",
+    "license",
+    "notice",
+    "dataset_payload",
+)
 _KERNEL_ID_RE = re.compile(r"^[a-z0-9][a-z0-9-]*/[a-z0-9][a-z0-9-]*$")
 
-RUNNER_TEMPLATE = """# SPDX-License-Identifier: Apache-2.0
+RUNNER_TEMPLATE_EMBEDDED = """# SPDX-License-Identifier: Apache-2.0
 from __future__ import annotations
 
 import json
@@ -77,6 +94,49 @@ def main() -> int:
         f"gpt_ppl={reports['gpt']['model_ppl']:.4f}",
         f"recurrent_ppl={reports['recurrent']['model_ppl']:.4f}",
         f"rwkv_ppl={reports['rwkv']['model_ppl']:.4f}",
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+"""
+
+RUNNER_TEMPLATE_DATASET = """# SPDX-License-Identifier: Apache-2.0
+from __future__ import annotations
+
+import json
+import os
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent
+env_data_root = os.environ.get("LLCORE_KAGGLE_DATA_ROOT")
+if env_data_root:
+    DATA_ROOT = Path(env_data_root)
+else:
+    DATA_ROOT = Path("/kaggle/input") / "{dataset_mount_name}"
+for candidate in (DATA_ROOT, DATA_ROOT / "src"):
+    sys.path.insert(0, str(candidate))
+
+from llcore.lm.compare import CompareConfig, compare_on_text
+
+
+def main() -> int:
+    payload = json.loads((DATA_ROOT / "config.json").read_text(encoding="utf-8"))
+    corpus_path = DATA_ROOT / "input_corpus.txt"
+    out_path = ROOT / "artifacts" / "lm_compare.json"
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    text = corpus_path.read_text(encoding="utf-8")
+    cfg = CompareConfig(**payload["compare_config"])
+    result = compare_on_text(text, cfg=cfg, out_path=out_path)
+    reports = result["reports"]
+    print(
+        "[compare] wrote",
+        out_path,
+        f"gpt_ppl={{reports['gpt']['model_ppl']:.4f}}",
+        f"recurrent_ppl={{reports['recurrent']['model_ppl']:.4f}}",
+        f"rwkv_ppl={{reports['rwkv']['model_ppl']:.4f}}",
     )
     return 0
 
@@ -121,6 +181,39 @@ pinned here.
 """
 
 
+README_TEMPLATE_DATASET = """# llcore lm.compare Kaggle bundle
+
+This folder is a local, deterministic Kaggle script-kernel bundle for
+`llcore.lm.compare`.
+
+- `runner.py` is the only kernel source file Kaggle will execute for
+  `kernel_type: "script"`.
+- Runtime inputs live under `dataset_payload/` and must be published as a Kaggle
+  Dataset referenced by `kernel-metadata.json.dataset_sources`.
+- Local smoke uses `LLCORE_KAGGLE_DATA_ROOT` to simulate `/kaggle/input/...`.
+
+## Local contents
+
+- `kernel-metadata.json`: Kaggle kernel metadata
+- `runner.py`: kernel entrypoint
+- `dataset_payload/`: local dataset candidate (`config.json`, `input_corpus.txt`,
+  `src/llcore/`, `llcore/`, `LICENSE`, `NOTICE`, `dataset-metadata.json`)
+- `artifacts/`: expected output directory (`lm_compare.json`, `.md`, `.svg`)
+
+## Human-gated publish
+
+Do not push automatically. Publish order is:
+
+```powershell
+kaggle datasets create -p <this_dir>/dataset_payload
+kaggle kernels push -p <this_dir>
+```
+
+If the dataset already exists, use `kaggle datasets version -p ...` instead of
+`create`.
+"""
+
+
 def _sha256_text(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
@@ -158,6 +251,22 @@ def _write_json(path: Path, payload: object) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def _dataset_mount_name(dataset_source: str) -> str:
+    return dataset_source.split("/", 1)[1]
+
+
+def _render_runner(dataset_source: str | None) -> str:
+    if dataset_source is None:
+        return RUNNER_TEMPLATE_EMBEDDED
+    return RUNNER_TEMPLATE_DATASET.format(dataset_mount_name=_dataset_mount_name(dataset_source))
+
+
+def _render_readme(dataset_source: str | None) -> str:
+    if dataset_source is None:
+        return README_TEMPLATE
+    return README_TEMPLATE_DATASET
+
+
 def _load_json_object(path: Path) -> dict[str, object]:
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
@@ -184,6 +293,7 @@ def _build_kernel_metadata(
     enable_internet: bool,
     is_private: bool,
     machine_shape: str | None,
+    dataset_sources: list[str],
 ) -> dict[str, object]:
     payload: dict[str, object] = {
         "id": kernel_id,
@@ -195,7 +305,7 @@ def _build_kernel_metadata(
         "enable_gpu": "true" if enable_gpu else "false",
         "enable_tpu": "false",
         "enable_internet": "true" if enable_internet else "false",
-        "dataset_sources": [],
+        "dataset_sources": dataset_sources,
         "competition_sources": [],
         "kernel_sources": [],
         "model_sources": [],
@@ -241,29 +351,45 @@ def _is_builder_bundle_dir(bundle_dir: Path) -> bool:
     kernel_id = manifest.get("kernel_id")
     copied_files = manifest.get("copied_files")
     source_sha256 = manifest.get("source_sha256")
+    data_mode = manifest.get("data_mode", "embedded")
+    expected_keys = EMBEDDED_COPIED_FILE_KEYS if data_mode == "embedded" else DATASET_COPIED_FILE_KEYS
     if not (
         runner == RUNNER_NAME
         and isinstance(kernel_id, str)
         and bool(kernel_id)
         and isinstance(copied_files, dict)
-        and set(copied_files) == set(REQUIRED_COPIED_FILE_KEYS)
-        and isinstance(source_sha256, str)
-        and len(source_sha256) == 64
+        and set(copied_files) == set(expected_keys)
     ):
+        return False
+    if data_mode == "embedded":
+        if not (isinstance(source_sha256, str) and len(source_sha256) == 64):
+            return False
+    elif data_mode == "dataset":
+        dataset_payload_rel = manifest.get("dataset_payload_rel")
+        dataset_payload_manifest_sha256 = manifest.get("dataset_payload_manifest_sha256")
+        if not (
+            isinstance(dataset_payload_rel, str)
+            and dataset_payload_rel
+            and isinstance(dataset_payload_manifest_sha256, str)
+            and len(dataset_payload_manifest_sha256) == 64
+        ):
+            return False
+    else:
         return False
     required_paths = (
         "kernel-metadata.json",
-        "config.json",
-        "input_corpus.txt",
         "LICENSE",
         "NOTICE",
         "README.md",
         RUNNER_NAME,
-        "src/llcore",
-        "llcore",
     )
-    return (
-        all((bundle_dir / rel).exists() for rel in required_paths)
+    if not all((bundle_dir / rel).exists() for rel in required_paths):
+        return False
+    if data_mode == "embedded":
+        return all((bundle_dir / rel).exists() for rel in ("config.json", "input_corpus.txt", "src/llcore", "llcore"))
+    return all(
+        (bundle_dir / rel).exists()
+        for rel in (f"{DATASET_PAYLOAD_DIRNAME}/{DATASET_METADATA_NAME}", f"{DATASET_PAYLOAD_DIRNAME}/{DATASET_PAYLOAD_MANIFEST_NAME}")
     )
 
 
@@ -304,6 +430,7 @@ def build_bundle(
     enable_gpu: bool,
     enable_internet: bool,
     is_private: bool,
+    dataset_source: str | None = None,
     cfg: CompareConfig,
 ) -> dict[str, object]:
     """Build a local Kaggle bundle and return manifest-level summary data.
@@ -320,6 +447,8 @@ def build_bundle(
         raise ValueError("kernel_id must match Kaggle owner/slug form (lowercase alnum/hyphen)")
     if not title.strip():
         raise ValueError("title must be a non-empty string")
+    if dataset_source is not None and not _KERNEL_ID_RE.fullmatch(dataset_source):
+        raise ValueError("dataset_source must match Kaggle owner/slug form (lowercase alnum/hyphen)")
     if enable_gpu and not machine_shape:
         raise ValueError("machine_shape is required when enable_gpu is true")
     if not enable_gpu and machine_shape is not None:
@@ -329,16 +458,66 @@ def build_bundle(
     backup_dir = temp_root / f"{bundle_dir.name}.backup"
     try:
         (staging_dir / "artifacts").mkdir(parents=True, exist_ok=True)
-        corpus_target = staging_dir / "input_corpus.txt"
-        shutil.copyfile(corpus_file, corpus_target)
         shutil.copyfile(REPO_ROOT / "LICENSE", staging_dir / "LICENSE")
         (staging_dir / "NOTICE").write_text(_bundle_notice_text(), encoding="utf-8")
-        src_target = staging_dir / "src" / "llcore"
-        shutil.copytree(SRC_ROOT / "llcore", src_target, ignore=_ignore_source_noise)
-        pkg_target = staging_dir / "llcore"
-        shutil.copytree(SRC_ROOT / "llcore", pkg_target, ignore=_ignore_source_noise)
-        (staging_dir / RUNNER_NAME).write_text(RUNNER_TEMPLATE, encoding="utf-8")
-        (staging_dir / "README.md").write_text(README_TEMPLATE, encoding="utf-8")
+        if dataset_source is None:
+            corpus_target = staging_dir / "input_corpus.txt"
+            shutil.copyfile(corpus_file, corpus_target)
+            src_target = staging_dir / "src" / "llcore"
+            shutil.copytree(SRC_ROOT / "llcore", src_target, ignore=_ignore_source_noise)
+            pkg_target = staging_dir / "llcore"
+            shutil.copytree(SRC_ROOT / "llcore", pkg_target, ignore=_ignore_source_noise)
+            config_payload = {
+                "compare_config": asdict(cfg),
+                "corpus_file_name": corpus_file.name,
+                "corpus_sha256": _sha256_text(corpus_file),
+            }
+            _write_json(staging_dir / "config.json", config_payload)
+        else:
+            dataset_payload_dir = staging_dir / DATASET_PAYLOAD_DIRNAME
+            dataset_payload_dir.mkdir(parents=True, exist_ok=True)
+            corpus_target = dataset_payload_dir / "input_corpus.txt"
+            shutil.copyfile(corpus_file, corpus_target)
+            shutil.copyfile(REPO_ROOT / "LICENSE", dataset_payload_dir / "LICENSE")
+            (dataset_payload_dir / "NOTICE").write_text(_bundle_notice_text(), encoding="utf-8")
+            src_target = dataset_payload_dir / "src" / "llcore"
+            shutil.copytree(SRC_ROOT / "llcore", src_target, ignore=_ignore_source_noise)
+            pkg_target = dataset_payload_dir / "llcore"
+            shutil.copytree(SRC_ROOT / "llcore", pkg_target, ignore=_ignore_source_noise)
+            config_payload = {
+                "compare_config": asdict(cfg),
+                "corpus_file_name": corpus_file.name,
+                "corpus_sha256": _sha256_text(corpus_file),
+            }
+            _write_json(dataset_payload_dir / "config.json", config_payload)
+            dataset_metadata_payload = {
+                "title": _dataset_mount_name(dataset_source),
+                "id": dataset_source,
+                "licenses": [{"name": "other"}],
+            }
+            _write_json(dataset_payload_dir / DATASET_METADATA_NAME, dataset_metadata_payload)
+            dataset_payload_manifest = {
+                "dataset_source": dataset_source,
+                "dataset_mount_name": _dataset_mount_name(dataset_source),
+                "copied_files": {
+                    "corpus": "input_corpus.txt",
+                    "config": "config.json",
+                    "metadata": DATASET_METADATA_NAME,
+                    "src_llcore": "src/llcore",
+                    "pkg_llcore": "llcore",
+                    "license": "LICENSE",
+                    "notice": "NOTICE",
+                },
+                "corpus_sha256": config_payload["corpus_sha256"],
+                "source_sha256": _sha256_tree(src_target),
+                "config_sha256": _sha256_text(dataset_payload_dir / "config.json"),
+                "license_sha256": _sha256_text(dataset_payload_dir / "LICENSE"),
+                "notice_sha256": _sha256_text(dataset_payload_dir / "NOTICE"),
+                "dataset_metadata_sha256": _sha256_text(dataset_payload_dir / DATASET_METADATA_NAME),
+            }
+            _write_json(dataset_payload_dir / DATASET_PAYLOAD_MANIFEST_NAME, dataset_payload_manifest)
+        (staging_dir / RUNNER_NAME).write_text(_render_runner(dataset_source), encoding="utf-8")
+        (staging_dir / "README.md").write_text(_render_readme(dataset_source), encoding="utf-8")
         kernel_metadata = _build_kernel_metadata(
             kernel_id=kernel_id,
             title=title,
@@ -346,18 +525,11 @@ def build_bundle(
             enable_internet=enable_internet,
             is_private=is_private,
             machine_shape=machine_shape,
+            dataset_sources=[] if dataset_source is None else [dataset_source],
         )
         _write_json(staging_dir / "kernel-metadata.json", kernel_metadata)
-        source_sha256 = _sha256_tree(src_target)
-        config_payload = {
-            "compare_config": asdict(cfg),
-            "corpus_file_name": corpus_file.name,
-            "corpus_sha256": _sha256_text(corpus_file),
-        }
-        _write_json(staging_dir / "config.json", config_payload)
         runner_sha256 = _sha256_text(staging_dir / RUNNER_NAME)
-        config_sha256 = _sha256_text(staging_dir / "config.json")
-        manifest_payload = {
+        manifest_payload: dict[str, object] = {
             "kernel_id": kernel_id,
             "title": title,
             "machine_shape": machine_shape,
@@ -366,22 +538,53 @@ def build_bundle(
             "enable_gpu": kernel_metadata["enable_gpu"],
             "enable_tpu": kernel_metadata["enable_tpu"],
             "runner": RUNNER_NAME,
-            "copied_files": {
-                "corpus": "input_corpus.txt",
-                "config": "config.json",
-                "metadata": "kernel-metadata.json",
-                "src_llcore": "src/llcore",
-                "pkg_llcore": "llcore",
-                "license": "LICENSE",
-                "notice": "NOTICE",
-            },
-            "corpus_sha256": config_payload["corpus_sha256"],
-            "source_sha256": source_sha256,
             "runner_sha256": runner_sha256,
-            "config_sha256": config_sha256,
             "license_sha256": _sha256_text(staging_dir / "LICENSE"),
             "notice_sha256": _sha256_text(staging_dir / "NOTICE"),
         }
+        summary_source_sha256: str | None = None
+        summary_config_sha256: str | None = None
+        if dataset_source is None:
+            source_sha256 = _sha256_tree(src_target)
+            config_sha256 = _sha256_text(staging_dir / "config.json")
+            summary_source_sha256 = source_sha256
+            summary_config_sha256 = config_sha256
+            manifest_payload.update(
+                {
+                    "data_mode": "embedded",
+                    "copied_files": {
+                        "corpus": "input_corpus.txt",
+                        "config": "config.json",
+                        "metadata": "kernel-metadata.json",
+                        "src_llcore": "src/llcore",
+                        "pkg_llcore": "llcore",
+                        "license": "LICENSE",
+                        "notice": "NOTICE",
+                    },
+                    "corpus_sha256": config_payload["corpus_sha256"],
+                    "source_sha256": source_sha256,
+                    "config_sha256": config_sha256,
+                }
+            )
+        else:
+            dataset_payload_dir = staging_dir / DATASET_PAYLOAD_DIRNAME
+            dataset_payload_manifest_path = dataset_payload_dir / DATASET_PAYLOAD_MANIFEST_NAME
+            manifest_payload.update(
+                {
+                    "data_mode": "dataset",
+                    "dataset_source": dataset_source,
+                    "dataset_mount_name": _dataset_mount_name(dataset_source),
+                    "dataset_payload_rel": DATASET_PAYLOAD_DIRNAME,
+                    "dataset_payload_manifest_sha256": _sha256_text(dataset_payload_manifest_path),
+                    "copied_files": {
+                        "metadata": "kernel-metadata.json",
+                        "runner": RUNNER_NAME,
+                        "license": "LICENSE",
+                        "notice": "NOTICE",
+                        "dataset_payload": DATASET_PAYLOAD_DIRNAME,
+                    },
+                }
+            )
         _write_json(staging_dir / "bundle_manifest.json", manifest_payload)
 
         if bundle_dir.exists():
@@ -400,9 +603,11 @@ def build_bundle(
             "title": title,
             "machine_shape": machine_shape,
             "corpus_sha256": config_payload["corpus_sha256"],
-            "source_sha256": source_sha256,
             "runner_sha256": runner_sha256,
-            "config_sha256": config_sha256,
+            "data_mode": "embedded" if dataset_source is None else "dataset",
+            "dataset_source": dataset_source,
+            "source_sha256": summary_source_sha256,
+            "config_sha256": summary_config_sha256,
         }
     except Exception:
         shutil.rmtree(temp_root, ignore_errors=True)
@@ -419,6 +624,14 @@ def _parser() -> argparse.ArgumentParser:
     ap.add_argument("--bundle-dir", required=True, help="output directory for the Kaggle bundle")
     ap.add_argument("--corpus-file", required=True, help="UTF-8 corpus file to embed")
     ap.add_argument("--kernel-id", default=DEFAULT_KERNEL_ID)
+    ap.add_argument(
+        "--dataset-source",
+        default=None,
+        help=(
+            "optional Kaggle dataset owner/slug for runtime inputs; when set, build "
+            "a dataset-backed kernel bundle with local payload under dataset_payload/"
+        ),
+    )
     ap.add_argument("--title", default="llcore-lm-compare")
     ap.add_argument("--machine-shape", default="NvidiaTeslaT4")
     ap.add_argument("--enable-gpu", action="store_true", help="emit GPU-enabled Kaggle metadata")
@@ -468,17 +681,18 @@ def main(argv: list[str] | None = None) -> int:
             enable_gpu=args.enable_gpu,
             enable_internet=args.enable_internet,
             is_private=not args.public,
+            dataset_source=args.dataset_source,
             cfg=cfg,
         )
     except (ValueError, OSError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
-    summary_map = cast(dict[str, str], summary)
     print(
         "[kaggle-bundle]",
-        f"dir={summary_map['bundle_dir']}",
-        f"kernel_id={summary_map['kernel_id']}",
-        f"corpus_sha256={summary_map['corpus_sha256'][:12]}",
+        f"dir={summary['bundle_dir']}",
+        f"kernel_id={summary['kernel_id']}",
+        f"mode={summary['data_mode']}",
+        f"corpus_sha256={str(summary['corpus_sha256'])[:12]}",
     )
     return 0
 
