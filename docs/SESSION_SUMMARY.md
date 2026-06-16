@@ -56,6 +56,7 @@
 4. 追加 hardening 済み:
    - `build_bundle()` 関数 API は `enable_gpu` と `machine_shape` の矛盾を `ValueError` で fail-closed reject
    - `memory_footprint_harness.py` の `lengths_effective` は **入力順保持 + dedup** に変更済み
+   - local commit `4bd61e2` = `Harden Kaggle bundle guards and memory harness ordering`
 
 ## 補足
 
