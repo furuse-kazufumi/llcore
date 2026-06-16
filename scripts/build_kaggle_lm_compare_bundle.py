@@ -243,12 +243,15 @@ This folder is a local, deterministic Kaggle script-kernel bundle for
 Do not push automatically. Publish order is:
 
 ```powershell
-kaggle datasets create -p <this_dir>/dataset_payload
-kaggle datasets version -p <this_dir>/dataset_payload -m "update dataset payload"
+kaggle datasets create -p <this_dir>/dataset_payload --dir-mode zip
+kaggle datasets version -p <this_dir>/dataset_payload --dir-mode zip -m "update dataset payload"
 kaggle kernels push -p <this_dir>
 ```
 
 Use `create` for the first publish of a dataset slug and `version` for updates.
+`--dir-mode zip` is required to avoid Kaggle CLI skipping directories inside
+`dataset_payload/`, but it does not by itself prove Kaggle will expose the
+payload as importable expanded directories at runtime.
 """
 
 

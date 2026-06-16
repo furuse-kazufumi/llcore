@@ -150,13 +150,17 @@ def prepare_bundle(argv: list[str] | None = None) -> int:
         "dataset_create_command": (
             None
             if not args.dataset_source
-            else f'kaggle datasets create -p "{Path(args.bundle_dir).resolve() / "dataset_payload"}"'
+            else (
+                f'kaggle datasets create -p "{Path(args.bundle_dir).resolve() / "dataset_payload"}" '
+                "--dir-mode zip"
+            )
         ),
         "dataset_version_command": (
             None
             if not args.dataset_source
             else (
                 f'kaggle datasets version -p "{Path(args.bundle_dir).resolve() / "dataset_payload"}" '
+                "--dir-mode zip "
                 '-m "update dataset payload"'
             )
         ),

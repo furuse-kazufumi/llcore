@@ -157,7 +157,14 @@ def test_prepare_bundle_dataset_mode_reports_dataset_command(tmp_path: Path, cap
     payload = json.loads(report_path.read_text(encoding="utf-8"))
     assert payload["dataset_source"] == "furusekazufumi/llcore-lm-compare-support"
     assert "dataset_payload" in payload["dataset_create_command"]
+    assert "--dir-mode zip" in payload["dataset_create_command"]
     assert "datasets version" in payload["dataset_version_command"]
+    assert "--dir-mode zip" in payload["dataset_version_command"]
+    dataset_payload = bundle_dir / "dataset_payload"
+    assert (dataset_payload / "config.json").is_file()
+    assert (dataset_payload / "input_corpus.txt").is_file()
+    assert (dataset_payload / "src" / "llcore" / "__init__.py").is_file()
+    assert (dataset_payload / "llcore" / "__init__.py").is_file()
 
 
 def test_prepare_bundle_rejects_nonpositive_runner_timeout(
