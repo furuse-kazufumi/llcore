@@ -5,6 +5,8 @@ The generated directory is intentionally self-contained:
 
 - `input_corpus.txt` is copied in so the run does not depend on remote fetches.
 - `src/llcore/` is snapshotted into the bundle.
+- `llcore/` is also copied at the bundle root so Kaggle runtime import-path
+  differences do not strand the package behind `src/`.
 - `LICENSE` + `NOTICE` are copied in for redistribution review.
 - `runner.py` reads `config.json` and writes compare artifacts under `artifacts/`.
 
@@ -35,7 +37,15 @@ REPO_ROOT = HERE.parent
 SRC_ROOT = REPO_ROOT / "src"
 DEFAULT_KERNEL_ID = "furusekazufumi/llcore-lm-compare"
 RUNNER_NAME = "runner.py"
-REQUIRED_COPIED_FILE_KEYS = ("corpus", "config", "metadata", "src_llcore", "license", "notice")
+REQUIRED_COPIED_FILE_KEYS = (
+    "corpus",
+    "config",
+    "metadata",
+    "src_llcore",
+    "pkg_llcore",
+    "license",
+    "notice",
+)
 _KERNEL_ID_RE = re.compile(r"^[a-z0-9][a-z0-9-]*/[a-z0-9][a-z0-9-]*$")
 
 RUNNER_TEMPLATE = """# SPDX-License-Identifier: Apache-2.0
@@ -46,7 +56,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-sys.path.insert(0, str(ROOT / "src"))
+for candidate in (ROOT, ROOT / "src"):
+    sys.path.insert(0, str(candidate))
 
 from llcore.lm.compare import CompareConfig, compare_on_text
 
@@ -81,7 +92,7 @@ This folder is a local, deterministic Kaggle kernel bundle for `llcore.lm.compar
 
 - Corpus input is pinned via `input_corpus.txt`.
 - Compare config is pinned via `config.json`.
-- Code is snapshotted under `src/llcore/`.
+- Code is snapshotted under both `src/llcore/` and bundle-root `llcore/`.
 - Metadata defaults are safe: private + internet disabled + GPU disabled.
 
 ## Local contents
@@ -249,6 +260,7 @@ def _is_builder_bundle_dir(bundle_dir: Path) -> bool:
         "README.md",
         RUNNER_NAME,
         "src/llcore",
+        "llcore",
     )
     return (
         all((bundle_dir / rel).exists() for rel in required_paths)
@@ -323,6 +335,8 @@ def build_bundle(
         (staging_dir / "NOTICE").write_text(_bundle_notice_text(), encoding="utf-8")
         src_target = staging_dir / "src" / "llcore"
         shutil.copytree(SRC_ROOT / "llcore", src_target, ignore=_ignore_source_noise)
+        pkg_target = staging_dir / "llcore"
+        shutil.copytree(SRC_ROOT / "llcore", pkg_target, ignore=_ignore_source_noise)
         (staging_dir / RUNNER_NAME).write_text(RUNNER_TEMPLATE, encoding="utf-8")
         (staging_dir / "README.md").write_text(README_TEMPLATE, encoding="utf-8")
         kernel_metadata = _build_kernel_metadata(
@@ -357,6 +371,7 @@ def build_bundle(
                 "config": "config.json",
                 "metadata": "kernel-metadata.json",
                 "src_llcore": "src/llcore",
+                "pkg_llcore": "llcore",
                 "license": "LICENSE",
                 "notice": "NOTICE",
             },

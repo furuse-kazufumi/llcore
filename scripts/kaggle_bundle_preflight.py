@@ -30,7 +30,15 @@ REQUIRED_FILES = (
     "runner.py",
     "README.md",
 )
-REQUIRED_COPIED_FILE_KEYS = ("corpus", "config", "metadata", "src_llcore", "license", "notice")
+REQUIRED_COPIED_FILE_KEYS = (
+    "corpus",
+    "config",
+    "metadata",
+    "src_llcore",
+    "pkg_llcore",
+    "license",
+    "notice",
+)
 _BOOL_TEXT_VALUES = {"true", "false"}
 
 
@@ -68,6 +76,9 @@ def _validate_bundle_dir(bundle_dir: Path) -> dict[str, object]:
     src_llcore = bundle_dir / "src" / "llcore"
     if not src_llcore.is_dir():
         missing.append("src/llcore")
+    pkg_llcore = bundle_dir / "llcore"
+    if not pkg_llcore.is_dir():
+        missing.append("llcore")
     if missing:
         raise ValueError(f"bundle is missing required paths: {', '.join(missing)}")
 
@@ -125,8 +136,11 @@ def _validate_bundle_dir(bundle_dir: Path) -> dict[str, object]:
     if corpus_sha256 != manifest_corpus_sha256:
         raise ValueError("config.json.corpus_sha256 does not match bundle_manifest.json.corpus_sha256")
     actual_source_sha256 = _sha256_tree(src_llcore)
+    actual_pkg_source_sha256 = _sha256_tree(pkg_llcore)
     if actual_source_sha256 != manifest_source_sha256:
         raise ValueError("src/llcore sha256 does not match bundle_manifest.json.source_sha256")
+    if actual_pkg_source_sha256 != manifest_source_sha256:
+        raise ValueError("llcore sha256 does not match bundle_manifest.json.source_sha256")
     if actual_config_sha256 != manifest_config_sha256:
         raise ValueError("config.json sha256 does not match bundle_manifest.json.config_sha256")
     if actual_license_sha256 != manifest_license_sha256:

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -132,6 +133,17 @@ def test_preflight_rejects_source_snapshot_drift(tmp_path: Path) -> None:
     assert rc == 2
 
 
+def test_preflight_rejects_top_level_package_snapshot_drift(tmp_path: Path) -> None:
+    preflight = _load_script("kaggle_bundle_preflight.py")
+    bundle_dir = _build_bundle(tmp_path)
+    compare_path = bundle_dir / "llcore" / "lm" / "compare.py"
+    compare_path.write_text(compare_path.read_text(encoding="utf-8") + "\n# tampered\n", encoding="utf-8")
+
+    rc = preflight.main(["--bundle-dir", str(bundle_dir)])
+
+    assert rc == 2
+
+
 def test_preflight_rejects_manifest_kernel_id_mismatch(tmp_path: Path) -> None:
     preflight = _load_script("kaggle_bundle_preflight.py")
     bundle_dir = _build_bundle(tmp_path)
@@ -242,6 +254,16 @@ def test_preflight_rejects_missing_required_copied_file_key(tmp_path: Path) -> N
     assert isinstance(copied_files, dict)
     copied_files.pop("src_llcore")
     manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    rc = preflight.main(["--bundle-dir", str(bundle_dir)])
+
+    assert rc == 2
+
+
+def test_preflight_rejects_missing_top_level_package(tmp_path: Path) -> None:
+    preflight = _load_script("kaggle_bundle_preflight.py")
+    bundle_dir = _build_bundle(tmp_path)
+    shutil.rmtree(bundle_dir / "llcore")
 
     rc = preflight.main(["--bundle-dir", str(bundle_dir)])
 

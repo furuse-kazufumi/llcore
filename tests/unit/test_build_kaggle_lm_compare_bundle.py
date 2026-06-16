@@ -85,6 +85,7 @@ def test_build_bundle_writes_metadata_and_copies_inputs(tmp_path: Path) -> None:
         "config",
         "metadata",
         "src_llcore",
+        "pkg_llcore",
         "license",
         "notice",
     }
@@ -96,7 +97,9 @@ def test_build_bundle_writes_metadata_and_copies_inputs(tmp_path: Path) -> None:
     assert (bundle_dir / "README.md").is_file()
     assert (bundle_dir / "bundle_manifest.json").is_file()
     assert (bundle_dir / "src" / "llcore" / "lm" / "compare.py").is_file()
+    assert (bundle_dir / "llcore" / "lm" / "compare.py").is_file()
     assert not (bundle_dir / "src" / "llcore" / "__pycache__").exists()
+    assert not (bundle_dir / "llcore" / "__pycache__").exists()
 
 
 def test_build_bundle_rejects_missing_corpus(
@@ -275,6 +278,7 @@ def test_build_bundle_rejects_weak_bundle_sentinel_directory(
             "config": "config.json",
             "metadata": "kernel-metadata.json",
             "src_llcore": "src/llcore",
+            "pkg_llcore": "llcore",
             "license": "LICENSE",
             "notice": "NOTICE",
         },
