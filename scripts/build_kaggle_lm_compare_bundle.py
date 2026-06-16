@@ -276,6 +276,12 @@ def build_bundle(
     is_private: bool,
     cfg: CompareConfig,
 ) -> dict[str, object]:
+    """Build a local Kaggle bundle and return manifest-level summary data.
+
+    `enable_gpu` and `machine_shape` must agree. Mixed inputs that were
+    previously tolerated via direct function calls are now rejected
+    fail-closed with `ValueError`.
+    """
     if not corpus_file.is_file():
         raise ValueError(f"corpus file does not exist: {corpus_file}")
     if not kernel_id.strip():

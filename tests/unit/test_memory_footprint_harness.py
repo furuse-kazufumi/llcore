@@ -156,6 +156,40 @@ def test_parse_lengths_preserves_input_order_while_deduping() -> None:
     assert harness._parse_lengths("512,128,512,64") == [512, 128, 64]
 
 
+def test_headline_uses_min_max_t_even_when_lengths_are_descending(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    harness = _load_harness()
+
+    class _DummyConfig:
+        def __init__(self, vocab_size: int) -> None:
+            self.vocab_size = vocab_size
+            self.n_layer = 4
+            self.n_embd = 128
+            self.n_head = 4
+
+    class _DummyModel(torch.nn.Module):
+        def __init__(self, cfg: Any) -> None:
+            super().__init__()
+            self.config = _DummyConfig(cfg.vocab_size)
+            self.p = torch.nn.Parameter(torch.zeros(1))
+
+    monkeypatch.setattr(harness, "CharGPT", _DummyModel)
+    monkeypatch.setattr(harness, "RecurrentLM", _DummyModel)
+    monkeypatch.setattr(harness, "RWKVLM", _DummyModel)
+    monkeypatch.setattr(harness, "_recurrent_state_bytes", lambda model, t, warmup=1: (2048, 0.0))
+    monkeypatch.setattr(harness, "_gpt_context", lambda model, t, warmup=1: (4096 * t, 1024 * t * t, 0.0))
+    monkeypatch.setattr(harness, "_system_memory_snapshot", lambda: None)
+
+    rc = harness.main(["--lengths", "512,128,64", "--json", str(tmp_path / "mem.json")])
+    assert rc == 0
+    out = capsys.readouterr().out
+    assert "[headline] T 64→512 (×8.00):" in out
+    assert "GPT attn ×64 (QUADRATIC)." in out
+
+
 def test_main_rejects_non_positive_lengths(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:

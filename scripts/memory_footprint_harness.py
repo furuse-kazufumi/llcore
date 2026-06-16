@@ -205,6 +205,17 @@ def _parse_lengths(raw: str) -> list[int]:
     return list(dict.fromkeys(values))
 
 
+def _headline_range(records: list[dict[str, Any]]) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Return the low/high-T records used for the growth headline.
+
+    Table output preserves user order, but the headline compares the smallest and
+    largest measured context lengths so growth labels remain meaningful even
+    when `--lengths` is supplied in descending or mixed order.
+    """
+    by_t = sorted(records, key=lambda record: cast(int, record["T"]))
+    return by_t[0], by_t[-1]
+
+
 @torch.no_grad()
 def _gpt_context(model: CharGPT, t: int, warmup: int = 1) -> tuple[int, int, float]:
     """T トークンの実 forward を走らせ、(KV-cache バイト解析値, attn 行列バイト解析値, RSS増分) を返す。
@@ -290,15 +301,19 @@ def main(argv: list[str] | None = None) -> int:
         print(f"| {r['T']} | {r['recurrent_state_bytes']:,} B | {r['rwkv_state_bytes']:,} B | "
               f"{r['gpt_kv_bytes']:,} B | {r['gpt_attn_bytes']:,} B | {r['rss_mb']['gpt']} MB |")
 
-    # headline: state constancy vs GPT growth ratio across the T range
-    sb0 = cast(int, records[0]["recurrent_state_bytes"])
-    sbN = cast(int, records[-1]["recurrent_state_bytes"])
-    kv0 = cast(int, records[0]["gpt_kv_bytes"])
-    kvN = cast(int, records[-1]["gpt_kv_bytes"])
-    t_ratio = lengths[-1] / lengths[0]
-    print(f"\n[headline] T {lengths[0]}→{lengths[-1]} (×{t_ratio:.2f}): "
+    # Headline uses the measured min/max T range, even if the user requested
+    # output rows in descending or mixed order.
+    low_record, high_record = _headline_range(records)
+    low_t = cast(int, low_record["T"])
+    high_t = cast(int, high_record["T"])
+    sb0 = cast(int, low_record["recurrent_state_bytes"])
+    sbN = cast(int, high_record["recurrent_state_bytes"])
+    kv0 = cast(int, low_record["gpt_kv_bytes"])
+    kvN = cast(int, high_record["gpt_kv_bytes"])
+    t_ratio = high_t / low_t
+    print(f"\n[headline] T {low_t}→{high_t} (×{t_ratio:.2f}): "
           f"Recurrent state {sb0:,}→{sbN:,} B (×{sbN/max(1, sb0):.2f}=CONSTANT) / "
-          f"GPT KV {kv0:,}→{kvN:,} B (×{kvN/max(1, kv0):.1f}=LINEAR) / GPT attn ×{(lengths[-1]/lengths[0])**2:.0f} (QUADRATIC). "
+          f"GPT KV {kv0:,}→{kvN:,} B (×{kvN/max(1, kv0):.1f}=LINEAR) / GPT attn ×{(high_t/low_t)**2:.0f} (QUADRATIC). "
           f"state_bytes=実測テンソル / KV・attn=解析値 (RSS でトレンド裏取り)")
     print("[vm-note] pagefile / commit は速度向上ではなく OOM 回避の headroom 指標。"
           " avail_commit が小さいなら pagefile 設定や同時実行数を見直す。")

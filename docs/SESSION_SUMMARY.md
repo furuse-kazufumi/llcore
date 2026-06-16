@@ -21,6 +21,9 @@
 - 直近の局所 gate:
   - `py -3.11 -m pytest tests/unit/test_memory_footprint_harness.py tests/unit/test_build_kaggle_lm_compare_bundle.py tests/unit/test_kaggle_push_readiness.py -q`
   - **`31 passed`**
+- さらに今回の局所修正:
+  - `py -3.11 -m pytest tests/unit/test_memory_footprint_harness.py -q`
+  - **`7 passed`** (`--lengths` descending 時も headline が min/max T を使うことを固定)
 - live 実測は **3 本**ある。旧 auth failure path (`rc=3`) は OAuth 依存実装時の記録で、現行実装では **CPU bundle の ready path (`rc=0`)** も `C:\Users\puruy\AppData\Local\Temp\llcore_kaggle_livecheck_20260617b` で確認済み。さらに GPU bundle `C:\Users\puruy\AppData\Local\Temp\llcore_kaggle_gpu_livecheck_20260617` でも readiness を試したが、ローカル **Kaggle CLI 2.2.1 の `quota` サブコマンド自体が `not enough values to unpack (expected 2, got 1)` で失敗**し、`rc=4` へ落ちた。現行 auth は OAuth ではなく **push credential (`kaggle.json` または `KAGGLE_USERNAME`+`KAGGLE_KEY`) + `kaggle kernels list -m --page-size 1 --csv` 疎通**で見る。したがって GPU quota live path は「未実施」ではなく **local CLI failure で確認不能**、実 `kaggle kernels push` は未実施。
 - 外部 publish は **0 件**。
 
@@ -64,3 +67,4 @@
 - 旧 `out/kaggle_lm_compare_smoke` は `source_sha256` 追加前の古い manifest 世代で、current preflight の正本には使わない。
 - 再開後の focused gate 再実行は **memory harness を含む 5 test ファイル集合で `57 passed`**、対応 `mypy` / `ruff` も通過。
 - fresh bundle は `C:\Users\puruy\AppData\Local\Temp\llcore_kaggle_livecheck_20260617b` に再生成し、前回と同じ manifest hash 群で `kaggle_push_readiness.py` の **CPU ready path `rc=0`** を確認した。CPU bundle なので live quota は skip され、`quota_rows=0 quota_checked=cpu` を表示した。別途 GPU bundle `C:\Users\puruy\AppData\Local\Temp\llcore_kaggle_gpu_livecheck_20260617` では readiness を試したが、`kaggle quota -v` が **CLI 2.2.1 側で `not enough values to unpack (expected 2, got 1)`** となり `rc=4` で停止した。実 `kaggle kernels push` 自体は未実施。
+- repo-local `out/kaggle_lm_compare_smoke` は **current push candidate ではない**。これは historical smoke artifact で、現物 metadata は `enable_gpu=true`, `machine_shape=NvidiaTeslaT4`, `is_private=false`, `enable_internet=true`。現在の push 判断は repo 外 fresh CPU bundle `C:\Users\puruy\AppData\Local\Temp\llcore_kaggle_livecheck_20260617b` を正本とする。
