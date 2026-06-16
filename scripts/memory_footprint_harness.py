@@ -21,7 +21,11 @@ honest 留保:
     block_size で頭打ち。「線形」は『block_size を伸ばして厳密長文脈を attention する』場合の
     必要量。recurrent の固定状態は原理的に任意の過去を一定サイズで運べる、という対比を示す。
   - RSS は torch のアロケータ・キャッシュ・断片化でノイジー。クリーンな信号は state_bytes (real)
-    と KV/attn (解析値)。RSS は補助。
+    と KV/attn (解析値)。RSS は補助。**負の RSS Δ（ページアウト等）は 0 に丸める**。
+  - 先頭点の lazy allocation ノイズを下げるため、既定で **1 回 warmup** してから測る。
+    ただし RSS は補助指標であり、allocator/cache の影響は残る。
+  - Windows telemetry の ctypes struct / WinAPI 呼び出しは、CI では fake 置換で shape 回帰のみを見る。
+    実 struct layout の妥当性は live Windows 実行で確認する。
 
 使い方::
 
@@ -34,79 +38,189 @@ import argparse
 import ctypes
 import gc
 import json
+import sys
 from pathlib import Path
+from typing import Any, cast
 
 import torch
+from torch import Tensor
 
-from llcore.lm.model import CharGPT, GPTConfig
-from llcore.lm.recurrent import RecurrentConfig, RecurrentLM
-from llcore.lm.rwkv import RWKVConfig, RWKVLM
+from llcore.lm.model import CharGPT, GPTConfig  # type: ignore[import-untyped]
+from llcore.lm.recurrent import RecurrentConfig, RecurrentLM  # type: ignore[import-untyped]
+from llcore.lm.rwkv import RWKVConfig, RWKVLM  # type: ignore[import-untyped]
+
+
+class _PMC(ctypes.Structure):
+    _fields_ = [
+        ("cb", ctypes.c_uint32), ("PageFaultCount", ctypes.c_uint32),
+        ("PeakWorkingSetSize", ctypes.c_size_t), ("WorkingSetSize", ctypes.c_size_t),
+        ("QuotaPeakPagedPoolUsage", ctypes.c_size_t), ("QuotaPagedPoolUsage", ctypes.c_size_t),
+        ("QuotaPeakNonPagedPoolUsage", ctypes.c_size_t), ("QuotaNonPagedPoolUsage", ctypes.c_size_t),
+        ("PagefileUsage", ctypes.c_size_t), ("PeakPagefileUsage", ctypes.c_size_t),
+    ]
+
+
+def _get_process_memory_info() -> _PMC | None:
+    """Windows の process memory info を返す。失敗時は None。"""
+    try:
+        import ctypes.wintypes as wt
+
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        psapi = ctypes.WinDLL("psapi", use_last_error=True)
+        kernel32.GetCurrentProcess.restype = wt.HANDLE
+        psapi.GetProcessMemoryInfo.argtypes = [wt.HANDLE, ctypes.POINTER(_PMC), wt.DWORD]
+        psapi.GetProcessMemoryInfo.restype = wt.BOOL
+        c = _PMC()
+        c.cb = ctypes.sizeof(c)
+        h = kernel32.GetCurrentProcess()
+        ok = psapi.GetProcessMemoryInfo(h, ctypes.byref(c), c.cb)
+        return c if ok else None
+    except Exception:  # noqa: BLE001 - RSS は補助情報、取れなくても続行
+        return None
 
 
 def _working_set_bytes() -> int:
     """現在のプロセスの working set (RSS) バイト数を返す (Windows; 失敗時 0)。"""
     try:
-        class _PMC(ctypes.Structure):
-            _fields_ = [
-                ("cb", ctypes.c_uint32), ("PageFaultCount", ctypes.c_uint32),
-                ("PeakWorkingSetSize", ctypes.c_size_t), ("WorkingSetSize", ctypes.c_size_t),
-                ("QuotaPeakPagedPoolUsage", ctypes.c_size_t), ("QuotaPagedPoolUsage", ctypes.c_size_t),
-                ("QuotaPeakNonPagedPoolUsage", ctypes.c_size_t), ("QuotaNonPagedPoolUsage", ctypes.c_size_t),
-                ("PagefileUsage", ctypes.c_size_t), ("PeakPagefileUsage", ctypes.c_size_t),
-            ]
-        c = _PMC()
-        c.cb = ctypes.sizeof(c)
-        h = ctypes.windll.kernel32.GetCurrentProcess()  # type: ignore[attr-defined]
-        ok = ctypes.windll.psapi.GetProcessMemoryInfo(h, ctypes.byref(c), c.cb)  # type: ignore[attr-defined]
-        return int(c.WorkingSetSize) if ok else 0
+        info = _get_process_memory_info()
+        return int(info.WorkingSetSize) if info is not None else 0
     except Exception:  # noqa: BLE001 - RSS は補助情報、取れなくても続行
         return 0
 
 
-def _rss_delta(fn) -> tuple[int, float]:
-    """fn() を実行し、(結果, RSS増分MB) を返す (gc を挟んでノイズを抑える)。"""
-    gc.collect()
-    before = _working_set_bytes()
-    out = fn()
-    after = _working_set_bytes()
-    del out
-    return after, max(0.0, (after - before) / 1e6)
+def _system_memory_snapshot() -> dict[str, int] | None:
+    """Windows の commit/pagefile/physical memory スナップショットを返す。"""
+    try:
+        import ctypes.wintypes as wt
+
+        class _MemoryStatusEx(ctypes.Structure):
+            _fields_ = [
+                ("dwLength", ctypes.c_uint32),
+                ("dwMemoryLoad", ctypes.c_uint32),
+                ("ullTotalPhys", ctypes.c_uint64),
+                ("ullAvailPhys", ctypes.c_uint64),
+                ("ullTotalPageFile", ctypes.c_uint64),
+                ("ullAvailPageFile", ctypes.c_uint64),
+                ("ullTotalVirtual", ctypes.c_uint64),
+                ("ullAvailVirtual", ctypes.c_uint64),
+                ("ullAvailExtendedVirtual", ctypes.c_uint64),
+            ]
+
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        kernel32.GlobalMemoryStatusEx.argtypes = [ctypes.POINTER(_MemoryStatusEx)]
+        kernel32.GlobalMemoryStatusEx.restype = wt.BOOL
+
+        ms = _MemoryStatusEx()
+        ms.dwLength = ctypes.sizeof(ms)
+        if not kernel32.GlobalMemoryStatusEx(ctypes.byref(ms)):
+            return None
+
+        snapshot = {
+            "memory_load_percent": int(ms.dwMemoryLoad),
+            "total_phys_bytes": int(ms.ullTotalPhys),
+            "avail_phys_bytes": int(ms.ullAvailPhys),
+            "total_commit_bytes": int(ms.ullTotalPageFile),
+            "avail_commit_bytes": int(ms.ullAvailPageFile),
+        }
+        pmc = _get_process_memory_info()
+        if pmc is not None:
+            snapshot["process_working_set_bytes"] = int(pmc.WorkingSetSize)
+            snapshot["process_pagefile_bytes"] = int(pmc.PagefileUsage)
+            snapshot["process_peak_pagefile_bytes"] = int(pmc.PeakPagefileUsage)
+        return snapshot
+    except Exception:  # noqa: BLE001 - 補助 telemetry が取れなくても本体を落とさない
+        return None
+
+
+def _snapshot_summary(snapshot: dict[str, int] | None) -> dict[str, float | None] | None:
+    """生 snapshot を MB / percent の簡約値へ変換する。process 側は部分成功を許容。"""
+    if snapshot is None:
+        return None
+    return {
+        "memory_load_percent": float(snapshot["memory_load_percent"]),
+        "avail_phys_mb": round(snapshot["avail_phys_bytes"] / 1e6, 1),
+        "avail_commit_mb": round(snapshot["avail_commit_bytes"] / 1e6, 1),
+        "process_working_set_mb": (
+            round(snapshot["process_working_set_bytes"] / 1e6, 1)
+            if "process_working_set_bytes" in snapshot else None
+        ),
+        "process_pagefile_mb": (
+            round(snapshot["process_pagefile_bytes"] / 1e6, 1)
+            if "process_pagefile_bytes" in snapshot else None
+        ),
+        "process_peak_pagefile_mb": (
+            round(snapshot["process_peak_pagefile_bytes"] / 1e6, 1)
+            if "process_peak_pagefile_bytes" in snapshot else None
+        ),
+    }
 
 
 @torch.no_grad()
-def _recurrent_state_bytes(model: RecurrentLM | RWKVLM, t: int) -> tuple[int, float]:
-    """T 個のトークンを step ループで流し、最終状態の state_bytes と RSS 増分を返す。"""
+def _recurrent_state_bytes(model: RecurrentLM | RWKVLM, t: int, warmup: int = 1) -> tuple[int, float]:
+    """T 個のトークンを step ループで流し、最終状態の state_bytes と RSS 増分を返す。
+
+    RSS Δ は補助指標であり、負値 (ページアウト等) は 0 に丸める。
+    """
     model.eval()
     idx = torch.randint(0, model.config.vocab_size, (1,))
 
-    def run() -> int:
+    def run() -> tuple[int, Any]:
         state = None
         sb = 0
         for _ in range(t):
             _, state = model.step(idx, state)
             sb = model.state_bytes(state)  # T に依らず一定のはず
-        return sb
+        return sb, state
 
+    for _ in range(warmup):
+        _, state = run()
+        del state
     gc.collect()
     before = _working_set_bytes()
-    sb = run()
+    sb, state = run()
     after = _working_set_bytes()
+    del state
     return sb, max(0.0, (after - before) / 1e6)
 
 
+def _parse_lengths(raw: str) -> list[int]:
+    """comma-separated lengths を fail-closed に正規化する。"""
+    raw_parts = raw.split(",")
+    parts = [part.strip() for part in raw_parts]
+    if not raw.strip():
+        raise ValueError("--lengths must contain at least one positive integer")
+    if any(not part for part in parts):
+        raise ValueError("--lengths must not contain empty items")
+    try:
+        values = [int(part) for part in parts]
+    except ValueError as exc:
+        raise ValueError("--lengths must contain only positive integers") from exc
+    invalid = [value for value in values if value <= 0]
+    if invalid:
+        bad = ", ".join(str(value) for value in invalid)
+        raise ValueError(f"--lengths must contain only positive integers; got {bad}")
+    return sorted(set(values))
+
+
 @torch.no_grad()
-def _gpt_context(model: CharGPT, t: int) -> tuple[int, int, float]:
-    """T トークンの実 forward を走らせ、(KV-cache バイト解析値, attn 行列バイト解析値, RSS増分) を返す。"""
+def _gpt_context(model: CharGPT, t: int, warmup: int = 1) -> tuple[int, int, float]:
+    """T トークンの実 forward を走らせ、(KV-cache バイト解析値, attn 行列バイト解析値, RSS増分) を返す。
+
+    RSS Δ は補助指標であり、負値 (ページアウト等) は 0 に丸める。
+    """
     model.eval()
     cfg = model.config
     kv_bytes = 2 * cfg.n_layer * t * cfg.n_embd * 4  # k,v それぞれ [L,T,C] float32
     attn_bytes = cfg.n_head * t * t * 4              # 1 層あたり attention 行列 [nh,T,T] (transient)
     idx = torch.randint(0, cfg.vocab_size, (1, t))
 
-    def run() -> torch.Tensor:
+    def run() -> Tensor:
         logits, _ = model(idx)
-        return logits
+        return cast(Tensor, logits)
 
+    for _ in range(warmup):
+        out = run()
+        del out
     gc.collect()
     before = _working_set_bytes()
     out = run()
@@ -123,25 +237,43 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--n-head", type=int, default=4)
     ap.add_argument("--vocab", type=int, default=256)
     ap.add_argument("--json", default="out/mem_footprint.json")
+    ap.add_argument("--warmup", type=int, default=1, help="warmup forwards/step-loops before measuring RSS")
     args = ap.parse_args(argv)
+    try:
+        lengths = _parse_lengths(args.lengths)
+        if args.warmup < 0:
+            raise ValueError("--warmup must be non-negative")
+    except ValueError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
     torch.manual_seed(1337)
-    lengths = [int(x) for x in args.lengths.split(",") if x.strip()]
     max_t = max(lengths)
-
     gpt = CharGPT(GPTConfig(vocab_size=args.vocab, block_size=max_t, n_layer=args.n_layer,
                             n_head=args.n_head, n_embd=args.n_embd))
     rec = RecurrentLM(RecurrentConfig(vocab_size=args.vocab, block_size=max_t, n_layer=args.n_layer,
                                       n_embd=args.n_embd, state_size=args.n_embd))
     rwkv = RWKVLM(RWKVConfig(vocab_size=args.vocab, block_size=max_t, n_layer=args.n_layer,
                              n_embd=args.n_embd))
-    print(f"models: GPT {gpt.num_params(False):,} / Recurrent {rec.num_params():,} / "
-          f"RWKV {rwkv.num_params():,} params  (n_embd={args.n_embd} L={args.n_layer})")
+    system_before = _snapshot_summary(_system_memory_snapshot())
+    def _np(m: torch.nn.Module) -> int:
+        return sum(p.numel() for p in m.parameters())
+    print(f"models: GPT {_np(gpt):,} / Recurrent {_np(rec):,} / "
+          f"RWKV {_np(rwkv):,} params  (n_embd={args.n_embd} L={args.n_layer})")
+    if system_before is not None:
+        proc_ws = system_before["process_working_set_mb"]
+        proc_commit = system_before["process_pagefile_mb"]
+        print("[system] before: "
+              f"load={system_before['memory_load_percent']:.0f}% "
+              f"avail_phys={system_before['avail_phys_mb']:.1f}MB "
+              f"avail_commit={system_before['avail_commit_mb']:.1f}MB "
+              f"proc_ws={'n/a' if proc_ws is None else f'{proc_ws:.1f}MB'} "
+              f"proc_commit={'n/a' if proc_commit is None else f'{proc_commit:.1f}MB'}")
 
-    records = []
+    records: list[dict[str, Any]] = []
     for t in lengths:
-        rec_sb, rec_rss = _recurrent_state_bytes(rec, t)
-        rwkv_sb, rwkv_rss = _recurrent_state_bytes(rwkv, t)
-        gpt_kv, gpt_attn, gpt_rss = _gpt_context(gpt, t)
+        rec_sb, rec_rss = _recurrent_state_bytes(rec, t, warmup=args.warmup)
+        rwkv_sb, rwkv_rss = _recurrent_state_bytes(rwkv, t, warmup=args.warmup)
+        gpt_kv, gpt_attn, gpt_rss = _gpt_context(gpt, t, warmup=args.warmup)
         records.append({"T": t, "recurrent_state_bytes": rec_sb, "rwkv_state_bytes": rwkv_sb,
                         "gpt_kv_bytes": gpt_kv, "gpt_attn_bytes": gpt_attn,
                         "rss_mb": {"recurrent": round(rec_rss, 1), "rwkv": round(rwkv_rss, 1),
@@ -156,17 +288,41 @@ def main(argv: list[str] | None = None) -> int:
               f"{r['gpt_kv_bytes']:,} B | {r['gpt_attn_bytes']:,} B | {r['rss_mb']['gpt']} MB |")
 
     # headline: state constancy vs GPT growth ratio across the T range
-    sb0, sbN = records[0]["recurrent_state_bytes"], records[-1]["recurrent_state_bytes"]
-    kv0, kvN = records[0]["gpt_kv_bytes"], records[-1]["gpt_kv_bytes"]
-    print(f"\n[headline] T {lengths[0]}→{lengths[-1]} ({lengths[-1]//lengths[0]}×): "
-          f"Recurrent state {sb0:,}→{sbN:,} B (×{sbN/sb0:.2f}=CONSTANT) / "
-          f"GPT KV {kv0:,}→{kvN:,} B (×{kvN/kv0:.1f}=LINEAR) / GPT attn ×{(lengths[-1]/lengths[0])**2:.0f} (QUADRATIC). "
+    sb0 = cast(int, records[0]["recurrent_state_bytes"])
+    sbN = cast(int, records[-1]["recurrent_state_bytes"])
+    kv0 = cast(int, records[0]["gpt_kv_bytes"])
+    kvN = cast(int, records[-1]["gpt_kv_bytes"])
+    t_ratio = lengths[-1] / lengths[0]
+    print(f"\n[headline] T {lengths[0]}→{lengths[-1]} (×{t_ratio:.2f}): "
+          f"Recurrent state {sb0:,}→{sbN:,} B (×{sbN/max(1, sb0):.2f}=CONSTANT) / "
+          f"GPT KV {kv0:,}→{kvN:,} B (×{kvN/max(1, kv0):.1f}=LINEAR) / GPT attn ×{(lengths[-1]/lengths[0])**2:.0f} (QUADRATIC). "
           f"state_bytes=実測テンソル / KV・attn=解析値 (RSS でトレンド裏取り)")
+    print("[vm-note] pagefile / commit は速度向上ではなく OOM 回避の headroom 指標。"
+          " avail_commit が小さいなら pagefile 設定や同時実行数を見直す。")
+
+    system_after = _snapshot_summary(_system_memory_snapshot())
+    if system_after is not None:
+        proc_ws = system_after["process_working_set_mb"]
+        proc_commit = system_after["process_pagefile_mb"]
+        peak_proc_commit = system_after["process_peak_pagefile_mb"]
+        print("[system] after: "
+              f"load={system_after['memory_load_percent']:.0f}% "
+              f"avail_phys={system_after['avail_phys_mb']:.1f}MB "
+              f"avail_commit={system_after['avail_commit_mb']:.1f}MB "
+              f"proc_ws={'n/a' if proc_ws is None else f'{proc_ws:.1f}MB'} "
+              f"proc_commit={'n/a' if proc_commit is None else f'{proc_commit:.1f}MB'} "
+              f"peak_proc_commit={'n/a' if peak_proc_commit is None else f'{peak_proc_commit:.1f}MB'}")
 
     outp = Path(args.json)
     outp.parent.mkdir(parents=True, exist_ok=True)
-    outp.write_text(json.dumps({"config": vars(args), "records": records}, ensure_ascii=False, indent=2),
-                    encoding="utf-8")
+    payload: dict[str, Any] = {
+        "config": vars(args),
+        "lengths_effective": lengths,
+        "records": records,
+        "system_before": system_before,
+        "system_after": system_after,
+    }
+    outp.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"\nwrote {outp}")
     return 0
 
