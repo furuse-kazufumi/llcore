@@ -1,6 +1,6 @@
 # next_plan (正本) — EXIT 時点の再開地点
 
-> 最終更新: 2026-06-16 (作業木 clean。LM recurrent の canonical 化、loop_ledger 追跡解除、HD-1 viz 追加、rerun 準備メモ更新まで完了。残る人間ゲートは corpus staging 側)
+> 最終更新: 2026-06-16 (LM recurrent の canonical 化、loop_ledger 追跡解除、HD-1 viz 追加、rerun 準備メモ更新まで完了。残る人間ゲートは corpus staging 側。現状の作業木は主に記録更新で、`docs/ARTICLE_SEEDS.md` は append-only 追記が中心。`collect_research_seeds.py` 側では裸の `記事化` / `published` レグを除去済みだが、legacy shorthand `→ #...` / `→ 記事...` はまだ consumed 判定に残る。dirty の実体は `git status` を正とする)
 > SESSION_SUMMARY.md は Stop hook で自動上書きされるため、**このファイルが再開の正本**。
 > hook 非管理の再開ポインタ: `docs/PROGRESS.md`
 
@@ -29,6 +29,14 @@
 - `feat/lm-recurrent` の LM 無関係 dirty（loop_ledger / *.svg / PROGRESS / next_plan / make_trajectory.py）と raptor 側差分は commit 時に**別件として分離**。
 - 各ループ末に `py -3.11 tools/llterm_status.py` で自走ステータスを SVG 化（`docs/status/llterm_status.svg`・seed=`tools/llterm_status_seed.json`）すると進捗が一目で見える。
 
+### 記事フィードバック（FullSense 記事側へ・重要）
+- **article-worthy な発見**（数値・honest disclosure・教訓・新規性・落とし穴）は `docs/ARTICLE_SEEDS.md` に**正規形式で append**:
+  `### N. タイトル` ／ `- **気付き**: …` ／ `- **根拠**: …（正本へのポインタ）` ／ `- **側面**: …（13 側面）`。
+  過去観測を後日 supersede する場合も、旧 entry を削ったり書き換えたりせず、新しい numbered seed を append して上書き関係を明示する。
+  現行 collector には「統合前提 cluster を機械的に読み飛ばす」マーカーが無いため、同一論点を 1〜2 本へ圧縮したい場合は **deposit 前**に `###` 単位を絞っておく。deposit 後の #21〜#28 のような束は、記事ドラフト化までは機械的に個別 seed として扱われる。
+  ※ 2026-06-16 に `D:\projects\fullsense\tools\collect_research_seeds.py` を観測確認済み。collector が通す parser 最小条件は「日付セッション `## YYYY-MM-DD` 配下」かつ「`###` 見出し + `**気付き**` または `**側面**` の同一行非空値」で、同日複数セクションは date 単位で併存集約される。ただし producer 契約としては引き続き `気付き` / `根拠` / `側面` を揃えて書く。`ARTICLE_SEEDS.md` は append-only を原則とする。consumed 判定の実 regex は **観測メモ** として、`→ 記事化: #NN` と legacy shorthand `→ #...` / `→ 記事...` を拾い、裸の `記事化` / `published` は consumed 判定に使わない状態だった。観測対象は repo 外の local dirty 作業木なので、この記述は**内部仕様の snapshot 依存メモ**であり、契約として再利用する前に現物を再取得すること。散文では parser / consumer が実際に拾うフィールド記法 `**気付き**:` / `**側面**:` や、消費マーカー `→ 記事化: #NN` / `→ #...` / `→ 記事...` を本文用途で流用しない。記事ドラフトの小見出しを `###` で混ぜない。
+- FullSense 記事側（ccr）が `fullsense/tools/collect_research_seeds.py` で全 project の seed を `fullsense/docs/articles/INBOX_research_seeds.md` に集約 → 記事化する。記事化されたら元エントリに `→ 記事化: #NN` を追記（INBOX で ☑ 化）。
+
 ---
 
 ## EXIT 時点の現在地
@@ -43,7 +51,9 @@
 
 1. `★ユーザー判断 (2026-06-16, ccr 経由)` を開き、人間ゲートの未回答を確認
 2. `verified_safe_learning` publish か `self_evolving_agents` precision rerun 本実行のどちらを先に進めるか、人間判断を回収
-3. rerun 実行が承認された場合のみ、`queries_refined_candidate.txt` の SHA256 `0E6CCB7A91C74E4728098EA92B98BD5E07889A320537EEC724F1D44795B9C042` を再確認して fetch / 再生成へ着手
+3. rerun 実行が承認された場合のみ、`queries_refined_candidate.txt` の SHA256 `2AB6A443E70D7A58DDDCFFE4213BF0156960C48E89109245CC9C34F74D6B7D73` を再確認して fetch / 再生成へ着手
+   - 監査注記: この SHA は repo 外 `D:\docs\self_evolving_agents_corpus_v2.staging\_STAGING_META\queries_refined_candidate.txt` の実体に依存する。**llcore repo 単体では再現・強制できず、CI/レビューだけでは gate を検証できない**ため、判断時は **保存先パス + 取得日時 + SHA** を必ずセットで読み、外部ファイルの再取得を前提に扱う。現時点の再確認値は **2026-06-16 10:19:33 +09:00 取得時点**のもの
+   - 意図メモ: これは collector 観測メモとは違い、precision rerun の**入力固定**として意図的に保持している SHA。旧 `0E6C...` から `2AB6...` への更新は query tightening を反映した rerun ゲート更新であり、drift ではない
 
 ## 今セッションまでに完了したこと (重複作業禁止)
 
@@ -53,7 +63,9 @@
   - 818 docs / 64 clusters / 72 SKILL.md
   - 判断記録: `_STAGING_META/DECISIONS.md`
 - 検証済み: fallback 残 0 / frontmatter 破損 0 / Navigation リンク全有効
-- live (`D:\docs\verified_safe_learning_corpus_v2`) は未作成のまま
+- live (`D:\docs\verified_safe_learning_corpus_v2`) は **未作成ではない**。2026-06-16 再確認で、`SKILL.md` frontmatter の `note_count: 97` と `Get-ChildItem D:\docs\verified_safe_learning_corpus_v2 -Filter *.md` 実測 98 files は、**97 ノート + `SKILL.md` = 98 files と整合**する v1/live flat corpus の存在を示す。したがって v2 staging の publish は「新規作成」ではなく、既存 live v1 をどう移行/置換/併存させるかの判断を含む
+- 構造差の追加確認 (2026-06-16): 既存 live v1 は flat corpus (`SKILL.md` 起点, 98 md files) だが、v2 staging は hierarchical corpus (`INDEX.md` + `metadata.json` + 8 top-level `cluster_*`, 72 `SKILL.md`, publish tree md 実測 891) 。ここで **818 は corpus doc 数、891 は `INDEX.md` / cluster `SKILL.md` を含む md ファイル総数**。**top-level entrypoint が `SKILL.md` → `INDEX.md` に変わる**ため、publish は内容差だけでなく利用者/ツールの参照前提変更を伴う
+- ツール互換性の追加確認 (2026-06-16): publish 対象 `D:\docs\<topic>_corpus_v2` を直接前提化しているのは `D:\tools\raptor\libexec\raptor-rad-ingest` で、`D:/docs/<topic>_corpus_v2/SKILL.md` を deposit / reindex 読取対象として使う。したがって v2 staging を live 名へ**単純置換すると、少なくとも rad-ingest 経由の `RAD_INDEX.md` 再生成で `(no SKILL.md)` 化する退行** が起こりうる。publish するなら、少なくとも top-level `SKILL.md` 互換導線をどう保つかまで判断が必要
 
 ### 2. self_evolving_agents 分野 — 完了・人間ゲート待ち
 
@@ -131,6 +143,95 @@
 1. **【人間】verified_safe_learning staging の publish 判断**
    - `D:\docs\verified_safe_learning_corpus_v2.staging`
    - rename 手順は `..._STAGING_META/DECISIONS.md` の publish 節
+   - ただし 2026-06-16 再確認で `D:\docs\verified_safe_learning_corpus_v2` は既存 live v1（`note_count: 97` と実測 98 files が **97 ノート + `SKILL.md` = 98 files と整合**する flat corpus）と判明。よって判断点は「publish するか」だけでなく、**既存 live v1 を残す / 置換する / 別名退避して v2 へ切替える** のどれを採るかも含む
+   - 比較メモ:
+     - v1/live = flat corpus, top-level `SKILL.md`, 98 md files
+     - v2/staging = hierarchical corpus, top-level `INDEX.md`, 8 top-level clusters, 72 `SKILL.md`, publish tree md 実測 891
+     - `818 docs` は corpus document 数、`891 md` は `INDEX.md` / cluster `SKILL.md` を含む md ファイル総数
+     - `D:\tools\raptor\libexec\raptor-rad-ingest` は `D:\docs\<topic>_corpus_v2\SKILL.md` 前提で `RAD_INDEX.md` を再生成する
+     - したがって「置換」は path の差し替えだけでなく **entrypoint 互換性と rad-ingest 側 reindex 契約の断絶** を受け入れる判断になる
+   - 現時点の移行オプション整理:
+     - 最小リスク: 既存 live v1 は維持し、v2 は別名のまま保持
+     - 中間案: v2 を live 名へ採用するが、top-level `SKILL.md` 互換 shim を新設して `INDEX.md` へ案内し、`rad-ingest` / `RAD_INDEX.md` の契約だけは維持する
+     - 最大変更: v2 をそのまま置換し、必要なら `rad-ingest` 側を `INDEX.md` 対応へ改修する
+   - 比較軸メモ:
+     - 最小リスク案 = 破壊半径は最小だが、利用者は v1/live と v2/staging の二重系を手で見分け続ける必要がある
+     - 中間案 = live 名は v2 に寄せつつ、entrypoint だけ明示的 shim で後方互換に固定できる。`rad-ingest` が読めない場合は `(no SKILL.md)` として fail-closed に露出しやすく、監視もしやすい
+     - 最大変更案 = 入口契約とツール契約を同時に動かすため、publish 時の判断コストも巻き戻しコストも最も高い
+   - 現時点の推奨順:
+     - 人間ゲートを最も通しやすいのは中間案。理由は、v2 の live 採用を前進させつつ、hacker corpus 側の既存教訓どおり「互換性は曖昧な fallback ではなく、明示的 entrypoint に解決して fail-closed に監視可能にする」ため
+   - 中間案の shim 最小仕様:
+     - frontmatter に少なくとも `name:` / top-level `description:` / `collected:` を持たせる (`collected:` は frontmatter 内なら `metadata:` 配下でも top-level でも read 可。実装はファイル全体を走査するため、shim 本文に偶発的な `collected:` 行を書かない)
+     - 本文冒頭に「verified safe learning corpus は hierarchical v2 へ移行した」旨の短い説明を置く
+     - `INDEX.md` への明示リンクと、必要なら top-level clusters の代表リンクだけを置く
+     - `rad-ingest` が reindex で使うのは top-level `description:` と `collected:` (`description:` は列 0 必須、`collected:` は strip 後マッチ)。`collected:` は frontmatter 内の top-level / `metadata:` 配下どちらでもよいが、実装はファイル全体を走査するため本文中の偶発一致は避ける。本文の最初の非見出し段落は `description:` 欠落時のフォールバックに留まるため、shim では主に人間向け導線とみなす
+   - 中間案の shim 草案（そのまま置ける最小骨子）:
+     - frontmatter:
+       `name: verified_safe_learning_corpus_v2` / top-level `description: verified safe learning の RAD コーパス (hierarchical v2; INDEX 起点)` / `metadata:` 配下 `collected: <publish日>`
+     - `rad-ingest` 契約として必須なのは **列 0 の `description:`** と、**frontmatter 内のどこか(top-level でも `metadata:` 配下でも可)の `collected:`**。実装はファイル全体走査なので本文側に偶発的な `collected:` 行を置かない。`name:` は SKILL.md の慣習上は推奨だが、reindex 契約そのものには不要
+     - H1: `# verified safe learning corpus`
+     - 本文 1 段落目の例:
+       `> FullSense 内部 RAD 知識源。verified safe learning corpus は hierarchical v2 へ移行したため、閲覧の起点は \`INDEX.md\`。`
+     - その直後に `- [INDEX.md](./INDEX.md)` を置けば、人間向け導線を満たしつつ、`rad-ingest` 側は frontmatter の `description:` / `collected:` を安定して読める
+   - 中間案を採る場合の最小チェックリスト:
+     - publish 前: top-level `SKILL.md` shim を staging 側で先に作り、`description:` が行頭にあること、`collected:` が frontmatter 内に存在すること、`INDEX.md` への導線があることを静的に確認する。これは **事前フィルタ** であり、publish 判断の最終根拠ではない
+     - publish 前: `INDEX.md` への相対リンクが live 名へ移っても壊れないことを確認する
+     - publish 前: isolated copy に対して `py -3.11 D:\tools\raptor\libexec\raptor-rad-ingest --reindex --docs-root <temp_docs_root>` を 1 回流し、共有 `D:\docs\RAD_INDEX.md` を触らずに **実消費者の読取結果** を確認する。ここで `verified_safe_learning_corpus_v2` 行が `(no SKILL.md)` / `-` に退行しないことを publish 可否の最終根拠にする
+     - publish 実行直前: 旧 live `D:\docs\verified_safe_learning_corpus_v2` を退避コピーまたは退避リネーム（例: `.bak-YYYYMMDD-HHMMSS`）し、共有 `D:\docs\RAD_INDEX.md` も同じ粒度で退避する。rollback 行で言う「直前退避」はこの時点で作成する
+     - publish 実行: staging を live 名へ昇格し、その後に本番 `py -3.11 D:\tools\raptor\libexec\raptor-rad-ingest --reindex` を実行する。これは **共有 `D:\docs\RAD_INDEX.md` を上書きする副作用つき再生成** なので、上記 isolated dry-run 合格後に限って進む
+     - publish 後: 本番 `reindex` の結果 `verified_safe_learning_corpus_v2` 行が `(no SKILL.md)` / `-` へ退行したら、退避した旧 live corpus ディレクトリを即座に書き戻し、退避した `RAD_INDEX.md` も戻すか、shim 修正後に corpus / index の両方へ再 `--reindex` して復旧する。fail 状態のまま放置しない
+     - publish 後: 人間導線として top-level `SKILL.md` から `INDEX.md` へ 1 hop で辿れることだけを確認し、旧 v1 の 97 ノート一覧を再現していないことは仕様どおりとして扱う
+   - static gate の pass / fail:
+     - pass = frontmatter フェンスちょうど 2 本、frontmatter が 1 行目から開始、frontmatter 内 `description:`、frontmatter 内 `collected:`、本文側に実在する `INDEX.md` への 1 hop 導線、本文側の余計な `collected:` なし、かつ isolated copy に対する `py -3.11 D:\tools\raptor\libexec\raptor-rad-ingest --reindex --docs-root <temp_docs_root>` で `verified_safe_learning_corpus_v2` 行が `(no SKILL.md)` / `-` に退行しない
+     - fail = 上記のどれか 1 つでも欠ける、リンク先抽出が空になる、または isolated dry-run で `RAD_INDEX.md` 行が退行する。fail 時は `--reindex` / publish に進まない
+     - 補足: この gate は実消費者 `_read_collected()` より厳格で、`collected:` を frontmatter 内に限定して要求する。意図的に fail-closed 側へ寄せている
+   - publish 前の隔離チェック例:
+     - `$lines = Get-Content <staging>\\SKILL.md; $fence = @(); for ($i=0; $i -lt $lines.Count; $i++) { if ($lines[$i].Trim() -eq '---') { $fence += $i } }`
+       frontmatter フェンス位置を先に確定する。`$fence.Count -ne 2` なら検査を通さず警告扱いにし、fail-closed で止める。加えて `$fence[0] -ne 0` や `$fence[0]` より前の非空行も fail 扱いにし、frontmatter が 1 行目から始まることを要求する
+     - `if ($fence[1] -le ($fence[0] + 1)) { Write-Warning 'frontmatter body missing'; <チェック失敗扱い> }`
+       frontmatter 区間が空なら不合格とし、PowerShell の降順 range で逆順走査しないよう fail-closed に止める
+     - `$lines[($fence[0]+1)..($fence[1]-1)] | Select-String -Pattern '^description:'`
+       frontmatter 区間に列 0 の `description:` があることを確認
+     - `$lines[($fence[0]+1)..($fence[1]-1)] | Select-String -Pattern '^\\s*collected:'`
+       frontmatter 区間に `collected:` があることを確認
+     - `if ($fence[1] -ge $lines.Count-1) { Write-Warning 'body missing after frontmatter'; <チェック失敗扱い> }`
+       frontmatter がファイル末尾までで本文ゼロなら不合格とし、PowerShell の降順 range で逆順本文を誤って拾わないよう fail-closed に止める
+     - `$body = $lines[($fence[1]+1)..($lines.Count-1)]; $inCode = $false; $codeFence = ([string][char]96) * 3; $bodyNoCode = foreach ($line in $body) { if ($line.Trim().StartsWith($codeFence)) { $inCode = -not $inCode; continue }; if (-not $inCode) { $line } }`
+       本文区間を先に切り出し、frontmatter 区間を除外したうえで、Markdown のコードフェンス内行も導線検査の対象から外す
+     - `$m = $bodyNoCode | Select-String -Pattern '\\]\\(<?(?<target>(?:\\./)?INDEX\\.md(?:#[^)>\s]+)?)>?\\)' | Select-Object -First 1; $indexTarget = if ($m) { $m.Matches[0].Groups['target'].Value }`
+       本文側に、相対形 (`INDEX.md` / `./INDEX.md`) の `INDEX.md` 1 hop 導線が少なくとも 1 本あることを確認し、リンク先文字列を取り出す（`#anchor` や `<...>` 囲みは許容）
+     - `if (-not $indexTarget) { Write-Warning 'INDEX link target not found'; <チェック失敗扱い> } else { Test-Path (Join-Path <staging> (($indexTarget -split '#', 2)[0] -replace '/', '\\')) }`
+       `SKILL.md` に書かれたリンク先そのものが実在することを確認する。リンク抽出に失敗した場合は pass させず fail-closed で止める
+     - `$bodyNoCode | Select-String -Pattern '^\\s*collected:'`
+       frontmatter 終了後の本文側に、想定外の `collected:` 行が紛れていないことを確認。実害が出るのは frontmatter 側 `collected:` が欠けたときに限られるが、gate としては過少検知より過検知を許す
+     - `# 前提: staging 側に top-level SKILL.md shim を先に作成してから実行`
+     - `$tempDocsRoot = Join-Path $env:TEMP ('rad-dryrun-' + (Get-Date -Format 'yyyyMMdd-HHmmss-fff') + '-' + (Get-Random -Maximum 100000)); try { New-Item -ItemType Directory -Path $tempDocsRoot -Force | Out-Null; Copy-Item <staging_dir> (Join-Path $tempDocsRoot 'verified_safe_learning_corpus_v2') -Recurse; py -3.11 D:\tools\raptor\libexec\raptor-rad-ingest --reindex --docs-root $tempDocsRoot; Select-String -Path (Join-Path $tempDocsRoot 'RAD_INDEX.md') -Pattern 'verified_safe_learning_corpus_v2' } finally { if (Test-Path $tempDocsRoot) { Remove-Item $tempDocsRoot -Recurse -Force } }`
+       isolated copy を **空の `<temp_docs_root>` 直下**に `verified_safe_learning_corpus_v2` 名で置き、共有 `D:\docs\RAD_INDEX.md` を汚さず **temp 配下にのみ書き込んで** 実消費者 `rad-ingest` の読取結果を 1 回だけ確認する。`--docs-root` は corpus ディレクトリ自身ではなく **その親ディレクトリ** を指す点に注意する。文字列検査はこの dry-run 前の事前フィルタであり、publish 可否の最終根拠はここに置く
+   - 中間案の残留リスク:
+     - `rad-ingest` 契約は守れても、既存利用者が top-level `SKILL.md` 一枚物を期待していた場合は UX が変わる
+     - したがって人間ゲートでは「完全後方互換」ではなく「entrypoint 互換 + 本体導線の変更」を受け入れる判断だと明示する
+     - shim 本文には水平線 `---` を置かない。`raptor-rad-ingest` の `_read_description()` は `---` 行で frontmatter 判定を再トグルするため、本文内 `---` は静的検査と実装解釈の両方を不安定にする
+   - 人間ゲートでの選び分け基準:
+     - 最小リスク案を選ぶ条件 = live 名を当面変えたくない、既存参照者の UX 変更を避けたい、v2 は比較検証用に別名保持でよい
+     - 中間案を選ぶ条件 = live 名を v2 へ前進させたいが、`rad-ingest` / `RAD_INDEX.md` の entrypoint 契約は壊したくない
+     - 最大変更案を選ぶ条件 = `rad-ingest` 側の `INDEX.md` 対応改修まで同時に着手でき、巻き戻しより構造統一を優先する
+     - 現在の前提だと、最も説明責任を果たしやすい default は中間案。理由は、内容本体は v2 へ寄せつつ、互換性は shim + static gate で fail-closed に監視できるため
+   - 次に出す確認ダイアログの順序メモ:
+     - 第1問は「今どちらの人間ゲートを先に処理するか」を聞く。選択肢は `verified_safe_learning publish` と `self_evolving_agents rerun 本実行`
+     - `verified_safe_learning` が選ばれた場合だけ、第2問で `最小リスク / 中間案 / 最大変更` の 3 択を出す
+     - recommended は中間案だが、UI 上の並びは比較しやすさを優先して `最小リスク / 中間案 / 最大変更` の順に固定し、recommended 表記だけを中間案へ付ける
+   - 次回そのまま使う `LLTERM_CHOICE` 下書き:
+     - 第1問:
+       ⟦LLTERM_CHOICE multi=false question="どちらの人間ゲートを先に処理しますか?"⟧
+       1) verified_safe_learning publish
+       2) self_evolving_agents rerun
+       ⟦/LLTERM_CHOICE⟧
+     - 第2問（verified_safe_learning が選ばれた場合）:
+       ⟦LLTERM_CHOICE multi=false question="verified_safe_learning の migration 方式を選んでください"⟧
+       1) 最小リスク
+       2) 中間案
+       3) 最大変更
+       ⟦/LLTERM_CHOICE⟧
 2. **【人間】self_evolving_agents rerun 本実行の判断**
    - `D:\docs\self_evolving_agents_corpus_v2.staging`
    - 3 択のうち **(b) stopword 除去 + query を絞って staging 再生成** は既にユーザー承認済み
@@ -142,10 +243,21 @@
    - `D:\tools\raptor\packages\corpus2skill\embedder.py` / `clusterer.py` の stopword 修正は適用済みなので、そのまま使う
    - rerun 前提の最小 runtime 検証は完了済み。追加の確認を重複させず、まず `queries` / 記録 / 既存成果の読み合わせまで進めてよい
    - `_STAGING_META/queries_refined_candidate.txt` は準備済み。まずこれを採用候補として使い、必要なら title 制約や category 制約の微調整だけを追加する
-   - 入力固定メモ: `queries_refined_candidate.txt` の現スナップショットは SHA256 `0E6CCB7A91C74E4728098EA92B98BD5E07889A320537EEC724F1D44795B9C042`。rerun 本実行前に同一性を再確認する
+   - 入力固定メモ: `queries_refined_candidate.txt` の現スナップショットは SHA256 `2AB6A443E70D7A58DDDCFFE4213BF0156960C48E89109245CC9C34F74D6B7D73`。対象は repo 外 `D:\docs\self_evolving_agents_corpus_v2.staging\_STAGING_META\queries_refined_candidate.txt` で、repo 単体では検証不能。**2026-06-16 10:19:33 +09:00 取得時点**の値として記録し、rerun 本実行前に **保存先パス + 取得日時 + SHA** を再確認する
+   - 補足: この SHA は query tightening 後の rerun 入力を固定するための意図的な gate 値で、旧 `0E6C...` から `2AB6...` への変化自体が更新対象だった。もっと強い監査性が要る場合は、将来この query file 自体または hash 対象 snapshot を repo 内へ取り込む
+   - rerun 本実行前の追加ゲート: lightweight probe により `ti:Reflexion` は完全クエリでも flagship `2303.11366` を回収できる一方、`AI Scientist` は派生研究が多く flagship が順位埋没しうると判明した。そのため candidate に `ti:"The AI Scientist"` と `ti:"The AI Scientist-v2"` の専用行を追加したが、確認できたのは各専用行を単独で投げたときに flagship 1 件を回収できることまでで、query file 全体としての最終 recall / precision 改善はまだ未検証。`ti:Reflexion` への tightening も recall 側副作用が未検証のまま扱う
    - **ここから先の本実行 (`papers/` 作り直し、別 output dir への fetch、`fetch_arxiv_topical.py` → `raptor-corpus2skill` 実行) は人間承認後**
    - rerun コマンドの骨子は既に固定できる:
      - `py -3.11 D:\tools\raptor\fetch_arxiv_topical.py --query-file D:\docs\self_evolving_agents_corpus_v2.staging\_STAGING_META\queries_refined_candidate.txt --output <new_papers_dir> --per-query 60 --since 2019-01-01`
+   - 次に出す確認ダイアログの順序メモ:
+     - `self_evolving_agents` 側は yes/no ではなく、`rerun 本実行へ進む / 現状維持で publish 判断へ送る / query 再調整を継続` の 3 択で聞く
+     - recommended は「即 publish」ではなく、まず rerun 本実行の可否だけを決めること。publish 判断は rerun 結果を見るまで後段に置く
+   - 次回そのまま使う `LLTERM_CHOICE` 下書き:
+     - ⟦LLTERM_CHOICE multi=false question="self_evolving_agents を次にどう進めますか?"⟧
+       1) rerun 本実行へ進む
+       2) 現状維持で publish 判断へ送る
+       3) query 再調整を継続
+       ⟦/LLTERM_CHOICE⟧
      - その後 `py -3.11 D:\tools\raptor\raptor_corpus2skill.py --source <new_papers_dir> --name <new_staging_name> --max-depth 2 --min-cluster-size 5 --max-clusters 8`
    - broad query 由来の off-topic cluster を主に削る
    - 必要なら学術 stopword (`fig`, `et`, `al`) は rerun 前に小さく追加検証する。ただし過剰除去リスクがあるので後回し
@@ -227,7 +339,7 @@
 ## 環境メモ
 
 - llcore ブランチ: `feat/lm-recurrent` (本ファイル内の現在地は後段「LM recurrent 現在地」を正本とする)
-- リポジトリの現 dirty はなし（作業木 clean）。query 候補の編集は repo 外 `D:\docs\...` で行っており、この repo の rerun 準備メモとは別管理
+- リポジトリの現状は記録更新のみ。query 候補の編集は repo 外 `D:\docs\...` で行っており、この repo の rerun 準備メモとは別管理。dirty の実体は都度 `git status` を正とする
 
 ## 統合修正指示の反映メモ (2026-06-13)
 
@@ -308,6 +420,29 @@
 
 - `docs/SESSION_SUMMARY.md` / 本ファイルを再読し、再開地点は **LM recurrent canonical 化まで完了済み、残る人間ゲートは `verified_safe_learning` / `self_evolving_agents` 側** と確認
 - repo 直下には `CLAUDE.md` / `AGENTS.md` は存在しないため、再開時は `docs/next_plan.md` / `docs/PROGRESS.md` を主に参照する。ただし上位指示は引き続き優先し、global `C:\Users\puruy\.claude\CLAUDE.md` の規約も有効
+- global `C:\Users\puruy\.claude\CLAUDE.md` の SESSION START 系規約を再確認し、報告構造・fail-closed・`py -3.11` / `rtk` 規約を本セッションでも継続適用すると確認
+- RAD 研究接地として `D:\docs\self_evolving_agents_corpus_v2` / `D:\docs\hacker_corpus_v2` を再 grep し、既存差別化軸が引き続き memory / Reflexion / AI Scientist / model merging / recursive self-improvement にあることを再確認。`hacker_corpus_v2` は今回も query 精密化の直接材料は薄い
+- `llcore` 作業木は再開時点で **clean ではなく**、記録更新の未コミット差分がある状態として扱う。固定的なファイル名列挙はせず、実体は都度 `git status` を正とする
+- `self_evolving_agents` rerun 準備を追加で前進:
+  - `queries_refined_candidate.txt` を見直し、既知ノイズに対応して `Reflexion` を `ti:` 条件へ tightening、`AI Scientist` に `scientific discovery` / `agentic tree search` 条件を追加
+  - 目的は、既知の perovskite / domain-specific science agent 混入を query 段階で少しでも減らすこと。まだ fetch rerun 未実行なので **precision 改善は未検証**
+  - 追加の lightweight probe として `fetch_arxiv_topical.py --query ... --count 5/20` を temp dir に対して実行し、`ti:Reflexion` は完全クエリでも flagship 本体を回収できる一方、`AI Scientist` は派生研究が多く `The AI Scientist` / `The AI Scientist-v2` が埋もれうることを確認。これに合わせて candidate query に flagship 専用行を追加したが、**専用行追加後の query file 全体としての改善は未検証**
+  - 今回の query 設計教訓は `docs/ARTICLE_SEEDS.md` に article seed として追記済み。テーマは「flagship 回収 probe の必要性」と「query 1 行ではなく query file 全体を評価単位にすべき」
+- `verified_safe_learning` 側の前提を再確認:
+  - `D:\docs\verified_safe_learning_corpus_v2` は live 未作成ではなく、`SKILL.md` frontmatter 上 `note_count: 97` と `Get-ChildItem ... -Filter *.md` 実測 98 files は **97 ノート + `SKILL.md` = 98 files と整合**する v1/live flat corpus の存在を示す
+  - 既存 live v1 は flat `SKILL.md` 起点、staging v2 は hierarchical `INDEX.md` 起点で、入口の型そのものが異なる
+  - `D:\tools\raptor\libexec\raptor-rad-ingest` は live corpus の top-level `SKILL.md` を前提に `RAD_INDEX.md` を再生成するため、`INDEX.md` 起点の v2 をそのまま live 名へ置くと少なくとも rad-ingest 側で不整合になる
+  - `rad-ingest` が reindex で実際に使うのは top-level `SKILL.md` の frontmatter (`description:` / `collected:`) で、本文側の導線は主に人間向けである。したがって完全置換より **`INDEX.md` へ案内する薄い `SKILL.md` shim** を併設する方が変更半径は小さい
+  - したがって中間案は「旧 v1 の 97 ノート一覧を top-level に残す」ことではなく、**top-level だけ互換にして本体は `INDEX.md` 以下へ委譲する adapter** と捉えるのが正確
+  - staging v2 (`818 docs / 64 clusters / 72 SKILL.md`) を publish する場合、単純 rename ではなく **既存 live v1 をどう扱うか** の人間判断が必要。なお `818` は corpus doc 数、`891` は `INDEX.md` / cluster `SKILL.md` を含む md 総数
+  - 現時点で raptor 内部 live 相当の `D:\tools\raptor\.claude\skills\corpus\verified_safe_learning_corpus_v2` は未存在なので、移行対象は主に `D:\docs\...` 側
+  - この「entrypoint 契約を壊さない migration」が論点だという教訓は `docs/ARTICLE_SEEDS.md` に seed #21 として追記済み
+  - 現在の working tree には `(A) rerun query/SHA + dirty 記録更新` と `(B) article seed 追加 + 記事フィードバック節/再開メモ` が未コミット状態で混在している。具体的な dirty の実体は固定列挙せず、都度 `git status` を正とする
+  - ただし commit 時の分離メモとして、`記事フィードバック` 節と `再開メモ (2026-06-16, 現セッション)` のような運用/再開メモ差分は、rerun query/SHA 追記と混ぜず **別件コミットに分離** する
+  - 1 ファイル内に混在しているので、commit 時は `git add -p docs/next_plan.md docs/ARTICLE_SEEDS.md docs/SESSION_SUMMARY.md docs/PROGRESS.md docs/LM_RECURRENT_PLAN.md` で hunk 単位 staging を使う前提にする
+  - 最低粒度の束分けは `(A) rerun query/SHA + dirty 記録更新` と `(B) article seed 追加 + 記事フィードバック節/再開メモ`。cherry-pick / 巻き戻し / 監査はこの単位で扱う
+  - `docs/ARTICLE_SEEDS.md` については、append-only 追記 (#19〜#30) を他の再開メモ差分と論理上分離して扱う。コミット時は `git add -p` で束を意識して切る
+  - #30 が示す append-only 方針（#17 の旧形式 supersede 注記は残したまま、以後は numbered seed の append に統一する）は、commit message にも明記して監査時の誤読を防ぐ
 - 統合修正指示の反映:
   - `.git/hooks` に有効フックはなく、repo 内検索でも `.llterm/loop_ledger.jsonl` を `git add` する自動再 tracked 経路は未検出。`tools/llterm_status.py` は ledger を読むだけで stage しない
   - ignore 粒度は単一ファイルではなく **`.llterm/` 単位** を採用する。将来 tracked に戻す設定ファイルが要る場合のみ negate パターンで例外化する

@@ -40,6 +40,6 @@
 - `runner._strip_skill_header()` は H1 限定へ補正し、`## Overview` 始まりの legacy summary も resume 対象に戻した
 - `D:\tools\raptor` 側の現 dirty は `_bazue_*` 3 件削除のみで、self_evolving_agents rerun 束には混ぜない
 - 現在地点は「`self_evolving_agents` の (b) rerun 方針は承認済み、Anthropic 要約器の疎通確認も通過済み、残る主ブロッカーは rerun 本実行の人間判断待ち」という状態。最小 fetch 検証と query 汚染是正までは完了済み
-- 現在の既存 dirty はなし（作業木 clean）
+- 現在の llcore 側 dirty は `docs/*.md` の文書更新のみ。fullsense 側も `collect_research_seeds.py` など別 repo の dirty が残っているため、実体は各 repo の `git status` を正とする
 - 次は `verified_safe_learning` / `self_evolving_agents` の人間判断待ちを処理するか、人間判断なしで進めるなら `(b)` rerun 本実行の判断回収と準備再開へ進む
 - 再開時は `next_plan.md` の「今回追加で進めた内容」と「次の具体的な一手」から続行

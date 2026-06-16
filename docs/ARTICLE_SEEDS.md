@@ -188,3 +188,144 @@
 - **根拠**: `self_evolving_agents_corpus_v2.staging` の `_STAGING_META/queries.txt` と
   `_STAGING_META/DECISIONS.md` (いずれも環境依存の別ドライブ staging 出力)。
 - **側面**: 教訓 / 実装報告 / honest disclosure。
+
+## 2026-06-16 (セッション: self_evolving_agents rerun query 精密化)
+
+### 19. precision 改善 query は「ノイズ除去」だけでなく flagship 回収の監視が必要
+- **気付き**: `Reflexion` や `AI Scientist` のような有名軸は、`ti:` tightening で
+  cross-domain ノイズを減らせる一方、**派生研究の量が増えるほど本命論文が検索順位に埋もれる**。
+  実際に `ti:"AI Scientist"` 系は domain-specific 派生が先に大量ヒットし、flagship
+  本体を確実に残すには `ti:"The AI Scientist"` / `ti:"The AI Scientist-v2"` の
+  専用回収行と lightweight probe が必要だった。precision チューニングは
+  「病気を見つけた」だけで治療完了と見なしてはいけない、という honest-disclosure の
+  実例。
+- **根拠**: `docs/next_plan.md` の rerun 前ゲート記録、
+  `D:\docs\self_evolving_agents_corpus_v2.staging\_STAGING_META\queries_refined_candidate.txt`、
+  同 `DECISIONS.md` の lightweight probe メモ。
+- **側面**: honest disclosure / 教訓 / 戦略 / 実装報告。
+
+### 20. query 1 行の正しさより「query file 全体のふるまい」を疑うべき
+- **気付き**: `ti:Reflexion` 完全クエリや `The AI Scientist-v2` 単独行が各 flagship を
+  1 件回収できても、それだけでは **query file 全体としての最終 precision / recall 改善**
+  は証明できない。単独 probe は局所的な壊れ方検知には効くが、複数 query の重複・順位埋没・
+  周辺分野混入は本 rerun 後の before/after 比較でしか確定しない。検索戦略の評価単位は
+  「1 行」ではなく「query set + downstream cluster quality」だと明示できた。
+- **根拠**: `docs/next_plan.md` の `queries_refined_candidate.txt` ゲート注記、
+  `self_evolving_agents_corpus_v2_stopwordcheck` の off-topic 混入観測、
+  staging 側 `_STAGING_META/DECISIONS.md`。
+- **側面**: honest disclosure / ベンチ / 教訓 / 戦略。
+
+## 2026-06-16 (セッション: verified_safe_learning v1→v2 migration)
+
+> 注: #21〜#28 は同一 migration 論点の別アングル。記事ドラフト化フェーズでは 1〜2 本へ統合前提で扱う。
+
+### 21. 知識資産の v1→v2 移行は「中身」より入口契約を壊さないことが本体
+- **気付き**: `verified_safe_learning` の v2 staging は 818 docs / 64 clusters の
+  階層 corpus として豊かだが、既存 live v1 は flat `SKILL.md` 起点で、
+  publish 対象 `D:\docs\<topic>_corpus_v2` を直接使う `raptor-rad-ingest` は
+  **`D:/docs/<topic>_corpus_v2/SKILL.md`** を入口契約として前提化していた。つまり
+  v2 化の難所は「情報量を増やすこと」より、
+  **人間とツールがどの entrypoint を読みに来るか** を壊さず移行すること。内容差分だけ見て
+  rename すると、知識そのものは改善しても運用上は退行しうる。
+- **根拠**: `docs/next_plan.md` の verified_safe_learning publish 判断メモ、
+  `D:\tools\raptor\libexec\raptor-rad-ingest` の `D:/docs/<topic>_corpus_v2/SKILL.md`
+  前提、`D:\docs\verified_safe_learning_corpus_v2` と
+  `D:\docs\verified_safe_learning_corpus_v2.staging` の構造比較。
+- **側面**: 実装報告 / 教訓 / エコシステム / ユーザー体験。
+
+### 22. 互換 shim は「目次の複製」ではなく「説明 1 段落 + 新入口リンク」で足りる
+- **気付き**: `raptor-rad-ingest` が top-level `SKILL.md` から実際に使うのは
+  top-level `description:` と `collected:` で、frontmatter 後の最初の非見出し段落は
+  `description:` 欠落時のフォールバックだった。つまり hierarchical v2 へ移るときの
+  互換 shim は、旧 v1 の 97 ノート一覧を再現する必要はなく、**列 0 の
+  `description:` と frontmatter 内の `collected:` を満たしたうえで**「v2 へ移行した」という
+  1 段落の説明と `INDEX.md` への明示リンクを置けば、人間向け導線は十分になる。
+- **根拠**: `D:\tools\raptor\libexec\raptor-rad-ingest` の `_read_description()` /
+  `_read_collected()` 実装、`docs/next_plan.md` の verified_safe_learning shim メモ、
+  既存 live `SKILL.md` と staging `INDEX.md` の先頭比較。
+- **側面**: 実装報告 / 教訓 / 戦略 / ユーザー体験。
+
+### 23. 後方互換 migration は「何を残すか」より「何を観測して退行判定するか」を固定すべき
+- **気付き**: `verified_safe_learning` の中間案で本当に守りたいのは、旧 v1 の
+  97 ノート一覧を top-level に複製することではなく、**publish 後も `rad-ingest`
+  が `RAD_INDEX.md` を `(no SKILL.md)` へ退行させないこと** と、人間が `SKILL.md`
+  から `INDEX.md` へ 1 hop で辿れることだった。互換 migration は「残す内容」を
+  議論するより先に、**退行判定の観測点を 2-3 個に固定する**方が人間ゲートを通しやすい。
+- **注記**: #21 / #22 と同テーマの別アングル。記事ドラフト化する段階では統合前提。
+- **根拠**: `docs/next_plan.md` の中間案チェックリスト、`D:\tools\raptor\libexec\raptor-rad-ingest`
+  の reindex 契約、`D:\docs\verified_safe_learning_corpus_v2` と staging `INDEX.md`
+  の構造比較。
+- **側面**: 教訓 / 実装報告 / 戦略 / ユーザー体験。
+
+### 24. fail-closed な migration では「副作用を隔離して落とせる検査」を先に設計する
+- **気付き**: `verified_safe_learning` の中間案では、`--reindex` を打つ前に
+  frontmatter フェンス数、frontmatter 内の `description:` / `collected:`、`INDEX.md`
+  1 hop 導線、`INDEX.md` 実在、本文側の想定外 `collected:` 出現などを事前フィルタで
+  見たうえで、isolated dry-run を 1 回流せば、かなりの割合の壊れ方を共有 index 無変更の
+  まま弾ける。fail-closed な移行は、本番反映後の観測より先に**副作用を temp 配下へ隔離して
+  落とせる検査列**を作る方が実務的。特に
+  本文側 `collected:` 検査は brittle な split/固定行数ではなく、frontmatter フェンスを
+  先に確定して本文区間だけを見る方が壊れにくい。
+- **根拠**: `docs/next_plan.md` の publish 前隔離チェック例、
+  `D:\tools\raptor\libexec\raptor-rad-ingest` の `RAD_INDEX.md` 再生成副作用、
+  live `SKILL.md` と staging `INDEX.md` の先頭比較。
+- **側面**: 教訓 / 実装報告 / 戦略 / ユーザー体験。
+
+### 25. migration の人間ゲートは「どの案が正しいか」より「どの破壊半径を受け入れるか」で切る
+- **気付き**: `verified_safe_learning` の v1→v2 移行 3 択は、機能差の比較というより
+  破壊半径の比較として書いた方が人間判断が速い。最小リスク案は live 名を守る代わりに
+  二重系を残し、中間案は live 名を v2 に進めつつ shim + static gate で entrypoint 契約を
+  fail-closed に保ち、最大変更案は `rad-ingest` 側改修まで含めて構造統一を優先する。
+  つまり migration ゲートは「どの世界観が美しいか」ではなく、**どの半径の変更まで今この場で
+  承認できるか** に翻訳した方が詰まりにくい。
+- **根拠**: `docs/next_plan.md` の verified_safe_learning 3 択比較、shim 草案、
+  static gate と隔離チェック例、RAD / hacker corpus の fail-closed / compatibility
+  既存教訓。
+- **側面**: 教訓 / 戦略 / 哲学 / ユーザー体験。
+
+### 26. fail-closed な gate は文字列一致で閉じず、実消費者の isolated dry-run で閉じる
+- **気付き**: `verified_safe_learning` の shim 検査で、frontmatter の
+  `description:` / `collected:` や `INDEX.md` 導線を grep するだけでは、
+  YAML 構文破損や実消費者との読取ズレを完全には拾えない。最終的な go/no-go は
+  **isolated copy を別 `docs-root` に置き、`rad-ingest --reindex --docs-root <temp>` を
+  1 回だけ流して `RAD_INDEX.md` の `verified_safe_learning_corpus_v2` 行が退行しないこと**
+  で閉じる方が、文字列 gate より監査可能で fail-closed になる。
+- **根拠**: `D:\tools\raptor\libexec\raptor-rad-ingest` の `--docs-root` / `write_index()`
+  実装、`docs/next_plan.md` の static gate 改訂、verified-safe-learning 側の
+  entrypoint migration 論点。
+- **側面**: 教訓 / 実装報告 / honest disclosure / 戦略。
+
+### 27. dry-run は「別パスに置く」だけでは足りず、「消費者が期待する親ディレクトリ構造」を再現する必要がある
+- **気付き**: `rad-ingest --reindex --docs-root ...` の isolated dry-run は、
+  staging を別場所へコピーするだけでは不十分で、**`--docs-root` が走査するのは
+  `*_corpus_v2` ディレクトリの親** だと意識して temp root を組まないと、検査自体が
+  空振りする。dry-run の信頼性は「隔離されているか」だけでなく、**実消費者が期待する
+  ディレクトリ形をそのまま再現しているか** に依存する。
+- **根拠**: `D:\tools\raptor\libexec\raptor-rad-ingest` の `--docs-root` /
+  `write_index()` 実装、`docs/next_plan.md` の isolated dry-run 手順。
+- **側面**: 教訓 / 実装報告 / 戦略 / ユーザー体験。
+
+### 28. rollback を書くなら、rollback 素材をいつ作るかまで手順化しないと fail-closed は閉じない
+- **気付き**: `verified_safe_learning` の publish 手順で「退行したら `RAD_INDEX.md` を戻す」とだけ
+  書いても、**その退避コピーをいつ作るか** がチェックリストに無いと運用時に抜けやすい。
+  しかも本件では index だけでなく live corpus 本体の置換も起きるため、rollback 素材は
+  `RAD_INDEX.md` 単体では足りず、**旧 live corpus ディレクトリも同じタイミングで退避**
+  しておく必要がある。fail-closed な rollback は、復旧方針そのものより先に、
+  **本番 `rename/reindex` の直前に index と corpus 本体の両方の退避を作る**
+  ところまで手順化して初めて閉じる。
+- **根拠**: `docs/next_plan.md` の verified_safe_learning publish 前後チェックリスト、
+  `RAD_INDEX.md` rollback 行、RAD / hacker corpus の auditability・fail-closed 既存教訓。
+- **側面**: 教訓 / 実装報告 / honest disclosure / ユーザー体験。
+
+## 2026-06-16 (セッション: article seed collector 実装確認)
+
+### 29. 収集規約は「想定」で運用せず、collector 実装を1回読むだけで曖昧さが消える
+- **気付き**: `ARTICLE_SEEDS.md` の運用で曖昧だった「同日複数セクションは衝突するか」「何が集約対象として通るか」は、`collect_research_seeds.py` を実読すると即座に解消した。実装上の **parser 最小条件** は、`## YYYY-MM-DD` を date key とし、`###` 見出し配下で `**気付き**` または `**側面**` のどちらかに**同一行で非空の値**があることだった。したがって同日複数セッションは date 単位で併存集約される。一方で、これはあくまで collector が受理する最小条件であり、**producer 契約としての seed 規約 (`気付き` + `根拠` + `側面`) を置き換えるものではない**。特に `根拠` は parser 非強制でも、記事ドラフト化と監査のために契約上は維持すべき必須項目だと分かった。運用規約の曖昧さは、推測を積み重ねるより collector 本体を一度読む方が安い。
+- **根拠**: 2026-06-16 に観測した `D:\projects\fullsense\tools\collect_research_seeds.py` の `DATE_RE` / `ENTRY_RE` / `flush()` 実装（repo 外・dirty 作業木なので再利用前に要再取得）、`docs/next_plan.md` の article seed 規約メモ更新。
+- **側面**: 教訓 / 実装報告 / 戦略 / エコシステム。
+
+### 30. append-only の知見ログでは、後日 supersede した観測も「削る」のではなく新しい注記として残すべき
+- **気付き**: `ARTICLE_SEEDS.md` を append-only として運用するなら、後日状態が変わった観測を「いまは古いから」と削るのは筋が悪い。正しい扱いは、元の観測を残したまま、**新しい事実を別の追記として supersede させる**ことだった。たとえば #17 の `ANTHROPIC org disabled` は 2026-06-13 時点では事実で、その後 2026-06-16 に `ANTHROPIC_API_KEY` が present かつ valid と再確認された。この種の変化は過去 entry の削除ではなく、append-only の新しい注記として残した方が監査しやすい。
+- **根拠**: `docs/next_plan.md` の `ANTHROPIC_API_KEY` valid 記録、同ファイルの article seed append-only 方針、`docs/SESSION_SUMMARY.md` の再開ポインタ。
+- **側面**: 教訓 / honest disclosure / 戦略 / エコシステム。
+- **注記**: #17 の 2026-06-16 追記は旧形式の supersede 注記として残しつつ、以後の supersede は同様のインライン改変を増やさず、numbered seed の append で行う。
