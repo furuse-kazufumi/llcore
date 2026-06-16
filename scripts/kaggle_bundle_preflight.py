@@ -1,0 +1,335 @@
+# SPDX-License-Identifier: Apache-2.0
+"""Run local preflight checks for a Kaggle llcore.lm.compare bundle.
+
+This script never contacts Kaggle. It only validates local bundle structure and
+optionally runs the bundled `runner.py` to confirm the package executes.
+"""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import os
+import subprocess
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str((Path(__file__).resolve().parent.parent / "src")))
+
+from llcore.lm.compare import CompareConfig  # type: ignore[import-untyped]
+
+
+REQUIRED_FILES = (
+    "kernel-metadata.json",
+    "config.json",
+    "bundle_manifest.json",
+    "input_corpus.txt",
+    "runner.py",
+    "README.md",
+)
+REQUIRED_COPIED_FILE_KEYS = ("corpus", "config", "metadata", "src_llcore")
+_BOOL_TEXT_VALUES = {"true", "false"}
+
+
+def _write_json(path: Path, payload: object) -> None:
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def _sha256_text(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _is_ignored_source_path(path: Path) -> bool:
+    return "__pycache__" in path.parts or path.suffix in {".pyc", ".pyo"}
+
+
+def _sha256_tree(root: Path) -> str:
+    digest = hashlib.sha256()
+    for path in sorted(p for p in root.rglob("*") if p.is_file() and not _is_ignored_source_path(p)):
+        rel = path.relative_to(root).as_posix().encode("utf-8")
+        digest.update(rel)
+        digest.update(b"\0")
+        digest.update(path.read_bytes())
+        digest.update(b"\0")
+    return digest.hexdigest()
+
+
+def _require_bool_text(value: object, *, field_name: str) -> str:
+    if not isinstance(value, str) or value not in _BOOL_TEXT_VALUES:
+        raise ValueError(f"{field_name} must be one of: true, false")
+    return value
+
+
+def _validate_bundle_dir(bundle_dir: Path) -> dict[str, object]:
+    missing = [name for name in REQUIRED_FILES if not (bundle_dir / name).is_file()]
+    src_llcore = bundle_dir / "src" / "llcore"
+    if not src_llcore.is_dir():
+        missing.append("src/llcore")
+    if missing:
+        raise ValueError(f"bundle is missing required paths: {', '.join(missing)}")
+
+    metadata = json.loads((bundle_dir / "kernel-metadata.json").read_text(encoding="utf-8"))
+    config = json.loads((bundle_dir / "config.json").read_text(encoding="utf-8"))
+    manifest = json.loads((bundle_dir / "bundle_manifest.json").read_text(encoding="utf-8"))
+
+    if not isinstance(metadata, dict):
+        raise ValueError("kernel-metadata.json must contain an object")
+    if not isinstance(config, dict):
+        raise ValueError("config.json must contain an object")
+    if not isinstance(manifest, dict):
+        raise ValueError("bundle_manifest.json must contain an object")
+
+    compare_config = config.get("compare_config")
+    corpus_sha256 = config.get("corpus_sha256")
+    manifest_corpus_sha256 = manifest.get("corpus_sha256")
+    manifest_source_sha256 = manifest.get("source_sha256")
+    manifest_runner_sha256 = manifest.get("runner_sha256")
+    manifest_config_sha256 = manifest.get("config_sha256")
+    manifest_is_private = manifest.get("is_private")
+    manifest_enable_internet = manifest.get("enable_internet")
+    manifest_enable_gpu = manifest.get("enable_gpu")
+    if not isinstance(compare_config, dict):
+        raise ValueError("config.json.compare_config must contain an object")
+    if not isinstance(corpus_sha256, str) or len(corpus_sha256) != 64:
+        raise ValueError("config.json.corpus_sha256 must be a 64-char sha256 hex string")
+    if not isinstance(manifest_corpus_sha256, str) or len(manifest_corpus_sha256) != 64:
+        raise ValueError("bundle_manifest.json.corpus_sha256 must be a 64-char sha256 hex string")
+    if not isinstance(manifest_source_sha256, str) or len(manifest_source_sha256) != 64:
+        raise ValueError("bundle_manifest.json.source_sha256 must be a 64-char sha256 hex string")
+    if not isinstance(manifest_runner_sha256, str) or len(manifest_runner_sha256) != 64:
+        raise ValueError("bundle_manifest.json.runner_sha256 must be a 64-char sha256 hex string")
+    if not isinstance(manifest_config_sha256, str) or len(manifest_config_sha256) != 64:
+        raise ValueError("bundle_manifest.json.config_sha256 must be a 64-char sha256 hex string")
+
+    try:
+        CompareConfig(**compare_config)
+    except Exception as exc:
+        raise ValueError(f"config.json.compare_config is invalid: {exc}") from exc
+
+    corpus_path = bundle_dir / "input_corpus.txt"
+    actual_corpus_sha256 = _sha256_text(corpus_path)
+    actual_config_sha256 = _sha256_text(bundle_dir / "config.json")
+    if actual_corpus_sha256 != corpus_sha256:
+        raise ValueError("input_corpus.txt sha256 does not match config.json.corpus_sha256")
+    if corpus_sha256 != manifest_corpus_sha256:
+        raise ValueError("config.json.corpus_sha256 does not match bundle_manifest.json.corpus_sha256")
+    actual_source_sha256 = _sha256_tree(src_llcore)
+    if actual_source_sha256 != manifest_source_sha256:
+        raise ValueError("src/llcore sha256 does not match bundle_manifest.json.source_sha256")
+    if actual_config_sha256 != manifest_config_sha256:
+        raise ValueError("config.json sha256 does not match bundle_manifest.json.config_sha256")
+
+    metadata_id = metadata.get("id")
+    manifest_kernel_id = manifest.get("kernel_id")
+    if metadata_id != manifest_kernel_id:
+        raise ValueError("kernel-metadata.json id does not match bundle_manifest.json kernel_id")
+    if not isinstance(metadata_id, str) or not metadata_id.strip():
+        raise ValueError("kernel-metadata.json id must be a non-empty string")
+    if metadata.get("code_file") != "runner.py":
+        raise ValueError("kernel-metadata.json code_file must be 'runner.py'")
+    if manifest.get("runner") != "runner.py":
+        raise ValueError("bundle_manifest.json runner must be 'runner.py'")
+    metadata_title = metadata.get("title")
+    manifest_title = manifest.get("title")
+    if metadata_title != manifest_title:
+        raise ValueError("kernel-metadata.json title does not match bundle_manifest.json title")
+    if not isinstance(metadata_title, str) or not metadata_title.strip():
+        raise ValueError("kernel-metadata.json title must be a non-empty string")
+    actual_runner_sha256 = _sha256_text(bundle_dir / "runner.py")
+    if actual_runner_sha256 != manifest_runner_sha256:
+        raise ValueError("runner.py sha256 does not match bundle_manifest.json.runner_sha256")
+    corpus_file_name = config.get("corpus_file_name")
+    if not isinstance(corpus_file_name, str) or not corpus_file_name:
+        raise ValueError("config.json.corpus_file_name must be a non-empty string")
+    metadata_enable_gpu = metadata.get("enable_gpu")
+    metadata_enable_internet = metadata.get("enable_internet")
+    metadata_is_private = metadata.get("is_private")
+    metadata_enable_tpu = metadata.get("enable_tpu")
+    metadata_machine_shape = metadata.get("machine_shape")
+    manifest_is_private = _require_bool_text(manifest_is_private, field_name="bundle_manifest.json is_private")
+    manifest_enable_internet = _require_bool_text(
+        manifest_enable_internet, field_name="bundle_manifest.json enable_internet"
+    )
+    manifest_enable_gpu = _require_bool_text(manifest_enable_gpu, field_name="bundle_manifest.json enable_gpu")
+    manifest_enable_tpu = _require_bool_text(
+        manifest.get("enable_tpu"), field_name="bundle_manifest.json enable_tpu"
+    )
+    metadata_is_private = _require_bool_text(metadata_is_private, field_name="kernel-metadata.json is_private")
+    metadata_enable_internet = _require_bool_text(
+        metadata_enable_internet, field_name="kernel-metadata.json enable_internet"
+    )
+    metadata_enable_gpu = _require_bool_text(metadata_enable_gpu, field_name="kernel-metadata.json enable_gpu")
+    metadata_enable_tpu = _require_bool_text(metadata_enable_tpu, field_name="kernel-metadata.json enable_tpu")
+    if metadata_is_private != manifest_is_private:
+        raise ValueError("kernel-metadata.json is_private does not match bundle_manifest.json is_private")
+    if metadata_enable_internet != manifest_enable_internet:
+        raise ValueError(
+            "kernel-metadata.json enable_internet does not match bundle_manifest.json enable_internet"
+        )
+    if metadata_enable_gpu != manifest_enable_gpu:
+        raise ValueError("kernel-metadata.json enable_gpu does not match bundle_manifest.json enable_gpu")
+    if metadata_enable_tpu != manifest_enable_tpu:
+        raise ValueError("kernel-metadata.json enable_tpu does not match bundle_manifest.json enable_tpu")
+    if metadata_enable_gpu == "true":
+        if not isinstance(metadata_machine_shape, str) or not metadata_machine_shape:
+            raise ValueError("kernel-metadata.json machine_shape must be set when enable_gpu=true")
+    else:
+        if "machine_shape" in metadata and metadata_machine_shape is not None:
+            raise ValueError("kernel-metadata.json machine_shape must be omitted/null when enable_gpu!=true")
+    if metadata.get("machine_shape") != manifest.get("machine_shape"):
+        raise ValueError("kernel-metadata.json machine_shape does not match bundle_manifest.json machine_shape")
+    copied_files = manifest.get("copied_files")
+    if not isinstance(copied_files, dict):
+        raise ValueError("bundle_manifest.json.copied_files must contain an object")
+    if set(copied_files) != set(REQUIRED_COPIED_FILE_KEYS):
+        raise ValueError(
+            "bundle_manifest.json.copied_files must contain exactly: "
+            + ", ".join(REQUIRED_COPIED_FILE_KEYS)
+        )
+    for logical_name, relative_path in copied_files.items():
+        if not isinstance(relative_path, str) or not relative_path:
+            raise ValueError(f"bundle_manifest.json copied_files[{logical_name!r}] must be a non-empty string")
+        resolved = (bundle_dir / relative_path).resolve()
+        if not resolved.is_relative_to(bundle_dir):
+            raise ValueError(
+                f"bundle_manifest.json copied_files[{logical_name!r}] escapes bundle_dir: {relative_path}"
+            )
+        if not resolved.exists():
+            raise ValueError(
+                f"bundle_manifest.json copied_files[{logical_name!r}] points to a missing path: {relative_path}"
+            )
+
+    metadata_summary = {
+        "kernel_id": metadata_id,
+        "enable_gpu": metadata.get("enable_gpu"),
+        "enable_tpu": metadata.get("enable_tpu"),
+        "enable_internet": metadata.get("enable_internet"),
+        "is_private": metadata.get("is_private"),
+        "machine_shape": metadata.get("machine_shape"),
+    }
+    return {
+        "metadata": metadata_summary,
+        "config": {
+            "block_size": compare_config.get("block_size"),
+            "max_iters": compare_config.get("max_iters"),
+            "corpus_sha256": corpus_sha256,
+        },
+        "manifest": {
+            "kernel_id": manifest_kernel_id,
+            "runner": manifest.get("runner"),
+            "copied_files": copied_files,
+            "source_sha256": manifest_source_sha256,
+        },
+    }
+
+
+def _run_runner(bundle_dir: Path, *, timeout_s: int) -> dict[str, object]:
+    out_json = bundle_dir / "artifacts" / "lm_compare.json"
+    out_md = bundle_dir / "artifacts" / "lm_compare.md"
+    out_svg = bundle_dir / "artifacts" / "lm_compare.svg"
+    out_json.unlink(missing_ok=True)
+    out_md.unlink(missing_ok=True)
+    out_svg.unlink(missing_ok=True)
+    proc = subprocess.run(
+        [sys.executable, str(bundle_dir / "runner.py")],
+        cwd=bundle_dir,
+        check=False,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        env={**os.environ, "PYTHONUTF8": "1", "PYTHONDONTWRITEBYTECODE": "1"},
+        timeout=timeout_s,
+    )
+    payload: dict[str, object] = {
+        "returncode": proc.returncode,
+        "stdout": proc.stdout,
+        "stderr": proc.stderr,
+        "output_exists": out_json.is_file(),
+    }
+    if proc.returncode != 0:
+        raise ValueError(f"runner.py failed with rc={proc.returncode}: {proc.stderr.strip()}")
+    if not out_json.is_file():
+        raise ValueError("runner.py completed without writing artifacts/lm_compare.json")
+    if not out_md.is_file():
+        raise ValueError("runner.py completed without writing artifacts/lm_compare.md")
+    if not out_svg.is_file():
+        raise ValueError("runner.py completed without writing artifacts/lm_compare.svg")
+    try:
+        json.loads(out_json.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"runner.py wrote invalid artifacts/lm_compare.json: {exc}") from exc
+    return payload
+
+
+def preflight_bundle(bundle_dir: Path, *, run_runner: bool, runner_timeout: int) -> dict[str, object]:
+    bundle_dir = bundle_dir.resolve()
+    if not bundle_dir.is_dir():
+        raise ValueError(f"bundle directory does not exist: {bundle_dir}")
+    result: dict[str, object] = {
+        "bundle_dir": str(bundle_dir),
+        "checks": _validate_bundle_dir(bundle_dir),
+        "runner": None,
+    }
+    if run_runner:
+        result["runner"] = _run_runner(bundle_dir, timeout_s=runner_timeout)
+    return result
+
+
+def _parser() -> argparse.ArgumentParser:
+    ap = argparse.ArgumentParser(
+        description=(
+            "Validate a local Kaggle llcore.lm.compare bundle without pushing it. "
+            "Can optionally run the bundled runner.py locally."
+        )
+    )
+    ap.add_argument("--bundle-dir", required=True, help="existing Kaggle bundle directory")
+    ap.add_argument("--json", help="optional path to write structured preflight report")
+    ap.add_argument(
+        "--run-runner",
+        action="store_true",
+        help="run the bundled runner.py locally after structural checks",
+    )
+    ap.add_argument(
+        "--runner-timeout",
+        type=int,
+        default=300,
+        help="timeout in seconds for local runner execution (default: 300)",
+    )
+    return ap
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = _parser()
+    args = parser.parse_args(argv)
+    if args.runner_timeout < 1:
+        print("error: --runner-timeout must be >= 1", file=sys.stderr)
+        return 2
+    try:
+        report = preflight_bundle(
+            Path(args.bundle_dir),
+            run_runner=args.run_runner,
+            runner_timeout=args.runner_timeout,
+        )
+    except (ValueError, OSError, subprocess.TimeoutExpired) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
+    if args.json:
+        _write_json(Path(args.json), report)
+    checks = report["checks"]
+    checks_map = checks if isinstance(checks, dict) else {}
+    metadata = checks_map.get("metadata") if isinstance(checks_map, dict) else {}
+    metadata_map = metadata if isinstance(metadata, dict) else {}
+    print(
+        "[kaggle-preflight]",
+        f"dir={report['bundle_dir']}",
+        f"gpu={metadata_map.get('enable_gpu')}",
+        f"internet={metadata_map.get('enable_internet')}",
+        f"runner={'yes' if args.run_runner else 'no'}",
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
