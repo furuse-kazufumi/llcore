@@ -53,6 +53,22 @@ DATASET_PAYLOAD_MANIFEST_NAME = "dataset_payload_manifest.json"
 DATASET_SRC_ARCHIVE_NAME = "src_llcore.zip"
 DATASET_PKG_ARCHIVE_NAME = "pkg_llcore.zip"
 _BOOL_TEXT_VALUES = {"true", "false"}
+_EMBEDDED_COPIED_FILE_PATHS = {
+    "corpus": "input_corpus.txt",
+    "config": "config.json",
+    "metadata": "kernel-metadata.json",
+    "src_llcore": "src/llcore",
+    "pkg_llcore": "llcore",
+    "license": "LICENSE",
+    "notice": "NOTICE",
+}
+_DATASET_COPIED_FILE_PATHS = {
+    "metadata": "kernel-metadata.json",
+    "runner": "runner.py",
+    "license": "LICENSE",
+    "notice": "NOTICE",
+    "dataset_payload": DATASET_PAYLOAD_DIRNAME,
+}
 
 
 def _write_json(path: Path, payload: object) -> None:
@@ -80,11 +96,15 @@ def _sha256_tree(root: Path) -> str:
 
 def _sha256_zip_tree(archive_path: Path, *, expected_prefix: str) -> str:
     digest = hashlib.sha256()
+    seen_members: set[str] = set()
     with zipfile.ZipFile(archive_path) as zf:
         for info in sorted(zf.infolist(), key=lambda item: item.filename):
             member_name = info.filename.replace("\\", "/")
             if info.is_dir():
                 continue
+            if member_name in seen_members:
+                raise ValueError(f"{archive_path.name} contains duplicate member name: {member_name}")
+            seen_members.add(member_name)
             if not member_name.startswith(expected_prefix):
                 raise ValueError(
                     f"{archive_path.name} contains member outside expected prefix {expected_prefix!r}: {member_name}"
@@ -201,6 +221,7 @@ def _validate_bundle_dir(bundle_dir: Path) -> dict[str, object]:
     if not isinstance(copied_files, dict):
         raise ValueError("bundle_manifest.json.copied_files must contain an object")
     expected_keys = EMBEDDED_COPIED_FILE_KEYS if data_mode == "embedded" else DATASET_COPIED_FILE_KEYS
+    expected_paths = _EMBEDDED_COPIED_FILE_PATHS if data_mode == "embedded" else _DATASET_COPIED_FILE_PATHS
     if set(copied_files) != set(expected_keys):
         raise ValueError(
             "bundle_manifest.json.copied_files must contain exactly: "
@@ -209,6 +230,11 @@ def _validate_bundle_dir(bundle_dir: Path) -> dict[str, object]:
     for logical_name, relative_path in copied_files.items():
         if not isinstance(relative_path, str) or not relative_path:
             raise ValueError(f"bundle_manifest.json copied_files[{logical_name!r}] must be a non-empty string")
+        expected_path = expected_paths[logical_name]
+        if relative_path != expected_path:
+            raise ValueError(
+                f"bundle_manifest.json copied_files[{logical_name!r}] must be {expected_path!r}, got {relative_path!r}"
+            )
         resolved = (bundle_dir / relative_path).resolve()
         if not resolved.is_relative_to(bundle_dir):
             raise ValueError(

@@ -6,6 +6,7 @@ import json
 import shutil
 import subprocess
 import sys
+import zipfile
 from pathlib import Path
 from typing import Any
 
@@ -329,6 +330,21 @@ def test_preflight_rejects_copied_files_escape(tmp_path: Path) -> None:
     assert rc == 2
 
 
+def test_preflight_rejects_copied_files_value_mismatch(tmp_path: Path) -> None:
+    preflight = _load_script("kaggle_bundle_preflight.py")
+    bundle_dir = _build_dataset_bundle(tmp_path)
+    manifest_path = bundle_dir / "bundle_manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    copied_files = manifest["copied_files"]
+    assert isinstance(copied_files, dict)
+    copied_files["dataset_payload"] = "dataset_payload_renamed"
+    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    rc = preflight.main(["--bundle-dir", str(bundle_dir)])
+
+    assert rc == 2
+
+
 def test_preflight_rejects_missing_required_copied_file_key(tmp_path: Path) -> None:
     preflight = _load_script("kaggle_bundle_preflight.py")
     bundle_dir = _build_bundle(tmp_path)
@@ -338,6 +354,19 @@ def test_preflight_rejects_missing_required_copied_file_key(tmp_path: Path) -> N
     assert isinstance(copied_files, dict)
     copied_files.pop("src_llcore")
     manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    rc = preflight.main(["--bundle-dir", str(bundle_dir)])
+
+    assert rc == 2
+
+
+def test_preflight_rejects_duplicate_zip_members(tmp_path: Path) -> None:
+    preflight = _load_script("kaggle_bundle_preflight.py")
+    bundle_dir = _build_dataset_bundle(tmp_path)
+    src_zip = bundle_dir / "dataset_payload" / "src_llcore.zip"
+    with zipfile.ZipFile(src_zip, "w") as zf:
+        zf.writestr("src/llcore/__init__.py", "# first\n")
+        zf.writestr("src/llcore/__init__.py", "# duplicate\n")
 
     rc = preflight.main(["--bundle-dir", str(bundle_dir)])
 

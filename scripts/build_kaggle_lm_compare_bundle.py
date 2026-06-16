@@ -148,6 +148,7 @@ def _safe_extract_zip(
     max_uncompressed_bytes: int = 256 * 1024 * 1024,
 ) -> None:
     total_uncompressed = 0
+    seen_members: set[str] = set()
     with zipfile.ZipFile(archive_path) as zf:
         infos = zf.infolist()
         if len(infos) > max_entries:
@@ -158,6 +159,9 @@ def _safe_extract_zip(
             member_name = info.filename.replace("\\\\", "/")
             if not member_name:
                 raise RuntimeError(f"archive contains an empty member name: {{archive_path}}")
+            if member_name in seen_members:
+                raise RuntimeError(f"archive contains a duplicate member name: {{member_name}}")
+            seen_members.add(member_name)
             if member_name.startswith("/") or member_name.startswith("../"):
                 raise RuntimeError(f"archive member escapes extraction root: {{member_name}}")
             member_path = PurePosixPath(member_name)
