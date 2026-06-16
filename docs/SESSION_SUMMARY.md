@@ -1,70 +1,64 @@
-# Session Summary
+# Session Summary (auto-generated)
 
-- **更新時刻**: 2026-06-17
+> 自動生成: `libexec/raptor-auto-summary` (Stop hook)
+> 次回 ccr 起動時に CLAUDE.md SESSION START で自動的に読み取られる。
+
+- **最終更新**: 2026-06-17 06:31:36
 - **プロジェクト**: `D:/projects/llcore`
 - **ブランチ**: `feat/lm-recurrent`
 
-## 現在地点
+## 直近の git log
 
-- 主作業は 2 束:
-  - `scripts/memory_footprint_harness.py` と [tests/unit/test_memory_footprint_harness.py](D:/projects/llcore/tests/unit/test_memory_footprint_harness.py)
-  - Kaggle local/offload 導線 4 本:
-    - [scripts/build_kaggle_lm_compare_bundle.py](D:/projects/llcore/scripts/build_kaggle_lm_compare_bundle.py)
-    - [scripts/kaggle_bundle_preflight.py](D:/projects/llcore/scripts/kaggle_bundle_preflight.py)
-    - [scripts/prepare_kaggle_lm_compare_bundle.py](D:/projects/llcore/scripts/prepare_kaggle_lm_compare_bundle.py)
-    - [scripts/kaggle_push_readiness.py](D:/projects/llcore/scripts/kaggle_push_readiness.py)
-- Kaggle focused 回帰の最新:
-  - builder / preflight / prepare / readiness の **4 ファイル集合**で **`50 passed`**
-- Kaggle を含む broad gate の最新:
-  - `py -3.11 -m pytest tests/unit -k "lm or corpus or probe or p1_compare or p1_prepare or p1_manifest_reconcile or memory_footprint or kaggle_lm_compare_bundle or kaggle_bundle_preflight or prepare_kaggle_lm_compare_bundle or kaggle_push_readiness" -q`
-  - **`262 passed, 401 deselected`**
-- 直近の局所 gate:
-  - `py -3.11 -m pytest tests/unit/test_memory_footprint_harness.py tests/unit/test_build_kaggle_lm_compare_bundle.py tests/unit/test_kaggle_push_readiness.py -q`
-  - **`31 passed`**
-- さらに今回の局所修正:
-  - `py -3.11 -m pytest tests/unit/test_memory_footprint_harness.py -q`
-  - **`7 passed`** (`--lengths` descending 時も headline が min/max T を使うことを固定)
-- live 実測は **3 本**ある。旧 auth failure path (`rc=3`) は OAuth 依存実装時の記録で、現行実装では **CPU bundle の ready path (`rc=0`)** も `C:\Users\puruy\AppData\Local\Temp\llcore_kaggle_livecheck_20260617b` で確認済み。さらに GPU bundle `C:\Users\puruy\AppData\Local\Temp\llcore_kaggle_gpu_livecheck_20260617` でも readiness を試したが、ローカル **Kaggle CLI 2.2.1 の `quota` サブコマンド自体が `not enough values to unpack (expected 2, got 1)` で失敗**し、`rc=4` へ落ちた。現行 auth は OAuth ではなく **push credential (`kaggle.json` または `KAGGLE_USERNAME`+`KAGGLE_KEY`) + `kaggle kernels list -m --page-size 1 --csv` 疎通**で見る。したがって GPU quota live path は「未実施」ではなく **local CLI failure で確認不能**、実 `kaggle kernels push` は未実施。
-- 外部 publish は **0 件**。
+```
+17212d3 Clarify Kaggle bundle provenance and memory headline range
+63bf7aa Refine Kaggle approval wait-state guidance
+cda2c5f Clarify time-scoped Kaggle handoff status
+514f2c2 Record latest hardening commit in handoff docs
+4bd61e2 Harden Kaggle bundle guards and memory harness ordering
+90378cf Update session handoff after local verification
+1d1234a Add Kaggle compare bundle readiness tooling
+af90dd6 Add memory footprint telemetry hardening
+432ca5d auto: memory_footprint_harness.py 編集前 (2026-06-16 21:08)
+b73f8a0 auto: p1_compare.py 編集前 (2026-06-16 12:43)
+```
 
 ## 現在の git status
 
-```text
-(clean after local commits `af90dd6` and `1d1234a`)
+```
+M docs/LM_RECURRENT_PLAN.md
+ M docs/PROGRESS.md
+ M docs/next_plan.md
+ M scripts/build_kaggle_lm_compare_bundle.py
+ M scripts/kaggle_bundle_preflight.py
+ M scripts/kaggle_push_readiness.py
+ M src/llcore/chat/backend.py
+ M src/llcore/clip/backend.py
+ M src/llcore/clip/text_encoders.py
+ M tests/unit/test_build_kaggle_lm_compare_bundle.py
+ M tests/unit/test_kaggle_push_readiness.py
 ```
 
-- 再開時点では `docs/LM_RECURRENT_PLAN.md` も **dirty** だった。もし他の記録でこのファイルが脱落していたら、その記述は stale とみなす。現在は local commit 済み。
+## 直近 2 時間に変更されたファイル
 
-## Kaggle 導線の現契約
+```
+06:29 .llterm/loop_ledger.jsonl
+06:27 .ruff_cache/0.15.12/16546767254229203700
+06:27 .ruff_cache/0.15.12/11287728664031201126
+06:27 .pytest_cache/v/cache/nodeids
+06:27 .mypy_cache/3.11/cache.3.db
+06:27 .mypy_cache/3.11/cache.15.db
+06:27 .mypy_cache/3.11/cache.14.db
+06:26 tests/unit/test_kaggle_push_readiness.py
+06:26 scripts/kaggle_push_readiness.py
+06:26 docs/next_plan.md
+06:17 docs/LM_RECURRENT_PLAN.md
+05:51 docs/PROGRESS.md
+05:50 .mypy_cache/3.11/cache.7.db
+05:50 .mypy_cache/3.11/cache.2.db
+05:49 tests/unit/test_build_kaggle_lm_compare_bundle.py
+```
 
-- builder の safe default は **private + internet disabled + GPU disabled + TPU disabled**
-- preflight は corpus / `src/llcore` / `runner.py` / `config.json` の hash 再計算、metadata↔manifest 整合、`copied_files`、runner sidecar 再生成まで見る
-- readiness は:
-  - `rc=2` = local validation / preflight failure / TPU unsupported
-  - `rc=3` = auth failure
-  - `rc=4` = quota failure
-- CPU bundle は **quota check 自体を skip** する
-- GPU bundle は **GPU-like row (`"gpu"` substring match) の残量のみ**で判定
-- GPU quota path は **Kaggle CLI 2.2.1 の live `kaggle quota -v` failure によりこのマシンでは確認不能**。CSV schema と GPU row 判定は parser coverage であって、live compatibility claim ではない
-- GPU readiness が green でも、`kaggle quota -v` は **週次の GPU 合計時間**しか返さず **`machine_shape` 別 capacity** は保証しない
-- `enable_tpu=true` bundle は readiness 未対応なので **clean `rc=2` reject**
+---
 
-## 次の具体的な一手
-
-1. ローカル整理は完了。
-   - `af90dd6` = memory harness
-   - `1d1234a` = Kaggle 導線 + docs
-2. `docs/next_plan.md` の再開追記を正本として、CPU ready path `rc=0` と GPU quota live path の CLI 2.2.1 failure を前提に次の人間ゲート準備へ進む。
-3. ここまでは自律で可。`kaggle kernels push` に進む段になったら、直前に `docs/next_plan.md` を更新してから **`⟦LLTERM_CHOICE⟧`** で人間確認へ切り替える。
-4. 追加 hardening 済み:
-   - `build_bundle()` 関数 API は `enable_gpu` と `machine_shape` の矛盾を `ValueError` で fail-closed reject
-   - `memory_footprint_harness.py` の `lengths_effective` は **入力順保持 + dedup** に変更済み
-   - local commit `4bd61e2` = `Harden Kaggle bundle guards and memory harness ordering`
-
-## 補足
-
-- `docs/SESSION_SUMMARY.md` は本来 hook 更新物なので、**再開の正本は `docs/next_plan.md`**。
-- 旧 `out/kaggle_lm_compare_smoke` は `source_sha256` 追加前の古い manifest 世代で、current preflight の正本には使わない。
-- 再開後の focused gate 再実行は **memory harness を含む 5 test ファイル集合で `57 passed`**、対応 `mypy` / `ruff` も通過。
-- fresh bundle は `C:\Users\puruy\AppData\Local\Temp\llcore_kaggle_livecheck_20260617b` に再生成し、前回と同じ manifest hash 群で `kaggle_push_readiness.py` の **CPU ready path `rc=0`** を確認した。CPU bundle なので live quota は skip され、`quota_rows=0 quota_checked=cpu` を表示した。別途 GPU bundle `C:\Users\puruy\AppData\Local\Temp\llcore_kaggle_gpu_livecheck_20260617` では readiness を試したが、`kaggle quota -v` が **CLI 2.2.1 側で `not enough values to unpack (expected 2, got 1)`** となり `rc=4` で停止した。実 `kaggle kernels push` 自体は未実施。
-- repo-local `out/kaggle_lm_compare_smoke` は **current push candidate ではない**。これは historical smoke artifact で、現物 metadata は `enable_gpu=true`, `machine_shape=NvidiaTeslaT4`, `is_private=false`, `enable_internet=true`。現在の push 判断は repo 外 fresh CPU bundle `C:\Users\puruy\AppData\Local\Temp\llcore_kaggle_livecheck_20260617b` を正本とする。
+> このファイルは毎ターン自動上書きされます。**手動で書いた内容は失われます。**
+> 永続化したいメモは `docs/PROGRESS.md` または `docs/NOTES.md` を使ってください。
