@@ -32,6 +32,12 @@ _MODEL_RE = re.compile(
     r"\[model\]\s+(?P<config>\S+):\s+(?P<params>[\d,]+)\s+params"
     r"(?:.*?L(?P<L>\d+)\s+H(?P<H>\d+)\s+D(?P<D>\d+)\s+ctx(?P<ctx>\d+)\s+dropout(?P<drop>[\d.]+))?"
 )
+# 旧 trainer の log 形式: ``[model] smoke: ... cfg={'n_layer': 4, ...}``
+_CFG_RE = re.compile(
+    r"cfg=\{[^}]*'n_layer':\s*(?P<L>\d+)[^}]*'n_head':\s*(?P<H>\d+)"
+    r"[^}]*'n_embd':\s*(?P<D>\d+)[^}]*'block_size':\s*(?P<ctx>\d+)"
+    r"[^}]*'dropout':\s*(?P<drop>[\d.]+)"
+)
 _TRAIN_RE = re.compile(
     r"\[train\]\s+iter\s+(?P<iter>\d+)\s+train_loss\s+(?P<tr>[\d.]+)\s+val_loss\s+(?P<va>[\d.]+)"
 )
