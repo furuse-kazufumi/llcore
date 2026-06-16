@@ -44,6 +44,7 @@ SRC_ROOT = REPO_ROOT / "src"
 DEFAULT_KERNEL_ID = "furusekazufumi/llcore-lm-compare"
 DEFAULT_DATASET_SOURCE = "furusekazufumi/llcore-lm-compare-support"
 RUNNER_NAME = "runner.py"
+KAGGLEIGNORE_NAME = ".kaggleignore"
 DATASET_PAYLOAD_DIRNAME = "dataset_payload"
 DATASET_METADATA_NAME = "dataset-metadata.json"
 DATASET_PAYLOAD_MANIFEST_NAME = "dataset_payload_manifest.json"
@@ -105,6 +106,7 @@ if __name__ == "__main__":
 RUNNER_TEMPLATE_DATASET = """# SPDX-License-Identifier: Apache-2.0
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import sys
@@ -116,6 +118,16 @@ if env_data_root:
     DATA_ROOT = Path(env_data_root)
 else:
     DATA_ROOT = Path("/kaggle/input") / "{dataset_mount_name}"
+
+
+EXPECTED_CONFIG_SHA256 = "{config_sha256}"
+EXPECTED_CORPUS_SHA256 = "{corpus_sha256}"
+
+
+def _sha256_text(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 for candidate in (DATA_ROOT, DATA_ROOT / "src"):
     sys.path.insert(0, str(candidate))
 
@@ -123,8 +135,30 @@ from llcore.lm.compare import CompareConfig, compare_on_text
 
 
 def main() -> int:
-    payload = json.loads((DATA_ROOT / "config.json").read_text(encoding="utf-8"))
+    if not DATA_ROOT.exists():
+        raise FileNotFoundError(
+            "dataset mount not found: "
+            f"{{DATA_ROOT}} (expected Kaggle dataset mount '{{DATA_ROOT.name}}')"
+        )
+    config_path = DATA_ROOT / "config.json"
     corpus_path = DATA_ROOT / "input_corpus.txt"
+    if not config_path.is_file():
+        raise FileNotFoundError(f"dataset config missing: {{config_path}}")
+    if not corpus_path.is_file():
+        raise FileNotFoundError(f"dataset corpus missing: {{corpus_path}}")
+    actual_config_sha256 = _sha256_text(config_path)
+    if actual_config_sha256 != EXPECTED_CONFIG_SHA256:
+        raise RuntimeError(
+            "dataset config sha256 mismatch: "
+            f"expected {{EXPECTED_CONFIG_SHA256}} got {{actual_config_sha256}}"
+        )
+    actual_corpus_sha256 = _sha256_text(corpus_path)
+    if actual_corpus_sha256 != EXPECTED_CORPUS_SHA256:
+        raise RuntimeError(
+            "dataset corpus sha256 mismatch: "
+            f"expected {{EXPECTED_CORPUS_SHA256}} got {{actual_corpus_sha256}}"
+        )
+    payload = json.loads(config_path.read_text(encoding="utf-8"))
     out_path = ROOT / "artifacts" / "lm_compare.json"
     out_path.parent.mkdir(parents=True, exist_ok=True)
     text = corpus_path.read_text(encoding="utf-8")
@@ -190,7 +224,11 @@ This folder is a local, deterministic Kaggle script-kernel bundle for
   `kernel_type: "script"`.
 - Runtime inputs live under `dataset_payload/` and must be published as a Kaggle
   Dataset referenced by `kernel-metadata.json.dataset_sources`.
+- `.kaggleignore` excludes `dataset_payload/` from `kaggle kernels push` so the
+  kernel and dataset payload are not uploaded twice.
 - Local smoke uses `LLCORE_KAGGLE_DATA_ROOT` to simulate `/kaggle/input/...`.
+- Default ids assume the `furusekazufumi` Kaggle account; override
+  `--kernel-id` / `--dataset-source` when publishing from another owner.
 
 ## Local contents
 
@@ -206,11 +244,11 @@ Do not push automatically. Publish order is:
 
 ```powershell
 kaggle datasets create -p <this_dir>/dataset_payload
+kaggle datasets version -p <this_dir>/dataset_payload -m "update dataset payload"
 kaggle kernels push -p <this_dir>
 ```
 
-If the dataset already exists, use `kaggle datasets version -p ...` instead of
-`create`.
+Use `create` for the first publish of a dataset slug and `version` for updates.
 """
 
 
@@ -255,10 +293,21 @@ def _dataset_mount_name(dataset_source: str) -> str:
     return dataset_source.split("/", 1)[1]
 
 
-def _render_runner(dataset_source: str | None) -> str:
+def _render_runner(
+    dataset_source: str | None,
+    *,
+    config_sha256: str | None = None,
+    corpus_sha256: str | None = None,
+) -> str:
     if dataset_source is None:
         return RUNNER_TEMPLATE_EMBEDDED
-    return RUNNER_TEMPLATE_DATASET.format(dataset_mount_name=_dataset_mount_name(dataset_source))
+    if config_sha256 is None or corpus_sha256 is None:
+        raise ValueError("dataset runner rendering requires config_sha256 and corpus_sha256")
+    return RUNNER_TEMPLATE_DATASET.format(
+        dataset_mount_name=_dataset_mount_name(dataset_source),
+        config_sha256=config_sha256,
+        corpus_sha256=corpus_sha256,
+    )
 
 
 def _render_readme(dataset_source: str | None) -> str:
@@ -389,7 +438,11 @@ def _is_builder_bundle_dir(bundle_dir: Path) -> bool:
         return all((bundle_dir / rel).exists() for rel in ("config.json", "input_corpus.txt", "src/llcore", "llcore"))
     return all(
         (bundle_dir / rel).exists()
-        for rel in (f"{DATASET_PAYLOAD_DIRNAME}/{DATASET_METADATA_NAME}", f"{DATASET_PAYLOAD_DIRNAME}/{DATASET_PAYLOAD_MANIFEST_NAME}")
+        for rel in (
+            KAGGLEIGNORE_NAME,
+            f"{DATASET_PAYLOAD_DIRNAME}/{DATASET_METADATA_NAME}",
+            f"{DATASET_PAYLOAD_DIRNAME}/{DATASET_PAYLOAD_MANIFEST_NAME}",
+        )
     )
 
 
@@ -457,6 +510,8 @@ def build_bundle(
     temp_root, staging_dir = _prepare_bundle_target(bundle_dir)
     backup_dir = temp_root / f"{bundle_dir.name}.backup"
     try:
+        dataset_config_sha256: str | None = None
+        dataset_corpus_sha256: str | None = None
         (staging_dir / "artifacts").mkdir(parents=True, exist_ok=True)
         shutil.copyfile(REPO_ROOT / "LICENSE", staging_dir / "LICENSE")
         (staging_dir / "NOTICE").write_text(_bundle_notice_text(), encoding="utf-8")
@@ -516,7 +571,17 @@ def build_bundle(
                 "dataset_metadata_sha256": _sha256_text(dataset_payload_dir / DATASET_METADATA_NAME),
             }
             _write_json(dataset_payload_dir / DATASET_PAYLOAD_MANIFEST_NAME, dataset_payload_manifest)
-        (staging_dir / RUNNER_NAME).write_text(_render_runner(dataset_source), encoding="utf-8")
+            (staging_dir / KAGGLEIGNORE_NAME).write_text(f"{DATASET_PAYLOAD_DIRNAME}/\n", encoding="utf-8")
+            dataset_config_sha256 = str(dataset_payload_manifest["config_sha256"])
+            dataset_corpus_sha256 = str(config_payload["corpus_sha256"])
+        (staging_dir / RUNNER_NAME).write_text(
+            _render_runner(
+                dataset_source,
+                config_sha256=dataset_config_sha256,
+                corpus_sha256=dataset_corpus_sha256,
+            ),
+            encoding="utf-8",
+        )
         (staging_dir / "README.md").write_text(_render_readme(dataset_source), encoding="utf-8")
         kernel_metadata = _build_kernel_metadata(
             kernel_id=kernel_id,

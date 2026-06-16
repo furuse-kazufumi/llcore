@@ -45,6 +45,7 @@ DATASET_COPIED_FILE_KEYS = (
     "dataset_payload",
 )
 DATASET_PAYLOAD_DIRNAME = "dataset_payload"
+KAGGLEIGNORE_NAME = ".kaggleignore"
 DATASET_METADATA_NAME = "dataset-metadata.json"
 DATASET_PAYLOAD_MANIFEST_NAME = "dataset_payload_manifest.json"
 _BOOL_TEXT_VALUES = {"true", "false"}
@@ -272,6 +273,7 @@ def _validate_bundle_dir(bundle_dir: Path) -> dict[str, object]:
         if not isinstance(dataset_mount_name, str) or not dataset_mount_name:
             raise ValueError("bundle_manifest.json.dataset_mount_name must be a non-empty string")
         dataset_payload_dir = bundle_dir / dataset_payload_rel
+        kaggleignore_path = bundle_dir / KAGGLEIGNORE_NAME
         dataset_manifest_path = dataset_payload_dir / DATASET_PAYLOAD_MANIFEST_NAME
         dataset_metadata_path = dataset_payload_dir / DATASET_METADATA_NAME
         config_path = dataset_payload_dir / "config.json"
@@ -295,6 +297,11 @@ def _validate_bundle_dir(bundle_dir: Path) -> dict[str, object]:
         ]
         if missing_dataset:
             raise ValueError("bundle is missing required dataset payload paths: " + ", ".join(missing_dataset))
+        if not kaggleignore_path.is_file():
+            raise ValueError("dataset bundle must include .kaggleignore to exclude dataset_payload/ from kernel push")
+        kaggleignore_text = kaggleignore_path.read_text(encoding="utf-8")
+        if f"{DATASET_PAYLOAD_DIRNAME}/" not in kaggleignore_text.splitlines():
+            raise ValueError(".kaggleignore must exclude dataset_payload/")
         if _sha256_text(dataset_manifest_path) != dataset_payload_manifest_sha256:
             raise ValueError(
                 "dataset payload manifest sha256 does not match bundle_manifest.json.dataset_payload_manifest_sha256"

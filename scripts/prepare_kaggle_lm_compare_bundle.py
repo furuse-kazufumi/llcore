@@ -147,10 +147,18 @@ def prepare_bundle(argv: list[str] | None = None) -> int:
         "kernel_id": args.kernel_id,
         "push_command": f'kaggle kernels push -p "{Path(args.bundle_dir).resolve()}"',
         "dataset_source": args.dataset_source,
-        "dataset_push_command": (
+        "dataset_create_command": (
             None
             if not args.dataset_source
             else f'kaggle datasets create -p "{Path(args.bundle_dir).resolve() / "dataset_payload"}"'
+        ),
+        "dataset_version_command": (
+            None
+            if not args.dataset_source
+            else (
+                f'kaggle datasets version -p "{Path(args.bundle_dir).resolve() / "dataset_payload"}" '
+                '-m "update dataset payload"'
+            )
         ),
         "preflight": preflight_report,
     }
@@ -171,8 +179,9 @@ def prepare_bundle(argv: list[str] | None = None) -> int:
             "runner smoke uses local CPU training and may still require a larger "
             "--runner-timeout for heavier configs.",
         )
-    if combined_report["dataset_push_command"]:
-        print("[dataset-next]", combined_report["dataset_push_command"])
+    if combined_report["dataset_create_command"]:
+        print("[dataset-create]", combined_report["dataset_create_command"])
+        print("[dataset-version]", combined_report["dataset_version_command"])
     print("[next]", combined_report["push_command"])
     return 0
 

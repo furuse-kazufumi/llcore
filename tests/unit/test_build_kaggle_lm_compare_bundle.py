@@ -136,12 +136,39 @@ def test_build_bundle_dataset_mode_writes_dataset_payload(tmp_path: Path) -> Non
     assert manifest["data_mode"] == "dataset"
     assert manifest["dataset_source"] == "furusekazufumi/llcore-lm-compare-support"
     assert manifest["dataset_mount_name"] == "llcore-lm-compare-support"
+    assert (bundle_dir / ".kaggleignore").read_text(encoding="utf-8") == "dataset_payload/\n"
     dataset_dir = bundle_dir / "dataset_payload"
     assert (dataset_dir / "dataset-metadata.json").is_file()
     assert (dataset_dir / "config.json").is_file()
     assert (dataset_dir / "input_corpus.txt").is_file()
     assert (dataset_dir / "src" / "llcore" / "lm" / "compare.py").is_file()
     assert (dataset_dir / "llcore" / "lm" / "compare.py").is_file()
+
+
+def test_build_bundle_dataset_runner_embeds_payload_hashes(tmp_path: Path) -> None:
+    builder = _load_builder()
+    corpus = tmp_path / "corpus.txt"
+    corpus.write_text("abcabc\n", encoding="utf-8")
+    bundle_dir = tmp_path / "bundle"
+
+    rc = builder.main(
+        [
+            "--bundle-dir",
+            str(bundle_dir),
+            "--corpus-file",
+            str(corpus),
+            "--dataset-source",
+            "furusekazufumi/llcore-lm-compare-support",
+        ]
+    )
+
+    assert rc == 0
+    runner_text = (bundle_dir / "runner.py").read_text(encoding="utf-8")
+    payload_manifest = json.loads(
+        (bundle_dir / "dataset_payload" / "dataset_payload_manifest.json").read_text(encoding="utf-8")
+    )
+    assert payload_manifest["config_sha256"] in runner_text
+    assert payload_manifest["corpus_sha256"] in runner_text
 
 
 def test_build_bundle_rejects_missing_corpus(

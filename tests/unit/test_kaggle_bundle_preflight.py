@@ -151,6 +151,36 @@ def test_preflight_dataset_mode_runner_smoke_passes(tmp_path: Path) -> None:
     assert (bundle_dir / "artifacts" / "lm_compare.json").is_file()
 
 
+def test_preflight_dataset_mode_rejects_missing_kaggleignore(tmp_path: Path) -> None:
+    preflight = _load_script("kaggle_bundle_preflight.py")
+    bundle_dir = _build_dataset_bundle(tmp_path)
+    (bundle_dir / ".kaggleignore").unlink()
+
+    rc = preflight.main(["--bundle-dir", str(bundle_dir)])
+
+    assert rc == 2
+
+
+def test_preflight_dataset_mode_rejects_kaggleignore_without_dataset_payload_rule(tmp_path: Path) -> None:
+    preflight = _load_script("kaggle_bundle_preflight.py")
+    bundle_dir = _build_dataset_bundle(tmp_path)
+    (bundle_dir / ".kaggleignore").write_text("artifacts/\n", encoding="utf-8")
+
+    rc = preflight.main(["--bundle-dir", str(bundle_dir)])
+
+    assert rc == 2
+
+
+def test_preflight_dataset_mode_rejects_dataset_corpus_sha256_drift(tmp_path: Path) -> None:
+    preflight = _load_script("kaggle_bundle_preflight.py")
+    bundle_dir = _build_dataset_bundle(tmp_path)
+    (bundle_dir / "dataset_payload" / "input_corpus.txt").write_text("tampered\n", encoding="utf-8")
+
+    rc = preflight.main(["--bundle-dir", str(bundle_dir)])
+
+    assert rc == 2
+
+
 def test_preflight_runner_smoke_can_be_repeated_without_false_sha_drift(tmp_path: Path) -> None:
     preflight = _load_script("kaggle_bundle_preflight.py")
     bundle_dir = _build_bundle(tmp_path)

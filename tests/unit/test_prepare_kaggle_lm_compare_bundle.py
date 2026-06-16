@@ -152,10 +152,12 @@ def test_prepare_bundle_dataset_mode_reports_dataset_command(tmp_path: Path, cap
 
     assert rc == 0
     out = capsys.readouterr().out
-    assert "[dataset-next]" in out
+    assert "[dataset-create]" in out
+    assert "[dataset-version]" in out
     payload = json.loads(report_path.read_text(encoding="utf-8"))
     assert payload["dataset_source"] == "furusekazufumi/llcore-lm-compare-support"
-    assert "dataset_payload" in payload["dataset_push_command"]
+    assert "dataset_payload" in payload["dataset_create_command"]
+    assert "datasets version" in payload["dataset_version_command"]
 
 
 def test_prepare_bundle_rejects_nonpositive_runner_timeout(
