@@ -63,16 +63,24 @@ def clean_aozora(raw: bytes | str, encoding: str = "cp932") -> str:
     return body + "\n"
 
 
+def extract_aozora_text_from_zip_bytes(zip_bytes: bytes) -> str:
+    """Extract and clean the first ``.txt`` payload from an Aozora zip blob."""
+    with zipfile.ZipFile(io.BytesIO(zip_bytes)) as zf:
+        names = [name for name in zf.namelist() if name.lower().endswith(".txt")]
+        if not names:
+            raise ValueError("no .txt payload in Aozora zip")
+        raw = zf.read(names[0])
+    return clean_aozora(raw)
+
+
 def fetch_aozora_text(url: str = AOZORA_WAGAHAI_ZIP_URL, *, timeout: float = 30.0) -> str:
     """Download an Aozora zip, extract its single ``.txt``, and clean it."""
     with urllib.request.urlopen(url, timeout=timeout) as resp:  # noqa: S310 - Aozora
         zip_bytes = resp.read()
-    with zipfile.ZipFile(io.BytesIO(zip_bytes)) as zf:
-        names = [n for n in zf.namelist() if n.lower().endswith(".txt")]
-        if not names:
-            raise ValueError(f"no .txt in Aozora zip {url}")
-        raw = zf.read(names[0])
-    return clean_aozora(raw)
+    try:
+        return extract_aozora_text_from_zip_bytes(zip_bytes)
+    except ValueError as exc:
+        raise ValueError(f"no .txt in Aozora zip {url}") from exc
 
 
 def fetch_tinyshakespeare(url: str = TINY_SHAKESPEARE_URL, *, timeout: float = 30.0) -> str:

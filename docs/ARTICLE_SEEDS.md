@@ -329,3 +329,13 @@
 - **根拠**: `docs/next_plan.md` の `ANTHROPIC_API_KEY` valid 記録、同ファイルの article seed append-only 方針、`docs/SESSION_SUMMARY.md` の再開ポインタ。
 - **側面**: 教訓 / honest disclosure / 戦略 / エコシステム。
 - **注記**: #17 の 2026-06-16 追記は旧形式の supersede 注記として残しつつ、以後の supersede は同様のインライン改変を増やさず、numbered seed の append で行う。
+
+### 31. artifact 名が同じでも producer と consumer の契約が 1 bit ずれると round-trip は壊れる
+- **気付き**: `prepare` と `probe` の両方が `<manifest>.bundle.json` を書いていても、それだけでは互換性は保証されない。実際に今回、`prepare` は extras-only の bundle (`includes_base=false`)、`probe` は base+extras の bundle (`includes_base=true`) を生成していたため、**同じ manifest/bundle という見た目でも consumer 側 verify は必ず fail** した。重要だったのは artifact 名の統一ではなく、**契約フィールド `includes_base` の意味を producer/consumer が共有し、verify が bundle の自己申告に追従すること**だった。値を一律に揃えるより、「この bundle は base を含む/含まない」を双方が同じ意味で解釈できるかが round-trip を決める。
+- **根拠**: `docs/next_plan.md` の 2026-06-16 追記（prepare bundle mismatch の修正ログ）、`src/llcore/lm/corpus.py` の `build_utf8_corpus_bundle()` / `verify_corpus_manifest_bundle()`、`tests/unit/test_lm_cli.py` の prepare manifest round-trip 回帰 **(既存回帰として存在を参照、今回は未実行)**。
+- **側面**: 教訓 / honest disclosure / 実装報告 / 戦略。
+
+### 32. fail-closed provenance は「書ける」だけでなく「読む側も再検証して止まれる」まで閉じて初めて成立する
+- **気付き**: manifest 横に provenance JSON を出すだけでは、監査可能なようでいて実際には drift を見逃す。今回の bundle hardeningで効いたのは、producer 側の sidecar / bundle 生成よりも、**consumer 側 (`resolve_extra_corpus_files`) が sibling bundle を再計算して manifest 本体・base 側 drift を consume 時点で fail-closed に止める**ようにしたことだった。さらに比較から絶対 path (`files[].path`) を外し、**内容由来フィールド (各 file の `sha256` / `chars` / `vocab_size`、`combined`、`bundle_sha256`) だけで判定する**ようにしたことで、配置移動のような非本質差分は許しつつ、内容 drift だけを止める監査線になった。
+- **根拠**: `docs/PROGRESS.md` / `docs/next_plan.md` の bundle verify 追記、`src/llcore/lm/corpus.py` の `verify_corpus_manifest_bundle()`、`tests/unit/test_lm_corpus.py` の manifest/base drift reject と stale absolute path 無視、`tests/unit/test_lm_cli.py` の probe-manifest drift reject **(既存回帰として存在を参照、今回は未実行)**。
+- **側面**: 教訓 / 実装報告 / honest disclosure / エコシステム。

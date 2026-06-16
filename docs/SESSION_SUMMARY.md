@@ -1,31 +1,78 @@
-# Session Summary
+# Session Summary (auto-generated)
 
-> ⚠️ このファイルは Stop hook (`raptor-auto-summary`) に上書きされうる。
-> 最終更新: 2026-06-16 (LM recurrent cleanup と rerun 準備は完了済み、残る人間ゲートは corpus staging 側。現状の作業木は主に記録更新で、`docs/ARTICLE_SEEDS.md` は append-only 追記が中心。`collect_research_seeds.py` 側では裸の `記事化` / `published` レグを除去済みだが、legacy shorthand `→ #...` / `→ 記事...` はまだ consumed 判定に残る。dirty の実体は `git status` を正とする)
-> **実体の正本は `docs/next_plan.md`**。進捗と承認待ちの詳細はそちらを優先し、このファイルは再開ポインタに留める。
-> 補助ポインタは `docs/PROGRESS.md`。
+> 自動生成: `libexec/raptor-auto-summary` (Stop hook)
+> 次回 ccr 起動時に CLAUDE.md SESSION START で自動的に読み取られる。
 
-再開地点:
-- 現在の主作業ブランチは `feat/lm-recurrent`
-- LM recurrent 実装・verdict packet・tracked artifacts は完成済み
-- strongest claim は **「RWKV が最も再現性の高い候補」**、full winner は未宣言
-- LM recurrent の duplicate SVG canonical 化と `.llterm/loop_ledger.jsonl` 追跡解除はどちらも完了済み
-- 現状の作業木は主に文書更新で、`docs/ARTICLE_SEEDS.md` は append-only 追記が中心。`collect_research_seeds.py` は 2026-06-16 に fullsense 側の local dirty 作業木で観測確認し、裸の `記事化` / `published` レグは除去済みだが、legacy shorthand `→ #...` / `→ 記事...` は残る状態だった。repo 外・dirty 作業木なので、この要約は**時点スナップショット**に留め、再利用前に現物を再取得する。**llcore repo 内**の dirty は `docs/*.md` の文書更新だけで、llcore 側のコード/アセットに未コミット変更は無い。fullsense repo 側は `collect_research_seeds.py` などが dirty。dirty の実体は各 repo の `git status` を正とし、ここでは固定列挙しない
+- **最終更新**: 2026-06-16 20:46:52
+- **プロジェクト**: `D:/projects/llcore`
+- **ブランチ**: `feat/lm-recurrent`
 
-未解決:
-- `verified_safe_learning` staging の publish 判断
-  - 既存 live v1 (`SKILL.md` 起点, 97 ノート + `SKILL.md`) と staging v2 (`INDEX.md` 起点, hierarchical) は入口互換が無く、publish 判断は「新規作成」ではなく migration 方式の選択になる
-  - 詳細な 3 択比較、中間案 shim 草案、publish 前後チェックリスト、隔離チェック例、static gate の pass/fail 条件、`--reindex` の副作用メモ、人間ゲートでの選び分け基準、次に出す確認ダイアログ順は **`docs/next_plan.md` を正本**として参照する
-- `self_evolving_agents` precision rerun 本実行の判断
-- `self_evolving_agents` staging の publish 判断（rerun 後または現状維持）
+## 直近の git log
 
-次の具体的な一手:
-1. `docs/next_plan.md` の `★ユーザー判断` と `次の具体的な一手` を開き、未回収の人間ゲートを確認する
-2. 最優先で `verified_safe_learning` publish か `self_evolving_agents` precision rerun 本実行のどちらを先に処理するか、人間判断を回収する
-3. rerun 実行が承認されたら、repo 外 `D:\docs\self_evolving_agents_corpus_v2.staging\_STAGING_META\queries_refined_candidate.txt` の SHA256 `2AB6A443E70D7A58DDDCFFE4213BF0156960C48E89109245CC9C34F74D6B7D73` を、**2026-06-16 10:19:33 +09:00 取得時点**の値として、保存先パス + 取得日時とセットで再確認してから fetch / corpus2skill 実行へ進む
-   - この SHA は precision rerun の入力固定用に意図的に保持している gate 値だが、repo 外ファイル依存なので llcore 単体では再現不能。旧 `0E6C...` から `2AB6...` への更新は query tightening 反映
+```
+b73f8a0 auto: p1_compare.py 編集前 (2026-06-16 12:43)
+3114dac auto: p1_compare.py 編集前 (2026-06-16 12:43)
+a83defa auto: next_plan.md 編集前 (2026-06-16 08:05)
+6682683 auto: next_plan.md 編集前 (2026-06-16 08:00)
+20235bd Refresh status seed and rerun notes
+8688018 Clear stale dirty-state notes after HD-1 viz commit
+bee971e Add HD-1 null-vs-real visualization generator
+620a247 Refresh llterm status seed timestamp
+d7087e6 Add forward pointer for article seed API outage note
+43245d0 Clarify completed approval log and refresh status seed
+```
 
-直近 gate:
-- `py -3.11 -m pytest tests/unit -k lm -q && py -3.11 -m mypy src/llcore/lm/ && py -3.11 -m ruff check src/llcore/lm/`
-- exit code `0`
-- `91 passed, 401 deselected` / `mypy success` / `ruff success`
+## 現在の git status
+
+```
+M docs/ARTICLE_SEEDS.md
+ M docs/LM_P0_PLAN.md
+ M docs/LM_RECURRENT_PLAN.md
+ M docs/PROGRESS.md
+ M docs/SESSION_SUMMARY.md
+ M docs/next_plan.md
+MM scripts/p1_compare.py
+ M src/llcore/lm/__main__.py
+ M src/llcore/lm/data.py
+ M src/llcore/lm/trainer.py
+ M tests/unit/test_lm_data.py
+ M tests/unit/test_lm_trainer.py
+AM tests/unit/test_p1_compare.py
+?? scripts/build_aozora_corpus.py
+?? scripts/p1_corpus_probe.py
+?? scripts/p1_manifest_inspect.py
+?? scripts/p1_manifest_reconcile.py
+?? scripts/p1_prepare_aozora.py
+?? src/llcore/lm/corpus.py
+?? tests/unit/test_lm_cli.py
+?? tests/unit/test_lm_corpus.py
+?? tests/unit/test_p1_corpus_manifest_inspect.py
+?? tests/unit/test_p1_corpus_probe.py
+?? tests/unit/test_p1_manifest_reconcile.py
+?? tests/unit/test_p1_prepare_aozora.py
+```
+
+## 直近 2 時間に変更されたファイル
+
+```
+20:46 .mypy_cache/3.11/cache.6.db
+20:46 .mypy_cache/3.11/cache.3.db
+20:46 .ruff_cache/0.15.12/11287728664031201126
+20:46 tests/unit/test_lm_cli.py
+20:45 .pytest_cache/v/cache/nodeids
+20:45 .mypy_cache/3.11/cache.9.db
+20:45 .mypy_cache/3.11/cache.8.db
+20:45 .mypy_cache/3.11/cache.7.db
+20:45 .mypy_cache/3.11/cache.5.db
+20:45 .mypy_cache/3.11/cache.4.db
+20:45 .mypy_cache/3.11/cache.2.db
+20:45 .mypy_cache/3.11/cache.14.db
+20:45 .mypy_cache/3.11/cache.13.db
+20:45 .mypy_cache/3.11/cache.12.db
+20:45 .mypy_cache/3.11/cache.11.db
+```
+
+---
+
+> このファイルは毎ターン自動上書きされます。**手動で書いた内容は失われます。**
+> 永続化したいメモは `docs/PROGRESS.md` または `docs/NOTES.md` を使ってください。

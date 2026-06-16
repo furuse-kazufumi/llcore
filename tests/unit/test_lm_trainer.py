@@ -2,6 +2,8 @@
 """Tests for :mod:`llcore.lm.trainer` — LR schedule + end-to-end learning."""
 from __future__ import annotations
 
+from copy import deepcopy
+
 import torch
 
 from llcore.lm.data import encode_corpus, train_val_split
@@ -75,3 +77,73 @@ def test_train_returns_history_and_loss_decreases() -> None:
     assert isinstance(history, list) and len(history) >= 2
     # training loss should fall from first to last eval
     assert history[-1]["train_loss"] < history[0]["train_loss"]
+
+
+def _assert_resume_matches_continuous_training(
+    *, seed: int, dropout: float, eval_interval: int
+) -> None:
+    torch.manual_seed(seed)
+    text = ("abcdefg" * 200) + "\n"
+    tok = CharTokenizer.from_text(text)
+    ids = encode_corpus(text, tok)
+    train_ids, val_ids = train_val_split(ids, val_frac=0.2)
+    model_cfg = GPTConfig(
+        vocab_size=tok.vocab_size, block_size=8, n_layer=1, n_head=2, n_embd=16, dropout=dropout
+    )
+    base_model = CharGPT(model_cfg)
+    initial_state = deepcopy(base_model.state_dict())
+    initial_rng_state = torch.get_rng_state()
+
+    continuous_model = CharGPT(model_cfg)
+    continuous_model.load_state_dict(initial_state)
+    continuous_cfg = TrainConfig(
+        max_iters=6,
+        warmup_iters=2,
+        lr_decay_iters=6,
+        batch_size=8,
+        eval_interval=eval_interval,
+        eval_iters=1,
+        seed=seed + 1,
+    )
+    torch.set_rng_state(initial_rng_state)
+    continuous_trainer = Trainer(continuous_model, continuous_cfg)
+    continuous_trainer.train(train_ids, val_ids)
+
+    partial_model = CharGPT(model_cfg)
+    partial_model.load_state_dict(initial_state)
+    partial_cfg = TrainConfig(
+        max_iters=3,
+        warmup_iters=2,
+        lr_decay_iters=6,
+        batch_size=8,
+        eval_interval=eval_interval,
+        eval_iters=1,
+        seed=seed + 1,
+    )
+    torch.set_rng_state(initial_rng_state)
+    partial_trainer = Trainer(partial_model, partial_cfg)
+    partial_trainer.train(train_ids, val_ids)
+    partial_state = partial_trainer.state_dict()
+
+    resumed_model = CharGPT(model_cfg)
+    resumed_model.load_state_dict(partial_model.state_dict())
+    resumed_trainer = Trainer(resumed_model, continuous_cfg)
+    resumed_trainer.load_state_dict(partial_state)
+    resumed_trainer.train(train_ids, val_ids)
+
+    for name, param in continuous_model.state_dict().items():
+        torch.testing.assert_close(param, resumed_model.state_dict()[name], rtol=0.0, atol=0.0)
+    assert resumed_trainer.iter_num == continuous_trainer.iter_num == 6
+    assert resumed_trainer.history == continuous_trainer.history
+
+
+def test_trainer_resume_matches_continuous_training() -> None:
+    _assert_resume_matches_continuous_training(seed=123, dropout=0.0, eval_interval=1)
+
+
+def test_trainer_resume_matches_continuous_training_with_dropout() -> None:
+    _assert_resume_matches_continuous_training(seed=456, dropout=0.2, eval_interval=1)
+
+
+def test_trainer_resume_matches_continuous_training_with_sparse_evals() -> None:
+    _assert_resume_matches_continuous_training(seed=789, dropout=0.2, eval_interval=2)

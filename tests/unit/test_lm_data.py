@@ -5,7 +5,13 @@ from __future__ import annotations
 import pytest
 import torch
 
-from llcore.lm.data import clean_aozora, encode_corpus, get_batch, train_val_split
+from llcore.lm.data import (
+    clean_aozora,
+    encode_corpus,
+    extract_aozora_text_from_zip_bytes,
+    get_batch,
+    train_val_split,
+)
 from llcore.lm.tokenizer import CharTokenizer
 
 # A miniature Aozora-formatted document (header / legend / body / colophon).
@@ -42,6 +48,18 @@ def test_clean_aozora_decodes_shift_jis_bytes() -> None:
     raw = AOZORA_SAMPLE.encode("cp932")
     body = clean_aozora(raw)
     assert "名前はまだ無い" in body
+
+
+def test_extract_aozora_text_from_zip_bytes() -> None:
+    import io
+    import zipfile
+
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as zf:
+        zf.writestr("sample.txt", AOZORA_SAMPLE.encode("cp932"))
+    body = extract_aozora_text_from_zip_bytes(buf.getvalue())
+    assert "名前はまだ無い" in body
+    assert "《" not in body
 
 
 def test_train_val_split_contiguous() -> None:
