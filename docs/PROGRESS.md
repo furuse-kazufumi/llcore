@@ -10,7 +10,7 @@
 
 ## 現在の要点
 
-- Kaggle push handoff の **進捗状態の正本は `docs/next_plan.md`**。current candidate の所在地は **`D:\projects\llcore_kaggle_livecheck_20260617c`** で、旧 `...20260617b` は pre-license-guard 時代の stale candidate として残す。fresh candidate は `LICENSE` / `NOTICE` 同梱と wording 整理まで入れた上で **`rc=0`** を再取得し、その後 **`kaggle kernels push -p D:\projects\llcore_kaggle_livecheck_20260617c` が `Kernel version 1 successfully pushed`** を返した。private notebook のため CLI `kernels status` は `kernels.get denied` で追跡不能なので、進捗確認の正本は `docs/next_plan.md` と Kaggle Web UI を使う。
+- Kaggle push handoff の **進捗状態の正本は `docs/next_plan.md`**。historical push candidate `D:\projects\llcore_kaggle_livecheck_20260617c` は `Kernel version 1 successfully pushed` まで到達したが、その後 `kaggle kernels status furusekazufumi/llcore-lm-compare` は `KernelWorkerStatus.ERROR` を返し、取得済み log `D:\projects\llcore_kaggle_output_20260617\llcore-lm-compare.log` には `ModuleNotFoundError: No module named 'llcore'` が残った。したがって **現行の replacement candidate 正本は `D:\projects\llcore_kaggle_livecheck_20260617d`** で、`prepare_kaggle_lm_compare_bundle.py --run-runner` と `kaggle_push_readiness.py` の **`rc=0`** までを再取得済み。進捗確認の正本は `docs/next_plan.md` と Kaggle Web UI を使う。
 - **現在の主作業ブランチは `feat/lm-recurrent`**。LM recurrent 実験の正本は `docs/LM_RECURRENT_PLAN.md` と tracked artifact `docs/artifacts/lm_recurrent_*` で、再開フロー自体の正本は引き続き `next_plan.md`
 - LM recurrent 比較は **verdict packet 完成** まで到達:
   - `docs/artifacts/lm_recurrent_verdict.md` に PPL 表 / memory@T 曲線 / caveat を集約
