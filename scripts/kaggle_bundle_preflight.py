@@ -14,6 +14,8 @@ import os
 import subprocess
 import sys
 from pathlib import Path
+from pathlib import PurePosixPath
+import zipfile
 
 sys.path.insert(0, str((Path(__file__).resolve().parent.parent / "src")))
 
@@ -48,6 +50,8 @@ DATASET_PAYLOAD_DIRNAME = "dataset_payload"
 KAGGLEIGNORE_NAME = ".kaggleignore"
 DATASET_METADATA_NAME = "dataset-metadata.json"
 DATASET_PAYLOAD_MANIFEST_NAME = "dataset_payload_manifest.json"
+DATASET_SRC_ARCHIVE_NAME = "src_llcore.zip"
+DATASET_PKG_ARCHIVE_NAME = "pkg_llcore.zip"
 _BOOL_TEXT_VALUES = {"true", "false"}
 
 
@@ -71,6 +75,28 @@ def _sha256_tree(root: Path) -> str:
         digest.update(b"\0")
         digest.update(path.read_bytes())
         digest.update(b"\0")
+    return digest.hexdigest()
+
+
+def _sha256_zip_tree(archive_path: Path, *, expected_prefix: str) -> str:
+    digest = hashlib.sha256()
+    with zipfile.ZipFile(archive_path) as zf:
+        for info in sorted(zf.infolist(), key=lambda item: item.filename):
+            member_name = info.filename.replace("\\", "/")
+            if info.is_dir():
+                continue
+            if not member_name.startswith(expected_prefix):
+                raise ValueError(
+                    f"{archive_path.name} contains member outside expected prefix {expected_prefix!r}: {member_name}"
+                )
+            member_path = PurePosixPath(member_name)
+            if any(part in {"", ".", ".."} for part in member_path.parts):
+                raise ValueError(f"{archive_path.name} contains unsafe member path: {member_name}")
+            rel = member_name.removeprefix(expected_prefix).encode("utf-8")
+            digest.update(rel)
+            digest.update(b"\0")
+            digest.update(zf.read(info))
+            digest.update(b"\0")
     return digest.hexdigest()
 
 
@@ -278,8 +304,8 @@ def _validate_bundle_dir(bundle_dir: Path) -> dict[str, object]:
         dataset_metadata_path = dataset_payload_dir / DATASET_METADATA_NAME
         config_path = dataset_payload_dir / "config.json"
         corpus_path = dataset_payload_dir / "input_corpus.txt"
-        src_llcore = dataset_payload_dir / "src" / "llcore"
-        pkg_llcore = dataset_payload_dir / "llcore"
+        src_archive_path = dataset_payload_dir / DATASET_SRC_ARCHIVE_NAME
+        pkg_archive_path = dataset_payload_dir / DATASET_PKG_ARCHIVE_NAME
         missing_dataset = [
             rel
             for rel in (
@@ -288,8 +314,8 @@ def _validate_bundle_dir(bundle_dir: Path) -> dict[str, object]:
                 f"{dataset_payload_rel}/{DATASET_METADATA_NAME}",
                 f"{dataset_payload_rel}/config.json",
                 f"{dataset_payload_rel}/input_corpus.txt",
-                f"{dataset_payload_rel}/src/llcore",
-                f"{dataset_payload_rel}/llcore",
+                f"{dataset_payload_rel}/{DATASET_SRC_ARCHIVE_NAME}",
+                f"{dataset_payload_rel}/{DATASET_PKG_ARCHIVE_NAME}",
                 f"{dataset_payload_rel}/LICENSE",
                 f"{dataset_payload_rel}/NOTICE",
             )
@@ -334,12 +360,16 @@ def _validate_bundle_dir(bundle_dir: Path) -> dict[str, object]:
             raise ValueError("dataset payload input_corpus.txt sha256 does not match config.json.corpus_sha256")
         if dataset_manifest.get("corpus_sha256") != corpus_sha256:
             raise ValueError("dataset payload manifest corpus_sha256 does not match config.json.corpus_sha256")
-        actual_source_sha256 = _sha256_tree(src_llcore)
-        actual_pkg_source_sha256 = _sha256_tree(pkg_llcore)
+        actual_source_sha256 = _sha256_zip_tree(src_archive_path, expected_prefix="src/llcore/")
+        actual_pkg_source_sha256 = _sha256_zip_tree(pkg_archive_path, expected_prefix="llcore/")
         if dataset_manifest.get("source_sha256") != actual_source_sha256:
-            raise ValueError("dataset payload src/llcore sha256 does not match dataset manifest source_sha256")
+            raise ValueError("dataset payload src_llcore.zip contents do not match dataset manifest source_sha256")
         if dataset_manifest.get("source_sha256") != actual_pkg_source_sha256:
-            raise ValueError("dataset payload llcore sha256 does not match dataset manifest source_sha256")
+            raise ValueError("dataset payload pkg_llcore.zip contents do not match dataset manifest source_sha256")
+        if dataset_manifest.get("src_archive_sha256") != _sha256_text(src_archive_path):
+            raise ValueError("dataset payload src_llcore.zip sha256 does not match dataset manifest src_archive_sha256")
+        if dataset_manifest.get("pkg_archive_sha256") != _sha256_text(pkg_archive_path):
+            raise ValueError("dataset payload pkg_llcore.zip sha256 does not match dataset manifest pkg_archive_sha256")
         if dataset_manifest.get("config_sha256") != _sha256_text(config_path):
             raise ValueError("dataset payload config.json sha256 does not match dataset manifest config_sha256")
         if dataset_manifest.get("license_sha256") != _sha256_text(dataset_payload_dir / "LICENSE"):

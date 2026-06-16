@@ -6,6 +6,7 @@ import json
 import shutil
 import subprocess
 import sys
+import zipfile
 from pathlib import Path
 from typing import Any
 
@@ -141,8 +142,14 @@ def test_build_bundle_dataset_mode_writes_dataset_payload(tmp_path: Path) -> Non
     assert (dataset_dir / "dataset-metadata.json").is_file()
     assert (dataset_dir / "config.json").is_file()
     assert (dataset_dir / "input_corpus.txt").is_file()
-    assert (dataset_dir / "src" / "llcore" / "lm" / "compare.py").is_file()
-    assert (dataset_dir / "llcore" / "lm" / "compare.py").is_file()
+    assert (dataset_dir / "src_llcore.zip").is_file()
+    assert (dataset_dir / "pkg_llcore.zip").is_file()
+    with zipfile.ZipFile(dataset_dir / "src_llcore.zip") as zf:
+        assert "src/llcore/__init__.py" in zf.namelist()
+        assert "src/llcore/lm/compare.py" in zf.namelist()
+    with zipfile.ZipFile(dataset_dir / "pkg_llcore.zip") as zf:
+        assert "llcore/__init__.py" in zf.namelist()
+        assert "llcore/lm/compare.py" in zf.namelist()
 
 
 def test_build_bundle_dataset_runner_embeds_payload_hashes(tmp_path: Path) -> None:

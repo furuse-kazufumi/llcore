@@ -31,6 +31,7 @@ import re
 import shutil
 import sys
 import tempfile
+import zipfile
 from dataclasses import asdict
 from pathlib import Path
 sys.path.insert(0, str((Path(__file__).resolve().parent.parent / "src")))
@@ -48,6 +49,8 @@ KAGGLEIGNORE_NAME = ".kaggleignore"
 DATASET_PAYLOAD_DIRNAME = "dataset_payload"
 DATASET_METADATA_NAME = "dataset-metadata.json"
 DATASET_PAYLOAD_MANIFEST_NAME = "dataset_payload_manifest.json"
+DATASET_SRC_ARCHIVE_NAME = "src_llcore.zip"
+DATASET_PKG_ARCHIVE_NAME = "pkg_llcore.zip"
 EMBEDDED_COPIED_FILE_KEYS = (
     "corpus",
     "config",
@@ -109,8 +112,12 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import shutil
+import stat
 import sys
 from pathlib import Path
+from pathlib import PurePosixPath
+import zipfile
 
 ROOT = Path(__file__).resolve().parent
 env_data_root = os.environ.get("LLCORE_KAGGLE_DATA_ROOT")
@@ -122,16 +129,78 @@ else:
 
 EXPECTED_CONFIG_SHA256 = "{config_sha256}"
 EXPECTED_CORPUS_SHA256 = "{corpus_sha256}"
+EXPECTED_SRC_ARCHIVE_SHA256 = "{src_archive_sha256}"
+EXPECTED_PKG_ARCHIVE_SHA256 = "{pkg_archive_sha256}"
+SRC_ARCHIVE_NAME = "{src_archive_name}"
+PKG_ARCHIVE_NAME = "{pkg_archive_name}"
 
 
 def _sha256_text(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-for candidate in (DATA_ROOT, DATA_ROOT / "src"):
-    sys.path.insert(0, str(candidate))
+def _safe_extract_zip(
+    archive_path: Path,
+    dest_root: Path,
+    *,
+    expected_prefix: str,
+    max_entries: int = 4096,
+    max_uncompressed_bytes: int = 256 * 1024 * 1024,
+) -> None:
+    total_uncompressed = 0
+    with zipfile.ZipFile(archive_path) as zf:
+        infos = zf.infolist()
+        if len(infos) > max_entries:
+            raise RuntimeError(
+                f"archive has too many entries: {{archive_path}} ({{len(infos)}} > {{max_entries}})"
+            )
+        for info in infos:
+            member_name = info.filename.replace("\\\\", "/")
+            if not member_name:
+                raise RuntimeError(f"archive contains an empty member name: {{archive_path}}")
+            if member_name.startswith("/") or member_name.startswith("../"):
+                raise RuntimeError(f"archive member escapes extraction root: {{member_name}}")
+            member_path = PurePosixPath(member_name)
+            if any(part in {{"", ".", ".."}} for part in member_path.parts):
+                raise RuntimeError(f"archive member is not a safe relative path: {{member_name}}")
+            if not member_name.startswith(expected_prefix):
+                raise RuntimeError(
+                    f"archive member does not stay under expected prefix {{expected_prefix!r}}: {{member_name}}"
+                )
+            mode = info.external_attr >> 16
+            if stat.S_IFMT(mode) == stat.S_IFLNK:
+                raise RuntimeError(f"symlinks are not allowed in dataset payload archive: {{member_name}}")
+            target = (dest_root / member_path).resolve()
+            if not target.is_relative_to(dest_root.resolve()):
+                raise RuntimeError(f"archive member resolves outside extraction root: {{member_name}}")
+            if info.is_dir():
+                target.mkdir(parents=True, exist_ok=True)
+                continue
+            total_uncompressed += info.file_size
+            if total_uncompressed > max_uncompressed_bytes:
+                raise RuntimeError(
+                    "archive exceeds extracted size budget: "
+                    f"{{archive_path}} ({{total_uncompressed}} > {{max_uncompressed_bytes}})"
+                )
+            target.parent.mkdir(parents=True, exist_ok=True)
+            with zf.open(info, "r") as src, target.open("wb") as dst:
+                shutil.copyfileobj(src, dst)
 
-from llcore.lm.compare import CompareConfig, compare_on_text
+
+def _prepare_import_tree() -> None:
+    extract_root = ROOT / ".dataset_payload_unpack"
+    shutil.rmtree(extract_root, ignore_errors=True)
+    extract_root.mkdir(parents=True, exist_ok=True)
+    src_archive = DATA_ROOT / SRC_ARCHIVE_NAME
+    pkg_archive = DATA_ROOT / PKG_ARCHIVE_NAME
+    if _sha256_text(src_archive) != EXPECTED_SRC_ARCHIVE_SHA256:
+        raise RuntimeError("dataset src archive sha256 mismatch")
+    if _sha256_text(pkg_archive) != EXPECTED_PKG_ARCHIVE_SHA256:
+        raise RuntimeError("dataset pkg archive sha256 mismatch")
+    _safe_extract_zip(src_archive, extract_root, expected_prefix="src/llcore/")
+    _safe_extract_zip(pkg_archive, extract_root, expected_prefix="llcore/")
+    for candidate in (extract_root, extract_root / "src"):
+        sys.path.insert(0, str(candidate))
 
 
 def main() -> int:
@@ -158,6 +227,9 @@ def main() -> int:
             "dataset corpus sha256 mismatch: "
             f"expected {{EXPECTED_CORPUS_SHA256}} got {{actual_corpus_sha256}}"
         )
+    _prepare_import_tree()
+    from llcore.lm.compare import CompareConfig, compare_on_text
+
     payload = json.loads(config_path.read_text(encoding="utf-8"))
     out_path = ROOT / "artifacts" / "lm_compare.json"
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -224,6 +296,8 @@ This folder is a local, deterministic Kaggle script-kernel bundle for
   `kernel_type: "script"`.
 - Runtime inputs live under `dataset_payload/` and must be published as a Kaggle
   Dataset referenced by `kernel-metadata.json.dataset_sources`.
+- `dataset_payload/` carries `src_llcore.zip` and `pkg_llcore.zip`; `runner.py`
+  safely extracts them at runtime before importing `llcore`.
 - `.kaggleignore` excludes `dataset_payload/` from `kaggle kernels push` so the
   kernel and dataset payload are not uploaded twice.
 - Local smoke uses `LLCORE_KAGGLE_DATA_ROOT` to simulate `/kaggle/input/...`.
@@ -235,7 +309,8 @@ This folder is a local, deterministic Kaggle script-kernel bundle for
 - `kernel-metadata.json`: Kaggle kernel metadata
 - `runner.py`: kernel entrypoint
 - `dataset_payload/`: local dataset candidate (`config.json`, `input_corpus.txt`,
-  `src/llcore/`, `llcore/`, `LICENSE`, `NOTICE`, `dataset-metadata.json`)
+  `src_llcore.zip`, `pkg_llcore.zip`, `LICENSE`, `NOTICE`,
+  `dataset-metadata.json`)
 - `artifacts/`: expected output directory (`lm_compare.json`, `.md`, `.svg`)
 
 ## Human-gated publish
@@ -249,9 +324,9 @@ kaggle kernels push -p <this_dir>
 ```
 
 Use `create` for the first publish of a dataset slug and `version` for updates.
-`--dir-mode zip` is required to avoid Kaggle CLI skipping directories inside
-`dataset_payload/`, but it does not by itself prove Kaggle will expose the
-payload as importable expanded directories at runtime.
+`--dir-mode zip` remains part of the publish recipe, but the runtime now relies
+on uploaded files plus its own safe extraction step rather than Kaggle exposing
+expanded package directories directly.
 """
 
 
@@ -288,6 +363,17 @@ def _sha256_tree(root: Path) -> str:
     return digest.hexdigest()
 
 
+def _write_source_archive(source_root: Path, archive_path: Path, *, prefix: str) -> str:
+    with zipfile.ZipFile(archive_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+        for path in sorted(p for p in source_root.rglob("*") if p.is_file() and not _is_ignored_source_path(p)):
+            rel = path.relative_to(source_root).as_posix()
+            info = zipfile.ZipInfo(f"{prefix}/{rel}")
+            info.date_time = (2026, 1, 1, 0, 0, 0)
+            info.compress_type = zipfile.ZIP_DEFLATED
+            zf.writestr(info, path.read_bytes())
+    return _sha256_text(archive_path)
+
+
 def _write_json(path: Path, payload: object) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
@@ -301,15 +387,28 @@ def _render_runner(
     *,
     config_sha256: str | None = None,
     corpus_sha256: str | None = None,
+    src_archive_sha256: str | None = None,
+    pkg_archive_sha256: str | None = None,
 ) -> str:
     if dataset_source is None:
         return RUNNER_TEMPLATE_EMBEDDED
-    if config_sha256 is None or corpus_sha256 is None:
-        raise ValueError("dataset runner rendering requires config_sha256 and corpus_sha256")
+    if (
+        config_sha256 is None
+        or corpus_sha256 is None
+        or src_archive_sha256 is None
+        or pkg_archive_sha256 is None
+    ):
+        raise ValueError(
+            "dataset runner rendering requires config/corpus/archive sha256 values"
+        )
     return RUNNER_TEMPLATE_DATASET.format(
         dataset_mount_name=_dataset_mount_name(dataset_source),
         config_sha256=config_sha256,
         corpus_sha256=corpus_sha256,
+        src_archive_sha256=src_archive_sha256,
+        pkg_archive_sha256=pkg_archive_sha256,
+        src_archive_name=DATASET_SRC_ARCHIVE_NAME,
+        pkg_archive_name=DATASET_PKG_ARCHIVE_NAME,
     )
 
 
@@ -538,10 +637,12 @@ def build_bundle(
             shutil.copyfile(corpus_file, corpus_target)
             shutil.copyfile(REPO_ROOT / "LICENSE", dataset_payload_dir / "LICENSE")
             (dataset_payload_dir / "NOTICE").write_text(_bundle_notice_text(), encoding="utf-8")
-            src_target = dataset_payload_dir / "src" / "llcore"
-            shutil.copytree(SRC_ROOT / "llcore", src_target, ignore=_ignore_source_noise)
-            pkg_target = dataset_payload_dir / "llcore"
-            shutil.copytree(SRC_ROOT / "llcore", pkg_target, ignore=_ignore_source_noise)
+            source_tree = SRC_ROOT / "llcore"
+            src_archive_target = dataset_payload_dir / DATASET_SRC_ARCHIVE_NAME
+            pkg_archive_target = dataset_payload_dir / DATASET_PKG_ARCHIVE_NAME
+            source_sha256 = _sha256_tree(source_tree)
+            src_archive_sha256 = _write_source_archive(source_tree, src_archive_target, prefix="src/llcore")
+            pkg_archive_sha256 = _write_source_archive(source_tree, pkg_archive_target, prefix="llcore")
             config_payload = {
                 "compare_config": asdict(cfg),
                 "corpus_file_name": corpus_file.name,
@@ -561,13 +662,15 @@ def build_bundle(
                     "corpus": "input_corpus.txt",
                     "config": "config.json",
                     "metadata": DATASET_METADATA_NAME,
-                    "src_llcore": "src/llcore",
-                    "pkg_llcore": "llcore",
+                    "src_llcore_zip": DATASET_SRC_ARCHIVE_NAME,
+                    "pkg_llcore_zip": DATASET_PKG_ARCHIVE_NAME,
                     "license": "LICENSE",
                     "notice": "NOTICE",
                 },
                 "corpus_sha256": config_payload["corpus_sha256"],
-                "source_sha256": _sha256_tree(src_target),
+                "source_sha256": source_sha256,
+                "src_archive_sha256": src_archive_sha256,
+                "pkg_archive_sha256": pkg_archive_sha256,
                 "config_sha256": _sha256_text(dataset_payload_dir / "config.json"),
                 "license_sha256": _sha256_text(dataset_payload_dir / "LICENSE"),
                 "notice_sha256": _sha256_text(dataset_payload_dir / "NOTICE"),
@@ -582,6 +685,12 @@ def build_bundle(
                 dataset_source,
                 config_sha256=dataset_config_sha256,
                 corpus_sha256=dataset_corpus_sha256,
+                src_archive_sha256=(
+                    str(dataset_payload_manifest["src_archive_sha256"]) if dataset_source is not None else None
+                ),
+                pkg_archive_sha256=(
+                    str(dataset_payload_manifest["pkg_archive_sha256"]) if dataset_source is not None else None
+                ),
             ),
             encoding="utf-8",
         )

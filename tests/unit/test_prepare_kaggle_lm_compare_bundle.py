@@ -163,8 +163,8 @@ def test_prepare_bundle_dataset_mode_reports_dataset_command(tmp_path: Path, cap
     dataset_payload = bundle_dir / "dataset_payload"
     assert (dataset_payload / "config.json").is_file()
     assert (dataset_payload / "input_corpus.txt").is_file()
-    assert (dataset_payload / "src" / "llcore" / "__init__.py").is_file()
-    assert (dataset_payload / "llcore" / "__init__.py").is_file()
+    assert (dataset_payload / "src_llcore.zip").is_file()
+    assert (dataset_payload / "pkg_llcore.zip").is_file()
 
 
 def test_prepare_bundle_rejects_nonpositive_runner_timeout(
