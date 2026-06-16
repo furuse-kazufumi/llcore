@@ -203,6 +203,9 @@ def _ensure_safe_bundle_dir(bundle_dir: Path) -> Path:
 
 
 def _is_builder_bundle_dir(bundle_dir: Path) -> bool:
+    # This is a cheap recognizer for our own bundle layout, not a full manifest
+    # integrity verifier. We intentionally avoid destructive replacement unless
+    # the directory already looks like one of our generated bundles.
     manifest_path = bundle_dir / "bundle_manifest.json"
     if not manifest_path.is_file():
         return False
@@ -281,6 +284,10 @@ def build_bundle(
         raise ValueError("kernel_id must match Kaggle owner/slug form (lowercase alnum/hyphen)")
     if not title.strip():
         raise ValueError("title must be a non-empty string")
+    if enable_gpu and not machine_shape:
+        raise ValueError("machine_shape is required when enable_gpu is true")
+    if not enable_gpu and machine_shape is not None:
+        raise ValueError("machine_shape must be omitted when enable_gpu is false")
     bundle_dir = _ensure_safe_bundle_dir(bundle_dir)
     temp_root, staging_dir = _prepare_bundle_target(bundle_dir)
     backup_dir = temp_root / f"{bundle_dir.name}.backup"

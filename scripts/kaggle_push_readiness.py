@@ -7,6 +7,19 @@ This script does not publish anything. It combines:
 2. Kaggle push-credential presence + lightweight API probe
 3. Kaggle quota fetch (GPU bundles only)
 4. exact human-gated `kaggle kernels push -p ...` command emission
+
+Honest disclosure for the GPU quota path:
+
+- GPU readiness currently depends on `kaggle quota -v`.
+- On this machine's Kaggle CLI 2.2.1, live `kaggle quota` / `kaggle quota -v`
+  fails before CSV parsing with `not enough values to unpack`, so the live GPU
+  quota path is presently unconfirmable here.
+- The CSV schema assumptions (`remaining` / `used` / `total`) and GPU row
+  matching logic are therefore parser coverage only, not a confirmed live
+  compatibility claim.
+- Even when `kaggle quota -v` works, this script does not verify
+  `machine_shape`-specific capacity. A green GPU readiness result only means
+  "credential probe ok + some GPU-like quota row shows remaining capacity".
 """
 
 from __future__ import annotations
@@ -102,6 +115,8 @@ def _parse_quota_amount(value: str | None) -> float | None:
 
 
 def _is_gpu_quota_row(row: dict[str, str]) -> bool:
+    # This is a coarse resource-family match, not a machine-shape match.
+    # For example, it cannot distinguish T4 vs P100 availability.
     for key in ("resource", "name", "quota", "type"):
         value = row.get(key)
         if value is not None and "gpu" in value.strip().lower():
@@ -110,6 +125,19 @@ def _is_gpu_quota_row(row: dict[str, str]) -> bool:
 
 
 def _check_quota(*, timeout_s: int, enable_gpu: bool) -> dict[str, object]:
+    """Fetch and parse Kaggle quota rows for GPU bundles.
+
+    This path is intentionally fail-closed, but its live compatibility is not
+    fully established on this machine. Kaggle CLI 2.2.1 currently fails local
+    `kaggle quota -v` calls before returning CSV, so the parser below is only
+    schema-coverage tested. Column names (`remaining`, `used`, `total`) and the
+    GPU row classifier are inferred from expected CLI output, not validated
+    against a working live sample here.
+
+    The result also does not enforce `machine_shape`-specific availability.
+    Passing this check means only that a GPU-like quota row reported remaining
+    capacity; it does not guarantee capacity for a specific shape such as T4.
+    """
     proc = _run_kaggle(["quota", "-v"], timeout_s=timeout_s)
     csv_text = proc.stdout.strip()
     if proc.returncode != 0 or not csv_text:

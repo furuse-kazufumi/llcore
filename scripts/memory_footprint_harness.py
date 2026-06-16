@@ -184,7 +184,10 @@ def _recurrent_state_bytes(model: RecurrentLM | RWKVLM, t: int, warmup: int = 1)
 
 
 def _parse_lengths(raw: str) -> list[int]:
-    """comma-separated lengths を fail-closed に正規化する。"""
+    """comma-separated lengths を fail-closed に正規化する。
+
+    重複は落とすが、ユーザーが与えた順序は保持する。
+    """
     raw_parts = raw.split(",")
     parts = [part.strip() for part in raw_parts]
     if not raw.strip():
@@ -199,7 +202,7 @@ def _parse_lengths(raw: str) -> list[int]:
     if invalid:
         bad = ", ".join(str(value) for value in invalid)
         raise ValueError(f"--lengths must contain only positive integers; got {bad}")
-    return sorted(set(values))
+    return list(dict.fromkeys(values))
 
 
 @torch.no_grad()

@@ -141,7 +141,7 @@ def test_main_writes_json_with_system_before_after(
     assert rc == 0
     payload = json.loads(out.read_text(encoding="utf-8"))
     assert set(payload) >= {"config", "lengths_effective", "records", "system_before", "system_after"}
-    assert payload["lengths_effective"] == [64, 128]
+    assert payload["lengths_effective"] == [128, 64]
     assert payload["system_before"]["avail_commit_mb"] == 12.0
     assert payload["system_before"]["process_working_set_mb"] is None
     assert payload["system_after"]["avail_commit_mb"] == 11.0
@@ -149,6 +149,11 @@ def test_main_writes_json_with_system_before_after(
     assert payload["system_after"]["process_pagefile_mb"] == 300.0
     assert payload["system_after"]["process_peak_pagefile_mb"] == 320.0
     assert warmup_seen == {"recurrent": 3, "gpt": 3}
+
+
+def test_parse_lengths_preserves_input_order_while_deduping() -> None:
+    harness = _load_harness()
+    assert harness._parse_lengths("512,128,512,64") == [512, 128, 64]
 
 
 def test_main_rejects_non_positive_lengths(

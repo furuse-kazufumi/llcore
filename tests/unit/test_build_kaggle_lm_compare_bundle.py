@@ -97,6 +97,44 @@ def test_build_bundle_rejects_missing_corpus(
     assert "corpus file does not exist" in capsys.readouterr().err
 
 
+def test_build_bundle_rejects_gpu_without_machine_shape(tmp_path: Path) -> None:
+    builder = _load_builder()
+    corpus = tmp_path / "corpus.txt"
+    corpus.write_text("abcabc\n", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="machine_shape is required"):
+        builder.build_bundle(
+            bundle_dir=tmp_path / "bundle",
+            corpus_file=corpus,
+            kernel_id="furusekazufumi/test-lm-compare",
+            title="test-lm-compare",
+            machine_shape=None,
+            enable_gpu=True,
+            enable_internet=False,
+            is_private=True,
+            cfg=builder.CompareConfig(),
+        )
+
+
+def test_build_bundle_rejects_machine_shape_when_gpu_disabled(tmp_path: Path) -> None:
+    builder = _load_builder()
+    corpus = tmp_path / "corpus.txt"
+    corpus.write_text("abcabc\n", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="machine_shape must be omitted"):
+        builder.build_bundle(
+            bundle_dir=tmp_path / "bundle",
+            corpus_file=corpus,
+            kernel_id="furusekazufumi/test-lm-compare",
+            title="test-lm-compare",
+            machine_shape="NvidiaTeslaT4",
+            enable_gpu=False,
+            enable_internet=False,
+            is_private=True,
+            cfg=builder.CompareConfig(),
+        )
+
+
 def test_build_bundle_rejects_unsafe_bundle_dir(capsys: pytest.CaptureFixture[str]) -> None:
     builder = _load_builder()
     repo_root = Path(__file__).resolve().parents[2]

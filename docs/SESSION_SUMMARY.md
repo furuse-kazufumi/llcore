@@ -18,6 +18,9 @@
 - Kaggle を含む broad gate の最新:
   - `py -3.11 -m pytest tests/unit -k "lm or corpus or probe or p1_compare or p1_prepare or p1_manifest_reconcile or memory_footprint or kaggle_lm_compare_bundle or kaggle_bundle_preflight or prepare_kaggle_lm_compare_bundle or kaggle_push_readiness" -q`
   - **`262 passed, 401 deselected`**
+- 直近の局所 gate:
+  - `py -3.11 -m pytest tests/unit/test_memory_footprint_harness.py tests/unit/test_build_kaggle_lm_compare_bundle.py tests/unit/test_kaggle_push_readiness.py -q`
+  - **`31 passed`**
 - live 実測は **3 本**ある。旧 auth failure path (`rc=3`) は OAuth 依存実装時の記録で、現行実装では **CPU bundle の ready path (`rc=0`)** も `C:\Users\puruy\AppData\Local\Temp\llcore_kaggle_livecheck_20260617b` で確認済み。さらに GPU bundle `C:\Users\puruy\AppData\Local\Temp\llcore_kaggle_gpu_livecheck_20260617` でも readiness を試したが、ローカル **Kaggle CLI 2.2.1 の `quota` サブコマンド自体が `not enough values to unpack (expected 2, got 1)` で失敗**し、`rc=4` へ落ちた。現行 auth は OAuth ではなく **push credential (`kaggle.json` または `KAGGLE_USERNAME`+`KAGGLE_KEY`) + `kaggle kernels list -m --page-size 1 --csv` 疎通**で見る。したがって GPU quota live path は「未実施」ではなく **local CLI failure で確認不能**、実 `kaggle kernels push` は未実施。
 - 外部 publish は **0 件**。
 
@@ -39,6 +42,8 @@
   - `rc=4` = quota failure
 - CPU bundle は **quota check 自体を skip** する
 - GPU bundle は **GPU-like row (`"gpu"` substring match) の残量のみ**で判定
+- GPU quota path は **Kaggle CLI 2.2.1 の live `kaggle quota -v` failure によりこのマシンでは確認不能**。CSV schema と GPU row 判定は parser coverage であって、live compatibility claim ではない
+- GPU readiness が green でも、`kaggle quota -v` は **週次の GPU 合計時間**しか返さず **`machine_shape` 別 capacity** は保証しない
 - `enable_tpu=true` bundle は readiness 未対応なので **clean `rc=2` reject**
 
 ## 次の具体的な一手
@@ -48,6 +53,9 @@
    - `1d1234a` = Kaggle 導線 + docs
 2. `docs/next_plan.md` の再開追記を正本として、CPU ready path `rc=0` と GPU quota live path の CLI 2.2.1 failure を前提に次の人間ゲート準備へ進む。
 3. ここまでは自律で可。`kaggle kernels push` に進む段になったら、直前に `docs/next_plan.md` を更新してから **`⟦LLTERM_CHOICE⟧`** で人間確認へ切り替える。
+4. 追加 hardening 済み:
+   - `build_bundle()` 関数 API は `enable_gpu` と `machine_shape` の矛盾を `ValueError` で fail-closed reject
+   - `memory_footprint_harness.py` の `lengths_effective` は **入力順保持 + dedup** に変更済み
 
 ## 補足
 
