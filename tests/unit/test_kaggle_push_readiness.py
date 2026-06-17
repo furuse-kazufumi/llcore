@@ -1679,7 +1679,13 @@ def test_iter_kernel_push_files_respects_kaggleignore_and_hashes(tmp_path: Path)
         "kernel-metadata.json",
         "runner.py",
     ]
-    assert set(hashes) == {".kaggleignore", "bundle_manifest.json", "kernel-metadata.json", "runner.py"}
+    assert set(hashes) == {
+        ".kaggleignore",
+        "README.md",
+        "bundle_manifest.json",
+        "kernel-metadata.json",
+        "runner.py",
+    }
 
 
 def test_check_readiness_fails_cleanly_when_no_push_credentials_exist(

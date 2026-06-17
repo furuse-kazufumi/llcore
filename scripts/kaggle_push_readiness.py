@@ -471,7 +471,7 @@ def _iter_kernel_push_files(bundle_dir: Path) -> list[str]:
 
 def _kernel_push_critical_hashes(bundle_dir: Path) -> dict[str, str]:
     hashes: dict[str, str] = {}
-    for rel in ("kernel-metadata.json", "runner.py", "bundle_manifest.json", ".kaggleignore"):
+    for rel in _iter_kernel_push_files(bundle_dir):
         path = bundle_dir / rel
         if path.is_file():
             hashes[rel] = _sha256_text(path)
