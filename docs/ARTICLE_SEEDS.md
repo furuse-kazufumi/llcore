@@ -407,3 +407,20 @@
 - **根拠**: `scripts/quant_bitwidth_sweep.py` / `out/quant_bitwidth_sweep*.json` /
   `docs/MEMORY_EFFICIENCY_FINDINGS.md` (b')。
 - **側面**: ベンチ / honest disclosure / 教訓 / 実装報告 / 業界比較。
+
+### 38. 「使える RAM < モデル」でも動く — working-set 上限で mmap の RAM 超を実機実証
+- **気付き**: 「仮想メモリでモデルを回す」は漠然と言われるが、実際にどう成立するかを実機で示した。
+  130M params(**522MB**)のモデルを、Windows の **working-set hard max を 358MB(= モデルの 68%)に
+  設定したプロセスで forward 完走**(`SetProcessWorkingSetSizeEx`・強制成功・peak WS 357.7MB ≤ 上限)、
+  しかも **出力(logits)は無制限実行と完全一致**。機構: read-only な mmap ページは clean なので、上限
+  超過時に OS が**破棄**(pagefile 書込み不要)し、必要になったら**再 fault で disk から読み直す**
+  (llama.cpp 流)。つまり「**使える物理 RAM がモデルより小さくても、正しく動く**」。さらに int8 量子化で
+  ディスクは 0.25×(4x 縮小)= 置くページ自体が減る。これが pivot memo の「✅ 本筋 = working set を
+  小さく・予測可能に」の実証。
+- **honest 留保**: avail RAM が限られる本マシンでは「RAM 総量超の巨大モデル」ではなく「working-set 上限 <
+  モデルサイズ」で同性質を実証。hard-max 強制可否は環境依存なので `cap_set_ok` と実測 peak をそのまま記録。
+  int8 は disk/load まで(per-layer streaming dequant forward は将来)。
+- **根拠**: `scripts/mmap_ram_exceed_poc.py` / `out/mmap_ram_exceed_poc.json` /
+  `docs/MEMORY_EFFICIENCY_FINDINGS.md` (a')。
+- **側面**: 技術設計 / 実装報告 / honest disclosure / ユーザー体験(自宅 PC で大モデル)/ TRIZ(少 RAM を
+  仮想メモリで反転)/ 未来予測(GPU/大 RAM で跳ねる土台)。
