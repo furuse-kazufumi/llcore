@@ -205,7 +205,8 @@ def _save_int8_model(cfg: GPTConfig, path: Path, seed: int = 1234) -> dict[str, 
 
 def _build_int8_skeleton(cfg: GPTConfig) -> nn.Module:
     """形状だけ合った Int8Linear 骨格(load_state_dict で int8 を流し込む先)。"""
-    model = CharGPT(cfg)
+    # CharGPT は untyped import で Any 扱いになるため nn.Module へ明示束縛する。
+    model: nn.Module = CharGPT(cfg)
     convert_linears_to_int8(model)
     return model
 
