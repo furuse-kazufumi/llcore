@@ -1391,6 +1391,26 @@ def test_ignored_bundle_prefixes_only_strip_literal_dot_slash(tmp_path: Path) ->
     assert script._ignored_bundle_prefixes(bundle_dir) == ("artifacts/", ".venv/", "..foo")
 
 
+def test_ignored_bundle_prefixes_rejects_negation_rule(tmp_path: Path) -> None:
+    script = _load_script("kaggle_push_readiness.py")
+    bundle_dir = tmp_path / "bundle"
+    bundle_dir.mkdir()
+    (bundle_dir / ".kaggleignore").write_text("artifacts/\n!runner.py\n", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="negation rules are unsupported"):
+        script._ignored_bundle_prefixes(bundle_dir)
+
+
+def test_ignored_bundle_prefixes_rejects_glob_rule(tmp_path: Path) -> None:
+    script = _load_script("kaggle_push_readiness.py")
+    bundle_dir = tmp_path / "bundle"
+    bundle_dir.mkdir()
+    (bundle_dir / ".kaggleignore").write_text("artifacts/**\n", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="glob patterns are unsupported"):
+        script._ignored_bundle_prefixes(bundle_dir)
+
+
 def test_check_readiness_rejects_archive_member_with_commercial_license_reference(
     tmp_path: Path, monkeypatch: Any, capsys: Any
 ) -> None:

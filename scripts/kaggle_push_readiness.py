@@ -528,8 +528,12 @@ def _ignored_bundle_prefixes(bundle_dir: Path) -> tuple[str, ...]:
     prefixes: list[str] = []
     for raw_line in kaggleignore.read_text(encoding="utf-8").splitlines():
         line = raw_line.strip()
-        if not line or line.startswith("#") or line.startswith("!"):
+        if not line or line.startswith("#"):
             continue
+        if line.startswith("!"):
+            raise ValueError(".kaggleignore negation rules are unsupported for kernel push readiness")
+        if any(token in line for token in ("*", "?", "[")):
+            raise ValueError(".kaggleignore glob patterns are unsupported for kernel push readiness")
         if line.startswith("./"):
             line = line[2:]
         normalized = line.replace("\\", "/")
