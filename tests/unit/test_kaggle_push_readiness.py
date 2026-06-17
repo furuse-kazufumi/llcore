@@ -1380,6 +1380,15 @@ def test_ignored_relative_path_requires_directory_boundary() -> None:
     assert script._is_ignored_relative_path("artifacts/lm_compare.json", prefixes) is True
 
 
+def test_ignored_bundle_prefixes_only_strip_literal_dot_slash(tmp_path: Path) -> None:
+    script = _load_script("kaggle_push_readiness.py")
+    bundle_dir = tmp_path / "bundle"
+    bundle_dir.mkdir()
+    (bundle_dir / ".kaggleignore").write_text("./artifacts/\n.venv/\n..foo\n", encoding="utf-8")
+
+    assert script._ignored_bundle_prefixes(bundle_dir) == ("artifacts/", ".venv/", "..foo")
+
+
 def test_check_readiness_rejects_archive_member_with_commercial_license_reference(
     tmp_path: Path, monkeypatch: Any, capsys: Any
 ) -> None:
@@ -1509,6 +1518,7 @@ def test_check_readiness_verifies_dataset_dependency_shas(
     assert rc == 0
     payload = json.loads(report_path.read_text(encoding="utf-8"))
     assert payload["dataset"]["checked"] is True
+    assert payload["dataset"]["status"] == "ready"
     assert payload["dataset"]["matches"] == {
         "config_sha256": True,
         "corpus_sha256": True,
@@ -1561,6 +1571,76 @@ def test_check_readiness_rejects_dataset_manifest_missing_required_sha_keys(
 
     assert rc == script.RC_VALIDATION
     assert "dataset payload manifest missing required keys" in capsys.readouterr().err
+
+
+def test_check_readiness_accepts_warning_prefixed_dataset_ready_status(
+    tmp_path: Path, monkeypatch: Any
+) -> None:
+    script = _load_script("kaggle_push_readiness.py")
+    bundle_dir = tmp_path / "bundle"
+    dataset_payload = bundle_dir / "dataset_payload"
+    dataset_payload.mkdir(parents=True)
+    (dataset_payload / "dataset_payload_manifest.json").write_text(
+        json.dumps(
+            {
+                "config_sha256": "a" * 64,
+                "corpus_sha256": "b" * 64,
+                "source_sha256": "c" * 64,
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    report_path = tmp_path / "ready.json"
+
+    class _FakePreflight:
+        subprocess = SimpleNamespace(TimeoutExpired=subprocess.TimeoutExpired)
+
+        @staticmethod
+        def preflight_bundle(bundle_dir: Path, *, run_runner: bool, runner_timeout: int) -> dict[str, object]:
+            return {
+                "bundle_dir": str(bundle_dir),
+                "checks": {
+                    "metadata": {"kernel_id": "furusekazufumi/test-kernel", "enable_gpu": "false"},
+                    "manifest": {"data_mode": "dataset", "dataset_source": "furusekazufumi/test-dataset"},
+                },
+                "runner": None,
+            }
+
+    def _fake_run_kaggle(args: list[str], *, timeout_s: int) -> Any:
+        if args[:2] == ["kernels", "list"]:
+            return _completed(stdout="ref,title,author\nr,t,\n")
+        if args[:2] == ["datasets", "status"]:
+            return _completed(stdout="Warning: outdated client\nready\n")
+        if args[:2] == ["datasets", "download"]:
+            out_dir = Path(args[args.index("-p") + 1])
+            (out_dir / "config.json").write_text("config\n", encoding="utf-8")
+            (out_dir / "input_corpus.txt").write_text("corpus\n", encoding="utf-8")
+            (out_dir / "src_llcore" / "src" / "llcore").mkdir(parents=True)
+            (out_dir / "pkg_llcore" / "llcore").mkdir(parents=True)
+            (out_dir / "src_llcore" / "src" / "llcore" / "__init__.py").write_text("# src\n", encoding="utf-8")
+            (out_dir / "pkg_llcore" / "llcore" / "__init__.py").write_text("# src\n", encoding="utf-8")
+            return _completed(stdout="downloaded\n")
+        raise AssertionError(args)
+
+    _clear_kaggle_env(monkeypatch)
+    monkeypatch.setattr(script, "_load_script", lambda path, module_name: _FakePreflight)
+    monkeypatch.setattr(script, "_run_kaggle", _fake_run_kaggle)
+    monkeypatch.setattr(script, "_credential_sources", lambda: ["kaggle.json"])
+    monkeypatch.setattr(script, "_configured_kaggle_username", lambda: "furusekazufumi")
+    monkeypatch.setattr(
+        script,
+        "_sha256_text",
+        lambda path: {"config.json": "a" * 64, "input_corpus.txt": "b" * 64}.get(path.name, "z" * 64),
+    )
+    monkeypatch.setattr(script, "_sha256_tree", lambda path: "c" * 64)
+
+    rc = script.main(["--bundle-dir", str(bundle_dir), "--json", str(report_path)])
+
+    assert rc == 0
+    payload = json.loads(report_path.read_text(encoding="utf-8"))
+    assert payload["dataset"]["status"] == "ready"
+    assert payload["dataset"]["status_raw"] == "Warning: outdated client\nready"
 
 
 def test_check_readiness_fails_cleanly_when_no_push_credentials_exist(

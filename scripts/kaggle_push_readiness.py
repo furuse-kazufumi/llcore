@@ -465,7 +465,9 @@ def _ignored_bundle_prefixes(bundle_dir: Path) -> tuple[str, ...]:
         line = raw_line.strip()
         if not line or line.startswith("#") or line.startswith("!"):
             continue
-        normalized = line.lstrip("./").replace("\\", "/")
+        if line.startswith("./"):
+            line = line[2:]
+        normalized = line.replace("\\", "/")
         if normalized.endswith("/"):
             prefixes.append(normalized.rstrip("/") + "/")
         else:
@@ -529,7 +531,12 @@ def _check_dataset_source(*, bundle_dir: Path, preflight_report: dict[str, objec
     if status_proc.returncode != 0 or not status_text:
         detail = status_proc.stderr.strip() or status_proc.stdout.strip() or f"rc={status_proc.returncode}"
         raise ValueError(f"kaggle dataset status check failed: {detail}")
-    if status_text.lower() != "ready":
+    status_lines = [line.strip() for line in status_text.splitlines() if line.strip()]
+    normalized_status = next(
+        (line for line in reversed(status_lines) if not line.lower().startswith("warning:")),
+        status_lines[-1],
+    )
+    if normalized_status.lower() != "ready":
         raise ValueError(f"kaggle dataset status is not ready: {status_text}")
     dataset_manifest_path = bundle_dir / "dataset_payload" / "dataset_payload_manifest.json"
     dataset_manifest = json.loads(dataset_manifest_path.read_text(encoding="utf-8"))
@@ -577,7 +584,8 @@ def _check_dataset_source(*, bundle_dir: Path, preflight_report: dict[str, objec
         return {
             "checked": True,
             "dataset_source": dataset_source,
-            "status": status_text,
+            "status": normalized_status,
+            "status_raw": status_text,
             "expected": expected,
             "actual": actual,
             "matches": matches,
