@@ -446,3 +446,15 @@
 - **根拠**: `scripts/recurrent_runtime_rss.py` / `out/recurrent_runtime_rss.json` /
   `docs/MEMORY_EFFICIENCY_FINDINGS.md` (0')。
 - **側面**: 技術設計 / ベンチ / honest disclosure / 実装報告 / 業界比較(SSM vs Transformer の長文脈)。
+
+### 41. per-group 量子化は低ビットの床を押し下げるが「2bit を安全」には RTN 超が要る
+- **気付き**: per-channel(群=行全体)を per-group(行を群ごとに区切り scale)へ拡張すると、低ビット品質は
+  **単調改善**(scale 増で footprint は微増)。realp1 2bit で top1 劣化が **full -13.5pp → group32 -5.3pp
+  (≈60% 減)**、multi_smoke 2bit は group≤64 が **ppl-gate を救出**(full は FAIL)。**だが strict
+  capability-gate(top1 fp32 比 97% 保持)は 2bit では RTN per-group でも届かない**(realp1 group32 で 81.5%)。
+  = **3bit が実用床**(realp1 は per-channel で既に cap-gate PASS)、**2bit を安全にするには RTN 超(GPTQ/AWQ の
+  誤差補償 or QAT)が必要** — これは GPU/将来課題。「群を細かくすれば 2bit も救える」という期待は CPU・RTN の
+  範囲では半分だけ正しい(品質は上がるが gate は越えない)、と honest に確定。
+- **根拠**: `scripts/quant_group_compare.py` / `out/quant_group_compare*.json` /
+  `docs/MEMORY_EFFICIENCY_FINDINGS.md` (b'')。
+- **側面**: ベンチ / honest disclosure / 教訓 / 実装報告 / 業界比較(GPTQ/AWQ/QAT との位置づけ)。
