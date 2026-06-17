@@ -105,6 +105,41 @@ recurrent、(b) 量子化、の 3 つが本筋。
 
 ---
 
+## (b') 量子化ビット幅スイープ — cliff_then_flat の実測 (`out/quant_bitwidth_sweep*.json`)
+
+memory-scaling ワークフローの完全性批評が推奨した反証可能実験。`scripts/quant_bitwidth_sweep.py` で
+per-channel weight-only PTQ を {8,6,5,4,3,2}-bit へスイープし、held-out PPL に加え **hard-capability
+proxy = 次トークン top-1 accuracy** を併記。予測(Dettmers 2023: ~4bit 平坦・3bit cliff・2bit 破綻)を検証。
+
+### multi_smoke (1.36M, vocab 4358) — fp32 PPL 24.88 / top1 36.28%
+| bits | 削減率 | PPL | ΔPPL% | top1 | Δtop1(pp) | gate |
+|---|---|---|---|---|---|---|
+| 8 | 74.0% | 24.886 | +0.01% | 36.28% | -0.00 | PASS |
+| 5 | 83.3% | 24.935 | +0.21% | 36.25% | -0.04 | PASS |
+| 4 | 86.4% | 25.295 | +1.66% | 36.08% | -0.20 | PASS |
+| 3 | 89.5% | 27.761 | +11.57% | 34.30% | -1.98 | PASS |
+| 2 | 92.6% | 269.716 | **+983.95%** | 7.49% | **-28.80** | **FAIL** |
+
+### realp1 (11.9M, vocab 3044) — fp32 PPL 38.32 / top1 28.65%
+| bits | 削減率 | PPL | ΔPPL% | top1 | Δtop1(pp) | gate |
+|---|---|---|---|---|---|---|
+| 8 | 74.6% | 38.316 | +0.00% | 28.65% | -0.02 | PASS |
+| 4 | 87.1% | 38.599 | +0.74% | 28.42% | -0.25 | PASS |
+| 3 | 90.2% | 40.154 | +4.80% | 27.97% | -0.70 | PASS |
+| 2 | 93.3% | 101.114 | **+163.90%** | 15.21% | **-13.46** | PASS |
+
+### 知見(honest)
+- **cliff_then_flat は確認**。8/6/5bit は平坦、低ビットで非線形に急落 = 予測通り。
+- **★cliff 位置はモデルサイズ依存**: 小 multi_smoke は 3bit で劣化開始(+11.6%)・2bit 破綻。大 realp1 は
+  **3bit でも実用**(+4.8% / top1 -0.7pp)、cliff は 2bit。**大モデルほど低ビットに頑健**(冗長性が多い、
+  literature と整合)。
+- **★PPL-only gate は危険を実証**: realp1 の 2bit は top1 が **-13.46pp(28.7%→15.2%)= 半減近く壊れている
+  のに unigram gate は PASS**(PPL 101 < 0.85×215=183)。「PPL が unigram を下回る」だけの合否は低ビットの
+  capability 喪失を見逃す。→ llcore の合否ゲートに hard-capability proxy を足すべき。
+- **批評仮説の honest 反証**: 「top1 は PPL より先に劣化する」という事前予想は**本データでは成立せず**、
+  top1 と PPL はほぼ同時(lockstep)に劣化した。誇張せず「同時劣化 + gate が粗い」が正確な観測。
+- 留保: weights-only / dequant fp32 の simulated quant(速度未測)/ 2bit は QAT なしの PTQ 限界。
+
 ## 記事側面 (feedback_daily_articles_policy の 13 側面)
 - **技術設計/実装報告**: 3 本柱の実機計測。「構造プロット → 実測」への昇格手続き。
 - **honest disclosure**: 各柱に明確な留保(weights-only / simulated quant / 部分 working set /
