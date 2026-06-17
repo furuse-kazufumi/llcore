@@ -779,6 +779,7 @@ def build_bundle(
             (staging_dir / KAGGLEIGNORE_NAME).write_text(
                 f"{DATASET_PAYLOAD_DIRNAME}/\n"
                 f"{DATASET_UNPACK_DIRNAME}/\n"
+                "artifacts/\n"
                 "preflight_report.json\n"
                 "prepare_report.json\n",
                 encoding="utf-8",

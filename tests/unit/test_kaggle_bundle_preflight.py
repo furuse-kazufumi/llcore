@@ -195,7 +195,7 @@ def test_preflight_dataset_mode_rejects_missing_kaggleignore(tmp_path: Path) -> 
 def test_preflight_dataset_mode_rejects_kaggleignore_without_dataset_payload_rule(tmp_path: Path) -> None:
     preflight = _load_script("kaggle_bundle_preflight.py")
     bundle_dir = _build_dataset_bundle(tmp_path)
-    (bundle_dir / ".kaggleignore").write_text("artifacts/\n", encoding="utf-8")
+    (bundle_dir / ".kaggleignore").write_text("dataset_payload/\nartifacts/\n", encoding="utf-8")
 
     rc = preflight.main(["--bundle-dir", str(bundle_dir)])
 
@@ -206,7 +206,7 @@ def test_preflight_dataset_mode_rejects_kaggleignore_reinclude_rule(tmp_path: Pa
     preflight = _load_script("kaggle_bundle_preflight.py")
     bundle_dir = _build_dataset_bundle(tmp_path)
     (bundle_dir / ".kaggleignore").write_text(
-        "dataset_payload/\n.dataset_payload_unpack/\n!dataset_payload/config.json\n",
+        "dataset_payload/\n.dataset_payload_unpack/\nartifacts/\n!dataset_payload/config.json\n",
         encoding="utf-8",
     )
 
@@ -219,7 +219,7 @@ def test_preflight_dataset_mode_rejects_kaggleignore_glob_reinclude_rule(tmp_pat
     preflight = _load_script("kaggle_bundle_preflight.py")
     bundle_dir = _build_dataset_bundle(tmp_path)
     (bundle_dir / ".kaggleignore").write_text(
-        "dataset_payload/\n.dataset_payload_unpack/\npreflight_report.json\nprepare_report.json\n!**/dataset_payload/config.json\n",
+        "dataset_payload/\n.dataset_payload_unpack/\nartifacts/\npreflight_report.json\nprepare_report.json\n!**/dataset_payload/config.json\n",
         encoding="utf-8",
     )
 

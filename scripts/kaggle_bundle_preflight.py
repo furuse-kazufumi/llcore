@@ -118,6 +118,7 @@ _DATASET_PAYLOAD_COPIED_FILE_PATHS = {
 _DATASET_REQUIRED_KAGGLEIGNORE_ENTRIES = (
     f"{DATASET_PAYLOAD_DIRNAME}/",
     f"{DATASET_UNPACK_DIRNAME}/",
+    "artifacts/",
     "preflight_report.json",
     "prepare_report.json",
 )

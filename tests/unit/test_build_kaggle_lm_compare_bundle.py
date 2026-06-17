@@ -180,7 +180,7 @@ def test_build_bundle_dataset_mode_writes_dataset_payload(tmp_path: Path) -> Non
     assert manifest["dataset_source"] == "furusekazufumi/llcore-lm-compare-support"
     assert manifest["dataset_mount_name"] == "llcore-lm-compare-support"
     assert (bundle_dir / ".kaggleignore").read_text(encoding="utf-8") == (
-        "dataset_payload/\n.dataset_payload_unpack/\npreflight_report.json\nprepare_report.json\n"
+        "dataset_payload/\n.dataset_payload_unpack/\nartifacts/\npreflight_report.json\nprepare_report.json\n"
     )
     dataset_dir = bundle_dir / "dataset_payload"
     assert (dataset_dir / "dataset-metadata.json").is_file()
