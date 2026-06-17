@@ -253,6 +253,19 @@ def test_preflight_rejects_bad_dataset_archive_as_validation_error(
     assert "error:" in capsys.readouterr().err
 
 
+def test_preflight_rejects_dataset_archive_with_path_traversal(tmp_path: Path, capsys: Any) -> None:
+    preflight = _load_script("kaggle_bundle_preflight.py")
+    bundle_dir = _build_dataset_bundle(tmp_path)
+    archive_path = bundle_dir / "dataset_payload" / "src_llcore.zip"
+    with zipfile.ZipFile(archive_path, "w") as zf:
+        zf.writestr("../escape.txt", "owned\n")
+
+    rc = preflight.main(["--bundle-dir", str(bundle_dir)])
+
+    assert rc == 2
+    assert "contains unsafe member path" in capsys.readouterr().err
+
+
 def test_preflight_rejects_dataset_metadata_without_licenses(tmp_path: Path) -> None:
     preflight = _load_script("kaggle_bundle_preflight.py")
     bundle_dir = _build_dataset_bundle(tmp_path)

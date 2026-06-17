@@ -478,6 +478,49 @@ def _kernel_push_critical_hashes(bundle_dir: Path) -> dict[str, str]:
     return hashes
 
 
+def _verify_push_payload_snapshot(bundle_dir: Path, snapshot_path: Path) -> None:
+    try:
+        payload = json.loads(snapshot_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError) as exc:
+        raise ValueError(f"push payload snapshot unreadable: {snapshot_path} ({exc})") from exc
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"push payload snapshot malformed JSON: {snapshot_path} ({exc.msg})") from exc
+    if not isinstance(payload, dict):
+        raise ValueError("push payload snapshot must be a JSON object")
+    push_payload = payload.get("push_payload")
+    if not isinstance(push_payload, dict):
+        raise ValueError("push payload snapshot missing push_payload object")
+    included_files = push_payload.get("included_files")
+    critical_hashes = push_payload.get("critical_hashes")
+    if not isinstance(included_files, list) or not all(isinstance(item, str) for item in included_files):
+        raise ValueError("push payload snapshot missing included_files string list")
+    if not isinstance(critical_hashes, dict) or not all(
+        isinstance(key, str) and isinstance(value, str) for key, value in critical_hashes.items()
+    ):
+        raise ValueError("push payload snapshot missing critical_hashes string map")
+    expected_files = sorted(included_files, key=lambda item: PurePosixPath(item).parts)
+    current_files = _iter_kernel_push_files(bundle_dir)
+    if current_files != expected_files:
+        raise ValueError(
+            "push payload file set drifted: "
+            f"expected {expected_files!r}, got {current_files!r}"
+        )
+    expected_hash_keys = sorted(critical_hashes, key=lambda item: PurePosixPath(item).parts)
+    if expected_hash_keys != expected_files:
+        raise ValueError(
+            "push payload critical_hashes must cover included_files exactly: "
+            f"expected {expected_files!r}, got {expected_hash_keys!r}"
+        )
+    current_hashes = _kernel_push_critical_hashes(bundle_dir)
+    mismatches = [
+        rel
+        for rel in expected_files
+        if current_hashes.get(rel) != critical_hashes.get(rel)
+    ]
+    if mismatches:
+        raise ValueError("push payload hash drifted: " + ", ".join(mismatches))
+
+
 def _ignored_bundle_prefixes(bundle_dir: Path) -> tuple[str, ...]:
     kaggleignore = bundle_dir / ".kaggleignore"
     if not kaggleignore.is_file():
@@ -710,6 +753,13 @@ def _parser() -> argparse.ArgumentParser:
     )
     ap.add_argument("--bundle-dir", required=True, help="existing Kaggle bundle directory")
     ap.add_argument("--json", help="optional combined report path")
+    ap.add_argument(
+        "--verify-push-payload-json",
+        help=(
+            "optional prior readiness JSON whose push_payload.included_files and "
+            "push_payload.critical_hashes must still match the live bundle"
+        ),
+    )
     ap.add_argument("--run-runner", action="store_true", help="run bundled runner locally before readiness checks")
     ap.add_argument(
         "--runner-timeout",
@@ -734,6 +784,12 @@ def check_readiness(argv: list[str] | None = None) -> int:
     if args.kaggle_timeout < 1:
         print("error: --kaggle-timeout must be >= 1", file=sys.stderr)
         return RC_VALIDATION
+    if args.verify_push_payload_json:
+        try:
+            _verify_push_payload_snapshot(bundle_dir=Path(args.bundle_dir).resolve(), snapshot_path=Path(args.verify_push_payload_json))
+        except ValueError as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return RC_VALIDATION
 
     preflight_mod = _load_script(PREFLIGHT_SCRIPT, "kaggle_bundle_preflight")
     bundle_dir = Path(args.bundle_dir).resolve()

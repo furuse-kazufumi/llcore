@@ -1688,6 +1688,57 @@ def test_iter_kernel_push_files_respects_kaggleignore_and_hashes(tmp_path: Path)
     }
 
 
+def test_verify_push_payload_snapshot_rejects_hash_drift(tmp_path: Path) -> None:
+    script = _load_script("kaggle_push_readiness.py")
+    bundle_dir = tmp_path / "bundle"
+    bundle_dir.mkdir()
+    (bundle_dir / ".kaggleignore").write_text("artifacts/\n", encoding="utf-8")
+    (bundle_dir / "runner.py").write_text("# ok\n", encoding="utf-8")
+    snapshot = tmp_path / "snapshot.json"
+    snapshot.write_text(
+        json.dumps(
+            {
+                "push_payload": {
+                    "included_files": [".kaggleignore", "runner.py"],
+                    "critical_hashes": {
+                        ".kaggleignore": script._sha256_text(bundle_dir / ".kaggleignore"),
+                        "runner.py": "0" * 64,
+                    },
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="push payload hash drifted: runner.py"):
+        script._verify_push_payload_snapshot(bundle_dir, snapshot)
+
+
+def test_verify_push_payload_snapshot_rejects_coverage_gap(tmp_path: Path) -> None:
+    script = _load_script("kaggle_push_readiness.py")
+    bundle_dir = tmp_path / "bundle"
+    bundle_dir.mkdir()
+    (bundle_dir / ".kaggleignore").write_text("", encoding="utf-8")
+    (bundle_dir / "runner.py").write_text("# ok\n", encoding="utf-8")
+    snapshot = tmp_path / "snapshot.json"
+    snapshot.write_text(
+        json.dumps(
+            {
+                "push_payload": {
+                    "included_files": [".kaggleignore", "runner.py"],
+                    "critical_hashes": {
+                        "runner.py": script._sha256_text(bundle_dir / "runner.py"),
+                    },
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="critical_hashes must cover included_files exactly"):
+        script._verify_push_payload_snapshot(bundle_dir, snapshot)
+
+
 def test_check_readiness_fails_cleanly_when_no_push_credentials_exist(
     tmp_path: Path, monkeypatch: Any, capsys: Any
 ) -> None:

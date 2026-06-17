@@ -244,6 +244,63 @@ def _sanitize_report_text(text: str, *, bundle_dir: Path) -> str:
     return text.replace(str(bundle_dir), "<bundle_dir>")
 
 
+def _safe_extract_zip(
+    archive_path: Path,
+    dest_root: Path,
+    *,
+    expected_prefix: str,
+    max_entries: int = 4096,
+    max_uncompressed_bytes: int = 256 * 1024 * 1024,
+) -> None:
+    total_uncompressed = 0
+    seen_members: set[str] = set()
+    extracted_files = 0
+    resolved_dest_root = dest_root.resolve()
+    with zipfile.ZipFile(archive_path) as zf:
+        infos = zf.infolist()
+        if len(infos) > max_entries:
+            raise ValueError(
+                f"archive has too many entries: {archive_path} ({len(infos)} > {max_entries})"
+            )
+        for info in infos:
+            member_name = info.filename.replace("\\", "/")
+            if not member_name:
+                raise ValueError(f"archive contains an empty member name: {archive_path}")
+            if member_name in seen_members:
+                raise ValueError(f"archive contains a duplicate member name: {member_name}")
+            seen_members.add(member_name)
+            if member_name.startswith("/") or member_name.startswith("../"):
+                raise ValueError(f"archive member escapes extraction root: {member_name}")
+            member_path = PurePosixPath(member_name)
+            if any(part in {"", ".", ".."} for part in member_path.parts):
+                raise ValueError(f"archive member is not a safe relative path: {member_name}")
+            if not member_name.startswith(expected_prefix):
+                raise ValueError(
+                    f"archive member does not stay under expected prefix {expected_prefix!r}: {member_name}"
+                )
+            mode = info.external_attr >> 16
+            if stat.S_IFMT(mode) == stat.S_IFLNK:
+                raise ValueError(f"symlinks are not allowed in dataset payload archive: {member_name}")
+            target = (dest_root / member_path).resolve()
+            if not target.is_relative_to(resolved_dest_root):
+                raise ValueError(f"archive member resolves outside extraction root: {member_name}")
+            if info.is_dir():
+                target.mkdir(parents=True, exist_ok=True)
+                continue
+            total_uncompressed += info.file_size
+            if total_uncompressed > max_uncompressed_bytes:
+                raise ValueError(
+                    f"archive exceeds extracted size budget: {archive_path} "
+                    f"({total_uncompressed} > {max_uncompressed_bytes})"
+                )
+            target.parent.mkdir(parents=True, exist_ok=True)
+            with zf.open(info, "r") as src, target.open("wb") as dst:
+                shutil.copyfileobj(src, dst)
+            extracted_files += 1
+    if extracted_files < 1:
+        raise ValueError(f"archive did not extract any files under expected prefix: {archive_path}")
+
+
 def _build_simulated_dataset_mount(dataset_payload_dir: Path) -> Path:
     temp_root = Path(tempfile.mkdtemp(prefix="llcore-kaggle-dataset-smoke-"))
     for name in (
@@ -259,8 +316,8 @@ def _build_simulated_dataset_mount(dataset_payload_dir: Path) -> Path:
         archive_path = dataset_payload_dir / archive_name
         extract_dir = temp_root / Path(archive_name).stem
         extract_dir.mkdir(parents=True, exist_ok=True)
-        with zipfile.ZipFile(archive_path) as zf:
-            zf.extractall(extract_dir)
+        expected_prefix = "src/llcore/" if archive_name == DATASET_SRC_ARCHIVE_NAME else "llcore/"
+        _safe_extract_zip(archive_path, extract_dir, expected_prefix=expected_prefix)
     return temp_root
 
 
