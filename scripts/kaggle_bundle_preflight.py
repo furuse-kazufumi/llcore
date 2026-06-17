@@ -626,6 +626,7 @@ def _validate_bundle_dir(bundle_dir: Path) -> dict[str, object]:
             "block_size": compare_config.get("block_size"),
             "max_iters": compare_config.get("max_iters"),
             "corpus_sha256": corpus_sha256,
+            "config_sha256": manifest_config_sha256,
         }
         manifest_summary: dict[str, object] = {
             "kernel_id": manifest_kernel_id,
@@ -770,6 +771,7 @@ def _validate_bundle_dir(bundle_dir: Path) -> dict[str, object]:
             "block_size": compare_config.get("block_size"),
             "max_iters": compare_config.get("max_iters"),
             "corpus_sha256": corpus_sha256,
+            "config_sha256": dataset_manifest.get("config_sha256"),
             "dataset_source": dataset_source,
             "dataset_metadata_path": f"{dataset_payload_rel}/{DATASET_METADATA_NAME}",
         }

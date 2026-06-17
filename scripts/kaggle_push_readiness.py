@@ -41,7 +41,9 @@ import re
 import subprocess
 import sys
 from pathlib import Path
+from pathlib import PurePosixPath
 from typing import Any, cast
+import zipfile
 
 
 HERE = Path(__file__).resolve().parent
@@ -55,6 +57,7 @@ _TRUE_STR = "true"
 _KERNEL_ID_RE = re.compile(r"^[a-z0-9][a-z0-9-]*/[a-z0-9][a-z0-9-]*$")
 _KAGGLE_API_V1_TOKEN_ENV = "KAGGLE_API_V1_TOKEN"
 _LICENSE_GUARD_EXTENSIONS = {".py", ".md", ".txt", ".json", ".toml", ".yaml", ".yml"}
+_LICENSE_GUARD_ARCHIVE_NAMES = {"src_llcore.zip", "pkg_llcore.zip"}
 # This marker scan intentionally covers bundled source-like text as well as
 # redistribution docs. Adding these literals to src/llcore comments will make
 # bundle readiness fail closed until wording is adjusted.
@@ -235,21 +238,28 @@ def _configured_oauth_username() -> str | None:
             "credentials.json present but malformed: expected top-level object",
             token_advisory_ok=True,
         )
-    username = payload.get("username")
     refresh_token = payload.get("refresh_token")
-    if not isinstance(username, str) or not isinstance(refresh_token, str):
+    username = payload.get("username")
+    if not isinstance(refresh_token, str):
         raise _KaggleConfigValidationError(
-            "credentials.json present but malformed: expected non-empty string username and refresh_token",
+            "credentials.json present but malformed: expected non-empty string refresh_token",
+            token_advisory_ok=True,
+        )
+    refresh_token = refresh_token.strip()
+    if not refresh_token:
+        raise _KaggleConfigValidationError(
+            "credentials.json present but malformed: expected non-empty string refresh_token",
+            token_advisory_ok=True,
+        )
+    if username is None:
+        return None
+    if not isinstance(username, str):
+        raise _KaggleConfigValidationError(
+            "credentials.json present but malformed: username must be a string when provided",
             token_advisory_ok=True,
         )
     username = username.strip()
-    refresh_token = refresh_token.strip()
-    if not username or not refresh_token:
-        raise _KaggleConfigValidationError(
-            "credentials.json present but malformed: expected non-empty string username and refresh_token",
-            token_advisory_ok=True,
-        )
-    return username
+    return username or None
 
 
 def _check_kernel_owner_config(kernel_id: str) -> str:
@@ -422,10 +432,48 @@ def _iter_bundle_text_files(bundle_dir: Path) -> list[Path]:
     return files
 
 
+def _iter_bundle_archive_files(bundle_dir: Path) -> list[Path]:
+    files: list[Path] = []
+    for path in bundle_dir.rglob("*"):
+        if not path.is_file():
+            continue
+        if path.name in _LICENSE_GUARD_ARCHIVE_NAMES:
+            files.append(path)
+    return files
+
+
+def _iter_archive_text_members(bundle_dir: Path, archive_path: Path) -> list[tuple[str, str]]:
+    try:
+        with zipfile.ZipFile(archive_path) as zf:
+            members: list[tuple[str, str]] = []
+            for info in zf.infolist():
+                if info.is_dir():
+                    continue
+                member = PurePosixPath(info.filename.replace("\\", "/"))
+                if member.suffix.lower() not in _LICENSE_GUARD_EXTENSIONS:
+                    continue
+                try:
+                    content = zf.read(info).decode("utf-8")
+                except UnicodeDecodeError as exc:
+                    raise ValueError(
+                        "bundle license guard failed: archive member is not valid UTF-8: "
+                        f"{archive_path.name}:{member.as_posix()}"
+                    ) from exc
+                members.append((member.as_posix(), content))
+            return members
+    except OSError as exc:
+        raise ValueError(
+            f"bundle license guard failed: archive unreadable: {archive_path.relative_to(bundle_dir)}"
+        ) from exc
+    except zipfile.BadZipFile as exc:
+        raise ValueError(f"bundle license guard failed: invalid zip archive: {archive_path.name}") from exc
+
+
 def _check_bundle_license_policy(bundle_dir: Path) -> dict[str, object]:
     text_files = _iter_bundle_text_files(bundle_dir)
-    source_like_present = any(
-        path.name == "runner.py" or "src" in path.parts for path in text_files
+    archive_files = _iter_bundle_archive_files(bundle_dir)
+    source_like_present = any(path.name == "runner.py" or "src" in path.parts for path in text_files) or bool(
+        archive_files
     )
     if not source_like_present:
         return {
@@ -446,11 +494,22 @@ def _check_bundle_license_policy(bundle_dir: Path) -> dict[str, object]:
     for path in text_files:
         try:
             content = path.read_text(encoding="utf-8")
-        except (OSError, UnicodeDecodeError):
-            continue
+        except OSError as exc:
+            raise ValueError(
+                f"bundle license guard failed: unreadable text file: {path.relative_to(bundle_dir)}"
+            ) from exc
+        except UnicodeDecodeError as exc:
+            raise ValueError(
+                f"bundle license guard failed: non-UTF-8 text file: {path.relative_to(bundle_dir)}"
+            ) from exc
         for marker in _COMMERCIAL_LICENSE_MARKERS:
             if marker in content:
                 findings.append(f"{path.relative_to(bundle_dir)}: {marker}")
+    for archive_path in archive_files:
+        for member_name, content in _iter_archive_text_members(bundle_dir, archive_path):
+            for marker in _COMMERCIAL_LICENSE_MARKERS:
+                if marker in content:
+                    findings.append(f"{archive_path.relative_to(bundle_dir)}:{member_name}: {marker}")
     if findings:
         joined = "; ".join(findings[:5])
         raise ValueError(
@@ -537,7 +596,7 @@ def check_readiness(argv: list[str] | None = None) -> int:
         return RC_VALIDATION
     credential_sources = _credential_sources()
     token_auth_available = any(
-        source in {"api_v1_token_file", "api_token_env", "access_token"} for source in credential_sources
+        source in {"api_v1_token_file", "api_token_env", "access_token", "oauth_credentials"} for source in credential_sources
     )
     owner_check_status = "validated_local_config"
     try:

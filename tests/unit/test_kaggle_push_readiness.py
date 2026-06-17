@@ -5,6 +5,7 @@ import importlib.util
 import json
 import subprocess
 import tempfile
+import zipfile
 from types import SimpleNamespace
 from pathlib import Path
 from typing import Any
@@ -588,6 +589,22 @@ def test_configured_kaggle_username_reads_username_from_oauth_credentials(
     monkeypatch.setattr(script, "_kaggle_oauth_credentials_path", lambda: creds_path)
 
     assert script._configured_oauth_username() == "oauth-user"
+
+
+def test_configured_kaggle_username_allows_refresh_token_only_oauth_credentials(
+    tmp_path: Path, monkeypatch: Any
+) -> None:
+    script = _load_script("kaggle_push_readiness.py")
+    creds_path = tmp_path / "credentials.json"
+    creds_path.write_text(
+        json.dumps({"refresh_token": "refresh-token"}) + "\n",
+        encoding="utf-8",
+    )
+
+    _clear_kaggle_env(monkeypatch)
+    monkeypatch.setattr(script, "_kaggle_oauth_credentials_path", lambda: creds_path)
+
+    assert script._configured_oauth_username() is None
 
 
 def test_credential_sources_follow_installed_sdk_token_paths(
@@ -1274,6 +1291,68 @@ def test_check_readiness_ignores_commercial_marker_inside_input_corpus(
 
     assert rc == 0
     assert "quota_checked=cpu" in capsys.readouterr().out
+
+
+def test_check_readiness_rejects_archive_member_with_commercial_license_reference(
+    tmp_path: Path, monkeypatch: Any, capsys: Any
+) -> None:
+    script = _load_script("kaggle_push_readiness.py")
+    bundle_dir = tmp_path / "bundle"
+    dataset_payload = bundle_dir / "dataset_payload"
+    dataset_payload.mkdir(parents=True)
+    (bundle_dir / "LICENSE").write_text("Apache License 2.0\n", encoding="utf-8")
+    (bundle_dir / "NOTICE").write_text("Commercial licenses are available separately.\n", encoding="utf-8")
+    with zipfile.ZipFile(dataset_payload / "src_llcore.zip", "w") as zf:
+        zf.writestr("src/llcore/__init__.py", "Commercial licenses are also available; see LICENSE-COMMERCIAL.\n")
+
+    class _FakePreflight:
+        subprocess = SimpleNamespace(TimeoutExpired=subprocess.TimeoutExpired)
+
+        @staticmethod
+        def preflight_bundle(bundle_dir: Path, *, run_runner: bool, runner_timeout: int) -> dict[str, object]:
+            return {
+                "bundle_dir": str(bundle_dir),
+                "checks": {"metadata": {"kernel_id": "furusekazufumi/test-kernel", "enable_gpu": "false"}},
+                "runner": None,
+            }
+
+    monkeypatch.setattr(script, "_load_script", lambda path, module_name: _FakePreflight)
+    _clear_kaggle_env(monkeypatch)
+
+    rc = script.main(["--bundle-dir", str(bundle_dir)])
+
+    assert rc == script.RC_VALIDATION
+    assert "commercial-license wording remains" in capsys.readouterr().err
+
+
+def test_check_readiness_rejects_unreadable_license_text_file(
+    tmp_path: Path, monkeypatch: Any, capsys: Any
+) -> None:
+    script = _load_script("kaggle_push_readiness.py")
+    bundle_dir = tmp_path / "bundle"
+    (bundle_dir / "src" / "llcore").mkdir(parents=True)
+    (bundle_dir / "src" / "llcore" / "__init__.py").write_text("# ok\n", encoding="utf-8")
+    (bundle_dir / "LICENSE").write_bytes(b"\xff\xfe\x00")
+    (bundle_dir / "NOTICE").write_text("ok\n", encoding="utf-8")
+
+    class _FakePreflight:
+        subprocess = SimpleNamespace(TimeoutExpired=subprocess.TimeoutExpired)
+
+        @staticmethod
+        def preflight_bundle(bundle_dir: Path, *, run_runner: bool, runner_timeout: int) -> dict[str, object]:
+            return {
+                "bundle_dir": str(bundle_dir),
+                "checks": {"metadata": {"kernel_id": "furusekazufumi/test-kernel", "enable_gpu": "false"}},
+                "runner": None,
+            }
+
+    monkeypatch.setattr(script, "_load_script", lambda path, module_name: _FakePreflight)
+    _clear_kaggle_env(monkeypatch)
+
+    rc = script.main(["--bundle-dir", str(bundle_dir)])
+
+    assert rc == script.RC_VALIDATION
+    assert "non-UTF-8 text file" in capsys.readouterr().err
 
 
 def test_check_readiness_fails_cleanly_when_no_push_credentials_exist(

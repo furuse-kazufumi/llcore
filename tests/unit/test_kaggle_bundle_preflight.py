@@ -120,6 +120,7 @@ def test_preflight_validates_bundle_and_writes_json(tmp_path: Path) -> None:
     assert payload["checks"]["metadata"]["machine_shape"] is None
     assert payload["checks"]["manifest"]["runner"] == "runner.py"
     assert len(payload["checks"]["manifest"]["source_sha256"]) == 64
+    assert len(payload["checks"]["config"]["config_sha256"]) == 64
     assert payload["runner"] is None
 
 
@@ -152,6 +153,7 @@ def test_preflight_dataset_mode_runner_smoke_passes(tmp_path: Path) -> None:
     assert checks["manifest"]["dataset_source"] == "furusekazufumi/llcore-lm-compare-support"
     assert checks["manifest"]["dataset_publish_dir"] == "dataset_payload"
     assert checks["config"]["dataset_metadata_path"] == "dataset_payload/dataset-metadata.json"
+    assert len(checks["config"]["config_sha256"]) == 64
     publish_safety = checks["manifest"]["publish_safety"]
     assert publish_safety["status"] == "passed"
     assert publish_safety["dataset_payload_dir"] == "dataset_payload"
