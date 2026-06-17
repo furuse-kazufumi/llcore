@@ -245,9 +245,11 @@ def run_worker(checkpoint: Path, mode: str, cap_bytes: int | None = None) -> dic
     }
 
 
-def _spawn_worker(checkpoint: Path, mode: str) -> dict[str, Any]:
+def _spawn_worker(checkpoint: Path, mode: str, cap_bytes: int | None = None) -> dict[str, Any]:
     cmd = [sys.executable, str(Path(__file__).resolve()), "--worker", mode,
            "--checkpoint", str(checkpoint)]
+    if cap_bytes is not None:
+        cmd += ["--cap-bytes", str(cap_bytes)]
     proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8")
     if proc.returncode != 0:
         raise RuntimeError(f"worker failed (rc={proc.returncode}): {proc.stderr.strip()[:400]}")
