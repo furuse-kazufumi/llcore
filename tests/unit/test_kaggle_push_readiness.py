@@ -1714,14 +1714,22 @@ def test_verify_push_payload_snapshot_rejects_hash_drift(tmp_path: Path) -> None
     bundle_dir.mkdir()
     (bundle_dir / ".kaggleignore").write_text("artifacts/\n", encoding="utf-8")
     (bundle_dir / "runner.py").write_text("# ok\n", encoding="utf-8")
+    (bundle_dir / "bundle_manifest.json").write_text(
+        json.dumps({"kernel_id": "furusekazufumi/test-kernel", "dataset_source": None}),
+        encoding="utf-8",
+    )
     snapshot = tmp_path / "snapshot.json"
     snapshot.write_text(
         json.dumps(
             {
+                "bundle_dir": str(bundle_dir),
+                "kernel_id": "furusekazufumi/test-kernel",
+                "dataset": {"dataset_source": None},
                 "push_payload": {
-                    "included_files": [".kaggleignore", "runner.py"],
+                    "included_files": [".kaggleignore", "bundle_manifest.json", "runner.py"],
                     "critical_hashes": {
                         ".kaggleignore": script._sha256_text(bundle_dir / ".kaggleignore"),
+                        "bundle_manifest.json": script._sha256_text(bundle_dir / "bundle_manifest.json"),
                         "runner.py": "0" * 64,
                     },
                 }
@@ -1740,13 +1748,21 @@ def test_verify_push_payload_snapshot_rejects_coverage_gap(tmp_path: Path) -> No
     bundle_dir.mkdir()
     (bundle_dir / ".kaggleignore").write_text("", encoding="utf-8")
     (bundle_dir / "runner.py").write_text("# ok\n", encoding="utf-8")
+    (bundle_dir / "bundle_manifest.json").write_text(
+        json.dumps({"kernel_id": "furusekazufumi/test-kernel", "dataset_source": None}),
+        encoding="utf-8",
+    )
     snapshot = tmp_path / "snapshot.json"
     snapshot.write_text(
         json.dumps(
             {
+                "bundle_dir": str(bundle_dir),
+                "kernel_id": "furusekazufumi/test-kernel",
+                "dataset": {"dataset_source": None},
                 "push_payload": {
-                    "included_files": [".kaggleignore", "runner.py"],
+                    "included_files": [".kaggleignore", "bundle_manifest.json", "runner.py"],
                     "critical_hashes": {
+                        "bundle_manifest.json": script._sha256_text(bundle_dir / "bundle_manifest.json"),
                         "runner.py": script._sha256_text(bundle_dir / "runner.py"),
                     },
                 }
