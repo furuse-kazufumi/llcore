@@ -34,12 +34,15 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import importlib.util
 import json
 import os
 import re
 import subprocess
 import sys
+import tempfile
+import shutil
 from pathlib import Path
 from pathlib import PurePosixPath
 from typing import Any, cast
@@ -419,9 +422,13 @@ def _check_quota(*, timeout_s: int, enable_gpu: bool) -> dict[str, object]:
 
 
 def _iter_bundle_text_files(bundle_dir: Path) -> list[Path]:
+    ignored_prefixes = _ignored_bundle_prefixes(bundle_dir)
     files: list[Path] = []
     for path in bundle_dir.rglob("*"):
         if not path.is_file():
+            continue
+        rel = path.relative_to(bundle_dir).as_posix()
+        if _is_ignored_relative_path(rel, ignored_prefixes):
             continue
         if path.name == "input_corpus.txt":
             continue
@@ -433,13 +440,125 @@ def _iter_bundle_text_files(bundle_dir: Path) -> list[Path]:
 
 
 def _iter_bundle_archive_files(bundle_dir: Path) -> list[Path]:
+    ignored_prefixes = _ignored_bundle_prefixes(bundle_dir)
     files: list[Path] = []
     for path in bundle_dir.rglob("*"):
         if not path.is_file():
             continue
+        rel = path.relative_to(bundle_dir).as_posix()
+        if _is_ignored_relative_path(rel, ignored_prefixes):
+            continue
         if path.name in _LICENSE_GUARD_ARCHIVE_NAMES:
             files.append(path)
     return files
+
+
+def _ignored_bundle_prefixes(bundle_dir: Path) -> tuple[str, ...]:
+    kaggleignore = bundle_dir / ".kaggleignore"
+    if not kaggleignore.is_file():
+        return ()
+    prefixes: list[str] = []
+    for raw_line in kaggleignore.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or line.startswith("!"):
+            continue
+        normalized = line.lstrip("./").replace("\\", "/")
+        if normalized.endswith("/"):
+            prefixes.append(normalized)
+        else:
+            prefixes.append(normalized)
+    return tuple(prefixes)
+
+
+def _is_ignored_relative_path(relative_path: str, ignored_prefixes: tuple[str, ...]) -> bool:
+    return any(
+        relative_path == prefix.rstrip("/") or relative_path.startswith(prefix)
+        for prefix in ignored_prefixes
+    )
+
+
+def _sha256_text(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _is_ignored_source_path(path: Path) -> bool:
+    return "__pycache__" in path.parts or path.suffix in {".pyc", ".pyo"}
+
+
+def _sha256_tree(root: Path) -> str:
+    digest = hashlib.sha256()
+    for path in sorted(
+        (p for p in root.rglob("*") if p.is_file() and not _is_ignored_source_path(p)),
+        key=lambda item: PurePosixPath(item.relative_to(root).as_posix()).parts,
+    ):
+        rel = path.relative_to(root).as_posix().encode("utf-8")
+        digest.update(rel)
+        digest.update(b"\0")
+        digest.update(path.read_bytes())
+        digest.update(b"\0")
+    return digest.hexdigest()
+
+
+def _check_dataset_source(*, bundle_dir: Path, preflight_report: dict[str, object], timeout_s: int) -> dict[str, object]:
+    checks = preflight_report.get("checks")
+    if not isinstance(checks, dict):
+        return {"checked": False, "reason": "preflight checks unavailable"}
+    manifest = checks.get("manifest")
+    if not isinstance(manifest, dict):
+        return {"checked": False, "reason": "embedded bundle has no external dataset dependency"}
+    dataset_source = manifest.get("dataset_source")
+    data_mode = manifest.get("data_mode")
+    if data_mode != "dataset" or not isinstance(dataset_source, str) or not dataset_source:
+        return {"checked": False, "reason": "embedded bundle has no external dataset dependency"}
+    status_proc = _run_kaggle(["datasets", "status", dataset_source], timeout_s=timeout_s)
+    status_text = status_proc.stdout.strip() or status_proc.stderr.strip()
+    if status_proc.returncode != 0 or not status_text:
+        detail = status_proc.stderr.strip() or status_proc.stdout.strip() or f"rc={status_proc.returncode}"
+        raise ValueError(f"kaggle dataset status check failed: {detail}")
+    if status_text.lower() != "ready":
+        raise ValueError(f"kaggle dataset status is not ready: {status_text}")
+    dataset_manifest_path = bundle_dir / "dataset_payload" / "dataset_payload_manifest.json"
+    dataset_manifest = json.loads(dataset_manifest_path.read_text(encoding="utf-8"))
+    if not isinstance(dataset_manifest, dict):
+        raise ValueError("dataset payload manifest must be an object for dataset verification")
+    temp_root = Path(tempfile.mkdtemp(prefix="llcore-kaggle-dataset-verify-"))
+    try:
+        download_proc = _run_kaggle(
+            ["datasets", "download", dataset_source, "--unzip", "-p", str(temp_root)],
+            timeout_s=max(timeout_s, 120),
+        )
+        if download_proc.returncode != 0:
+            detail = download_proc.stderr.strip() or download_proc.stdout.strip() or f"rc={download_proc.returncode}"
+            raise ValueError(f"kaggle dataset download check failed: {detail}")
+        expected = {
+            "config_sha256": str(dataset_manifest["config_sha256"]),
+            "corpus_sha256": str(dataset_manifest["corpus_sha256"]),
+            "source_sha256": str(dataset_manifest["source_sha256"]),
+        }
+        actual = {
+            "config_sha256": _sha256_text(temp_root / "config.json"),
+            "corpus_sha256": _sha256_text(temp_root / "input_corpus.txt"),
+            "src_tree_sha256": _sha256_tree(temp_root / "src_llcore" / "src" / "llcore"),
+            "pkg_tree_sha256": _sha256_tree(temp_root / "pkg_llcore" / "llcore"),
+        }
+        matches = {
+            "config_sha256": expected["config_sha256"] == actual["config_sha256"],
+            "corpus_sha256": expected["corpus_sha256"] == actual["corpus_sha256"],
+            "src_tree_sha256": expected["source_sha256"] == actual["src_tree_sha256"],
+            "pkg_tree_sha256": expected["source_sha256"] == actual["pkg_tree_sha256"],
+        }
+        if not all(matches.values()):
+            raise ValueError("kaggle dataset payload sha verification failed")
+        return {
+            "checked": True,
+            "dataset_source": dataset_source,
+            "status": status_text,
+            "expected": expected,
+            "actual": actual,
+            "matches": matches,
+        }
+    finally:
+        shutil.rmtree(temp_root, ignore_errors=True)
 
 
 def _iter_archive_text_members(bundle_dir: Path, archive_path: Path) -> list[tuple[str, str]]:
@@ -638,8 +757,10 @@ def check_readiness(argv: list[str] | None = None) -> int:
             auth_report["probe_author_status"] = "advisory_owner_mismatch_unverified"
         else:
             auth_report["probe_author_status"] = "validated_against_owner"
+        auth_report["probe_row_state"] = "existing_slug_seen"
     else:
         auth_report["probe_author_status"] = "advisory_unverified_empty_probe"
+        auth_report["probe_row_state"] = "header_only_or_first_push"
     auth_report["configured_username"] = configured_username
     auth_report["owner_check_status"] = owner_check_status
     owner_warning: str | None = None
@@ -653,6 +774,8 @@ def check_readiness(argv: list[str] | None = None) -> int:
         )
     if owner_warning is not None:
         print(f"warning: {owner_warning}", file=sys.stderr)
+    auth_report["owner_warning"] = owner_warning
+    auth_report["owner_verification_passed"] = owner_warning is None
     enable_gpu = metadata.get("enable_gpu") == _TRUE_STR
     if enable_gpu:
         try:
@@ -666,6 +789,15 @@ def check_readiness(argv: list[str] | None = None) -> int:
             "skipped": True,
             "reason": "cpu bundle does not require accelerator quota",
         }
+    try:
+        dataset_report = _check_dataset_source(
+            bundle_dir=bundle_dir,
+            preflight_report=preflight_report,
+            timeout_s=args.kaggle_timeout,
+        )
+    except (ValueError, OSError, subprocess.TimeoutExpired) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return RC_VALIDATION
     report = {
         "bundle_dir": str(bundle_dir),
         "kernel_id": kernel_id,
@@ -674,6 +806,7 @@ def check_readiness(argv: list[str] | None = None) -> int:
         "license": license_report,
         "auth": auth_report,
         "quota": quota_report,
+        "dataset": dataset_report,
     }
     quota_rows = quota_report.get("rows")
     quota_row_count = len(quota_rows) if isinstance(quota_rows, list) else 0

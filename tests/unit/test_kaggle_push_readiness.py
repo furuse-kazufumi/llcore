@@ -97,9 +97,12 @@ def test_check_readiness_runs_preflight_and_kaggle_checks(
     assert payload["auth"]["owner_check_status"] == "validated_local_config"
     assert str(payload["auth"]["probe_author"]).lower() == "furusekazufumi"
     assert payload["auth"]["probe_author_status"] == "validated_against_owner"
+    assert payload["auth"]["probe_row_state"] == "existing_slug_seen"
+    assert payload["auth"]["owner_verification_passed"] is True
     assert payload["quota"]["skipped"] is True
     assert payload["quota"]["reason"] == "cpu bundle does not require accelerator quota"
     assert payload["quota"]["checked_resource"] == "cpu"
+    assert payload["dataset"]["checked"] is False
 
 
 def test_check_readiness_rejects_nonpositive_kaggle_timeout(
@@ -1052,6 +1055,39 @@ def test_check_readiness_allows_first_push_when_probe_has_header_only_csv(
     assert "quota_checked=cpu" in capsys.readouterr().out
 
 
+def test_check_readiness_reports_header_only_probe_state(
+    tmp_path: Path, monkeypatch: Any
+) -> None:
+    script = _load_script("kaggle_push_readiness.py")
+    bundle_dir = tmp_path / "bundle"
+    bundle_dir.mkdir()
+    report_path = tmp_path / "ready.json"
+
+    class _FakePreflight:
+        subprocess = SimpleNamespace(TimeoutExpired=subprocess.TimeoutExpired)
+
+        @staticmethod
+        def preflight_bundle(bundle_dir: Path, *, run_runner: bool, runner_timeout: int) -> dict[str, object]:
+            return {
+                "bundle_dir": str(bundle_dir),
+                "checks": {"metadata": {"kernel_id": "furusekazufumi/test-kernel", "enable_gpu": "false"}},
+                "runner": None,
+            }
+
+    _clear_kaggle_env(monkeypatch)
+    monkeypatch.setattr(script, "_load_script", lambda path, module_name: _FakePreflight)
+    monkeypatch.setattr(script, "_run_kaggle", lambda args, *, timeout_s: _completed(stdout="ref,title,author\n"))
+    monkeypatch.setattr(script, "_credential_sources", lambda: ["kaggle.json"])
+    monkeypatch.setattr(script, "_configured_kaggle_username", lambda: "furusekazufumi")
+
+    rc = script.main(["--bundle-dir", str(bundle_dir), "--json", str(report_path)])
+
+    assert rc == 0
+    payload = json.loads(report_path.read_text(encoding="utf-8"))
+    assert payload["auth"]["probe_row_state"] == "header_only_or_first_push"
+    assert payload["auth"]["owner_verification_passed"] is False
+
+
 def test_check_readiness_marks_probe_author_mismatch_as_advisory(
     tmp_path: Path, monkeypatch: Any, capsys: Any
 ) -> None:
@@ -1293,6 +1329,44 @@ def test_check_readiness_ignores_commercial_marker_inside_input_corpus(
     assert "quota_checked=cpu" in capsys.readouterr().out
 
 
+def test_check_readiness_ignores_commercial_marker_inside_kaggleignored_artifacts(
+    tmp_path: Path, monkeypatch: Any, capsys: Any
+) -> None:
+    script = _load_script("kaggle_push_readiness.py")
+    bundle_dir = tmp_path / "bundle"
+    (bundle_dir / "src" / "llcore").mkdir(parents=True)
+    (bundle_dir / "src" / "llcore" / "__init__.py").write_text("# ok\n", encoding="utf-8")
+    (bundle_dir / "artifacts").mkdir()
+    (bundle_dir / "artifacts" / "lm_compare.json").write_text(
+        '{"note":"Commercial dual-license"}\n', encoding="utf-8"
+    )
+    (bundle_dir / ".kaggleignore").write_text("artifacts/\n", encoding="utf-8")
+    (bundle_dir / "LICENSE").write_text("Apache License 2.0\n", encoding="utf-8")
+    (bundle_dir / "NOTICE").write_text("Commercial licenses are available separately.\n", encoding="utf-8")
+
+    class _FakePreflight:
+        subprocess = SimpleNamespace(TimeoutExpired=subprocess.TimeoutExpired)
+
+        @staticmethod
+        def preflight_bundle(bundle_dir: Path, *, run_runner: bool, runner_timeout: int) -> dict[str, object]:
+            return {
+                "bundle_dir": str(bundle_dir),
+                "checks": {"metadata": {"kernel_id": "furusekazufumi/test-kernel", "enable_gpu": "false"}},
+                "runner": None,
+            }
+
+    monkeypatch.setattr(script, "_load_script", lambda path, module_name: _FakePreflight)
+    monkeypatch.setattr(script, "_run_kaggle", lambda args, *, timeout_s: _completed(stdout="ref,title,author\n"))
+    _clear_kaggle_env(monkeypatch)
+    monkeypatch.setattr(script, "_credential_sources", lambda: ["kaggle.json"])
+    monkeypatch.setattr(script, "_configured_kaggle_username", lambda: "furusekazufumi")
+
+    rc = script.main(["--bundle-dir", str(bundle_dir)])
+
+    assert rc == 0
+    assert "quota_checked=cpu" in capsys.readouterr().out
+
+
 def test_check_readiness_rejects_archive_member_with_commercial_license_reference(
     tmp_path: Path, monkeypatch: Any, capsys: Any
 ) -> None:
@@ -1353,6 +1427,82 @@ def test_check_readiness_rejects_unreadable_license_text_file(
 
     assert rc == script.RC_VALIDATION
     assert "non-UTF-8 text file" in capsys.readouterr().err
+
+
+def test_check_readiness_verifies_dataset_dependency_shas(
+    tmp_path: Path, monkeypatch: Any, capsys: Any
+) -> None:
+    script = _load_script("kaggle_push_readiness.py")
+    bundle_dir = tmp_path / "bundle"
+    dataset_payload = bundle_dir / "dataset_payload"
+    dataset_payload.mkdir(parents=True)
+    (dataset_payload / "dataset_payload_manifest.json").write_text(
+        json.dumps(
+            {
+                "config_sha256": "a" * 64,
+                "corpus_sha256": "b" * 64,
+                "source_sha256": "c" * 64,
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    class _FakePreflight:
+        subprocess = SimpleNamespace(TimeoutExpired=subprocess.TimeoutExpired)
+
+        @staticmethod
+        def preflight_bundle(bundle_dir: Path, *, run_runner: bool, runner_timeout: int) -> dict[str, object]:
+            return {
+                "bundle_dir": str(bundle_dir),
+                "checks": {
+                    "metadata": {"kernel_id": "furusekazufumi/test-kernel", "enable_gpu": "false"},
+                    "manifest": {"data_mode": "dataset", "dataset_source": "furusekazufumi/test-dataset"},
+                },
+                "runner": None,
+            }
+
+    def _fake_run_kaggle(args: list[str], *, timeout_s: int) -> Any:
+        if args[:2] == ["kernels", "list"]:
+            return _completed(stdout="ref,title,author\nr,t,furusekazufumi\n")
+        if args[:2] == ["datasets", "status"]:
+            return _completed(stdout="ready\n")
+        if args[:2] == ["datasets", "download"]:
+            out_dir = Path(args[args.index("-p") + 1])
+            (out_dir / "config.json").write_text("config\n", encoding="utf-8")
+            (out_dir / "input_corpus.txt").write_text("corpus\n", encoding="utf-8")
+            (out_dir / "src_llcore" / "src" / "llcore").mkdir(parents=True)
+            (out_dir / "pkg_llcore" / "llcore").mkdir(parents=True)
+            (out_dir / "src_llcore" / "src" / "llcore" / "__init__.py").write_text("# src\n", encoding="utf-8")
+            (out_dir / "pkg_llcore" / "llcore" / "__init__.py").write_text("# src\n", encoding="utf-8")
+            return _completed(stdout="downloaded\n")
+        raise AssertionError(args)
+
+    _clear_kaggle_env(monkeypatch)
+    monkeypatch.setattr(script, "_load_script", lambda path, module_name: _FakePreflight)
+    monkeypatch.setattr(script, "_run_kaggle", _fake_run_kaggle)
+    monkeypatch.setattr(script, "_credential_sources", lambda: ["kaggle.json"])
+    monkeypatch.setattr(script, "_configured_kaggle_username", lambda: "furusekazufumi")
+    monkeypatch.setattr(
+        script,
+        "_sha256_text",
+        lambda path: {"config.json": "a" * 64, "input_corpus.txt": "b" * 64}.get(path.name, "z" * 64),
+    )
+    monkeypatch.setattr(script, "_sha256_tree", lambda path: "c" * 64)
+
+    report_path = tmp_path / "ready.json"
+    rc = script.main(["--bundle-dir", str(bundle_dir), "--json", str(report_path)])
+
+    assert rc == 0
+    payload = json.loads(report_path.read_text(encoding="utf-8"))
+    assert payload["dataset"]["checked"] is True
+    assert payload["dataset"]["matches"] == {
+        "config_sha256": True,
+        "corpus_sha256": True,
+        "src_tree_sha256": True,
+        "pkg_tree_sha256": True,
+    }
+    assert "quota_checked=cpu" in capsys.readouterr().out
 
 
 def test_check_readiness_fails_cleanly_when_no_push_credentials_exist(
