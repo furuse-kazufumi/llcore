@@ -12,9 +12,11 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import stat
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 from pathlib import PurePosixPath
 import zipfile
@@ -239,6 +241,26 @@ def _normalized_bundle_top_level_entry(path: Path, *, bundle_dir: Path) -> str:
 
 def _sanitize_report_text(text: str, *, bundle_dir: Path) -> str:
     return text.replace(str(bundle_dir), "<bundle_dir>")
+
+
+def _build_simulated_dataset_mount(dataset_payload_dir: Path) -> Path:
+    temp_root = Path(tempfile.mkdtemp(prefix="llcore-kaggle-dataset-smoke-"))
+    for name in (
+        "config.json",
+        "input_corpus.txt",
+        "LICENSE",
+        "NOTICE",
+        DATASET_METADATA_NAME,
+        DATASET_PAYLOAD_MANIFEST_NAME,
+    ):
+        shutil.copyfile(dataset_payload_dir / name, temp_root / name)
+    for archive_name in (DATASET_SRC_ARCHIVE_NAME, DATASET_PKG_ARCHIVE_NAME):
+        archive_path = dataset_payload_dir / archive_name
+        extract_dir = temp_root / Path(archive_name).stem
+        extract_dir.mkdir(parents=True, exist_ok=True)
+        with zipfile.ZipFile(archive_path) as zf:
+            zf.extractall(extract_dir)
+    return temp_root
 
 
 def _top_level_publish_safety_summary(bundle_dir: Path) -> dict[str, object]:
@@ -787,21 +809,27 @@ def _run_runner(bundle_dir: Path, *, timeout_s: int) -> dict[str, object]:
     out_svg.unlink(missing_ok=True)
     manifest = json.loads((bundle_dir / "bundle_manifest.json").read_text(encoding="utf-8"))
     env = {**os.environ, "PYTHONUTF8": "1", "PYTHONDONTWRITEBYTECODE": "1"}
+    simulated_data_root: Path | None = None
     if manifest.get("data_mode") == "dataset":
         dataset_payload_rel = manifest.get("dataset_payload_rel")
         if isinstance(dataset_payload_rel, str) and dataset_payload_rel:
-            env["LLCORE_KAGGLE_DATA_ROOT"] = str((bundle_dir / dataset_payload_rel).resolve())
-    proc = subprocess.run(
-        [sys.executable, str(bundle_dir / "runner.py")],
-        cwd=bundle_dir,
-        check=False,
-        capture_output=True,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
-        env=env,
-        timeout=timeout_s,
-    )
+            simulated_data_root = _build_simulated_dataset_mount((bundle_dir / dataset_payload_rel).resolve())
+            env["LLCORE_KAGGLE_DATA_ROOT"] = str(simulated_data_root)
+    try:
+        proc = subprocess.run(
+            [sys.executable, str(bundle_dir / "runner.py")],
+            cwd=bundle_dir,
+            check=False,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            env=env,
+            timeout=timeout_s,
+        )
+    finally:
+        if simulated_data_root is not None:
+            shutil.rmtree(simulated_data_root, ignore_errors=True)
     payload: dict[str, object] = {
         "returncode": proc.returncode,
         "stdout": _sanitize_report_text(proc.stdout, bundle_dir=bundle_dir),

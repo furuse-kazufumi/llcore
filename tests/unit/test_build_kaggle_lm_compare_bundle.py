@@ -277,6 +277,56 @@ def test_build_bundle_dataset_runner_compiles(tmp_path: Path) -> None:
     compile(runner_text, str(bundle_dir / "runner.py"), "exec")
 
 
+def test_build_bundle_dataset_runner_supports_extracted_dataset_layout(tmp_path: Path) -> None:
+    builder = _load_builder()
+    corpus = tmp_path / "corpus.txt"
+    corpus.write_text(("abcde " * 400).strip() + "\n", encoding="utf-8")
+    bundle_dir = tmp_path / "bundle"
+
+    rc = builder.main(
+        [
+            "--bundle-dir",
+            str(bundle_dir),
+            "--corpus-file",
+            str(corpus),
+            "--dataset-source",
+            "furusekazufumi/llcore-lm-compare-support",
+        ]
+    )
+
+    assert rc == 0
+    data_root = tmp_path / "downloaded_dataset"
+    data_root.mkdir()
+    dataset_payload = bundle_dir / "dataset_payload"
+    for name in (
+        "config.json",
+        "input_corpus.txt",
+        "LICENSE",
+        "NOTICE",
+        "dataset-metadata.json",
+        "dataset_payload_manifest.json",
+    ):
+        shutil.copyfile(dataset_payload / name, data_root / name)
+    for archive_name in ("src_llcore.zip", "pkg_llcore.zip"):
+        extract_root = data_root / Path(archive_name).stem
+        extract_root.mkdir()
+        with zipfile.ZipFile(dataset_payload / archive_name) as zf:
+            zf.extractall(extract_root)
+
+    proc = subprocess.run(
+        [sys.executable, str(bundle_dir / "runner.py")],
+        cwd=bundle_dir,
+        check=False,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        env={**os.environ, "LLCORE_KAGGLE_DATA_ROOT": str(data_root), "PYTHONUTF8": "1"},
+    )
+
+    assert proc.returncode == 0, proc.stderr
+    assert (bundle_dir / "artifacts" / "lm_compare.json").is_file()
+
+
 def test_build_bundle_dataset_runner_rejects_duplicate_archive_members(tmp_path: Path) -> None:
     builder = _load_builder()
     corpus = tmp_path / "corpus.txt"

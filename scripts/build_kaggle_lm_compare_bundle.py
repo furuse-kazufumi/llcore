@@ -156,14 +156,35 @@ else:
 
 EXPECTED_CONFIG_SHA256 = "{config_sha256}"
 EXPECTED_CORPUS_SHA256 = "{corpus_sha256}"
+EXPECTED_SOURCE_SHA256 = "{source_sha256}"
 EXPECTED_SRC_ARCHIVE_SHA256 = "{src_archive_sha256}"
 EXPECTED_PKG_ARCHIVE_SHA256 = "{pkg_archive_sha256}"
 SRC_ARCHIVE_NAME = "{src_archive_name}"
 PKG_ARCHIVE_NAME = "{pkg_archive_name}"
+SRC_ARCHIVE_STEM = "{src_archive_stem}"
+PKG_ARCHIVE_STEM = "{pkg_archive_stem}"
 
 
 def _sha256_text(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _is_ignored_source_path(path: Path) -> bool:
+    return "__pycache__" in path.parts or path.suffix in {{".pyc", ".pyo"}}
+
+
+def _sha256_tree(root: Path) -> str:
+    digest = hashlib.sha256()
+    for path in sorted(
+        (p for p in root.rglob("*") if p.is_file() and not _is_ignored_source_path(p)),
+        key=lambda item: PurePosixPath(item.relative_to(root).as_posix()).parts,
+    ):
+        rel = path.relative_to(root).as_posix().encode("utf-8")
+        digest.update(rel)
+        digest.update(b"\\0")
+        digest.update(path.read_bytes())
+        digest.update(b"\\0")
+    return digest.hexdigest()
 
 
 def _safe_extract_zip(
@@ -231,13 +252,31 @@ def _prepare_import_tree() -> None:
     try:
         src_archive = DATA_ROOT / SRC_ARCHIVE_NAME
         pkg_archive = DATA_ROOT / PKG_ARCHIVE_NAME
-        if _sha256_text(src_archive) != EXPECTED_SRC_ARCHIVE_SHA256:
-            raise RuntimeError("dataset src archive sha256 mismatch")
-        if _sha256_text(pkg_archive) != EXPECTED_PKG_ARCHIVE_SHA256:
-            raise RuntimeError("dataset pkg archive sha256 mismatch")
-        _safe_extract_zip(src_archive, extract_root, expected_prefix="src/llcore/")
-        _safe_extract_zip(pkg_archive, extract_root, expected_prefix="llcore/")
-        for candidate in (extract_root, extract_root / "src"):
+        src_tree_root = DATA_ROOT / SRC_ARCHIVE_STEM / "src" / "llcore"
+        pkg_tree_root = DATA_ROOT / PKG_ARCHIVE_STEM / "llcore"
+        if src_archive.is_file() and pkg_archive.is_file():
+            if _sha256_text(src_archive) != EXPECTED_SRC_ARCHIVE_SHA256:
+                raise RuntimeError("dataset src archive sha256 mismatch")
+            if _sha256_text(pkg_archive) != EXPECTED_PKG_ARCHIVE_SHA256:
+                raise RuntimeError("dataset pkg archive sha256 mismatch")
+            _safe_extract_zip(src_archive, extract_root, expected_prefix="src/llcore/")
+            _safe_extract_zip(pkg_archive, extract_root, expected_prefix="llcore/")
+            if _sha256_tree(extract_root / "src" / "llcore") != EXPECTED_SOURCE_SHA256:
+                raise RuntimeError("dataset src extracted tree sha256 mismatch")
+            if _sha256_tree(extract_root / "llcore") != EXPECTED_SOURCE_SHA256:
+                raise RuntimeError("dataset pkg extracted tree sha256 mismatch")
+            for candidate in (extract_root, extract_root / "src"):
+                sys.path.insert(0, str(candidate))
+            return
+        if not src_tree_root.is_dir() or not pkg_tree_root.is_dir():
+            raise RuntimeError(
+                "dataset payload must expose either archive files or extracted source trees"
+            )
+        if _sha256_tree(src_tree_root) != EXPECTED_SOURCE_SHA256:
+            raise RuntimeError("dataset src extracted tree sha256 mismatch")
+        if _sha256_tree(pkg_tree_root) != EXPECTED_SOURCE_SHA256:
+            raise RuntimeError("dataset pkg extracted tree sha256 mismatch")
+        for candidate in (DATA_ROOT / PKG_ARCHIVE_STEM, DATA_ROOT / SRC_ARCHIVE_STEM / "src"):
             sys.path.insert(0, str(candidate))
     except Exception:
         shutil.rmtree(extract_root, ignore_errors=True)
@@ -432,6 +471,7 @@ def _render_runner(
     *,
     config_sha256: str | None = None,
     corpus_sha256: str | None = None,
+    source_sha256: str | None = None,
     src_archive_sha256: str | None = None,
     pkg_archive_sha256: str | None = None,
 ) -> str:
@@ -440,21 +480,25 @@ def _render_runner(
     if (
         config_sha256 is None
         or corpus_sha256 is None
+        or source_sha256 is None
         or src_archive_sha256 is None
         or pkg_archive_sha256 is None
     ):
         raise ValueError(
-            "dataset runner rendering requires config/corpus/archive sha256 values"
+            "dataset runner rendering requires config/corpus/source/archive sha256 values"
         )
     return RUNNER_TEMPLATE_DATASET.format(
         dataset_mount_name=_dataset_mount_name(dataset_source),
         dataset_unpack_dirname=DATASET_UNPACK_DIRNAME,
         config_sha256=config_sha256,
         corpus_sha256=corpus_sha256,
+        source_sha256=source_sha256,
         src_archive_sha256=src_archive_sha256,
         pkg_archive_sha256=pkg_archive_sha256,
         src_archive_name=DATASET_SRC_ARCHIVE_NAME,
         pkg_archive_name=DATASET_PKG_ARCHIVE_NAME,
+        src_archive_stem=Path(DATASET_SRC_ARCHIVE_NAME).stem,
+        pkg_archive_stem=Path(DATASET_PKG_ARCHIVE_NAME).stem,
     )
 
 
@@ -746,6 +790,7 @@ def build_bundle(
                 dataset_source,
                 config_sha256=dataset_config_sha256,
                 corpus_sha256=dataset_corpus_sha256,
+                source_sha256=(str(dataset_payload_manifest["source_sha256"]) if dataset_source is not None else None),
                 src_archive_sha256=(
                     str(dataset_payload_manifest["src_archive_sha256"]) if dataset_source is not None else None
                 ),
