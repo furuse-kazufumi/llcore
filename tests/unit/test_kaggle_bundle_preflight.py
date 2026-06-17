@@ -373,6 +373,19 @@ def test_preflight_rejects_duplicate_zip_members(tmp_path: Path) -> None:
     assert rc == 2
 
 
+def test_preflight_rejects_zip_file_directory_collision(tmp_path: Path) -> None:
+    preflight = _load_script("kaggle_bundle_preflight.py")
+    bundle_dir = _build_dataset_bundle(tmp_path)
+    src_zip = bundle_dir / "dataset_payload" / "src_llcore.zip"
+    with zipfile.ZipFile(src_zip, "w") as zf:
+        zf.writestr("src/llcore/pkg", "# file\n")
+        zf.writestr("src/llcore/pkg/__init__.py", "# package\n")
+
+    rc = preflight.main(["--bundle-dir", str(bundle_dir)])
+
+    assert rc == 2
+
+
 def test_preflight_rejects_zip_symlink_member(tmp_path: Path) -> None:
     preflight = _load_script("kaggle_bundle_preflight.py")
     bundle_dir = _build_dataset_bundle(tmp_path)
@@ -386,6 +399,23 @@ def test_preflight_rejects_zip_symlink_member(tmp_path: Path) -> None:
     rc = preflight.main(["--bundle-dir", str(bundle_dir)])
 
     assert rc == 2
+
+
+def test_preflight_zip_hash_matches_tree_parts_sort_order(tmp_path: Path) -> None:
+    preflight = _load_script("kaggle_bundle_preflight.py")
+    tree_root = tmp_path / "tree"
+    (tree_root / "src" / "llcore" / "a").mkdir(parents=True)
+    (tree_root / "src" / "llcore" / "a" / "__init__.py").write_text("# package\n", encoding="utf-8")
+    (tree_root / "src" / "llcore" / "a.py").write_text("# sibling file\n", encoding="utf-8")
+    archive_path = tmp_path / "src_llcore.zip"
+    with zipfile.ZipFile(archive_path, "w") as zf:
+        zf.write(tree_root / "src" / "llcore" / "a" / "__init__.py", "src/llcore/a/__init__.py")
+        zf.write(tree_root / "src" / "llcore" / "a.py", "src/llcore/a.py")
+
+    tree_sha256 = preflight._sha256_tree(tree_root / "src" / "llcore")
+    archive_sha256 = preflight._sha256_zip_tree(archive_path, expected_prefix="src/llcore/")
+
+    assert archive_sha256 == tree_sha256
 
 
 def test_preflight_rejects_zip_over_size_budget(tmp_path: Path) -> None:

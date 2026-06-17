@@ -100,6 +100,8 @@ def _sha256_tree(root: Path) -> str:
 def _sha256_zip_tree(archive_path: Path, *, expected_prefix: str) -> str:
     digest = hashlib.sha256()
     seen_members: set[str] = set()
+    file_members: set[PurePosixPath] = set()
+    dir_members: set[PurePosixPath] = set()
     with zipfile.ZipFile(archive_path) as zf:
         infos = zf.infolist()
         if len(infos) > _DATASET_ARCHIVE_MAX_ENTRIES:
@@ -107,7 +109,10 @@ def _sha256_zip_tree(archive_path: Path, *, expected_prefix: str) -> str:
                 f"{archive_path.name} contains too many members: {len(infos)} > {_DATASET_ARCHIVE_MAX_ENTRIES}"
             )
         total_uncompressed = 0
-        for info in sorted(infos, key=lambda item: item.filename):
+        for info in sorted(
+            infos,
+            key=lambda item: PurePosixPath(item.filename.replace("\\", "/")).parts,
+        ):
             member_name = info.filename.replace("\\", "/")
             if not member_name:
                 raise ValueError(f"{archive_path.name} contains an empty member name")
@@ -126,8 +131,24 @@ def _sha256_zip_tree(archive_path: Path, *, expected_prefix: str) -> str:
             mode = info.external_attr >> 16
             if stat.S_IFMT(mode) == stat.S_IFLNK:
                 raise ValueError(f"{archive_path.name} contains forbidden symlink member: {member_name}")
+            if member_path in file_members:
+                raise ValueError(
+                    f"{archive_path.name} reuses a file path as a directory: {member_name}"
+                )
             if info.is_dir():
+                dir_members.add(member_path)
                 continue
+            file_conflict = next((parent for parent in member_path.parents if parent in file_members), None)
+            if file_conflict is not None:
+                raise ValueError(
+                    f"{archive_path.name} contains file/directory collision at: {file_conflict.as_posix()}"
+                )
+            if member_path in dir_members:
+                raise ValueError(
+                    f"{archive_path.name} reuses a directory path as a file: {member_name}"
+                )
+            file_members.add(member_path)
+            dir_members.update(member_path.parents)
             total_uncompressed += info.file_size
             if total_uncompressed > _DATASET_ARCHIVE_MAX_UNCOMPRESSED_BYTES:
                 raise ValueError(
