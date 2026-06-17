@@ -96,9 +96,10 @@ def test_check_readiness_runs_preflight_and_kaggle_checks(
     assert str(payload["auth"]["configured_username"]).lower() == "furusekazufumi"
     assert payload["auth"]["owner_check_status"] == "validated_local_config"
     assert str(payload["auth"]["probe_author"]).lower() == "furusekazufumi"
-    assert payload["auth"]["probe_author_status"] == "validated_against_owner"
-    assert payload["auth"]["probe_row_state"] == "existing_slug_seen"
-    assert payload["auth"]["owner_verification_passed"] is True
+    assert payload["auth"]["probe_author_status"] == "owner_slug_matches_authenticated_user"
+    assert payload["auth"]["probe_row_state"] == "authenticated_account_has_kernels"
+    assert payload["auth"]["target_slug_existence"] == "unverified_by_probe"
+    assert payload["auth"]["owner_verification_passed"] is False
     assert payload["quota"]["skipped"] is True
     assert payload["quota"]["reason"] == "cpu bundle does not require accelerator quota"
     assert payload["quota"]["checked_resource"] == "cpu"
@@ -1129,7 +1130,7 @@ def test_check_readiness_marks_probe_author_mismatch_as_advisory(
 
     assert rc == 0
     payload = json.loads(report_path.read_text(encoding="utf-8"))
-    assert payload["auth"]["probe_author_status"] == "advisory_owner_mismatch_unverified"
+    assert payload["auth"]["probe_author_status"] == "advisory_probe_owner_slug_mismatch"
     captured = capsys.readouterr()
     assert "warning: owner verification is advisory only" in captured.err
     assert "owner=validated_local_config" in captured.out
@@ -1178,7 +1179,7 @@ def test_check_readiness_marks_first_probe_row_mismatch_as_advisory(
 
     assert rc == 0
     payload = json.loads(report_path.read_text(encoding="utf-8"))
-    assert payload["auth"]["probe_author_status"] == "advisory_owner_mismatch_unverified"
+    assert payload["auth"]["probe_author_status"] == "advisory_probe_owner_slug_mismatch"
     captured = capsys.readouterr()
     assert "warning: owner verification is advisory only" in captured.err
     assert "owner=validated_local_config" in captured.out
@@ -1365,6 +1366,18 @@ def test_check_readiness_ignores_commercial_marker_inside_kaggleignored_artifact
 
     assert rc == 0
     assert "quota_checked=cpu" in capsys.readouterr().out
+
+
+def test_ignored_relative_path_requires_directory_boundary() -> None:
+    script = _load_script("kaggle_push_readiness.py")
+
+    prefixes = ("src", "artifacts/")
+
+    assert script._is_ignored_relative_path("src", prefixes) is True
+    assert script._is_ignored_relative_path("src/module.py", prefixes) is False
+    assert script._is_ignored_relative_path("src_llcore.zip", prefixes) is False
+    assert script._is_ignored_relative_path("artifacts", prefixes) is True
+    assert script._is_ignored_relative_path("artifacts/lm_compare.json", prefixes) is True
 
 
 def test_check_readiness_rejects_archive_member_with_commercial_license_reference(

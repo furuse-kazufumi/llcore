@@ -321,11 +321,14 @@ def _check_auth(*, timeout_s: int) -> dict[str, object]:
         detail = proc.stderr.strip() or proc.stdout.strip() or f"rc={proc.returncode}"
         raise ValueError(f"kaggle credential probe failed: {detail}")
     # A header-only CSV is intentional first-push compatibility: an account can
-    # be authenticated yet legitimately have zero kernels listed.
+    # be authenticated yet legitimately have zero kernels listed. This probe
+    # only inspects the authenticated account's first listed kernel, so it is
+    # never authoritative for the specific target slug's existence or owner.
     report = {
         "authenticated": True,
         "credential_sources": sources,
         "probe_command": "kaggle kernels list -m --page-size 1 --csv",
+        "target_slug_existence": "unverified_by_probe",
     }
     probe_author = _extract_probe_author(proc.stdout)
     if probe_author is not None:
@@ -464,17 +467,22 @@ def _ignored_bundle_prefixes(bundle_dir: Path) -> tuple[str, ...]:
             continue
         normalized = line.lstrip("./").replace("\\", "/")
         if normalized.endswith("/"):
-            prefixes.append(normalized)
+            prefixes.append(normalized.rstrip("/") + "/")
         else:
             prefixes.append(normalized)
     return tuple(prefixes)
 
 
 def _is_ignored_relative_path(relative_path: str, ignored_prefixes: tuple[str, ...]) -> bool:
-    return any(
-        relative_path == prefix.rstrip("/") or relative_path.startswith(prefix)
-        for prefix in ignored_prefixes
-    )
+    for prefix in ignored_prefixes:
+        if prefix.endswith("/"):
+            base = prefix.rstrip("/")
+            if relative_path == base or relative_path.startswith(base + "/"):
+                return True
+            continue
+        if relative_path == prefix:
+            return True
+    return False
 
 
 def _sha256_text(path: Path) -> str:
@@ -500,6 +508,12 @@ def _sha256_tree(root: Path) -> str:
 
 
 def _check_dataset_source(*, bundle_dir: Path, preflight_report: dict[str, object], timeout_s: int) -> dict[str, object]:
+    """Verify the external support dataset for dataset-backed bundles.
+
+    Honest disclosure: this path currently expects `kaggle datasets status` to
+    yield a plain `ready` token after `.lower()`. If the CLI switches to a more
+    verbose success string, this check will fail closed until updated.
+    """
     checks = preflight_report.get("checks")
     if not isinstance(checks, dict):
         return {"checked": False, "reason": "preflight checks unavailable"}
@@ -765,19 +779,28 @@ def check_readiness(argv: list[str] | None = None) -> int:
     probe_author = auth_report.get("probe_author")
     if isinstance(probe_author, str) and probe_author.strip():
         if kernel_id.partition("/")[0].lower() != probe_author.strip().lower():
-            auth_report["probe_author_status"] = "advisory_owner_mismatch_unverified"
+            auth_report["probe_author_status"] = "advisory_probe_owner_slug_mismatch"
         else:
-            auth_report["probe_author_status"] = "validated_against_owner"
-        auth_report["probe_row_state"] = "existing_slug_seen"
+            auth_report["probe_author_status"] = "owner_slug_matches_authenticated_user"
+        auth_report["probe_row_state"] = "authenticated_account_has_kernels"
     else:
         auth_report["probe_author_status"] = "advisory_unverified_empty_probe"
         auth_report["probe_row_state"] = "header_only_or_first_push"
     auth_report["configured_username"] = configured_username
     auth_report["owner_check_status"] = owner_check_status
     owner_warning: str | None = None
-    if isinstance(auth_report.get("probe_author_status"), str) and str(auth_report["probe_author_status"]).startswith("advisory_"):
+    probe_author_status = auth_report.get("probe_author_status")
+    target_slug_existence = auth_report.get("target_slug_existence")
+    if (
+        isinstance(probe_author_status, str)
+        and (
+            probe_author_status.startswith("advisory_")
+            or probe_author_status == "owner_slug_matches_authenticated_user"
+        )
+    ) or target_slug_existence == "unverified_by_probe":
         owner_warning = (
-            "owner verification is advisory only; live probe author did not produce a verified owner match"
+            "owner verification is advisory only; kaggle kernels list -m --page-size 1 --csv "
+            "does not verify the target slug's existence or ownership"
         )
     if isinstance(owner_check_status, str) and owner_check_status.startswith("advisory_"):
         owner_warning = (
@@ -786,7 +809,7 @@ def check_readiness(argv: list[str] | None = None) -> int:
     if owner_warning is not None:
         print(f"warning: {owner_warning}", file=sys.stderr)
     auth_report["owner_warning"] = owner_warning
-    auth_report["owner_verification_passed"] = owner_warning is None
+    auth_report["owner_verification_passed"] = False
     enable_gpu = metadata.get("enable_gpu") == _TRUE_STR
     if enable_gpu:
         try:
