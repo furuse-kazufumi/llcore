@@ -11,6 +11,8 @@ from llcore.lm.eval import (
     held_out_perplexity,
     held_out_report,
     held_out_report_any,
+    held_out_top1_report,
+    passes_capability_gate,
     passes_gate,
     unigram_nll,
     unigram_perplexity,
