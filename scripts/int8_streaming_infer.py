@@ -60,7 +60,13 @@ class _PMC(ctypes.Structure):
     ]
 
 
-def _peak_working_set_bytes() -> int:
+def _peak_mem() -> tuple[int, int]:
+    """(peak working set bytes, peak pagefile bytes) を返す(失敗時 (0,0))。
+
+    pagefile は「ダーティな anonymous ページの退避量」。stream は重みを int8(mmap で
+    file-backed=破棄可)に保つので圧力下でも pagefile が小さく、dense は dequant した
+    anonymous fp32 を退避するので大きい、という差を見るために併せて測る。
+    """
     try:
         import ctypes.wintypes as wt
 
@@ -72,9 +78,29 @@ def _peak_working_set_bytes() -> int:
         c = _PMC()
         c.cb = ctypes.sizeof(c)
         ok = psapi.GetProcessMemoryInfo(kernel32.GetCurrentProcess(), ctypes.byref(c), c.cb)
-        return int(c.PeakWorkingSetSize) if ok else 0
+        return (int(c.PeakWorkingSetSize), int(c.PeakPagefileUsage)) if ok else (0, 0)
     except Exception:  # noqa: BLE001 - RSS は補助指標、取れなくても続行
-        return 0
+        return (0, 0)
+
+
+def _set_working_set_cap(max_bytes: int) -> bool:
+    """プロセスの working set に hard max を課す(mmap_ram_exceed_poc.py と同方式)。"""
+    try:
+        import ctypes.wintypes as wt
+
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        kernel32.GetCurrentProcess.restype = wt.HANDLE
+        kernel32.SetProcessWorkingSetSizeEx.argtypes = [
+            wt.HANDLE, ctypes.c_size_t, ctypes.c_size_t, wt.DWORD
+        ]
+        kernel32.SetProcessWorkingSetSizeEx.restype = wt.BOOL
+        # QUOTA_LIMITS_HARDWS_MIN_DISABLE(0x2) | QUOTA_LIMITS_HARDWS_MAX_ENABLE(0x4)
+        ok = kernel32.SetProcessWorkingSetSizeEx(
+            kernel32.GetCurrentProcess(), max_bytes // 2, max_bytes, 0x2 | 0x4
+        )
+        return bool(ok)
+    except Exception:  # noqa: BLE001 - 強制不可なら honest に False を返す
+        return False
 
 
 def quantize_per_channel_int8(w: Tensor) -> tuple[Tensor, Tensor]:
