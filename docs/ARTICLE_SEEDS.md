@@ -424,3 +424,15 @@
   `docs/MEMORY_EFFICIENCY_FINDINGS.md` (a')。
 - **側面**: 技術設計 / 実装報告 / honest disclosure / ユーザー体験(自宅 PC で大モデル)/ TRIZ(少 RAM を
   仮想メモリで反転)/ 未来予測(GPU/大 RAM で跳ねる土台)。
+
+### 39. int8 streaming 推論で「常駐は減るが peak は圧力下でしか減らない」— allocator の壁を honest に
+- **気付き**: int8 を resident に保ち forward 内で層ごとに dequant→即解放する `Int8Linear` で、130M params の
+  **常駐モデルを 72% 削減**(dense fp32 538.6MB → stream int8 148.9MB)。だが **圧力(working-set 上限)が
+  無いと peak working set はほぼ減らない**(963→882MB)= torch caching allocator が解放した fp32 を OS に
+  返さず、transient 活性も乗るため。素朴な「層ごとに捨てれば peak も減る」直感は CPU では崩れる。**削減が
+  顕在化したのは working-set 上限 368MB(< dense 常駐 539MB)で stream が完走した時**(出力は dense と完全
+  一致)。教訓: メモリ最適化の効果は「常駐の下限」と「圧力下で動くか」に出るのであって、無風時の peak には
+  出ない。計測する指標を間違えると「効果なし」と誤読する。
+- **根拠**: `scripts/int8_streaming_infer.py` / `out/int8_streaming_infer.json` /
+  `docs/MEMORY_EFFICIENCY_FINDINGS.md` (c)。
+- **側面**: 教訓 / honest disclosure / 実装報告 / 技術設計 / 認知科学(直感の落とし穴)。
