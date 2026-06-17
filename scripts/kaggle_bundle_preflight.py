@@ -202,8 +202,10 @@ def _text_publish_findings(label: str, text: str) -> list[str]:
     return findings
 
 
-def _scan_dataset_payload_publish_safety(dataset_payload_dir: Path) -> None:
+def _scan_dataset_payload_publish_safety(dataset_payload_dir: Path) -> dict[str, object]:
     findings: list[str] = []
+    scanned_text_files: list[str] = []
+    scanned_archive_text_members: list[str] = []
     for path in sorted(p for p in dataset_payload_dir.iterdir() if p.is_file()):
         if path.suffix in _TEXT_SCAN_SUFFIXES or path.name in {
             "LICENSE",
@@ -213,6 +215,7 @@ def _scan_dataset_payload_publish_safety(dataset_payload_dir: Path) -> None:
             "config.json",
             "input_corpus.txt",
         }:
+            scanned_text_files.append(path.name)
             findings.extend(
                 _text_publish_findings(
                     str(path.relative_to(dataset_payload_dir)),
@@ -226,6 +229,7 @@ def _scan_dataset_payload_publish_safety(dataset_payload_dir: Path) -> None:
                 member = PurePosixPath(info.filename.replace("\\", "/"))
                 if member.suffix not in _TEXT_SCAN_SUFFIXES:
                     continue
+                scanned_archive_text_members.append(f"{path.name}:{member.as_posix()}")
                 findings.extend(
                     _text_publish_findings(
                         f"{path.name}:{member.as_posix()}",
@@ -234,6 +238,13 @@ def _scan_dataset_payload_publish_safety(dataset_payload_dir: Path) -> None:
                 )
     if findings:
         raise ValueError("dataset payload secret/path scan failed: " + "; ".join(findings))
+    return {
+        "status": "passed",
+        "dataset_payload_dir": dataset_payload_dir.name,
+        "scanned_text_files": scanned_text_files,
+        "scanned_archive_text_member_count": len(scanned_archive_text_members),
+        "scanned_archive_text_members_sample": scanned_archive_text_members[:8],
+    }
 
 
 def _require_bool_text(value: object, *, field_name: str) -> str:
@@ -563,12 +574,13 @@ def _validate_bundle_dir(bundle_dir: Path) -> dict[str, object]:
             raise ValueError("dataset payload NOTICE sha256 does not match dataset manifest notice_sha256")
         if dataset_manifest.get("dataset_metadata_sha256") != _sha256_text(dataset_metadata_path):
             raise ValueError("dataset-metadata.json sha256 does not match dataset payload manifest")
-        _scan_dataset_payload_publish_safety(dataset_payload_dir)
+        publish_safety_summary = _scan_dataset_payload_publish_safety(dataset_payload_dir)
         config_summary = {
             "block_size": compare_config.get("block_size"),
             "max_iters": compare_config.get("max_iters"),
             "corpus_sha256": corpus_sha256,
             "dataset_source": dataset_source,
+            "dataset_metadata_path": f"{dataset_payload_rel}/{DATASET_METADATA_NAME}",
         }
         manifest_summary = {
             "kernel_id": manifest_kernel_id,
@@ -578,6 +590,8 @@ def _validate_bundle_dir(bundle_dir: Path) -> dict[str, object]:
             "dataset_source": dataset_source,
             "dataset_mount_name": dataset_mount_name,
             "dataset_payload_rel": dataset_payload_rel,
+            "dataset_publish_dir": dataset_payload_rel,
+            "publish_safety": publish_safety_summary,
         }
 
     metadata_summary = {

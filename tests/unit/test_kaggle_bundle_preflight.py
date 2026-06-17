@@ -149,6 +149,13 @@ def test_preflight_dataset_mode_runner_smoke_passes(tmp_path: Path) -> None:
     checks = report["checks"]
     assert checks["manifest"]["data_mode"] == "dataset"
     assert checks["manifest"]["dataset_source"] == "furusekazufumi/llcore-lm-compare-support"
+    assert checks["manifest"]["dataset_publish_dir"] == "dataset_payload"
+    assert checks["config"]["dataset_metadata_path"] == "dataset_payload/dataset-metadata.json"
+    publish_safety = checks["manifest"]["publish_safety"]
+    assert publish_safety["status"] == "passed"
+    assert publish_safety["dataset_payload_dir"] == "dataset_payload"
+    assert "dataset-metadata.json" in publish_safety["scanned_text_files"]
+    assert publish_safety["scanned_archive_text_member_count"] >= 1
     assert (bundle_dir / "artifacts" / "lm_compare.json").is_file()
 
 

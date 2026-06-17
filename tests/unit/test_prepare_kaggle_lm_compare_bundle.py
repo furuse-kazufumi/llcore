@@ -163,6 +163,12 @@ def test_prepare_bundle_dataset_mode_reports_dataset_command(tmp_path: Path, cap
     assert "--public" not in payload["dataset_create_command"]
     assert "datasets version" in payload["dataset_version_command"]
     assert "--dir-mode zip" in payload["dataset_version_command"]
+    assert payload["preflight"]["checks"]["manifest"]["dataset_publish_dir"] == "dataset_payload"
+    assert (
+        payload["preflight"]["checks"]["config"]["dataset_metadata_path"]
+        == "dataset_payload/dataset-metadata.json"
+    )
+    assert payload["preflight"]["checks"]["manifest"]["publish_safety"]["status"] == "passed"
     dataset_payload = bundle_dir / "dataset_payload"
     assert (dataset_payload / "config.json").is_file()
     assert (dataset_payload / "input_corpus.txt").is_file()
