@@ -74,6 +74,36 @@ recurrent、(b) 量子化、の 3 つが本筋。
 
 ---
 
+## (a') RAM 超 × mmap 実証 — 「使える RAM < モデルでも回る」 (`out/mmap_ram_exceed_poc.json`)
+
+(a) は load 時の遅延までを示したが、フル forward は全重みを touch するためメモリ圧力が無ければ RSS は
+モデルサイズへ収束する。北極星「仮想メモリ含む」の本丸 = **使える物理 RAM がモデルより小さくても回る**を、
+`scripts/mmap_ram_exceed_poc.py` で実証。Windows の **working-set hard max(`SetProcessWorkingSetSizeEx`)を
+モデルサイズ未満**に設定したサブプロセスで forward を完走させ peak WS を実測。
+
+### 実測(130M params ランダム CharGPT, n_embd=1024 / L=10)
+
+| mode | working-set 上限 | load ΔRSS | peak WS | logits checksum |
+|---|---|---|---|---|
+| uncapped | なし | 541.6 MB | **1243.9 MB** | -215.1 |
+| capped | **357.6 MB(強制成功)** | 159.7 MB | **357.7 MB** | -215.1 |
+
+- **fp32 モデル 522 MB を、working-set 上限 358 MB(= モデルの 68%)で forward 完走**。capped peak WS =
+  357.7 MB ≤ 上限 = **モデルサイズ未満で動いた**。read-only mmap ページは clean なので圧力下で破棄され、
+  再 fault で disk から読み直す(llama.cpp 流)= **これが「RAM 超で回る」機構**。
+- **機能正当性**: capped と uncapped の logits checksum 完全一致(-215.1)= 上限下でも結果は同一。
+- **int8 連結**: 同モデルを per-channel int8 でディスク保存すると **131 MB(fp32 522 MB の 0.251×=4x 縮小)**。
+  量子化で「ディスクに置くページ」も減る → mmap 常駐がさらに軽くなる。
+
+### honest 留保 (a')
+- このマシンは avail RAM が限られる(本実行時 ~3.6 GB)ため、**物理 RAM 総量を literally 超える巨大モデル
+  ではなく**「working-set 上限 < モデルサイズ」で同性質を実証。RAM 総量超の超大型は GPU/大 RAM で将来検証。
+- `SetProcessWorkingSetSizeEx` の hard-max は本環境では強制された(cap_set_ok=true・peak WS ≈ 上限)。
+  強制可否は環境依存なので JSON に `cap_set_ok` と実測 peak をそのまま残す(成功を偽装しない)。
+- uncapped peak が 1243.9 MB と大きいのは torch ランタイム + 全materialize + transient の合算で、
+  クリーンな信号は **capped peak が上限に張り付いた**こと。int8 は disk/load まで(per-layer streaming
+  dequant forward は将来課題)。
+
 ## (b) int8 weight-only 量子化 footprint vs PPL (`out/int8_quant_footprint*.json`)
 
 2-D 重み行列を対称 int8 量子化(per-tensor / per-channel)。同一 held-out split で fp32 と
