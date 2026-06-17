@@ -270,6 +270,7 @@ def _build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--json", default="out/int8_streaming_infer.json")
     ap.add_argument("--worker", choices=["dense", "stream"], default=None)
     ap.add_argument("--checkpoint", default=None)
+    ap.add_argument("--cap-bytes", type=int, default=None)
     return ap
 
 
