@@ -252,6 +252,8 @@ def test_build_bundle_dataset_runner_embeds_payload_hashes(tmp_path: Path) -> No
     )
     assert payload_manifest["config_sha256"] in runner_text
     assert payload_manifest["corpus_sha256"] in runner_text
+    assert payload_manifest["src_tree_sha256"] in runner_text
+    assert payload_manifest["pkg_tree_sha256"] in runner_text
 
 
 def test_build_bundle_dataset_runner_compiles(tmp_path: Path) -> None:

@@ -156,7 +156,8 @@ else:
 
 EXPECTED_CONFIG_SHA256 = "{config_sha256}"
 EXPECTED_CORPUS_SHA256 = "{corpus_sha256}"
-EXPECTED_SOURCE_SHA256 = "{source_sha256}"
+EXPECTED_SRC_TREE_SHA256 = "{src_tree_sha256}"
+EXPECTED_PKG_TREE_SHA256 = "{pkg_tree_sha256}"
 EXPECTED_SRC_ARCHIVE_SHA256 = "{src_archive_sha256}"
 EXPECTED_PKG_ARCHIVE_SHA256 = "{pkg_archive_sha256}"
 SRC_ARCHIVE_NAME = "{src_archive_name}"
@@ -261,9 +262,9 @@ def _prepare_import_tree() -> None:
                 raise RuntimeError("dataset pkg archive sha256 mismatch")
             _safe_extract_zip(src_archive, extract_root, expected_prefix="src/llcore/")
             _safe_extract_zip(pkg_archive, extract_root, expected_prefix="llcore/")
-            if _sha256_tree(extract_root / "src" / "llcore") != EXPECTED_SOURCE_SHA256:
+            if _sha256_tree(extract_root / "src" / "llcore") != EXPECTED_SRC_TREE_SHA256:
                 raise RuntimeError("dataset src extracted tree sha256 mismatch")
-            if _sha256_tree(extract_root / "llcore") != EXPECTED_SOURCE_SHA256:
+            if _sha256_tree(extract_root / "llcore") != EXPECTED_PKG_TREE_SHA256:
                 raise RuntimeError("dataset pkg extracted tree sha256 mismatch")
             for candidate in (extract_root, extract_root / "src"):
                 sys.path.insert(0, str(candidate))
@@ -272,9 +273,9 @@ def _prepare_import_tree() -> None:
             raise RuntimeError(
                 "dataset payload must expose either archive files or extracted source trees"
             )
-        if _sha256_tree(src_tree_root) != EXPECTED_SOURCE_SHA256:
+        if _sha256_tree(src_tree_root) != EXPECTED_SRC_TREE_SHA256:
             raise RuntimeError("dataset src extracted tree sha256 mismatch")
-        if _sha256_tree(pkg_tree_root) != EXPECTED_SOURCE_SHA256:
+        if _sha256_tree(pkg_tree_root) != EXPECTED_PKG_TREE_SHA256:
             raise RuntimeError("dataset pkg extracted tree sha256 mismatch")
         for candidate in (DATA_ROOT / PKG_ARCHIVE_STEM, DATA_ROOT / SRC_ARCHIVE_STEM / "src"):
             sys.path.insert(0, str(candidate))
@@ -471,7 +472,8 @@ def _render_runner(
     *,
     config_sha256: str | None = None,
     corpus_sha256: str | None = None,
-    source_sha256: str | None = None,
+    src_tree_sha256: str | None = None,
+    pkg_tree_sha256: str | None = None,
     src_archive_sha256: str | None = None,
     pkg_archive_sha256: str | None = None,
 ) -> str:
@@ -480,19 +482,21 @@ def _render_runner(
     if (
         config_sha256 is None
         or corpus_sha256 is None
-        or source_sha256 is None
+        or src_tree_sha256 is None
+        or pkg_tree_sha256 is None
         or src_archive_sha256 is None
         or pkg_archive_sha256 is None
     ):
         raise ValueError(
-            "dataset runner rendering requires config/corpus/source/archive sha256 values"
+            "dataset runner rendering requires config/corpus/src/pkg/archive sha256 values"
         )
     return RUNNER_TEMPLATE_DATASET.format(
         dataset_mount_name=_dataset_mount_name(dataset_source),
         dataset_unpack_dirname=DATASET_UNPACK_DIRNAME,
         config_sha256=config_sha256,
         corpus_sha256=corpus_sha256,
-        source_sha256=source_sha256,
+        src_tree_sha256=src_tree_sha256,
+        pkg_tree_sha256=pkg_tree_sha256,
         src_archive_sha256=src_archive_sha256,
         pkg_archive_sha256=pkg_archive_sha256,
         src_archive_name=DATASET_SRC_ARCHIVE_NAME,
@@ -747,7 +751,8 @@ def build_bundle(
             source_tree = SRC_ROOT / "llcore"
             src_archive_target = dataset_payload_dir / DATASET_SRC_ARCHIVE_NAME
             pkg_archive_target = dataset_payload_dir / DATASET_PKG_ARCHIVE_NAME
-            source_sha256 = _sha256_tree(source_tree)
+            src_tree_sha256 = _sha256_tree(source_tree)
+            pkg_tree_sha256 = _sha256_tree(source_tree)
             src_archive_sha256 = _write_source_archive(source_tree, src_archive_target, prefix="src/llcore")
             pkg_archive_sha256 = _write_source_archive(source_tree, pkg_archive_target, prefix="llcore")
             config_payload = {
@@ -767,7 +772,9 @@ def build_bundle(
                 "dataset_mount_name": _dataset_mount_name(dataset_source),
                 "copied_files": dict(_DATASET_PAYLOAD_COPIED_FILE_PATHS),
                 "corpus_sha256": config_payload["corpus_sha256"],
-                "source_sha256": source_sha256,
+                "source_sha256": src_tree_sha256,
+                "src_tree_sha256": src_tree_sha256,
+                "pkg_tree_sha256": pkg_tree_sha256,
                 "src_archive_sha256": src_archive_sha256,
                 "pkg_archive_sha256": pkg_archive_sha256,
                 "config_sha256": _sha256_text(dataset_payload_dir / "config.json"),
@@ -791,7 +798,8 @@ def build_bundle(
                 dataset_source,
                 config_sha256=dataset_config_sha256,
                 corpus_sha256=dataset_corpus_sha256,
-                source_sha256=(str(dataset_payload_manifest["source_sha256"]) if dataset_source is not None else None),
+                src_tree_sha256=(str(dataset_payload_manifest["src_tree_sha256"]) if dataset_source is not None else None),
+                pkg_tree_sha256=(str(dataset_payload_manifest["pkg_tree_sha256"]) if dataset_source is not None else None),
                 src_archive_sha256=(
                     str(dataset_payload_manifest["src_archive_sha256"]) if dataset_source is not None else None
                 ),

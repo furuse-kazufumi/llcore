@@ -1463,7 +1463,8 @@ def test_check_readiness_verifies_dataset_dependency_shas(
             {
                 "config_sha256": "a" * 64,
                 "corpus_sha256": "b" * 64,
-                "source_sha256": "c" * 64,
+                "src_tree_sha256": "c" * 64,
+                "pkg_tree_sha256": "d" * 64,
             }
         )
         + "\n",
@@ -1510,7 +1511,11 @@ def test_check_readiness_verifies_dataset_dependency_shas(
         "_sha256_text",
         lambda path: {"config.json": "a" * 64, "input_corpus.txt": "b" * 64}.get(path.name, "z" * 64),
     )
-    monkeypatch.setattr(script, "_sha256_tree", lambda path: "c" * 64)
+    monkeypatch.setattr(
+        script,
+        "_sha256_tree",
+        lambda path: "c" * 64 if "src_llcore" in str(path) else "d" * 64,
+    )
 
     report_path = tmp_path / "ready.json"
     rc = script.main(["--bundle-dir", str(bundle_dir), "--json", str(report_path)])
@@ -1536,7 +1541,7 @@ def test_check_readiness_rejects_dataset_manifest_missing_required_sha_keys(
     dataset_payload = bundle_dir / "dataset_payload"
     dataset_payload.mkdir(parents=True)
     (dataset_payload / "dataset_payload_manifest.json").write_text(
-        json.dumps({"config_sha256": "a" * 64, "source_sha256": "c" * 64}) + "\n",
+        json.dumps({"config_sha256": "a" * 64, "src_tree_sha256": "c" * 64}) + "\n",
         encoding="utf-8",
     )
 
@@ -1585,7 +1590,8 @@ def test_check_readiness_accepts_warning_prefixed_dataset_ready_status(
             {
                 "config_sha256": "a" * 64,
                 "corpus_sha256": "b" * 64,
-                "source_sha256": "c" * 64,
+                "src_tree_sha256": "c" * 64,
+                "pkg_tree_sha256": "c" * 64,
             }
         )
         + "\n",

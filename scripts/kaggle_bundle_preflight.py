@@ -751,10 +751,10 @@ def _validate_bundle_dir(bundle_dir: Path) -> dict[str, object]:
             raise ValueError("dataset payload manifest corpus_sha256 does not match config.json.corpus_sha256")
         actual_source_sha256 = _sha256_zip_tree(src_archive_path, expected_prefix="src/llcore/")
         actual_pkg_source_sha256 = _sha256_zip_tree(pkg_archive_path, expected_prefix="llcore/")
-        if dataset_manifest.get("source_sha256") != actual_source_sha256:
-            raise ValueError("dataset payload src_llcore.zip contents do not match dataset manifest source_sha256")
-        if dataset_manifest.get("source_sha256") != actual_pkg_source_sha256:
-            raise ValueError("dataset payload pkg_llcore.zip contents do not match dataset manifest source_sha256")
+        if dataset_manifest.get("src_tree_sha256") != actual_source_sha256:
+            raise ValueError("dataset payload src_llcore.zip contents do not match dataset manifest src_tree_sha256")
+        if dataset_manifest.get("pkg_tree_sha256") != actual_pkg_source_sha256:
+            raise ValueError("dataset payload pkg_llcore.zip contents do not match dataset manifest pkg_tree_sha256")
         if dataset_manifest.get("src_archive_sha256") != _sha256_text(src_archive_path):
             raise ValueError("dataset payload src_llcore.zip sha256 does not match dataset manifest src_archive_sha256")
         if dataset_manifest.get("pkg_archive_sha256") != _sha256_text(pkg_archive_path):
@@ -785,6 +785,8 @@ def _validate_bundle_dir(bundle_dir: Path) -> dict[str, object]:
             "dataset_mount_name": dataset_mount_name,
             "dataset_payload_rel": dataset_payload_rel,
             "dataset_publish_dir": dataset_payload_rel,
+            "src_tree_sha256": dataset_manifest.get("src_tree_sha256"),
+            "pkg_tree_sha256": dataset_manifest.get("pkg_tree_sha256"),
             "publish_safety": publish_safety_summary,
         }
 

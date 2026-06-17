@@ -171,6 +171,8 @@ def test_prepare_bundle_dataset_mode_reports_dataset_command(tmp_path: Path, cap
     assert "<bundle_dir>" in runner["stdout"]
     assert str(bundle_dir) not in runner["stdout"]
     assert payload["preflight"]["checks"]["manifest"]["dataset_publish_dir"] == "dataset_payload"
+    assert len(payload["preflight"]["checks"]["manifest"]["src_tree_sha256"]) == 64
+    assert len(payload["preflight"]["checks"]["manifest"]["pkg_tree_sha256"]) == 64
     assert (
         payload["preflight"]["checks"]["config"]["dataset_metadata_path"]
         == "dataset_payload/dataset-metadata.json"

@@ -152,6 +152,8 @@ def test_preflight_dataset_mode_runner_smoke_passes(tmp_path: Path) -> None:
     assert checks["manifest"]["data_mode"] == "dataset"
     assert checks["manifest"]["dataset_source"] == "furusekazufumi/llcore-lm-compare-support"
     assert checks["manifest"]["dataset_publish_dir"] == "dataset_payload"
+    assert len(checks["manifest"]["src_tree_sha256"]) == 64
+    assert len(checks["manifest"]["pkg_tree_sha256"]) == 64
     assert checks["config"]["dataset_metadata_path"] == "dataset_payload/dataset-metadata.json"
     assert len(checks["config"]["config_sha256"]) == 64
     publish_safety = checks["manifest"]["publish_safety"]
