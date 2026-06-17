@@ -211,8 +211,14 @@ def _build_int8_skeleton(cfg: GPTConfig) -> nn.Module:
 
 
 @torch.no_grad()
-def run_worker(checkpoint: Path, mode: str) -> dict[str, Any]:
-    """1 モード(dense / stream)で mmap-load + forward し peak WS と checksum を返す。"""
+def run_worker(checkpoint: Path, mode: str, cap_bytes: int | None = None) -> dict[str, Any]:
+    """1 モード(dense / stream)で mmap-load + forward し peak WS / pagefile / checksum を返す。
+
+    cap_bytes 指定時は load 前に working-set hard max を課す(圧力下の挙動を見る)。
+    """
+    cap_set = False
+    if cap_bytes is not None:
+        cap_set = _set_working_set_cap(cap_bytes)
     ckpt = torch.load(checkpoint, map_location="cpu", weights_only=True, mmap=True)
     cfg = GPTConfig(**ckpt["config"])
     model = _build_int8_skeleton(cfg)
@@ -227,11 +233,14 @@ def run_worker(checkpoint: Path, mode: str) -> dict[str, Any]:
     idx = torch.randint(0, cfg.vocab_size, (1, t))
     logits = cast(CharGPT, model).forward_logits(idx)
     checksum = float(logits.double().sum().item())
-    peak = _peak_working_set_bytes()
+    peak_ws, peak_pf = _peak_mem()
     return {
         "mode": mode,
+        "cap_mb": round(cap_bytes / 1e6, 1) if cap_bytes is not None else None,
+        "cap_set_ok": cap_set,
         "resident_mb": round(resident / 1e6, 1),
-        "peak_ws_mb": round(peak / 1e6, 1),
+        "peak_ws_mb": round(peak_ws / 1e6, 1),
+        "peak_pagefile_mb": round(peak_pf / 1e6, 1),
         "checksum": checksum,
     }
 
