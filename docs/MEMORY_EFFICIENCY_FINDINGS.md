@@ -15,6 +15,7 @@
 | 柱 | スクリプト | 何を実測したか | ヘッドライン |
 |---|---|---|---|
 | (0) 定数状態 vs 文脈線形 | `scripts/memory_footprint_harness.py` | recurrent state の実バイト vs GPT KV/attn | T を 16× にしても recurrent **×1.00**、GPT KV **×16**、attn **×256** |
+| (0') runtime peak RSS | `scripts/recurrent_runtime_rss.py` | 実生成ループの peak WS を文脈長スイープ | T ×8 で **GPT peak ×2.65 / Recurrent・RWKV ×1.00**(解析値を実機裏取り)|
 | (a) mmap read-only 重み | `scripts/mmap_weights_poc.py` | load 時 RSS(別プロセス隔離) | eager は即全載、mmap は **load 時 ΔRSS を ~2.8% に遅延**(54MB モデル) |
 | (a') RAM 超 × mmap | `scripts/mmap_ram_exceed_poc.py` | working-set 上限 < モデルで forward 完走 | **522MB モデルを 358MB の WS 上限で完走**(出力一致)= 使える RAM < モデルでも回る |
 | (c) int8 streaming 推論 | `scripts/int8_streaming_infer.py` | dense vs 層ごと dequant の常駐/peak WS | **常駐 72% 削減**(539→149MB)/ stream は 368MB 上限で完走(出力一致)|
