@@ -282,7 +282,7 @@ def main(argv: list[str] | None = None) -> int:
         if not args.checkpoint or not Path(args.checkpoint).exists():
             print(f"error: --worker needs an existing --checkpoint: {args.checkpoint}", file=sys.stderr)
             return 2
-        result = run_worker(Path(args.checkpoint), args.worker)
+        result = run_worker(Path(args.checkpoint), args.worker, args.cap_bytes)
         print(RESULT_PREFIX + json.dumps(result, ensure_ascii=False))
         return 0
 
