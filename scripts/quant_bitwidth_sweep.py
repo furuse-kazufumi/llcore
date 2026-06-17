@@ -237,14 +237,15 @@ def main(argv: list[str] | None = None) -> int:
             "capability_gate_pass": passes_capability_gate(acc["top1_acc"], fp32_acc["top1_acc"]),
         })
 
-    print("\n| bits | ratio | savings | PPL | ΔPPL% | top1% | Δtop1(pp) | top5% | gate |")
+    print("\n| bits | ratio | savings | PPL | ΔPPL% | top1% | Δtop1(pp) | ppl-gate | cap-gate |")
     print("|" + "---|" * 9)
     for r in records:
         print(
             f"| {r['bits']} | {r['compression_ratio']:.3f} | {r['savings_pct']:.1f}% | "
             f"{r['model_ppl']:.3f} | {r['delta_ppl_pct']:+.2f}% | {r['top1_acc'] * 100:.2f} | "
-            f"{r['delta_top1_pp']:+.2f} | {r['top5_acc'] * 100:.2f} | "
-            f"{'PASS' if r['ppl_gate_pass'] else 'FAIL'} |"
+            f"{r['delta_top1_pp']:+.2f} | "
+            f"{'PASS' if r['ppl_gate_pass'] else 'FAIL'} | "
+            f"{'PASS' if r['capability_gate_pass'] else 'FAIL'} |"
         )
 
     # cliff = 明確な急落の最初の点(ΔPPL% > 10 か unigram gate 失敗)。降順(8→2)で下げながら見る。
