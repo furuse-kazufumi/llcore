@@ -36,6 +36,40 @@ def _load_script(script_name: str) -> Any:
     return module
 
 
+def _assert_script_loads_without_torch(script_name: str) -> None:
+    script = Path(__file__).resolve().parents[2] / "scripts" / script_name
+    code = """
+import builtins
+import importlib.util
+import pathlib
+import sys
+
+orig_import = builtins.__import__
+def blocked(name, *args, **kwargs):
+    if name == "torch" or name.startswith("torch."):
+        raise ModuleNotFoundError("blocked torch import for test")
+    return orig_import(name, *args, **kwargs)
+
+builtins.__import__ = blocked
+script = pathlib.Path(sys.argv[1])
+spec = importlib.util.spec_from_file_location("under_test", script)
+if spec is None or spec.loader is None:
+    raise RuntimeError(f"unable to load {script}")
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+print("ok")
+"""
+    proc = subprocess.run(
+        [sys.executable, "-c", code, str(script)],
+        check=False,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+    )
+    assert proc.returncode == 0, proc.stderr
+    assert "ok" in proc.stdout
+
+
 def test_build_bundle_writes_metadata_and_copies_inputs(tmp_path: Path) -> None:
     builder = _load_builder()
     corpus = tmp_path / "corpus.txt"
@@ -104,6 +138,11 @@ def test_build_bundle_writes_metadata_and_copies_inputs(tmp_path: Path) -> None:
     assert (bundle_dir / "llcore" / "lm" / "compare.py").is_file()
     assert not (bundle_dir / "src" / "llcore" / "__pycache__").exists()
     assert not (bundle_dir / "llcore" / "__pycache__").exists()
+
+
+def test_build_and_preflight_scripts_load_without_torch() -> None:
+    _assert_script_loads_without_torch("build_kaggle_lm_compare_bundle.py")
+    _assert_script_loads_without_torch("kaggle_bundle_preflight.py")
 
 
 def test_build_bundle_dataset_mode_writes_dataset_payload(tmp_path: Path) -> None:
@@ -462,6 +501,56 @@ def test_build_bundle_rejects_weak_bundle_sentinel_directory(
             str(bundle_dir),
             "--corpus-file",
             str(corpus),
+        ]
+    )
+
+    assert rc == 2
+    assert "not a recognized Kaggle bundle" in capsys.readouterr().err
+
+
+def test_build_bundle_rejects_weak_dataset_bundle_sentinel_directory(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    builder = _load_builder()
+    corpus = tmp_path / "corpus.txt"
+    corpus.write_text("abcabc\n", encoding="utf-8")
+    bundle_dir = tmp_path / "existing"
+    dataset_dir = bundle_dir / "dataset_payload"
+    dataset_dir.mkdir(parents=True)
+    (bundle_dir / "runner.py").write_text("# fake\n", encoding="utf-8")
+    (bundle_dir / "kernel-metadata.json").write_text("{}\n", encoding="utf-8")
+    (bundle_dir / "README.md").write_text("fake\n", encoding="utf-8")
+    (bundle_dir / "LICENSE").write_text("license\n", encoding="utf-8")
+    (bundle_dir / "NOTICE").write_text("notice\n", encoding="utf-8")
+    (dataset_dir / "dataset-metadata.json").write_text("{}\n", encoding="utf-8")
+    (dataset_dir / "dataset_payload_manifest.json").write_text("{}\n", encoding="utf-8")
+    manifest = {
+        "runner": "runner.py",
+        "kernel_id": "fake/kernel",
+        "data_mode": "dataset",
+        "dataset_payload_rel": "dataset_payload",
+        "dataset_payload_manifest_sha256": "0" * 64,
+        "copied_files": {
+            "metadata": "kernel-metadata.json",
+            "runner": "runner.py",
+            "license": "LICENSE",
+            "notice": "NOTICE",
+            "dataset_payload": "dataset_payload",
+        },
+    }
+    (bundle_dir / "bundle_manifest.json").write_text(
+        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+    rc = builder.main(
+        [
+            "--bundle-dir",
+            str(bundle_dir),
+            "--corpus-file",
+            str(corpus),
+            "--dataset-source",
+            "furusekazufumi/llcore-lm-compare-support",
         ]
     )
 

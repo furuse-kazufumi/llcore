@@ -20,7 +20,7 @@ import zipfile
 
 sys.path.insert(0, str((Path(__file__).resolve().parent.parent / "src")))
 
-from llcore.lm.compare import CompareConfig  # type: ignore[import-untyped]
+from llcore.lm_compare_config import CompareConfig
 
 
 REQUIRED_FILES = (
@@ -72,6 +72,24 @@ _DATASET_COPIED_FILE_PATHS = {
     "notice": "NOTICE",
     "dataset_payload": DATASET_PAYLOAD_DIRNAME,
 }
+_DATASET_PAYLOAD_COPIED_FILE_KEYS = (
+    "corpus",
+    "config",
+    "metadata",
+    "src_llcore_zip",
+    "pkg_llcore_zip",
+    "license",
+    "notice",
+)
+_DATASET_PAYLOAD_COPIED_FILE_PATHS = {
+    "corpus": "input_corpus.txt",
+    "config": "config.json",
+    "metadata": DATASET_METADATA_NAME,
+    "src_llcore_zip": DATASET_SRC_ARCHIVE_NAME,
+    "pkg_llcore_zip": DATASET_PKG_ARCHIVE_NAME,
+    "license": "LICENSE",
+    "notice": "NOTICE",
+}
 
 
 def _write_json(path: Path, payload: object) -> None:
@@ -88,7 +106,10 @@ def _is_ignored_source_path(path: Path) -> bool:
 
 def _sha256_tree(root: Path) -> str:
     digest = hashlib.sha256()
-    for path in sorted(p for p in root.rglob("*") if p.is_file() and not _is_ignored_source_path(p)):
+    for path in sorted(
+        (p for p in root.rglob("*") if p.is_file() and not _is_ignored_source_path(p)),
+        key=lambda item: PurePosixPath(item.relative_to(root).as_posix()).parts,
+    ):
         rel = path.relative_to(root).as_posix().encode("utf-8")
         digest.update(rel)
         digest.update(b"\0")
@@ -410,6 +431,36 @@ def _validate_bundle_dir(bundle_dir: Path) -> dict[str, object]:
             raise ValueError("dataset-metadata.json must contain an object")
         if not isinstance(config, dict):
             raise ValueError("dataset payload config.json must contain an object")
+        dataset_copied_files = dataset_manifest.get("copied_files")
+        if not isinstance(dataset_copied_files, dict):
+            raise ValueError("dataset_payload_manifest.json.copied_files must contain an object")
+        if set(dataset_copied_files) != set(_DATASET_PAYLOAD_COPIED_FILE_KEYS):
+            raise ValueError(
+                "dataset_payload_manifest.json.copied_files must contain exactly: "
+                + ", ".join(_DATASET_PAYLOAD_COPIED_FILE_KEYS)
+            )
+        for logical_name, relative_path in dataset_copied_files.items():
+            if not isinstance(relative_path, str) or not relative_path:
+                raise ValueError(
+                    f"dataset_payload_manifest.json copied_files[{logical_name!r}] must be a non-empty string"
+                )
+            expected_path = _DATASET_PAYLOAD_COPIED_FILE_PATHS[logical_name]
+            if relative_path != expected_path:
+                raise ValueError(
+                    "dataset_payload_manifest.json copied_files"
+                    f"[{logical_name!r}] must be {expected_path!r}, got {relative_path!r}"
+                )
+            resolved = (dataset_payload_dir / relative_path).resolve()
+            if not resolved.is_relative_to(dataset_payload_dir.resolve()):
+                raise ValueError(
+                    "dataset_payload_manifest.json copied_files"
+                    f"[{logical_name!r}] escapes dataset_payload/: {relative_path}"
+                )
+            if not resolved.exists():
+                raise ValueError(
+                    "dataset_payload_manifest.json copied_files"
+                    f"[{logical_name!r}] points to a missing path: {relative_path}"
+                )
         compare_config = config.get("compare_config")
         corpus_sha256 = config.get("corpus_sha256")
         if not isinstance(compare_config, dict):

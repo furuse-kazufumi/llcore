@@ -34,9 +34,10 @@ import tempfile
 import zipfile
 from dataclasses import asdict
 from pathlib import Path
+from pathlib import PurePosixPath
 sys.path.insert(0, str((Path(__file__).resolve().parent.parent / "src")))
 
-from llcore.lm.compare import CompareConfig  # type: ignore[import-untyped]
+from llcore.lm_compare_config import CompareConfig
 
 
 HERE = Path(__file__).resolve().parent
@@ -67,6 +68,24 @@ DATASET_COPIED_FILE_KEYS = (
     "notice",
     "dataset_payload",
 )
+_DATASET_PAYLOAD_COPIED_FILE_KEYS = (
+    "corpus",
+    "config",
+    "metadata",
+    "src_llcore_zip",
+    "pkg_llcore_zip",
+    "license",
+    "notice",
+)
+_DATASET_PAYLOAD_COPIED_FILE_PATHS = {
+    "corpus": "input_corpus.txt",
+    "config": "config.json",
+    "metadata": DATASET_METADATA_NAME,
+    "src_llcore_zip": DATASET_SRC_ARCHIVE_NAME,
+    "pkg_llcore_zip": DATASET_PKG_ARCHIVE_NAME,
+    "license": "LICENSE",
+    "notice": "NOTICE",
+}
 _KERNEL_ID_RE = re.compile(r"^[a-z0-9][a-z0-9-]*/[a-z0-9][a-z0-9-]*$")
 
 RUNNER_TEMPLATE_EMBEDDED = """# SPDX-License-Identifier: Apache-2.0
@@ -358,7 +377,10 @@ def _is_ignored_source_path(path: Path) -> bool:
 
 def _sha256_tree(root: Path) -> str:
     digest = hashlib.sha256()
-    for path in sorted(p for p in root.rglob("*") if p.is_file() and not _is_ignored_source_path(p)):
+    for path in sorted(
+        (p for p in root.rglob("*") if p.is_file() and not _is_ignored_source_path(p)),
+        key=lambda item: PurePosixPath(item.relative_to(root).as_posix()).parts,
+    ):
         rel = path.relative_to(root).as_posix().encode("utf-8")
         digest.update(rel)
         digest.update(b"\0")
@@ -529,6 +551,13 @@ def _is_builder_bundle_dir(bundle_dir: Path) -> bool:
             and len(dataset_payload_manifest_sha256) == 64
         ):
             return False
+        if not isinstance(copied_files, dict):
+            return False
+        if any(
+            copied_files.get(key) != expected
+            for key, expected in _DATASET_PAYLOAD_COPIED_FILE_PATHS.items()
+        ):
+            return False
     else:
         return False
     required_paths = (
@@ -542,12 +571,22 @@ def _is_builder_bundle_dir(bundle_dir: Path) -> bool:
         return False
     if data_mode == "embedded":
         return all((bundle_dir / rel).exists() for rel in ("config.json", "input_corpus.txt", "src/llcore", "llcore"))
+    kaggleignore = bundle_dir / KAGGLEIGNORE_NAME
+    if not kaggleignore.is_file():
+        return False
+    if f"{DATASET_PAYLOAD_DIRNAME}/" not in kaggleignore.read_text(encoding="utf-8").splitlines():
+        return False
     return all(
         (bundle_dir / rel).exists()
         for rel in (
-            KAGGLEIGNORE_NAME,
             f"{DATASET_PAYLOAD_DIRNAME}/{DATASET_METADATA_NAME}",
             f"{DATASET_PAYLOAD_DIRNAME}/{DATASET_PAYLOAD_MANIFEST_NAME}",
+            f"{DATASET_PAYLOAD_DIRNAME}/config.json",
+            f"{DATASET_PAYLOAD_DIRNAME}/input_corpus.txt",
+            f"{DATASET_PAYLOAD_DIRNAME}/{DATASET_SRC_ARCHIVE_NAME}",
+            f"{DATASET_PAYLOAD_DIRNAME}/{DATASET_PKG_ARCHIVE_NAME}",
+            f"{DATASET_PAYLOAD_DIRNAME}/LICENSE",
+            f"{DATASET_PAYLOAD_DIRNAME}/NOTICE",
         )
     )
 
@@ -662,15 +701,7 @@ def build_bundle(
             dataset_payload_manifest = {
                 "dataset_source": dataset_source,
                 "dataset_mount_name": _dataset_mount_name(dataset_source),
-                "copied_files": {
-                    "corpus": "input_corpus.txt",
-                    "config": "config.json",
-                    "metadata": DATASET_METADATA_NAME,
-                    "src_llcore_zip": DATASET_SRC_ARCHIVE_NAME,
-                    "pkg_llcore_zip": DATASET_PKG_ARCHIVE_NAME,
-                    "license": "LICENSE",
-                    "notice": "NOTICE",
-                },
+                "copied_files": dict(_DATASET_PAYLOAD_COPIED_FILE_PATHS),
                 "corpus_sha256": config_payload["corpus_sha256"],
                 "source_sha256": source_sha256,
                 "src_archive_sha256": src_archive_sha256,

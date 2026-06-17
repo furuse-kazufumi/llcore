@@ -345,6 +345,21 @@ def test_preflight_rejects_copied_files_value_mismatch(tmp_path: Path) -> None:
     assert rc == 2
 
 
+def test_preflight_rejects_dataset_payload_manifest_copied_files_value_mismatch(tmp_path: Path) -> None:
+    preflight = _load_script("kaggle_bundle_preflight.py")
+    bundle_dir = _build_dataset_bundle(tmp_path)
+    manifest_path = bundle_dir / "dataset_payload" / "dataset_payload_manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    copied_files = manifest["copied_files"]
+    assert isinstance(copied_files, dict)
+    copied_files["src_llcore_zip"] = "src_llcore_renamed.zip"
+    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    rc = preflight.main(["--bundle-dir", str(bundle_dir)])
+
+    assert rc == 2
+
+
 def test_preflight_rejects_missing_required_copied_file_key(tmp_path: Path) -> None:
     preflight = _load_script("kaggle_bundle_preflight.py")
     bundle_dir = _build_bundle(tmp_path)

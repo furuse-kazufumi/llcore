@@ -14,7 +14,7 @@ from llcore.lm.data import (
     get_batch,
     train_val_split,
 )
-from llcore.lm.compare import CompareConfig, compare_on_text, gpt_kv_bytes
+from llcore.lm.compare import compare_on_text, gpt_kv_bytes
 from llcore.lm.eval import (
     held_out_nll,
     held_out_perplexity,
@@ -35,6 +35,7 @@ from llcore.lm.model import (
 )
 from llcore.lm.recurrent import RecurrentConfig, RecurrentLM
 from llcore.lm.rwkv import RWKVConfig, RWKVLM
+from llcore.lm_compare_config import CompareConfig
 from llcore.lm.tokenizer import CharTokenizer
 from llcore.lm.trainer import TrainConfig, Trainer
 
