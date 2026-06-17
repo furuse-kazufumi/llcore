@@ -38,7 +38,6 @@ from typing import Any
 
 import torch
 from torch import Tensor, nn
-from torch.nn import functional as F
 
 from llcore.lm.data import train_val_split  # type: ignore[import-untyped]
 from llcore.lm.eval import held_out_report_any, passes_gate  # type: ignore[import-untyped]
