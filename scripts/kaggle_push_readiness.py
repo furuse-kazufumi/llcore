@@ -487,6 +487,39 @@ def _verify_push_payload_snapshot(bundle_dir: Path, snapshot_path: Path) -> None
         raise ValueError(f"push payload snapshot malformed JSON: {snapshot_path} ({exc.msg})") from exc
     if not isinstance(payload, dict):
         raise ValueError("push payload snapshot must be a JSON object")
+    snapshot_bundle_dir = payload.get("bundle_dir")
+    if snapshot_bundle_dir != str(bundle_dir):
+        raise ValueError(
+            "push payload snapshot bundle_dir mismatch: "
+            f"expected {bundle_dir}, got {snapshot_bundle_dir!r}"
+        )
+    snapshot_kernel_id = payload.get("kernel_id")
+    manifest_path = bundle_dir / "bundle_manifest.json"
+    try:
+        manifest_payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError) as exc:
+        raise ValueError(f"bundle_manifest unreadable: {manifest_path} ({exc})") from exc
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"bundle_manifest malformed JSON: {manifest_path} ({exc.msg})") from exc
+    if not isinstance(manifest_payload, dict):
+        raise ValueError("bundle_manifest must be a JSON object")
+    manifest_kernel_id = manifest_payload.get("kernel_id")
+    if not isinstance(manifest_kernel_id, str) or not manifest_kernel_id:
+        raise ValueError("bundle_manifest missing kernel_id")
+    if snapshot_kernel_id != manifest_kernel_id:
+        raise ValueError(
+            "push payload snapshot kernel_id mismatch: "
+            f"expected {manifest_kernel_id!r}, got {snapshot_kernel_id!r}"
+        )
+    snapshot_dataset = payload.get("dataset")
+    if isinstance(snapshot_dataset, dict):
+        snapshot_dataset_source = snapshot_dataset.get("dataset_source")
+        manifest_dataset_source = manifest_payload.get("dataset_source")
+        if snapshot_dataset_source != manifest_dataset_source:
+            raise ValueError(
+                "push payload snapshot dataset_source mismatch: "
+                f"expected {manifest_dataset_source!r}, got {snapshot_dataset_source!r}"
+            )
     push_payload = payload.get("push_payload")
     if not isinstance(push_payload, dict):
         raise ValueError("push payload snapshot missing push_payload object")

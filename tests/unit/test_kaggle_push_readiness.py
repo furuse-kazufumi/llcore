@@ -1759,6 +1759,79 @@ def test_verify_push_payload_snapshot_rejects_coverage_gap(tmp_path: Path) -> No
         script._verify_push_payload_snapshot(bundle_dir, snapshot)
 
 
+def test_verify_push_payload_snapshot_rejects_kernel_id_mismatch(tmp_path: Path) -> None:
+    script = _load_script("kaggle_push_readiness.py")
+    bundle_dir = tmp_path / "bundle"
+    bundle_dir.mkdir()
+    (bundle_dir / ".kaggleignore").write_text("", encoding="utf-8")
+    (bundle_dir / "runner.py").write_text("# ok\n", encoding="utf-8")
+    (bundle_dir / "bundle_manifest.json").write_text(
+        json.dumps({"kernel_id": "furusekazufumi/expected", "dataset_source": None}),
+        encoding="utf-8",
+    )
+    snapshot = tmp_path / "snapshot.json"
+    snapshot.write_text(
+        json.dumps(
+            {
+                "bundle_dir": str(bundle_dir),
+                "kernel_id": "furusekazufumi/other",
+                "dataset": {"dataset_source": None},
+                "push_payload": {
+                    "included_files": [".kaggleignore", "bundle_manifest.json", "runner.py"],
+                    "critical_hashes": {
+                        ".kaggleignore": script._sha256_text(bundle_dir / ".kaggleignore"),
+                        "bundle_manifest.json": script._sha256_text(bundle_dir / "bundle_manifest.json"),
+                        "runner.py": script._sha256_text(bundle_dir / "runner.py"),
+                    },
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="snapshot kernel_id mismatch"):
+        script._verify_push_payload_snapshot(bundle_dir, snapshot)
+
+
+def test_verify_push_payload_snapshot_rejects_dataset_source_mismatch(tmp_path: Path) -> None:
+    script = _load_script("kaggle_push_readiness.py")
+    bundle_dir = tmp_path / "bundle"
+    bundle_dir.mkdir()
+    (bundle_dir / ".kaggleignore").write_text("", encoding="utf-8")
+    (bundle_dir / "runner.py").write_text("# ok\n", encoding="utf-8")
+    (bundle_dir / "bundle_manifest.json").write_text(
+        json.dumps(
+            {
+                "kernel_id": "furusekazufumi/expected",
+                "dataset_source": "furusekazufumi/current-dataset",
+            }
+        ),
+        encoding="utf-8",
+    )
+    snapshot = tmp_path / "snapshot.json"
+    snapshot.write_text(
+        json.dumps(
+            {
+                "bundle_dir": str(bundle_dir),
+                "kernel_id": "furusekazufumi/expected",
+                "dataset": {"dataset_source": "furusekazufumi/stale-dataset"},
+                "push_payload": {
+                    "included_files": [".kaggleignore", "bundle_manifest.json", "runner.py"],
+                    "critical_hashes": {
+                        ".kaggleignore": script._sha256_text(bundle_dir / ".kaggleignore"),
+                        "bundle_manifest.json": script._sha256_text(bundle_dir / "bundle_manifest.json"),
+                        "runner.py": script._sha256_text(bundle_dir / "runner.py"),
+                    },
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="snapshot dataset_source mismatch"):
+        script._verify_push_payload_snapshot(bundle_dir, snapshot)
+
+
 def test_check_readiness_fails_cleanly_when_no_push_credentials_exist(
     tmp_path: Path, monkeypatch: Any, capsys: Any
 ) -> None:
