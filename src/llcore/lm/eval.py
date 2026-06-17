@@ -189,6 +189,48 @@ def held_out_report_any(
     }
 
 
+@torch.no_grad()
+def held_out_top1_report(
+    model: SupportsForwardLogits,
+    val_ids: torch.Tensor,
+    block_size: int,
+    batch_size: int = 32,
+) -> dict[str, float]:
+    """Teacher-forced next-token top-1 / top-5 accuracy over held-out windows.
+
+    A *hard*-capability proxy that complements perplexity: top-1 asks "did the model
+    rank the true next char first?", which can expose capability loss (e.g. from
+    aggressive quantization) that a soft likelihood metric understates — the bit-width
+    sweep (`scripts/quant_bitwidth_sweep.py`) showed a PPL-only gate passing a model
+    whose top-1 had collapsed. Uses the same non-overlapping windowing as
+    :func:`held_out_report_any` so the token set is identical.
+    """
+    was_training = model.training
+    model.eval()
+    n = val_ids.size(0)
+    starts = list(range(0, n - block_size, block_size))
+    if not starts:
+        raise ValueError(f"val length {n} too small for block_size {block_size}")
+    top1 = 0
+    top5 = 0
+    total = 0
+    for s in range(0, len(starts), batch_size):
+        idxs = starts[s : s + batch_size]
+        x = torch.stack([val_ids[i : i + block_size] for i in idxs])
+        y = torch.stack([val_ids[i + 1 : i + 1 + block_size] for i in idxs])
+        logits = model.forward_logits(x)
+        flat_logits = logits.view(-1, logits.size(-1))
+        flat_y = y.reshape(-1)
+        top1 += int((flat_logits.argmax(dim=-1) == flat_y).sum().item())
+        # top-5: is the true token among the 5 highest-scoring candidates?
+        k = min(5, flat_logits.size(-1))
+        top5_idx = flat_logits.topk(k, dim=-1).indices
+        top5 += int((top5_idx == flat_y.unsqueeze(-1)).any(dim=-1).sum().item())
+        total += int(flat_y.numel())
+    model.train(was_training)
+    return {"top1_acc": top1 / total, "top5_acc": top5 / total, "n_tokens": float(total)}
+
+
 def passes_gate(model_ppl: float, unigram_ppl: float, margin: float = 0.85) -> bool:
     """P0 perplexity gate: model PPL must be ``<= margin * unigram_ppl``.
 
@@ -196,3 +238,20 @@ def passes_gate(model_ppl: float, unigram_ppl: float, margin: float = 0.85) -> b
     genuinely-learned char-LM typically beats unigram by 2x+.
     """
     return model_ppl <= margin * unigram_ppl
+
+
+def passes_capability_gate(
+    model_top1: float, reference_top1: float, min_retention: float = 0.97
+) -> bool:
+    """Capability-retention gate: model must keep ``>= min_retention`` of a reference top-1.
+
+    Complements :func:`passes_gate`, which only checks PPL against the unigram baseline.
+    The bit-width sweep showed a perplexity-only gate can PASS a quantized model that has
+    lost a large fraction of its exact next-token accuracy (e.g. a 2-bit model with top-1
+    nearly halved still cleared the unigram PPL gate). This gate catches that by requiring
+    the model to retain most of a reference (e.g. fp32) top-1 accuracy. A non-positive
+    reference is treated as "no constraint" (any non-negative top-1 passes).
+    """
+    if reference_top1 <= 0.0:
+        return model_top1 >= 0.0
+    return model_top1 >= min_retention * reference_top1
