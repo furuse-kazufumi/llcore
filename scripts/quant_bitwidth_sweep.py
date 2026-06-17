@@ -43,6 +43,7 @@ from llcore.lm.data import train_val_split  # type: ignore[import-untyped]
 from llcore.lm.eval import (  # type: ignore[import-untyped]
     held_out_report_any,
     held_out_top1_report,
+    passes_capability_gate,
     passes_gate,
 )
 from llcore.lm.model import CharGPT, GPTConfig  # type: ignore[import-untyped]
