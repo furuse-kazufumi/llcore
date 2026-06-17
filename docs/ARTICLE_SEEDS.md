@@ -350,7 +350,7 @@
 
 ### 33. mmap の load 時メモリは「ほぼ固定コスト」— だから大きいモデルほど効く
 - **気付き**: `torch.load(mmap=True)` + `load_state_dict(assign=True)` で重みを file-backed の
-  まま割り当てると、load 直後の ΔRSS は **モデルサイズによらず ~1.4 MB のほぼ一定**(mmap セット
+  まま割り当てると、load 直後の ΔRSS は **モデルサイズによらず ~1.4–1.5 MB のほぼ一定**(mmap セット
   アップ + メタデータ unpickling の固定コスト)。よって param 7.73 MB の smoke では ×0.218 だが、
   53.91 MB の realp1 では **×0.028(load 時 RSS を ~2.8% に遅延)**。「mmap で省メモリ」を漠然と
   言うより、**固定コスト構造 → 大モデルほど相対効果大**という規模則が本質。eager は load 時に
