@@ -108,7 +108,7 @@ def test_unique_named_params_dedups_tied_weights() -> None:
     net = _TinyNet()
     # Tie a second attribute to the same Parameter object (as CharGPT ties
     # lm_head.weight to wte.weight). It must be counted exactly once.
-    net.w2 = net.w  # type: ignore[assignment]
+    net.w2 = net.w
     names = [name for name, _ in mod._unique_named_params(net)]
     assert names.count("w") + names.count("w2") == 1
     # Footprint must not double-count the shared weight.
