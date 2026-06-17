@@ -268,23 +268,25 @@ def main(argv: list[str] | None = None) -> int:
             f"{'PASS' if r['ppl_gate_pass'] else 'FAIL'} |"
         )
 
-    # cliff 検出: ΔPPL% が前ビット幅の 5x かつ 1% 超へ跳ねる最初の点。
+    # cliff = 明確な急落の最初の点(ΔPPL% > 10 か unigram gate 失敗)。降順(8→2)で下げながら見る。
+    # +1.66%@4bit のような「軽い膝」を cliff と呼ばないよう、しきい値は保守的に 10% とする。
     cliff_bits = None
-    prev_dppl = 0.0
-    for r in records:  # records は降順(8→2)なのでビットを下げながら見る
-        if r["delta_ppl_pct"] > 1.0 and r["delta_ppl_pct"] > max(0.2, prev_dppl * 5):
+    knee_bits = None  # 膝 = ΔPPL% が初めて 1% を超える点(cliff より高ビット側に来やすい)
+    for r in records:
+        if knee_bits is None and r["delta_ppl_pct"] > 1.0:
+            knee_bits = r["bits"]
+        if r["delta_ppl_pct"] > 10.0 or not r["ppl_gate_pass"]:
             cliff_bits = r["bits"]
             break
-        prev_dppl = max(prev_dppl, abs(r["delta_ppl_pct"]))
-    # capability cliff は PPL cliff より高い(=ビット数が多い)所で来ることがある。
     worst = records[-1]
     print(
-        f"\n[headline] PPL cliff(急落開始)= {cliff_bits if cliff_bits else '検出なし'} bit。"
-        f" 最低ビット {worst['bits']}bit で PPL {worst['delta_ppl_pct']:+.1f}% / top1 {worst['delta_top1_pp']:+.2f}pp。"
+        f"\n[headline] 膝(ΔPPL>1%開始)= {knee_bits or '無'} bit / cliff(ΔPPL>10% or gate fail)= "
+        f"{cliff_bits or '無'} bit。最低 {worst['bits']}bit で PPL {worst['delta_ppl_pct']:+.1f}% / "
+        f"top1 {worst['delta_top1_pp']:+.2f}pp / gate {'PASS' if worst['ppl_gate_pass'] else 'FAIL'}。"
     )
     print(
-        "[honest] hard-capability(top1)は PPL より早く/大きく劣化し得る = "
-        "PPL だけの gate は低ビットの recall 喪失を見逃す恐れ。weights-only / simulated quant(速度未測)。"
+        "[honest] top1(hard-capability)と PPL の劣化順序は本実測で確認する(先行する保証はない)。"
+        " 留意: unigram gate は粗く、劣化ビットでも PASS し得る。weights-only / simulated quant(速度未測)。"
     )
 
     outp = Path(args.json)
