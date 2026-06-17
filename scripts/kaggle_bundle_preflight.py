@@ -59,6 +59,19 @@ _DATASET_ARCHIVE_MAX_ENTRIES = 4096
 _DATASET_ARCHIVE_MAX_UNCOMPRESSED_BYTES = 256 * 1024 * 1024
 _TEXT_SCAN_SUFFIXES = {".py", ".json", ".txt", ".md", ".cfg", ".ini", ".toml", ".yaml", ".yml", ".rst"}
 _BOOL_TEXT_VALUES = {"true", "false"}
+_PUBLISH_BLOCKLIST_ARCHIVE_SUFFIXES = {
+    ".pem",
+    ".key",
+    ".p12",
+    ".pfx",
+    ".p8",
+    ".der",
+    ".crt",
+    ".cer",
+    ".csr",
+    ".jks",
+    ".keystore",
+}
 _PUBLISH_BLOCKLIST_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("private-key", re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----")),
     ("openai-api-key-name", re.compile(r"\bOPENAI_API_KEY\b")),
@@ -202,6 +215,69 @@ def _text_publish_findings(label: str, text: str) -> list[str]:
     return findings
 
 
+def _archive_member_publish_findings(label: str, member_name: str) -> list[str]:
+    findings: list[str] = []
+    suffix = PurePosixPath(member_name.replace("\\", "/")).suffix.lower()
+    if suffix in _PUBLISH_BLOCKLIST_ARCHIVE_SUFFIXES:
+        findings.append(f"{label}: blocked publish archive member suffix {suffix!r} detected")
+    return findings
+
+
+def _validate_dataset_bundle_kaggleignore(kaggleignore_path: Path) -> None:
+    if not kaggleignore_path.is_file():
+        raise ValueError("dataset bundle must include .kaggleignore to exclude dataset_payload/ from kernel push")
+    kaggleignore_text = kaggleignore_path.read_text(encoding="utf-8")
+    kaggleignore_lines = {line.strip() for line in kaggleignore_text.splitlines()}
+    required_entries = (f"{DATASET_PAYLOAD_DIRNAME}/", f"{DATASET_UNPACK_DIRNAME}/")
+    missing_ignore_entries = [entry for entry in required_entries if entry not in kaggleignore_lines]
+    if missing_ignore_entries:
+        raise ValueError(".kaggleignore must exclude: " + ", ".join(missing_ignore_entries))
+    protected_prefixes = (f"{DATASET_PAYLOAD_DIRNAME}/", DATASET_PAYLOAD_DIRNAME, f"{DATASET_UNPACK_DIRNAME}/", DATASET_UNPACK_DIRNAME)
+    for raw_line in kaggleignore_text.splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or not line.startswith("!"):
+            continue
+        target = line[1:].strip().lstrip("/").replace("\\", "/")
+        if target.startswith("./"):
+            target = target[2:]
+        if any(target == prefix or target.startswith(f"{prefix}/") for prefix in protected_prefixes):
+            raise ValueError(
+                ".kaggleignore must not re-include protected dataset paths: "
+                + line
+            )
+
+
+def _validate_bundle_top_level_entries(bundle_dir: Path, *, data_mode: str) -> None:
+    allowed_entries = {
+        "kernel-metadata.json",
+        "bundle_manifest.json",
+        "LICENSE",
+        "NOTICE",
+        "runner.py",
+        "README.md",
+        "artifacts",
+        "preflight_report.json",
+        "prepare_report.json",
+    }
+    if data_mode == "embedded":
+        allowed_entries.update({"config.json", "input_corpus.txt", "src", "llcore"})
+    else:
+        allowed_entries.update(
+            {
+                KAGGLEIGNORE_NAME,
+                DATASET_PAYLOAD_DIRNAME,
+                DATASET_UNPACK_DIRNAME,
+            }
+        )
+    unexpected_entries = sorted(
+        path.name for path in bundle_dir.iterdir() if path.name not in allowed_entries
+    )
+    if unexpected_entries:
+        raise ValueError(
+            "bundle contains unexpected top-level entries: " + ", ".join(unexpected_entries)
+        )
+
+
 def _scan_dataset_payload_publish_safety(dataset_payload_dir: Path) -> dict[str, object]:
     findings: list[str] = []
     scanned_text_files: list[str] = []
@@ -253,6 +329,7 @@ def _scan_dataset_payload_publish_safety(dataset_payload_dir: Path) -> dict[str,
             continue
         with zipfile.ZipFile(path) as zf:
             for info in zf.infolist():
+                findings.extend(_archive_member_publish_findings(f"{path.name}:{info.filename}", info.filename))
                 member = PurePosixPath(info.filename.replace("\\", "/"))
                 if member.suffix not in _TEXT_SCAN_SUFFIXES:
                     continue
@@ -296,6 +373,7 @@ def _validate_bundle_dir(bundle_dir: Path) -> dict[str, object]:
     data_mode = manifest.get("data_mode", "embedded")
     if data_mode not in {"embedded", "dataset"}:
         raise ValueError("bundle_manifest.json.data_mode must be 'embedded' or 'dataset'")
+    _validate_bundle_top_level_entries(bundle_dir, data_mode=data_mode)
 
     manifest_runner_sha256 = manifest.get("runner_sha256")
     manifest_license_sha256 = manifest.get("license_sha256")
@@ -504,19 +582,7 @@ def _validate_bundle_dir(bundle_dir: Path) -> dict[str, object]:
         ]
         if missing_dataset:
             raise ValueError("bundle is missing required dataset payload paths: " + ", ".join(missing_dataset))
-        if not kaggleignore_path.is_file():
-            raise ValueError("dataset bundle must include .kaggleignore to exclude dataset_payload/ from kernel push")
-        kaggleignore_text = kaggleignore_path.read_text(encoding="utf-8")
-        kaggleignore_lines = set(kaggleignore_text.splitlines())
-        missing_ignore_entries = [
-            entry
-            for entry in (f"{DATASET_PAYLOAD_DIRNAME}/", f"{DATASET_UNPACK_DIRNAME}/")
-            if entry not in kaggleignore_lines
-        ]
-        if missing_ignore_entries:
-            raise ValueError(
-                ".kaggleignore must exclude: " + ", ".join(missing_ignore_entries)
-            )
+        _validate_dataset_bundle_kaggleignore(kaggleignore_path)
         if _sha256_text(dataset_manifest_path) != dataset_payload_manifest_sha256:
             raise ValueError(
                 "dataset payload manifest sha256 does not match bundle_manifest.json.dataset_payload_manifest_sha256"

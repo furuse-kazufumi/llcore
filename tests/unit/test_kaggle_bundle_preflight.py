@@ -196,6 +196,19 @@ def test_preflight_dataset_mode_rejects_kaggleignore_without_dataset_payload_rul
     assert rc == 2
 
 
+def test_preflight_dataset_mode_rejects_kaggleignore_reinclude_rule(tmp_path: Path) -> None:
+    preflight = _load_script("kaggle_bundle_preflight.py")
+    bundle_dir = _build_dataset_bundle(tmp_path)
+    (bundle_dir / ".kaggleignore").write_text(
+        "dataset_payload/\n.dataset_payload_unpack/\n!dataset_payload/config.json\n",
+        encoding="utf-8",
+    )
+
+    rc = preflight.main(["--bundle-dir", str(bundle_dir)])
+
+    assert rc == 2
+
+
 def test_preflight_dataset_mode_rejects_dataset_corpus_sha256_drift(tmp_path: Path) -> None:
     preflight = _load_script("kaggle_bundle_preflight.py")
     bundle_dir = _build_dataset_bundle(tmp_path)
@@ -255,6 +268,43 @@ def test_preflight_rejects_unexpected_nested_dataset_payload_directory(tmp_path:
     rc = preflight.main(["--bundle-dir", str(bundle_dir)])
 
     assert rc == 2
+
+
+def test_preflight_rejects_unexpected_dataset_bundle_top_level_file(tmp_path: Path) -> None:
+    preflight = _load_script("kaggle_bundle_preflight.py")
+    bundle_dir = _build_dataset_bundle(tmp_path)
+    (bundle_dir / "secret.txt").write_text("do not publish\n", encoding="utf-8")
+
+    rc = preflight.main(["--bundle-dir", str(bundle_dir)])
+
+    assert rc == 2
+
+
+def test_dataset_payload_publish_safety_rejects_archive_secret_suffix(tmp_path: Path) -> None:
+    preflight = _load_script("kaggle_bundle_preflight.py")
+    dataset_payload_dir = tmp_path / "dataset_payload"
+    dataset_payload_dir.mkdir()
+    for name in (
+        "LICENSE",
+        "NOTICE",
+        "config.json",
+        "dataset-metadata.json",
+        "dataset_payload_manifest.json",
+        "input_corpus.txt",
+    ):
+        (dataset_payload_dir / name).write_text("{}\n" if name.endswith(".json") else "ok\n", encoding="utf-8")
+    for archive_name in ("src_llcore.zip", "pkg_llcore.zip"):
+        with zipfile.ZipFile(dataset_payload_dir / archive_name, "w") as zf:
+            prefix = "src/llcore/" if archive_name == "src_llcore.zip" else "llcore/"
+            zf.writestr(prefix + "__init__.py", "# ok\n")
+            zf.writestr(prefix + "secret.pem", "-----BEGIN PRIVATE KEY-----\n")
+
+    try:
+        preflight._scan_dataset_payload_publish_safety(dataset_payload_dir)
+    except ValueError as exc:
+        assert "blocked publish archive member suffix '.pem' detected" in str(exc)
+    else:
+        raise AssertionError("expected publish safety to reject forbidden archive suffix")
 
 
 def test_preflight_runner_smoke_can_be_repeated_without_false_sha_drift(tmp_path: Path) -> None:
