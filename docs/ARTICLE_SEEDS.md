@@ -339,3 +339,47 @@
 - **気付き**: manifest 横に provenance JSON を出すだけでは、監査可能なようでいて実際には drift を見逃す。今回の bundle hardeningで効いたのは、producer 側の sidecar / bundle 生成よりも、**consumer 側 (`resolve_extra_corpus_files`) が sibling bundle を再計算して manifest 本体・base 側 drift を consume 時点で fail-closed に止める**ようにしたことだった。さらに比較から絶対 path (`files[].path`) を外し、**内容由来フィールド (各 file の `sha256` / `chars` / `vocab_size`、`combined`、`bundle_sha256`) だけで判定する**ようにしたことで、配置移動のような非本質差分は許しつつ、内容 drift だけを止める監査線になった。
 - **根拠**: `docs/PROGRESS.md` / `docs/next_plan.md` の bundle verify 追記、`src/llcore/lm/corpus.py` の `verify_corpus_manifest_bundle()`、`tests/unit/test_lm_corpus.py` の manifest/base drift reject と stale absolute path 無視、`tests/unit/test_lm_cli.py` の probe-manifest drift reject **(既存回帰として存在を参照、今回は未実行)**。
 - **側面**: 教訓 / 実装報告 / honest disclosure / エコシステム。
+
+---
+
+## 2026-06-17 (セッション: メモリ効率 pivot 第二歩 (a)mmap + (b)int8 実測)
+
+> 正本ドキュメント = `docs/MEMORY_EFFICIENCY_FINDINGS.md`(3 本柱の全数値・表・honest 留保)。
+> 以下は記事化のための気付き要約。出力 JSON = `out/mmap_weights_poc.json` /
+> `out/int8_quant_footprint*.json`(shakespeare/multi_smoke/realp1)。
+
+### 33. mmap の load 時メモリは「ほぼ固定コスト」— だから大きいモデルほど効く
+- **気付き**: `torch.load(mmap=True)` + `load_state_dict(assign=True)` で重みを file-backed の
+  まま割り当てると、load 直後の ΔRSS は **モデルサイズによらず ~1.4 MB のほぼ一定**(mmap セット
+  アップ + メタデータ unpickling の固定コスト)。よって param 7.73 MB の smoke では ×0.218 だが、
+  53.91 MB の realp1 では **×0.028(load 時 RSS を ~2.8% に遅延)**。「mmap で省メモリ」を漠然と
+  言うより、**固定コスト構造 → 大モデルほど相対効果大**という規模則が本質。eager は load 時に
+  ΔRSS ≈ モデルサイズを即全載するのと対照的。全バイト touch すると mmap も ~51.5 MB へ伸び
+  =「使った working set の分だけ fault-in」。forward logits は eager と完全一致(max|Δ|=0.0)。
+- **根拠**: `scripts/mmap_weights_poc.py`(別プロセス隔離計測)/ `out/mmap_weights_poc.json` /
+  `docs/MEMORY_EFFICIENCY_FINDINGS.md` (a)。realp1 で 2 回再測 ×0.028/0.027 で安定。
+- **側面**: 技術設計 / honest disclosure / 教訓 / TRIZ(制約=少 RAM を「遅延と固定コスト」で反転)/
+  ユーザー体験(「自宅 PC で動く」の裏付け)。
+- **honest 留保**: 恩恵は部分 working set / ページキャッシュ共有 / コールド起動遅延。全載ワーク
+  ロードでは最終 RSS は eager に近づく(touch 行が示す)。RAM 超モデルの検証は別途要実測。
+
+### 34. int8 weight-only は char-LM でも「約 4× 圧縮・品質ほぼ無劣化」が再現する
+- **気付き**: 2-D 重みを対称 int8 量子化すると、重み常駐を **約 3.9×(74–75% 削減)** 圧縮しつつ、
+  held-out PPL 劣化は **0.1% 未満**(多くは 0.02% 未満)。英語(vocab 65)・日本語単一本・日本語
+  マルチ作品の 3 モデルで一貫。per_channel(行ごと scale)は per_tensor より重み誤差が小さい
+  (rel-RMSE ~0.007 vs ~0.013–0.016)。llama.cpp/GGUF の常識を自前 char-LM で実測再確認。
+- **根拠**: `scripts/int8_quant_footprint.py` / `out/int8_quant_footprint*.json` /
+  `docs/MEMORY_EFFICIENCY_FINDINGS.md` (b)。
+- **側面**: ベンチ / 業界比較 / 実装報告 / honest disclosure。
+- **honest 留保**: weights-only(activation は fp32)/ dequant fp32 forward の simulated quant=
+  **速度は未測定** / footprint は scale と非量子化 1-D params を含む実合計(理想下限 0.25 に対し
+  実値 0.25–0.26)。
+
+### 35. 「構造プロット」を「実機計測」へ昇格させる、が pivot 第一歩の型
+- **気付き**: recurrent verdict は memory@T 曲線を「config 由来の構造プロット(実測でない)」と
+  honest に明記していた。北極星転換後の最初の作業は、新説を足すことではなく **既存の主張を実機
+  数値へ格上げ**すること(state_bytes は実測テンソル、GPT KV/attn は解析値+RSS 裏取り)。負け筋
+  (capability)を捨て、勝ち筋(memory)を「実証」へ昇格する、という pivot の作法そのもの。
+- **根拠**: `scripts/memory_footprint_harness.py` / `out/mem_footprint.json` /
+  memory:`project_llcore_memory_efficiency_pivot`。
+- **側面**: 哲学 / 戦略 / honest disclosure / 教訓。
