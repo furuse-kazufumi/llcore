@@ -91,6 +91,8 @@ def test_check_readiness_runs_preflight_and_kaggle_checks(
     assert 'kaggle kernels push -p "' in out
     payload = json.loads(report_path.read_text(encoding="utf-8"))
     assert payload["kernel_id"] == "furusekazufumi/test-kernel"
+    assert payload["push_payload"]["checked"] is True
+    assert "bundle_manifest.json" not in payload["push_payload"]["included_files"]
     assert payload["auth"]["authenticated"] is True
     assert payload["auth"]["credential_sources"] == ["kaggle.json"]
     assert str(payload["auth"]["configured_username"]).lower() == "furusekazufumi"
@@ -1647,6 +1649,37 @@ def test_check_readiness_accepts_warning_prefixed_dataset_ready_status(
     payload = json.loads(report_path.read_text(encoding="utf-8"))
     assert payload["dataset"]["status"] == "ready"
     assert payload["dataset"]["status_raw"] == "Warning: outdated client\nready"
+
+
+def test_iter_kernel_push_files_respects_kaggleignore_and_hashes(tmp_path: Path) -> None:
+    script = _load_script("kaggle_push_readiness.py")
+    bundle_dir = tmp_path / "bundle"
+    bundle_dir.mkdir()
+    (bundle_dir / ".kaggleignore").write_text(
+        "dataset_payload/\nartifacts/\npreflight_report.json\nprepare_report.json\n",
+        encoding="utf-8",
+    )
+    (bundle_dir / "kernel-metadata.json").write_text("{}\n", encoding="utf-8")
+    (bundle_dir / "runner.py").write_text("# ok\n", encoding="utf-8")
+    (bundle_dir / "bundle_manifest.json").write_text("{}\n", encoding="utf-8")
+    (bundle_dir / "README.md").write_text("readme\n", encoding="utf-8")
+    (bundle_dir / "preflight_report.json").write_text("{}\n", encoding="utf-8")
+    (bundle_dir / "artifacts").mkdir()
+    (bundle_dir / "artifacts" / "lm_compare.json").write_text("{}\n", encoding="utf-8")
+    (bundle_dir / "dataset_payload").mkdir()
+    (bundle_dir / "dataset_payload" / "config.json").write_text("{}\n", encoding="utf-8")
+
+    included = script._iter_kernel_push_files(bundle_dir)
+    hashes = script._kernel_push_critical_hashes(bundle_dir)
+
+    assert included == [
+        ".kaggleignore",
+        "README.md",
+        "bundle_manifest.json",
+        "kernel-metadata.json",
+        "runner.py",
+    ]
+    assert set(hashes) == {".kaggleignore", "bundle_manifest.json", "kernel-metadata.json", "runner.py"}
 
 
 def test_check_readiness_fails_cleanly_when_no_push_credentials_exist(

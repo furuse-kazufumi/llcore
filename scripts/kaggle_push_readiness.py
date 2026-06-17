@@ -456,6 +456,28 @@ def _iter_bundle_archive_files(bundle_dir: Path) -> list[Path]:
     return files
 
 
+def _iter_kernel_push_files(bundle_dir: Path) -> list[str]:
+    ignored_prefixes = _ignored_bundle_prefixes(bundle_dir)
+    files: list[str] = []
+    for path in bundle_dir.rglob("*"):
+        if not path.is_file():
+            continue
+        rel = path.relative_to(bundle_dir).as_posix()
+        if _is_ignored_relative_path(rel, ignored_prefixes):
+            continue
+        files.append(rel)
+    return sorted(files, key=lambda item: PurePosixPath(item).parts)
+
+
+def _kernel_push_critical_hashes(bundle_dir: Path) -> dict[str, str]:
+    hashes: dict[str, str] = {}
+    for rel in ("kernel-metadata.json", "runner.py", "bundle_manifest.json", ".kaggleignore"):
+        path = bundle_dir / rel
+        if path.is_file():
+            hashes[rel] = _sha256_text(path)
+    return hashes
+
+
 def _ignored_bundle_prefixes(bundle_dir: Path) -> tuple[str, ...]:
     kaggleignore = bundle_dir / ".kaggleignore"
     if not kaggleignore.is_file():
@@ -847,6 +869,11 @@ def check_readiness(argv: list[str] | None = None) -> int:
         "bundle_dir": str(bundle_dir),
         "kernel_id": kernel_id,
         "push_command": f'kaggle kernels push -p "{bundle_dir}"',
+        "push_payload": {
+            "checked": True,
+            "included_files": _iter_kernel_push_files(bundle_dir),
+            "critical_hashes": _kernel_push_critical_hashes(bundle_dir),
+        },
         "preflight": preflight_report,
         "license": license_report,
         "auth": auth_report,
