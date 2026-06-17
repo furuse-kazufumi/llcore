@@ -247,6 +247,30 @@ proxy = 次トークン top-1 accuracy** を併記。予測(Dettmers 2023: ~4bit
   必要**。これは #3 の GPU/将来課題(真の int8 GEMM と同じく)。CPU で測れる範囲の honest な到達点。
 - 留保: RTN(誤差補償なし)/ weights-only / simulated quant(速度未測)。
 
+## (b''') GPTQ 誤差補償 vs RTN — 2bit の床は越えられるか (#3 CPU スライス, `out/gptq_compare*.json`)
+
+`scripts/gptq_compare.py`。GPTQ(Frantar et al. 2022)を自前実装 — 校正データで各 Linear の入力 Hessian
+``H=Σxᵀx`` を捕捉し、出力誤差 ‖(W−Ŵ)X‖² を最小化する列ごと誤差補償量子化。RTN per-channel と同条件比較。
+
+### realp1 (11.9M) — fp32 PPL 38.32 / top1 28.66%(Linear 25 層を量子化)
+| bits | method | ΔPPL% | Δtop1(pp) | ppl-gate | cap-gate |
+|---|---|---|---|---|---|
+| 3 | rtn | +4.5% | -0.65 | PASS | **PASS** |
+| 3 | gptq | +2.4% | -0.43 | PASS | **PASS** |
+| 2 | rtn | +159.3% | -13.35 | PASS | FAIL |
+| 2 | gptq | **+41.5%** | **-6.38** | PASS | FAIL |
+
+### 知見(honest)
+- **GPTQ は全 bit で RTN を改善**(2bit: ΔPPL +159→+41.5%、top1 劣化 -13.35→-6.38pp ≈ 52% 減)= 出力誤差
+  最小化(誤差補償)が効いている実証。**機構の気付き**: GPTQ は **weight 誤差を犠牲にして output 誤差を下げる**
+  (probe: 2bit weight err 0.61→0.68 だが output err 78.6→71.2)= ‖W−Ŵ‖² でなく ‖(W−Ŵ)X‖² を最小化。
+- **だが strict cap-gate(top1 97% 保持)は 2bit では GPTQ でも越えられない**(realp1 77.7% 保持)。
+  **3bit が PTQ の実用床・2bit は QAT 領域**、が RTN/per-group/GPTQ の 3 手法で一貫した結論。
+- **★比較の気付き**: realp1 2bit で **per-group32 RTN(top1 -5.31pp)が GPTQ-per-channel(-6.38pp)を上回る**。
+  極低ビット小モデルでは「**粒度(per-group)> 誤差補償(GPTQ)**」になり得る(両者は相補的=GPTQ+per-group が
+  真の SOTA)。「最新手法 GPTQ が常に最強」ではない、を自前実測で確認。
+- 留保: Linear のみ量子化(Embedding/LN fp32)/ 校正 8,192 tokens / weights-only / simulated quant(速度未測)。
+
 ## 記事側面 (feedback_daily_articles_policy の 13 側面)
 - **技術設計/実装報告**: 3 本柱の実機計測。「構造プロット → 実測」への昇格手続き。
 - **honest disclosure**: 各柱に明確な留保(weights-only / simulated quant / 部分 working set /
