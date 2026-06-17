@@ -583,6 +583,17 @@ def check_readiness(argv: list[str] | None = None) -> int:
         auth_report["probe_author_status"] = "advisory_unverified_empty_probe"
     auth_report["configured_username"] = configured_username
     auth_report["owner_check_status"] = owner_check_status
+    owner_warning: str | None = None
+    if isinstance(auth_report.get("probe_author_status"), str) and str(auth_report["probe_author_status"]).startswith("advisory_"):
+        owner_warning = (
+            "owner verification is advisory only; live probe author did not produce a verified owner match"
+        )
+    if isinstance(owner_check_status, str) and owner_check_status.startswith("advisory_"):
+        owner_warning = (
+            "owner verification is advisory only; local owner/auth configuration could not be fully validated"
+        )
+    if owner_warning is not None:
+        print(f"warning: {owner_warning}", file=sys.stderr)
     enable_gpu = metadata.get("enable_gpu") == _TRUE_STR
     if enable_gpu:
         try:
@@ -616,6 +627,7 @@ def check_readiness(argv: list[str] | None = None) -> int:
         f"kernel_id={kernel_id}",
         f"runner={'yes' if args.run_runner else 'no'}",
         "auth=yes",
+        f"owner={owner_check_status}",
         f"quota_rows={quota_row_count}",
         f"quota_checked={quota_report['checked_resource']}",
     )

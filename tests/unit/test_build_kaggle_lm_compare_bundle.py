@@ -194,6 +194,38 @@ def test_build_bundle_dataset_mode_writes_dataset_payload(tmp_path: Path) -> Non
         assert "llcore/lm/compare.py" in zf.namelist()
 
 
+def test_build_bundle_dataset_mode_can_refresh_existing_bundle(tmp_path: Path) -> None:
+    builder = _load_builder()
+    corpus = tmp_path / "corpus.txt"
+    corpus.write_text("abcabc\n", encoding="utf-8")
+    bundle_dir = tmp_path / "bundle"
+
+    first_rc = builder.main(
+        [
+            "--bundle-dir",
+            str(bundle_dir),
+            "--corpus-file",
+            str(corpus),
+            "--dataset-source",
+            "furusekazufumi/llcore-lm-compare-support",
+        ]
+    )
+    assert first_rc == 0
+
+    second_rc = builder.main(
+        [
+            "--bundle-dir",
+            str(bundle_dir),
+            "--corpus-file",
+            str(corpus),
+            "--dataset-source",
+            "furusekazufumi/llcore-lm-compare-support",
+        ]
+    )
+
+    assert second_rc == 0
+
+
 def test_build_bundle_dataset_runner_embeds_payload_hashes(tmp_path: Path) -> None:
     builder = _load_builder()
     corpus = tmp_path / "corpus.txt"

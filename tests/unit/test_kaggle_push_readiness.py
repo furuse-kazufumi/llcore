@@ -1077,7 +1077,9 @@ def test_check_readiness_marks_probe_author_mismatch_as_advisory(
     assert rc == 0
     payload = json.loads(report_path.read_text(encoding="utf-8"))
     assert payload["auth"]["probe_author_status"] == "advisory_owner_mismatch_unverified"
-    assert "authenticated Kaggle account" not in capsys.readouterr().err
+    captured = capsys.readouterr()
+    assert "warning: owner verification is advisory only" in captured.err
+    assert "owner=validated_local_config" in captured.out
 
 
 def test_check_readiness_marks_first_probe_row_mismatch_as_advisory(
@@ -1124,7 +1126,9 @@ def test_check_readiness_marks_first_probe_row_mismatch_as_advisory(
     assert rc == 0
     payload = json.loads(report_path.read_text(encoding="utf-8"))
     assert payload["auth"]["probe_author_status"] == "advisory_owner_mismatch_unverified"
-    assert "authenticated Kaggle account" not in capsys.readouterr().err
+    captured = capsys.readouterr()
+    assert "warning: owner verification is advisory only" in captured.err
+    assert "owner=validated_local_config" in captured.out
 
 
 def test_check_readiness_rejects_bundle_without_license_and_notice(

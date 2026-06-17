@@ -475,6 +475,11 @@ def _validate_bundle_dir(bundle_dir: Path) -> dict[str, object]:
             raise ValueError("dataset-metadata.json id must match bundle_manifest.json.dataset_source")
         if dataset_metadata.get("title") != dataset_mount_name:
             raise ValueError("dataset-metadata.json title must match bundle_manifest.json.dataset_mount_name")
+        licenses = dataset_metadata.get("licenses")
+        if not isinstance(licenses, list) or not licenses:
+            raise ValueError("dataset-metadata.json licenses must contain at least one entry")
+        if not all(isinstance(item, dict) and isinstance(item.get("name"), str) and item.get("name") for item in licenses):
+            raise ValueError("dataset-metadata.json licenses entries must contain non-empty string name")
         actual_corpus_sha256 = _sha256_text(corpus_path)
         if actual_corpus_sha256 != corpus_sha256:
             raise ValueError("dataset payload input_corpus.txt sha256 does not match config.json.corpus_sha256")
@@ -623,7 +628,7 @@ def main(argv: list[str] | None = None) -> int:
             run_runner=args.run_runner,
             runner_timeout=args.runner_timeout,
         )
-    except (ValueError, OSError, subprocess.TimeoutExpired) as exc:
+    except (ValueError, OSError, zipfile.BadZipFile, subprocess.TimeoutExpired) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
     if args.json:

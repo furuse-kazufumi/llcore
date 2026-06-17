@@ -68,6 +68,13 @@ DATASET_COPIED_FILE_KEYS = (
     "notice",
     "dataset_payload",
 )
+_DATASET_TOPLEVEL_COPIED_FILE_PATHS = {
+    "metadata": "kernel-metadata.json",
+    "runner": RUNNER_NAME,
+    "license": "LICENSE",
+    "notice": "NOTICE",
+    "dataset_payload": DATASET_PAYLOAD_DIRNAME,
+}
 _DATASET_PAYLOAD_COPIED_FILE_KEYS = (
     "corpus",
     "config",
@@ -168,6 +175,7 @@ def _safe_extract_zip(
 ) -> None:
     total_uncompressed = 0
     seen_members: set[str] = set()
+    extracted_files = 0
     with zipfile.ZipFile(archive_path) as zf:
         infos = zf.infolist()
         if len(infos) > max_entries:
@@ -208,6 +216,11 @@ def _safe_extract_zip(
             target.parent.mkdir(parents=True, exist_ok=True)
             with zf.open(info, "r") as src, target.open("wb") as dst:
                 shutil.copyfileobj(src, dst)
+            extracted_files += 1
+    if extracted_files < 1:
+        raise RuntimeError(
+            f"archive did not extract any files under expected prefix: {{archive_path}}"
+        )
 
 
 def _prepare_import_tree() -> None:
@@ -555,7 +568,7 @@ def _is_builder_bundle_dir(bundle_dir: Path) -> bool:
             return False
         if any(
             copied_files.get(key) != expected
-            for key, expected in _DATASET_PAYLOAD_COPIED_FILE_PATHS.items()
+            for key, expected in _DATASET_TOPLEVEL_COPIED_FILE_PATHS.items()
         ):
             return False
     else:

@@ -182,6 +182,32 @@ def test_preflight_dataset_mode_rejects_dataset_corpus_sha256_drift(tmp_path: Pa
     assert rc == 2
 
 
+def test_preflight_rejects_bad_dataset_archive_as_validation_error(
+    tmp_path: Path, capsys: Any
+) -> None:
+    preflight = _load_script("kaggle_bundle_preflight.py")
+    bundle_dir = _build_dataset_bundle(tmp_path)
+    (bundle_dir / "dataset_payload" / "src_llcore.zip").write_text("not a zip\n", encoding="utf-8")
+
+    rc = preflight.main(["--bundle-dir", str(bundle_dir)])
+
+    assert rc == 2
+    assert "error:" in capsys.readouterr().err
+
+
+def test_preflight_rejects_dataset_metadata_without_licenses(tmp_path: Path) -> None:
+    preflight = _load_script("kaggle_bundle_preflight.py")
+    bundle_dir = _build_dataset_bundle(tmp_path)
+    metadata_path = bundle_dir / "dataset_payload" / "dataset-metadata.json"
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    metadata["licenses"] = []
+    metadata_path.write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    rc = preflight.main(["--bundle-dir", str(bundle_dir)])
+
+    assert rc == 2
+
+
 def test_preflight_runner_smoke_can_be_repeated_without_false_sha_drift(tmp_path: Path) -> None:
     preflight = _load_script("kaggle_bundle_preflight.py")
     bundle_dir = _build_bundle(tmp_path)
