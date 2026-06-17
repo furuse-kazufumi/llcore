@@ -46,7 +46,8 @@ def test_more_bits_means_lower_quant_error() -> None:
 
     def rel_err(bits: int) -> float:
         w_hat = mod.dequantize(*mod.quantize_symmetric(w, bits, per_channel=True))
-        return float(((w_hat - w) ** 2).sum().item()) ** 0.5
+        # Wrap the whole power expression in float() so mypy sees a concrete float.
+        return float(float(((w_hat - w) ** 2).sum().item()) ** 0.5)
 
     # The cliff mechanism: fewer levels -> larger reconstruction error, monotonically.
     e8, e4, e3, e2 = rel_err(8), rel_err(4), rel_err(3), rel_err(2)
