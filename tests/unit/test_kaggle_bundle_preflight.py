@@ -208,6 +208,19 @@ def test_preflight_rejects_dataset_metadata_without_licenses(tmp_path: Path) -> 
     assert rc == 2
 
 
+def test_preflight_rejects_dataset_payload_with_local_path_marker(tmp_path: Path) -> None:
+    preflight = _load_script("kaggle_bundle_preflight.py")
+    bundle_dir = _build_dataset_bundle(tmp_path)
+    config_path = bundle_dir / "dataset_payload" / "config.json"
+    config = json.loads(config_path.read_text(encoding="utf-8"))
+    config["note"] = r"D:\projects\secret"
+    config_path.write_text(json.dumps(config, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    rc = preflight.main(["--bundle-dir", str(bundle_dir)])
+
+    assert rc == 2
+
+
 def test_preflight_runner_smoke_can_be_repeated_without_false_sha_drift(tmp_path: Path) -> None:
     preflight = _load_script("kaggle_bundle_preflight.py")
     bundle_dir = _build_bundle(tmp_path)

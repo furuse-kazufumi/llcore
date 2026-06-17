@@ -156,8 +156,10 @@ def test_prepare_bundle_dataset_mode_reports_dataset_command(tmp_path: Path, cap
     assert "[dataset-version]" in out
     payload = json.loads(report_path.read_text(encoding="utf-8"))
     assert payload["dataset_source"] == "furusekazufumi/llcore-lm-compare-support"
+    assert payload["dataset_visibility"] == "private"
     assert "dataset_payload" in payload["dataset_create_command"]
     assert "--dir-mode zip" in payload["dataset_create_command"]
+    assert "--public" not in payload["dataset_create_command"]
     assert "datasets version" in payload["dataset_version_command"]
     assert "--dir-mode zip" in payload["dataset_version_command"]
     dataset_payload = bundle_dir / "dataset_payload"
@@ -165,6 +167,56 @@ def test_prepare_bundle_dataset_mode_reports_dataset_command(tmp_path: Path, cap
     assert (dataset_payload / "input_corpus.txt").is_file()
     assert (dataset_payload / "src_llcore.zip").is_file()
     assert (dataset_payload / "pkg_llcore.zip").is_file()
+
+
+def test_prepare_bundle_dataset_mode_reports_public_visibility(tmp_path: Path, capsys: Any) -> None:
+    script = _load_script("prepare_kaggle_lm_compare_bundle.py")
+    corpus = tmp_path / "corpus.txt"
+    corpus.write_text(("abcde " * 80).strip() + "\n", encoding="utf-8")
+    bundle_dir = tmp_path / "bundle"
+    report_path = tmp_path / "report.json"
+
+    rc = script.main(
+        [
+            "--bundle-dir",
+            str(bundle_dir),
+            "--corpus-file",
+            str(corpus),
+            "--dataset-source",
+            "furusekazufumi/llcore-lm-compare-support",
+            "--dataset-visibility",
+            "public",
+            "--block-size",
+            "16",
+            "--n-layer",
+            "1",
+            "--n-head",
+            "1",
+            "--n-embd",
+            "16",
+            "--state-size",
+            "8",
+            "--max-iters",
+            "1",
+            "--batch-size",
+            "2",
+            "--eval-iters",
+            "1",
+            "--throughput-new-tokens",
+            "1",
+            "--throughput-repeats",
+            "1",
+            "--json",
+            str(report_path),
+        ]
+    )
+
+    assert rc == 0
+    out = capsys.readouterr().out
+    assert "[dataset-visibility] public" in out
+    payload = json.loads(report_path.read_text(encoding="utf-8"))
+    assert payload["dataset_visibility"] == "public"
+    assert "--public" in payload["dataset_create_command"]
 
 
 def test_prepare_bundle_rejects_nonpositive_runner_timeout(

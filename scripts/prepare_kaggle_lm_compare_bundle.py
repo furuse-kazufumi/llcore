@@ -50,6 +50,12 @@ def _parser() -> argparse.ArgumentParser:
         default=None,
         help="optional Kaggle dataset owner/slug that will supply llcore/config/corpus at runtime",
     )
+    ap.add_argument(
+        "--dataset-visibility",
+        choices=("private", "public"),
+        default="private",
+        help="intended visibility for dataset create guidance (default: private)",
+    )
     ap.add_argument("--title", default="llcore-lm-compare")
     ap.add_argument("--machine-shape", default="NvidiaTeslaT4")
     ap.add_argument("--enable-gpu", action="store_true", help="emit GPU-enabled Kaggle metadata")
@@ -147,12 +153,14 @@ def prepare_bundle(argv: list[str] | None = None) -> int:
         "kernel_id": args.kernel_id,
         "push_command": f'kaggle kernels push -p "{Path(args.bundle_dir).resolve()}"',
         "dataset_source": args.dataset_source,
+        "dataset_visibility": args.dataset_visibility,
         "dataset_create_command": (
             None
             if not args.dataset_source
             else (
                 f'kaggle datasets create -p "{Path(args.bundle_dir).resolve() / "dataset_payload"}" '
-                "--dir-mode zip"
+                + ("--public " if args.dataset_visibility == "public" else "")
+                + "--dir-mode zip"
             )
         ),
         "dataset_version_command": (
@@ -184,6 +192,7 @@ def prepare_bundle(argv: list[str] | None = None) -> int:
             "--runner-timeout for heavier configs.",
         )
     if combined_report["dataset_create_command"]:
+        print("[dataset-visibility]", combined_report["dataset_visibility"])
         print("[dataset-create]", combined_report["dataset_create_command"])
         print("[dataset-version]", combined_report["dataset_version_command"])
     print("[next]", combined_report["push_command"])

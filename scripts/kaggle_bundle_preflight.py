@@ -11,6 +11,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import stat
 import subprocess
 import sys
@@ -55,7 +56,15 @@ DATASET_SRC_ARCHIVE_NAME = "src_llcore.zip"
 DATASET_PKG_ARCHIVE_NAME = "pkg_llcore.zip"
 _DATASET_ARCHIVE_MAX_ENTRIES = 4096
 _DATASET_ARCHIVE_MAX_UNCOMPRESSED_BYTES = 256 * 1024 * 1024
+_TEXT_SCAN_SUFFIXES = {".py", ".json", ".txt", ".md", ".cfg", ".ini", ".toml", ".yaml", ".yml", ".rst"}
 _BOOL_TEXT_VALUES = {"true", "false"}
+_PUBLISH_BLOCKLIST_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
+    ("private-key", re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----")),
+    ("openai-api-key-name", re.compile(r"\bOPENAI_API_KEY\b")),
+    ("kaggle-key-name", re.compile(r"\bKAGGLE_KEY\b")),
+    ("kaggle-api-token-name", re.compile(r"\bKAGGLE_API_TOKEN\b")),
+    ("local-windows-path", re.compile(r"\b(?:[A-Za-z]:\\\\|[A-Za-z]:/)(?:Users|projects)\\b")),
+)
 _EMBEDDED_COPIED_FILE_PATHS = {
     "corpus": "input_corpus.txt",
     "config": "config.json",
@@ -182,6 +191,48 @@ def _sha256_zip_tree(archive_path: Path, *, expected_prefix: str) -> str:
             digest.update(zf.read(info))
             digest.update(b"\0")
     return digest.hexdigest()
+
+
+def _text_publish_findings(label: str, text: str) -> list[str]:
+    findings: list[str] = []
+    for finding_label, pattern in _PUBLISH_BLOCKLIST_PATTERNS:
+        if pattern.search(text):
+            findings.append(f"{label}: blocked publish marker {finding_label!r} detected")
+    return findings
+
+
+def _scan_dataset_payload_publish_safety(dataset_payload_dir: Path) -> None:
+    findings: list[str] = []
+    for path in sorted(p for p in dataset_payload_dir.iterdir() if p.is_file()):
+        if path.suffix in _TEXT_SCAN_SUFFIXES or path.name in {
+            "LICENSE",
+            "NOTICE",
+            DATASET_METADATA_NAME,
+            DATASET_PAYLOAD_MANIFEST_NAME,
+            "config.json",
+            "input_corpus.txt",
+        }:
+            findings.extend(
+                _text_publish_findings(
+                    str(path.relative_to(dataset_payload_dir)),
+                    path.read_text(encoding="utf-8", errors="replace"),
+                )
+            )
+        if path.name not in {DATASET_SRC_ARCHIVE_NAME, DATASET_PKG_ARCHIVE_NAME}:
+            continue
+        with zipfile.ZipFile(path) as zf:
+            for info in zf.infolist():
+                member = PurePosixPath(info.filename.replace("\\", "/"))
+                if member.suffix not in _TEXT_SCAN_SUFFIXES:
+                    continue
+                findings.extend(
+                    _text_publish_findings(
+                        f"{path.name}:{member.as_posix()}",
+                        zf.read(info).decode("utf-8", errors="replace"),
+                    )
+                )
+    if findings:
+        raise ValueError("dataset payload secret/path scan failed: " + "; ".join(findings))
 
 
 def _require_bool_text(value: object, *, field_name: str) -> str:
@@ -503,6 +554,7 @@ def _validate_bundle_dir(bundle_dir: Path) -> dict[str, object]:
             raise ValueError("dataset payload NOTICE sha256 does not match dataset manifest notice_sha256")
         if dataset_manifest.get("dataset_metadata_sha256") != _sha256_text(dataset_metadata_path):
             raise ValueError("dataset-metadata.json sha256 does not match dataset payload manifest")
+        _scan_dataset_payload_publish_safety(dataset_payload_dir)
         config_summary = {
             "block_size": compare_config.get("block_size"),
             "max_iters": compare_config.get("max_iters"),
