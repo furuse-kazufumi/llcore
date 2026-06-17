@@ -16,6 +16,7 @@
 |---|---|---|---|
 | (0) 定数状態 vs 文脈線形 | `scripts/memory_footprint_harness.py` | recurrent state の実バイト vs GPT KV/attn | T を 16× にしても recurrent **×1.00**、GPT KV **×16**、attn **×256** |
 | (a) mmap read-only 重み | `scripts/mmap_weights_poc.py` | load 時 RSS(別プロセス隔離) | eager は即全載、mmap は **load 時 ΔRSS を ~2.8% に遅延**(54MB モデル) |
+| (a') RAM 超 × mmap | `scripts/mmap_ram_exceed_poc.py` | working-set 上限 < モデルで forward 完走 | **522MB モデルを 358MB の WS 上限で完走**(出力一致)= 使える RAM < モデルでも回る |
 | (b) int8 weight-only 量子化 | `scripts/int8_quant_footprint.py` | footprint vs held-out PPL | 重み常駐を **約 3.9× 圧縮(74–75% 削減)**、PPL コスト **< 0.1%** |
 
 「仮想メモリ含む」の honest な解釈(pivot memo より): スワップに hot data を載せる素朴な活用では
