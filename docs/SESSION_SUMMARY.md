@@ -3,49 +3,52 @@
 > 自動生成: `libexec/raptor-auto-summary` (Stop hook)
 > 次回 ccr 起動時に CLAUDE.md SESSION START で自動的に読み取られる。
 
-- **最終更新**: 2026-06-17 22:32:06
+- **最終更新**: 2026-06-18 06:55:09
 - **プロジェクト**: `D:/projects/llcore`
 - **ブランチ**: `feat/lm-recurrent`
 
 ## 直近の git log
 
 ```
-183a91b auto: MEMORY_EFFICIENCY_FINDINGS.md 編集前 (2026-06-17 22:30)
-c209a14 auto: quant_bitwidth_sweep.py 編集前 (2026-06-17 22:23)
-1fd60f3 auto: quant_bitwidth_sweep.py 編集前 (2026-06-17 22:20)
-03e7cef auto: quant_bitwidth_sweep.py 編集前 (2026-06-17 22:20)
-a4790f8 auto: quant_bitwidth_sweep.py 編集前 (2026-06-17 22:20)
-b9200b5 auto: test_lm_eval.py 編集前 (2026-06-17 22:19)
-6d54e96 auto: test_lm_eval.py 編集前 (2026-06-17 22:19)
-8694e43 auto: test_lm_eval.py 編集前 (2026-06-17 22:19)
-da812d7 auto: quant_bitwidth_sweep.py 編集前 (2026-06-17 22:19)
-f80733f auto: quant_bitwidth_sweep.py 編集前 (2026-06-17 22:18)
+fa0b997 auto: ARTICLE_SEEDS.md 編集前 (2026-06-18 06:40)
+28e397b auto: MEMORY_EFFICIENCY_FINDINGS.md 編集前 (2026-06-18 06:40)
+ad7a808 auto: MEMORY_EFFICIENCY_FINDINGS.md 編集前 (2026-06-18 06:40)
+0f9dd76 auto: ARTICLE_SEEDS.md 編集前 (2026-06-18 06:35)
+dae5395 auto: MEMORY_EFFICIENCY_FINDINGS.md 編集前 (2026-06-18 06:34)
+929f0ff auto: MEMORY_EFFICIENCY_FINDINGS.md 編集前 (2026-06-18 06:34)
+ad1ade1 auto: int8_streaming_infer.py 編集前 (2026-06-18 06:33)
+96fe7fe auto: int8_streaming_infer.py 編集前 (2026-06-18 06:33)
+e9884aa auto: int8_streaming_infer.py 編集前 (2026-06-18 06:32)
+2371310 auto: int8_streaming_infer.py 編集前 (2026-06-18 06:31)
 ```
 
 ## 現在の git status
 
 ```
-M docs/MEMORY_EFFICIENCY_FINDINGS.md
+M docs/ARTICLE_SEEDS.md
+ M docs/SESSION_SUMMARY.md
+?? scripts/quant_group_compare.py
+?? tests/unit/test_quant_group_compare.py
 ```
 
 ## 直近 2 時間に変更されたファイル
 
 ```
-22:31 .pytest_cache/v/cache/nodeids
-22:30 docs/MEMORY_EFFICIENCY_FINDINGS.md
-22:23 .mypy_cache/3.11/cache.3.db
-22:23 .mypy_cache/3.11/cache.12.db
-22:23 .ruff_cache/0.15.12/16546767254229203700
-22:23 scripts/quant_bitwidth_sweep.py
-22:20 .mypy_cache/3.11/cache.14.db
-22:20 .mypy_cache/3.11/cache.13.db
-22:20 .mypy_cache/3.11/cache.0.db
-22:20 .ruff_cache/0.15.12/460471245633591413
-22:20 .ruff_cache/0.15.12/11287728664031201126
-22:19 tests/unit/test_lm_eval.py
-22:18 src/llcore/lm/eval.py
-22:16 docs/ARTICLE_SEEDS.md
-22:14 .mypy_cache/3.11/cache.11.db
+06:54 .pytest_cache/v/cache/nodeids
+06:54 .mypy_cache/3.11/cache.6.db
+06:54 .mypy_cache/3.11/cache.3.db
+06:54 .ruff_cache/0.15.12/11287728664031201126
+06:53 tests/unit/test_quant_group_compare.py
+06:48 .mypy_cache/3.11/cache.8.db
+06:48 .ruff_cache/0.15.12/16546767254229203700
+06:48 scripts/quant_group_compare.py
+06:42 docs/SESSION_SUMMARY.md
+06:40 docs/ARTICLE_SEEDS.md
+06:40 docs/MEMORY_EFFICIENCY_FINDINGS.md
+06:38 .mypy_cache/3.11/cache.2.db
+06:37 tests/unit/test_recurrent_runtime_rss.py
+06:37 .mypy_cache/3.11/cache.10.db
+06:36 scripts/recurrent_runtime_rss.py
 ```
 
 ---

@@ -436,3 +436,13 @@
 - **根拠**: `scripts/int8_streaming_infer.py` / `out/int8_streaming_infer.json` /
   `docs/MEMORY_EFFICIENCY_FINDINGS.md` (c)。
 - **側面**: 教訓 / honest disclosure / 実装報告 / 技術設計 / 認知科学(直感の落とし穴)。
+
+### 40. 「文脈でメモリが膨らむ Transformer / 平坦な recurrent」を実機 peak RSS で裏取り
+- **気付き**: harness は state_bytes(実測)+ KV/attn(解析値)までだった。実生成ワークロードを文脈長 T で
+  振り、別プロセスで peak working set を実測すると、**T 256→2048(×8)で GPT は peak WS ×2.65(固定 baseline
+  ~205MB を引くと文脈コストは ~25→403MB と超線形=attn O(T²) が大 T で支配)/ Recurrent・RWKV は ×1.00
+  (定数状態で平坦)**。構造的に決着済みの「recurrent=定数状態 / Transformer=文脈線形(+attn 二次)」を、
+  解析値でなく**実機 peak RSS**で示せた。これがメモリ効率北極星で recurrent が勝ち筋である土台の実証。
+- **根拠**: `scripts/recurrent_runtime_rss.py` / `out/recurrent_runtime_rss.json` /
+  `docs/MEMORY_EFFICIENCY_FINDINGS.md` (0')。
+- **側面**: 技術設計 / ベンチ / honest disclosure / 実装報告 / 業界比較(SSM vs Transformer の長文脈)。
