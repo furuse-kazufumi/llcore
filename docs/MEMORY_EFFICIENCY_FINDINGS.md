@@ -223,6 +223,30 @@ proxy = 次トークン top-1 accuracy** を併記。予測(Dettmers 2023: ~4bit
   実際に捕捉。llcore の評価基盤が一段成長。
 - 留保: weights-only / dequant fp32 の simulated quant(速度未測)/ 2bit は QAT なしの PTQ 限界。
 
+## (b'') per-group 量子化 — 低ビットの床を下げられるか (#3 CPU スライス, `out/quant_group_compare*.json`)
+
+`scripts/quant_group_compare.py`。per-channel(群=行全体)を、行を `group_size` 列ごとに区切る per-group へ
+拡張し、低ビット(3/2bit)で per-channel が壊れる床を救えるかを held-out PPL + top-1 で検証。
+
+### realp1 (11.9M) — fp32 PPL 38.32 / top1 28.65%
+| bits | group | ΔPPL% | Δtop1(pp) | ppl-gate | cap-gate |
+|---|---|---|---|---|---|
+| 3 | full | +4.8% | -0.70 | PASS | **PASS** |
+| 3 | 32 | +3.2% | -0.60 | PASS | **PASS** |
+| 2 | full | +163.9% | -13.46 | PASS | FAIL |
+| 2 | 64 | +44.9% | -6.88 | PASS | FAIL |
+| 2 | 32 | +32.9% | **-5.31** | PASS | FAIL |
+
+### 知見(honest)
+- **per-group は単調に低ビット品質を改善**(誤差↓・PPL↓・top1↑)、scale 増で footprint は微増(両モデルで確認)。
+  realp1 2bit: top1 劣化が **full -13.5pp → group32 -5.3pp(≈60% 減)**。multi_smoke 2bit: group≤64 が
+  **ppl-gate を救出**(full は FAIL)。
+- **しかし strict cap-gate(top1 fp32 比 97% 保持)は 2bit では RTN per-group でも届かない**(realp1 group32 で
+  81.5% 保持)。**3bit が実用床**(realp1 は per-channel で既に cap-gate PASS=97.6% 保持、per-group は上乗せ)。
+- **結論**: per-group は床を確実に押し下げるが、**2bit を「安全」にするには RTN 超(GPTQ/AWQ 誤差補償 or QAT)が
+  必要**。これは #3 の GPU/将来課題(真の int8 GEMM と同じく)。CPU で測れる範囲の honest な到達点。
+- 留保: RTN(誤差補償なし)/ weights-only / simulated quant(速度未測)。
+
 ## 記事側面 (feedback_daily_articles_policy の 13 側面)
 - **技術設計/実装報告**: 3 本柱の実機計測。「構造プロット → 実測」への昇格手続き。
 - **honest disclosure**: 各柱に明確な留保(weights-only / simulated quant / 部分 working set /
