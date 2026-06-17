@@ -93,7 +93,12 @@ llcore 既測: ① constant-state recurrent vs GPT KV/attn、② mmap read-only 
 
 ## 6. 次の実験(批評推奨・このハードで実行可能)
 
-**int8 量子化の cliff を実測**して cliff_then_flat(4bit は plateau・3bit で cliff・2bit で破綻)を反証可能に検証。
-→ 実装・結果は `scripts/quant_bitwidth_sweep.py` / `out/quant_bitwidth_sweep*.json` /
-`docs/MEMORY_EFFICIENCY_FINDINGS.md` を参照。honest hook: PPL に加え **hard-capability proxy(held-out
-top-1 accuracy)** を併記し、「PPL は無傷でも capability cliff は先に来る」を自前データで確認する。
+**int8 量子化の cliff を実測**して cliff_then_flat を反証可能に検証 — **実行済み**(`scripts/quant_bitwidth_sweep.py`
+/ `out/quant_bitwidth_sweep*.json` / `docs/MEMORY_EFFICIENCY_FINDINGS.md` (b'))。結果:
+- **cliff_then_flat 確認**。8/6/5bit 平坦、低ビットで非線形急落。
+- **cliff 位置はモデルサイズ依存**: 小 1.36M は 3bit 劣化(+11.6%)・2bit 破綻、大 11.9M は 3bit 実用(+4.8%)・
+  cliff は 2bit = **大モデルほど低ビットに頑健**。
+- **PPL-only gate の危険を実証**: 11.9M の 2bit は top1 -13.5pp(半減近く破綻)なのに unigram gate は PASS。
+- **honest 反証**: 「top1 が PPL より先に劣化」の事前予想は不成立 — 本データでは lockstep。誇張せず記録。
+honest hook(達成): PPL に加え hard-capability proxy(held-out top-1 accuracy)を併記し、gate の粗さを自前
+データで確認した。
