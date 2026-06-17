@@ -470,3 +470,15 @@
 - **根拠**: `scripts/gptq_compare.py`(probe で weight↑/output↓ を確認)。realp1/multi_smoke の cap-gate
   経験値は `out/gptq_compare*.json` / `docs/MEMORY_EFFICIENCY_FINDINGS.md` 参照。
 - **側面**: 教訓 / 認知科学(指標の取り違え)/ honest disclosure / 技術設計 / 業界比較。
+
+### 43. 「最新の GPTQ が常に最強」ではない — 極低ビットでは粒度が誤差補償に勝つことがある
+- **気付き**: RTN per-channel / per-group / GPTQ の 3 手法を同条件比較。realp1 2bit で GPTQ は RTN を大きく
+  改善(top1 劣化 -13.35→-6.38pp ≈ 52% 減)するが、**per-group32 RTN(-5.31pp)が GPTQ-per-channel(-6.38pp)を
+  上回った**。= 極低ビット・小モデルでは「**粒度(scale を細かく)> 誤差補償(Hessian)**」になり得る(両者は
+  直交・相補的で、GPTQ+per-group が真の SOTA)。さらに 3 手法すべてで **strict cap-gate(top1 fp32 比 97%)を
+  2bit では越えられず**、3bit は全手法で楽に PASS = **3bit が PTQ の実用床、2bit は QAT(学習時量子化)領域**、
+  という床の位置は手法を変えても動かない(手法は各ビットの damage を減らすだけ)。「新しい手法を足せば床が
+  下がる」という期待は外れ、床を動かすには質的に別のアプローチ(QAT)が要る、が自前実測の結論。
+- **根拠**: `scripts/gptq_compare.py` / `scripts/quant_group_compare.py` / `out/gptq_compare*.json` /
+  `out/quant_group_compare*.json` / `docs/MEMORY_EFFICIENCY_FINDINGS.md` (b'')(b''')。
+- **側面**: ベンチ / honest disclosure / 教訓 / 業界比較(PTQ vs QAT)/ 技術設計。
