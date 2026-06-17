@@ -1505,6 +1505,51 @@ def test_check_readiness_verifies_dataset_dependency_shas(
     assert "quota_checked=cpu" in capsys.readouterr().out
 
 
+def test_check_readiness_rejects_dataset_manifest_missing_required_sha_keys(
+    tmp_path: Path, monkeypatch: Any, capsys: Any
+) -> None:
+    script = _load_script("kaggle_push_readiness.py")
+    bundle_dir = tmp_path / "bundle"
+    dataset_payload = bundle_dir / "dataset_payload"
+    dataset_payload.mkdir(parents=True)
+    (dataset_payload / "dataset_payload_manifest.json").write_text(
+        json.dumps({"config_sha256": "a" * 64, "source_sha256": "c" * 64}) + "\n",
+        encoding="utf-8",
+    )
+
+    class _FakePreflight:
+        subprocess = SimpleNamespace(TimeoutExpired=subprocess.TimeoutExpired)
+
+        @staticmethod
+        def preflight_bundle(bundle_dir: Path, *, run_runner: bool, runner_timeout: int) -> dict[str, object]:
+            return {
+                "bundle_dir": str(bundle_dir),
+                "checks": {
+                    "metadata": {"kernel_id": "furusekazufumi/test-kernel", "enable_gpu": "false"},
+                    "manifest": {"data_mode": "dataset", "dataset_source": "furusekazufumi/test-dataset"},
+                },
+                "runner": None,
+            }
+
+    _clear_kaggle_env(monkeypatch)
+    monkeypatch.setattr(script, "_load_script", lambda path, module_name: _FakePreflight)
+    def _fake_run_kaggle(args: list[str], *, timeout_s: int) -> Any:
+        if args[:2] == ["kernels", "list"]:
+            return _completed(stdout="ref,title,author\nr,t,furusekazufumi\n")
+        if args[:2] == ["datasets", "status"]:
+            return _completed(stdout="ready\n")
+        raise AssertionError(args)
+
+    monkeypatch.setattr(script, "_run_kaggle", _fake_run_kaggle)
+    monkeypatch.setattr(script, "_credential_sources", lambda: ["kaggle.json"])
+    monkeypatch.setattr(script, "_configured_kaggle_username", lambda: "furusekazufumi")
+
+    rc = script.main(["--bundle-dir", str(bundle_dir)])
+
+    assert rc == script.RC_VALIDATION
+    assert "dataset payload manifest missing required keys" in capsys.readouterr().err
+
+
 def test_check_readiness_fails_cleanly_when_no_push_credentials_exist(
     tmp_path: Path, monkeypatch: Any, capsys: Any
 ) -> None:

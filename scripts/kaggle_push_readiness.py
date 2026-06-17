@@ -521,6 +521,14 @@ def _check_dataset_source(*, bundle_dir: Path, preflight_report: dict[str, objec
     dataset_manifest = json.loads(dataset_manifest_path.read_text(encoding="utf-8"))
     if not isinstance(dataset_manifest, dict):
         raise ValueError("dataset payload manifest must be an object for dataset verification")
+    required_manifest_keys = ("config_sha256", "corpus_sha256", "source_sha256")
+    missing_manifest_keys = [key for key in required_manifest_keys if key not in dataset_manifest]
+    if missing_manifest_keys:
+        missing_joined = ", ".join(missing_manifest_keys)
+        raise ValueError(
+            "dataset payload manifest missing required keys for dataset verification: "
+            f"{missing_joined}"
+        )
     temp_root = Path(tempfile.mkdtemp(prefix="llcore-kaggle-dataset-verify-"))
     try:
         download_proc = _run_kaggle(
@@ -541,6 +549,9 @@ def _check_dataset_source(*, bundle_dir: Path, preflight_report: dict[str, objec
             "src_tree_sha256": _sha256_tree(temp_root / "src_llcore" / "src" / "llcore"),
             "pkg_tree_sha256": _sha256_tree(temp_root / "pkg_llcore" / "llcore"),
         }
+        # Current dataset contract intentionally ships identical llcore trees in
+        # both src_llcore/ and pkg_llcore/. A single source_sha256 therefore
+        # guards both copies and fails closed if they ever diverge.
         matches = {
             "config_sha256": expected["config_sha256"] == actual["config_sha256"],
             "corpus_sha256": expected["corpus_sha256"] == actual["corpus_sha256"],
