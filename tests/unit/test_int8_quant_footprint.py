@@ -144,8 +144,10 @@ def test_parse_schemes_validates_and_dedups() -> None:
 
 def _write_tiny_checkpoint(tmp_path: Path) -> tuple[Path, Path]:
     """Build a minimal trained-shaped CharGPT checkpoint + matching corpus file."""
-    from llcore.lm.model import CharGPT, GPTConfig
-    from llcore.lm.tokenizer import CharTokenizer
+    # llcore resolves to the installed (untyped) package under standard mypy;
+    # mirror the import-untyped ignore the rest of the script uses.
+    from llcore.lm.model import CharGPT, GPTConfig  # type: ignore[import-untyped]
+    from llcore.lm.tokenizer import CharTokenizer  # type: ignore[import-untyped]
 
     # Repeat a short phrase so train/val both exceed block_size after the split.
     text = "hello llcore world\n" * 60
