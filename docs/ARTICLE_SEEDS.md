@@ -458,3 +458,15 @@
 - **根拠**: `scripts/quant_group_compare.py` / `out/quant_group_compare*.json` /
   `docs/MEMORY_EFFICIENCY_FINDINGS.md` (b'')。
 - **側面**: ベンチ / honest disclosure / 教訓 / 実装報告 / 業界比較(GPTQ/AWQ/QAT との位置づけ)。
+
+### 42. GPTQ は「重みをわざと不正確にして出力を正確にする」— 誤差補償量子化の逆説
+- **気付き**: GPTQ(Frantar et al. 2022)を自前実装して検証すると、2bit で **weight 誤差は RTN より大きい
+  (0.61→0.68)のに output 誤差は小さい(78.6→71.2)**。理由: GPTQ が最小化するのは ‖W−Ŵ‖²(重み誤差)
+  ではなく **‖(W−Ŵ)X‖²(出力誤差)** で、入力 Hessian H=Σxᵀx を使って「ある列の量子化誤差を、まだ量子化
+  していない列へ伝播」させ、出力空間で打ち消す。直感「量子化は重みを正確に近似するほど良い」は誤りで、
+  **重みの忠実度を捨てて出力の忠実度を買う**のが正解。これは「何を誤差の指標にするか(weight space vs
+  function space)で最適解が変わる」という量子化(ひいては圧縮一般)の核心。校正データ(活性化統計)が
+  必要なのも、出力誤差は入力分布に依存するから。
+- **根拠**: `scripts/gptq_compare.py`(probe で weight↑/output↓ を確認)。realp1/multi_smoke の cap-gate
+  経験値は `out/gptq_compare*.json` / `docs/MEMORY_EFFICIENCY_FINDINGS.md` 参照。
+- **側面**: 教訓 / 認知科学(指標の取り違え)/ honest disclosure / 技術設計 / 業界比較。
