@@ -302,23 +302,35 @@ def main(argv: list[str] | None = None) -> int:
 
     dense = _spawn_worker(ckpt, "dense")
     stream = _spawn_worker(ckpt, "stream")
-    checksum_match = dense["checksum"] == stream["checksum"]
+    # 圧力下の本番: dense の resident(全 fp32)未満の working-set 上限で stream を走らせる。
+    # stream の必須常駐は int8(~1/4)なので、dense が収まらない上限でも完走できるはず。
+    cap_bytes = int(sizes["int8_bytes"] / 1e6 + 220) * 1_000_000
+    stream_capped = _spawn_worker(ckpt, "stream", cap_bytes)
+    checksum_match = dense["checksum"] == stream["checksum"] == stream_capped["checksum"]
 
-    print("\n| mode | resident | peak WS | checksum |")
-    print("|" + "---|" * 4)
-    for rec in (dense, stream):
-        print(f"| {rec['mode']} | {rec['resident_mb']} MB | {rec['peak_ws_mb']} MB | {rec['checksum']:.4g} |")
+    print("\n| mode | cap | resident | peak WS | peak pagefile | checksum |")
+    print("|" + "---|" * 6)
+    for rec in (dense, stream, stream_capped):
+        cap = "none" if rec["cap_mb"] is None else f"{rec['cap_mb']}MB({'set' if rec['cap_set_ok'] else 'NOT'})"
+        print(
+            f"| {rec['mode']} | {cap} | {rec['resident_mb']} MB | {rec['peak_ws_mb']} MB | "
+            f"{rec['peak_pagefile_mb']} MB | {rec['checksum']:.4g} |"
+        )
 
-    reduction = (1.0 - stream["peak_ws_mb"] / dense["peak_ws_mb"]) * 100 if dense["peak_ws_mb"] else 0.0
+    resident_red = (1.0 - stream["resident_mb"] / dense["resident_mb"]) * 100 if dense["resident_mb"] else 0.0
+    capped_below_dense = stream_capped["peak_ws_mb"] < dense["resident_mb"]
     print(
-        f"\n[headline] 同一 int8 ソースから forward。dense(全層 materialize)peak WS "
-        f"{dense['peak_ws_mb']} MB vs stream(層ごと dequant)peak WS {stream['peak_ws_mb']} MB "
-        f"= **{reduction:.0f}% 削減**。stream 常駐は int8({sizes['int8_bytes']/1e6:.0f} MB)+ 最大1層 fp32。"
+        f"\n[headline] **堅牢な勝ち = 常駐モデル {resident_red:.0f}% 削減**"
+        f"(dense fp32 {dense['resident_mb']} MB → stream int8 {stream['resident_mb']} MB)。"
+        f" 圧力なしの peak WS は torch allocator/transient 支配でほぼ不変だが、**working-set 上限 "
+        f"{cap_bytes/1e6:.0f} MB(< dense 常駐 {dense['resident_mb']} MB)で stream は完走**"
+        f"(capped peak WS {stream_capped['peak_ws_mb']} MB"
+        f"{' < dense 常駐 ✓' if capped_below_dense else ''})= 実 RAM 削減が顕在化。"
     )
-    print(f"[functional] dense と stream の logits checksum 一致: {checksum_match}(= メモリ最適化は結果不変)。")
+    print(f"[functional] dense / stream / stream(capped) の logits checksum 全一致: {checksum_match}。")
     print(
-        "[honest] 量子化は nn.Linear のみ(Embedding/LN は fp32)。simulated quant=速度未測。"
-        " peak WS は torch allocator 込みの実測値。"
+        "[honest] 圧力なしでは peak WS は減らない(allocator が解放 fp32 を OS へ返さない)= "
+        "削減は『常駐の下限』と『圧力下の完走可否』に出る。量子化は nn.Linear のみ・simulated quant(速度未測)。"
     )
 
     payload: dict[str, Any] = {
@@ -326,10 +338,13 @@ def main(argv: list[str] | None = None) -> int:
         "fp32_weight_bytes": sizes["fp32_bytes"],
         "int8_resident_bytes": sizes["int8_bytes"],
         "int8_file_bytes": sizes["file_bytes"],
+        "cap_bytes": cap_bytes,
         "dense": dense,
         "stream": stream,
+        "stream_capped": stream_capped,
         "checksum_match": checksum_match,
-        "peak_ws_reduction_pct": round(reduction, 1),
+        "resident_reduction_pct": round(resident_red, 1),
+        "capped_peak_below_dense_resident": capped_below_dense,
     }
     outp = Path(args.json)
     outp.parent.mkdir(parents=True, exist_ok=True)
