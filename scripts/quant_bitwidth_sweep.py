@@ -306,6 +306,7 @@ def main(argv: list[str] | None = None) -> int:
             "top5_acc": round(fp32_acc["top5_acc"], 6),
             "n_eval_tokens": n_tokens,
         },
+        "ppl_knee_bits": knee_bits,
         "ppl_cliff_bits": cliff_bits,
         "records": records,
     }
