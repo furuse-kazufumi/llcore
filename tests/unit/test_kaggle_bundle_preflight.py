@@ -154,7 +154,24 @@ def test_preflight_dataset_mode_runner_smoke_passes(tmp_path: Path) -> None:
     publish_safety = checks["manifest"]["publish_safety"]
     assert publish_safety["status"] == "passed"
     assert publish_safety["dataset_payload_dir"] == "dataset_payload"
-    assert "dataset-metadata.json" in publish_safety["scanned_text_files"]
+    assert publish_safety["scanned_text_files"] == [
+        "LICENSE",
+        "NOTICE",
+        "config.json",
+        "dataset-metadata.json",
+        "dataset_payload_manifest.json",
+        "input_corpus.txt",
+    ]
+    assert publish_safety["scanned_top_level_files"] == [
+        "LICENSE",
+        "NOTICE",
+        "config.json",
+        "dataset-metadata.json",
+        "dataset_payload_manifest.json",
+        "input_corpus.txt",
+        "pkg_llcore.zip",
+        "src_llcore.zip",
+    ]
     assert publish_safety["scanned_archive_text_member_count"] >= 1
     assert (bundle_dir / "artifacts" / "lm_compare.json").is_file()
 
@@ -222,6 +239,18 @@ def test_preflight_rejects_dataset_payload_with_local_path_marker(tmp_path: Path
     config = json.loads(config_path.read_text(encoding="utf-8"))
     config["note"] = r"D:\projects\secret"
     config_path.write_text(json.dumps(config, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    rc = preflight.main(["--bundle-dir", str(bundle_dir)])
+
+    assert rc == 2
+
+
+def test_preflight_rejects_unexpected_nested_dataset_payload_directory(tmp_path: Path) -> None:
+    preflight = _load_script("kaggle_bundle_preflight.py")
+    bundle_dir = _build_dataset_bundle(tmp_path)
+    extra_dir = bundle_dir / "dataset_payload" / "extra"
+    extra_dir.mkdir()
+    (extra_dir / "secret.txt").write_text("secret\n", encoding="utf-8")
 
     rc = preflight.main(["--bundle-dir", str(bundle_dir)])
 

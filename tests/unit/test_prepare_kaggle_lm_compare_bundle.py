@@ -168,7 +168,18 @@ def test_prepare_bundle_dataset_mode_reports_dataset_command(tmp_path: Path, cap
         payload["preflight"]["checks"]["config"]["dataset_metadata_path"]
         == "dataset_payload/dataset-metadata.json"
     )
-    assert payload["preflight"]["checks"]["manifest"]["publish_safety"]["status"] == "passed"
+    publish_safety = payload["preflight"]["checks"]["manifest"]["publish_safety"]
+    assert publish_safety["status"] == "passed"
+    assert publish_safety["scanned_top_level_files"] == [
+        "LICENSE",
+        "NOTICE",
+        "config.json",
+        "dataset-metadata.json",
+        "dataset_payload_manifest.json",
+        "input_corpus.txt",
+        "pkg_llcore.zip",
+        "src_llcore.zip",
+    ]
     dataset_payload = bundle_dir / "dataset_payload"
     assert (dataset_payload / "config.json").is_file()
     assert (dataset_payload / "input_corpus.txt").is_file()

@@ -206,7 +206,34 @@ def _scan_dataset_payload_publish_safety(dataset_payload_dir: Path) -> dict[str,
     findings: list[str] = []
     scanned_text_files: list[str] = []
     scanned_archive_text_members: list[str] = []
-    for path in sorted(p for p in dataset_payload_dir.iterdir() if p.is_file()):
+    known_top_level_files = {
+        "config.json",
+        DATASET_METADATA_NAME,
+        DATASET_PAYLOAD_MANIFEST_NAME,
+        "input_corpus.txt",
+        "LICENSE",
+        "NOTICE",
+        DATASET_SRC_ARCHIVE_NAME,
+        DATASET_PKG_ARCHIVE_NAME,
+    }
+    top_level_entries = sorted(dataset_payload_dir.iterdir(), key=lambda path: path.name)
+    for entry in top_level_entries:
+        if entry.is_dir():
+            raise ValueError(
+                "dataset payload secret/path scan failed: unexpected nested directory "
+                f"under dataset_payload/: {entry.name}"
+            )
+        if not entry.is_file():
+            raise ValueError(
+                "dataset payload secret/path scan failed: unexpected non-file entry "
+                f"under dataset_payload/: {entry.name}"
+            )
+        if entry.name not in known_top_level_files:
+            raise ValueError(
+                "dataset payload secret/path scan failed: unexpected unscanned file "
+                f"under dataset_payload/: {entry.name}"
+            )
+    for path in top_level_entries:
         if path.suffix in _TEXT_SCAN_SUFFIXES or path.name in {
             "LICENSE",
             "NOTICE",
@@ -242,6 +269,7 @@ def _scan_dataset_payload_publish_safety(dataset_payload_dir: Path) -> dict[str,
         "status": "passed",
         "dataset_payload_dir": dataset_payload_dir.name,
         "scanned_text_files": scanned_text_files,
+        "scanned_top_level_files": [path.name for path in top_level_entries],
         "scanned_archive_text_member_count": len(scanned_archive_text_members),
         "scanned_archive_text_members_sample": scanned_archive_text_members[:8],
     }
