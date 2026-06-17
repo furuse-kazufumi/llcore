@@ -259,14 +259,20 @@ def main(argv: list[str] | None = None) -> int:
             cliff_bits = r["bits"]
             break
     worst = records[-1]
+    # ppl-gate は通すのに cap-gate が止める最初のビット幅 = 「PPL だけでは見逃す」実証点。
+    ppl_pass_cap_fail = next(
+        (r["bits"] for r in records if r["ppl_gate_pass"] and not r["capability_gate_pass"]), None
+    )
     print(
         f"\n[headline] 膝(ΔPPL>1%開始)= {knee_bits or '無'} bit / cliff(ΔPPL>10% or gate fail)= "
         f"{cliff_bits or '無'} bit。最低 {worst['bits']}bit で PPL {worst['delta_ppl_pct']:+.1f}% / "
-        f"top1 {worst['delta_top1_pp']:+.2f}pp / gate {'PASS' if worst['ppl_gate_pass'] else 'FAIL'}。"
+        f"top1 {worst['delta_top1_pp']:+.2f}pp / ppl-gate {'PASS' if worst['ppl_gate_pass'] else 'FAIL'} / "
+        f"cap-gate {'PASS' if worst['capability_gate_pass'] else 'FAIL'}。"
     )
     print(
-        "[honest] top1(hard-capability)と PPL の劣化順序は本実測で確認する(先行する保証はない)。"
-        " 留意: unigram gate は粗く、劣化ビットでも PASS し得る。weights-only / simulated quant(速度未測)。"
+        f"[honest] ppl-gate は通すが cap-gate が止めるビット幅 = {ppl_pass_cap_fail or '無し'}"
+        "(= PPL だけの合否では低ビットの capability 喪失を見逃す実証)。"
+        " weights-only / simulated quant(速度未測)。"
     )
 
     outp = Path(args.json)
