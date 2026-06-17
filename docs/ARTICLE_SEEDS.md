@@ -383,3 +383,27 @@
 - **根拠**: `scripts/memory_footprint_harness.py` / `out/mem_footprint.json` /
   memory:`project_llcore_memory_efficiency_pivot`。
 - **側面**: 哲学 / 戦略 / honest disclosure / 教訓。
+
+### 36. 「メモリで線形か指数か」— ニューラルの賢さは指数的には伸びない(多エージェント検証)
+- **気付き**: ユーザー論点「アルゴリズムはメモリ容量に対し線形/指数で性能が伸び、レジーム別の使い分けが
+  勝敗を決める」を 8 アルゴリズム族 × 各 2 レンズ敵対検証(26 エージェント)で整理。結論: **ニューラル
+  capability がメモリに対し指数的に伸びる族は存在しない**。指数が本物なのは古典計算の 2 か所だけ —
+  (a)メモ化/DP(重複部分問題があるとき**のみ**指数時間→多項式=指数的スピードアップ)、(b)modern
+  Hopfield(容量が次元 d に指数、ただし footprint→容量は線形・分離条件付き・容量≠知能)。圧倒的多数は
+  **べき乗則/対数(劣線形)** — scaling law / MoE / RAG(log(corpus))/ SSM 品質。「emergence で指数的に
+  賢くなる」は Schaeffer 2023 の通り**不連続メトリクスの測定アーティファクト**で、「指数の支出×線形の利得」
+  の誤読。**完全性批評が overclaim を 1 件検出**: 「大 RAM→大モデル常駐」は無条件には誤り — Beyond-Chinchilla
+  ではサービング量が多いほど compute-optimal は“より小さい N×長い学習 D”へ動く(推論回数で割り戻す)。
+- **根拠**: `docs/MEMORY_SCALING_STRATEGY.md`(訂正反映済み正本・族別表・regime→primitive 決定則)。
+- **側面**: 業界比較 / honest disclosure / 教訓 / 哲学 / 戦略 / 認知科学(emergence の誤読)。
+
+### 37. 量子化 cliff はモデルが大きいほど低ビットに頑健・PPL-only gate は壊れた 2bit を PASS する
+- **気付き**: 批評推奨の反証可能実験(int8 ビット幅スイープ {8..2}bit)を 2 モデルで実測。**cliff_then_flat
+  を確認**しつつ、(1)**cliff 位置はモデルサイズ依存** — 小 1.36M は 3bit で劣化(+11.6%)・2bit 破綻だが、
+  大 11.9M は **3bit でも実用**(+4.8% / top1 -0.7pp)、cliff は 2bit = **大モデルほど低ビットに頑健**
+  (冗長性、literature 整合)。(2)**PPL だけの合否は危険** — 11.9M の 2bit は top1 が -13.5pp(28.7%→15.2%
+  =半減近く壊れている)のに unigram PPL gate は PASS。→ 合否に hard-capability proxy が要る。(3)**honest
+  反証**: 「top1 は PPL より先に劣化する」という事前予想は本データでは不成立、両者 lockstep。誇張せず記録。
+- **根拠**: `scripts/quant_bitwidth_sweep.py` / `out/quant_bitwidth_sweep*.json` /
+  `docs/MEMORY_EFFICIENCY_FINDINGS.md` (b')。
+- **側面**: ベンチ / honest disclosure / 教訓 / 実装報告 / 業界比較。
