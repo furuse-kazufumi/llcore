@@ -126,3 +126,30 @@ def test_passes_gate() -> None:
     assert passes_gate(model_ppl=10.0, unigram_ppl=40.0) is True
     assert passes_gate(model_ppl=39.0, unigram_ppl=40.0) is False
     assert passes_gate(model_ppl=34.0, unigram_ppl=40.0, margin=0.85) is True
+
+
+def test_held_out_top1_report_bounds() -> None:
+    # Random tiny model: accuracy can be anything in [0,1], but the invariants
+    # (top1 <= top5 <= 1, positive token count) must always hold.
+    torch.manual_seed(0)
+    val = torch.randint(0, 16, (200,))
+    model = CharGPT(GPTConfig(vocab_size=16, block_size=8, n_layer=1, n_head=1, n_embd=16))
+    rep = held_out_top1_report(model, val, block_size=8)
+    assert 0.0 <= rep["top1_acc"] <= rep["top5_acc"] <= 1.0
+    assert rep["n_tokens"] > 0
+
+
+def test_held_out_top1_report_rejects_too_small_val() -> None:
+    model = CharGPT(GPTConfig(vocab_size=8, block_size=16, n_layer=1, n_head=1, n_embd=16))
+    # val shorter than block_size yields no windows -> explicit error (fail-closed).
+    with pytest.raises(ValueError):
+        held_out_top1_report(model, torch.zeros(8, dtype=torch.long), block_size=16)
+
+
+def test_passes_capability_gate() -> None:
+    # Retains >= 97% of reference -> pass; below -> fail.
+    assert passes_capability_gate(0.30, 0.30) is True
+    assert passes_capability_gate(0.291, 0.30, min_retention=0.97) is True  # exactly 0.97x
+    assert passes_capability_gate(0.28, 0.30, min_retention=0.97) is False
+    # Non-positive reference = no constraint (any non-negative top-1 passes).
+    assert passes_capability_gate(0.0, 0.0) is True
