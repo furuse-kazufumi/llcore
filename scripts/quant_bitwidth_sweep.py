@@ -130,37 +130,9 @@ def apply_quantization(model: nn.Module, bits: int, per_channel: bool) -> float:
     return (total_sq_err / total_sq_val) ** 0.5 if total_sq_val > 0 else 0.0
 
 
-@torch.no_grad()
-def held_out_top1(
-    model: CharGPT, val_ids: Tensor, block_size: int, batch_size: int = 32
-) -> dict[str, float]:
-    """held-out の teacher-forced 次トークン top-1 / top-5 accuracy(hard-capability proxy)。
-
-    PPL(ソフトな尤度)に対し、top-1 は「正解そのものを当てたか」という硬い指標。capability cliff は
-    PPL cliff より低く来る、を可視化するために併記する。eval.held_out_report と同じ窓割りを使う。
-    """
-    model.eval()
-    n = val_ids.size(0)
-    starts = list(range(0, n - block_size, block_size))
-    if not starts:
-        raise ValueError(f"val length {n} too small for block_size {block_size}")
-    top1 = 0
-    top5 = 0
-    total = 0
-    for s in range(0, len(starts), batch_size):
-        idxs = starts[s : s + batch_size]
-        x = torch.stack([val_ids[i : i + block_size] for i in idxs])
-        y = torch.stack([val_ids[i + 1 : i + 1 + block_size] for i in idxs])
-        logits = model.forward_logits(x)
-        flat_logits = logits.view(-1, logits.size(-1))
-        flat_y = y.reshape(-1)
-        pred1 = flat_logits.argmax(dim=-1)
-        top1 += int((pred1 == flat_y).sum().item())
-        # top-5: 正解が上位 5 候補に入っているか
-        top5_idx = flat_logits.topk(min(5, flat_logits.size(-1)), dim=-1).indices
-        top5 += int((top5_idx == flat_y.unsqueeze(-1)).any(dim=-1).sum().item())
-        total += int(flat_y.numel())
-    return {"top1_acc": top1 / total, "top5_acc": top5 / total, "n_tokens": float(total)}
+# hard-capability proxy(top-1/top-5)は llcore の first-class eval 指標へ昇格したので再利用する
+# (DRY)。エイリアスにすることで本スクリプト内の既存呼び出し・テストの参照名はそのまま使える。
+held_out_top1 = held_out_top1_report
 
 
 def _load_checkpoint(path: Path) -> tuple[CharGPT, CharTokenizer]:
