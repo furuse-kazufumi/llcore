@@ -1,8 +1,11 @@
 # SPDX-License-Identifier: Apache-2.0
 from __future__ import annotations
 
+import ast
+import hashlib
 import importlib.util
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -176,6 +179,94 @@ def test_build_bundle_dataset_runner_embeds_payload_hashes(tmp_path: Path) -> No
     )
     assert payload_manifest["config_sha256"] in runner_text
     assert payload_manifest["corpus_sha256"] in runner_text
+
+
+def test_build_bundle_dataset_runner_compiles(tmp_path: Path) -> None:
+    builder = _load_builder()
+    corpus = tmp_path / "corpus.txt"
+    corpus.write_text("abcabc\n", encoding="utf-8")
+    bundle_dir = tmp_path / "bundle"
+
+    rc = builder.main(
+        [
+            "--bundle-dir",
+            str(bundle_dir),
+            "--corpus-file",
+            str(corpus),
+            "--dataset-source",
+            "furusekazufumi/llcore-lm-compare-support",
+        ]
+    )
+
+    assert rc == 0
+    runner_text = (bundle_dir / "runner.py").read_text(encoding="utf-8")
+    ast.parse(runner_text)
+    compile(runner_text, str(bundle_dir / "runner.py"), "exec")
+
+
+def test_build_bundle_dataset_runner_rejects_duplicate_archive_members(tmp_path: Path) -> None:
+    builder = _load_builder()
+    corpus = tmp_path / "corpus.txt"
+    corpus.write_text(("abcde " * 80).strip() + "\n", encoding="utf-8")
+    bundle_dir = tmp_path / "bundle"
+
+    rc = builder.main(
+        [
+            "--bundle-dir",
+            str(bundle_dir),
+            "--corpus-file",
+            str(corpus),
+            "--dataset-source",
+            "furusekazufumi/llcore-lm-compare-support",
+            "--block-size",
+            "16",
+            "--n-layer",
+            "1",
+            "--n-head",
+            "1",
+            "--n-embd",
+            "16",
+            "--state-size",
+            "8",
+            "--max-iters",
+            "1",
+            "--batch-size",
+            "2",
+            "--eval-iters",
+            "1",
+            "--throughput-new-tokens",
+            "1",
+            "--throughput-repeats",
+            "1",
+        ]
+    )
+    assert rc == 0
+
+    dataset_root = bundle_dir / "dataset_payload"
+    src_zip = dataset_root / "src_llcore.zip"
+    with zipfile.ZipFile(src_zip, "w") as zf:
+        zf.writestr("src/llcore/__init__.py", "# first\n")
+        zf.writestr("src/llcore/__init__.py", "# duplicate\n")
+    src_sha256 = hashlib.sha256(src_zip.read_bytes()).hexdigest()
+    runner_path = bundle_dir / "runner.py"
+    runner_text = runner_path.read_text(encoding="utf-8")
+    manifest = json.loads((dataset_root / "dataset_payload_manifest.json").read_text(encoding="utf-8"))
+    old_sha256 = manifest["src_archive_sha256"]
+    assert isinstance(old_sha256, str)
+    runner_path.write_text(runner_text.replace(old_sha256, src_sha256), encoding="utf-8")
+
+    proc = subprocess.run(
+        [sys.executable, str(runner_path)],
+        cwd=bundle_dir,
+        check=False,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        env={**os.environ, "LLCORE_KAGGLE_DATA_ROOT": str(dataset_root)},
+    )
+
+    assert proc.returncode != 0
+    assert "duplicate member name" in (proc.stderr or proc.stdout)
 
 
 def test_build_bundle_rejects_missing_corpus(

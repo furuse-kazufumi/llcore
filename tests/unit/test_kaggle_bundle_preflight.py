@@ -373,6 +373,34 @@ def test_preflight_rejects_duplicate_zip_members(tmp_path: Path) -> None:
     assert rc == 2
 
 
+def test_preflight_rejects_zip_symlink_member(tmp_path: Path) -> None:
+    preflight = _load_script("kaggle_bundle_preflight.py")
+    bundle_dir = _build_dataset_bundle(tmp_path)
+    src_zip = bundle_dir / "dataset_payload" / "src_llcore.zip"
+    symlink_info = zipfile.ZipInfo("src/llcore/link.py")
+    symlink_info.external_attr = (0o120777 << 16)
+    with zipfile.ZipFile(src_zip, "w") as zf:
+        zf.writestr("src/llcore/__init__.py", "# package\n")
+        zf.writestr(symlink_info, "target.py")
+
+    rc = preflight.main(["--bundle-dir", str(bundle_dir)])
+
+    assert rc == 2
+
+
+def test_preflight_rejects_zip_over_size_budget(tmp_path: Path) -> None:
+    preflight = _load_script("kaggle_bundle_preflight.py")
+    bundle_dir = _build_dataset_bundle(tmp_path)
+    preflight._DATASET_ARCHIVE_MAX_UNCOMPRESSED_BYTES = 8
+    src_zip = bundle_dir / "dataset_payload" / "src_llcore.zip"
+    with zipfile.ZipFile(src_zip, "w", compression=zipfile.ZIP_STORED) as zf:
+        zf.writestr("src/llcore/__init__.py", "012345678")
+
+    rc = preflight.main(["--bundle-dir", str(bundle_dir)])
+
+    assert rc == 2
+
+
 def test_preflight_rejects_missing_top_level_package(tmp_path: Path) -> None:
     preflight = _load_script("kaggle_bundle_preflight.py")
     bundle_dir = _build_bundle(tmp_path)

@@ -11,6 +11,7 @@ import argparse
 import hashlib
 import json
 import os
+import stat
 import subprocess
 import sys
 from pathlib import Path
@@ -52,6 +53,8 @@ DATASET_METADATA_NAME = "dataset-metadata.json"
 DATASET_PAYLOAD_MANIFEST_NAME = "dataset_payload_manifest.json"
 DATASET_SRC_ARCHIVE_NAME = "src_llcore.zip"
 DATASET_PKG_ARCHIVE_NAME = "pkg_llcore.zip"
+_DATASET_ARCHIVE_MAX_ENTRIES = 4096
+_DATASET_ARCHIVE_MAX_UNCOMPRESSED_BYTES = 256 * 1024 * 1024
 _BOOL_TEXT_VALUES = {"true", "false"}
 _EMBEDDED_COPIED_FILE_PATHS = {
     "corpus": "input_corpus.txt",
@@ -98,13 +101,21 @@ def _sha256_zip_tree(archive_path: Path, *, expected_prefix: str) -> str:
     digest = hashlib.sha256()
     seen_members: set[str] = set()
     with zipfile.ZipFile(archive_path) as zf:
-        for info in sorted(zf.infolist(), key=lambda item: item.filename):
+        infos = zf.infolist()
+        if len(infos) > _DATASET_ARCHIVE_MAX_ENTRIES:
+            raise ValueError(
+                f"{archive_path.name} contains too many members: {len(infos)} > {_DATASET_ARCHIVE_MAX_ENTRIES}"
+            )
+        total_uncompressed = 0
+        for info in sorted(infos, key=lambda item: item.filename):
             member_name = info.filename.replace("\\", "/")
-            if info.is_dir():
-                continue
+            if not member_name:
+                raise ValueError(f"{archive_path.name} contains an empty member name")
             if member_name in seen_members:
                 raise ValueError(f"{archive_path.name} contains duplicate member name: {member_name}")
             seen_members.add(member_name)
+            if member_name.startswith("/") or member_name.startswith("../"):
+                raise ValueError(f"{archive_path.name} contains unsafe member path: {member_name}")
             if not member_name.startswith(expected_prefix):
                 raise ValueError(
                     f"{archive_path.name} contains member outside expected prefix {expected_prefix!r}: {member_name}"
@@ -112,6 +123,17 @@ def _sha256_zip_tree(archive_path: Path, *, expected_prefix: str) -> str:
             member_path = PurePosixPath(member_name)
             if any(part in {"", ".", ".."} for part in member_path.parts):
                 raise ValueError(f"{archive_path.name} contains unsafe member path: {member_name}")
+            mode = info.external_attr >> 16
+            if stat.S_IFMT(mode) == stat.S_IFLNK:
+                raise ValueError(f"{archive_path.name} contains forbidden symlink member: {member_name}")
+            if info.is_dir():
+                continue
+            total_uncompressed += info.file_size
+            if total_uncompressed > _DATASET_ARCHIVE_MAX_UNCOMPRESSED_BYTES:
+                raise ValueError(
+                    f"{archive_path.name} exceeds extracted size budget: "
+                    f"{total_uncompressed} > {_DATASET_ARCHIVE_MAX_UNCOMPRESSED_BYTES}"
+                )
             rel = member_name.removeprefix(expected_prefix).encode("utf-8")
             digest.update(rel)
             digest.update(b"\0")
