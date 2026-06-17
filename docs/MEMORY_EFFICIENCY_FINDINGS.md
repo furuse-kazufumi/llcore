@@ -43,6 +43,25 @@ recurrent、(b) 量子化、の 3 つが本筋。
 
 ---
 
+## (0') runtime peak RSS スイープ — 解析値を実機計測へ昇格 (`out/recurrent_runtime_rss.json`)
+
+(0) は state_bytes(実測)+ KV/attn(解析値)だった。`scripts/recurrent_runtime_rss.py` はその後続で、
+**実ワークロードを文脈長 T で振り、別プロセス隔離で peak working set を実測**(重み構成は T 間固定なので
+増分は純粋に文脈依存コスト)。
+
+| T | GPT peak WS | Recurrent peak WS | RWKV peak WS |
+|---|---|---|---|
+| 256 | 229.8 MB | 205.0 MB | 215.3 MB |
+| 512 | 247.3 MB | 205.1 MB | 216.0 MB |
+| 1024 | 330.5 MB | 204.8 MB | 215.7 MB |
+| 2048 | **607.9 MB** | 204.8 MB | 215.2 MB |
+
+- **T 256→2048(×8)の peak WS 倍率: GPT ×2.65(文脈で膨張)/ Recurrent ×1.00 / RWKV ×1.00(平坦)**。
+  固定 baseline(~205MB=torch+重み)を引くと GPT の文脈コストは ~25MB→~403MB と超線形(attn O(T²) が
+  大 T で支配、1024→2048 で +277MB)。**解析値(KV 線形・attn 二次)を実機 peak RSS で裏取り**。
+- honest: peak WS は torch + 固定重み + T 依存バッファの合算。クリーンな信号は増分トレンド。GPT.generate は
+  block_size crop で実行上有界(本測は厳密長文脈想定)。
+
 ## (a) mmap read-only 重み PoC (`out/mmap_weights_poc.json`)
 
 `torch.load(mmap=True)` + `load_state_dict(assign=True)` で重みを **file-backed のまま**割り当て
