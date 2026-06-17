@@ -92,8 +92,7 @@ def _peak_working_set_bytes() -> int:
 def _avail_phys_bytes() -> int:
     """利用可能な物理メモリ(Windows; 失敗時 0)。モデルサイズ安全弁に使う。"""
     try:
-        import ctypes.wintypes as wt
-
+        # GlobalMemoryStatusEx only needs ctypes scalar types here (no wintypes).
         class _MS(ctypes.Structure):
             _fields_ = [
                 ("dwLength", ctypes.c_uint32), ("dwMemoryLoad", ctypes.c_uint32),
