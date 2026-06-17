@@ -3,49 +3,49 @@
 > 自動生成: `libexec/raptor-auto-summary` (Stop hook)
 > 次回 ccr 起動時に CLAUDE.md SESSION START で自動的に読み取られる。
 
-- **最終更新**: 2026-06-17 22:04:05
+- **最終更新**: 2026-06-17 22:32:06
 - **プロジェクト**: `D:/projects/llcore`
 - **ブランチ**: `feat/lm-recurrent`
 
 ## 直近の git log
 
 ```
-b646570 auto: ARTICLE_SEEDS.md 編集前 (2026-06-17 22:02)
-a773e5b auto: MEMORY_SCALING_STRATEGY.md 編集前 (2026-06-17 22:01)
-3c1e43c auto: MEMORY_EFFICIENCY_FINDINGS.md 編集前 (2026-06-17 22:01)
-8698fdd auto: test_quant_bitwidth_sweep.py 編集前 (2026-06-17 22:00)
-6301cc5 auto: quant_bitwidth_sweep.py 編集前 (2026-06-17 22:00)
-e3c07bf auto: quant_bitwidth_sweep.py 編集前 (2026-06-17 21:53)
-bcd5eb1 auto: quant_bitwidth_sweep.py 編集前 (2026-06-17 21:53)
-1251e6b auto: ARTICLE_SEEDS.md 編集前 (2026-06-17 21:26)
-ccf1cc0 auto: MEMORY_EFFICIENCY_FINDINGS.md 編集前 (2026-06-17 21:26)
-9a8e7a4 auto: ARTICLE_SEEDS.md 編集前 (2026-06-17 21:24)
+183a91b auto: MEMORY_EFFICIENCY_FINDINGS.md 編集前 (2026-06-17 22:30)
+c209a14 auto: quant_bitwidth_sweep.py 編集前 (2026-06-17 22:23)
+1fd60f3 auto: quant_bitwidth_sweep.py 編集前 (2026-06-17 22:20)
+03e7cef auto: quant_bitwidth_sweep.py 編集前 (2026-06-17 22:20)
+a4790f8 auto: quant_bitwidth_sweep.py 編集前 (2026-06-17 22:20)
+b9200b5 auto: test_lm_eval.py 編集前 (2026-06-17 22:19)
+6d54e96 auto: test_lm_eval.py 編集前 (2026-06-17 22:19)
+8694e43 auto: test_lm_eval.py 編集前 (2026-06-17 22:19)
+da812d7 auto: quant_bitwidth_sweep.py 編集前 (2026-06-17 22:19)
+f80733f auto: quant_bitwidth_sweep.py 編集前 (2026-06-17 22:18)
 ```
 
 ## 現在の git status
 
 ```
-M docs/ARTICLE_SEEDS.md
+M docs/MEMORY_EFFICIENCY_FINDINGS.md
 ```
 
 ## 直近 2 時間に変更されたファイル
 
 ```
-22:02 docs/ARTICLE_SEEDS.md
-22:01 docs/MEMORY_SCALING_STRATEGY.md
-22:01 docs/MEMORY_EFFICIENCY_FINDINGS.md
-22:01 .pytest_cache/v/cache/nodeids
-22:00 .mypy_cache/3.11/cache.3.db
-22:00 .mypy_cache/3.11/cache.12.db
-22:00 .mypy_cache/3.11/cache.1.db
-22:00 .ruff_cache/0.15.12/16546767254229203700
-22:00 .ruff_cache/0.15.12/11287728664031201126
-22:00 tests/unit/test_quant_bitwidth_sweep.py
-22:00 scripts/quant_bitwidth_sweep.py
-21:32 docs/SESSION_SUMMARY.md
-21:20 .mypy_cache/3.11/cache.13.db
-21:19 tests/unit/test_mmap_weights_poc.py
-21:18 scripts/mmap_weights_poc.py
+22:31 .pytest_cache/v/cache/nodeids
+22:30 docs/MEMORY_EFFICIENCY_FINDINGS.md
+22:23 .mypy_cache/3.11/cache.3.db
+22:23 .mypy_cache/3.11/cache.12.db
+22:23 .ruff_cache/0.15.12/16546767254229203700
+22:23 scripts/quant_bitwidth_sweep.py
+22:20 .mypy_cache/3.11/cache.14.db
+22:20 .mypy_cache/3.11/cache.13.db
+22:20 .mypy_cache/3.11/cache.0.db
+22:20 .ruff_cache/0.15.12/460471245633591413
+22:20 .ruff_cache/0.15.12/11287728664031201126
+22:19 tests/unit/test_lm_eval.py
+22:18 src/llcore/lm/eval.py
+22:16 docs/ARTICLE_SEEDS.md
+22:14 .mypy_cache/3.11/cache.11.db
 ```
 
 ---

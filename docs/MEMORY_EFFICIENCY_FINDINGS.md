@@ -169,6 +169,11 @@ proxy = 次トークン top-1 accuracy** を併記。予測(Dettmers 2023: ~4bit
   capability 喪失を見逃す。→ llcore の合否ゲートに hard-capability proxy を足すべき。
 - **批評仮説の honest 反証**: 「top1 は PPL より先に劣化する」という事前予想は**本データでは成立せず**、
   top1 と PPL はほぼ同時(lockstep)に劣化した。誇張せず「同時劣化 + gate が粗い」が正確な観測。
+- **★成長要素として eval に capability gate を新設**: 発見「PPL-only gate は壊れた低ビットを PASS」を受け、
+  `src/llcore/lm/eval.py` に **`held_out_top1_report`(top-1/top-5)+ `passes_capability_gate`(fp32 比
+  top-1 retention ≥97%)** を追加(既存関数は不変=純粋追加)。スイープに配線した結果、**ppl-gate は PASS でも
+  cap-gate が止めるビット幅 = multi_smoke 3bit / realp1 2bit** = PPL だけの合否が見逃す capability 喪失を
+  実際に捕捉。llcore の評価基盤が一段成長。
 - 留保: weights-only / dequant fp32 の simulated quant(速度未測)/ 2bit は QAT なしの PTQ 限界。
 
 ## 記事側面 (feedback_daily_articles_policy の 13 側面)
