@@ -512,13 +512,25 @@ def _verify_push_payload_snapshot(bundle_dir: Path, snapshot_path: Path) -> None
             f"expected {manifest_kernel_id!r}, got {snapshot_kernel_id!r}"
         )
     snapshot_dataset = payload.get("dataset")
-    if isinstance(snapshot_dataset, dict):
+    manifest_dataset_source = manifest_payload.get("dataset_source")
+    if manifest_dataset_source is not None:
+        if not isinstance(snapshot_dataset, dict):
+            raise ValueError(
+                "push payload snapshot missing dataset block for dataset-mode bundle "
+                f"(manifest dataset_source={manifest_dataset_source!r})"
+            )
         snapshot_dataset_source = snapshot_dataset.get("dataset_source")
-        manifest_dataset_source = manifest_payload.get("dataset_source")
         if snapshot_dataset_source != manifest_dataset_source:
             raise ValueError(
                 "push payload snapshot dataset_source mismatch: "
                 f"expected {manifest_dataset_source!r}, got {snapshot_dataset_source!r}"
+            )
+    elif isinstance(snapshot_dataset, dict):
+        snapshot_dataset_source = snapshot_dataset.get("dataset_source")
+        if snapshot_dataset_source is not None:
+            raise ValueError(
+                "push payload snapshot claims dataset_source for embedded bundle: "
+                f"got {snapshot_dataset_source!r}"
             )
     push_payload = payload.get("push_payload")
     if not isinstance(push_payload, dict):
