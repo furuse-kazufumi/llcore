@@ -63,6 +63,7 @@ def test_prepare_bundle_builds_and_preflights(tmp_path: Path, capsys: Any) -> No
     assert "[kaggle-prepare]" in out
     assert 'kaggle kernels push -p "' in out
     payload = json.loads(report_path.read_text(encoding="utf-8"))
+    assert payload["bundle_dir"] == bundle_dir.name
     assert payload["preflight"]["checks"]["metadata"]["enable_gpu"] == "false"
     assert len(payload["preflight"]["checks"]["manifest"]["source_sha256"]) == 64
     assert payload["preflight"]["runner"] is None
@@ -156,13 +157,19 @@ def test_prepare_bundle_dataset_mode_reports_dataset_command(tmp_path: Path, cap
     assert "[dataset-create]" in out
     assert "[dataset-version]" in out
     payload = json.loads(report_path.read_text(encoding="utf-8"))
+    assert payload["bundle_dir"] == bundle_dir.name
     assert payload["dataset_source"] == "furusekazufumi/llcore-lm-compare-support"
     assert payload["dataset_visibility"] == "private"
-    assert "dataset_payload" in payload["dataset_create_command"]
+    assert '<bundle_dir>/dataset_payload' in payload["dataset_create_command"]
     assert "--dir-mode zip" in payload["dataset_create_command"]
     assert "--public" not in payload["dataset_create_command"]
     assert "datasets version" in payload["dataset_version_command"]
     assert "--dir-mode zip" in payload["dataset_version_command"]
+    assert bundle_dir.name in payload["dataset_version_command"]
+    runner = payload["preflight"]["runner"]
+    assert isinstance(runner, dict)
+    assert "<bundle_dir>" in runner["stdout"]
+    assert str(bundle_dir) not in runner["stdout"]
     assert payload["preflight"]["checks"]["manifest"]["dataset_publish_dir"] == "dataset_payload"
     assert (
         payload["preflight"]["checks"]["config"]["dataset_metadata_path"]

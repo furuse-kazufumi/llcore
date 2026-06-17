@@ -77,7 +77,7 @@ _PUBLISH_BLOCKLIST_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("openai-api-key-name", re.compile(r"\bOPENAI_API_KEY\b")),
     ("kaggle-key-name", re.compile(r"\bKAGGLE_KEY\b")),
     ("kaggle-api-token-name", re.compile(r"\bKAGGLE_API_TOKEN\b")),
-    ("local-windows-path", re.compile(r"\b(?:[A-Za-z]:\\\\|[A-Za-z]:/)(?:Users|projects)\\b")),
+    ("local-windows-path", re.compile(r"\b[A-Za-z]:(?:\\|/)+(?:Users|projects)\b")),
 )
 _EMBEDDED_COPIED_FILE_PATHS = {
     "corpus": "input_corpus.txt",
@@ -113,6 +113,12 @@ _DATASET_PAYLOAD_COPIED_FILE_PATHS = {
     "license": "LICENSE",
     "notice": "NOTICE",
 }
+_DATASET_REQUIRED_KAGGLEIGNORE_ENTRIES = (
+    f"{DATASET_PAYLOAD_DIRNAME}/",
+    f"{DATASET_UNPACK_DIRNAME}/",
+    "preflight_report.json",
+    "prepare_report.json",
+)
 
 
 def _write_json(path: Path, payload: object) -> None:
@@ -223,16 +229,60 @@ def _archive_member_publish_findings(label: str, member_name: str) -> list[str]:
     return findings
 
 
+def _bundle_dir_label(bundle_dir: Path) -> str:
+    return bundle_dir.name
+
+
+def _normalized_bundle_top_level_entry(path: Path, *, bundle_dir: Path) -> str:
+    return path.relative_to(bundle_dir).as_posix()
+
+
+def _sanitize_report_text(text: str, *, bundle_dir: Path) -> str:
+    return text.replace(str(bundle_dir), "<bundle_dir>")
+
+
+def _top_level_publish_safety_summary(bundle_dir: Path) -> dict[str, object]:
+    findings: list[str] = []
+    scanned_text_files: list[str] = []
+    for path in sorted(bundle_dir.iterdir(), key=lambda item: item.name):
+        if path.is_symlink() or not path.is_file():
+            continue
+        if path.suffix in _TEXT_SCAN_SUFFIXES or path.name in {
+            "LICENSE",
+            "NOTICE",
+            "README.md",
+            "kernel-metadata.json",
+            "bundle_manifest.json",
+            "config.json",
+            "input_corpus.txt",
+            "preflight_report.json",
+            "prepare_report.json",
+        }:
+            scanned_text_files.append(path.name)
+            findings.extend(
+                _text_publish_findings(
+                    _normalized_bundle_top_level_entry(path, bundle_dir=bundle_dir),
+                    path.read_text(encoding="utf-8", errors="replace"),
+                )
+            )
+    if findings:
+        raise ValueError("bundle root secret/path scan failed: " + "; ".join(findings))
+    return {
+        "status": "passed",
+        "scanned_text_files": scanned_text_files,
+    }
+
+
 def _validate_dataset_bundle_kaggleignore(kaggleignore_path: Path) -> None:
     if not kaggleignore_path.is_file():
         raise ValueError("dataset bundle must include .kaggleignore to exclude dataset_payload/ from kernel push")
     kaggleignore_text = kaggleignore_path.read_text(encoding="utf-8")
     kaggleignore_lines = {line.strip() for line in kaggleignore_text.splitlines()}
-    required_entries = (f"{DATASET_PAYLOAD_DIRNAME}/", f"{DATASET_UNPACK_DIRNAME}/")
+    required_entries = _DATASET_REQUIRED_KAGGLEIGNORE_ENTRIES
     missing_ignore_entries = [entry for entry in required_entries if entry not in kaggleignore_lines]
     if missing_ignore_entries:
         raise ValueError(".kaggleignore must exclude: " + ", ".join(missing_ignore_entries))
-    protected_prefixes = (f"{DATASET_PAYLOAD_DIRNAME}/", DATASET_PAYLOAD_DIRNAME, f"{DATASET_UNPACK_DIRNAME}/", DATASET_UNPACK_DIRNAME)
+    protected_segments = {DATASET_PAYLOAD_DIRNAME, DATASET_UNPACK_DIRNAME}
     for raw_line in kaggleignore_text.splitlines():
         line = raw_line.strip()
         if not line or line.startswith("#") or not line.startswith("!"):
@@ -240,7 +290,8 @@ def _validate_dataset_bundle_kaggleignore(kaggleignore_path: Path) -> None:
         target = line[1:].strip().lstrip("/").replace("\\", "/")
         if target.startswith("./"):
             target = target[2:]
-        if any(target == prefix or target.startswith(f"{prefix}/") for prefix in protected_prefixes):
+        target_segments = [segment for segment in target.split("/") if segment not in {"", "."}]
+        if any(segment in protected_segments for segment in target_segments):
             raise ValueError(
                 ".kaggleignore must not re-include protected dataset paths: "
                 + line
@@ -248,33 +299,57 @@ def _validate_dataset_bundle_kaggleignore(kaggleignore_path: Path) -> None:
 
 
 def _validate_bundle_top_level_entries(bundle_dir: Path, *, data_mode: str) -> None:
-    allowed_entries = {
-        "kernel-metadata.json",
-        "bundle_manifest.json",
-        "LICENSE",
-        "NOTICE",
-        "runner.py",
-        "README.md",
-        "artifacts",
-        "preflight_report.json",
-        "prepare_report.json",
+    allowed_entries: dict[str, str] = {
+        "kernel-metadata.json": "file",
+        "bundle_manifest.json": "file",
+        "LICENSE": "file",
+        "NOTICE": "file",
+        "runner.py": "file",
+        "README.md": "file",
+        "artifacts": "dir",
+        "preflight_report.json": "file",
+        "prepare_report.json": "file",
     }
     if data_mode == "embedded":
-        allowed_entries.update({"config.json", "input_corpus.txt", "src", "llcore"})
+        allowed_entries.update(
+            {
+                "config.json": "file",
+                "input_corpus.txt": "file",
+                "src": "dir",
+                "llcore": "dir",
+            }
+        )
     else:
         allowed_entries.update(
             {
-                KAGGLEIGNORE_NAME,
-                DATASET_PAYLOAD_DIRNAME,
-                DATASET_UNPACK_DIRNAME,
+                KAGGLEIGNORE_NAME: "file",
+                DATASET_PAYLOAD_DIRNAME: "dir",
+                DATASET_UNPACK_DIRNAME: "dir",
             }
         )
-    unexpected_entries = sorted(
-        path.name for path in bundle_dir.iterdir() if path.name not in allowed_entries
-    )
+    unexpected_entries: list[str] = []
+    invalid_typed_entries: list[str] = []
+    for path in bundle_dir.iterdir():
+        expected_kind = allowed_entries.get(path.name)
+        if expected_kind is None:
+            unexpected_entries.append(path.name)
+            continue
+        if path.is_symlink():
+            invalid_typed_entries.append(f"{path.name} (symlink not allowed)")
+            continue
+        if expected_kind == "file" and not path.is_file():
+            invalid_typed_entries.append(f"{path.name} (expected file)")
+            continue
+        if expected_kind == "dir" and not path.is_dir():
+            invalid_typed_entries.append(f"{path.name} (expected directory)")
+            continue
     if unexpected_entries:
         raise ValueError(
             "bundle contains unexpected top-level entries: " + ", ".join(unexpected_entries)
+        )
+    if invalid_typed_entries:
+        raise ValueError(
+            "bundle contains invalid top-level entry types: " + ", ".join(sorted(invalid_typed_entries))
         )
 
 
@@ -729,8 +804,8 @@ def _run_runner(bundle_dir: Path, *, timeout_s: int) -> dict[str, object]:
     )
     payload: dict[str, object] = {
         "returncode": proc.returncode,
-        "stdout": proc.stdout,
-        "stderr": proc.stderr,
+        "stdout": _sanitize_report_text(proc.stdout, bundle_dir=bundle_dir),
+        "stderr": _sanitize_report_text(proc.stderr, bundle_dir=bundle_dir),
         "output_exists": out_json.is_file(),
     }
     if proc.returncode != 0:
@@ -753,12 +828,18 @@ def preflight_bundle(bundle_dir: Path, *, run_runner: bool, runner_timeout: int)
     if not bundle_dir.is_dir():
         raise ValueError(f"bundle directory does not exist: {bundle_dir}")
     result: dict[str, object] = {
-        "bundle_dir": str(bundle_dir),
+        "bundle_dir": _bundle_dir_label(bundle_dir),
         "checks": _validate_bundle_dir(bundle_dir),
         "runner": None,
     }
     if run_runner:
         result["runner"] = _run_runner(bundle_dir, timeout_s=runner_timeout)
+    top_level_publish_safety = _top_level_publish_safety_summary(bundle_dir)
+    checks = result.get("checks")
+    if isinstance(checks, dict):
+        manifest = checks.get("manifest")
+        if isinstance(manifest, dict):
+            manifest["bundle_root_publish_safety"] = top_level_publish_safety
     return result
 
 

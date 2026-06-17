@@ -339,8 +339,9 @@ This folder is a local, deterministic Kaggle script-kernel bundle for
   Dataset referenced by `kernel-metadata.json.dataset_sources`.
 - `dataset_payload/` carries `src_llcore.zip` and `pkg_llcore.zip`; `runner.py`
   safely extracts them at runtime before importing `llcore`.
-- `.kaggleignore` excludes `dataset_payload/` from `kaggle kernels push` so the
-  kernel and dataset payload are not uploaded twice.
+- `.kaggleignore` excludes `dataset_payload/`, `.dataset_payload_unpack/`, and
+  local report files from `kaggle kernels push` so the kernel and dataset
+  payload are not uploaded twice and root-side audit logs stay local.
 - Local smoke uses `LLCORE_KAGGLE_DATA_ROOT` to simulate `/kaggle/input/...`.
 - Default ids assume the `furusekazufumi` Kaggle account; override
   `--kernel-id` / `--dataset-source` when publishing from another owner.
@@ -360,7 +361,7 @@ Do not push automatically. Publish order is:
 
 ```powershell
 kaggle datasets create -p <this_dir>/dataset_payload --dir-mode zip
-kaggle datasets version -p <this_dir>/dataset_payload --dir-mode zip -m "update dataset payload"
+kaggle datasets version -p <this_dir>/dataset_payload --dir-mode zip -m "update dataset payload (<candidate-id>)"
 kaggle kernels push -p <this_dir>
 ```
 
@@ -732,7 +733,10 @@ def build_bundle(
             }
             _write_json(dataset_payload_dir / DATASET_PAYLOAD_MANIFEST_NAME, dataset_payload_manifest)
             (staging_dir / KAGGLEIGNORE_NAME).write_text(
-                f"{DATASET_PAYLOAD_DIRNAME}/\n{DATASET_UNPACK_DIRNAME}/\n",
+                f"{DATASET_PAYLOAD_DIRNAME}/\n"
+                f"{DATASET_UNPACK_DIRNAME}/\n"
+                "preflight_report.json\n"
+                "prepare_report.json\n",
                 encoding="utf-8",
             )
             dataset_config_sha256 = str(dataset_payload_manifest["config_sha256"])

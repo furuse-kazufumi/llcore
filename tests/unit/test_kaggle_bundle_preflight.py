@@ -147,6 +147,7 @@ def test_preflight_dataset_mode_runner_smoke_passes(tmp_path: Path) -> None:
     assert isinstance(runner, dict)
     assert runner["returncode"] == 0
     checks = report["checks"]
+    assert report["bundle_dir"] == bundle_dir.name
     assert checks["manifest"]["data_mode"] == "dataset"
     assert checks["manifest"]["dataset_source"] == "furusekazufumi/llcore-lm-compare-support"
     assert checks["manifest"]["dataset_publish_dir"] == "dataset_payload"
@@ -173,6 +174,9 @@ def test_preflight_dataset_mode_runner_smoke_passes(tmp_path: Path) -> None:
         "src_llcore.zip",
     ]
     assert publish_safety["scanned_archive_text_member_count"] >= 1
+    root_safety = checks["manifest"]["bundle_root_publish_safety"]
+    assert root_safety["status"] == "passed"
+    assert "bundle_manifest.json" in root_safety["scanned_text_files"]
     assert (bundle_dir / "artifacts" / "lm_compare.json").is_file()
 
 
@@ -201,6 +205,19 @@ def test_preflight_dataset_mode_rejects_kaggleignore_reinclude_rule(tmp_path: Pa
     bundle_dir = _build_dataset_bundle(tmp_path)
     (bundle_dir / ".kaggleignore").write_text(
         "dataset_payload/\n.dataset_payload_unpack/\n!dataset_payload/config.json\n",
+        encoding="utf-8",
+    )
+
+    rc = preflight.main(["--bundle-dir", str(bundle_dir)])
+
+    assert rc == 2
+
+
+def test_preflight_dataset_mode_rejects_kaggleignore_glob_reinclude_rule(tmp_path: Path) -> None:
+    preflight = _load_script("kaggle_bundle_preflight.py")
+    bundle_dir = _build_dataset_bundle(tmp_path)
+    (bundle_dir / ".kaggleignore").write_text(
+        "dataset_payload/\n.dataset_payload_unpack/\npreflight_report.json\nprepare_report.json\n!**/dataset_payload/config.json\n",
         encoding="utf-8",
     )
 
@@ -274,6 +291,30 @@ def test_preflight_rejects_unexpected_dataset_bundle_top_level_file(tmp_path: Pa
     preflight = _load_script("kaggle_bundle_preflight.py")
     bundle_dir = _build_dataset_bundle(tmp_path)
     (bundle_dir / "secret.txt").write_text("do not publish\n", encoding="utf-8")
+
+    rc = preflight.main(["--bundle-dir", str(bundle_dir)])
+
+    assert rc == 2
+
+
+def test_preflight_rejects_invalid_dataset_bundle_top_level_entry_type(tmp_path: Path) -> None:
+    preflight = _load_script("kaggle_bundle_preflight.py")
+    bundle_dir = _build_dataset_bundle(tmp_path)
+    shutil.rmtree(bundle_dir / "artifacts")
+    (bundle_dir / "artifacts").write_text("not a directory\n", encoding="utf-8")
+
+    rc = preflight.main(["--bundle-dir", str(bundle_dir)])
+
+    assert rc == 2
+
+
+def test_preflight_rejects_root_report_with_local_path_marker(tmp_path: Path) -> None:
+    preflight = _load_script("kaggle_bundle_preflight.py")
+    bundle_dir = _build_dataset_bundle(tmp_path)
+    (bundle_dir / "preflight_report.json").write_text(
+        json.dumps({"bundle_dir": r"D:\projects\secret"}, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
 
     rc = preflight.main(["--bundle-dir", str(bundle_dir)])
 

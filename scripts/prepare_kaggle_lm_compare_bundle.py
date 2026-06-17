@@ -153,17 +153,20 @@ def prepare_bundle(argv: list[str] | None = None) -> int:
         print(f"error: {exc}", file=sys.stderr)
         return 2
 
+    bundle_dir = Path(args.bundle_dir).resolve()
+    bundle_label = bundle_dir.name
+    dataset_publish_message = f"update dataset payload ({bundle_label})"
     combined_report = {
-        "bundle_dir": str(Path(args.bundle_dir).resolve()),
+        "bundle_dir": bundle_label,
         "kernel_id": args.kernel_id,
-        "push_command": f'kaggle kernels push -p "{Path(args.bundle_dir).resolve()}"',
+        "push_command": 'kaggle kernels push -p "<bundle_dir>"',
         "dataset_source": args.dataset_source,
         "dataset_visibility": args.dataset_visibility,
         "dataset_create_command": (
             None
             if not args.dataset_source
             else (
-                f'kaggle datasets create -p "{Path(args.bundle_dir).resolve() / "dataset_payload"}" '
+                'kaggle datasets create -p "<bundle_dir>/dataset_payload" '
                 + ("--public " if args.dataset_visibility == "public" else "")
                 + "--dir-mode zip"
             )
@@ -172,9 +175,8 @@ def prepare_bundle(argv: list[str] | None = None) -> int:
             None
             if not args.dataset_source
             else (
-                f'kaggle datasets version -p "{Path(args.bundle_dir).resolve() / "dataset_payload"}" '
-                "--dir-mode zip "
-                '-m "update dataset payload"'
+                'kaggle datasets version -p "<bundle_dir>/dataset_payload" '
+                f'--dir-mode zip -m "{dataset_publish_message}"'
             )
         ),
         "preflight": preflight_report,
@@ -187,7 +189,7 @@ def prepare_bundle(argv: list[str] | None = None) -> int:
 
     print(
         "[kaggle-prepare]",
-        f"dir={Path(args.bundle_dir).resolve()}",
+        f"dir={bundle_dir}",
         f"runner={'yes' if args.run_runner else 'no'}",
     )
     if args.run_runner:
