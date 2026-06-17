@@ -58,7 +58,7 @@ recurrent、(b) 量子化、の 3 つが本筋。
 - **on-demand fault**: mmap でも全バイトを touch するとページが fault-in し ΔRSS は ~51.5 MB へ
   =「**使った working set の分だけ**載る」を実機で確認。
 - **機能正当性**: mmap(assign=True)の forward logits は eager と **完全一致**(max|Δ|=0.0)。
-- **規模効果(重要 honest 知見)**: mmap の load 時 ΔRSS は**モデルサイズによらず ~1.4 MB の
+- **規模効果(重要 honest 知見)**: mmap の load 時 ΔRSS は**モデルサイズによらず ~1.4–1.5 MB の
   ほぼ固定コスト**(mmap セットアップ + メタデータ unpickling)。よって smoke(param 7.73 MB)では
   ×0.218 だが realp1(53.91 MB)では ×0.028。**モデルが大きいほど mmap の相対効果が大きい**。
 - 再現性: realp1 で 2 回測定 → ΔRSS 1.42 / 1.38 MB(×0.028 / 0.027)で安定。
