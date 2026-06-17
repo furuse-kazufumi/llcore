@@ -232,6 +232,9 @@ def main(argv: list[str] | None = None) -> int:
             "top5_acc": round(acc["top5_acc"], 6),
             "weight_rel_rmse": round(rel_rmse, 6),
             "ppl_gate_pass": passes_gate(rep["model_ppl"], unigram_ppl),
+            # capability gate: top-1 を fp32 比 97% 以上保てているか。ppl_gate が見逃す
+            # 低ビットの recall 喪失を捕まえる(両者の差が本実験の眼目)。
+            "capability_gate_pass": passes_capability_gate(acc["top1_acc"], fp32_acc["top1_acc"]),
         })
 
     print("\n| bits | ratio | savings | PPL | ΔPPL% | top1% | Δtop1(pp) | top5% | gate |")
