@@ -48,6 +48,7 @@ DEFAULT_DATASET_SOURCE = "furusekazufumi/llcore-lm-compare-support"
 RUNNER_NAME = "runner.py"
 KAGGLEIGNORE_NAME = ".kaggleignore"
 DATASET_PAYLOAD_DIRNAME = "dataset_payload"
+DATASET_UNPACK_DIRNAME = ".dataset_payload_unpack"
 DATASET_METADATA_NAME = "dataset-metadata.json"
 DATASET_PAYLOAD_MANIFEST_NAME = "dataset_payload_manifest.json"
 DATASET_SRC_ARCHIVE_NAME = "src_llcore.zip"
@@ -224,19 +225,23 @@ def _safe_extract_zip(
 
 
 def _prepare_import_tree() -> None:
-    extract_root = ROOT / ".dataset_payload_unpack"
+    extract_root = ROOT / "{dataset_unpack_dirname}"
     shutil.rmtree(extract_root, ignore_errors=True)
     extract_root.mkdir(parents=True, exist_ok=True)
-    src_archive = DATA_ROOT / SRC_ARCHIVE_NAME
-    pkg_archive = DATA_ROOT / PKG_ARCHIVE_NAME
-    if _sha256_text(src_archive) != EXPECTED_SRC_ARCHIVE_SHA256:
-        raise RuntimeError("dataset src archive sha256 mismatch")
-    if _sha256_text(pkg_archive) != EXPECTED_PKG_ARCHIVE_SHA256:
-        raise RuntimeError("dataset pkg archive sha256 mismatch")
-    _safe_extract_zip(src_archive, extract_root, expected_prefix="src/llcore/")
-    _safe_extract_zip(pkg_archive, extract_root, expected_prefix="llcore/")
-    for candidate in (extract_root, extract_root / "src"):
-        sys.path.insert(0, str(candidate))
+    try:
+        src_archive = DATA_ROOT / SRC_ARCHIVE_NAME
+        pkg_archive = DATA_ROOT / PKG_ARCHIVE_NAME
+        if _sha256_text(src_archive) != EXPECTED_SRC_ARCHIVE_SHA256:
+            raise RuntimeError("dataset src archive sha256 mismatch")
+        if _sha256_text(pkg_archive) != EXPECTED_PKG_ARCHIVE_SHA256:
+            raise RuntimeError("dataset pkg archive sha256 mismatch")
+        _safe_extract_zip(src_archive, extract_root, expected_prefix="src/llcore/")
+        _safe_extract_zip(pkg_archive, extract_root, expected_prefix="llcore/")
+        for candidate in (extract_root, extract_root / "src"):
+            sys.path.insert(0, str(candidate))
+    except Exception:
+        shutil.rmtree(extract_root, ignore_errors=True)
+        raise
 
 
 def main() -> int:
@@ -442,6 +447,7 @@ def _render_runner(
         )
     return RUNNER_TEMPLATE_DATASET.format(
         dataset_mount_name=_dataset_mount_name(dataset_source),
+        dataset_unpack_dirname=DATASET_UNPACK_DIRNAME,
         config_sha256=config_sha256,
         corpus_sha256=corpus_sha256,
         src_archive_sha256=src_archive_sha256,
@@ -725,7 +731,10 @@ def build_bundle(
                 "dataset_metadata_sha256": _sha256_text(dataset_payload_dir / DATASET_METADATA_NAME),
             }
             _write_json(dataset_payload_dir / DATASET_PAYLOAD_MANIFEST_NAME, dataset_payload_manifest)
-            (staging_dir / KAGGLEIGNORE_NAME).write_text(f"{DATASET_PAYLOAD_DIRNAME}/\n", encoding="utf-8")
+            (staging_dir / KAGGLEIGNORE_NAME).write_text(
+                f"{DATASET_PAYLOAD_DIRNAME}/\n{DATASET_UNPACK_DIRNAME}/\n",
+                encoding="utf-8",
+            )
             dataset_config_sha256 = str(dataset_payload_manifest["config_sha256"])
             dataset_corpus_sha256 = str(config_payload["corpus_sha256"])
         (staging_dir / RUNNER_NAME).write_text(

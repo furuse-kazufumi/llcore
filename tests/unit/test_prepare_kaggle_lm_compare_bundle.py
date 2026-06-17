@@ -5,6 +5,7 @@ import importlib.util
 import json
 import subprocess
 import sys
+import zipfile
 from pathlib import Path
 from typing import Any
 
@@ -217,6 +218,48 @@ def test_prepare_bundle_dataset_mode_reports_public_visibility(tmp_path: Path, c
     payload = json.loads(report_path.read_text(encoding="utf-8"))
     assert payload["dataset_visibility"] == "public"
     assert "--public" in payload["dataset_create_command"]
+
+
+def test_prepare_bundle_rejects_badzip_preflight_with_rc2(tmp_path: Path, capsys: Any, monkeypatch: Any) -> None:
+    script = _load_script("prepare_kaggle_lm_compare_bundle.py")
+    corpus = tmp_path / "corpus.txt"
+    corpus.write_text("abc\n", encoding="utf-8")
+    bundle_dir = tmp_path / "bundle"
+    bundle_dir.mkdir()
+
+    class _FakeBuild:
+        @staticmethod
+        def main(argv: list[str]) -> int:
+            return 0
+
+    class _FakePreflight:
+        zipfile = zipfile
+        subprocess = subprocess
+
+        @staticmethod
+        def preflight_bundle(bundle_dir: Path, *, run_runner: bool, runner_timeout: int) -> dict[str, object]:
+            raise zipfile.BadZipFile("broken archive")
+
+    def _fake_load_script(path: Path, module_name: str) -> Any:
+        if module_name == "build_kaggle_lm_compare_bundle":
+            return _FakeBuild
+        if module_name == "kaggle_bundle_preflight":
+            return _FakePreflight
+        raise AssertionError(module_name)
+
+    monkeypatch.setattr(script, "_load_script", _fake_load_script)
+
+    rc = script.main(
+        [
+            "--bundle-dir",
+            str(bundle_dir),
+            "--corpus-file",
+            str(corpus),
+        ]
+    )
+
+    assert rc == 2
+    assert "error:" in capsys.readouterr().err
 
 
 def test_prepare_bundle_rejects_nonpositive_runner_timeout(

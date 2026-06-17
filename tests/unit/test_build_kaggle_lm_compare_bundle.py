@@ -179,7 +179,9 @@ def test_build_bundle_dataset_mode_writes_dataset_payload(tmp_path: Path) -> Non
     assert manifest["data_mode"] == "dataset"
     assert manifest["dataset_source"] == "furusekazufumi/llcore-lm-compare-support"
     assert manifest["dataset_mount_name"] == "llcore-lm-compare-support"
-    assert (bundle_dir / ".kaggleignore").read_text(encoding="utf-8") == "dataset_payload/\n"
+    assert (bundle_dir / ".kaggleignore").read_text(encoding="utf-8") == (
+        "dataset_payload/\n.dataset_payload_unpack/\n"
+    )
     dataset_dir = bundle_dir / "dataset_payload"
     assert (dataset_dir / "dataset-metadata.json").is_file()
     assert (dataset_dir / "config.json").is_file()

@@ -144,7 +144,12 @@ def prepare_bundle(argv: list[str] | None = None) -> int:
             run_runner=args.run_runner,
             runner_timeout=args.runner_timeout,
         )
-    except (ValueError, OSError, preflight_mod.subprocess.TimeoutExpired) as exc:
+    except (
+        ValueError,
+        OSError,
+        preflight_mod.zipfile.BadZipFile,
+        preflight_mod.subprocess.TimeoutExpired,
+    ) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
 
