@@ -146,7 +146,7 @@ class Int8Linear(nn.Module):
     def forward(self, x: Tensor) -> Tensor:
         # 一時 fp32 重み: この行のスコープを抜けると解放される = 同時常駐は 1 層分。
         w = self.qweight.to(torch.float32) * self.scale
-        return cast(Tensor, F.linear(x, w, self.bias))
+        return F.linear(x, w, self.bias)
 
     def to_fp32_linear(self) -> nn.Linear:
         """dense モード用: dequant した通常の nn.Linear を返す(fp32 を常駐させる)。"""
