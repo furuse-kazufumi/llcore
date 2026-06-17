@@ -105,6 +105,32 @@ recurrent、(b) 量子化、の 3 つが本筋。
   クリーンな信号は **capped peak が上限に張り付いた**こと。int8 は disk/load まで(per-layer streaming
   dequant forward は将来課題)。
 
+## (c) int8 streaming-dequant 推論 — (a')mmap + (b)int8 を実推論パスへ統合 (`out/int8_streaming_infer.json`)
+
+`scripts/int8_streaming_infer.py`。`Int8Linear`(int8 を resident に保持し forward 内で層ごとに fp32 へ
+dequant→即解放)で CharGPT の Linear を置換。同一 int8 ソースから **dense(全層一括 dequant 常駐)vs
+stream(層ごと dequant)** を別プロセスで比較。
+
+### 実測(130M params, n_embd=1024 / L=10)
+
+| mode | working-set 上限 | resident | peak WS | logits checksum |
+|---|---|---|---|---|
+| dense | なし | 538.6 MB(fp32 全載) | 963.8 MB | -192.1 |
+| stream | なし | **148.9 MB(int8, 0.285×)** | 882.2 MB | -192.1 |
+| stream | **368 MB(強制成功)** | 148.9 MB | **368.2 MB**(完走) | -192.1 |
+
+### 知見(honest)
+- **★堅牢な勝ち = 常駐モデル 72% 削減**(dense fp32 538.6 MB → stream int8 148.9 MB)。
+- **圧力なしの peak WS はほぼ不変**(963.8 vs 882.2)= torch caching allocator が解放した fp32 を OS へ
+  返さず、transient 活性も加わるため。**「常に省メモリ」ではない**ことを honest に明示。
+- **★削減は圧力下で顕在化**: working-set 上限 **368 MB(= dense 常駐 538.6 MB 未満)で stream は完走**
+  (capped peak WS 368.2 MB ≤ 上限)。dense はこの上限に必須常駐(539MB)が収まらない。= **streaming-dequant
+  は dense が要求する RAM 未満で動かせる**((a') の RAM 超機構と同根)。
+- **正当性**: dense / stream / stream(capped) の logits checksum **全一致**(-192.1)= メモリ最適化は結果不変
+  (量子化誤差は別問題で (b) で測定済み)。
+- 留保: 量子化は `nn.Linear` のみ(Embedding/LN は fp32)。simulated quant(速度未測)。「resident ≈ 最大層」
+  まで絞るには int8 自体も mmap でストリーム + 圧力が要る(本版は int8 を常駐保持)。
+
 ## (b) int8 weight-only 量子化 footprint vs PPL (`out/int8_quant_footprint*.json`)
 
 2-D 重み行列を対称 int8 量子化(per-tensor / per-channel)。同一 held-out split で fp32 と
