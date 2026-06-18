@@ -69,7 +69,7 @@ perplexity ツールに **`Same top p` として既に出荷済み**のメトリ
 
 残る差別化を **控えめに** 3 点。各々「新規アルゴリズムではなく、性質はこうだ」を明記する。
 
-### (a) fail-closed capability-gate を eval に operationalize した engineering 規律
+### (a) fail-closed capability-gate を eval に operationalize した engineering 規律(新規アルゴリズムではなく運用の独自性)
 
 - **何か**: 量子化の合否を **PPL だけで決めず、top-1 retention ≥ 97%(fp32 比)を fail-closed の機械ゲート**
   として eval pipeline に配線(`src/llcore/lm/eval.py` の `passes_capability_gate`)。
