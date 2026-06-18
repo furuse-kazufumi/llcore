@@ -507,3 +507,34 @@
 - **根拠**: `src/llcore/lm/quant.py` / `src/llcore/lm/__main__.py`(quantize subcommand)/
   `tests/unit/test_lm_quant.py`(round-trip 検証)。
 - **側面**: 実装報告 / 技術設計 / 教訓 / ユーザー体験(自宅 PC で量子化推論)。
+
+---
+
+## 2026-06-18 (セッション: techno-edge 生成AIウィークリー#147 を一次情報検証 → llcore/portfolio マッピング。ユーザーが Telegram で共有した記事が出発点。5技術すべて is_real=confirmed・honest 監査 verdict=合格)
+
+> ★共通 honest 注記(全エントリに効く・記事化時 必須要件): **各社のベンチ数値はすべて開発元 self-report で第三者再現は未確認**。一次情報(arXiv論文/公式repo/公式blog/HF model card)で実在は確認済みだが、優位主張は各社の評価条件下のもの。記事で横並びにする時は必ずこの一文を本文に入れる(feedback_benchmark_honest_disclosure)。
+
+### 46. 2026年6月、業界が一斉に「小型・低メモリ・ローカル」へ収斂 — llcore pivot が主流の正面に来た(追い風と脅威の両面)
+- **気付き**: 同じ週(2026-06)に **Gemma 4 12B(16GB級・Apache 2.0)/ PaddleOCR-VL 0.9B / NVIDIA Cosmos の小バリアント Edge 2B・Nano 16B / Hermes Agent(local self-host)** が出揃い、「小型・低メモリ・ローカル実行」が業界の主流潮流に。llcore の北極星(2026-06-16 転換=メモリ効率・自宅 PC で動く)と FullSense「ローカルこそ AI の居場所」が**トレンドの正面**に立つ=pivot のタイミングは正しかった、の傍証。**だが脅威も同時に確定**: 大手(Google/Baidu/NVIDIA)が高性能小モデルを **Apache/open で無料配布**するため、llcore が「自前で小モデルを育てる」価値は**モデル本体では勝てない**。→ llcore の価値は**モデルではなく「メモリ効率の手法・計測・gate(int8 3.9×/mmap 358MB完走/定数状態×1.00/capability-gate≥97%/cliff のモデルサイズ依存実測)」=再利用可能なインフラ層**に置くべき(pivot 後の実装は既にこの方向)。
+- **根拠**: 一次情報= Gemma4 blog.google + HF `google/gemma-4-12B` / PaddleOCR arXiv:2606.03264 + HF / Cosmos3 NVIDIA newsroom + HF。llcore 側= `docs/MEMORY_EFFICIENCY_FINDINGS.md`(3本柱+量子化アーク実測)。**注記: Cosmos は本体 64B(学習20兆トークン)で本質は大規模、Edge2B/Nano16B は小バリアントを持つだけ**(「Cosmos も小型志向」と数えるのは限定付き)。
+- **側面**: 業界比較 / 戦略 / 未来予測 / honest disclosure / エコシステム。
+
+### 47. 「OSS が Gemini を超えた」の内訳を疑う — Cosmos3 と PaddleOCR が示す業界のベンチ cherry-pick
+- **気付き**: 派手な「proprietary 超え」主張は**負け軸の省略 / 専用ベンチ**で成立していた、を一次情報で実演。**(a) Cosmos 3**: 記事の「自動運転/ロボ制御で Gemini 3.1 Pro 超え」は**半分誤り** — 技報 Table 10 で Driving は 79.3 vs 47.2(Cosmos 勝ち, ただし 3 ベンチのみ母数小)だが **Robotics 57.8 vs 58.2 / General 73.7 vs 77.5 は Gemini が勝つ**。しかも **NVIDIA 公式 press/blog は Gemini 比較を一切せず「open models 内 1 位」と慎重に限定**、Gemini 数値は技報の詳細表にだけ存在。二次情報が拡大解釈した典型。**(b) PaddleOCR-VL-1.6**: 「0.9B が 235B Qwen3-VL・Gemini 3 Pro 超え(OmniDocBench v1.6 で 96.33)」は数値上 true だが **文書解析専用ベンチ上の話**で「汎用知能で超えた」ではない。汎用 VLM は文書解析に最適化されていないため**専用 0.9B が勝つのは構造的に有利**、かつ比較スコアは全て **Baidu 自前測定**。= FullSense ベンチ規律「異常に良い結果は勝った気になる前に内訳を疑う」の生きた教材。
+- **根拠**: Cosmos3 技報 Table 10(Driving/Robotics/General/SmartInfra の category-average)/ PaddleOCR arXiv:2606.03264 Table 2(Baidu 側測定)。honest 監査(workflow critic)が「T2V サブメトリクス勝ち(AV/Physics)を使うなら『T2V 全体は open 内 1 位・closed の Veo/Seedance に負け』とペア提示」も要件化。
+- **側面**: honest disclosure / 業界比較 / 教訓 / ベンチ。**FullSense の構造的差別化軸**。
+
+### 48. 記憶でキャラ/状態を「定数的に」保つ — MangaFlow の story section memory と llcore 定数状態 recurrent の同じ発想
+- **気付き**: 東大+香港科技大(HKUST広州)の **MangaFlow**(arXiv:2605.28173)は、マンガ生成のコマ間キャラ一貫性を **story section memory**(各セクションにキャラ/シーン/オブジェクト参照を紐づけパネル間で再利用する外部記憶)で担保し、ablation で **CIDS 0.619→0.582 / CSD 0.668→0.547** と寄与を実証。= llcore の「記憶で状態を定数的に保持(RWKV/Mamba 定数状態)」+ llive 4 層メモリ訴求の**他ドメイン傍証**になる(記憶機構は LLM だけでなくマルチモーダル生成の一貫性でも効く)。manga-md-poc(宣言的コマ→SVG)とも設計思想が近い先行例。**さらに MangaFlow の自認の限界=「stylized 顔での話者帰属・吹き出し配置が困難」は、bazue index(159 hard case=話者≠中央被写体)が突こうとしている まさにその弱点**=bazue ベンチの存在意義の外部裏づけ。
+- **根拠**: arXiv:2605.28173 Table1/Table2 + ablation。**記事化時 必須注記**:(1)「作画」は MangaFlow 自体でなく**外部クラウド拡散モデル(Gemini 2.5 Flash Image / FLUX.2 9B)**が担う制御層、(2)Layout IoU 100%/Coverage 99.98% は**幾何座標で明示配置する設計上ほぼ自明な自作メトリクス**でピクセル生成ベースラインと土俵が違う、(3)**商用サイト mangaflow.studio は本論文と無関係の別製品(混同回避を明記)**、(4)査読前 v1・引用ゼロ・GitHub 公開記載なし。
+- **側面**: エコシステム / 認知科学(記憶と一貫性)/ 技術設計 / マルチモーダル。manga-md-poc・bazue・llive に接続。
+
+### 49. 「成長するエージェント」vs「責任を持って成長するエージェント」— Hermes Agent と llive
+- **気付き**: Nous Research の **Hermes Agent**(OSS, MIT)は built-in learning loop(①タスク後 skill 自動生成 ②使用中 skill 自己改善 ③記憶永続化 ④FTS5 横断検索 ⑤Honcho user modeling)で「使うほど育つ」を謳い、**llive の『自己進化・4 層メモリ・派生集団進化』と真正面に競合**。だが honest に見ると差別化の余地が明確: Hermes は **learning loop の有効性を示す独立ベンチ・査読論文がゼロ**(arXiv 検索 0 件、効果は公式自称のみ)、かつ二次情報(Pebblous)が**「汚染ループ」リスク(誤 skill を蓄積・再利用)**を指摘。= llive の **Approval Bus + HITL + honest disclosure** は「成長=常に改善ではない」へのまさに責任ある回答。**llive は『成長する』より『責任を持って成長する(誤 skill 汚染を止める)』を前面に**出すべき、という positioning の確定。
+- **根拠**: GitHub `NousResearch/hermes-agent`(MIT, 2025-07 作成)+ release v2026.6.5「Surface Release」(Desktop=既存 core の GUI ガワ、新モデル/新FWではない)。**注記: stars 196,554 は GitHub API 実測だが star の質(bot/campaign 由来比率)は未検証** — 「マインドシェア先行」の脅威確度は規模が大きいぶん留保付き。二次記事の「180,000/24,600/4か月」は数値も時期もバラバラ=API 実測を正とする。
+- **側面**: 自己進化 / 哲学(責任所在を architecture に)/ 業界比較 / エコシステム。**llive 差別化の核**。
+
+### 50. open weights ライセンスの実務地図 — Gemma4 Apache 2.0 化・Cosmos OpenMDW・Qwen 障壁
+- **気付き**: 同週のリリースで **open モデルのライセンスが 3 種に割れた**:(a)**Gemma 4 = Apache 2.0**(Gemma 1/2/3 の独自 Gemma Terms of Use から**変更**=本物の前進、商用障壁ゼロ)(b)**Cosmos 3 = OpenMDW 1.1**(Linux Foundation の model-centric ライセンス=**OSI 認定の古典的 OSS ではない**「open model」ライセンス、商用条件・派生物条項は要条文実読)(c)**PaddleOCR = Apache 2.0**(ただし ERNIE-4.5 ベースで派生ライセンス要確認)。FullSense は Apache-2.0 + Commercial dual-license で、かつ `feedback_qwen_commercial_barrier`(Qwen 依存は商用障壁)を回避したい立場。→ **「Apache 2.0 のローカル実行可能モデルが増えた」は llmesh on-prem hub のローカルバックエンド選択肢を増やす追い風**であると同時に、llcore がモデルで競合しない判断を補強する。
+- **根拠**: Gemma4 HF model card(Apache 2.0)/ Cosmos3 HF blog(OpenMDW 1.1)/ PaddleOCR HF(Apache-2.0)。FullSense 側= `feedback_qwen_commercial_barrier` / `project_fullsense_brand`(dual-license)。
+- **側面**: 戦略 / ライセンス / エコシステム / 業界比較。llmesh のローカルバックエンド戦略に直結。
