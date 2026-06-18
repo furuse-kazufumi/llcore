@@ -273,6 +273,29 @@ proxy = 次トークン top-1 accuracy** を併記。予測(Dettmers 2023: ~4bit
   3bit は GPTQ でも cap-gate を僅かに届かず(top1 96.3% 保持 < 97%)= 小モデルほど床が高い。
 - 留保: Linear のみ量子化(Embedding/LN fp32)/ 校正 8,192 tokens / weights-only / simulated quant(速度未測)。
 
+## (d) QAT capstone — 「2bit は QAT 領域」を実証 (`out/qat_train_2bit.json`)
+
+`scripts/qat_train.py`。fake-quant + STE(straight-through estimator)で重みを量子化したまま学習し、PTQ が
+越えられなかった 2bit cap-gate を QAT が越えるか検証。fp32 reference と同 corpus/config/iters(2000)で公平比較。
+
+### multi_smoke 2-bit(fp32 ref: PPL 24.88 / top1 36.28%)
+| 手法 | PPL | top1 | retention | cap-gate |
+|---|---|---|---|---|
+| PTQ RTN | 236.9 | 7.98% | 22% | FAIL |
+| PTQ GPTQ | 138.7 | 12.07% | 33% | FAIL |
+| **QAT** | **38.15** | **30.10%** | **82.9%** | FAIL |
+
+### 知見(honest)— アークの結論
+- **QAT は PTQ を圧倒**: 2bit top1 **30.10% vs GPTQ 12.07%(+18pp)/ RTN 7.98%(+22pp)= 約 3 倍の保持**。
+  「**2bit は QAT 領域**」(PTQ では届かない)を実証 = 量子化を見越して学習する効果は本物。
+- **だが QAT でも strict 97% cap-gate は越えられず**(82.9% 保持)。この CPU-scale char-LM では 2bit は
+  QAT でも完全には安全化できない=**より大きいモデル/学習予算/学習可能 scale(LSQ 等)が要る**可能性。
+- **アーク総括**(RTN→per-group→GPTQ→QAT、2 モデル): **3bit が PTQ の安全な実用床**(realp1 は per-channel で
+  cap-gate PASS)。**2bit は手法を上げるほど damage が減る**(RTN 7.98% → GPTQ 12% → QAT 30% top1)が、
+  **strict gate を越えるには QAT でも本モデル規模では不足**。「床を動かすには質的に別アプローチ(学習時量子化)」
+  は正しく、QAT は実際に大きく前進させたが、tiny model の 2bit 完全制覇には至らず=honest な到達点。
+- 留保: CPU smoke / weights-only / Linear のみ / 固定 per-channel scale(学習可能 scale=LSQ は未実装)/ 速度未測。
+
 ## 記事側面 (feedback_daily_articles_policy の 13 側面)
 - **技術設計/実装報告**: 3 本柱の実機計測。「構造プロット → 実測」への昇格手続き。
 - **honest disclosure**: 各柱に明確な留保(weights-only / simulated quant / 部分 working set /
