@@ -214,3 +214,78 @@ def test_cli_report_with_corpus_file_computes_retention(tmp_path: Path) -> None:
     assert payload["int8_top1"] is not None
     assert payload["n_eval_tokens"] is not None and payload["n_eval_tokens"] > 0
     assert isinstance(payload["capability_gate_pass"], bool)
+
+
+# --- fail-closed --save-int8 promotion gate ---------------------------------
+
+
+def _report(gate: bool | None) -> MemoryReport:
+    return MemoryReport(
+        fp32_bytes=100,
+        int8_bytes=30,
+        compression_ratio=0.3,
+        percent_smaller=70.0,
+        min_retention=0.97,
+        capability_gate_pass=gate,
+    )
+
+
+def test_should_promote_passes_only_when_gate_passed() -> None:
+    assert _should_promote(_report(True), force=False)[0] is True
+
+
+def test_should_promote_refuses_on_gate_fail() -> None:
+    ok, reason = _should_promote(_report(False), force=False)
+    assert ok is False
+    assert "gate" in reason.lower()
+
+
+def test_should_promote_refuses_without_capability_evidence() -> None:
+    ok, reason = _should_promote(_report(None), force=False)
+    assert ok is False
+    assert "corpus" in reason.lower() or "evidence" in reason.lower()
+
+
+def test_should_promote_force_overrides_both_refusals() -> None:
+    assert _should_promote(_report(False), force=True)[0] is True
+    assert _should_promote(_report(None), force=True)[0] is True
+
+
+def test_cli_save_int8_promotes_when_gate_passes(tmp_path: Path) -> None:
+    text = "to be or not to be that is the question " * 20
+    ckpt = tmp_path / "model.pt"
+    tok = _save_fp32_checkpoint(ckpt, text)
+    corpus = tmp_path / "corpus.txt"
+    corpus.write_text(text, encoding="utf-8")
+    out_int8 = tmp_path / "model_int8.pt"
+    # min-retention 0.0 makes the gate pass deterministically.
+    rc = mem.main(
+        [
+            "report", str(ckpt),
+            "--corpus-file", str(corpus),
+            "--min-retention", "0.0",
+            "--save-int8", str(out_int8),
+        ]
+    )
+    assert rc == 0
+    assert out_int8.exists()
+    loaded, loaded_itos = load_int8_model(out_int8)
+    assert loaded_itos == tok.itos
+
+
+def test_cli_save_int8_refused_without_corpus(tmp_path: Path) -> None:
+    ckpt = tmp_path / "model.pt"
+    _save_fp32_checkpoint(ckpt, "hello world " * 30)
+    out_int8 = tmp_path / "model_int8.pt"
+    rc = mem.main(["report", str(ckpt), "--save-int8", str(out_int8)])
+    assert rc != 0
+    assert not out_int8.exists()
+
+
+def test_cli_save_int8_force_writes_without_corpus(tmp_path: Path) -> None:
+    ckpt = tmp_path / "model.pt"
+    _save_fp32_checkpoint(ckpt, "hello world " * 30)
+    out_int8 = tmp_path / "model_int8.pt"
+    rc = mem.main(["report", str(ckpt), "--save-int8", str(out_int8), "--force"])
+    assert rc == 0
+    assert out_int8.exists()
