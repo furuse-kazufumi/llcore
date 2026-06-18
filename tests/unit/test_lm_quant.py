@@ -72,12 +72,12 @@ def _int8_state(model: CharGPT) -> dict[str, torch.Tensor]:
     return _dense_to_int8_state(model)
 
 
-def test_save_load_roundtrip_matches_in_process(tmp_path: torch.serialization.FILE_LIKE) -> None:  # type: ignore[name-defined]
+def test_save_load_roundtrip_matches_in_process(tmp_path: Path) -> None:
     torch.manual_seed(1)
     dense = CharGPT(_cfg())
     dense.eval()
     itos = [chr(65 + i) for i in range(48)]
-    path = tmp_path / "int8.pt"  # type: ignore[operator]
+    path = tmp_path / "int8.pt"
     save_int8_checkpoint(dense, path, itos)
 
     # In-process int8 reference: quantize the same weights directly.
