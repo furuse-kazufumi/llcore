@@ -104,3 +104,66 @@ def test_higher_w_mem_rewards_contractive_over_divergent_at_equal_retention() ->
     # 収縮的は footprint 0.25(報酬 0.75)、発散的は footprint 1.0(報酬 0.0)。
     # retention 差が footprint 差(0.7*0.75=0.525)を逆転させない限り収縮的が上。
     assert f_contractive > f_divergent
+
+
+# --- PoC script (scripts/poc_branch_a_memory_fitness.py) ---
+
+
+def _load_poc() -> object:
+    import importlib.util
+    from pathlib import Path
+
+    script = Path(__file__).resolve().parents[2] / "scripts" / "poc_branch_a_memory_fitness.py"
+    spec = importlib.util.spec_from_file_location("poc_branch_a", script)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def _tiny_cell(mod: object, gate_mode: str) -> dict[str, object]:
+    task = CopyTask()
+    readout = make_fixed_readout(task.state_dim, task.out_dim, seed=2026)
+    obj = MemoryEfficiencyObjective(base_task=task, w_acc=0.7, w_mem=0.3, n_trials=3)
+    return mod.run_cell(  # type: ignore[attr-defined]
+        gate_mode, obj, readout,
+        n_seeds=2, pop_size=6, n_generations=2, resample_cap=10, base_seed=0,
+    )
+
+
+def test_run_cell_control_has_no_gate_stats_and_unit_metrics() -> None:
+    mod = _load_poc()
+    cell = _tiny_cell(mod, "none")
+    assert "gate_stats" not in cell
+    for k in ("safe_rate", "mean_footprint", "mean_retention"):
+        assert 0.0 <= cell[k] <= 1.0  # type: ignore[operator]
+
+
+def test_run_cell_gated_records_gate_stats_without_spinning() -> None:
+    mod = _load_poc()
+    cell = _tiny_cell(mod, "contraction")  # G3/G6: fail-closed, bounded resamples
+    gs = cell["gate_stats"]
+    assert gs["n_resamples"] <= gs["max_possible_resamples"]  # type: ignore[index,call-overload]
+    assert gs["n_children_generated"] > 0  # type: ignore[index,operator]
+
+
+def test_run_cell_is_deterministic_g1() -> None:
+    mod = _load_poc()
+    assert _tiny_cell(mod, "none") == _tiny_cell(mod, "none")  # same seed -> identical
+
+
+def test_poc_main_smoke_writes_verdict(tmp_path: object) -> None:
+    mod = _load_poc()
+    out = tmp_path / "poc.json"  # type: ignore[attr-defined]
+    import json as _json
+
+    rc = mod.main([  # type: ignore[attr-defined]
+        "--n-seeds", "2", "--pop-size", "6", "--n-generations", "2",
+        "--falsify-seeds", "3", "--honest-trials", "3", "--json", str(out),
+    ])
+    assert rc == 0
+    payload = _json.loads(out.read_text(encoding="utf-8"))
+    v = payload["verdict"]
+    # G5 は記録のみ(bool 値が入るだけで合否に使わない)。
+    assert "memory_passes" in v["G5_falsification_recorded"]
+    assert isinstance(v["functional_min"], bool)
