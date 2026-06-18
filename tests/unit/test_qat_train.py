@@ -1,0 +1,84 @@
+# SPDX-License-Identifier: Apache-2.0
+"""Tests for ``scripts/qat_train.py`` (QAT fake-quant + STE)."""
+from __future__ import annotations
+
+import importlib.util
+import json
+from pathlib import Path
+from typing import Any
+
+import pytest
+import torch
+from torch import nn
+
+
+def _load_script() -> Any:
+    script = Path(__file__).resolve().parents[2] / "scripts" / "qat_train.py"
+    spec = importlib.util.spec_from_file_location("qat_train", script)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"unable to load {script}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_fake_quant_ste_forward_is_quantized_backward_is_identity() -> None:
+    mod = _load_script()
+    w = torch.randn(4, 8, requires_grad=True)
+    wq = mod.fake_quant_ste(w, bits=2)
+    # forward equals the genuine quantize-dequantize of w.
+    qmax = 1
+    scale = w.detach().abs().amax(dim=1, keepdim=True) / qmax
+    expected = torch.clamp(torch.round(w.detach() / scale), -qmax, qmax) * scale
+    assert torch.allclose(wq.detach(), expected)
+    # backward is the straight-through identity (grad of sum == ones).
+    wq.sum().backward()
+    assert torch.allclose(w.grad, torch.ones_like(w))
+
+
+def test_fakequant_linear_uses_quantized_weight() -> None:
+    mod = _load_script()
+    fq = mod.FakeQuantLinear(8, 4, bias=True)
+    fq.bits = 3
+    x = torch.randn(2, 8)
+    out = fq(x)
+    # Output matches F.linear with the fake-quantized weight.
+    from torch.nn import functional as F
+
+    expected = F.linear(x, mod.fake_quant_ste(fq.weight, 3), fq.bias)
+    assert torch.allclose(out, expected)
+
+
+def test_convert_to_fake_quant_replaces_all_linears() -> None:
+    mod = _load_script()
+    model = mod.CharGPT(mod.GPTConfig(vocab_size=32, block_size=16, n_layer=1, n_head=2, n_embd=16))
+    n_linear_before = sum(1 for m in model.modules()
+                          if isinstance(m, nn.Linear) and not isinstance(m, mod.FakeQuantLinear))
+    mod.convert_to_fake_quant(model, bits=2)
+    # Every plain Linear is now a FakeQuantLinear with the requested bit-width.
+    fq = [m for m in model.modules() if isinstance(m, mod.FakeQuantLinear)]
+    assert len(fq) == n_linear_before
+    assert all(m.bits == 2 for m in fq)
+    assert not any(type(m) is nn.Linear for m in model.modules())
+
+
+def test_main_end_to_end_short(tmp_path: Path) -> None:
+    mod = _load_script()
+    corpus = tmp_path / "corpus.txt"
+    corpus.write_text("hello llcore world\n" * 400, encoding="utf-8")
+    out = tmp_path / "qat.json"
+    # 2 iters only (just exercises the train+eval pipeline); no fp32 ref provided.
+    rc = mod.main(["--bits", "2", "--corpus-file", str(corpus),
+                   "--fp32-checkpoint", str(tmp_path / "nope.pt"),
+                   "--max-iters", "2", "--batch-size", "8", "--json", str(out)])
+    assert rc == 0
+    payload = json.loads(out.read_text(encoding="utf-8"))
+    assert "qat" in payload and "model_ppl" in payload["qat"]
+    assert payload["fp32_reference"] is None  # no checkpoint -> no reference
+    assert payload["capability_gate_pass"] is None
+
+
+def test_main_rejects_bad_args(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    mod = _load_script()
+    assert mod.main(["--bits", "1", "--corpus-file", str(tmp_path / "x.txt")]) == 2
+    assert mod.main(["--bits", "2", "--corpus-file", str(tmp_path / "nope.txt")]) == 2

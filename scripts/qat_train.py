@@ -73,7 +73,7 @@ class FakeQuantLinear(nn.Linear):
     bits: int
 
     def forward(self, x: Tensor) -> Tensor:
-        return cast(Tensor, F.linear(x, fake_quant_ste(self.weight, self.bits), self.bias))
+        return F.linear(x, fake_quant_ste(self.weight, self.bits), self.bias)
 
 
 def convert_to_fake_quant(model: nn.Module, bits: int) -> nn.Module:
