@@ -116,13 +116,11 @@ def save_int8_checkpoint(model: CharGPT, path: str | Path, itos: list[str]) -> N
     fp32 ``scale`` for each Linear, fp32 for embeddings / LayerNorm), and the tokenizer
     ``itos`` so :func:`load_int8_model` can round-trip without external metadata.
     """
-    int8_model = convert_linears_to_int8(CharGPT(model.config))
-    int8_model.load_state_dict(_dense_to_int8_state(model), strict=True)
     torch.save(
         {
             "kind": INT8_CKPT_KIND,
             "config": vars(model.config),
-            "model_state": int8_model.state_dict(),
+            "model_state": _dense_to_int8_state(model),
             "itos": list(itos),
         },
         path,
@@ -130,26 +128,25 @@ def save_int8_checkpoint(model: CharGPT, path: str | Path, itos: list[str]) -> N
 
 
 def _dense_to_int8_state(model: CharGPT) -> dict[str, Tensor]:
-    """Build an int8-skeleton state dict from a trained fp32 CharGPT."""
+    """Build an int8-skeleton state dict from a trained fp32 CharGPT.
+
+    Iterates the int8 skeleton's keys and fills them from the dense model's
+    ``state_dict()`` (which, unlike ``named_parameters()``, keeps tied keys such as
+    ``lm_head.weight`` under both names — needed because ``lm_head`` becomes an
+    :class:`Int8Linear` while ``wte`` stays a fp32 embedding).
+    """
     skeleton = convert_linears_to_int8(CharGPT(model.config))
-    src = dict(model.named_parameters())
-    src_buffers = dict(model.named_buffers())
+    src = model.state_dict()
     state: dict[str, Tensor] = {}
-    for name, tensor in skeleton.state_dict().items():
+    for name in skeleton.state_dict():
         if name.endswith(".qweight"):
-            linear_w = src[name[: -len(".qweight")] + ".weight"]
-            q, _ = quantize_per_channel_int8(linear_w.data)
+            q, _ = quantize_per_channel_int8(src[name[: -len(".qweight")] + ".weight"])
             state[name] = q
         elif name.endswith(".scale"):
-            linear_w = src[name[: -len(".scale")] + ".weight"]
-            _, scale = quantize_per_channel_int8(linear_w.data)
+            _, scale = quantize_per_channel_int8(src[name[: -len(".scale")] + ".weight"])
             state[name] = scale
-        elif name in src:
-            state[name] = src[name].data
-        elif name in src_buffers:
-            state[name] = src_buffers[name]
         else:
-            state[name] = tensor  # untied lm_head bias etc. (default)
+            state[name] = src[name]  # embeddings / LayerNorm / biases / attn mask buffer
     return state
 
 
