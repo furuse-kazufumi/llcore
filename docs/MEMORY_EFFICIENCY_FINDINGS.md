@@ -294,7 +294,34 @@ proxy = 次トークン top-1 accuracy** を併記。予測(Dettmers 2023: ~4bit
   cap-gate PASS)。**2bit は手法を上げるほど damage が減る**(RTN 7.98% → GPTQ 12% → QAT 30% top1)が、
   **strict gate を越えるには QAT でも本モデル規模では不足**。「床を動かすには質的に別アプローチ(学習時量子化)」
   は正しく、QAT は実際に大きく前進させたが、tiny model の 2bit 完全制覇には至らず=honest な到達点。
-- 留保: CPU smoke / weights-only / Linear のみ / 固定 per-channel scale(学習可能 scale=LSQ は未実装)/ 速度未測。
+- 留保: CPU smoke / weights-only / Linear のみ / 固定 per-channel scale / 速度未測。
+
+## (d') LSQ(学習可能 scale)— 「2bit 制覇」再挑戦の honest 決着 (`out/qat_lsq_2bit.json`)
+
+`scripts/qat_train.py --method lsq`(Esser et al. ICLR2020, arXiv:1902.08153 を自前実装)。固定 per-channel
+scale を **勾配で学習**する(round STE + 勾配均衡化 g=1/√(N·Q_P) + 初期化 s=2·mean(|w|)/√Q_P、scale は 1-D で
+trainer の weight-decay 群から除外)。multi_smoke 2bit を固定 scale QAT と **同 corpus/config/iters(2000)** で比較。
+
+| 手法 (multi_smoke 2bit, fp32 ref top1 36.28%) | top1 | retention | cap-gate |
+|---|---|---|---|
+| PTQ RTN | 7.98% | 22% | FAIL |
+| PTQ GPTQ | 12.07% | 33% | FAIL |
+| QAT(固定 scale) | 30.10% | 82.9% | FAIL |
+| **QAT + LSQ(学習可能 scale)** | **30.48%** | **84.0%** | **FAIL** |
+
+### 知見(honest)
+- **LSQ は固定 scale QAT を上回ったが、その差は +1.1pp(82.9→84.0%)に留まる**。手法系譜 RTN→GPTQ→QAT→LSQ で
+  retention は 22→33→82.9→**84.0%** と単調改善するが、**LSQ でも strict 97% cap-gate には遠く届かない**。
+- = **prior-art の予言どおり**: LSQ 自身が小モデル SqueezeNext-23 で 2bit -14.0pt を報告(ResNet-18 は -2.9pt)、
+  k-bit scaling law(Dettmers 2023)/ QiD(arXiv:2411.17691, N の指数 0.226)は「小モデルは冗長性が無く 2bit を
+  吸収できない」と複数独立に示す。**char-LM(1.36M)の 2bit は、学習可能 scale を足しても規模の壁が支配的**。
+  2bit で 90%+ retention は literature 上「7B+ + VQ codebook + QAT/fine-tune + group64」が揃って初成立
+  (EfficientQAT 7B=92.7% / 70B=95.9%、QuIP#/AQLM 等)。
+- **honest な締め**: 「手法を上げれば床が下がる」期待は LSQ でも**わずかしか報われなかった**(+1.1pp)。床を本当に
+  動かすのは手法でなく **規模 / 学習予算 / VQ codebook** であることが自前実測で確定。**3bit が PTQ 実用床**のまま。
+- 留保: CPU smoke / weights-only / Linear のみ / simulated quant(速度未測)/ LSQ scale は 1-D で WD 非適用(fair 比較)。
+- 実装 = `scripts/qat_train.py`(lsq_quant / LSQLinear / convert_to_lsq, `--method lsq`、既存 qat パス不変・純粋追加)+
+  `tests/unit/test_qat_train.py`(LSQ 7 件追加、全 12 passed / ruff / mypy strict green)。
 
 ## 記事側面 (feedback_daily_articles_policy の 13 側面)
 - **技術設計/実装報告**: 3 本柱の実機計測。「構造プロット → 実測」への昇格手続き。
