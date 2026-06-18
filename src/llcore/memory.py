@@ -230,13 +230,13 @@ def _should_promote(report: MemoryReport, *, force: bool) -> tuple[bool, str]:
     if report.capability_gate_pass is None:
         return (
             False,
-            "no capability evidence — pass --corpus/--corpus-file to measure retention "
+            "no capability evidence - pass --corpus/--corpus-file to measure retention "
             "before promoting (or --force to override)",
         )
     if report.capability_gate_pass is False:
         return (
             False,
-            f"capability gate FAILED (retention below {report.min_retention:.2f}) — "
+            f"capability gate FAILED (retention below {report.min_retention:.2f}) - "
             "refusing to promote (or --force to override)",
         )
     return True, "capability gate passed — promoting"
