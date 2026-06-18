@@ -8,8 +8,8 @@ import pytest
 import torch
 from torch import nn
 
-from llcore.lm.model import CharGPT, GPTConfig
-from llcore.lm.quant import (  # type: ignore[import-untyped]  # new module, untyped under standard mypy
+from llcore.lm.model import CharGPT, GPTConfig  # type: ignore[import-untyped]
+from llcore.lm.quant import (  # type: ignore[import-untyped]  # untyped under standard mypy
     INT8_CKPT_KIND,
     Int8Linear,
     _dense_to_int8_state,
