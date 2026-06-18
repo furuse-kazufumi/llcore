@@ -712,6 +712,11 @@ def build_parser() -> argparse.ArgumentParser:
     e.add_argument("checkpoint")
     e.add_argument("--out", default="model_viz.json")
     e.set_defaults(func=cmd_export)
+
+    q = sub.add_parser("quantize", help="quantize a checkpoint to int8 (streaming/mmap inference)")
+    q.add_argument("checkpoint")
+    q.add_argument("--out", default=None, help="defaults to <checkpoint dir>/model_int8.pt")
+    q.set_defaults(func=cmd_quantize)
     return ap
 
 
