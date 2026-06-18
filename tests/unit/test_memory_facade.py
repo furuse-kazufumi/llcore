@@ -28,7 +28,7 @@ from llcore.lm.quant import (
 from llcore.lm.tokenizer import CharTokenizer
 
 import llcore.memory as mem
-from llcore.memory import MemoryReport, measure_memory
+from llcore.memory import measure_memory
 
 
 def _cfg() -> GPTConfig:
