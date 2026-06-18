@@ -240,11 +240,16 @@ def main(argv: list[str] | None = None) -> int:
     model = CharGPT(GPTConfig(vocab_size=tok.vocab_size, block_size=block,
                               n_layer=int(preset["n_layer"]), n_head=int(preset["n_head"]),
                               n_embd=int(preset["n_embd"]), dropout=0.0))
-    convert_to_fake_quant(model, args.bits)
-    n_lin = sum(1 for m in model.modules() if isinstance(m, FakeQuantLinear))
+    mlabel = "LSQ" if args.method == "lsq" else "QAT"
+    if args.method == "lsq":
+        convert_to_lsq(model, args.bits)
+        n_lin = sum(1 for m in model.modules() if isinstance(m, LSQLinear))
+    else:
+        convert_to_fake_quant(model, args.bits)
+        n_lin = sum(1 for m in model.modules() if isinstance(m, FakeQuantLinear))
     print(
-        f"QAT: {args.bits}-bit  config={args.config}  vocab={tok.vocab_size}  block={block}  "
-        f"fake-quant Linears={n_lin}  iters={args.max_iters}  train={train_ids.numel():,}"
+        f"{mlabel}: {args.bits}-bit  config={args.config}  vocab={tok.vocab_size}  block={block}  "
+        f"quant Linears={n_lin}  iters={args.max_iters}  train={train_ids.numel():,}"
     )
     print("training (fake-quant active)...")
     trainer = Trainer(model, TrainConfig(
