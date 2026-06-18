@@ -543,3 +543,8 @@
 - **気付き**: ユーザー指示(2026-06-18「強豪のやり方を解析して記事に・特に我々との共通点・記事ネタ集めに情報収集も」)を受け、Gemma4/Cosmos3/PaddleOCR/MangaFlow/Hermes の**手法を一次情報で deep-read → FullSense/llcore との共通点を抽出 → honest 監査**した濃い記事素材を別 doc に用意。記事の核 = 3 グループ(引き算/再利用/責任を持って育つ)。最強の切り口 = 「自宅 CPU の小実験が frontier の何を**再導出**でき、どこが本当に**違う**(差別化)のかを honest に切り分ける」= career-grade で信頼を生む([[feedback_articles_career_advancement]])。
 - **正本**: `docs/ARTICLE_MATERIAL_2026_06_competitor_methods.md`(フック3案 / 5社解説 / 共通点マップ[関係タイプ+honest] / 比喩表 / 13側面タグ / 構成案。honest 監査の必須修正=競合数値にラベル・規模差 caveat・我田引水2件格下げ[Cosmos↔llive=loose_analogy / bazue=未検証 shared_problem_framing「裏取り」禁止]・arXiv ID 執筆前確認 を適用済)。立ち位置の土台 = `docs/POSITIONING_VS_LLAMACPP.md`。
 - **側面**: 業界比較 / honest disclosure / 技術設計 / 哲学 / 教訓 / 戦略(キャリア)。技術者向け(QIITA_SUMMARY 2-3万字)+非エンジニア向け(QIITA_GENERAL)の2系統で展開可。
+
+### 52. ★記事マスターシードバンク(26本+連載構成案・専用 doc)
+- **気付き**: ユーザー指示(2026-06-18「llterm が頑張れるよう記事ネタをいっぱい提供」)を受け、56本生成→編集長が **26本(S級7/A級11/B級8)+連載構成案2案** に統合した master seed bank を専用 doc に用意。honest 監査 verdict=**出版可(条件付き)**。編集長の推し = **S2 cherry-pick 5型(看板)/ A7 制御理論=SSM(クロスドメイン白眉)/ S1 PPL trap(入口)/ B1 負けを見せる(着地)**。
+- **正本**: `docs/ARTICLE_IDEA_BANK_2026_06.md`(冒頭に連載レベル恒久 caveat + honest 監査の必須 fix 7件[連載 caveat バナー・S1 過剰一般化修正・thin 4本救済・A10 線引き・アナロジー密度・B6 外挿明記]を記載済。llterm はこれを適用して記事化)。
+- **側面**: 全13側面を網羅(特に honest disclosure / 業界比較 / 技術設計 / 哲学 / 教訓 / クロスドメイン / 戦略)。**llterm の選べるメニュー**。
