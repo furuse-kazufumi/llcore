@@ -56,6 +56,7 @@ __all__ = [
     "CharTokenizer",
     "CompareConfig",
     "GPTConfig",
+    "Int8Linear",
     "NewGELU",
     "RecurrentConfig",
     "RecurrentLM",
