@@ -65,13 +65,6 @@ def test_convert_linears_replaces_and_preserves_forward() -> None:
     assert torch.isfinite(out).all()
 
 
-def _int8_state(model: CharGPT) -> dict[str, torch.Tensor]:
-    # Mirror quant._dense_to_int8_state for the convert test above.
-    from llcore.lm.quant import _dense_to_int8_state
-
-    return _dense_to_int8_state(model)
-
-
 def test_save_load_roundtrip_matches_in_process(tmp_path: Path) -> None:
     torch.manual_seed(1)
     dense = CharGPT(_cfg())
