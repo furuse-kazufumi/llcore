@@ -212,6 +212,36 @@ def _print_report(report: MemoryReport, checkpoint: Path) -> None:
     print(f"capability gate: {verdict} (>= {report.min_retention * 100:.0f}% retention)")
 
 
+def _should_promote(report: MemoryReport, *, force: bool) -> tuple[bool, str]:
+    """Fail-closed decision: may we emit the int8 checkpoint for this report?
+
+    The capability gate is treated as a *promotion gate* — this is the operational
+    contribution llcore adds on top of the (re-derived) quantization primitives. We
+    only promote a footprint win that is backed by measured capability retention:
+
+    - ``--force`` overrides everything (operator override).
+    - No capability evidence (no corpus given → ``capability_gate_pass is None``) →
+      refuse: a footprint win with no retention measurement is unverified.
+    - Gate failed (retention below ``min_retention``) → refuse.
+    - Gate passed → promote.
+    """
+    if force:
+        return True, "promotion forced (--force): writing despite the gate"
+    if report.capability_gate_pass is None:
+        return (
+            False,
+            "no capability evidence — pass --corpus/--corpus-file to measure retention "
+            "before promoting (or --force to override)",
+        )
+    if report.capability_gate_pass is False:
+        return (
+            False,
+            f"capability gate FAILED (retention below {report.min_retention:.2f}) — "
+            "refusing to promote (or --force to override)",
+        )
+    return True, "capability gate passed — promoting"
+
+
 def cmd_report(args: argparse.Namespace) -> int:
     model, tok = _load_fp32_checkpoint(Path(args.checkpoint))
     val_ids: torch.Tensor | None = None
@@ -226,6 +256,13 @@ def cmd_report(args: argparse.Namespace) -> int:
             json.dumps(report.to_dict(), ensure_ascii=False, indent=2), encoding="utf-8"
         )
         print(f"wrote {args.json}")
+    if args.save_int8:
+        ok, reason = _should_promote(report, force=args.force)
+        if not ok:
+            print(f"[save-int8] refused: {reason}", file=sys.stderr)
+            return 2
+        save_int8_checkpoint(model, Path(args.save_int8), tok.itos)
+        print(f"[save-int8] {reason} -> wrote {args.save_int8}")
     return 0
 
 
