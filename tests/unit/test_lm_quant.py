@@ -93,8 +93,8 @@ def test_save_load_roundtrip_matches_in_process(tmp_path: Path) -> None:
         assert torch.equal(loaded.forward_logits(idx), ref.forward_logits(idx))
 
 
-def test_load_rejects_non_int8_checkpoint(tmp_path: object) -> None:
-    path = tmp_path / "fp32.pt"  # type: ignore[operator]
+def test_load_rejects_non_int8_checkpoint(tmp_path: Path) -> None:
+    path = tmp_path / "fp32.pt"
     dense = CharGPT(_cfg())
     torch.save({"config": vars(dense.config), "model_state": dense.state_dict(), "itos": []}, path)
     with pytest.raises(ValueError, match=INT8_CKPT_KIND):
