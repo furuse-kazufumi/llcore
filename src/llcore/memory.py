@@ -280,6 +280,17 @@ def build_parser() -> argparse.ArgumentParser:
     r.add_argument("--val-frac", type=float, default=0.1)
     r.add_argument("--min-retention", type=float, default=DEFAULT_MIN_RETENTION)
     r.add_argument("--json", default=None, help="also write the report as JSON to this path")
+    r.add_argument(
+        "--save-int8",
+        default=None,
+        help="emit an int8 checkpoint here, but only if the capability gate passes "
+        "(fail-closed promotion gate)",
+    )
+    r.add_argument(
+        "--force",
+        action="store_true",
+        help="emit the int8 checkpoint even if the gate fails or no corpus was given",
+    )
     r.set_defaults(func=cmd_report)
     return ap
 
