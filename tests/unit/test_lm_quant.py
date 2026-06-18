@@ -9,9 +9,10 @@ import torch
 from torch import nn
 
 from llcore.lm.model import CharGPT, GPTConfig
-from llcore.lm.quant import (
+from llcore.lm.quant import (  # type: ignore[import-untyped]  # new module, untyped under standard mypy
     INT8_CKPT_KIND,
     Int8Linear,
+    _dense_to_int8_state,
     convert_linears_to_int8,
     dequantize,
     int8_footprint_bytes,
