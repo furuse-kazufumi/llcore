@@ -130,13 +130,18 @@ perplexity ツールに **`Same top p` として既に出荷済み**のメトリ
 [^1]: Gemma 4 12B(Google, 2026-06-03, Apache 2.0)。dense 11.95B・エンコーダフリー統合・256K ctx。
 「26B に迫る」は **定量ベンチ表が一次情報に無い一般文**で、比較相手は 26B MoE(active~4B)= apples-to-oranges。
 「16GB」は **RAM/VRAM 曖昧で Q4 量子化前提**(fp16 12B≈24GB は乗らない)。数値は self-report。
+一次: <https://blog.google/innovation-and-ai/technology/developers-tools/introducing-gemma-4-12b/> /
+model card <https://huggingface.co/google/gemma-4-12B>。
 
 [^2]: PaddleOCR-VL-1.6(Baidu, arXiv:2606.03264, Apache-2.0)。0.9B。OmniDocBench v1.6=96.33%。
 「235B/Gemini 超え」は **文書解析専用ベンチ上 + Baidu 自前測定**であって汎用超えではない。メモリ要件は未測(self-report)。
+一次: <https://arxiv.org/abs/2606.03264> / model card <https://huggingface.co/PaddlePaddle/PaddleOCR-VL-1.6>。
 
 [^3]: NVIDIA Cosmos 3(2026-05-31)。Super 64B / Nano 16B / Edge 2B、5 モダリティ単一アーキ。
 ライセンスは **OpenMDW 1.1 = OSI 承認の OSS ではない open model ライセンス**。「Gemini 超え」は
 **負け軸(Robotics/General)を省いた cherry-pick**。メモリ要件は未測(self-report)。
+一次: <https://nvidianews.nvidia.com/news/nvidia-launches-cosmos-3-the-open-frontier-foundation-model-for-physical-ai> /
+HF blog <https://huggingface.co/blog/nvidia/cosmos-3-for-physical-ai>。
 
 [^4]: llama.cpp / GGUF。bpw・ファイルサイズは公式 quantize README(Llama-3.1-8B)と k-quants PR #1684 の一次情報。
 **最重要確認**: llama.cpp の量子化パイプラインも公式 perplexity ツールも、downstream accuracy(HellaSwag/MMLU/
