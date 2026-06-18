@@ -73,15 +73,15 @@ def run_cell(
             pop_size=pop_size,
             n_generations=n_generations,
             rng=rng,
-            gate_mode=gate_mode,  # type: ignore[arg-type]
+            gate_mode=gate_mode,
             resample_cap=resample_cap,
         )
         best = result.final_best.gene
         safe.append(is_bounded(best))
-        footprints.append(state_boundedness_footprint(best))  # type: ignore[arg-type]
+        footprints.append(state_boundedness_footprint(best))
         ret_rng = np.random.default_rng(base_seed + s + 777)
         retentions.append(
-            evaluate_gene(best, objective.base_task, readout, ret_rng, n_trials=5)  # type: ignore[arg-type]
+            evaluate_gene(best, objective.base_task, readout, ret_rng, n_trials=5)
         )
         gs = result.gate_stats
         if gs is not None:
