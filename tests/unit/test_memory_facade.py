@@ -105,7 +105,9 @@ def test_measure_memory_retention_matches_underlying_primitives() -> None:
     report = measure_memory(model, val_ids=val, block_size=block, min_retention=0.97)
 
     expected_fp32 = held_out_top1_report(model, val, block)["top1_acc"]
-    int8_ref = convert_linears_to_int8(copy.deepcopy(model)).eval()
+    int8_ref = copy.deepcopy(model)  # stays typed CharGPT; convert mutates in place
+    convert_linears_to_int8(int8_ref)
+    int8_ref.eval()
     expected_int8 = held_out_top1_report(int8_ref, val, block)["top1_acc"]
 
     assert report.fp32_top1 == expected_fp32
