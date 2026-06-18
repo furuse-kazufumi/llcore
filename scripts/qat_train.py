@@ -265,10 +265,10 @@ def main(argv: list[str] | None = None) -> int:
     cap_pass = passes_capability_gate(qat["top1_acc"], ref_top1) if fp32_ref else None
     ptq = _ptq_reference(args.bits)
 
-    print(f"\n=== QAT {args.bits}-bit VERDICT ===")
+    print(f"\n=== {mlabel} {args.bits}-bit VERDICT ===")
     if fp32_ref:
         print(f"  fp32 ref : PPL {fp32_ref['model_ppl']:.2f}  top1 {fp32_ref['top1_acc'] * 100:.2f}%")
-    print(f"  QAT      : PPL {qat['model_ppl']:.2f}  top1 {qat['top1_acc'] * 100:.2f}%  "
+    print(f"  {mlabel:<8}: PPL {qat['model_ppl']:.2f}  top1 {qat['top1_acc'] * 100:.2f}%  "
           f"(unigram {unigram_ppl:.1f})")
     if fp32_ref:
         ret = qat["top1_acc"] / ref_top1 if ref_top1 > 0 else float("nan")
