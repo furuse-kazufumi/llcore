@@ -548,3 +548,8 @@
 - **気付き**: ユーザー指示(2026-06-18「llterm が頑張れるよう記事ネタをいっぱい提供」)を受け、56本生成→編集長が **26本(S級7/A級11/B級8)+連載構成案2案** に統合した master seed bank を専用 doc に用意。honest 監査 verdict=**出版可(条件付き)**。編集長の推し = **S2 cherry-pick 5型(看板)/ A7 制御理論=SSM(クロスドメイン白眉)/ S1 PPL trap(入口)/ B1 負けを見せる(着地)**。
 - **正本**: `docs/ARTICLE_IDEA_BANK_2026_06.md`(冒頭に連載レベル恒久 caveat + honest 監査の必須 fix 7件[連載 caveat バナー・S1 過剰一般化修正・thin 4本救済・A10 線引き・アナロジー密度・B6 外挿明記]を記載済。llterm はこれを適用して記事化)。
 - **側面**: 全13側面を網羅(特に honest disclosure / 業界比較 / 技術設計 / 哲学 / 教訓 / クロスドメイン / 戦略)。**llterm の選べるメニュー**。
+
+### 53. LSQ(学習可能 scale)で「2bit 制覇」に再挑戦 → +1.1pp しか報われなかった(負けの実データ)
+- **気付き**: 量子化アークの締めとして **LSQ(Learned Step Size Quantization, Esser et al. ICLR2020)を自前実装**し、固定 scale QAT(82.9%)を学習可能 scale が越えられるか実測。結果 = **multi_smoke 2bit で top1 30.48% / retention 84.0% = 固定 scale QAT を +1.1pp 上回るが、strict 97% cap-gate には遠く届かず FAIL**。手法系譜 RTN 22%→GPTQ 33%→QAT 82.9%→LSQ 84.0% は単調改善だが、**「手法を上げれば床が下がる」期待は LSQ でもほぼ報われない**。prior-art の予言(LSQ 自身が小モデル SqueezeNext で 2bit -14pt、k-bit scaling law/QiD が「小モデルは冗長性が無く 2bit を吸収できない」)が自前実測で裏取りされた。**床を動かすのは手法でなく規模/学習予算/VQ codebook**(2bit 90%+ は 7B+ でのみ成立)。3bit が PTQ 実用床のまま。
+- **根拠**: `out/qat_lsq_2bit.json`(top1 30.48%/retention 84.0%/cap-gate FAIL)/ `scripts/qat_train.py --method lsq`(lsq_quant/LSQLinear/convert_to_lsq, 純粋追加・既存不変)/ `tests/unit/test_qat_train.py`(LSQ 7件, 全12 passed/ruff/mypy green)/ `docs/MEMORY_EFFICIENCY_FINDINGS.md` (d')。prior-art = arXiv:1902.08153 / 2212.09720 / 2411.17691 / EfficientQAT 2407.11062。
+- **側面**: 教訓 / honest disclosure / ベンチ / 技術設計 / 業界比較(PTQ→QAT→LSQ の系譜と床の所在)。**B1「負けを見せる」の最新実データ**(=記事 b1-show-your-losses.md に反映済)。
