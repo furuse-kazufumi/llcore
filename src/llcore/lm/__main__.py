@@ -111,6 +111,20 @@ def _load_checkpoint(path: Path) -> tuple[CharGPT, CharTokenizer]:
     return model, CharTokenizer(ckpt["itos"])
 
 
+def _load_any_checkpoint(path: Path) -> tuple[CharGPT, CharTokenizer]:
+    """Load an fp32 or int8 checkpoint, transparently. int8 uses mmap streaming-dequant.
+
+    int8 checkpoints (``kind == INT8_CKPT_KIND``, produced by ``quantize``) are loaded
+    via :func:`~llcore.lm.quant.load_int8_model` so cold weight pages stay on disk; fp32
+    checkpoints fall back to the dense loader. The kind probe is cheap (mmap = lazy).
+    """
+    head = torch.load(path, map_location="cpu", weights_only=True, mmap=True)
+    if isinstance(head, dict) and head.get("kind") == INT8_CKPT_KIND:
+        model, itos = load_int8_model(path, mmap=True)
+        return model, CharTokenizer(itos)
+    return _load_checkpoint(path)
+
+
 def _save_training_snapshot(
     path: Path,
     model: CharGPT,
