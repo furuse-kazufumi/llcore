@@ -39,14 +39,14 @@ def make_eval_once(objective: MemoryEfficiencyObjective, readout: Any) -> EvalOn
     """``MemoryEfficiencyObjective`` を evolve/evolution_vs_random 用の ``(gene, rng)->float`` に束ねる。"""
 
     def eval_once(gene: object, rng: np.random.Generator) -> float:
-        return objective.fitness(gene, readout, rng)  # type: ignore[arg-type]
+        return objective.fitness(cast(StateUpdateGene, gene), readout, rng)
 
     return eval_once
 
 
 def is_bounded(gene: object) -> bool:
     """収縮率 ``L<1``(=有界状態)か。``footprint<0.5 ⟺ L<1``(footprint=L/2)。"""
-    return state_boundedness_footprint(gene) < 0.5  # type: ignore[arg-type]
+    return state_boundedness_footprint(cast(StateUpdateGene, gene)) < 0.5
 
 
 def run_cell(
