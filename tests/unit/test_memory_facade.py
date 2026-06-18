@@ -24,11 +24,12 @@ from llcore.lm.quant import (
     Int8Linear,
     convert_linears_to_int8,
     int8_footprint_bytes,
+    load_int8_model,
 )
 from llcore.lm.tokenizer import CharTokenizer
 
 import llcore.memory as mem
-from llcore.memory import measure_memory
+from llcore.memory import MemoryReport, _should_promote, measure_memory
 
 
 def _cfg() -> GPTConfig:
