@@ -132,10 +132,10 @@ def main(argv: list[str] | None = None) -> int:
     )
     print("running 2x2 cells (gate × fitness)...")
     cells = {
-        "none_memory": run_cell("none", memory_obj, readout, **common),  # type: ignore[arg-type]
-        "contraction_memory": run_cell("contraction", memory_obj, readout, **common),  # type: ignore[arg-type]
-        "none_retention": run_cell("none", retention_obj, readout, **common),  # type: ignore[arg-type]
-        "contraction_retention": run_cell("contraction", retention_obj, readout, **common),  # type: ignore[arg-type]
+        "none_memory": run_cell("none", memory_obj, readout, **common),
+        "contraction_memory": run_cell("contraction", memory_obj, readout, **common),
+        "none_retention": run_cell("none", retention_obj, readout, **common),
+        "contraction_retention": run_cell("contraction", retention_obj, readout, **common),
     }
 
     # G1: control セルの決定論(同 seed 再実行で一致)= gate_mode="none" 後方互換の代理。
