@@ -75,7 +75,7 @@ def test_save_load_roundtrip_matches_in_process(tmp_path: Path) -> None:
 
     # In-process int8 reference: quantize the same weights directly.
     ref = convert_linears_to_int8(CharGPT(dense.config))
-    ref.load_state_dict(_int8_state(dense), assign=True)
+    ref.load_state_dict(_dense_to_int8_state(dense), assign=True)
     ref.eval()
 
     idx = torch.randint(0, 48, (1, 8))
