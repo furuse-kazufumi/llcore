@@ -21,16 +21,16 @@ from typing import Any, Callable, cast
 
 import numpy as np
 
-from llcore.evolution.honest_eval import evolution_vs_random
-from llcore.evolution.minimal_ga import evolve
-from llcore.fitness import (
+from llcore.evolution.honest_eval import evolution_vs_random  # type: ignore[import-untyped]
+from llcore.evolution.minimal_ga import evolve  # type: ignore[import-untyped]
+from llcore.fitness import (  # type: ignore[import-untyped]
     CopyTask,
     MemoryEfficiencyObjective,
     evaluate_gene,
     make_fixed_readout,
     state_boundedness_footprint,
 )
-from llcore.state_update import StateUpdateGene
+from llcore.state_update import StateUpdateGene  # type: ignore[import-untyped]
 
 EvalOnce = Callable[[object, np.random.Generator], float]
 
