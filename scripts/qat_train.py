@@ -291,8 +291,9 @@ def main(argv: list[str] | None = None) -> int:
     outp = Path(args.json)
     outp.parent.mkdir(parents=True, exist_ok=True)
     payload: dict[str, Any] = {
-        "config": {"bits": args.bits, "corpus_file": str(corpus_path), "preset": args.config,
-                   "max_iters": args.max_iters, "vocab": tok.vocab_size, "block": block},
+        "config": {"bits": args.bits, "method": args.method, "corpus_file": str(corpus_path),
+                   "preset": args.config, "max_iters": args.max_iters, "vocab": tok.vocab_size,
+                   "block": block},
         "fp32_reference": fp32_ref,
         "qat": qat,
         "qat_top1_retention": (qat["top1_acc"] / ref_top1) if (fp32_ref and ref_top1 > 0) else None,
