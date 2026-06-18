@@ -269,6 +269,8 @@ proxy = 次トークン top-1 accuracy** を併記。予測(Dettmers 2023: ~4bit
 - **★比較の気付き**: realp1 2bit で **per-group32 RTN(top1 -5.31pp)が GPTQ-per-channel(-6.38pp)を上回る**。
   極低ビット小モデルでは「**粒度(per-group)> 誤差補償(GPTQ)**」になり得る(両者は相補的=GPTQ+per-group が
   真の SOTA)。「最新手法 GPTQ が常に最強」ではない、を自前実測で確認。
+- **multi_smoke(小モデル)**でも同傾向: **GPTQ が 2bit の ppl-gate を救出**(RTN +852% FAIL → GPTQ +458% PASS)、
+  3bit は GPTQ でも cap-gate を僅かに届かず(top1 96.3% 保持 < 97%)= 小モデルほど床が高い。
 - 留保: Linear のみ量子化(Embedding/LN fp32)/ 校正 8,192 tokens / weights-only / simulated quant(速度未測)。
 
 ## 記事側面 (feedback_daily_articles_policy の 13 側面)

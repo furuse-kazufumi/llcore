@@ -3,13 +3,14 @@
 > 自動生成: `libexec/raptor-auto-summary` (Stop hook)
 > 次回 ccr 起動時に CLAUDE.md SESSION START で自動的に読み取られる。
 
-- **最終更新**: 2026-06-18 08:05:43
+- **最終更新**: 2026-06-18 12:33:06
 - **プロジェクト**: `D:/projects/llcore`
 - **ブランチ**: `feat/lm-recurrent`
 
 ## 直近の git log
 
 ```
+21af4fd auto: MEMORY_EFFICIENCY_FINDINGS.md 編集前 (2026-06-18 08:07)
 e999c40 auto: ARTICLE_SEEDS.md 編集前 (2026-06-18 08:05)
 36d1de7 auto: MEMORY_EFFICIENCY_FINDINGS.md 編集前 (2026-06-18 08:04)
 dc9c63b auto: ARTICLE_SEEDS.md 編集前 (2026-06-18 08:03)
@@ -19,33 +20,19 @@ fa0b997 auto: ARTICLE_SEEDS.md 編集前 (2026-06-18 06:40)
 28e397b auto: MEMORY_EFFICIENCY_FINDINGS.md 編集前 (2026-06-18 06:40)
 ad7a808 auto: MEMORY_EFFICIENCY_FINDINGS.md 編集前 (2026-06-18 06:40)
 0f9dd76 auto: ARTICLE_SEEDS.md 編集前 (2026-06-18 06:35)
-dae5395 auto: MEMORY_EFFICIENCY_FINDINGS.md 編集前 (2026-06-18 06:34)
 ```
 
 ## 現在の git status
 
 ```
-M docs/ARTICLE_SEEDS.md
+M docs/MEMORY_EFFICIENCY_FINDINGS.md
+ M docs/SESSION_SUMMARY.md
 ```
 
 ## 直近 2 時間に変更されたファイル
 
 ```
-08:05 docs/ARTICLE_SEEDS.md
-08:04 docs/MEMORY_EFFICIENCY_FINDINGS.md
-08:03 docs/SESSION_SUMMARY.md
-08:02 .pytest_cache/v/cache/nodeids
-08:02 .mypy_cache/3.11/cache.3.db
-08:02 .mypy_cache/3.11/cache.2.db
-08:02 .ruff_cache/0.15.12/11287728664031201126
-08:01 tests/unit/test_gptq_compare.py
-08:01 .mypy_cache/3.11/cache.13.db
-08:01 .ruff_cache/0.15.12/16546767254229203700
-08:00 scripts/gptq_compare.py
-06:54 .mypy_cache/3.11/cache.6.db
-06:53 tests/unit/test_quant_group_compare.py
-06:48 .mypy_cache/3.11/cache.8.db
-06:48 scripts/quant_group_compare.py
+(直近 2h の変更なし)
 ```
 
 ---
