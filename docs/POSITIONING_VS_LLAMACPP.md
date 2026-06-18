@@ -199,4 +199,6 @@ honest な計測手続き** に絞る。これは llama.cpp/GGUF にも公式 pe
 - [ ] cap-gate を「新規アルゴリズム」と書いていないか(operationalization = engineering 規律)
 - [ ] (c) 進化統合を「実証済み」と書いていないか(prospective・未着手)
 - [ ] 競合数値に self-report / 条件付き(専用ベンチ/MoE 比較/RAM 曖昧)の注記を付けたか
+- [ ] **競合数値(Gemma4/PaddleOCR/Cosmos)に一次 URL を脚注で貼ったか**(blog.google / arXiv:2606.03264 / NVIDIA newsroom / 各 HF model card)
+- [ ] **char-LM(0.81M〜130M)を 12B/8B 実モデルと土俵違いで並べていないか**(規模差 約 15,000× を脚注でなく表本体に明示したか)
 - [ ] 測っていない利得(真 int8 GEMM 速度・RAM 総量超・大モデル)を「未測 / 将来検証」と明記したか
