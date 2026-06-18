@@ -125,7 +125,7 @@ perplexity ツールに **`Same top p` として既に出荷済み**のメトリ
 | **Cosmos 3 Edge** [^3] | 2B | 未測(self-report)[^3] | OpenMDW 1.1 [^3] | なし |
 | **llama.cpp / GGUF Q4_K_M** [^4] | 任意(例 Llama-3.1-8B) | 4.58GiB(fp16 14.96GiB 比 約 3.27×)、4.89 bpw | MIT(llama.cpp)/ モデル別 | **報告のみ**(PPL + opt-in KLD・top-1 一致率。downstream accuracy 合否ゲートは**非標準**)[^4] |
 | **llama.cpp / GGUF Q8_0** [^4] | 同上 | 7.95GiB(fp16 比 約 1.88× / fp32 比 約 3.76×)、8.50 bpw | 同上 | 同上 |
-| **llcore** [^5] | tiny char-LM 0.81M〜130M | int8 重み常駐 **約 3.9× 圧縮**(74–75% 減)/ mmap **358MB 上限で 522MB モデル完走** | Apache-2.0 + Commercial(FullSense) | **あり** — fail-closed cap-gate(**top-1 retention ≥97%**、未達は機械的に拒否)[^5] |
+| **llcore** [^5] | **tiny char-LM 0.81M〜130M**(Gemma4 比 約 15,000× 小) | int8 重み常駐 **約 3.9× 圧縮**(74–75% 減)/ mmap **358MB 上限で 522MB モデル完走**(★char-LM・simulated quant・速度未測) | Apache-2.0 + Commercial(FullSense) | **あり(char-LM スケール)** — fail-closed cap-gate(top-1 retention ≥97%、未達は機械的に拒否)。**8B 級での通過は未実証**[^5] |
 
 [^1]: Gemma 4 12B(Google, 2026-06-03, Apache 2.0)。dense 11.95B・エンコーダフリー統合・256K ctx。
 「26B に迫る」は **定量ベンチ表が一次情報に無い一般文**で、比較相手は 26B MoE(active~4B)= apples-to-oranges。
