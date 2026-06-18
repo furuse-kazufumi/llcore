@@ -33,6 +33,7 @@ def test_fake_quant_ste_forward_is_quantized_backward_is_identity() -> None:
     assert torch.allclose(wq.detach(), expected)
     # backward is the straight-through identity (grad of sum == ones).
     wq.sum().backward()
+    assert w.grad is not None
     assert torch.allclose(w.grad, torch.ones_like(w))
 
 
