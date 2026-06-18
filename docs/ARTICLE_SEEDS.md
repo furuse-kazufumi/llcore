@@ -494,3 +494,16 @@
   下がる」期待は、QAT で大きく前進したが完全制覇には至らず**、を honest に確定(アークの締め)。
 - **根拠**: `scripts/qat_train.py` / `out/qat_train_2bit.json` / `docs/MEMORY_EFFICIENCY_FINDINGS.md` (d)。
 - **側面**: ベンチ / honest disclosure / 教訓 / 業界比較(PTQ vs QAT)/ 認知科学(段階的改善 vs 質的跳躍)。
+
+### 45. PoC を「実 CLI 推論パス」へ昇格 — int8 を量子化して mmap streaming で日本語生成
+- **気付き**: メモリ効率の PoC 群(scripts/)を `src/llcore/lm/quant.py`(Int8Linear streaming-dequant /
+  save_int8_checkpoint / load_int8_model[mmap])へ昇格し、`llcore.lm` CLI に `quantize` サブコマンド + int8
+  対応 generate を配線。実機: `llcore.lm quantize model.pt`(5.5MB→**1.5MB resident, 72.6% 減**)→
+  `llcore.lm generate model_int8.pt` が **mmap streaming-dequant で読み込み、コヒーレントな日本語を生成**
+  (「僕は大事なんぞです」等の青空調)。= 研究 PoC が「再利用可能 module + 実用 CLI」になった一歩。教訓:
+  実験スクリプトと製品コードの境界を越える時、(a)src は import-untyped ignore 不要(mypy strict 通る)
+  (b)tied 重み(lm_head/wte)は state_dict 経由で扱う(named_parameters は dedup して欠ける)(c)int8/fp32
+  checkpoint は `kind` フィールドで透過判別、の 3 点が配線の勘所。
+- **根拠**: `src/llcore/lm/quant.py` / `src/llcore/lm/__main__.py`(quantize subcommand)/
+  `tests/unit/test_lm_quant.py`(round-trip 検証)。
+- **側面**: 実装報告 / 技術設計 / 教訓 / ユーザー体験(自宅 PC で量子化推論)。
