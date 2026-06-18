@@ -22,6 +22,10 @@ honest 留保:
 - proxy task mechanism feasibility のみ、実 LLM scale ではない。
 """
 
+from .memory_objective import (
+    MemoryEfficiencyObjective,
+    state_boundedness_footprint,
+)
 from .ridge_readout import (
     RidgeEvalOnce,
     RidgeReadout,
