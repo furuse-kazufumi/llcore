@@ -20,11 +20,21 @@ from llcore.lm.eval import (
     held_out_perplexity,
     held_out_report,
     held_out_report_any,
+    held_out_top1_report,
+    passes_capability_gate,
     passes_gate,
     unigram_nll,
     unigram_perplexity,
 )
 from llcore.lm.export import save_viz_json, to_viz_dict
+from llcore.lm.quant import (
+    Int8Linear,
+    convert_linears_to_int8,
+    int8_footprint_bytes,
+    load_int8_model,
+    quantize_per_channel_int8,
+    save_int8_checkpoint,
+)
 from llcore.lm.generation import generate_text, is_degenerate
 from llcore.lm.model import (
     Block,
