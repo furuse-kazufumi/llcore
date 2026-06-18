@@ -2,6 +2,8 @@
 """Tests for :mod:`llcore.lm.quant` — int8 streaming-dequant + mmap inference."""
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 import torch
 from torch import nn
