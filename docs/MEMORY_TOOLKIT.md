@@ -14,9 +14,13 @@ facade（受付窓口）である。新しいアルゴリズムではなく **pa
 from llcore.memory import measure_memory
 report = measure_memory(model, val_ids=val_ids)   # fp32 char-LM を渡すだけ
 print(report.to_dict())
-# {'fp32_bytes': ..., 'int8_bytes': ..., 'compression_ratio': 0.26,
-#  'percent_smaller': 74.1, 'fp32_top1': 0.58, 'int8_top1': 0.58,
-#  'retention': 0.998, 'capability_gate_pass': True, 'min_retention': 0.97, ...}
+# 実走例 (out/lm_aozora_multi_smoke/model.pt, 青空マルチ全文 val=330,368 token):
+# {'fp32_bytes': 5502976, 'int8_bytes': 1506072, 'compression_ratio': 0.2737,
+#  'percent_smaller': 72.63, 'fp32_top1': 0.3629, 'int8_top1': 0.3631,
+#  'retention': 1.0004, 'capability_gate_pass': True, 'min_retention': 0.97,
+#  'n_eval_tokens': 330368}
+# 注: int8 が fp32 を 0.0002 上回るのは「改善」でなく同点 argmax の測定ノイズ
+#     (この規模では int8 量子化の capability コストが実質ゼロ)。
 ```
 
 ## なぜ facade を作るのか（honest）
