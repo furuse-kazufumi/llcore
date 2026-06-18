@@ -95,6 +95,9 @@ py -3.11 -m llcore.memory report out\lm_run\model.pt
 
 # capability retention も（ローカルコーパスで）
 py -3.11 -m llcore.memory report out\lm_run\model.pt --corpus-file corpus.txt --json out\mem_report.json
+
+# 昇格ゲート: cap-gate PASS のときだけ int8 ckpt を emit（FAIL/コーパス無→fail-closed で拒否）
+py -3.11 -m llcore.memory report out\lm_run\model.pt --corpus-file corpus.txt --save-int8 out\model_int8.pt
 ```
 
 出力例（実走 = `out/lm_aozora_multi_smoke/model.pt`、青空マルチ全文）:
