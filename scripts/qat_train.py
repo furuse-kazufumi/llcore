@@ -197,6 +197,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--fp32-checkpoint", default="out/lm_aozora_multi_smoke/model.pt",
                     help="fp32 reference for the capability-retention baseline")
     ap.add_argument("--config", choices=list(MODEL_PRESETS), default="smoke")
+    ap.add_argument("--method", choices=["qat", "lsq"], default="qat",
+                    help="qat=fixed-scale fake-quant / lsq=learned step size (LSQ, 学習可能 scale)")
     ap.add_argument("--max-iters", type=int, default=2000)
     ap.add_argument("--batch-size", type=int, default=12)
     ap.add_argument("--val-frac", type=float, default=0.1)
