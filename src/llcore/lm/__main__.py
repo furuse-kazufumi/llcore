@@ -565,12 +565,28 @@ def _emit_artifacts(
 
 
 def cmd_generate(args: argparse.Namespace) -> int:
-    model, tok = _load_checkpoint(Path(args.checkpoint))
+    # Accept either an fp32 or an int8 (streaming/mmap) checkpoint.
+    model, tok = _load_any_checkpoint(Path(args.checkpoint))
     print(
         generate_text(
             model, tok, prompt=args.prompt, max_new_tokens=args.max_new_tokens,
             temperature=args.temperature, top_k=args.top_k, seed=args.seed,
         )
+    )
+    return 0
+
+
+def cmd_quantize(args: argparse.Namespace) -> int:
+    """Quantize an fp32 checkpoint to an int8 (streaming/mmap) checkpoint."""
+    model, tok = _load_checkpoint(Path(args.checkpoint))
+    out = Path(args.out) if args.out else Path(args.checkpoint).with_name("model_int8.pt")
+    save_int8_checkpoint(model, out, tok.itos)
+    fp = int8_footprint_bytes(model)
+    ratio = fp["int8_bytes"] / fp["fp32_bytes"]
+    print(
+        f"wrote {out}  fp32 weights={fp['fp32_bytes'] / 1e6:.1f}MB  "
+        f"int8 resident={fp['int8_bytes'] / 1e6:.1f}MB  (ratio {ratio:.3f}, "
+        f"{(1 - ratio) * 100:.1f}% smaller)"
     )
     return 0
 
