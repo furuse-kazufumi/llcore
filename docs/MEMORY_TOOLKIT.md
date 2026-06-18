@@ -91,19 +91,23 @@ py -3.11 -m llcore.memory report out\lm_run\model.pt
 py -3.11 -m llcore.memory report out\lm_run\model.pt --corpus-file corpus.txt --json out\mem_report.json
 ```
 
-出力例:
+出力例（実走 = `out/lm_aozora_multi_smoke/model.pt`、青空マルチ全文）:
 ```
-checkpoint     : out/lm_run/model.pt
+checkpoint     : out/lm_aozora_multi_smoke/model.pt
 fp32 weights   : 5.50 MB
-int8 resident  : 1.50 MB  (ratio 0.273, 72.6% smaller)
-top-1 retention: 99.8%  (fp32 0.5841 -> int8 0.5829, n=12480)
+int8 resident  : 1.51 MB  (ratio 0.274, 72.6% smaller)
+top-1 retention: 100.0%  (fp32 0.3629 -> int8 0.3631, n=330368)
 capability gate: PASS (>= 97% retention)
 ```
+（retention が 100% を僅かに超えるのは int8 が fp32 を上回ったのではなく、
+同点 argmax の測定ノイズ。この規模では int8 の capability コストが実質ゼロ。）
 
-## 設計指針: 「良いハードに載せ替えるほど効く」
+## 設計指針: 「良いハードに載せ替えるほど効く」（設計仮説・本デリバラブルでは未計測）
 
 このツールキットは CPU 専用の延命策**ではない**。各プリミティブは
-ハードが良くなるほどスペックが跳ね上がる性質を持つ（2026-06-17 ユーザー指針）:
+ハードが良くなるほどスペックが跳ね上がる性質を持つ（2026-06-17 ユーザー指針）。
+**以下は設計上の含意であり、速度・大 RAM 共有・長文脈は本デリバラブルでは未計測**
+（[`MEMORY_EFFICIENCY_FINDINGS.md`](MEMORY_EFFICIENCY_FINDINGS.md) #34 で速度は未測定と明記）:
 
 1. **int8** — 今は storage（footprint）圧縮だが、同じ int8 重みは GPU では
    真の int8 GEMM（tensor core）= **速度**向上に化ける。
