@@ -282,10 +282,11 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"  PTQ {method:<4}: top1 {ptq[k] * 100:.2f}%  (QAT vs PTQ top1 "
                       f"{(qat['top1_acc'] - ptq[k]) * 100:+.2f}pp)")
     print(
-        f"\n[headline] QAT {args.bits}-bit は PTQ が越えられなかった cap-gate を "
-        f"{'**越えた** ✓' if cap_pass else '越えられず(QAT でも 2bit は厳しい=honest)'}。"
+        f"\n[headline] {mlabel} {args.bits}-bit は PTQ が越えられなかった cap-gate を "
+        f"{'**越えた** ✓' if cap_pass else f'越えられず({mlabel} でも 2bit は厳しい=honest)'}。"
     )
-    print("[honest] CPU smoke / weights-only / Linear のみ / fp32 ref と同 iters で公平比較。")
+    print("[honest] CPU smoke / weights-only / Linear のみ / fp32 ref と同 iters で公平比較。"
+          + (" LSQ scale は 1-D で WD 非適用。" if args.method == "lsq" else ""))
 
     outp = Path(args.json)
     outp.parent.mkdir(parents=True, exist_ok=True)
