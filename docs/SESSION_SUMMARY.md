@@ -3,48 +3,50 @@
 > 自動生成: `libexec/raptor-auto-summary` (Stop hook)
 > 次回 ccr 起動時に CLAUDE.md SESSION START で自動的に読み取られる。
 
-- **最終更新**: 2026-06-18 21:48:03
+- **最終更新**: 2026-06-18 22:09:08
 - **プロジェクト**: `D:/projects/llcore`
 - **ブランチ**: `feat/lm-recurrent`
 
 ## 直近の git log
 
 ```
+384e743 auto: test_qat_train.py 編集前 (2026-06-18 22:01)
+47de263 auto: qat_train.py 編集前 (2026-06-18 22:00)
+39a65e0 auto: qat_train.py 編集前 (2026-06-18 22:00)
+13c6304 auto: qat_train.py 編集前 (2026-06-18 22:00)
+70b25d2 auto: qat_train.py 編集前 (2026-06-18 22:00)
+09882bd auto: qat_train.py 編集前 (2026-06-18 22:00)
+fac50bd auto: qat_train.py 編集前 (2026-06-18 22:00)
+8945b44 auto: qat_train.py 編集前 (2026-06-18 21:59)
+4e69ace auto: a7-control-theory-ssm.md 編集前 (2026-06-18 21:58)
 f15bc2d auto: ARTICLE_SEEDS.md 編集前 (2026-06-18 21:23)
-b4b0a28 auto: ARTICLE_SEEDS.md 編集前 (2026-06-18 21:18)
-4e5df09 auto: POSITIONING_VS_LLAMACPP.md 編集前 (2026-06-18 21:08)
-c521158 auto: POSITIONING_VS_LLAMACPP.md 編集前 (2026-06-18 21:08)
-1db307a auto: POSITIONING_VS_LLAMACPP.md 編集前 (2026-06-18 21:08)
-59fbc8f auto: POSITIONING_VS_LLAMACPP.md 編集前 (2026-06-18 21:08)
-a0060fe auto: POSITIONING_VS_LLAMACPP.md 編集前 (2026-06-18 21:07)
-0d6caab auto: POSITIONING_VS_LLAMACPP.md 編集前 (2026-06-18 21:07)
-28ccc77 auto: ARTICLE_SEEDS.md 編集前 (2026-06-18 19:24)
-7bba8a8 auto: ARTICLE_SEEDS.md 編集前 (2026-06-18 12:51)
 ```
 
 ## 現在の git status
 
 ```
-M docs/ARTICLE_SEEDS.md
- M docs/SESSION_SUMMARY.md
-?? docs/AUTONOMY_GOAL.md
-?? docs/QIITA_A7_control_theory_ssm.md
-?? docs/QIITA_S2_cherry_pick_anatomy.md
-?? docs/articles/
+M docs/SESSION_SUMMARY.md
+ M tests/unit/test_qat_train.py
 ```
 
 ## 直近 2 時間に変更されたファイル
 
 ```
+22:03 docs/SESSION_SUMMARY.md
+22:02 .mypy_cache/3.11/cache.4.db
+22:02 .mypy_cache/3.11/cache.3.db
+22:02 .ruff_cache/0.15.12/16546767254229203700
+22:02 .ruff_cache/0.15.12/11287728664031201126
+22:01 .pytest_cache/v/cache/nodeids
+22:01 tests/unit/test_qat_train.py
+22:00 scripts/qat_train.py
+21:58 docs/articles/drafts/a7-control-theory-ssm.md
+21:56 docs/BRANCH_B_LSQ_DESIGN.md
+21:55 docs/articles/drafts/s2-cherrypick-5types.md
+21:55 docs/articles/drafts/s1-ppl-pass-but-broken.md
+21:55 docs/articles/drafts/b1-show-your-losses.md
 21:46 docs/QIITA_S2_cherry_pick_anatomy.md
 21:46 docs/QIITA_A7_control_theory_ssm.md
-21:46 docs/AUTONOMY_GOAL.md
-21:46 docs/articles/QIITA_S1_ppl_pass_but_broken.md
-21:44 docs/SESSION_SUMMARY.md
-21:23 docs/ARTICLE_SEEDS.md
-21:23 docs/ARTICLE_IDEA_BANK_2026_06.md
-21:17 docs/ARTICLE_MATERIAL_2026_06_competitor_methods.md
-21:08 docs/POSITIONING_VS_LLAMACPP.md
 ```
 
 ---
