@@ -482,3 +482,15 @@
 - **根拠**: `scripts/gptq_compare.py` / `scripts/quant_group_compare.py` / `out/gptq_compare*.json` /
   `out/quant_group_compare*.json` / `docs/MEMORY_EFFICIENCY_FINDINGS.md` (b'')(b''')。
 - **側面**: ベンチ / honest disclosure / 教訓 / 業界比較(PTQ vs QAT)/ 技術設計。
+
+### 44. QAT は PTQ を 2bit で約3倍引き離すが、tiny モデルでは「最後の壁」を越えられない(量子化アーク締め)
+- **気付き**: 「2bit は QAT 領域」を自前実証。fake-quant + STE で学習(量子化を見越して重みが適応)すると、
+  multi_smoke 2bit で **top1 30.10%(fp32 36.28% の 82.9% 保持)** に達し、**PTQ GPTQ 12.07% / RTN 7.98% を
+  +18〜22pp 圧倒(約3倍の保持)**。= 量子化アークの全手法(RTN→per-group→GPTQ→QAT)で 2bit top1 は
+  8→12→30% と単調に改善し、**QAT が質的にジャンプ**。**だが strict 97% cap-gate は QAT でも越えられず**
+  (82.9%)。教訓2つ: ①「学習時量子化(QAT)は後処理(PTQ)と次元が違う」を数値で確認(誤差補償 GPTQ より
+  さらに上)②**それでも tiny char-LM の 2bit には最後の壁が残る**=床を動かす質的アプローチ(QAT)は効くが、
+  本当に 2bit を安全化するには「モデル規模 / 学習予算 / 学習可能 scale(LSQ)」が要る。**「新手法を足せば床が
+  下がる」期待は、QAT で大きく前進したが完全制覇には至らず**、を honest に確定(アークの締め)。
+- **根拠**: `scripts/qat_train.py` / `out/qat_train_2bit.json` / `docs/MEMORY_EFFICIENCY_FINDINGS.md` (d)。
+- **側面**: ベンチ / honest disclosure / 教訓 / 業界比較(PTQ vs QAT)/ 認知科学(段階的改善 vs 質的跳躍)。
