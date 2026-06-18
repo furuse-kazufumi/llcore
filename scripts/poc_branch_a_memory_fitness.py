@@ -17,7 +17,7 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, cast
 
 import numpy as np
 
@@ -30,6 +30,7 @@ from llcore.fitness import (
     make_fixed_readout,
     state_boundedness_footprint,
 )
+from llcore.state_update import StateUpdateGene
 
 EvalOnce = Callable[[object, np.random.Generator], float]
 
