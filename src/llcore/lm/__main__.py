@@ -34,6 +34,12 @@ from llcore.lm.eval import held_out_report, passes_gate
 from llcore.lm.export import save_viz_json
 from llcore.lm.generation import generate_text, is_degenerate
 from llcore.lm.model import CharGPT, GPTConfig
+from llcore.lm.quant import (
+    INT8_CKPT_KIND,
+    int8_footprint_bytes,
+    load_int8_model,
+    save_int8_checkpoint,
+)
 from llcore.lm.tokenizer import CharTokenizer
 from llcore.lm.trainer import Trainer, TrainConfig
 
