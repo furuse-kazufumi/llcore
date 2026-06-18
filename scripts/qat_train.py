@@ -93,6 +93,77 @@ def convert_to_fake_quant(model: nn.Module, bits: int) -> nn.Module:
     return model
 
 
+# --- LSQ (Learned Step Size Quantization, Esser et al., ICLR 2020, arXiv:1902.08153) ---
+# 固定 scale QAT との差 = step size(scale)を **勾配で学習** する。各層 per-channel の
+# 学習可能 scale を持ち、(1) round に STE、(2) scale 勾配に g=1/sqrt(N·Q_P) を掛けて重み勾配と
+# スケールを均衡化(論文 Appendix A)、(3) scale 初期値 = 2·mean(|w|)/sqrt(Q_P)。
+# 「2bit は QAT 領域、その QAT を学習可能 scale で更に詰められるか」を測るための拡張。
+# prior-art の honest 見積もり: 小モデルほど 2bit は壊れやすく(LSQ 自身 SqueezeNext で実証)、
+# char-LM 規模で strict 97% gate 突破は期待薄。「82.9%(固定 scale QAT)から何 % 詰まるか」を測る。
+
+
+def round_ste(x: Tensor) -> Tensor:
+    """round の straight-through estimator(forward=round / backward=恒等)。"""
+    return (torch.round(x) - x).detach() + x
+
+
+def grad_scale(x: Tensor, g: float) -> Tensor:
+    """LSQ の勾配均衡化(forward=恒等 / backward=勾配に g を掛ける、STE トリック)。"""
+    return (x - x * g).detach() + x * g
+
+
+def lsq_init_scale(w: Tensor, bits: int) -> Tensor:
+    """LSQ の scale 初期値 s = 2·mean(|w|)/sqrt(Q_P)(per-channel・1-D, shape=[out_features])。"""
+    qp = (1 << (bits - 1)) - 1
+    return (2.0 * w.detach().abs().mean(dim=1) / math.sqrt(max(qp, 1))).clamp(min=1e-12)
+
+
+def lsq_quant(w: Tensor, scale: Tensor, bits: int) -> Tensor:
+    """LSQ per-channel 量子化。学習可能 scale + round STE + 勾配均衡化 g=1/sqrt(N·Q_P)。
+
+    scale は 1-D(shape=[out_features])= trainer の weight-decay 群(dim>=2)に入れず WD で
+    縮むのを防ぐ。forward 内で [out,1] へ broadcast する。
+    """
+    qn = 1 << (bits - 1)          # 下側クリップ |Q_N| = 2^(b-1)
+    qp = (1 << (bits - 1)) - 1    # 上側クリップ Q_P = 2^(b-1)-1
+    n = w.shape[1]                # per-channel の重み数(in_features)
+    g = 1.0 / math.sqrt(max(n * qp, 1))
+    s = grad_scale(scale, g).clamp(min=1e-12).unsqueeze(1)  # [out,1]
+    wq = round_ste(torch.clamp(w / s, -qn, qp))
+    return wq * s
+
+
+class LSQLinear(nn.Linear):
+    """nn.Linear のサブクラス。per-channel **学習可能** scale で LSQ 量子化する。"""
+
+    bits: int
+
+    def __init__(self, in_features: int, out_features: int, bias: bool = True) -> None:
+        super().__init__(in_features, out_features, bias=bias)
+        # 1-D に保つ = trainer の no_decay 群(dim<2)へ入れ、scale が WD で縮むのを避ける。
+        self.lsq_scale = nn.Parameter(torch.ones(out_features))
+
+    def forward(self, x: Tensor) -> Tensor:
+        return F.linear(x, lsq_quant(self.weight, self.lsq_scale, self.bits), self.bias)
+
+
+def convert_to_lsq(model: nn.Module, bits: int) -> nn.Module:
+    """model 内の全 nn.Linear を LSQLinear へ置換し、scale を重みから LSQ 初期化する。"""
+    for name, child in list(model.named_children()):
+        if isinstance(child, nn.Linear) and not isinstance(child, (FakeQuantLinear, LSQLinear)):
+            lq = LSQLinear(child.in_features, child.out_features, bias=child.bias is not None)
+            lq.bits = bits
+            with torch.no_grad():
+                lq.weight.copy_(child.weight)
+                if child.bias is not None and lq.bias is not None:
+                    lq.bias.copy_(child.bias)
+                lq.lsq_scale.copy_(lsq_init_scale(child.weight, bits))
+            setattr(model, name, lq)
+        else:
+            convert_to_lsq(child, bits)
+    return model
+
+
 def _eval_model(
     model: CharGPT, train_ids: Tensor, val_ids: Tensor, vocab: int, block: int, bs: int
 ) -> dict[str, float]:
