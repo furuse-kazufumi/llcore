@@ -53,9 +53,8 @@ def test_convert_linears_replaces_and_preserves_forward() -> None:
     dense = CharGPT(_cfg())
     dense.eval()
     int8 = convert_linears_to_int8(CharGPT(_cfg()))
-    int8.load_state_dict(  # copy dense weights into the int8 skeleton via re-quantization
-        {k: v for k, v in _int8_state(dense).items()}, assign=True
-    )
+    # copy dense weights into the int8 skeleton via re-quantization
+    int8.load_state_dict(_dense_to_int8_state(dense), assign=True)
     int8.eval()
     assert not any(type(m) is nn.Linear for m in int8.modules())
     assert any(isinstance(m, Int8Linear) for m in int8.modules())
