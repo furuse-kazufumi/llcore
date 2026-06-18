@@ -36,7 +36,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Any, cast
+from typing import Any
 
 import torch
 from torch import Tensor, nn
