@@ -81,6 +81,12 @@ bit 幅スイープ（FINDINGS (b')）で **「PPL だけの gate は、top-1 �
 footprint の勝ちを **top-1 保持率で fail-closed に検収**する。これが
 「再導出されたプリミティブ群」に対して llcore が足す唯一の運用上の価値である。
 
+この gate を **昇格ゲート（promotion gate）** として実体化したのが CLI の
+`--save-int8` である: int8 チェックポイントの emit を **cap-gate PASS のときだけ
+許可**し、FAIL または「コーパス未指定＝capability 未計測」のときは **fail-closed で
+書き込みを拒否**する（`--force` で運用者が上書き可）。「どれだけ小さくなるか」だけで
+なく「**その縮小を本番に出して良いか**」までを 1 コマンドで検収する。
+
 ## CLI
 
 ```powershell
