@@ -48,6 +48,7 @@ __all__ = [
     "AdditionTask",
     "CopyTask",
     "FixedReadout",
+    "MemoryEfficiencyObjective",
     "RidgeEvalOnce",
     "RidgeReadout",
     "SyntheticTask",
@@ -58,4 +59,5 @@ __all__ = [
     "make_fixed_readout",
     "make_ridge_eval_once",
     "ridge_fitness",
+    "state_boundedness_footprint",
 ]
