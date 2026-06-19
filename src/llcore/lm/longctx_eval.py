@@ -174,7 +174,7 @@ def block_reset_nll(
     total = 0.0
     for w_start in range(0, n_pred, reset_every):
         w_stop = min(w_start + reset_every, n_pred)
-        state: list[torch.Tensor] | list[object] | None = None
+        state: object = None
         for start in range(w_start, w_stop, chunk_size):
             stop = min(start + chunk_size, w_stop)
             logits_chunk: list[torch.Tensor] = []
