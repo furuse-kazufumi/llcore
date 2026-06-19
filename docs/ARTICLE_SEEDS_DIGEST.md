@@ -22,7 +22,7 @@
 
 1. **量子化アーク** — #34/37/41/42/43/44/45/53, bank:A1/A8, comp:4, draft:s1。int8 4×圧縮の再現 → ビット幅 cliff → RTN/per-group/GPTQ/QAT/LSQ の段階再導出。一貫結論=tiny char-LM の 2bit strict 97% gate は手法では越えられず、床は規模/学習予算/VQ が動かす。全て simulated quant=速度未測。
 2. **メモリ効率の実機計測** — #33/35/38/39/40/56, bank:A2/A3/A4/A5/A6, comp:8/9/10, draft:a7。mmap 固定コスト・working-set 上限で RAM超・streaming の allocator 壁・文脈長×8 で GPT peak×2.65 vs recurrent×1.00。pivot(#35)後の勝ち筋実証。
-3. **honest disclosure・負けの記録** — #2/8/10/14/16/36/53/54/55, bank:B1/B3, draft:b1。null/敗北を消さない配当(2,000万エッジ回避)、capability⊥guarantee の同時観測、進化≒random の負け筋確定と機構資産の再配線。
+3. **honest disclosure・負けの記録** — #2/8/10/14/16/36/53/54/55/57, bank:B1/B3, draft:b1。null/敗北を消さない配当(2,000万エッジ回避)、capability⊥guarantee の同時観測、進化≒random の負け筋確定と機構資産の再配線。**#57=AI 批評家の『捏造』指摘を一次証拠で覆した回(冤罪)**=show-your-losses の白眉候補。
 4. **競合地図・業界比較** — #46–52, bank:S2/S3/S5/S7/B5/B6, comp:1–11, draft:s2。業界の小型・低メモリ収斂、cherry-pick 5型、Goodhart、Hermes ベンチ不在、ライセンス地図、強豪5社×FullSense。全社数値 self-report・規模差 caveat 必須。
 5. **fail-closed エンジニアリング** — #11/13/15/31/32, bank:A9/B8, comp:10。識別力設計、sound gate のコスト構造、最初の admit、producer/consumer 契約、provenance 再検証、SPC×fail-closed。
 6. **AI駆動研究ワークフロー・corpus・migration** — #1/3/4/5/6/7/9/12/17–30, bank:B2。計測の計測、RAD接地30分、circularity回避、checkpoint二軸、verified_safe_learning v1→v2 migration serial(#21–#28=1–2本へ統合前提)。
