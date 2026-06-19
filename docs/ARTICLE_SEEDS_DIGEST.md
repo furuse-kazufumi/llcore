@@ -18,7 +18,7 @@
 
 ---
 
-## 2. テーマ別クラスタ(8 群)
+## 2. テーマ別クラスタ(7 群)
 
 1. **量子化アーク** — #34/37/41/42/43/44/45/53, bank:A1/A8, comp:4, draft:s1。int8 4×圧縮の再現 → ビット幅 cliff → RTN/per-group/GPTQ/QAT/LSQ の段階再導出。一貫結論=tiny char-LM の 2bit strict 97% gate は手法では越えられず、床は規模/学習予算/VQ が動かす。全て simulated quant=速度未測。
 2. **メモリ効率の実機計測** — #33/35/38/39/40/56, bank:A2/A3/A4/A5/A6, comp:8/9/10, draft:a7。mmap 固定コスト・working-set 上限で RAM超・streaming の allocator 壁・文脈長×8 で GPT peak×2.65 vs recurrent×1.00。pivot(#35)後の勝ち筋実証。
