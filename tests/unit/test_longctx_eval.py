@@ -67,11 +67,12 @@ def test_nll_at_positions_matches_last_token_forward() -> None:
 
     # reference: for each p, predict ids[p] from a fresh forward over ids[p-c:p]
     ref_total = 0.0
-    for p in positions:
-        window = ids[p - c : p].unsqueeze(0)
-        logits, _ = model(window)
-        last = logits[0, -1]
-        ref_total += float(F.cross_entropy(last.unsqueeze(0), ids[p : p + 1], reduction="sum"))
+    with torch.no_grad():
+        for p in positions:
+            window = ids[p - c : p].unsqueeze(0)
+            logits, _ = model(window)
+            last = logits[0, -1]
+            ref_total += float(F.cross_entropy(last.unsqueeze(0), ids[p : p + 1], reduction="sum"))
     assert nll == pytest.approx(ref_total / len(positions), abs=1e-5)
 
 
