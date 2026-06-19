@@ -229,7 +229,7 @@ class Qwen2LM(nn.Module):
         self,
         input_ids: torch.Tensor,
         max_new_tokens: int,
-        temperature: float = 1.0,
+        temperature: float = 0.0,  # 0 = greedy (matches HF do_sample=False)
         top_k: int | None = None,
         eos_id: int | None = None,
         seed: int | None = None,
