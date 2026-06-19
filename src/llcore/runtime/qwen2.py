@@ -191,16 +191,21 @@ class Qwen2LM(nn.Module):
         self.params = params
         self.model = _Qwen2Inner(params)
         self.lm_head = nn.Linear(params.hidden_size, params.vocab_size, bias=False)
+        if params.tie_embeddings:
+            # share the storage with the input embedding (saves vocab*hidden params of RAM)
+            self.lm_head.weight = self.model.embed_tokens.weight
 
     def load_hf_state_dict(self, sd: dict[str, torch.Tensor]) -> None:
-        """Load a HuggingFace Qwen2ForCausalLM state_dict (casting to float32)."""
+        """Load a HuggingFace Qwen2ForCausalLM state_dict (casting to float32).
+
+        With tied embeddings ``lm_head.weight`` shares storage with ``embed_tokens.weight``, so
+        loading either key fills both — no duplicate vocab*hidden matrix is kept resident.
+        """
         own = self.state_dict()
         filtered = {
             k: v.float() for k, v in sd.items() if k in own and tuple(v.shape) == tuple(own[k].shape)
         }
         self.load_state_dict(filtered, strict=False)
-        if self.params.tie_embeddings and "lm_head.weight" not in filtered:
-            self.lm_head.weight.data.copy_(self.model.embed_tokens.weight.data)
 
     def forward(
         self,
