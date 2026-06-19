@@ -23,12 +23,15 @@ model's QUALITY at long context, while neutralizing the obvious artifact traps:
 """
 from __future__ import annotations
 
+import math
 from collections.abc import Sequence
 from typing import TypeAlias
 
 import torch
 from torch.nn import functional as F
 
+from llcore.lm.eval import passes_gate
+from llcore.lm.model import CharGPT
 from llcore.lm.recurrent import RecurrentLM
 from llcore.lm.rwkv import RWKVLM
 
