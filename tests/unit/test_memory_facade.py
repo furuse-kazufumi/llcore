@@ -289,3 +289,46 @@ def test_cli_save_int8_force_writes_without_corpus(tmp_path: Path) -> None:
     rc = mem.main(["report", str(ckpt), "--save-int8", str(out_int8), "--force"])
     assert rc == 0
     assert out_int8.exists()
+
+
+# --- structural memory axis: KV-cache growth vs constant state --------------
+
+
+def test_measure_memory_kv_growth_matches_primitive_and_is_linear() -> None:
+    model = CharGPT(_cfg())
+    lens = [64, 128, 256]
+    report = measure_memory(model, context_lens=lens)
+    assert report.kv_bytes_by_context == {t: mem.gpt_kv_bytes(model, t) for t in lens}
+    kv = report.kv_bytes_by_context
+    assert kv is not None
+    # GPT KV cache grows linearly with context length (doubling T doubles bytes).
+    assert kv[128] == 2 * kv[64]
+    assert kv[256] == 2 * kv[128]
+
+
+def test_measure_memory_without_context_lens_leaves_kv_none() -> None:
+    report = measure_memory(CharGPT(_cfg()))
+    assert report.kv_bytes_by_context is None
+
+
+def test_measure_memory_combines_all_three_axes() -> None:
+    report = measure_memory(CharGPT(_cfg()), val_ids=_val_ids(), context_lens=[64, 128])
+    assert report.int8_bytes < report.fp32_bytes            # footprint axis
+    assert report.capability_gate_pass is not None          # capability axis
+    assert report.kv_bytes_by_context is not None           # structural axis
+
+
+def test_cli_report_context_lens_in_json(tmp_path: Path) -> None:
+    ckpt = tmp_path / "model.pt"
+    _save_fp32_checkpoint(ckpt, "hello world " * 30)
+    out_json = tmp_path / "report.json"
+    rc = mem.main(
+        ["report", str(ckpt), "--context-lens", "64,128,256", "--json", str(out_json)]
+    )
+    assert rc == 0
+    payload = json.loads(out_json.read_text(encoding="utf-8"))
+    kv = payload["kv_bytes_by_context"]
+    assert kv is not None
+    # JSON object keys are strings; growth is still linear.
+    assert kv["128"] == 2 * kv["64"]
+    assert kv["256"] == 2 * kv["128"]
