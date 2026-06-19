@@ -230,6 +230,20 @@ def _print_report(report: MemoryReport, checkpoint: Path) -> None:
     print(f"capability gate: {verdict} (>= {report.min_retention * 100:.0f}% retention)")
 
 
+def _print_kv_growth(report: MemoryReport) -> None:
+    if not report.kv_bytes_by_context:
+        return
+    items = sorted(report.kv_bytes_by_context.items())
+    lo_t, lo_b = items[0]
+    hi_t, hi_b = items[-1]
+    growth = hi_b / lo_b if lo_b else float("nan")
+    print(
+        f"KV cache       : T={lo_t} {lo_b / 1e6:.2f} MB -> T={hi_t} {hi_b / 1e6:.2f} MB "
+        f"(x{growth:.1f}; grows linearly with context)"
+    )
+    print("                 (a constant-state recurrent model would stay flat here)")
+
+
 def _should_promote(report: MemoryReport, *, force: bool) -> tuple[bool, str]:
     """Fail-closed decision: may we emit the int8 checkpoint for this report?
 
