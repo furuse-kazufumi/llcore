@@ -44,10 +44,10 @@ def run_steps(model: ConstantStateLM, x: torch.Tensor) -> torch.Tensor:
     """
     if x.ndim != 2:
         raise ValueError(f"x must be 2-D [B,T], got shape {tuple(x.shape)}")
-    state = None
+    state: object = None
     outs: list[torch.Tensor] = []
     for pos in range(x.size(1)):
-        logits, state = model.step(x[:, pos], state)
+        logits, state = model.step(x[:, pos], state)  # type: ignore[arg-type]
         outs.append(logits.unsqueeze(1))
     return torch.cat(outs, dim=1)
 
