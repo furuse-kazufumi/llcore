@@ -14,6 +14,7 @@ Correctness is pinned by golden tests against HF (``tests/unit/test_runtime_qwen
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Any, cast
 
 import torch
 from torch import nn
