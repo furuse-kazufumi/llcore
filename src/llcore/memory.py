@@ -281,8 +281,14 @@ def cmd_report(args: argparse.Namespace) -> int:
         text = _load_corpus_text(args.corpus, args.corpus_file)
         ids = torch.tensor(tok.encode_safe(text), dtype=torch.long)
         _, val_ids = train_val_split(ids, val_frac=args.val_frac)
-    report = measure_memory(model, val_ids=val_ids, min_retention=args.min_retention)
+    context_lens: list[int] | None = None
+    if args.context_lens:
+        context_lens = [int(x) for x in args.context_lens.split(",") if x.strip()]
+    report = measure_memory(
+        model, val_ids=val_ids, min_retention=args.min_retention, context_lens=context_lens
+    )
     _print_report(report, Path(args.checkpoint))
+    _print_kv_growth(report)
     if args.json:
         Path(args.json).write_text(
             json.dumps(report.to_dict(), ensure_ascii=False, indent=2), encoding="utf-8"
