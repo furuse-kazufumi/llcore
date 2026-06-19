@@ -167,7 +167,7 @@ class TBPTTTrainer:
             y = train_ids[base + ar + 1]  # [B, cs]
             logits_steps: list[torch.Tensor] = []
             for t in range(cs):
-                logits, state = self.model.step(x[:, t], state)  # type: ignore[arg-type]
+                logits, state = self.model.step(x[:, t], state)  # type: ignore[arg-type, assignment]
                 logits_steps.append(logits.unsqueeze(1))
             chunk_logits = torch.cat(logits_steps, dim=1)  # [B, cs, V]
             loss = F.cross_entropy(chunk_logits.reshape(-1, vocab), y.reshape(-1))
