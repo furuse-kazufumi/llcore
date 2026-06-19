@@ -129,3 +129,109 @@ def test_block_reset_shorter_window_differs() -> None:
     # both finite & positive; resetting changes the number (sanity, not a direction claim)
     assert nll_short > 0.0 and nll_full > 0.0
     assert nll_short != pytest.approx(nll_full, abs=1e-6)
+
+
+# --- correctness gate: chunk_size must NOT change the streaming loss (state carries) ---
+
+
+@pytest.mark.parametrize("factory", [_recurrent, _rwkv])
+def test_streaming_nll_chunk_size_invariant(factory) -> None:  # type: ignore[no-untyped-def]
+    model = factory()
+    torch.manual_seed(9)
+    ids = torch.randint(0, 32, (300,))
+    a, _ = model.streaming_nll(ids, chunk_size=16)
+    b, _ = model.streaming_nll(ids, chunk_size=64)
+    c, _ = model.streaming_nll(ids, chunk_size=257)  # not a divisor of len
+    assert a == pytest.approx(b, abs=1e-5)
+    assert a == pytest.approx(c, abs=1e-5)
+
+
+# --- banded streaming metrics: reconcile with streaming_nll, partition, top-k, unigram ---
+
+
+def _band_edges() -> list[int]:
+    return [0, 16, 32, 64, 128]
+
+
+def test_streaming_metrics_by_band_reconciles_and_partitions() -> None:
+    from llcore.lm.longctx_eval import streaming_metrics_by_band
+
+    model = _recurrent()
+    torch.manual_seed(4)
+    ids = torch.randint(0, 32, (300,))
+    out = streaming_metrics_by_band(model, ids, _band_edges())
+    # token counts across bands partition the n-1 predicted positions exactly
+    assert sum(b["n_tok"] for b in out["bands"]) == ids.size(0) - 1
+    # token-weighted mean over bands == the scalar streaming_nll (same carried pass)
+    stream_nll, _ = model.streaming_nll(ids)
+    weighted = sum(b["mean_nll"] * b["n_tok"] for b in out["bands"]) / (ids.size(0) - 1)
+    assert weighted == pytest.approx(stream_nll, abs=1e-4)
+    assert out["full_mean_nll"] == pytest.approx(stream_nll, abs=1e-4)
+    # every band reports the standard char-LM units
+    for b in out["bands"]:
+        assert b["ppl"] == pytest.approx(float(torch.tensor(b["mean_nll"]).exp()), rel=1e-5)
+        assert b["bpc"] == pytest.approx(b["mean_nll"] / 0.6931471805599453, rel=1e-5)
+        assert 0.0 <= b["top1"] <= 1.0 and b["top1"] <= b["top5"]
+
+
+def test_streaming_metrics_by_band_tail_excludes_warmup() -> None:
+    from llcore.lm.longctx_eval import streaming_metrics_by_band
+
+    model = _recurrent()
+    torch.manual_seed(4)
+    ids = torch.randint(0, 32, (300,))
+    out = streaming_metrics_by_band(model, ids, _band_edges(), tail_start=64)
+    # tail mean is the token-weighted mean of bands whose target positions are >= 64
+    tail_bands = [b for b in out["bands"] if b["lo"] >= 64]
+    tok = sum(b["n_tok"] for b in tail_bands)
+    expect = sum(b["mean_nll"] * b["n_tok"] for b in tail_bands) / tok
+    assert out["tail_mean_nll"] == pytest.approx(expect, abs=1e-6)
+    assert out["tail_start"] == 64
+
+
+def test_streaming_metrics_by_band_unigram_floor() -> None:
+    from llcore.lm.eval import unigram_nll  # noqa: F401  (ensures helper exists)
+    from llcore.lm.longctx_eval import streaming_metrics_by_band
+
+    model = _recurrent()
+    torch.manual_seed(4)
+    ids = torch.randint(0, 32, (300,))
+    # add-1 unigram log-probs over the same vocab, computed on this sequence
+    counts = torch.bincount(ids, minlength=32).double()
+    probs = (counts + 1.0) / (ids.numel() + 32.0)
+    logp = torch.log(probs)
+    out = streaming_metrics_by_band(model, ids, _band_edges(), unigram_logp=logp)
+    for b in out["bands"]:
+        assert "unigram_nll" in b and "beats_unigram" in b
+        assert isinstance(b["beats_unigram"], bool)
+
+
+# --- GPT sliding-window baseline: scores every target exactly once ---
+
+
+def test_gpt_sliding_window_scores_all_targets() -> None:
+    from llcore.lm.model import CharGPT, GPTConfig
+    from llcore.lm.longctx_eval import gpt_sliding_window_nll
+
+    torch.manual_seed(0)
+    gpt = CharGPT(GPTConfig(vocab_size=32, block_size=16, n_layer=2, n_head=2, n_embd=24))
+    gpt.eval()
+    ids = torch.randint(0, 32, (120,))
+    nll_nonoverlap, n1 = gpt_sliding_window_nll(gpt, ids, stride=16)
+    nll_gold, n2 = gpt_sliding_window_nll(gpt, ids, stride=1)
+    assert n1 == n2 == ids.size(0) - 1  # every target scored exactly once
+    assert nll_nonoverlap > 0.0 and nll_gold > 0.0
+    # stride=1 gives each target the maximum available context -> <= non-overlapping mean
+    assert nll_gold <= nll_nonoverlap + 1e-6
+
+
+def test_gpt_sliding_window_rejects_bad_stride() -> None:
+    from llcore.lm.model import CharGPT, GPTConfig
+    from llcore.lm.longctx_eval import gpt_sliding_window_nll
+
+    gpt = CharGPT(GPTConfig(vocab_size=32, block_size=16, n_layer=2, n_head=2, n_embd=24))
+    ids = torch.randint(0, 32, (50,))
+    with pytest.raises(ValueError):
+        gpt_sliding_window_nll(gpt, ids, stride=0)
+    with pytest.raises(ValueError):
+        gpt_sliding_window_nll(gpt, ids, stride=17)  # > block_size
