@@ -25,7 +25,7 @@
 3. **honest disclosure・負けの記録** — #2/8/10/14/16/36/53/54/55/57, bank:B1/B3, draft:b1。null/敗北を消さない配当(2,000万エッジ回避)、capability⊥guarantee の同時観測、進化≒random の負け筋確定と機構資産の再配線。**#57=AI 批評家の『捏造』指摘を一次証拠で覆した回(冤罪)**=show-your-losses の白眉候補。
 4. **競合地図・業界比較** — #46–52, bank:S2/S3/S5/S7/B5/B6, comp:1–11, draft:s2。業界の小型・低メモリ収斂、cherry-pick 5型、Goodhart、Hermes ベンチ不在、ライセンス地図、強豪5社×FullSense。全社数値 self-report・規模差 caveat 必須。
 5. **fail-closed エンジニアリング** — #11/13/15/31/32, bank:A9/B8, comp:10。識別力設計、sound gate のコスト構造、最初の admit、producer/consumer 契約、provenance 再検証、SPC×fail-closed。
-6. **AI駆動研究ワークフロー・corpus・migration** — #1/3/4/5/6/7/9/12/17–30, bank:B2。計測の計測、RAD接地30分、circularity回避、checkpoint二軸、verified_safe_learning v1→v2 migration serial(#21–#28=1–2本へ統合前提)。
+6. **AI駆動研究ワークフロー・corpus・migration・開発規律** — #1/3/4/5/6/7/9/12/17–30/58, bank:B2。計測の計測、RAD接地30分、circularity回避、checkpoint二軸、verified_safe_learning v1→v2 migration serial(#21–#28=1–2本へ統合前提)。**#58=テストの flaky が設計の混在を教える(判定を純関数に分離)**。
 7. **メタ素材・記事元帳** — bank:S1/S4/S6/A7/A10/A11/B4/B7。連載構成案2案と単独保持の柱(認識=弁別的記号、分業の多義性、弱者の兵法TRIZ、家族OSS経済学)。
 
 ---
