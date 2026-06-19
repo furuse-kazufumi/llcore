@@ -1,6 +1,6 @@
 # llcore 記事マスターダイジェスト(編集長統合版)
 
-対象: 生 seed 56本(#1–#56)+ idea bank(bank:S1–S7 / A1–A11 / B1–B8)+ competitor doc(comp:1–11)+ 執筆済 draft(draft:s1 / s2 / a7 / b1)。
+対象: 生 seed 58本(#1–#58)+ idea bank(bank:S1–S7 / A1–A11 / B1–B8)+ competitor doc(comp:1–11)+ 執筆済 draft(draft:s1 / s2 / a7 / b1)。
 方針: **忠実性 > 整形**。全 seed の caveat を末尾「保持必須の honest caveats」へ落とさず転記。llterm が選べるメニューとして提示する。
 
 ---
