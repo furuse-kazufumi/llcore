@@ -322,16 +322,17 @@ def main(argv: list[str] | None = None) -> int:
     # assemble + honest verdict ------------------------------------------------------------
     tail_mean = statistics.fmean(tail_means) if tail_means else None
     first_band = band_rows[0]["mean_nll"] if band_rows else None
-    beyond = [r for r in band_rows if int(r["lo"]) >= block_size]
+    # non-degradation reference = the first WARM band [block_size, 2*block_size) (NOT the
+    # [0, block_size) warmup band). "Holds" = every band beyond block_size <= that warm band
+    # within dispersion (red-team spec: bands past block_size <= the block_size..2*block_size band).
+    ref_band = next((r for r in band_rows if int(r["lo"]) == block_size), None)
+    beyond = [r for r in band_rows if int(r["lo"]) > block_size]
     max_beyond = max((float(r["mean_nll"]) for r in beyond), default=None)
-    near_band = next((float(r["mean_nll"]) for r in band_rows if int(r["lo"]) < block_size <= (r["hi"] or 1 << 30)), None)
-    nondegrade = None
-    if max_beyond is not None and band_rows:
-        ref = near_band if near_band is not None else float(band_rows[min(1, len(band_rows) - 1)]["mean_nll"])
-        std_ref = max((float(r["std_nll"]) for r in beyond), default=0.0)
+    nondegrade: bool | None = None
+    if ref_band is not None and beyond:
+        ref = float(ref_band["mean_nll"])
+        std_ref = max([float(r["std_nll"]) for r in beyond] + [float(ref_band["std_nll"])])
         nondegrade = bool(max_beyond <= ref + 2 * std_ref + 0.05)
-    # effective-context read from the curve: where does NLL stop improving (>1% of the c=block drop)?
-    nll_by_c = curve["nll_by_context"]  # type: ignore[assignment]
     report = {
         "checkpoint": str(args.checkpoint),
         "arch": type(model).__name__,
