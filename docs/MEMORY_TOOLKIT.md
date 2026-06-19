@@ -104,6 +104,11 @@ py -3.11 -m llcore.memory report out\lm_run\model.pt --corpus-file corpus.txt --
 
 # 昇格ゲート: cap-gate PASS のときだけ int8 ckpt を emit（FAIL/コーパス無→fail-closed で拒否）
 py -3.11 -m llcore.memory report out\lm_run\model.pt --corpus-file corpus.txt --save-int8 out\model_int8.pt
+
+# 構造成長軸: GPT KV キャッシュの文脈長スイープ（線形成長 vs 定数状態は平坦）
+py -3.11 -m llcore.memory report out\lm_run\model.pt --context-lens 256,512,1024,2048
+# KV cache : T=256 4.72 MB -> T=2048 37.75 MB (x8.0; grows linearly with context)
+#            (a constant-state recurrent model would stay flat here)   ← 実走 realp1
 ```
 
 出力例（実走 = `out/lm_aozora_multi_smoke/model.pt`、青空マルチ全文）:
