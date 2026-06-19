@@ -69,7 +69,7 @@ class RMSNorm(nn.Module):
         dtype = x.dtype
         xf = x.float()
         normed = xf * torch.rsqrt(xf.pow(2).mean(-1, keepdim=True) + self.eps)
-        return cast(torch.Tensor, (self.weight * normed.to(dtype)).to(dtype))
+        return (self.weight * normed.to(dtype)).to(dtype)
 
 
 def _rope_cos_sin(positions: torch.Tensor, head_dim: int, theta: float) -> tuple[torch.Tensor, torch.Tensor]:
