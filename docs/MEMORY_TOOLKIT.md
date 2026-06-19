@@ -59,20 +59,26 @@ llcore の価値は「（豆粒のような）モデルそのもの」ではな�
 measure_memory(
     model: CharGPT,
     *,
-    val_ids: torch.Tensor | None = None,   # 与えれば capability も測る
+    val_ids: torch.Tensor | None = None,    # 与えれば capability も測る
     block_size: int | None = None,          # 既定 = model.config.block_size
     batch_size: int = 32,
     min_retention: float = 0.97,            # cap-gate の床
+    context_lens: Sequence[int] | None = None,  # 与えれば KV 成長軸も測る
 ) -> MemoryReport
 ```
 
-- **フットプリントは常に計測**（read-only, `int8_footprint_bytes`）。
-- `val_ids` を渡すと **モデルの deep copy を量子化**して採点する
-  → **呼び出し側の fp32 モデルは決して破壊されない**（テストで固定）。
-- `retention = int8_top1 / fp32_top1`、`capability_gate_pass =
-  passes_capability_gate(int8_top1, fp32_top1, min_retention)`。
-- 評価データが無いときは capability 系フィールドは `None`
-  = **「無い」を捏造せず「無い」と報告する**。
+`MemoryReport` は最大 **3 軸**を 1 つにまとめる:
+
+1. **フットプリント軸**（常に計測, read-only, `int8_footprint_bytes`）。
+2. **capability 軸**（`val_ids` を渡したとき）= **モデルの deep copy を量子化**して採点
+   → **呼び出し側の fp32 モデルは決して破壊されない**（テストで固定）。
+   `retention = int8_top1 / fp32_top1`、`capability_gate_pass =
+   passes_capability_gate(int8_top1, fp32_top1, min_retention)`。評価データが
+   無いときは capability 系フィールドは `None` = **「無い」を捏造せず「無い」と報告する**。
+3. **構造成長軸**（`context_lens` を渡したとき）= `kv_bytes_by_context[T] =
+   gpt_kv_bytes(model, T)`。GPT の KV キャッシュは文脈長 T に**線形**に膨らむ。
+   これは **定数状態 recurrent が回避する当のもの**（recurrent の状態は T 非依存=平坦,
+   `constant_state_bytes` 参照）。= 量子化(静的 footprint)と KV 成長(動的)の両軸を 1 レポートで。
 
 ### fail-closed cap-gate が誠実な独自点
 
