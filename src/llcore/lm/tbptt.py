@@ -19,6 +19,7 @@ from __future__ import annotations
 import math
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import cast
 
 import torch
 from torch.nn import functional as F
