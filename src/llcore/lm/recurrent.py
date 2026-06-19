@@ -161,6 +161,41 @@ class RecurrentLM(nn.Module):
         return logits, loss
 
     @torch.no_grad()
+    def streaming_nll(self, ids: torch.Tensor, chunk_size: int = 256) -> tuple[float, int]:
+        """Mean next-token cross-entropy (nats) over a 1-D sequence of *any* length.
+
+        The constant per-layer state has no architectural context limit, so this scores
+        sequences longer than ``block_size`` (which only caps the batched :meth:`forward`)
+        and never materializes O(T) logits: it steps through the sequence accumulating the
+        loss, so peak activation memory is O(``chunk_size``) in T while the state stays
+        O(1). Predicts ``ids[1:]`` from ``ids[:-1]``; returns ``(mean_nll, n_predicted)``.
+        A GPT cannot do this — its attention is O(T²) and ``block_size``-bounded.
+        """
+        if ids.ndim != 1:
+            raise ValueError(f"ids must be 1-D [T], got shape {tuple(ids.shape)}")
+        n = int(ids.size(0))
+        if n < 2:
+            raise ValueError(f"streaming_nll needs >= 2 tokens, got {n}")
+        if chunk_size <= 0:
+            raise ValueError(f"chunk_size must be > 0, got {chunk_size}")
+        was_training = self.training
+        self.eval()
+        state: list[torch.Tensor] | None = None
+        inputs, targets = ids[:-1], ids[1:]
+        total = 0.0
+        for start in range(0, n - 1, chunk_size):
+            stop = min(start + chunk_size, n - 1)
+            logits_chunk: list[torch.Tensor] = []
+            for i in range(start, stop):
+                logits, state = self.step(inputs[i : i + 1], state)
+                logits_chunk.append(logits)
+            chunk = torch.cat(logits_chunk, dim=0)
+            total += float(F.cross_entropy(chunk, targets[start:stop], reduction="sum").item())
+        if was_training:
+            self.train()
+        return total / (n - 1), n - 1
+
+    @torch.no_grad()
     def generate(
         self,
         idx: torch.Tensor,
