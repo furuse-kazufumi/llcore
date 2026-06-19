@@ -44,7 +44,8 @@ def detach_state(state: list[object]) -> list[object]:
         if isinstance(s, torch.Tensor):
             out.append(s.detach())
         else:
-            out.append(type(s)(*[t.detach() for t in s]))  # RWKVLayerState NamedTuple
+            fields = cast("tuple[torch.Tensor, ...]", s)  # RWKVLayerState NamedTuple
+            out.append(type(s)(*[t.detach() for t in fields]))
     return out
 
 
