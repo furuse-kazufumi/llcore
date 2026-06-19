@@ -67,7 +67,7 @@
 | 31 | artifact名が同じでも契約1bitずれでround-trip崩壊 | B | 教訓/honest/実装/戦略 | 生seed | standalone |
 | 32 | fail-closed provenanceは読む側も再検証して止まれて成立 | B | 教訓/実装/honest/エコ | 生seed | standalone |
 | 33 | mmapのload時メモリはほぼ固定コスト=大モデルほど効く | A | 技術設計/honest/教訓/TRIZ/UX | 生seed | standalone(→A2) |
-| 34 | int8 weight-onlyはchar-LMでも約4×圧縮・無劣化再現 | A | ベンチ/業界比較/実装/honest | 生seed | standalone(量子化アーク) |
+| 34 | int8 weight-onlyはchar-LMでも約4×圧縮・ほぼ無劣化(PPL<0.1%・速度未測) | A | ベンチ/業界比較/実装/honest | 生seed | standalone(量子化アーク) |
 | 35 | 「構造プロット」を「実機計測」へ昇格=pivot第一歩の型 | B | 哲学/戦略/honest/教訓 | 生seed | standalone(pivot) |
 | 36 | メモリで線形か指数か — 賢さは指数的に伸びない(26agent検証) | A | 業界比較/honest/教訓/哲学/戦略/認知 | 生seed | standalone(→A6) |
 | 37 | 量子化cliffは大モデルほど低ビット頑健・PPL-only gateは危険 | A | ベンチ/honest/教訓/実装/業界比較 | 生seed | standalone(量子化アーク) |
