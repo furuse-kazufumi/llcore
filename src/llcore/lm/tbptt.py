@@ -156,7 +156,7 @@ class TBPTTTrainer:
 
         seg_starts = self._sample_starts(train_ids, bsz)
         seg_pos = torch.zeros(bsz, dtype=torch.long)
-        state: list[object] = self.model.init_state(bsz)
+        state: list[object] = cast("list[object]", self.model.init_state(bsz))
         self.model.train()
         for it in range(self.update_num, cfg.max_updates):
             lr = self.get_lr(it)
