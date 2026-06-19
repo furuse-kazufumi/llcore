@@ -38,22 +38,22 @@ class Qwen2Params:
     max_position: int
 
     @classmethod
-    def from_hf_config(cls, cfg: dict[str, object]) -> Qwen2Params:
-        hidden = int(cfg["hidden_size"])  # type: ignore[arg-type]
-        n_head = int(cfg["num_attention_heads"])  # type: ignore[arg-type]
-        head_dim = int(cfg.get("head_dim", hidden // n_head))  # type: ignore[arg-type]
+    def from_hf_config(cls, cfg: dict[str, Any]) -> Qwen2Params:
+        hidden = int(cfg["hidden_size"])
+        n_head = int(cfg["num_attention_heads"])
+        head_dim = int(cfg.get("head_dim", hidden // n_head))
         return cls(
-            vocab_size=int(cfg["vocab_size"]),  # type: ignore[arg-type]
+            vocab_size=int(cfg["vocab_size"]),
             hidden_size=hidden,
-            intermediate_size=int(cfg["intermediate_size"]),  # type: ignore[arg-type]
-            n_layer=int(cfg["num_hidden_layers"]),  # type: ignore[arg-type]
+            intermediate_size=int(cfg["intermediate_size"]),
+            n_layer=int(cfg["num_hidden_layers"]),
             n_head=n_head,
-            n_kv_head=int(cfg["num_key_value_heads"]),  # type: ignore[arg-type]
+            n_kv_head=int(cfg["num_key_value_heads"]),
             head_dim=head_dim,
-            rope_theta=float(cfg.get("rope_theta", 1000000.0)),  # type: ignore[arg-type]
-            rms_norm_eps=float(cfg.get("rms_norm_eps", 1e-6)),  # type: ignore[arg-type]
+            rope_theta=float(cfg.get("rope_theta", 1000000.0)),
+            rms_norm_eps=float(cfg.get("rms_norm_eps", 1e-6)),
             tie_embeddings=bool(cfg.get("tie_word_embeddings", True)),
-            max_position=int(cfg.get("max_position_embeddings", 32768)),  # type: ignore[arg-type]
+            max_position=int(cfg.get("max_position_embeddings", 32768)),
         )
 
 
