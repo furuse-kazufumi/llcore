@@ -125,14 +125,21 @@ def measure_memory(
     block_size: int | None = None,
     batch_size: int = 32,
     min_retention: float = DEFAULT_MIN_RETENTION,
+    context_lens: Sequence[int] | None = None,
 ) -> MemoryReport:
-    """Measure ``model``'s int8 footprint win and, if given held-out tokens, its cost.
+    """Measure ``model``'s memory profile across up to three axes.
 
-    Footprint is always computed (read-only) via :func:`int8_footprint_bytes`. When
-    ``val_ids`` is provided, the model is quantized on a *deep copy* (the caller's fp32
-    model is never mutated) and scored against itself: ``retention = int8_top1 /
-    fp32_top1`` and the fail-closed :func:`passes_capability_gate` verdict at
-    ``min_retention``. ``block_size`` defaults to ``model.config.block_size``.
+    1. **Footprint** (always, read-only): int8 vs fp32 resident weight bytes via
+       :func:`int8_footprint_bytes`.
+    2. **Capability cost** (when ``val_ids`` given): the model is quantized on a *deep
+       copy* (the caller's fp32 model is never mutated) and scored against itself —
+       ``retention = int8_top1 / fp32_top1`` and the fail-closed
+       :func:`passes_capability_gate` verdict at ``min_retention``. ``block_size``
+       defaults to ``model.config.block_size``.
+    3. **Structural growth** (when ``context_lens`` given): the GPT KV-cache bytes at
+       each context length via :func:`gpt_kv_bytes` — this grows *linearly* with
+       context, which is exactly what a constant-state recurrent model (re-exported
+       :func:`constant_state_bytes`) avoids (its state is length-independent).
     """
     fp = int8_footprint_bytes(model)
     fp32_bytes = fp["fp32_bytes"]
@@ -157,6 +164,10 @@ def measure_memory(
         retention = (int8_top1 / fp32_top1) if fp32_top1 > 0 else None
         gate = passes_capability_gate(int8_top1, fp32_top1, min_retention)
 
+    kv_by_ctx: dict[int, int] | None = None
+    if context_lens is not None:
+        kv_by_ctx = {int(t): gpt_kv_bytes(model, int(t)) for t in context_lens}
+
     return MemoryReport(
         fp32_bytes=fp32_bytes,
         int8_bytes=int8_bytes,
@@ -168,6 +179,7 @@ def measure_memory(
         retention=retention,
         capability_gate_pass=gate,
         n_eval_tokens=n_eval,
+        kv_bytes_by_context=kv_by_ctx,
     )
 
 
