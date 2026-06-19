@@ -53,14 +53,17 @@ def reset_state_slots(
     model: ConstantStateLM, state: list[object], mask: torch.Tensor
 ) -> list[object]:
     """Reset the batch rows selected by ``mask`` (bool ``[B]``) to a fresh zero/init state."""
-    fresh = model.init_state(int(mask.size(0)))
+    fresh = cast("list[object]", model.init_state(int(mask.size(0))))
     m = mask.view(-1, 1)
     out: list[object] = []
     for s, f in zip(state, fresh, strict=True):
         if isinstance(s, torch.Tensor):
+            assert isinstance(f, torch.Tensor)
             out.append(torch.where(m, f, s))
         else:
-            out.append(type(s)(*[torch.where(m, ff, ss) for ss, ff in zip(s, f, strict=True)]))
+            sf = cast("tuple[torch.Tensor, ...]", s)
+            ff = cast("tuple[torch.Tensor, ...]", f)
+            out.append(type(s)(*[torch.where(m, b, a) for a, b in zip(sf, ff, strict=True)]))
     return out
 
 
