@@ -131,15 +131,16 @@ def _render_band_svg(rows: list[dict[str, object]], gpt_ref: float | None, block
         return "<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10'></svg>"
     lo_y = min([*ys, gpt_ref] if gpt_ref is not None else ys) * 0.95
     hi_y = max([*ys, gpt_ref] if gpt_ref is not None else ys) * 1.05
-    w, h, l, r, t, b = 680, 360, 70, 24, 30, 52
-    pw, ph = w - l - r, h - t - b
+    w, h = 680, 360
+    pad_l, pad_r, pad_t, pad_b = 70, 24, 30, 52
+    pw, ph = w - pad_l - pad_r, h - pad_t - pad_b
     n = len(xs)
 
     def sx(i: int) -> float:
-        return l + (pw * i / max(1, n - 1))
+        return pad_l + (pw * i / max(1, n - 1))
 
     def sy(v: float) -> float:
-        return t + ph - (v - lo_y) / (hi_y - lo_y) * ph if hi_y > lo_y else t + ph / 2
+        return pad_t + ph - (v - lo_y) / (hi_y - lo_y) * ph if hi_y > lo_y else pad_t + ph / 2
 
     pts = " ".join(f"{sx(i):.1f},{sy(ys[i]):.1f}" for i in range(n))
     dots = "".join(f'<circle cx="{sx(i):.1f}" cy="{sy(ys[i]):.1f}" r="3.5" fill="#059669" />' for i in range(n))
@@ -151,9 +152,9 @@ def _render_band_svg(rows: list[dict[str, object]], gpt_ref: float | None, block
     if gpt_ref is not None:
         gy = sy(gpt_ref)
         gpt_line = (
-            f'<line x1="{l}" y1="{gy:.1f}" x2="{w - r}" y2="{gy:.1f}" stroke="#2563eb" '
+            f'<line x1="{pad_l}" y1="{gy:.1f}" x2="{w - pad_r}" y2="{gy:.1f}" stroke="#2563eb" '
             f'stroke-width="2" stroke-dasharray="7 5" />'
-            f'<text x="{w - r - 4}" y="{gy - 6:.1f}" text-anchor="end" font-size="11" fill="#2563eb">'
+            f'<text x="{w - pad_r - 4}" y="{gy - 6:.1f}" text-anchor="end" font-size="11" fill="#2563eb">'
             f'GPT (≤block_size window): {gpt_ref:.3f}</text>'
         )
     block_x = None
@@ -162,9 +163,9 @@ def _render_band_svg(rows: list[dict[str, object]], gpt_ref: float | None, block
             block_x = sx(i)
             break
     block_marker = (
-        f'<line x1="{block_x:.1f}" y1="{t}" x2="{block_x:.1f}" y2="{h - b}" stroke="#9ca3af" '
+        f'<line x1="{block_x:.1f}" y1="{pad_t}" x2="{block_x:.1f}" y2="{h - pad_b}" stroke="#9ca3af" '
         f'stroke-width="1" stroke-dasharray="3 4" />'
-        f'<text x="{block_x:.1f}" y="{t - 8}" text-anchor="middle" font-size="10" fill="#6b7280">'
+        f'<text x="{block_x:.1f}" y="{pad_t - 8}" text-anchor="middle" font-size="10" fill="#6b7280">'
         f'block_size={block_size}</text>'
         if block_x is not None
         else ""
@@ -173,18 +174,18 @@ def _render_band_svg(rows: list[dict[str, object]], gpt_ref: float | None, block
 <title id="t">Trained recurrent: per-token NLL by context position</title>
 <desc id="d">Per-token held-out NLL (nats) bucketed by absolute target position. Flat past block_size = constant-memory non-degradation at O(1) state.</desc>
 <rect width="{w}" height="{h}" fill="#ffffff" />
-<text x="{l}" y="18" font-family="Segoe UI, sans-serif" font-size="13" fill="#111827">Trained recurrent: held-out NLL (nats) vs context position band</text>
-<line x1="{l}" y1="{t}" x2="{l}" y2="{h - b}" stroke="#111827" />
-<line x1="{l}" y1="{h - b}" x2="{w - r}" y2="{h - b}" stroke="#111827" />
-<text x="{l - 50}" y="{t + 6}" font-size="11" fill="#374151">{hi_y:.2f}</text>
-<text x="{l - 50}" y="{h - b}" font-size="11" fill="#374151">{lo_y:.2f}</text>
-<text x="{l}" y="{h - 10}" font-size="11" fill="#6b7280">target position band (chars)</text>
+<text x="{pad_l}" y="18" font-family="Segoe UI, sans-serif" font-size="13" fill="#111827">Trained recurrent: held-out NLL (nats) vs context position band</text>
+<line x1="{pad_l}" y1="{pad_t}" x2="{pad_l}" y2="{h - pad_b}" stroke="#111827" />
+<line x1="{pad_l}" y1="{h - pad_b}" x2="{w - pad_r}" y2="{h - pad_b}" stroke="#111827" />
+<text x="{pad_l - 50}" y="{pad_t + 6}" font-size="11" fill="#374151">{hi_y:.2f}</text>
+<text x="{pad_l - 50}" y="{h - pad_b}" font-size="11" fill="#374151">{lo_y:.2f}</text>
+<text x="{pad_l}" y="{h - 10}" font-size="11" fill="#6b7280">target position band (chars)</text>
 {block_marker}
 {gpt_line}
 <polyline fill="none" stroke="#059669" stroke-width="2.5" points="{pts}" />
 {dots}
 {xlabels}
-<text x="{w - r - 4}" y="{t + 14}" text-anchor="end" font-size="11" fill="#059669">recurrent streaming (O(1) state, carried)</text>
+<text x="{w - pad_r - 4}" y="{pad_t + 14}" text-anchor="end" font-size="11" fill="#059669">recurrent streaming (O(1) state, carried)</text>
 </svg>
 """
 
