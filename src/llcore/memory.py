@@ -107,9 +107,14 @@ class MemoryReport:
     retention: float | None = None
     capability_gate_pass: bool | None = None
     n_eval_tokens: int | None = None
+    kv_bytes_by_context: dict[int, int] | None = None
 
     def to_dict(self) -> dict[str, object]:
-        """Plain-dict view (JSON-serializable) for reports / artifacts."""
+        """Plain-dict view (JSON-serializable) for reports / artifacts.
+
+        Note: ``kv_bytes_by_context`` keeps ``int`` keys here; ``json.dumps`` will
+        render them as strings (JSON object keys are always strings).
+        """
         return asdict(self)
 
 
