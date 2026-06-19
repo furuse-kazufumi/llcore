@@ -264,7 +264,9 @@ class Qwen2LM(nn.Module):
             out = torch.cat((out, next_id), dim=1)
             if eos_id is not None and bool((next_id == eos_id).all()):
                 break
-            logits, cache = self.forward(next_id, past=cache, return_cache=True)  # type: ignore[misc]
+            logits, cache = cast(
+                "tuple[torch.Tensor, KVCache]", self.forward(next_id, past=cache, return_cache=True)
+            )
         if was_training:
             self.train()
         return out
