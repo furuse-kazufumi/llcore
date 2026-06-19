@@ -225,7 +225,7 @@ class Qwen2LM(nn.Module):
             x, kv = layer(x, cos, sin, past[i] if past is not None else None, past_len)
             new_cache.append(kv)
         x = self.model.norm(x)
-        logits = self.lm_head(x)
+        logits: torch.Tensor = self.lm_head(x)
         if return_cache:
             return logits, new_cache
         return logits
