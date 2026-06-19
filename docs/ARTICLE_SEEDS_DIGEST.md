@@ -92,6 +92,7 @@
 | 56 | 散らばった勝ち筋の道具を1窓口に畳む — llcore.memoryツールキット化 | A | 技術設計/教訓/honest/業界比較/エコ/戦略 | 生seed | 「勝ち筋を道具にする」連載の着地 |
 | 57 | AIレビュアーの『捏造』を一次証拠で覆したら犯人はcausal-mask buffer | S | honest/教訓/技術設計/認知 | 生seed | B1 show-your-losses(AIレビューが間違っていた回) |
 | 58 | retentionテストのflakyは設計の混在を教える=判定を純関数に分離 | A | 技術設計/教訓/実装 | 生seed | 「テストが設計を教える」小記事 |
+| 59 | int8で4MB削った隣で言語ランタイムが184MB食っていた(Rust論点の実測回答) | S | 技術設計/honest/業界比較/教訓/戦略 | 生seed | memory-efficiency連載・技術者向け中核 |
 | bank:S1 | PPLがPASSでもモデルは半分壊れていた | S | honest/ベンチ/認知/技術設計/教訓 | bank収録 | 連載案1第1部先頭(draft:s1と重複) |
 | bank:S2 | 「proprietary超え」の解剖学 — cherry-pick5型 | S | honest/業界比較/ベンチ/教訓/戦略 | bank収録 | 連載案1第1部2本目(draft:s2の元) |
 | bank:S3 | 「16GBで動く」のメモリはRAM?VRAM? — 必要メモリの曖昧さ | S | 業界比較/honest/エコ/教訓 | bank収録 | 連載案1第1部3本目 |
