@@ -317,6 +317,12 @@ def build_parser() -> argparse.ArgumentParser:
     r.add_argument("--corpus-file", default=None, help="local UTF-8 corpus for retention")
     r.add_argument("--val-frac", type=float, default=0.1)
     r.add_argument("--min-retention", type=float, default=DEFAULT_MIN_RETENTION)
+    r.add_argument(
+        "--context-lens",
+        default=None,
+        help="comma-separated context lengths (e.g. 256,512,1024) to report GPT "
+        "KV-cache growth (linear) vs constant-state recurrent (flat)",
+    )
     r.add_argument("--json", default=None, help="also write the report as JSON to this path")
     r.add_argument(
         "--save-int8",
