@@ -2,6 +2,7 @@
 
 対象: 生 seed 59本(#1–#59)+ idea bank(bank:S1–S7 / A1–A11 / B1–B8)+ competitor doc(comp:1–11)+ 執筆済 draft(draft:s1 / s2 / a7 / b1)。
 方針: **忠実性 > 整形**。全 seed の caveat を末尾「保持必須の honest caveats」へ落とさず転記。llterm が選べるメニューとして提示する。
+> 本ダイジェストは **seed #59 時点のスナップショット**。以後の新規 seed は `ARTICLE_SEEDS.md`(正本ストリーム)に追記され次回再生成で取り込む(現在ストリームは #60 まで=#60 は「llcore に話しかけた実演」)。
 
 ---
 
