@@ -245,7 +245,9 @@ class Qwen2LM(nn.Module):
         gen = None
         if seed is not None:
             gen = torch.Generator().manual_seed(seed)
-        logits, cache = self.forward(input_ids, return_cache=True)  # type: ignore[misc]
+        logits, cache = cast(
+            "tuple[torch.Tensor, KVCache]", self.forward(input_ids, return_cache=True)
+        )
         out = input_ids
         for _ in range(max_new_tokens):
             step_logits = logits[:, -1, :]
