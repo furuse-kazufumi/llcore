@@ -188,6 +188,8 @@ def test_evolve_multiobjective_seeding_preserved() -> None:
     res = evolve_multiobjective(
         ev, n_genes=n, n_options=3, pop_size=12, generations=8, seed=0, seed_genomes=[seed_genome]
     )
-    objs = [o for _, o in res["front"]]  # type: ignore[union-attr]
+    front = res["front"]
+    assert isinstance(front, list)
+    objs = [o for _, o in front]
     # the seeded extreme (6, 0) must survive on the final Pareto front
     assert any(abs(o[0] - 6.0) < 1e-9 and abs(o[1] - 0.0) < 1e-9 for o in objs)
