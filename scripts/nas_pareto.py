@@ -235,8 +235,16 @@ def main(argv: list[str] | None = None) -> int:
 
     budgets = [float(b) for b in str(args.budgets).split(",") if b.strip()]
 
-    def build_frontier(use_distill: bool) -> tuple[list[tuple[float, float]], list[tuple[float, float]], object]:
-        """Greedy + memetic NSGA-II frontier for one mode; returns (greedy_points, evolved_points, history)."""
+    def build_frontier(
+        use_distill: bool,
+    ) -> tuple[
+        list[tuple[float, float]], list[tuple[float, float]], object, list[CatGenome], list[CatGenome]
+    ]:
+        """Greedy + memetic NSGA-II frontier for one mode.
+
+        Returns ``(greedy_points, evolved_points, history, evolved_genomes, greedy_genomes)`` — the
+        last two (the genomes behind the points) feed the proxy-v2 rigorous tier; ignored by v1.
+        """
         # single-layer linear tolerance order (mode-specific: distilled layers reorder)
         single: list[float] = []
         for i in range(n_layer):
