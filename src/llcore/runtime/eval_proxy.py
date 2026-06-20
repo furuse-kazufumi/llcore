@@ -777,7 +777,9 @@ def honest_verdict(
     """
     ci_lo = float(hv_gain_ci["ci_lo"])
     ci_hi = float(hv_gain_ci["ci_hi"])
-    max_gap = max((float(p.get("optimism_gap", 0.0)) for p in frontier_holdout), default=0.0)
+    max_gap = max(
+        (float(cast(float, p.get("optimism_gap", 0.0))) for p in frontier_holdout), default=0.0
+    )
     if max_gap > ci_halfwidth_floor:
         return {
             "memetic_vs_greedy": "verdict suppressed: selection optimism exceeds noise floor",
