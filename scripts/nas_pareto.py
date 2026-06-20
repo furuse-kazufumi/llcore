@@ -40,14 +40,31 @@ import time
 from pathlib import Path
 from typing import cast
 
+import numpy as np
 import torch
 
 from llcore.runtime.distill import distill_all_layers
+from llcore.runtime.eval_proxy import (
+    base_window_losses,
+    bootstrap_hv_gain,
+    build_passkey_prompt,
+    build_proxy_v2_report,
+    context_sweep,
+    genome_attn_kl,
+    honest_verdict,
+    kendall_tau,
+    make_windows,
+    needle_horizon,
+    paired_window_deltas,
+    reeval_frontier,
+    right_shift_ci,
+    score_needle,
+)
 from llcore.runtime.evolve_linearize import CatGenome, dominates, evolve_multiobjective
 from llcore.runtime.linearize import LinearAttention, SlidingWindowAttention
 from llcore.runtime.loader import load_qwen2
 from llcore.runtime.pareto_metrics import frontier_right_shift, hypervolume_2d
-from llcore.runtime.qwen2 import Qwen2Attention
+from llcore.runtime.qwen2 import Qwen2Attention, Qwen2LM
 
 MIXERS = ("softmax", "sliding", "linear")
 
