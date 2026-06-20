@@ -133,9 +133,12 @@ def main(argv: list[str] | None = None) -> int:
     g_pct, g_dn = evaluate(tuple(greedy))
     print(f"[greedy] {MIXERS}-counts={[greedy.count(k) for k in range(3)]}  mem_saved={g_pct:.1f}%  Δnll={g_dn:+.4f}", flush=True)
 
-    # evolutionary search
+    # evolutionary search (optionally memetic: seed with the greedy solution)
     te = time.perf_counter()
-    res = evolve_categorical(fitness, n_layer, 3, pop_size=args.pop, generations=args.generations, seed=args.seed)
+    seeds = [tuple(greedy)] if args.seed_greedy else None
+    res = evolve_categorical(
+        fitness, n_layer, 3, pop_size=args.pop, generations=args.generations, seed=args.seed, seed_genomes=seeds
+    )
     best = res["best_genome"]
     assert isinstance(best, tuple)
     e_pct, e_dn = evaluate(best)
