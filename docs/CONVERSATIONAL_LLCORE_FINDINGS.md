@@ -178,16 +178,15 @@ model with genome = one bit per layer (linearize | keep softmax) and fitness = n
 linearized (memory) − a penalty when held-out Δnll exceeds a budget (quality) — the
 footprint-as-fitness + quality-gate idea of `memory_objective`, applied to a real model's architecture.
 
-**Honest first result (0.5B, budget Δnll ≤ 0.10):** greedy beat the small GA. Greedy linearized
-**6 layers** [7,13,15,19,21,22] (Δnll +0.098, just under budget); the GA (pop 16 × gen 12) found only
-**3 layers** [7,15,22] (Δnll −0.009). The GA under-searched — it converged to a safe small set under
-the hard budget cliff and never found greedy's 6-layer set. This is a legitimate negative: for a
-near-additive per-layer cost under a monotone budget, **greedy-by-tolerance is a strong baseline**,
-and a binary linearization mask is a greedy-friendly objective. Evolution should pay off where the
-problem is harder — strong layer interactions, a multi-objective Pareto frontier, a richer Level-2
-search space (per-layer mixer ∈ {softmax, sliding-window, linear, SSM, RWKV}, seeded by the corpus's
-real hybrids), and distillation-aware (non-uniform) costs. (An improved run with more search budget
-is in progress to confirm the under-search hypothesis vs a fundamental limit.)
+**Honest result (0.5B, budget Δnll ≤ 0.10):** greedy beat the GA — and more search did not fix it.
+Greedy linearized **6 layers** [7,13,15,19,21,22] (Δnll +0.098, just under budget). The GA at
+pop 16 × gen 12 found only **3 layers** (Δnll −0.009); raising it to **pop 24 × gen 20 (457 real
+evals, 20 min)** still found only **4 layers** [6,18,19,22] (Δnll +0.093) — still short of greedy's 6.
+So this is not mere under-search: for a **near-additive per-layer cost under a monotone budget, the
+binary linearization mask is a genuinely greedy-friendly objective** and greedy-by-tolerance is a
+strong baseline. Evolution should earn its place only where the problem is harder — a richer Level-2
+search space (per-layer mixer ∈ {softmax, sliding-window, linear, …}) with non-additive, non-monotone
+memory/quality trade-offs (see §7), a Pareto frontier, and distillation-aware costs.
 
 ---
 
