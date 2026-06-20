@@ -364,10 +364,40 @@ mechanistic / honest-disclosure adversary) before implementation; 26 unit tests 
 
 ### Smoke run (pipeline validation on real 0.5B)
 
-<!-- proxy-v2-smoke-results -->
-*(results appended after the first end-to-end `--proxy-v2` run; deliberately uses K<12 holdout windows
-so the "CI unreliable (K<12)" downgrade is exercised — a small but real data point, not the publishable
-frontier, which is the full-budget overnight run.)*
+Settings: 0.5B, inner L=512, K_fast=4, **holdout K=6 (deliberately <12)**, context sweep [256,512,1024],
+pop 6 × gen 3, seed 0. 279 evals, ~89 min. JSON: `out/nas_pareto_v2smoke/nas_pareto.json`. The pipeline
+ran end-to-end and every guard fired (`scope='next_token_nll_proxy'`, `conversational_claim=None`).
+
+1. **Memetic vs greedy, on a FRESH holdout (winner's curse removed): +2.8 % HV (95 % CI 2.3–3.3 %),
+   but self-downgraded `"CI unreliable (K=6<12)"`.** Optimism gaps are tiny and mostly *negative*
+   (selection slightly *under*-estimated holdout cost), so the +2.8 % is not selection noise —
+   `p_memetic_wins=1.0`, proxy-vs-judge `τ=1.0` — yet at K=6 it is a point estimate, not a significant
+   interval. (Contrast the v1 fast-pool scalar verdict "+3.3 %", which lacked any CI.)
+
+2. **The decisive regime finding — context sweep on the most aggressive genome (57 % mem saved):**
+
+   | L | Δnll (holdout) | 95 % CI | pos_frac |
+   |---:|---:|---|---:|
+   | 256 | +0.453 | [+0.38, +0.52] | 1.00 |
+   | 512 | +0.478 | [+0.43, +0.52] | 1.00 |
+   | 1024 | +0.490 | [+0.47, +0.51] | 1.00 |
+
+   Two honest points: (a) the cost is **large** — exp(0.48) ≈ **1.6× worse perplexity** (82.7 → 134),
+   worse on *every* window; (b) it **grows monotonically with context length**, directly confirming that
+   v1's 256-token proxy *under-detects* the cost — the entire motivation for proxy-v2. The 256→1024
+   growth is modest (+8 % relative); the dramatic long-context blow-up SUPRA predicts needs the
+   2048–8192 sweep this smoke did not run.
+
+3. **The usable band exists at modest savings:** 30.8 % saved for **+0.073** Δnll (~+7 % ppl), 38.3 % for
+   +0.136 — the frontier only collapses at the aggressive end (57 % → +0.48). attention-KL mean 2.61 nats
+   (max 4.88) over 15 converted layers corroborates the aggressive genome's large divergence from softmax.
+
+**Net (smoke):** the honest machinery did its job — it surfaced that the aggressive genome is decisively
+worse *and gets worse with context*, instead of hiding it behind a flattering single-window number
+(a 256-token view alone reads "+0.45, not bad"; the sweep reveals "worse on every window, rising with L").
+Evolution's edge over greedy is real but small (+2.8 %) and **not yet statistically established (K<12)**.
+A publishable "evolution helps" verdict needs the full run: **K≥12 holdout, sweep to 2048–4096, cross-corpus,
+larger pop/gen** — only then does the modest-savings band's value (and evolution's edge) become provable.
 
 ---
 
