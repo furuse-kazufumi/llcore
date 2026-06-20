@@ -86,3 +86,47 @@ def distill_layer(
 
     model.model.layers[layer].self_attn = student
     return {"mse_before": mse_before, "mse_after": mse_after, "steps": float(steps)}
+
+
+def distill_all_layers(
+    model: Qwen2LM,
+    calib_ids: torch.Tensor,
+    *,
+    steps: int = 200,
+    lr: float = 5e-2,
+    seed: int = 0,
+    chunk_size: int = 64,
+    on_layer: Callable[[int, dict[str, float]], None] | None = None,
+) -> dict[int, LinearAttention]:
+    """Distill every layer independently from the pristine all-softmax teacher.
+
+    For each layer ``i``, :func:`distill_layer` installs a learnable :class:`LinearAttention`
+    student on the model; we capture it, then restore layer ``i`` to its original softmax attention
+    before moving on, so each layer is distilled from the *unmodified* model (per-layer output
+    distillation — joint multi-layer distillation, where errors may compound, is a separate
+    experiment). The model is left in its original all-softmax state, so the caller may install any
+    subset of the returned students at will. Returns ``{layer_index: distilled_student}``.
+
+    Raises ``ValueError`` unless every layer is a softmax :class:`Qwen2Attention` (a valid teacher).
+    ``on_layer`` (if given) is called with ``(layer_index, distill_layer_result)`` after each layer.
+    """
+    n_layer = model.params.n_layer
+    originals: dict[int, Qwen2Attention] = {}
+    for i in range(n_layer):
+        attn = model.model.layers[i].self_attn
+        if not isinstance(attn, Qwen2Attention):
+            raise ValueError(
+                f"distill_all_layers needs an all-softmax model as teacher; "
+                f"layer {i} is {type(attn).__name__}"
+            )
+        originals[i] = attn
+    students: dict[int, LinearAttention] = {}
+    for i in range(n_layer):
+        info = distill_layer(model, i, calib_ids, steps=steps, lr=lr, seed=seed, chunk_size=chunk_size)
+        student = model.model.layers[i].self_attn
+        assert isinstance(student, LinearAttention)
+        students[i] = student
+        model.model.layers[i].self_attn = originals[i]  # restore pristine softmax for the next teacher
+        if on_layer is not None:
+            on_layer(i, info)
+    return students
