@@ -3,13 +3,14 @@
 > 自動生成: `libexec/raptor-auto-summary` (Stop hook)
 > 次回 ccr 起動時に CLAUDE.md SESSION START で自動的に読み取られる。
 
-- **最終更新**: 2026-06-20 15:13:47
+- **最終更新**: 2026-06-20 17:02:13
 - **プロジェクト**: `D:/projects/llcore`
 - **ブランチ**: `feat/lm-recurrent`
 
 ## 直近の git log
 
 ```
+b018d62 auto: CONVERSATIONAL_LLCORE_FINDINGS.md 編集前 (2026-06-20 16:57)
 31ca757 auto: test_pareto_metrics.py 編集前 (2026-06-20 15:11)
 1c2ab0c auto: nas_pareto.py 編集前 (2026-06-20 15:08)
 f9e3ea6 auto: nas_pareto.py 編集前 (2026-06-20 15:08)
@@ -19,18 +20,20 @@ f9e3ea6 auto: nas_pareto.py 編集前 (2026-06-20 15:08)
 398b297 auto: distill.py 編集前 (2026-06-20 15:03)
 47e819c auto: nas_pareto.py 編集前 (2026-06-20 13:50)
 f825397 auto: nas_pareto.py 編集前 (2026-06-20 13:49)
-6636990 auto: nas_pareto.py 編集前 (2026-06-20 13:49)
 ```
 
 ## 現在の git status
 
 ```
-M tests/unit/test_pareto_metrics.py
+M docs/CONVERSATIONAL_LLCORE_FINDINGS.md
+ M docs/SESSION_SUMMARY.md
 ```
 
 ## 直近 2 時間に変更されたファイル
 
 ```
+16:58 docs/SESSION_SUMMARY.md
+16:57 docs/CONVERSATIONAL_LLCORE_FINDINGS.md
 15:12 .pytest_cache/v/cache/nodeids
 15:12 .mypy_cache/3.11/cache.3.db
 15:12 .mypy_cache/3.11/cache.14.db
@@ -43,9 +46,6 @@ M tests/unit/test_pareto_metrics.py
 15:03 tests/unit/test_runtime_distill.py
 15:03 src/llcore/runtime/distill.py
 15:03 src/llcore/runtime/pareto_metrics.py
-14:52 docs/SESSION_SUMMARY.md
-13:48 .mypy_cache/3.11/cache.5.db
-13:48 .mypy_cache/3.11/cache.4.db
 ```
 
 ---

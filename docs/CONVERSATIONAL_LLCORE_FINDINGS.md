@@ -214,6 +214,42 @@ joining the preserved evolutionary substrate to the runtime.
 
 ---
 
+## 8. Pareto frontier: memetic NSGA-II vs greedy across the whole memory↔quality curve (step ①)
+
+§7 optimized memory saved at a *single* Δnll budget. Deployment wants the whole **frontier** — for
+every quality budget, the cheapest mixer assignment. `src/llcore/runtime/evolve_linearize.py` gains
+an NSGA-II multi-objective search (`evolve_multiobjective` + `dominates` / `non_dominated_sort` /
+`crowding_distance`, all pure-TDD'd in `test_evolve_linearize.py`); `scripts/nas_pareto.py` builds
+the frontier two ways and compares them by **2-D hypervolume** (`pareto_metrics.hypervolume_2d`):
+
+1. **Greedy frontier** — the budget-greedy assignment of §7 swept over a range of Δnll budgets
+   (0.02 … 0.50); each budget → one `(% memory saved, Δnll)` point.
+2. **Memetic NSGA-II frontier** — the multi-objective GA seeded with those greedy points, refining
+   the whole front.
+
+Result (0.5B, aozora 256-token proxy, base all-softmax nll 4.4155, 703 real evals):
+
+| frontier | points | span (% mem saved) | 2-D hypervolume |
+|---|---:|---|---:|
+| greedy (budget sweep) | 3 | 38.3 – 57.6 % | 42.14 |
+| **memetic NSGA-II** | **22** | **34.5 – 92.1 %** | **56.61 (+34.3 %)** |
+
+**The memetic frontier dominates greedy by +34.3 % hypervolume** — and where greedy traced only 3
+coarse points, the memetic front resolves 22, from 34.5 % memory saved at Δnll −0.0071 (a hair
+*better* than all-softmax, within proxy noise) out to 92.1 % saved at Δnll +0.77. This is the honest
+mirror image of §6's null: the **binary** linearization mask under a monotone budget was separable
+(greedy won), but the **3-mixer Pareto** problem is non-separable enough that memetic evolution
+clearly beats greedy across the curve — concrete justification for carrying the evolutionary
+substrate into the runtime. JSON: `out/nas_pareto/nas_pareto.json`.
+
+Honest caveats: 256-token perplexity proxy on one corpus (the −0.0071 "win" at the cheap end is
+measurement noise, not a real quality gain); zero-shot linear option (no distillation yet — that is
+§9); the memetic frontier is *seeded* with the greedy points, so by construction it can never lose
+to greedy — the +34.3 % is the value evolution adds *on top of* greedy, not evolution-from-scratch
+(which §6/§7 showed loses on the separable parts of this space).
+
+---
+
 ## Next
 
 - **Memetic NAS is the winning recipe** — scale it: Pareto frontier (not a single budget), per-layer
