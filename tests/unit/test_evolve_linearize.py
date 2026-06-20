@@ -171,7 +171,9 @@ def test_evolve_multiobjective_deterministic() -> None:
 
     a = evolve_multiobjective(ev, n_genes=6, n_options=3, pop_size=16, generations=10, seed=3)
     b = evolve_multiobjective(ev, n_genes=6, n_options=3, pop_size=16, generations=10, seed=3)
-    assert {(g, o) for g, o in a["front"]} == {(g, o) for g, o in b["front"]}  # type: ignore[union-attr]
+    fa, fb = a["front"], b["front"]
+    assert isinstance(fa, list) and isinstance(fb, list)
+    assert {(g, o) for g, o in fa} == {(g, o) for g, o in fb}
 
 
 def test_evolve_multiobjective_seeding_preserved() -> None:
