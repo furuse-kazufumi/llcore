@@ -89,3 +89,13 @@ def test_evolve_categorical_maximizes() -> None:
     )
     assert res["best_fitness"] == 10.0
     assert all(x == 2 for x in res["best_genome"])
+
+
+def test_evolve_categorical_seeding_never_worse_than_seed() -> None:
+    from llcore.runtime.evolve_linearize import evolve_categorical
+
+    # a deceptive fitness where a good seed should never be lost (elitism + seeding)
+    good = (2, 2, 2, 2, 2, 0, 0, 0)  # fitness 5
+    fit = lambda g: float(sum(1 for x in g if x == 2))  # noqa: E731
+    res = evolve_categorical(fit, n_genes=8, n_options=3, pop_size=10, generations=5, seed=0, seed_genomes=[good])
+    assert res["best_fitness"] >= fit(good)  # memetic: never regress below the seed
