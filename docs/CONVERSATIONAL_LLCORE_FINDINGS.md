@@ -147,12 +147,27 @@ conversation entirely through llcore's native forward (~1–3 tok/s CPU):
 **This meets the "まともに会話できる" goal for general Q&A / arithmetic / instruction-following**, in
 llcore's own instrumentable code (the prerequisite for the bounded-memory R&D), not a black box.
 
-int8 honesty: `convert_linears_to_int8` (llcore quant) on the loaded 1.5B keeps it answering
-correctly (「8」, 「富士山」), but **in-process fp32→int8 conversion does NOT lower measured RAM** (the
-freed fp32 buffers stay with the allocator — the known "peak WS unchanged without pressure" finding)
-and is **slower on CPU** (~0.5 tok/s: per-forward dequant, no int8 GEMM). The real int8 RAM win needs
-a **streaming-int8 load** (quantize per tensor from safetensors, never materialize fp32); the real
-int8 *speed* win needs GPU int8 GEMM ("良い HW ほど効く").
+int8 honesty: in-process `convert_linears_to_int8` keeps 1.5B answering correctly but does NOT lower
+measured RAM (freed fp32 buffers stay with the allocator) and is slower on CPU. The fix —
+**streaming-int8 load** (`load_qwen2_int8`, below).
+
+### Streaming-int8 load — the real RAM win (`src/llcore/runtime/loader.py`)
+
+Quantize the decoder Linears (q/k/v/o, gate/up/down) **per tensor straight from the mmap'd
+safetensors, never materializing the fp32 model**: build the model on the `meta` device (0 memory),
+swap decoder Linears for zero-init `Int8Linear`, `to_empty` + re-tie, then fill one tensor at a time
+(each Linear weight quantized to int8 on read, the transient fp32 freed immediately). Token embedding
+and lm_head stay fp32 (tied) for quality; only the matmul-heavy Linears go int8. Measured:
+
+| model | fp32 resident | **streaming-int8 resident** | converses? |
+|------|--------------:|----------------------------:|:----------:|
+| 0.5B | ~2.0 GB       | **~1.21 GB**                | yes (「東京」「12」) |
+| 1.5B | ~5.7 GB       | **~2.44 GB** (no fp32 spike) | yes (「8」, 丁寧語✓) |
+
+So **1.5B runs conversationally at 2.44 GB resident in llcore's own code** (down from 5.7 GB), the
+genuine memory-efficiency clincher on a real model. CPU speed ~0.7 tok/s (per-forward dequant — the
+int8 *speed* win still needs GPU int8 GEMM; "良い HW ほど効く"). Honest: 1.5B still makes factual
+errors (二番目に高い山→「箱根山」, should be 北岳) — a model-capability limit, not an int8 artifact.
 
 ---
 
