@@ -334,8 +334,9 @@ def main(argv: list[str] | None = None) -> int:
 
     ds_evolved_fmt: list[dict[str, float]] = []
     rshift: dict[str, float | str] | None = None
+    ds_front_g: list[CatGenome] = []
     if args.distill:
-        ds_greedy, ds_evolved, ds_hist = build_frontier(True)
+        ds_greedy, ds_evolved, ds_hist, ds_front_g, ds_greedy_g = build_frontier(True)
         ds_g_hv, ds_e_hv, ds_verdict = greedy_vs_memetic(ds_greedy, ds_evolved)
         ds_evolved_fmt = fmt(ds_evolved)
         rshift = frontier_right_shift(
