@@ -16,8 +16,20 @@ The memetic front should dominate or match the greedy one. If it merely ties,
 the landscape is separable and greedy already traces the frontier -- an honest
 negative, the same lens as ``project_llcore_evolvable_llm_replan``.
 
-Honest scope: zero-shot (no per-candidate distillation), tiny CPU model,
-perplexity proxy. Per-layer mixer in {softmax, sliding-window, linear}.
+**Distillation-aware frontier (``--distill``)** -- step ② of the conversational-llcore
+line. Instead of the *zero-shot* linear attention, the linear mixer option uses a
+per-layer **distilled** student (a small learnable feature map trained to match the
+softmax teacher's output on a held-out calibration window; see
+:func:`llcore.runtime.distill.distill_all_layers`). Each converted layer keeps the same
+constant-state memory, so distillation can only improve the *quality* axis -- the frontier
+shifts out. The script then reports the 2-D hypervolume **right-shift** of the distilled
+memetic frontier vs the zero-shot one (:func:`frontier_right_shift`). The calibration window
+is **disjoint** from the eval window so the recovery is measured on unseen text, and
+per-layer distillation is independent (joint multi-layer distillation -- where errors may
+compound -- is the separate step ②(ii)).
+
+Honest scope: tiny CPU model, perplexity proxy. Per-layer mixer in {softmax, sliding-window,
+linear}. Without ``--distill`` the output JSON is unchanged (backward compatible).
 """
 from __future__ import annotations
 
@@ -30,24 +42,14 @@ from typing import cast
 
 import torch
 
+from llcore.runtime.distill import distill_all_layers
 from llcore.runtime.evolve_linearize import CatGenome, dominates, evolve_multiobjective
 from llcore.runtime.linearize import LinearAttention, SlidingWindowAttention
 from llcore.runtime.loader import load_qwen2
+from llcore.runtime.pareto_metrics import frontier_right_shift, hypervolume_2d
 from llcore.runtime.qwen2 import Qwen2Attention
 
 MIXERS = ("softmax", "sliding", "linear")
-
-
-def hypervolume_2d(points: list[tuple[float, float]], ref: tuple[float, float]) -> float:
-    """2-D hypervolume (area dominated) for a **maximization** front; ``ref`` is the
-    shared lower-left reference point so two fronts are directly comparable."""
-    hv = 0.0
-    y_prev = ref[1]
-    for x, y in sorted(points, key=lambda p: -p[0]):
-        if y > y_prev:
-            hv += (x - ref[0]) * (y - y_prev)
-            y_prev = y
-    return hv
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -66,6 +68,13 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--pop", type=int, default=24)
     ap.add_argument("--generations", type=int, default=20)
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--distill", action="store_true",
+                    help="also build a distillation-aware frontier (linear layers use a per-layer "
+                         "distilled student) and report the hypervolume right-shift vs zero-shot")
+    ap.add_argument("--distill-steps", type=int, default=200)
+    ap.add_argument("--distill-lr", type=float, default=5e-2)
+    ap.add_argument("--distill-tokens", type=int, default=256,
+                    help="held-out calibration tokens for distillation (window AFTER the eval window)")
     ap.add_argument("--out", default="out/nas_pareto")
     args = ap.parse_args(argv)
 
@@ -83,7 +92,10 @@ def main(argv: list[str] | None = None) -> int:
     mem_opt = (mem_softmax, mem_sliding, mem_linear)
     mem_all_softmax = mem_softmax * n_layer
 
-    def set_genome(genome: CatGenome) -> None:
+    # per-layer distilled students, filled by --distill (referenced by set_genome's linear branch)
+    distilled: dict[int, LinearAttention] = {}
+
+    def set_genome(genome: CatGenome, use_distill: bool = False) -> None:
         for i, opt in enumerate(genome):
             src = originals[i]
             assert isinstance(src, Qwen2Attention)
@@ -92,7 +104,9 @@ def main(argv: list[str] | None = None) -> int:
             elif opt == 1:
                 model.model.layers[i].self_attn = SlidingWindowAttention.from_attention(src, p, window=args.window)
             else:
-                model.model.layers[i].self_attn = LinearAttention.from_attention(src, p)
+                model.model.layers[i].self_attn = (
+                    distilled[i] if use_distill else LinearAttention.from_attention(src, p)
+                )
 
     def restore() -> None:
         for i in range(n_layer):
@@ -113,73 +127,97 @@ def main(argv: list[str] | None = None) -> int:
     base = nll(ids)
     print(f"[base] all-softmax nll={base:.4f} ppl={torch.tensor(base).exp():.2f}", flush=True)
 
-    cache: dict[CatGenome, tuple[float, float]] = {}
+    cache: dict[tuple[CatGenome, bool], tuple[float, float]] = {}
 
-    def measure(genome: CatGenome) -> tuple[float, float]:
-        """Return ``(pct_mem_saved, delta_nll)`` for a genome (memoized)."""
-        if genome in cache:
-            return cache[genome]
-        set_genome(genome)
+    def measure(genome: CatGenome, use_distill: bool = False) -> tuple[float, float]:
+        """Return ``(pct_mem_saved, delta_nll)`` for a genome (memoized per (genome, mode))."""
+        key = (genome, use_distill)
+        if key in cache:
+            return cache[key]
+        set_genome(genome, use_distill)
         dn = nll(ids) - base
         restore()
         mem = sum(mem_opt[o] for o in genome)
         pct = 100.0 * (mem_all_softmax - mem) / mem_all_softmax
-        cache[genome] = (pct, dn)
+        cache[key] = (pct, dn)
         return pct, dn
 
-    # single-layer linear tolerance order (shared by every greedy budget)
-    single: list[float] = []
-    for i in range(n_layer):
-        set_genome(tuple(2 if j == i else 0 for j in range(n_layer)))
-        single.append(nll(ids) - base)
-        restore()
-    order = sorted(range(n_layer), key=lambda i: single[i])
+    # build per-layer distilled students from a HELD-OUT calibration window (disjoint from eval ids)
+    distill_mse_log: list[dict[str, float]] = []
+    calib_n = 0
+    if args.distill:
+        calib_ids = tok(text, return_tensors="pt").input_ids[:, args.n_tokens : args.n_tokens + args.distill_tokens]
+        calib_n = int(calib_ids.size(1))
+        print(f"[distill] calibrating {n_layer} layers on held-out tokens "
+              f"[{args.n_tokens}:{args.n_tokens + calib_n}] (eval=[0:{args.n_tokens}]), "
+              f"{args.distill_steps} steps lr={args.distill_lr}", flush=True)
 
-    def greedy_at(budget: float) -> CatGenome:
-        g = [0] * n_layer
-        for i in order:
-            for opt in (2, 1):  # cheapest memory first: linear, then sliding
-                trial = list(g)
-                trial[i] = opt
-                if measure(tuple(trial))[1] <= budget:
-                    g[i] = opt
-                    break
-        return tuple(g)
+        def _log(i: int, info: dict[str, float]) -> None:
+            distill_mse_log.append(
+                {"layer": float(i), "mse_before": info["mse_before"], "mse_after": info["mse_after"]}
+            )
+            print(f"[distill] layer {i:2d}: mse {info['mse_before']:.4e} -> {info['mse_after']:.4e}", flush=True)
+
+        distilled.update(
+            distill_all_layers(model, calib_ids, steps=args.distill_steps, lr=args.distill_lr, on_layer=_log)
+        )
+        restore()  # distill_all_layers already restores; be explicit before measuring
 
     budgets = [float(b) for b in str(args.budgets).split(",") if b.strip()]
-    greedy_seeds: list[CatGenome] = []
-    greedy_points: list[tuple[float, float]] = []
-    for b in budgets:
-        gg = greedy_at(b)
-        if gg not in greedy_seeds:
-            greedy_seeds.append(gg)
-        greedy_points.append(measure(gg))
-    print(f"[greedy] {len(greedy_seeds)} distinct configs over {len(budgets)} budgets", flush=True)
 
-    # memetic NSGA-II: maximize (pct_saved, -delta_nll), seeded with the greedy configs
-    te = time.perf_counter()
-    res = evolve_multiobjective(
-        lambda g: (measure(g)[0], -measure(g)[1]),
-        n_layer, 3, pop_size=args.pop, generations=args.generations,
-        seed=args.seed, seed_genomes=greedy_seeds,
-    )
-    front = cast("list[tuple[CatGenome, tuple[float, ...]]]", res["front"])
-    evolved_points = [measure(g) for g, _ in front]
-    print(f"[evolve] {len(front)} Pareto configs ({len(cache)} real evals, {time.perf_counter() - te:.0f}s)",
-          flush=True)
+    def build_frontier(use_distill: bool) -> tuple[list[tuple[float, float]], list[tuple[float, float]], object]:
+        """Greedy + memetic NSGA-II frontier for one mode; returns (greedy_points, evolved_points, history)."""
+        # single-layer linear tolerance order (mode-specific: distilled layers reorder)
+        single: list[float] = []
+        for i in range(n_layer):
+            set_genome(tuple(2 if j == i else 0 for j in range(n_layer)), use_distill)
+            single.append(nll(ids) - base)
+            restore()
+        order = sorted(range(n_layer), key=lambda i: single[i])
 
-    # compare the two fronts by 2-D hypervolume with a shared reference point
-    all_dn = [dn for _, dn in greedy_points + evolved_points] or [0.0]
-    ref = (0.0, -(max(all_dn) + 1e-6))
-    g_hv = hypervolume_2d([(pc, -dn) for pc, dn in greedy_points], ref)
-    e_hv = hypervolume_2d([(pc, -dn) for pc, dn in evolved_points], ref)
-    if e_hv > g_hv * 1.005:
-        verdict = f"memetic frontier dominates greedy: hypervolume +{100 * (e_hv - g_hv) / max(g_hv, 1e-9):.1f}%"
-    elif e_hv < g_hv * 0.995:
-        verdict = (f"greedy frontier wins by {100 * (g_hv - e_hv) / max(g_hv, 1e-9):.1f}% hypervolume "
-                   f"(separable landscape)")
-    else:
-        verdict = "memetic frontier ties greedy (separable: greedy already traces the frontier)"
+        def greedy_at(budget: float) -> CatGenome:
+            g = [0] * n_layer
+            for i in order:
+                for opt in (2, 1):  # cheapest memory first: linear, then sliding
+                    trial = list(g)
+                    trial[i] = opt
+                    if measure(tuple(trial), use_distill)[1] <= budget:
+                        g[i] = opt
+                        break
+            return tuple(g)
+
+        greedy_seeds: list[CatGenome] = []
+        greedy_points: list[tuple[float, float]] = []
+        for b in budgets:
+            gg = greedy_at(b)
+            if gg not in greedy_seeds:
+                greedy_seeds.append(gg)
+            greedy_points.append(measure(gg, use_distill))
+
+        res = evolve_multiobjective(
+            lambda g: (measure(g, use_distill)[0], -measure(g, use_distill)[1]),
+            n_layer, 3, pop_size=args.pop, generations=args.generations,
+            seed=args.seed, seed_genomes=greedy_seeds,
+        )
+        front = cast("list[tuple[CatGenome, tuple[float, ...]]]", res["front"])
+        evolved_points = [measure(g, use_distill) for g, _ in front]
+        return greedy_points, evolved_points, res["history"]
+
+    def greedy_vs_memetic(
+        greedy_points: list[tuple[float, float]], evolved_points: list[tuple[float, float]]
+    ) -> tuple[float, float, str]:
+        all_dn = [dn for _, dn in greedy_points + evolved_points] or [0.0]
+        ref = (0.0, -(max(all_dn) + 1e-6))
+        g_hv = hypervolume_2d([(pc, -dn) for pc, dn in greedy_points], ref)
+        e_hv = hypervolume_2d([(pc, -dn) for pc, dn in evolved_points], ref)
+        if e_hv > g_hv * 1.005:
+            verdict = f"memetic frontier dominates greedy: hypervolume +{100 * (e_hv - g_hv) / max(g_hv, 1e-9):.1f}%"
+        elif e_hv < g_hv * 0.995:
+            verdict = (f"greedy frontier wins by {100 * (g_hv - e_hv) / max(g_hv, 1e-9):.1f}% hypervolume "
+                       f"(separable landscape)")
+        else:
+            verdict = "memetic frontier ties greedy (separable: greedy already traces the frontier)"
+        return g_hv, e_hv, verdict
 
     def fmt(points: list[tuple[float, float]]) -> list[dict[str, float]]:
         objs = [(pc, -dn) for pc, dn in points]  # maximization objectives (saved %, -delta_nll)
@@ -190,31 +228,68 @@ def main(argv: list[str] | None = None) -> int:
             key=lambda d: d["pct_mem_saved"],
         )
 
-    greedy_fmt = fmt(greedy_points)
-    evolved_fmt = fmt(evolved_points)
-    report = {
+    te = time.perf_counter()
+    zs_greedy, zs_evolved, zs_hist = build_frontier(False)
+    zs_g_hv, zs_e_hv, zs_verdict = greedy_vs_memetic(zs_greedy, zs_evolved)
+    zs_greedy_fmt = fmt(zs_greedy)
+    zs_evolved_fmt = fmt(zs_evolved)
+    print(f"[zero-shot] {len(zs_evolved)} Pareto configs ({len(cache)} real evals)", flush=True)
+
+    report: dict[str, object] = {
         "model_dir": args.model_dir,
         "n_layer": n_layer,
         "mixers": MIXERS,
         "ref_context": tref,
         "base_nll": base,
         "budgets": budgets,
-        "greedy_frontier": greedy_fmt,
-        "evolved_frontier": evolved_fmt,
-        "hypervolume": {"greedy": g_hv, "evolved": e_hv},
+        "greedy_frontier": zs_greedy_fmt,
+        "evolved_frontier": zs_evolved_fmt,
+        "hypervolume": {"greedy": zs_g_hv, "evolved": zs_e_hv},
         "real_evals": len(cache),
-        "history": res["history"],
-        "verdict": verdict,
+        "history": zs_hist,
+        "verdict": zs_verdict,
     }
+
+    ds_evolved_fmt: list[dict[str, float]] = []
+    rshift: dict[str, float | str] | None = None
+    if args.distill:
+        ds_greedy, ds_evolved, ds_hist = build_frontier(True)
+        ds_g_hv, ds_e_hv, ds_verdict = greedy_vs_memetic(ds_greedy, ds_evolved)
+        ds_evolved_fmt = fmt(ds_evolved)
+        rshift = frontier_right_shift(
+            [(pc, -dn) for pc, dn in zs_evolved],
+            [(pc, -dn) for pc, dn in ds_evolved],
+        )
+        report["distill"] = {
+            "calib_tokens": calib_n,
+            "steps": args.distill_steps,
+            "lr": args.distill_lr,
+            "layer_mse": distill_mse_log,
+            "greedy_frontier": fmt(ds_greedy),
+            "evolved_frontier": ds_evolved_fmt,
+            "hypervolume": {"greedy": ds_g_hv, "evolved": ds_e_hv},
+            "history": ds_hist,
+            "verdict": ds_verdict,
+        }
+        report["right_shift"] = rshift
+
+    report["elapsed_s"] = time.perf_counter() - te
     (out / "nas_pareto.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
-    print("\n[greedy frontier]")
-    for d in greedy_fmt:
+
+    print("\n[zero-shot greedy frontier]")
+    for d in zs_greedy_fmt:
         print(f"  saved {d['pct_mem_saved']:5.1f}%  delta_nll {d['delta_nll']:+.4f}")
-    print("[evolved frontier]")
-    for d in evolved_fmt:
+    print("[zero-shot evolved frontier]")
+    for d in zs_evolved_fmt:
         print(f"  saved {d['pct_mem_saved']:5.1f}%  delta_nll {d['delta_nll']:+.4f}")
-    print(f"\n[verdict] {verdict}")
-    print(f"[done] wrote {out}/nas_pareto.json", flush=True)
+    print(f"[zero-shot verdict] {zs_verdict}")
+    if args.distill:
+        print("\n[distilled evolved frontier]")
+        for d in ds_evolved_fmt:
+            print(f"  saved {d['pct_mem_saved']:5.1f}%  delta_nll {d['delta_nll']:+.4f}")
+        assert rshift is not None
+        print(f"[right-shift] {rshift['verdict']}")
+    print(f"[done] wrote {out}/nas_pareto.json ({len(cache)} real evals, {report['elapsed_s']:.0f}s)", flush=True)
     return 0
 
 
