@@ -24,7 +24,7 @@ import torch
 from llcore.runtime.evolve_linearize import CatGenome, evolve_categorical
 from llcore.runtime.linearize import LinearAttention, SlidingWindowAttention
 from llcore.runtime.loader import load_qwen2
-from llcore.runtime.qwen2 import Qwen2Attention, Qwen2LM
+from llcore.runtime.qwen2 import Qwen2Attention
 
 MIXERS = ("softmax", "sliding", "linear")
 
