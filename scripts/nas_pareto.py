@@ -356,6 +356,15 @@ def main(argv: list[str] | None = None) -> int:
         }
         report["right_shift"] = rshift
 
+    if args.proxy_v2:
+        report["proxy_v2"] = _proxy_v2_rigorous(
+            model, tok, set_genome, restore, ids_all, args, mem_opt, mem_all_softmax,
+            fast_delta_cache, zs_front_g, zs_greedy_g, ds_front_g if args.distill else None,
+        )
+        pv = cast("dict[str, object]", report["proxy_v2"])
+        print(f"\n[proxy-v2 verdict] {cast('dict[str, str]', pv['verdict'])['memetic_vs_greedy']} "
+              f"(confidence={cast('dict[str, str]', pv['verdict'])['confidence']})", flush=True)
+
     elapsed = time.perf_counter() - te
     report["elapsed_s"] = elapsed
     (out / "nas_pareto.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
