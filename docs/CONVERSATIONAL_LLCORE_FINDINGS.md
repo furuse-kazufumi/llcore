@@ -318,6 +318,59 @@ workflow): the direction survives, the magnitude and generalization do not yet.
 
 ---
 
+## 10. proxy-v2: a statistically honest evaluation proxy (the measurement, not the model)
+
+§8/§9's verdicts rest on a single 256-token Δnll with no error bar (honest bound #2). That proxy is
+*structurally* wrong for constant-state attention: the linear mixer's quality cost manifests only at
+long context (2k–8k+; cf. SUPRA), so a 256-token window under-detects it, and the memory crossover is
+~227 tokens, so v1 measured quality where the savings barely exist. proxy-v2
+(`src/llcore/runtime/eval_proxy.py`, wired into `scripts/nas_pareto.py --proxy-v2`) replaces the point
+estimate with the machinery needed to make "the evolved frontier beats greedy" a *defensible* claim
+rather than proxy noise. The design was hardened by a 4-lens workflow (statistician / eval-protocol /
+mechanistic / honest-disclosure adversary) before implementation; 26 unit tests pin the pure core.
+
+**Two tiers (CPU-honest):**
+
+* **Fast inner loop** — every NAS genome is scored by a PAIRED multi-window Δnll at a single moderate
+  context (default L=1024, on the right side of *both* the 227-tok crossover and the degradation onset).
+  Same windows feed base and modified model, so per-window Δnll cancels window difficulty (the dominant
+  variance). The GA still selects on the scalar mean (so `evolve_multiobjective` is untouched); a
+  paired bootstrap CI rides along for disclosure. `--proxy-v2` off ⇒ the v1 256-tok path and JSON are
+  byte-identical.
+
+* **Rigorous frontier-only** — runs ONCE on the handful of non-dominated genomes, never inside the
+  search: (1) **winner's-curse correction** — the GA argmax-selects its frontier over hundreds of noisy
+  evals, so its search Δnll is optimistically biased; every frontier point is re-evaluated on a FRESH
+  disjoint holdout pool and the headline verdict uses **holdout only** (`optimism_gap = selection −
+  holdout` is reported and, if it exceeds the noise floor, the verdict is *suppressed*). (2) **context
+  sweep** [256…2048(+4096)] on the most aggressive genome, so regime-dependence is explicit and the
+  deployment-quality claim cites long-L, not the search proxy. (3) a long-context **needle/passkey**
+  retrieval probe (induction copy across the context) gated by an in-window control accuracy.
+
+* **Diagnostics (never feed selection):** a paired-bootstrap **CI on the hypervolume gain** (so the
+  memetic-vs-greedy "+X %" carries an error bar and fires "beats greedy" only if the CI excludes 0) and
+  on the distillation right-shift; an **attention-map KL** fidelity check (forward KL(softmax‖linear),
+  hard-capped at 256 tokens because it is O(T²) and shares v1's short-context blind spot — explicitly
+  *not* a long-context claim and *never* wired into fitness); and a **proxy-vs-judge** Kendall-τ gate
+  (τ<0.7 downgrades the verdict to "suggestive"). Cross-corpus holdout uses a DISJOINT Japanese slice
+  as the primary generalization test; English (shakespeare) is a labeled out-of-domain diagnostic only,
+  never the headline (tokenizer fertility is a confound). All scores are paired Δnll *within* a corpus,
+  never raw nll, never averaged across corpora.
+
+* **Honest-disclosure chokepoint** — `honest_verdict` collapses every guard into one verdict
+  {significant | suggestive | null | suppressed}; the report pins `scope='next_token_nll_proxy'` and
+  `conversational_claim=None`: a conversational-quality claim must come from a separate disclosed
+  generation eval, never inferred from these perplexity proxies.
+
+### Smoke run (pipeline validation on real 0.5B)
+
+<!-- proxy-v2-smoke-results -->
+*(results appended after the first end-to-end `--proxy-v2` run; deliberately uses K<12 holdout windows
+so the "CI unreliable (K<12)" downgrade is exercised — a small but real data point, not the publishable
+frontier, which is the full-budget overnight run.)*
+
+---
+
 ## Next
 
 - **Memetic NAS is the winning recipe** — scale it: Pareto frontier (not a single budget), per-layer
