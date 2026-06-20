@@ -188,12 +188,37 @@ strong baseline. Evolution should earn its place only where the problem is harde
 search space (per-layer mixer ∈ {softmax, sliding-window, linear, …}) with non-additive, non-monotone
 memory/quality trade-offs (see §7), a Pareto frontier, and distillation-aware costs.
 
+## 7. Level-2 NAS: per-layer mixer choice — where evolution finally beats greedy (memetic)
+
+Each layer picks one of **three** mixers with distinct memory/quality profiles: full **softmax**
+(O(T) KV, best quality), **sliding-window-128** softmax (`SlidingWindowAttention`, O(window) KV,
+local quality), or **linear** (`LinearAttention`, O(d²) state, O(1) in T). Genome = one categorical
+gene per layer; fitness = % of attention memory saved at context 2048 minus a penalty when held-out
+Δnll exceeds 0.15. (`evolve_categorical` + `scripts/nas_level2.py`.)
+
+Result (0.5B, baseline softmax ppl 82.7):
+
+| search | softmax/sliding/linear | attention memory saved | Δnll |
+|---|---|---:|---:|
+| greedy (cheapest-mixer-first, tolerance order) | 9 / 9 / 6 | 57.4 % | +0.148 |
+| GA from random init (pop 16 × gen 14) | 13 / 9 / 2 | 42.6 % | +0.140 — greedy won by 14.8 pp |
+| **GA seeded with greedy (memetic)** | **8 / 13 / 3** | **61.9 %** | **+0.113 — evolution won +4.5 pp AND better quality** |
+
+The honest arc: a **from-scratch GA loses** (the per-layer landscape is largely separable, so
+greedy-by-tolerance is near-optimal and a generic GA under-explores), but a **memetic GA seeded with
+the greedy solution beats it** — it refines greedy by trading some linear layers for sliding-window,
+reaching a jointly-better memory/quality point that greedy's per-layer heuristic cannot. **So
+evolution IS worth applying to the analyzed structure — as a memetic refiner (greedy seed +
+evolutionary search) in the richer mixer space, not from scratch.** This is the concrete payoff of
+joining the preserved evolutionary substrate to the runtime.
+
 ---
 
 ## Next
 
-- Make evolution earn its place via **Level-2 NAS** (per-layer mixer choice, not binary) + a Pareto
-  frontier + distillation in the loop — the regimes where greedy is not near-optimal.
+- **Memetic NAS is the winning recipe** — scale it: Pareto frontier (not a single budget), per-layer
+  distillation folded into the fitness (non-separable costs where evolution gains more), and a wider
+  mixer set (SSM/RWKV blocks for layers that need it, seeded by the RAD corpus's real hybrids).
 - Run the linearization-tolerance profile + per-layer distillation on **1.5B** (the R&D applied to the
   model that actually converses), then **joint multi-layer distillation** under a quality budget and
   **evolve which layers** with `memory_objective` + cap-gate (the evolutionary substrate on the runtime).
