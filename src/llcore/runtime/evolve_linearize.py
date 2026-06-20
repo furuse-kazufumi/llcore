@@ -95,17 +95,19 @@ def evolve_categorical(
     elitism: int = 2,
     tournament_k: int = 3,
     seed: int = 0,
+    seed_genomes: list[CatGenome] | None = None,
 ) -> dict[str, object]:
     """Evolve a per-gene categorical assignment (e.g. per-layer mixer choice) maximizing fitness.
 
-    Genes take integer values in ``[0, n_options)``. This is the Level-2 search where each layer
-    picks among >2 mixers (softmax / sliding-window / linear / ...) — a space too large and too
-    interacting for greedy, which is where evolution earns its place over the binary mask.
+    Genes take integer values in ``[0, n_options)``. ``seed_genomes`` injects known solutions
+    (e.g. a greedy baseline) into the initial population, turning the search memetic: if the GA
+    cannot improve on a seeded greedy solution, that is strong evidence the landscape is separable
+    and greedy is near-optimal; if it can, evolution adds value.
     """
     rng = random.Random(seed)
-    pop: list[CatGenome] = [
-        tuple(rng.randrange(n_options) for _ in range(n_genes)) for _ in range(pop_size)
-    ]
+    pop: list[CatGenome] = list(seed_genomes or [])[:pop_size]
+    while len(pop) < pop_size:
+        pop.append(tuple(rng.randrange(n_options) for _ in range(n_genes)))
     fits = [fitness_fn(g) for g in pop]
     best_i = max(range(pop_size), key=lambda i: fits[i])
     best_g, best_f = pop[best_i], fits[best_i]
