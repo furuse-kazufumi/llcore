@@ -173,7 +173,7 @@ def _proxy_v2_rigorous(
     cross: dict[str, object] | None = None
     if args.cross_corpus:
         ctext = Path(args.cross_corpus).read_text(encoding="utf-8")[50000:]
-        cids = cast(object, tok)(ctext, return_tensors="pt").input_ids  # type: ignore[operator]
+        cids = tok(ctext, return_tensors="pt").input_ids  # type: ignore[operator]
         cwin = make_windows(cids, args.inner_context, args.holdout_windows, offset=0)
         if cwin:
             cbase = base_window_losses(model, restore, cwin)
