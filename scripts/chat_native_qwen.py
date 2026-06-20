@@ -22,7 +22,7 @@ import time
 
 import torch
 
-from llcore.runtime.loader import load_qwen2
+from llcore.runtime.loader import load_qwen2  # type: ignore[import-untyped]
 
 PROMPTS = [
     ("挨拶", "こんにちは。あなたは何ができますか？一文で答えてください。"),
