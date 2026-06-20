@@ -109,7 +109,7 @@ def main(argv: list[str] | None = None) -> int:
         )
 
     text = Path(args.text_file).read_text(encoding="utf-8")[50000:]
-    ids = tok(text, return_tensors="pt").input_ids[:, : args.n_tokens]  # type: ignore[operator]
+    ids = tok(text, return_tensors="pt").input_ids[:, : args.n_tokens]
     base = nll(ids)
     print(f"[base] all-softmax nll={base:.4f} ppl={torch.tensor(base).exp():.2f}", flush=True)
 
