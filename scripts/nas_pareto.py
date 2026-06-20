@@ -182,10 +182,11 @@ def main(argv: list[str] | None = None) -> int:
         verdict = "memetic frontier ties greedy (separable: greedy already traces the frontier)"
 
     def fmt(points: list[tuple[float, float]]) -> list[dict[str, float]]:
-        items: list[tuple[int, tuple[float, ...]]] = [(i, (pc, -dn)) for i, (pc, dn) in enumerate(points)]
-        keep = pareto_front(items)
+        objs = [(pc, -dn) for pc, dn in points]  # maximization objectives (saved %, -delta_nll)
+        keep = [i for i in range(len(objs))
+                if not any(dominates(objs[j], objs[i]) for j in range(len(objs)) if j != i)]
         return sorted(
-            ({"pct_mem_saved": points[i][0], "delta_nll": points[i][1]} for i, _ in keep),
+            ({"pct_mem_saved": points[i][0], "delta_nll": points[i][1]} for i in keep),
             key=lambda d: d["pct_mem_saved"],
         )
 
