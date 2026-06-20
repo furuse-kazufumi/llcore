@@ -283,7 +283,7 @@ def main(argv: list[str] | None = None) -> int:
         )
         front = cast("list[tuple[CatGenome, tuple[float, ...]]]", res["front"])
         evolved_points = [measure(g, use_distill) for g, _ in front]
-        return greedy_points, evolved_points, res["history"]
+        return greedy_points, evolved_points, res["history"], [g for g, _ in front], greedy_seeds
 
     def greedy_vs_memetic(
         greedy_points: list[tuple[float, float]], evolved_points: list[tuple[float, float]]
