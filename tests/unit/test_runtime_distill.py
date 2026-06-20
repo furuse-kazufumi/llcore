@@ -60,3 +60,30 @@ def test_distill_layer_reduces_teacher_student_gap() -> None:
     assert result["mse_after"] < result["mse_before"]
     # the distilled layer is installed on the model and is a learnable LinearAttention
     assert isinstance(model.model.layers[1].self_attn, LinearAttention)
+
+
+def test_distill_all_layers_returns_student_per_layer_and_restores() -> None:
+    from llcore.runtime.distill import distill_all_layers
+    from llcore.runtime.qwen2 import Qwen2Attention
+
+    model = _tiny()  # n_layer = 2, all softmax
+    torch.manual_seed(2)
+    ids = torch.randint(0, 48, (1, 40))
+    students = distill_all_layers(model, ids, steps=30, lr=5e-2)
+    assert set(students) == {0, 1}
+    assert all(isinstance(s, LinearAttention) for s in students.values())
+    # each layer was distilled from a pristine softmax teacher → model is left all-softmax
+    assert all(isinstance(model.model.layers[i].self_attn, Qwen2Attention) for i in range(2))
+
+
+def test_distill_all_layers_rejects_non_softmax_model() -> None:
+    import pytest
+
+    from llcore.runtime.distill import distill_all_layers
+    from llcore.runtime.linearize import linearize_qwen2
+
+    model = _tiny()
+    linearize_qwen2(model, [0])  # layer 0 is now LinearAttention, not a softmax teacher
+    ids = torch.randint(0, 48, (1, 24))
+    with pytest.raises(ValueError, match="all-softmax"):
+        distill_all_layers(model, ids, steps=5)
