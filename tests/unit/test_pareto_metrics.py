@@ -43,8 +43,9 @@ def test_right_shift_positive_when_distilled_dominates() -> None:
     zs = [(40.0, -0.10), (60.0, -0.30)]
     ds = [(40.0, -0.02), (60.0, -0.12)]
     res = frontier_right_shift(zs, ds)
-    assert isinstance(res["shift_pct"], float) and res["shift_pct"] > 0.0
-    assert "shifts the frontier out" in res["verdict"]
+    shift, verdict = res["shift_pct"], res["verdict"]
+    assert isinstance(shift, float) and shift > 0.0
+    assert isinstance(verdict, str) and "shifts the frontier out" in verdict
 
 
 def test_right_shift_zero_when_identical() -> None:
@@ -52,8 +53,9 @@ def test_right_shift_zero_when_identical() -> None:
 
     pts = [(40.0, -0.10), (60.0, -0.30)]
     res = frontier_right_shift(pts, list(pts))
-    assert abs(res["shift_pct"]) < 1e-6  # type: ignore[arg-type]
-    assert "does not measurably move" in res["verdict"]
+    shift, verdict = res["shift_pct"], res["verdict"]
+    assert isinstance(shift, float) and abs(shift) < 1e-6
+    assert isinstance(verdict, str) and "does not measurably move" in verdict
 
 
 def test_right_shift_negative_when_distilled_worse() -> None:
@@ -62,5 +64,6 @@ def test_right_shift_negative_when_distilled_worse() -> None:
     zs = [(40.0, -0.02), (60.0, -0.12)]
     ds = [(40.0, -0.10), (60.0, -0.30)]
     res = frontier_right_shift(zs, ds)
-    assert isinstance(res["shift_pct"], float) and res["shift_pct"] < 0.0
-    assert "regresses the frontier" in res["verdict"]
+    shift, verdict = res["shift_pct"], res["verdict"]
+    assert isinstance(shift, float) and shift < 0.0
+    assert isinstance(verdict, str) and "regresses the frontier" in verdict
