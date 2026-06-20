@@ -39,7 +39,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Sequence
 from math import comb
-from typing import Protocol
+from typing import Protocol, cast
 
 import numpy as np
 import torch
