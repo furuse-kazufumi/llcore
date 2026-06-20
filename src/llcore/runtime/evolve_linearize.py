@@ -82,3 +82,45 @@ def evolve(
             best_f, best_g = fits[gi], pop[gi]
         history.append(best_f)
     return {"best_genome": best_g, "best_fitness": best_f, "history": history}
+
+
+def evolve_categorical(
+    fitness_fn: CatFitnessFn,
+    n_genes: int,
+    n_options: int,
+    *,
+    pop_size: int = 16,
+    generations: int = 12,
+    mutation_rate: float = 0.1,
+    elitism: int = 2,
+    tournament_k: int = 3,
+    seed: int = 0,
+) -> dict[str, object]:
+    """Evolve a per-gene categorical assignment (e.g. per-layer mixer choice) maximizing fitness.
+
+    Genes take integer values in ``[0, n_options)``. This is the Level-2 search where each layer
+    picks among >2 mixers (softmax / sliding-window / linear / ...) — a space too large and too
+    interacting for greedy, which is where evolution earns its place over the binary mask.
+    """
+    rng = random.Random(seed)
+    pop: list[CatGenome] = [
+        tuple(rng.randrange(n_options) for _ in range(n_genes)) for _ in range(pop_size)
+    ]
+    fits = [fitness_fn(g) for g in pop]
+    best_i = max(range(pop_size), key=lambda i: fits[i])
+    best_g, best_f = pop[best_i], fits[best_i]
+    history: list[float] = []
+    for _ in range(generations):
+        order = sorted(range(pop_size), key=lambda i: fits[i], reverse=True)
+        new_pop: list[CatGenome] = [pop[order[i]] for i in range(min(elitism, pop_size))]
+        while len(new_pop) < pop_size:
+            p1 = _tournament(pop, fits, tournament_k, rng)
+            p2 = _tournament(pop, fits, tournament_k, rng)
+            new_pop.append(mutate_categorical(crossover(p1, p2, rng), n_options, mutation_rate, rng))
+        pop = new_pop
+        fits = [fitness_fn(g) for g in pop]
+        gi = max(range(pop_size), key=lambda i: fits[i])
+        if fits[gi] > best_f:
+            best_f, best_g = fits[gi], pop[gi]
+        history.append(best_f)
+    return {"best_genome": best_g, "best_fitness": best_f, "history": history}
