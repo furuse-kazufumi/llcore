@@ -44,7 +44,7 @@ def load_qwen2(model_dir: str | Path, dtype: torch.dtype = torch.float32) -> tup
         raise FileNotFoundError(f"no .safetensors in {model_dir}")
     with torch.no_grad():
         for fp in files:
-            with safe_open(fp, framework="pt") as f:  # lazy / mmap — one tensor read at a time
+            with safe_open(fp, framework="pt") as f:  # type: ignore[no-untyped-call]  # lazy/mmap
                 for name in f.keys():  # noqa: SIM118
                     if name in own and tuple(f.get_slice(name).get_shape()) == tuple(own[name].shape):
                         own[name].copy_(f.get_tensor(name).to(dtype))
