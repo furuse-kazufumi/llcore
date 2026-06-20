@@ -273,7 +273,8 @@ def main(argv: list[str] | None = None) -> int:
         }
         report["right_shift"] = rshift
 
-    report["elapsed_s"] = time.perf_counter() - te
+    elapsed = time.perf_counter() - te
+    report["elapsed_s"] = elapsed
     (out / "nas_pareto.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
 
     print("\n[zero-shot greedy frontier]")
