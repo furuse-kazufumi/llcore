@@ -61,3 +61,63 @@ def load_qwen2(model_dir: str | Path, dtype: torch.dtype = torch.float32) -> tup
 
     tok = AutoTokenizer.from_pretrained(str(model_dir))
     return model, tok, params
+
+
+def _module_by_path(root: nn.Module, path: str) -> nn.Module:
+    obj: Any = root
+    for part in path.split("."):
+        obj = obj[int(part)] if part.isdigit() else getattr(obj, part)
+    return obj  # type: ignore[no-any-return]
+
+
+def load_qwen2_int8(model_dir: str | Path) -> tuple[Qwen2LM, Any, Qwen2Params]:
+    """Streaming-int8 load: quantize the decoder Linears per tensor straight from safetensors.
+
+    The fp32 model is NEVER materialized. The model is built on the ``meta`` device (zero memory),
+    its decoder-layer Linears (q/k/v/o, gate/up/down) are swapped for zero-init :class:`Int8Linear`,
+    the remaining tensors (token embedding, RMSNorm weights, attention biases, tied lm_head) are
+    materialized as fp32, and weights are filled one tensor at a time from the (mmap'd) safetensors —
+    each Linear weight quantized to int8 on read and the transient fp32 freed immediately. Resident
+    RAM ≈ int8 decoder weights + the fp32 embedding (kept full-precision for quality), instead of the
+    whole fp32 model. Embedding and lm_head stay fp32 (and tied); only the matmul-heavy Linears go int8.
+    """
+    from safetensors import safe_open
+    from transformers import AutoTokenizer
+
+    model_dir = Path(model_dir)
+    cfg = json.loads((model_dir / "config.json").read_text(encoding="utf-8"))
+    params = Qwen2Params.from_hf_config(cfg)
+
+    with torch.device("meta"):
+        model = Qwen2LM(params)
+    for blk in model.model.layers:
+        for sub in (blk.self_attn, blk.mlp):  # type: ignore[union-attr]
+            for name, child in list(sub.named_children()):
+                if isinstance(child, nn.Linear):
+                    setattr(sub, name, Int8Linear(child.in_features, child.out_features, bias=child.bias is not None))
+    model.to_empty(device="cpu")
+    if params.tie_embeddings:
+        model.lm_head.weight = model.model.embed_tokens.weight
+    model.eval()
+
+    own_params = dict(model.named_parameters())
+    files = sorted(glob.glob(str(model_dir / "*.safetensors")))
+    if not files:
+        raise FileNotFoundError(f"no .safetensors in {model_dir}")
+    with torch.no_grad():
+        for fp in files:
+            with safe_open(fp, framework="pt") as f:  # type: ignore[no-untyped-call]
+                for key in f.keys():  # noqa: SIM118
+                    mod_path, _, leaf = key.rpartition(".")
+                    mod = _module_by_path(model, mod_path) if mod_path else model
+                    if isinstance(mod, Int8Linear) and leaf == "weight":
+                        q, scale = quantize_per_channel_int8(f.get_tensor(key).float())
+                        mod.qweight.copy_(q)
+                        mod.scale.copy_(scale)
+                    elif isinstance(mod, Int8Linear) and leaf == "bias" and mod.bias is not None:
+                        mod.bias.copy_(f.get_tensor(key).float())
+                    elif key in own_params:
+                        own_params[key].copy_(f.get_tensor(key).float())
+
+    tok = AutoTokenizer.from_pretrained(str(model_dir))
+    return model, tok, params
