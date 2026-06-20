@@ -150,7 +150,8 @@ class Qwen2MLP(nn.Module):
         self.down_proj = nn.Linear(p.intermediate_size, p.hidden_size, bias=False)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.down_proj(F.silu(self.gate_proj(x)) * self.up_proj(x))
+        out: torch.Tensor = self.down_proj(F.silu(self.gate_proj(x)) * self.up_proj(x))
+        return out
 
 
 class Qwen2DecoderLayer(nn.Module):
