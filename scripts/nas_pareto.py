@@ -30,7 +30,7 @@ from typing import cast
 
 import torch
 
-from llcore.runtime.evolve_linearize import CatGenome, evolve_multiobjective, pareto_front
+from llcore.runtime.evolve_linearize import CatGenome, dominates, evolve_multiobjective
 from llcore.runtime.linearize import LinearAttention, SlidingWindowAttention
 from llcore.runtime.loader import load_qwen2
 from llcore.runtime.qwen2 import Qwen2Attention
