@@ -180,7 +180,7 @@ def test_right_shift_ci_straddles_zero_is_no_shift() -> None:
         {"p": 50.0}, {"p": 50.0}, n_boot=300, seed=0,
     )
     assert better["ci_lo"] > 0.0
-    assert "shifts out" in str(better["verdict"])
+    assert "shifts the frontier out" in str(better["verdict"])
 
 
 def test_winners_curse_selection_inflates_best_estimate() -> None:
