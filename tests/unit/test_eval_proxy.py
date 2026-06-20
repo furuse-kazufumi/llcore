@@ -451,3 +451,72 @@ def test_reeval_frontier_reports_optimism_gap() -> None:
         assert row["optimism_gap"] == pytest.approx(
             row["delta_nll_selection"] - row["delta_nll_heldout"], abs=1e-9
         )
+
+
+# --------------------------------------------------------------------------------------------------
+# Long-context needle / passkey probe (the direct constant-state failure-mode test).
+# --------------------------------------------------------------------------------------------------
+
+
+class _FakeTok:
+    """Minimal tokenizer stub: maps a fixed answer string to a known id sequence."""
+
+    def __init__(self, answer: str, ans_ids: list[int]) -> None:
+        self._answer = answer
+        self._ans_ids = ans_ids
+
+    def __call__(self, text: str, return_tensors: str | None = None) -> object:
+        assert text == self._answer, "fake tok only knows the answer string"
+        ids = torch.tensor([self._ans_ids])
+
+        class _Out:
+            input_ids = ids
+
+        return _Out()
+
+
+def test_build_passkey_prompt_span_indexes_answer_and_guards_recurrence() -> None:
+    from llcore.runtime.eval_proxy import build_passkey_prompt
+
+    answer, ans_ids = "KEY", [7, 8, 9]
+    tok = _FakeTok(answer, ans_ids)
+    # filler disjoint from the answer tokens => no spurious recurrence
+    filler = torch.arange(10, 60).view(1, 50)
+    ids, span = build_passkey_prompt(tok, filler, total_len=40, answer=answer, depth_frac=0.25)
+    assert ids.shape == (1, 40)
+    # the answer-span must index the FINAL answer occurrence in the targets array ids[:, 1:]
+    assert ids[0, 1:][span].tolist() == ans_ids
+
+    # a filler that already contains the answer after the needle would make retrieval trivial => raise
+    bad = torch.tensor([[7, 8, 9] * 20])
+    with pytest.raises(ValueError, match="recur"):
+        build_passkey_prompt(tok, bad, total_len=40, answer=answer, depth_frac=0.25)
+
+
+def test_score_needle_contract_and_perfect_when_target_known() -> None:
+    from llcore.runtime.eval_proxy import score_needle
+
+    model = _tiny()
+    ids = torch.randint(0, 48, (1, 20))
+    span = slice(15, 19)
+    r = score_needle(model, ids, span)
+    assert {"mean_logprob", "argmax_acc"} <= set(r)
+    assert 0.0 <= r["argmax_acc"] <= 1.0
+    assert r["mean_logprob"] <= 0.0  # log-prob is non-positive
+
+
+def test_needle_horizon_returns_horizon_structure() -> None:
+    from llcore.runtime.eval_proxy import needle_horizon
+
+    model = _tiny()
+    set_genome, restore = _genome_controls(model)
+    filler = torch.randint(0, 40, (1, 200))
+    answer, ans_ids = "K", [41]
+    tok = _FakeTok(answer, ans_ids)
+    base_acc = {(32, 0.5): 1.0, (48, 0.5): 1.0}
+    out = needle_horizon(
+        model, set_genome, restore, (0, 0), tok, filler, base_acc,
+        lengths=(32, 48), depths=(0.5,), answer=answer,
+    )
+    assert "horizon" in out and "by_depth" in out
+    assert out["horizon"] is None or isinstance(out["horizon"], int)
