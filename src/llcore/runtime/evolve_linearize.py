@@ -16,9 +16,14 @@ from __future__ import annotations
 
 import random
 from collections.abc import Callable
+from typing import TypeVar
 
 Genome = tuple[bool, ...]
+CatGenome = tuple[int, ...]
 FitnessFn = Callable[[Genome], float]
+CatFitnessFn = Callable[[CatGenome], float]
+
+_G = TypeVar("_G", bound=tuple[object, ...])
 
 
 def mutate(genome: Genome, rate: float, rng: random.Random) -> Genome:
@@ -26,12 +31,17 @@ def mutate(genome: Genome, rate: float, rng: random.Random) -> Genome:
     return tuple((not b) if rng.random() < rate else b for b in genome)
 
 
-def crossover(a: Genome, b: Genome, rng: random.Random) -> Genome:
+def mutate_categorical(genome: CatGenome, n_options: int, rate: float, rng: random.Random) -> CatGenome:
+    """Independently re-roll each gene to a uniform option in ``[0, n_options)`` with prob ``rate``."""
+    return tuple(rng.randrange(n_options) if rng.random() < rate else g for g in genome)
+
+
+def crossover(a: _G, b: _G, rng: random.Random) -> _G:
     """Uniform crossover: each gene comes from parent ``a`` or ``b`` with equal probability."""
-    return tuple(a[i] if rng.random() < 0.5 else b[i] for i in range(len(a)))
+    return tuple(a[i] if rng.random() < 0.5 else b[i] for i in range(len(a)))  # type: ignore[return-value]
 
 
-def _tournament(pop: list[Genome], fits: list[float], k: int, rng: random.Random) -> Genome:
+def _tournament(pop: list[_G], fits: list[float], k: int, rng: random.Random) -> _G:
     idxs = [rng.randrange(len(pop)) for _ in range(k)]
     return pop[max(idxs, key=lambda i: fits[i])]
 
