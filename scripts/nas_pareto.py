@@ -93,6 +93,26 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--distill-tokens", type=int, default=256,
                     help="held-out calibration tokens for distillation (window AFTER the eval window)")
     ap.add_argument("--out", default="out/nas_pareto")
+    # --- proxy-v2 (all default OFF => v1 JSON byte-identical) ---
+    ap.add_argument("--proxy-v2", action="store_true",
+                    help="use the statistically honest proxy: paired multi-window bootstrap-CI inner "
+                         "loop + frontier-only holdout re-eval (winner's-curse removed), context sweep, "
+                         "needle probe, attention-KL diagnostic. Adds report['proxy_v2'].")
+    ap.add_argument("--inner-context", type=int, default=1024,
+                    help="proxy-v2 inner-loop context length (right of the 227-tok crossover and the "
+                         "degradation onset)")
+    ap.add_argument("--fast-windows", type=int, default=8, help="proxy-v2 inner-loop paired windows (K)")
+    ap.add_argument("--holdout-windows", type=int, default=12,
+                    help="proxy-v2 holdout/context-sweep windows; <12 downgrades CIs to unreliable")
+    ap.add_argument("--holdout-offset", type=int, default=None,
+                    help="token offset for the fresh holdout pool (default: just after the fast pool)")
+    ap.add_argument("--context-sweep", default="256,512,1024,2048",
+                    help="proxy-v2 context lengths swept on the most aggressive frontier genome")
+    ap.add_argument("--cross-corpus", default=None,
+                    help="proxy-v2 cross-corpus generalization holdout (a DISJOINT corpus file)")
+    ap.add_argument("--needle", action="store_true",
+                    help="proxy-v2 long-context passkey/needle retrieval probe (slow; frontier only)")
+    ap.add_argument("--needle-lengths", default="2048,4096", help="proxy-v2 needle context lengths")
     args = ap.parse_args(argv)
 
     out = Path(args.out)
