@@ -311,7 +311,7 @@ def main(argv: list[str] | None = None) -> int:
         )
 
     te = time.perf_counter()
-    zs_greedy, zs_evolved, zs_hist = build_frontier(False)
+    zs_greedy, zs_evolved, zs_hist, zs_front_g, zs_greedy_g = build_frontier(False)
     zs_g_hv, zs_e_hv, zs_verdict = greedy_vs_memetic(zs_greedy, zs_evolved)
     zs_greedy_fmt = fmt(zs_greedy)
     zs_evolved_fmt = fmt(zs_evolved)
