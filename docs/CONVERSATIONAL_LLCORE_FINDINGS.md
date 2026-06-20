@@ -54,18 +54,34 @@ Held-out Japanese (aozora), 512 eval tokens, baseline softmax **ppl 68.74**.
 - **Layer 0 is by far the least tolerant**: linearizing it alone → ppl 160.76 (Δnll +0.85).
   Layers 11 (+0.62), 9 (+0.32), 3 (+0.24), 1 (+0.19) also resist — interpretable as early/“retrieval”
   layers that softmax is doing real work in.
-- **Most middle/late layers are nearly free**: layer 22 (Δ+0.0007 ≈ free), 7 (+0.006), 15 (+0.02),
-  13/19/18/12/6 all < +0.04.
-- **Cumulative (greedy by single-layer Δ):** top-4 tolerant layers → ppl 73.7 (+7%, ~free);
+- **Most middle/late layers have near-zero perplexity cost**: layer 22 (Δ+0.0007 — no measurable
+  quality loss), 7 (+0.006), 15 (+0.02), 13/19/18/12/6 all < +0.04.
+- **Cumulative (greedy by single-layer Δ):** top-4 tolerant layers → ppl 73.7 (+7% ppl);
   6 → 81.6; 8 → 93.8; 12 → 167 (breaks); all 24 → 17612 (catastrophic without recovery — expected).
 - **Memory:** linear state = 232,960 B/layer (constant) vs softmax KV @8192 tok = 8,388,608 B/layer
-  (36× and growing). **Crossover ≈ 227 tokens** — beyond a short context a linearized layer is
-  strictly cheaper and never OOMs as the chat grows.
+  (36× and growing). **Crossover ≈ 227 tokens** — only beyond that does a linearized layer use less
+  memory than softmax KV; below it the constant state is actually larger. The point is it never grows,
+  so a long chat never OOMs.
 
-**Honest result:** ~4–6 of Qwen2.5-0.5B's 24 layers can be converted to constant-memory attention
-**nearly for free, zero-shot**; layer 0 and a couple of retrieval layers resist. Prior art exists
-(linear attention: Katharopoulos 2020; linearizing pretrained LLMs: SUPRA, LoLCATs, Mamba-in-Llama).
-The contribution = on-prem internal surgery + rigorous per-layer measurement in llcore's own code.
+### What "tolerant / near-zero cost" precisely means (no, it is NOT "free")
+
+"Tolerant" refers to **one axis only — perplexity (quality)**. Converting a layer is a *trade*, not a
+free lunch:
+- **Gain = memory**: O(T) KV → O(d²) constant state — but a *net* memory win only for context
+  > ~227 tokens (below that the constant state is bigger).
+- **Cost = quality**: Δnll is small but **nonzero**; measured zero-shot, at 512 tokens, on one Japanese
+  corpus — not a general guarantee, and the smallest per-layer Δs are near measurement noise.
+- **Cost = compute**: linear attention's chunked outer product is **heavier per token at short
+  context**; the speed win only appears at long T. A short chat can be *slower*.
+
+So the honest claim is: *a handful of layers can be converted to constant-memory attention at
+near-zero perplexity cost, with the memory win realized only at long context and a short-context
+compute penalty* — **not** "free".
+
+**Honest result:** ~4–6 of Qwen2.5-0.5B's 24 layers tolerate zero-shot linearization at near-zero
+perplexity cost; layer 0 and a couple of retrieval layers resist. Prior art exists (linear attention:
+Katharopoulos 2020; linearizing pretrained LLMs: SUPRA, LoLCATs, Mamba-in-Llama). The contribution =
+on-prem internal surgery + rigorous per-layer measurement in llcore's own code.
 
 ## 3. Supporting result: constant-state recurrent long-context (the memory substrate)
 
