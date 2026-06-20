@@ -135,9 +135,9 @@ def linearize_qwen2(
     """
     layers = model.model.layers
     for i in layer_indices:
-        attn = layers[i].self_attn  # type: ignore[index,union-attr]
+        attn = layers[i].self_attn
         if isinstance(attn, Qwen2Attention):
-            layers[i].self_attn = LinearAttention.from_attention(  # type: ignore[index,union-attr]
+            layers[i].self_attn = LinearAttention.from_attention(
                 attn, model.params, chunk_size=chunk_size
             )
     return model
