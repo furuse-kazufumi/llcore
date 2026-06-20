@@ -737,11 +737,11 @@ def genome_attn_kl(
             handle.remove()
         x_norm = captured["x"]
         student = block.self_attn
-        a_sm = softmax_teacher_attention(student, x_norm, cos, sin)
+        a_sm = softmax_teacher_attention(cast(_AttnProj, student), x_norm, cos, sin)
         if isinstance(student, LinearAttention):
             a_st = implied_linear_attention(student, x_norm, cos, sin)
         elif isinstance(student, SlidingWindowAttention):
-            a_st = _masked_softmax_attention(student, x_norm, cos, sin, student.window)  # type: ignore[arg-type]
+            a_st = _masked_softmax_attention(student, x_norm, cos, sin, student.window)
         else:
             continue
         per_layer[i] = float(attn_kl_softmax_linear(a_sm, a_st).item())
