@@ -165,15 +165,48 @@ def main(argv: list[str] | None = None) -> int:
     print(f"[base] all-softmax nll={base:.4f} ppl={torch.tensor(base).exp():.2f}", flush=True)
 
     cache: dict[tuple[CatGenome, bool], tuple[float, float]] = {}
+    # proxy-v2 side cache: the per-window Δnll VECTOR behind each genome's scalar (reused by the
+    # rigorous tier so the holdout re-eval and hypervolume-gain CI need no extra inner-loop forwards).
+    fast_delta_cache: dict[tuple[CatGenome, bool], np.ndarray] = {}
+
+    ids_all = tok(text, return_tensors="pt").input_ids
+    fast_windows: list[torch.Tensor] = []
+    fast_base: list[torch.Tensor] = []
+    if args.proxy_v2:
+        fast_windows = make_windows(ids_all, args.inner_context, args.fast_windows, offset=0)
+        if not fast_windows:
+            raise SystemExit(
+                f"corpus too short for {args.fast_windows} non-overlapping windows of "
+                f"{args.inner_context} tokens ({int(ids_all.size(1))} tokens available)"
+            )
+        fast_base = base_window_losses(model, restore, fast_windows)
+        print(
+            f"[proxy-v2] fast inner-loop pool: {len(fast_windows)} paired windows x "
+            f"{args.inner_context} tok (mean Δnll selects; bootstrap CI rides along)",
+            flush=True,
+        )
 
     def measure(genome: CatGenome, use_distill: bool = False) -> tuple[float, float]:
-        """Return ``(pct_mem_saved, delta_nll)`` for a genome (memoized per (genome, mode))."""
+        """Return ``(pct_mem_saved, delta_nll)`` for a genome (memoized per (genome, mode)).
+
+        With ``--proxy-v2`` the quality scalar is the mean of a PAIRED multi-window Δnll at
+        ``inner_context`` (the per-window vector is stashed for the rigorous tier); the scalar contract
+        is unchanged so the GA / greedy / Pareto machinery is untouched. Without it, the v1 single
+        256-tok Δnll is used verbatim (byte-identical output).
+        """
         key = (genome, use_distill)
         if key in cache:
             return cache[key]
-        set_genome(genome, use_distill)
-        dn = nll(ids) - base
-        restore()
+        if args.proxy_v2:
+            dv = paired_window_deltas(
+                model, set_genome, restore, genome, fast_windows, fast_base, use_distill
+            )
+            fast_delta_cache[key] = dv
+            dn = float(dv.mean())
+        else:
+            set_genome(genome, use_distill)
+            dn = nll(ids) - base
+            restore()
         mem = sum(mem_opt[o] for o in genome)
         pct = 100.0 * (mem_all_softmax - mem) / mem_all_softmax
         cache[key] = (pct, dn)
