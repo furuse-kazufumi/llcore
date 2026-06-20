@@ -83,6 +83,7 @@ class LinearAttention(nn.Module):
         params: Qwen2Params,
         chunk_size: int = 64,
         eps: float = 1e-6,
+        learnable: bool = False,
     ) -> None:
         super().__init__()
         self.q_proj = q_proj
@@ -92,11 +93,26 @@ class LinearAttention(nn.Module):
         self.p = params
         self.chunk_size = chunk_size
         self.eps = eps
+        self.learnable = learnable
+        if learnable:
+            # per-head affine on q/k BEFORE the feature map φ; identity at init so a freshly
+            # learnable linear attention == the fixed one until distillation moves it (LoLCATs-style
+            # learnable feature map, with the pretrained projections frozen).
+            self.q_scale = nn.Parameter(torch.ones(params.n_head, params.head_dim))
+            self.q_bias = nn.Parameter(torch.zeros(params.n_head, params.head_dim))
+            self.k_scale = nn.Parameter(torch.ones(params.n_head, params.head_dim))
+            self.k_bias = nn.Parameter(torch.zeros(params.n_head, params.head_dim))
 
     @classmethod
     def from_attention(cls, src: Qwen2Attention, params: Qwen2Params, **kw: object) -> LinearAttention:
         """Build a linear attention that REUSES a pretrained Qwen2Attention's projections."""
         return cls(src.q_proj, src.k_proj, src.v_proj, src.o_proj, params, **kw)  # type: ignore[arg-type]
+
+    def feature_parameters(self) -> list[nn.Parameter]:
+        """The trainable feature-map parameters (empty unless ``learnable``)."""
+        if not self.learnable:
+            return []
+        return [self.q_scale, self.q_bias, self.k_scale, self.k_bias]
 
     def state_bytes(self) -> int:
         """Bytes of the per-head running state (S + z), float32 — constant in sequence length."""
