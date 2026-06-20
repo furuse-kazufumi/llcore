@@ -290,7 +290,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  saved {d['pct_mem_saved']:5.1f}%  delta_nll {d['delta_nll']:+.4f}")
         assert rshift is not None
         print(f"[right-shift] {rshift['verdict']}")
-    print(f"[done] wrote {out}/nas_pareto.json ({len(cache)} real evals, {report['elapsed_s']:.0f}s)", flush=True)
+    print(f"[done] wrote {out}/nas_pareto.json ({len(cache)} real evals, {elapsed:.0f}s)", flush=True)
     return 0
 
 
