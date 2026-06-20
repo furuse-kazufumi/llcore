@@ -141,7 +141,6 @@ def main(argv: list[str] | None = None) -> int:
         "memory": mem,
     }
     (out / "linearize_tolerance.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
-    best = per_layer[order[0] if False else 0]  # noqa: F841
     most_tol = min(per_layer, key=lambda d: d["delta_nll"])
     least_tol = max(per_layer, key=lambda d: d["delta_nll"])
     print(
