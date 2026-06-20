@@ -45,6 +45,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--pop", type=int, default=16)
     ap.add_argument("--generations", type=int, default=14)
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--seed-greedy", action="store_true", help="inject the greedy solution into the initial population (memetic)")
     ap.add_argument("--out", default="out/nas_level2")
     args = ap.parse_args(argv)
 
