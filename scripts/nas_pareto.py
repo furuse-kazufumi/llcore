@@ -68,6 +68,178 @@ from llcore.runtime.qwen2 import Qwen2Attention, Qwen2LM
 
 MIXERS = ("softmax", "sliding", "linear")
 
+SetGenome = Callable[[CatGenome, bool], None]
+
+
+def _proxy_v2_rigorous(
+    model: Qwen2LM,
+    tok: object,
+    set_genome: SetGenome,
+    restore: Callable[[], None],
+    ids_all: torch.Tensor,
+    args: argparse.Namespace,
+    mem_opt: tuple[int, int, int],
+    mem_all_softmax: int,
+    fast_delta_cache: dict[tuple[CatGenome, bool], np.ndarray],
+    zs_front: list[CatGenome],
+    zs_greedy: list[CatGenome],
+    ds_front: list[CatGenome] | None,
+) -> dict[str, object]:
+    """The proxy-v2 rigorous tier: runs ONCE on the handful of frontier genomes (never in the search).
+
+    Re-evaluates greedy + memetic frontiers on a FRESH disjoint holdout pool (removes winner's curse),
+    puts a paired-bootstrap CI on the memetic-vs-greedy hypervolume gain, sweeps the context length on
+    the most aggressive genome (regime dependence), runs the attention-KL diagnostic, and optionally a
+    cross-corpus holdout + a long-context needle probe. :func:`honest_verdict` turns every guard into
+    one disclosed verdict. The headline uses HOLDOUT numbers only.
+    """
+
+    def pct_of(g: CatGenome) -> float:
+        return 100.0 * (mem_all_softmax - sum(mem_opt[o] for o in g)) / mem_all_softmax
+
+    def _pw(row: dict[str, object]) -> np.ndarray:
+        return cast(np.ndarray, row["per_window_holdout"])
+
+    def _g(row: dict[str, object]) -> CatGenome:
+        return cast(CatGenome, row["genome"])
+
+    n_tok = int(ids_all.size(1))
+    used = args.fast_windows * args.inner_context
+    hoff = args.holdout_offset if args.holdout_offset is not None else used
+    holdout = make_windows(ids_all, args.inner_context, args.holdout_windows, offset=hoff)
+    if not holdout:  # corpus exhausted after the fast pool — wrap with half-stride rather than fail
+        holdout = make_windows(
+            ids_all, args.inner_context, args.holdout_windows,
+            offset=min(hoff, max(0, n_tok - args.inner_context)), stride=max(1, args.inner_context // 2),
+        )
+    hbase = base_window_losses(model, restore, holdout)
+    k_hold = len(holdout)
+
+    mem_genomes = [g for g in dict.fromkeys(zs_front) if (g, False) in fast_delta_cache]
+    greedy_genomes = [g for g in dict.fromkeys(zs_greedy) if (g, False) in fast_delta_cache]
+    search_m = {g: fast_delta_cache[(g, False)] for g in mem_genomes}
+    search_g = {g: fast_delta_cache[(g, False)] for g in greedy_genomes}
+    rows_m = reeval_frontier(model, set_genome, restore, mem_genomes, pct_of, search_m, holdout, hbase)
+    rows_g = reeval_frontier(model, set_genome, restore, greedy_genomes, pct_of, search_g, holdout, hbase)
+
+    pw: dict[CatGenome, np.ndarray] = {}
+    pct: dict[CatGenome, float] = {}
+    for row in rows_m + rows_g:
+        pw[_g(row)] = _pw(row)
+        pct[_g(row)] = float(cast(float, row["pct"]))
+    hv_gain = bootstrap_hv_gain(
+        {repr(k): v for k, v in pw.items()},
+        {repr(k): v for k, v in pct.items()},
+        greedy_ids=[repr(_g(r)) for r in rows_g],
+        memetic_ids=[repr(_g(r)) for r in rows_m],
+    )
+
+    tau: float | None = None
+    if len(rows_m) >= 3:
+        tau = kendall_tau(
+            np.array([float(cast(float, r["delta_nll_selection"])) for r in rows_m]),
+            np.array([float(cast(float, r["delta_nll_heldout"])) for r in rows_m]),
+        )
+
+    sweep_lengths = tuple(int(x) for x in str(args.context_sweep).split(",") if x.strip())
+    agg = max(mem_genomes, key=pct_of) if mem_genomes else None
+    sweep: dict[int, dict[str, float]] = {}
+    attn_kl: dict[str, object] | None = None
+    if agg is not None:
+        sweep = context_sweep(
+            model, set_genome, restore, agg, ids_all,
+            lengths=sweep_lengths, K=args.holdout_windows, offset=hoff,
+        )
+        attn_kl = genome_attn_kl(
+            model, set_genome, restore, agg, ids_all[:, hoff : hoff + 256], t_kl=256
+        )
+
+    rshift_ci: dict[str, object] | None = None
+    if ds_front is not None:
+        ds_genomes = [g for g in dict.fromkeys(ds_front) if (g, True) in fast_delta_cache]
+        ds_search = {g: fast_delta_cache[(g, True)] for g in ds_genomes}
+        ds_rows = reeval_frontier(
+            model, set_genome, restore, ds_genomes, pct_of, ds_search, holdout, hbase, use_distill=True
+        )
+        if rows_m and ds_rows:
+            rshift_ci = right_shift_ci(
+                {repr(_g(r)): _pw(r) for r in rows_m},
+                {repr(_g(r)): _pw(r) for r in ds_rows},
+                {repr(_g(r)): float(cast(float, r["pct"])) for r in rows_m},
+                {repr(_g(r)): float(cast(float, r["pct"])) for r in ds_rows},
+            )
+
+    cross: dict[str, object] | None = None
+    if args.cross_corpus:
+        ctext = Path(args.cross_corpus).read_text(encoding="utf-8")[50000:]
+        cids = cast(object, tok)(ctext, return_tensors="pt").input_ids  # type: ignore[operator]
+        cwin = make_windows(cids, args.inner_context, args.holdout_windows, offset=0)
+        if cwin:
+            cbase = base_window_losses(model, restore, cwin)
+            crows_m = reeval_frontier(model, set_genome, restore, mem_genomes, pct_of, search_m, cwin, cbase)
+            crows_g = reeval_frontier(model, set_genome, restore, greedy_genomes, pct_of, search_g, cwin, cbase)
+            cgain = bootstrap_hv_gain(
+                {repr(_g(r)): _pw(r) for r in crows_m + crows_g},
+                {repr(_g(r)): float(cast(float, r["pct"])) for r in crows_m + crows_g},
+                greedy_ids=[repr(_g(r)) for r in crows_g],
+                memetic_ids=[repr(_g(r)) for r in crows_m],
+            )
+            cross = {
+                "corpus": args.cross_corpus,
+                "n_windows": float(len(cwin)),
+                "hv_gain_ci": cgain,
+                "frontier_holdout": [
+                    {k: v for k, v in r.items() if k != "per_window_holdout"} for r in crows_m
+                ],
+            }
+
+    needle: dict[str, object] | None = None
+    if args.needle and agg is not None:
+        nlens = tuple(int(x) for x in str(args.needle_lengths).split(",") if x.strip())
+        filler = ids_all[:, hoff : hoff + max(nlens) + 64]
+        depths = (0.0, 0.5, 0.9)
+        base_acc: dict[tuple[int, float], float] = {}
+        all_softmax = tuple(0 for _ in agg)
+        set_genome(all_softmax, False)
+        for length in nlens:
+            for depth in depths:
+                try:
+                    pid, span = build_passkey_prompt(tok, filler, length, depth_frac=depth)
+                except ValueError:
+                    continue
+                base_acc[(length, depth)] = score_needle(model, pid, span)["argmax_acc"]
+        restore()
+        needle = needle_horizon(
+            model, set_genome, restore, agg, tok, filler, base_acc,
+            lengths=nlens, depths=depths,
+        )
+
+    halfwidths = [
+        abs(float(cast(float, r["ci_hi"])) - float(cast(float, r["ci_lo"]))) / 2.0 for r in rows_m
+    ]
+    floor = float(np.median(halfwidths)) if halfwidths else 0.0
+    verdict = honest_verdict(hv_gain, rows_m, tau, floor)
+    if k_hold < 12:
+        verdict = {**verdict, "ci_reliability": f"point estimate, CI unreliable (K={k_hold}<12)"}
+
+    report = build_proxy_v2_report(
+        inner_context=args.inner_context,
+        context_sweep=sweep,
+        frontier_holdout=rows_m,
+        hv_gain_ci=hv_gain,
+        right_shift_ci=rshift_ci,
+        needle=needle,
+        attention_kl=attn_kl,
+        proxy_vs_judge_tau=tau,
+        cross_corpus=cross,
+    )
+    report["holdout_offset"] = hoff
+    report["holdout_windows"] = float(k_hold)
+    report["fast_windows"] = float(args.fast_windows)
+    report["aggressive_genome_pct"] = pct_of(agg) if agg is not None else 0.0
+    report["verdict"] = verdict
+    return report
+
 
 def main(argv: list[str] | None = None) -> int:
     try:
