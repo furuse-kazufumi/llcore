@@ -91,8 +91,8 @@ def load_qwen2_int8(model_dir: str | Path) -> tuple[Qwen2LM, Any, Qwen2Params]:
     with torch.device("meta"):
         model = Qwen2LM(params)
     for blk in model.model.layers:
-        for sub in (blk.self_attn, blk.mlp):  # type: ignore[union-attr]
-            for name, child in list(sub.named_children()):
+        for sub in (blk.self_attn, blk.mlp):
+            for name, child in list(sub.named_children()):  # type: ignore[union-attr]
                 if isinstance(child, nn.Linear):
                     setattr(sub, name, Int8Linear(child.in_features, child.out_features, bias=child.bias is not None))
     model.to_empty(device="cpu")
