@@ -248,9 +248,13 @@ def main(argv: list[str] | None = None) -> int:
         # single-layer linear tolerance order (mode-specific: distilled layers reorder)
         single: list[float] = []
         for i in range(n_layer):
-            set_genome(tuple(2 if j == i else 0 for j in range(n_layer)), use_distill)
-            single.append(nll(ids) - base)
-            restore()
+            g_single = tuple(2 if j == i else 0 for j in range(n_layer))
+            if args.proxy_v2:
+                single.append(measure(g_single, use_distill)[1])  # fast-pool signal, cached
+            else:
+                set_genome(g_single, use_distill)
+                single.append(nll(ids) - base)  # v1 path unchanged (byte-identical output)
+                restore()
         order = sorted(range(n_layer), key=lambda i: single[i])
 
         def greedy_at(budget: float) -> CatGenome:
