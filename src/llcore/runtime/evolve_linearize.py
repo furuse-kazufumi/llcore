@@ -126,3 +126,170 @@ def evolve_categorical(
             best_f, best_g = fits[gi], pop[gi]
         history.append(best_f)
     return {"best_genome": best_g, "best_fitness": best_f, "history": history}
+
+
+# --- multi-objective Pareto search (the memory↔quality frontier, not a single budget) ---
+
+Objectives = tuple[float, ...]
+MOFitnessFn = Callable[[CatGenome], Objectives]
+
+
+def dominates(a: Objectives, b: Objectives) -> bool:
+    """Pareto domination for **maximization**: ``a`` dominates ``b`` iff ``a`` is >=
+    ``b`` on every objective and strictly > on at least one."""
+    return all(x >= y for x, y in zip(a, b)) and any(x > y for x, y in zip(a, b))
+
+
+def pareto_front(items: list[tuple[_G, Objectives]]) -> list[tuple[_G, Objectives]]:
+    """Return the non-dominated subset of ``(genome, objectives)`` pairs (the frontier)."""
+    objs = [o for _, o in items]
+    return [
+        (g, oi)
+        for i, (g, oi) in enumerate(items)
+        if not any(dominates(objs[j], oi) for j in range(len(objs)) if j != i)
+    ]
+
+
+def non_dominated_sort(objs: list[Objectives]) -> list[list[int]]:
+    """Fast non-dominated sort (Deb et al. NSGA-II). Returns fronts as index lists,
+    best (rank 0) first. Empty trailing fronts are dropped."""
+    n = len(objs)
+    dominated: list[list[int]] = [[] for _ in range(n)]  # indices that p dominates
+    dom_count = [0] * n  # how many solutions dominate p
+    fronts: list[list[int]] = [[]]
+    for p in range(n):
+        for q in range(n):
+            if p == q:
+                continue
+            if dominates(objs[p], objs[q]):
+                dominated[p].append(q)
+            elif dominates(objs[q], objs[p]):
+                dom_count[p] += 1
+        if dom_count[p] == 0:
+            fronts[0].append(p)
+    i = 0
+    while i < len(fronts) and fronts[i]:
+        nxt: list[int] = []
+        for p in fronts[i]:
+            for q in dominated[p]:
+                dom_count[q] -= 1
+                if dom_count[q] == 0:
+                    nxt.append(q)
+        fronts.append(nxt)
+        i += 1
+    return [f for f in fronts if f]
+
+
+def crowding_distance(objs: list[Objectives], front: list[int]) -> dict[int, float]:
+    """NSGA-II crowding distance for one front; boundary points get ``inf`` so the
+    extremes of the frontier are always preserved."""
+    dist: dict[int, float] = {i: 0.0 for i in front}
+    if not front:
+        return dist
+    m = len(objs[front[0]])
+    for k in range(m):
+        order = sorted(front, key=lambda i: objs[i][k])
+        dist[order[0]] = float("inf")
+        dist[order[-1]] = float("inf")
+        span = objs[order[-1]][k] - objs[order[0]][k]
+        if span <= 0:
+            continue
+        for r in range(1, len(order) - 1):
+            if dist[order[r]] != float("inf"):
+                dist[order[r]] += (objs[order[r + 1]][k] - objs[order[r - 1]][k]) / span
+    return dist
+
+
+def evolve_multiobjective(
+    fitness_fn: MOFitnessFn,
+    n_genes: int,
+    n_options: int,
+    *,
+    pop_size: int = 24,
+    generations: int = 20,
+    mutation_rate: float = 0.1,
+    tournament_k: int = 2,
+    seed: int = 0,
+    seed_genomes: list[CatGenome] | None = None,
+) -> dict[str, object]:
+    """NSGA-II over per-gene categorical assignments, maximizing a **vector** of
+    objectives (e.g. ``(% memory saved, -Delta nll)``) to trace the whole tradeoff
+    frontier rather than one budget point.
+
+    Returns ``{front, history, evaluations}`` where ``front`` is the final Pareto
+    front as ``(genome, objectives)`` pairs (deduped by genome) and ``history[g]``
+    is the front size after generation ``g``. ``fitness_fn`` is memoized, so an
+    expensive real-model evaluation runs at most once per distinct genome.
+
+    Memetic: ``seed_genomes`` injects known solutions (e.g. budget-greedy points
+    across a sweep) so the GA refines a good frontier instead of rediscovering it
+    — the same rationale as :func:`evolve_categorical`, applied to the full curve.
+    """
+    rng = random.Random(seed)
+    cache: dict[CatGenome, Objectives] = {}
+
+    def ev(g: CatGenome) -> Objectives:
+        o = cache.get(g)
+        if o is None:
+            o = tuple(fitness_fn(g))
+            cache[g] = o
+        return o
+
+    pop: list[CatGenome] = list(seed_genomes or [])[:pop_size]
+    while len(pop) < pop_size:
+        pop.append(tuple(rng.randrange(n_options) for _ in range(n_genes)))
+
+    def rank_and_crowd(genomes: list[CatGenome]) -> tuple[dict[int, int], dict[int, float]]:
+        objs = [ev(g) for g in genomes]
+        ranks: dict[int, int] = {}
+        crowd: dict[int, float] = {}
+        for r, f in enumerate(non_dominated_sort(objs)):
+            cd = crowding_distance(objs, f)
+            for i in f:
+                ranks[i] = r
+                crowd[i] = cd[i]
+        return ranks, crowd
+
+    def make_offspring(parents: list[CatGenome], ranks: dict[int, int], crowd: dict[int, float]) -> list[CatGenome]:
+        def pick() -> CatGenome:
+            best = rng.randrange(len(parents))
+            for _ in range(tournament_k - 1):
+                i = rng.randrange(len(parents))
+                if ranks[i] < ranks[best] or (ranks[i] == ranks[best] and crowd[i] > crowd[best]):
+                    best = i
+            return parents[best]
+
+        kids: list[CatGenome] = []
+        while len(kids) < pop_size:
+            kids.append(mutate_categorical(crossover(pick(), pick(), rng), n_options, mutation_rate, rng))
+        return kids
+
+    history: list[int] = []
+    ranks, crowd = rank_and_crowd(pop)
+    for _ in range(generations):
+        combined = pop + make_offspring(pop, ranks, crowd)
+        cobjs = [ev(g) for g in combined]
+        new_pop: list[CatGenome] = []
+        new_ranks: dict[int, int] = {}
+        new_crowd: dict[int, float] = {}
+        for r, f in enumerate(non_dominated_sort(cobjs)):
+            cd = crowding_distance(cobjs, f)
+            chosen = f if len(new_pop) + len(f) <= pop_size else sorted(
+                f, key=lambda i: cd[i], reverse=True)[: pop_size - len(new_pop)]
+            for i in chosen:
+                new_ranks[len(new_pop)] = r
+                new_crowd[len(new_pop)] = cd[i]
+                new_pop.append(combined[i])
+            if len(new_pop) >= pop_size:
+                break
+        pop, ranks, crowd = new_pop, new_ranks, new_crowd
+        history.append(len(pareto_front(list(zip(pop, [ev(g) for g in pop])))))
+
+    front = pareto_front(list(zip(pop, [ev(g) for g in pop])))
+    seen: set[CatGenome] = set()
+    deduped: list[tuple[CatGenome, Objectives]] = []
+    for g, o in front:
+        if g not in seen:
+            seen.add(g)
+            deduped.append((g, o))
+    return {"front": deduped, "history": history, "evaluations": len(cache)}
