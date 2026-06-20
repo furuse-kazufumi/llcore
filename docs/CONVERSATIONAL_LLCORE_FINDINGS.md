@@ -130,14 +130,44 @@ those layers — consistent with their low zero-shot Δ.
 
 ---
 
+## 5. Goal hit: Qwen2.5-1.5B-Instruct converses in llcore's own code
+
+`src/llcore/runtime/loader.py` — a memory-frugal **streaming loader** fills the native model one
+tensor at a time from the (mmap'd) safetensors, so peak RAM ≈ the model + one tensor (no 1.5×
+fp32-dict spike). Verified bit-exact against the dict loader on 0.5B (max|Δ| logits = 0.0). Actual
+machine RAM is **16.8 GB (≈7.4 GB free)** — the earlier "3.6 GB" assumption was stale.
+
+Loaded **Qwen2.5-1.5B-Instruct** (1.54B params, ~6 GB fp32, 29 s) and held a multi-turn Japanese
+conversation entirely through llcore's native forward (~1–3 tok/s CPU):
+- 「3たす5は？数字だけ」→ **「8」** ✓ (0.5B answered 18 — a real capability jump)
+- 「『明日来てね』を敬語に」→「明日に来てくださいね」 ✓
+- 「日本で一番高い山は？」→「富士山です」 ✓
+- しりとり → weak (1.5B still limited at word games — honest).
+
+**This meets the "まともに会話できる" goal for general Q&A / arithmetic / instruction-following**, in
+llcore's own instrumentable code (the prerequisite for the bounded-memory R&D), not a black box.
+
+int8 honesty: `convert_linears_to_int8` (llcore quant) on the loaded 1.5B keeps it answering
+correctly (「8」, 「富士山」), but **in-process fp32→int8 conversion does NOT lower measured RAM** (the
+freed fp32 buffers stay with the allocator — the known "peak WS unchanged without pressure" finding)
+and is **slower on CPU** (~0.5 tok/s: per-forward dequant, no int8 GEMM). The real int8 RAM win needs
+a **streaming-int8 load** (quantize per tensor from safetensors, never materialize fp32); the real
+int8 *speed* win needs GPU int8 GEMM ("良い HW ほど効く").
+
+---
+
 ## Next
 
-- Joint multi-layer distillation (cumulative), then re-measure how many layers can be linearized
-  under a quality budget; evolve *which* layers with `memory_objective` + cap-gate (the evolutionary
-  substrate applied to the runtime).
-- Scale the substrate to Qwen2.5-1.5B-Instruct for genuinely "まとも" conversation.
-- Build the open-model structural-analysis RAD corpus (`open_model_architectures_corpus_v2`) from the
-  transformers modeling code, to ground which architectures/patterns are most linearization-amenable.
+- **Streaming-int8 load** (quantize per tensor from safetensors) so 1.5B/3B run at int8-resident RAM
+  from the start — the genuine memory-efficiency clincher on a real conversational model.
+- Run the linearization-tolerance profile + per-layer distillation on **1.5B** (the R&D applied to the
+  model that actually converses), then **joint multi-layer distillation** under a quality budget and
+  **evolve which layers** with `memory_objective` + cap-gate (the evolutionary substrate on the runtime).
+- Scale to Qwen2.5-3B-Instruct (int8 ≈3 GB) for higher conversational quality.
+- The open-model structural-analysis RAD corpus (`D:/docs/open_model_architectures_corpus_v2`, 24
+  models + design-space map) grounds which architectures/patterns are most linearization-amenable
+  (e.g. Qwen3's QK-norm bounds q/k just like our learned affine feature map; MLA is an alternative
+  bounded-KV mechanism; SSM/hybrids are the O(1)-state destination).
 
 All artifacts are local, no push. Tests: `test_runtime_qwen2.py`, `test_runtime_linearize.py`,
 `test_lm_checkpoint.py`, `test_longctx_eval.py`, `test_tbptt.py` (all green; full suite non-regression).
