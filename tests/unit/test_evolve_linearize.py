@@ -62,3 +62,30 @@ def test_evolve_history_tracks_improvement() -> None:
     hist = res["history"]
     assert len(hist) == 15
     assert hist[-1] >= hist[0]  # best-so-far is monotonic non-decreasing
+
+
+# --- categorical GA (Level-2 NAS: per-layer mixer choice among >2 options) ---
+
+
+def test_mutate_categorical_valid_and_deterministic() -> None:
+    from llcore.runtime.evolve_linearize import mutate_categorical
+    import random
+
+    g = (0,) * 12
+    m1 = mutate_categorical(g, 3, 0.5, random.Random(1))
+    m2 = mutate_categorical(g, 3, 0.5, random.Random(1))
+    assert m1 == m2
+    assert len(m1) == 12 and all(0 <= x < 3 for x in m1)
+    assert any(x != 0 for x in m1)  # at rate 0.5 some genes changed
+
+
+def test_evolve_categorical_maximizes() -> None:
+    from llcore.runtime.evolve_linearize import evolve_categorical
+
+    # fitness = number of genes set to option 2 -> optimum is all 2s
+    res = evolve_categorical(
+        lambda g: float(sum(1 for x in g if x == 2)),
+        n_genes=10, n_options=3, pop_size=20, generations=25, seed=0,
+    )
+    assert res["best_fitness"] == 10.0
+    assert all(x == 2 for x in res["best_genome"])
