@@ -146,6 +146,75 @@ class LinearAttention(nn.Module):
         return self.o_proj(out), (k, v)
 
 
+class SlidingWindowAttention(nn.Module):
+    """Softmax attention restricted to the last ``window`` keys — bounded O(window) KV cache.
+
+    A NAS mixer between full softmax (O(T) KV, best quality) and linear attention (O(1) state): it
+    keeps softmax (so local quality is preserved) but each query attends only the previous
+    ``window`` keys, capping the KV cache. Reuses the pretrained q/k/v/o projections + RoPE, and is
+    identical to full softmax when ``window`` covers the sequence.
+    """
+
+    def __init__(
+        self,
+        q_proj: nn.Linear,
+        k_proj: nn.Linear,
+        v_proj: nn.Linear,
+        o_proj: nn.Linear,
+        params: Qwen2Params,
+        window: int,
+    ) -> None:
+        super().__init__()
+        self.q_proj = q_proj
+        self.k_proj = k_proj
+        self.v_proj = v_proj
+        self.o_proj = o_proj
+        self.p = params
+        self.window = window
+
+    @classmethod
+    def from_attention(cls, src: Qwen2Attention, params: Qwen2Params, window: int) -> SlidingWindowAttention:
+        return cls(src.q_proj, src.k_proj, src.v_proj, src.o_proj, params, window)
+
+    def kv_bytes(self, context_len: int) -> int:
+        """Resident KV bytes — capped at ``window`` keys regardless of context length."""
+        eff = min(self.window, context_len)
+        return 2 * self.p.n_kv_head * eff * self.p.head_dim * 4
+
+    def forward(
+        self,
+        x: torch.Tensor,
+        cos: torch.Tensor,
+        sin: torch.Tensor,
+        past: tuple[torch.Tensor, torch.Tensor] | None,
+        past_len: int,
+    ) -> tuple[torch.Tensor, tuple[torch.Tensor, torch.Tensor]]:
+        p = self.p
+        b, t, _ = x.shape
+        q = self.q_proj(x).view(b, t, p.n_head, p.head_dim).transpose(1, 2)
+        k = self.k_proj(x).view(b, t, p.n_kv_head, p.head_dim).transpose(1, 2)
+        v = self.v_proj(x).view(b, t, p.n_kv_head, p.head_dim).transpose(1, 2)
+        q, k = _apply_rope(q, k, cos, sin)
+        if past is not None:
+            k = torch.cat((past[0], k), dim=2)
+            v = torch.cat((past[1], v), dim=2)
+        new_cache = (k, v)
+        n_rep = p.n_head // p.n_kv_head
+        kf = _repeat_kv(k, n_rep)
+        vf = _repeat_kv(v, n_rep)
+        scores = torch.matmul(q, kf.transpose(-2, -1)) / (p.head_dim**0.5)
+        tk = kf.size(2)
+        qpos = torch.arange(t) + past_len
+        kpos = torch.arange(tk)
+        causal = kpos[None, :] <= qpos[:, None]
+        within = (qpos[:, None] - kpos[None, :]) < self.window
+        mask = torch.where(causal & within, 0.0, float("-inf"))
+        scores = scores + mask
+        attn = torch.softmax(scores, dim=-1)
+        out = torch.matmul(attn, vf).transpose(1, 2).reshape(b, t, p.n_head * p.head_dim)
+        return self.o_proj(out), new_cache
+
+
 def linearize_qwen2(
     model: Qwen2LM, layer_indices: Sequence[int], chunk_size: int = 64
 ) -> Qwen2LM:
