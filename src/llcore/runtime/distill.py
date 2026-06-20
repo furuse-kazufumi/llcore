@@ -15,6 +15,8 @@ CPU because only the small attention runs in the loop, not the whole model.
 """
 from __future__ import annotations
 
+from collections.abc import Callable
+
 import torch
 from torch.nn import functional as F
 
