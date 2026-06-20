@@ -169,12 +169,32 @@ genuine memory-efficiency clincher on a real model. CPU speed ~0.7 tok/s (per-fo
 int8 *speed* win still needs GPU int8 GEMM; "良い HW ほど効く"). Honest: 1.5B still makes factual
 errors (二番目に高い山→「箱根山」, should be 北岳) — a model-capability limit, not an int8 artifact.
 
+## 6. Evolution × structure: evolving the per-layer linearization mask
+
+The analyzed structure becomes an evolutionary search space, joining the preserved evolutionary
+substrate to the runtime. `src/llcore/runtime/evolve_linearize.py` is a pure, TDD'd GA (mutate /
+uniform crossover / tournament / elitism); `scripts/evolve_linearization.py` runs it on the real
+model with genome = one bit per layer (linearize | keep softmax) and fitness = number of layers
+linearized (memory) − a penalty when held-out Δnll exceeds a budget (quality) — the
+footprint-as-fitness + quality-gate idea of `memory_objective`, applied to a real model's architecture.
+
+**Honest first result (0.5B, budget Δnll ≤ 0.10):** greedy beat the small GA. Greedy linearized
+**6 layers** [7,13,15,19,21,22] (Δnll +0.098, just under budget); the GA (pop 16 × gen 12) found only
+**3 layers** [7,15,22] (Δnll −0.009). The GA under-searched — it converged to a safe small set under
+the hard budget cliff and never found greedy's 6-layer set. This is a legitimate negative: for a
+near-additive per-layer cost under a monotone budget, **greedy-by-tolerance is a strong baseline**,
+and a binary linearization mask is a greedy-friendly objective. Evolution should pay off where the
+problem is harder — strong layer interactions, a multi-objective Pareto frontier, a richer Level-2
+search space (per-layer mixer ∈ {softmax, sliding-window, linear, SSM, RWKV}, seeded by the corpus's
+real hybrids), and distillation-aware (non-uniform) costs. (An improved run with more search budget
+is in progress to confirm the under-search hypothesis vs a fundamental limit.)
+
 ---
 
 ## Next
 
-- **Streaming-int8 load** (quantize per tensor from safetensors) so 1.5B/3B run at int8-resident RAM
-  from the start — the genuine memory-efficiency clincher on a real conversational model.
+- Make evolution earn its place via **Level-2 NAS** (per-layer mixer choice, not binary) + a Pareto
+  frontier + distillation in the loop — the regimes where greedy is not near-optimal.
 - Run the linearization-tolerance profile + per-layer distillation on **1.5B** (the R&D applied to the
   model that actually converses), then **joint multi-layer distillation** under a quality budget and
   **evolve which layers** with `memory_objective` + cap-gate (the evolutionary substrate on the runtime).
