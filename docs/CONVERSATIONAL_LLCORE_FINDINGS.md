@@ -250,6 +250,74 @@ to greedy — the +34.3 % is the value evolution adds *on top of* greedy, not ev
 
 ---
 
+## 9. Distillation-aware frontier: per-layer distillation shifts the frontier out, with honest bounds (step ②(i))
+
+§8's linear mixer was *zero-shot*. Step ②(i) folds **distillation into the NAS**: `distill_all_layers`
+(`src/llcore/runtime/distill.py`) distils each layer's linear attention to match its softmax teacher
+(LoLCATs feature map, §4) on a **held-out calibration window** (tokens [256:768], 400 steps), then
+`scripts/nas_pareto.py --distill` makes the linear option use the *distilled* student instead of the
+zero-shot one. The run builds the zero-shot and distilled frontiers in one pass and compares them by a
+2-D hypervolume **right-shift** over a shared reference (`pareto_metrics.frontier_right_shift`). Eval =
+tokens [0:256], disjoint from calibration. JSON: `out/nas_pareto_distill/nas_pareto.json`.
+
+Result (0.5B, base all-softmax nll 4.4155):
+
+| frontier | points | span (% mem saved) | 2-D hypervolume |
+|---|---:|---|---:|
+| zero-shot memetic (= §8) | 22 | 34.5 – 92.1 % | 56.61 |
+| **distilled memetic** | 12 | 42.0 – 88.2 % | **65.90 → +16.4 %** |
+
+**The right-shift is a genuine frontier improvement, not a metric artifact:** 20 of 22 zero-shot
+frontier points are strictly Pareto-dominated by a distilled point, and **0 of 12** the reverse — the
+distilled front is a true up/out move of the achievable curve. The gain is broad and monotone: at
+matched memory savings the distilled front beats interpolated zero-shot by **+0.046 Δnll at 42 % up to
++0.51 Δnll at 88 %** (2–25× the proxy noise scale). Distillation is measured **end-to-end on the
+composed multi-linear model** (`set_genome` installs all distilled students at once; `measure` runs the
+full forward), so the calibration→runtime input-distribution mismatch is already inside the reported
+numbers and does not inflate them — indeed distillation helps *most* where many layers are linear
+(88.2 %: +0.207 distilled vs +0.729 zero-shot). Memory is mixer-only and mode-identical, so the shift
+is a pure quality-axis move. Within the distilled run, memetic still beats greedy (+20.6 % HV).
+
+### Honest bounds (this run does NOT establish more than these)
+
+1. **"Held-out" = same corpus, not generalization.** Calibration [256:768] and eval [0:256] are
+   disjoint but adjacent windows of the *same* classical-Japanese (aozora) slice. The +16.4 % is
+   **in-distribution recovery**, not generalization to conversational or cross-domain text — the
+   conversational north-star is explicitly *not* evidenced here.
+2. **Single 256-token window, no error bar.** Every Δnll, and +16.4 %, comes from one ~255-prediction
+   window at seed 0 — no cross-window/seed averaging. Sub-0.05 effects are within proxy noise; in
+   particular the cheap-end "beats all-softmax" points (distilled −0.0205, zero-shot −0.0071) are
+   **noise**, not a capability gain. A multi-window bootstrap with CIs is required before any magnitude
+   or "beats softmax" claim. *(This is the motivation for the proxy-v2 work.)*
+3. **The 16.4 % number is reference-dependent; only the sign is robust.** The shared floor is auto-set
+   to the deepest Δnll over both fronts (0.768, a zero-shot-only point); shallower references give
+   +10.8 % … +39.2 % (e.g. +34 % at floor 0.30, +35 % restricted to the overlapping 42–88 % band). So
+   +16.4 % is the **most conservative** framing — report the direction, not a tight effect size.
+4. **Distilled frontier is narrower (42–88 % vs 34.5–92 %).** It concedes the highest-memory corner.
+   The structural cause: the cheapest mixer is **sliding-window (0.0625× softmax), which is never
+   distilled** (only `LinearAttention` has a feature map). The zero-shot right edge (92.1 %) is
+   8 linear + 16 sliding; the distilled right edge (88.2 %) is 8 linear + 15 sliding + 1 softmax — i.e.
+   correct Pareto exclusion of the last resistant layer plus a non-distillable mixer, not a distillation
+   failure. So "shifts the frontier out" holds **regionally** (the moderate-savings band), not uniformly.
+5. **"Identical bytes" is literally false (but harmless to the constant-state argument).** A distilled
+   linear layer carries 4 affine feature-map tensors [n_head, head_dim] = **3,584 params/layer
+   (256/head, ≈14.3 KB fp32)** — *not* "~4 params/head" — that `state_bytes()`/`mem_linear` omit. This is
+   6.2 % of the per-layer linear state, 0.68 % of one layer's softmax KV@2048, and **O(1) in sequence
+   length** (fixed weights, never part of the growing state), so the bounded-memory × unbounded-context
+   claim is intact; counting it shifts the most-aggressive distilled point 88.89 %→88.21 % saved.
+6. **`layer_mse` is a single-layer diagnostic only.** Per-layer recoveries (layer 11: 0.100→0.0039 =
+   96 %; layer 23: 0.180→0.105 = 41 %) are measured with all *other* layers in softmax; on multi-linear
+   genomes a student runs off its calibration distribution, so its true error is unmeasured. The +16.4 %
+   does **not** depend on this table (it is pure end-to-end hypervolume), but the per-layer "recovery"
+   prose does not transfer 1:1 to high-linear-count configs.
+
+**Net:** per-layer distillation genuinely pushes the memory↔quality frontier out in the moderate-savings
+band (real Pareto dominance, conservative +16.4 % HV), on top of the memetic NAS — but only as
+*in-distribution, single-window, point-estimate* evidence so far. Adversarially audited (5-lens
+workflow): the direction survives, the magnitude and generalization do not yet.
+
+---
+
 ## Next
 
 - **Memetic NAS is the winning recipe** — scale it: Pareto frontier (not a single budget), per-layer
