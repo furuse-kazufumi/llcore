@@ -16,7 +16,9 @@ from pathlib import Path
 from typing import Any
 
 import torch
+from torch import nn
 
+from llcore.lm.quant import Int8Linear, quantize_per_channel_int8
 from llcore.runtime.qwen2 import Qwen2LM, Qwen2Params
 
 
