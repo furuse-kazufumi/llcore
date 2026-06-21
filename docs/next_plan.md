@@ -914,3 +914,9 @@
 - ドラフトの技術注記が引用する **ファイルパス 14 本(src/scripts/tests)は全て実在**(MISS ゼロ)。
 - 引用コードシンボル 8 個(`_should_promote`/`measure_memory`/`MemoryReport`/`MemoryEfficiencyObjective`/`state_boundedness_footprint`/`passes_capability_gate`/`int8_footprint_bytes`/`streaming_nll`)も **全て実コードに def/class として解決**(MISS ゼロ)。
 - → 連載は「リンク切れゼロ + 技術/一般の数値整合 + 引用パス/シンボル実在」の三層 QA を通過。**存在しないファイル/関数を技術注記で引く公開事故のリスクは解消**。記事生産ワークストリームは公開可能状態で確定。
+
+### 2026-06-21 追記 — セッション git 整合チェック合格 + 連載 C系まで完成
+- 記事 #50(c1, エコシステム/ライセンス)を技術+一般で追加し連載に C系新設。**全 14 記事 × 技術/一般 = 28 ドラフト + SERIES_INDEX**(三層QA済: リンク/数値/引用シンボル全合格)。
+- **git 整合チェック合格**: 作業ツリーは `docs/SESSION_SUMMARY.md`(自動生成・無視)以外 clean。markdown は実体 8〜19KB(`du` の 1.0M 表示は Windows ブロックサイズの癖で肥大化なし)。意図的な大容量追加は `ci/fixtures/corpus_aozora_multi.txt`(~580KB, offload用)のみ。b2 の SVG 参照パス(`../../../assets/articles/llcore_suppress_win.svg`)も実在解決。本セッション 31 コミット、全て local。
+- **収束点**: ローカル完結の高価値作業(NAS完了処理 / eval_cache resume堅牢化+991テスト / needle offload を push手前まで+ローカル実証 / 連載13側面を両輪+索引+三層QA / git整合)は出し切った。
+- 残: 他プロジェクト題材 #48(MangaFlow)/#49(Hermes Agent)= llcore一次データに乏しくアーク外 / 外部公開・push = human gate。
