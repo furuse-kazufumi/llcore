@@ -25,6 +25,8 @@ scripts/gptq_compare.py
 scripts/int8_quant_footprint.py
 scripts/kaggle_bundle_preflight.py
 scripts/kaggle_push_readiness.py
+scripts/linearize_tolerance.py
+scripts/memory_footprint_harness.py
 scripts/nas_level2.py
 scripts/nas_pareto.py
 scripts/nas_pareto_report.py
@@ -49,6 +51,7 @@ scripts/qat_train.py
 scripts/quant_bitwidth_sweep.py
 scripts/quant_group_compare.py
 scripts/rad_full_probes.py
+scripts/rad_ingest_poc.py
 scripts/recurrent_latency_sweep.py
 scripts/recurrent_longctx_eval.py
 scripts/retrieval_head_to_head.py

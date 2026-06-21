@@ -21,6 +21,7 @@ import json
 import sys
 import time
 from pathlib import Path
+from typing import Any, Callable
 
 import torch
 
@@ -93,7 +94,7 @@ def main(argv: list[str] | None = None) -> int:
     print(f"[baseline] softmax all-layers  nll={base_nll:.4f}  ppl={base_ppl:.2f}", flush=True)
 
     # 1) per-layer: linearize ONE layer at a time
-    per_layer = []
+    per_layer: list[dict[str, Any]] = []
     for i in range(n_layer):
         saved = _set_linear(model, [i])
         nll = _nll(model, ids)
@@ -102,7 +103,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"  layer {i:>2} linearized: ppl={per_layer[-1]['ppl']:.2f}  Δnll={per_layer[-1]['delta_nll']:+.4f}", flush=True)
 
     # 2) cumulative: linearize the most-tolerant K layers (greedy by single-layer Δ)
-    order = [d["layer"] for d in sorted(per_layer, key=lambda d: d["delta_nll"])]
+    order = [int(d["layer"]) for d in sorted(per_layer, key=lambda d: d["delta_nll"])]
     cumulative = []
     for k in (1, 2, 4, 6, 8, 12, n_layer):
         if k > n_layer:
@@ -116,7 +117,7 @@ def main(argv: list[str] | None = None) -> int:
 
     # 3) memory accounting: softmax KV O(T) vs linear state O(d^2) (constant)
     p = model.params
-    softmax_kv_per_layer = lambda T: 2 * p.n_kv_head * T * p.head_dim * 4  # noqa: E731
+    softmax_kv_per_layer: Callable[[int], int] = lambda T: 2 * p.n_kv_head * T * p.head_dim * 4  # noqa: E731
     linear_state_per_layer = p.n_head * p.head_dim * p.head_dim * 4 + p.n_head * p.head_dim * 4
     crossover_T = linear_state_per_layer // (2 * p.n_kv_head * p.head_dim * 4)
     mem = {

@@ -45,10 +45,10 @@ from typing import Any, cast
 import torch
 from torch import Tensor
 
-from llcore.lm.model import CharGPT, GPTConfig  # type: ignore[import-untyped]
-from llcore.lm.recurrent import RecurrentConfig, RecurrentLM  # type: ignore[import-untyped]
-from llcore.lm.rwkv import RWKVConfig, RWKVLM  # type: ignore[import-untyped]
-from llcore.runtime.rss import (  # type: ignore[import-untyped]
+from llcore.lm.model import CharGPT, GPTConfig
+from llcore.lm.recurrent import RecurrentConfig, RecurrentLM
+from llcore.lm.rwkv import RWKVConfig, RWKVLM
+from llcore.runtime.rss import (
     process_memory as _process_memory,
     working_set_bytes as _working_set_bytes,
 )
@@ -131,7 +131,7 @@ def _recurrent_state_bytes(model: RecurrentLM | RWKVLM, t: int, warmup: int = 1)
     idx = torch.randint(0, model.config.vocab_size, (1,))
 
     def run() -> tuple[int, Any]:
-        state = None
+        state: Any = None  # model は RecurrentLM|RWKVLM の union ゆえ state 型は実行時依存
         sb = 0
         for _ in range(t):
             _, state = model.step(idx, state)

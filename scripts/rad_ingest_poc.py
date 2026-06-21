@@ -35,7 +35,7 @@ import re
 import sys
 import time
 from pathlib import Path
-from typing import Callable
+from typing import Any, Callable
 
 _ROOT = Path(__file__).resolve().parents[1]
 _SRC = _ROOT / "src"
@@ -227,7 +227,7 @@ def main() -> int:
         print(f"{name:34s}  {c['R@1']:.3f} {c['R@3']:.3f} {c['MRR']:.4f}", flush=True)
 
     interference = float(cond_c0["MRR"]) - float(cond_c["MRR"])  # type: ignore[arg-type]
-    results: dict[str, object] = {
+    results: dict[str, Any] = {
         "encoder": "minilm (SentenceEncoderBackend, all-MiniLM-L6-v2)",
         "query_path": "store.query(q, k=10, exclude_questions=True)  # cosine",
         "stores": {
@@ -264,9 +264,9 @@ def main() -> int:
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
     v = results["verdict"]
-    print(f"\nverdict: world {v['world_floor_MRR']} -> {v['world_injected_MRR']} "  # type: ignore[index]
-          f"(injection_helps={v['injection_helps']}), "  # type: ignore[index]
-          f"conv interference drop = {v['conv_interference_MRR_drop']}", flush=True)  # type: ignore[index]
+    print(f"\nverdict: world {v['world_floor_MRR']} -> {v['world_injected_MRR']} "
+          f"(injection_helps={v['injection_helps']}), "
+          f"conv interference drop = {v['conv_interference_MRR_drop']}", flush=True)
     print(f"results: {args.out}", flush=True)
     return 0
 
