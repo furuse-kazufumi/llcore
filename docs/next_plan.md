@@ -995,3 +995,12 @@
 - **B. needle/2048 実測**: `git push` で workflow+fixtures を public remote へ → `gh workflow run nas-needle-offload` → `gh run watch`/`download` → 結果で b2 §5 の needle/2048 を実数値化。**push=外部公開=human gate**(LLTERM_CHOICE 既出・未回答)。
 - **C. Kaggle kernel push**(llcore-lm-compare 別系統): 従来どおり `kaggle kernels push -p "D:\projects\llcore_kaggle_livecheck_20260617g"` の human gate 継続。
 - **新規方向が無くローカル継続する場合**: 弱RAD候補の無理な引用や薄い早期seed(#1-32)の記事化は quality-over-volume に反するため**しない**。新実験/新題材の指示を待つのが妥当。
+
+### 2026-06-22 追記 — 公開前 内部QA を現ツリーで再検証(裏取り)+ 挿絵ゲートの所在確認
+- 前セッションの「三層QA合格」主張を現在の作業ツリーで**再実行して裏取り**(主張の鵜呑み回避):
+  - 相互参照 .md リンク(全32ドラフト)= **切れゼロ**(basename/相対の両方で解決)。
+  - 技術注記の引用 repo パス(src/scripts/tests/ci)= **14件 全実在**(MISS 0)。
+  - 引用コードシンボル(`_should_promote`/`measure_memory`/`MemoryReport`/`MemoryEfficiencyObjective`/`state_boundedness_footprint`/`passes_capability_gate`/`int8_footprint_bytes`/`streaming_nll`/`_meta_matches`)= **9件全て def/class に解決**(MISS 0)。
+  - → 回帰なし。連載は内部整合の面で公開可能状態を維持(新証拠で確認)。
+- **挿絵 verify-by-content の所在確認(運用上の事実)**: 漫画パネル素材 `bazue_all/`(集英社『週ヤン』公式SNS共有素材)は**当マシン上に存在しない**ため、`PANEL_PLACEMENT_PLAN.md` で未確認のパネル(b2 の4行ほか、s1/s2/a7/b1 の palette permalink 候補)を**今ここで内容照合できない**。確認済みは 162.jpg / 030.jpg の2枚のみ(過去セッションで目視済)。残り未カバーの11記事(a8/a9/a11/b3-b7/c1-c3)の挿絵プランは、推測列挙が honest-disclosure に反するため**素材入手後の公開フェーズ作業**として保留(=A の人間ゲート内)。
+- **結論変わらず**: ローカル完結の高価値タスクは枯渇。A(Qiita公開)/B(needle push)/C(Kaggle push)はいずれも human gate。新実験/新題材の指示があれば即着手。
