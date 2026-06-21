@@ -54,6 +54,12 @@
 ![推論レイテンシのスケーリング(両対数)。各モードを T=128 で正規化。GPT(赤)は ×16 の文脈で ×37 と理想線形(破線)より急に伸び、recurrent と RWKV(緑、ほぼ重なる)は ×16 文脈で ×16 と線形に乗る](../../../assets/articles/llcore_latency_scaling.svg)
 > 各モードを自分の T=128 で正規化しているので、見るのは「上がり方の急さ」だけ。GPT だけが理想線形(p=1 の破線)から上に外れる=超線形。recurrent と RWKV はほぼ重なって破線に沿う=線形。(公開時は SVG を raw 絶対 URL で参照すること)
 
+> **さらに鋭い軸 ── decode(1 トークンずつ生成する時間):** ここまでは「長さ T を **まとめて 1 回** forward する」prefill/batch のコストでした。でもチャットの体感遅延を支配するのは、**既に T トークンの文脈がある状態で、次の 1 トークンを出す** decode のコストです。これを T を変えて測ると(`scripts/decode_latency_sweep.py` / `out/decode_latency_sweep.json`)、アーキの差がさらに極端に出ます。Recurrent は「熟成済みの定数状態に 1 step 足すだけ」なので、文脈がどれだけ長くても **1 トークンの時間は一定(O(1))**。一方この GPT 実装は KV cache を持たないので、毎トークン全文脈を再 forward します。実測(n_embd=256/L4, T=128→2048・×16)では、**Recurrent は ×0.995(指数 p≈-0.006、つまり完全に平坦)/ RWKV も ×1.02(平坦)/ GPT は ×77.7(指数 p≈1.35〜1.49、超線形)**。文脈を 16 倍にしても recurrent 系は decode 時間が動かず、GPT は 77 倍に膨らむ ── streaming 生成では、この「O(1) vs 増大」がそのまま per-token の体感差になります。
+>
+> ![decode-step レイテンシ(両対数、各モードを T=128 で正規化)。recurrent / RWKV(緑)は ×1 に完全平坦=O(1)、GPT(赤)は理想線形(破線)を超えて ×77.6 へ超線形](../../../assets/articles/llcore_decode_latency.svg)
+>
+> **honest 留保(3点、重要):** (1) prefill と同じく **cross-mode の絶対 ms は比較不可**(recurrent/RWKV は Python per-step ループ計測)。読むのは各モード内の傾きだけ。(2) **この GPT は KV cache を持ちません**(毎 step 全文脈を再 forward=O(T²))。production の LLM serving は KV cache で decode を O(T)/token に落としますが、**cache を入れても GPT の decode は T とともに増え続け、recurrent の O(1) 平坦とは質的に別物**です。「平坦 vs 増大」という向きが load-bearing で、GPT 側の指数の絶対値は実装依存。(3) GPT の指数が理論上の 2(O(T²))でなく ~1.4 に見えるのは、この小モデル(n_embd=256)では T が n_embd を超える領域でようやく二次項が支配に入るため(§0 のメモリ regime 依存と同じ理屈)。なお当初 RWKV の小 T が startup の外れ値で傾きが汚れたが、**warmup を増やす(初回 lazy init を吸収する)と全 T が平坦に収束**した ── これも消さず、原因を特定して潰した経緯ごと残します。
+
 この差を見たとき、私はそれを「新しい発見」だと一瞬思いました。でも違いました。これは **1960 年代の制御工学が「可観測な系を、有界な状態で運ぶ」問題として(A の枠組みについては)整理し尽くしていた**ことの再演です。RWKV や Mamba が属する **状態空間モデル(State-Space Model, SSM)** の「S」は、State(状態)の S です。偶然ではありません。
 
 この記事は、その橋を 1 本だけ、丁寧に渡ります。
