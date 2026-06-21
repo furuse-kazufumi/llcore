@@ -47,6 +47,10 @@
 > **項分解して実測したわけではありません**。観測事実は「Transformer の文脈依存コストが超線形に伸びた」までで、
 > 「その超線形が二次項の顕在化である」は解析モデルに基づく解釈である、と区別しておきます。
 
+> **compute 軸でも裏取り(メモリと同じ向きが時間にも出る):** メモリだけでなく **推論にかかる時間**も同じ T 掃引で測りました(`scripts/recurrent_latency_sweep.py` / `out/recurrent_latency_sweep.json`、各点 7 回測定の中央値、`torch.set_num_threads(1)`)。T を 128→2048(×16)に伸ばしたときの **scaling 指数 p**(time ∝ Tᵖ を log-log 最小二乗で推定)は、**GPT が p≈1.6(min ベースで 1.4。明確に超線形、O(T²) 寄り)/ Recurrent が p≈0.94(ほぼ線形、O(T))**。メモリで見えた「Transformer は文脈で膨らむ / recurrent は構造的に軽い」が、**時間軸でも同じ向き**で再現しました。
+>
+> ただし強い honest 留保が 2 つ。**(1) cross-mode の絶対 ms は比較してはいけない。** recurrent/RWKV はここでは **Python の per-step ループ**(T 回の関数呼び出し)で測っており、インタプリタ呼び出しオーバーヘッドが支配的——「recurrent の方が速い/遅い」を絶対値で語るのは無意味で、読むのは **各モード内の伸び方(scaling 指数)だけ**。**(2) RWKV は T=128 の点が startup ノイズで外れ値**(1587ms)になり、傾き推定が汚れた(p≈0.5 と出たが、これは計測ノイズで構造的結論には使えない)ので、ここでは GPT と Recurrent の対比のみを load-bearing とします。汚れた点を消さず、結論に使わないと明示するのが規律です。
+
 この差を見たとき、私はそれを「新しい発見」だと一瞬思いました。でも違いました。これは **1960 年代の制御工学が「可観測な系を、有界な状態で運ぶ」問題として(A の枠組みについては)整理し尽くしていた**ことの再演です。RWKV や Mamba が属する **状態空間モデル(State-Space Model, SSM)** の「S」は、State(状態)の S です。偶然ではありません。
 
 この記事は、その橋を 1 本だけ、丁寧に渡ります。
@@ -276,7 +280,7 @@ LLM の長文脈・低メモリ競争は、突き詰めると **「過去をど�
 ### 参照(Qiita 投稿時は commit / file 参照に置換)
 
 - llcore 実測正本: `docs/MEMORY_EFFICIENCY_FINDINGS.md`(0)定数状態 vs 文脈線形 /(0')runtime peak RSS スイープ
-- harness: `scripts/memory_footprint_harness.py`(`out/mem_footprint.json`)、`scripts/recurrent_runtime_rss.py`(`out/recurrent_runtime_rss.json`)
+- harness: `scripts/memory_footprint_harness.py`(`out/mem_footprint.json`)、`scripts/recurrent_runtime_rss.py`(`out/recurrent_runtime_rss.json` / 32×曲線 `out/recurrent_runtime_rss_curve32.json`)、`scripts/recurrent_latency_sweep.py`(`out/recurrent_latency_sweep.json`、compute 軸 = 推論レイテンシのスケーリング指数)
 - `ρ<1` 証明器と `empirical_rho`: 検証付き可塑性アーク(`cert_inf` / `cert_two` / `cert_sdp`、`empirical_rho` 独立オラクル)
 - 制御理論側(一次概念): 状態空間モデル(SSM)/ 可観測性 / 収縮写像 `ρ<1` / Kalman フィルタ(R. E. Kálmán, 1960, *A New Approach to Linear Filtering and Prediction Problems*)
 - SSM 系 LLM: S4(Gu et al., 2022, *Efficiently Modeling Long Sequences with Structured State Spaces*)/ Mamba(Gu & Dao, 2023, *Mamba: Linear-Time Sequence Modeling with Selective State Spaces*)/ RWKV — attention を持たず(または部分的に併用しつつ)定数状態で系列を処理する系列モデル系譜。hybrid 例: Jamba(Mamba × Transformer 交互)

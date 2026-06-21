@@ -1015,3 +1015,11 @@
 ### 2026-06-22 追記 — a7 §0 にクロスラン再現性 + a8曲線への相互参照を追記
 - a7 の peak WS 表(256/512/1024/2048=229.8/247.3/330.5/607.9)が新ラン curve32(230.7/247.7/331.8/607.9)と **~1MB 差で一致**=3独立ラン(a7原/curve/long)で再現確認。×2.65 も再現(607.9/230.7=×2.64)。
 - a7 に「×2.65 は8倍という特定レンジ値、全体像(128→4096のregime依存)は a8」へのクロスリンクを追記=連載結合 + 単点誤読の予防。a7一般版は「8倍で2.65倍」が内部整合のため訂正不要(重複追記せず)。
+
+### 2026-06-22 追記 — compute軸(推論レイテンシ)を新規実測し a7 に統合
+- メモリ軸(a7/a8の peak WS 曲線)と相補の **compute 軸** を新規ハーネスで実測:
+  - `scripts/recurrent_latency_sweep.py`(+回帰8件) commit `d5cbcb1`。subprocess隔離+warmup+median/min、log-logで scaling 指数 p を推定。`torch.set_num_threads(1)`。
+  - 実測(T 128→2048 ×16、各7回中央値): **GPT p≈1.64(min 1.38)= 明確に超線形 O(T²)寄り / Recurrent p≈0.94(min 0.97)= ほぼ線形 O(T)**。メモリで見えた向きが時間軸でも再現。
+  - **honest 開示2点**: (1) cross-mode 絶対 ms は比較不可(recurrent は Python per-step ループ=インタプリタ律速 / GPT は1回 vectorized forward)→ 読むのは各モード内の scaling 指数のみ。(2) RWKV は T=128 が startup 外れ値(1587ms)でノイズ汚染 → p≈0.5 は計測ノイズで構造結論に使わないと明示。GPT vs Recurrent のみ load-bearing。
+- a7 技術版に compute 軸サブセクション + honest留保 + harness参照、一般版に平易版を追記。両版整合。RAD接地済(latency vs seq の先行研究は KV量子化/MoE推論=accelerator寄り、本実験の差別化軸=自宅CPU実機 wall-clock の scaling 指数対比、車輪の再発明でない)。
+- 残: RWKV のノイズを取るなら repeats増 or 大T(要RAM/時間)。GPT/recurrent の対比は確定。SVG化は公開フェーズ(human gate)。
