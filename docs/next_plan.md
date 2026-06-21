@@ -1123,6 +1123,8 @@
   - **(追加) allowlist 51本へ** commits `51e1c3b`(recurrent_longctx_eval=dict[str,object]→Any+curve注釈)・`243b7a7`(memory_footprint_harness/rad_ingest_poc/linearize_tolerance)。計 **src 67 + scripts 51 = 118ファイル strict 0**。
   - **★ rad_* を除く全 scripts が strict gate 配下に到達**。残 dirty は **rad_* 研究ユーティリティ7本のみ**(rad_scale_poc 19/rad_topic_overlap_poc 31/rad_role_filter_check 35/rad_domain_filter_check 38/rad_ann_check 39/rad_full_eval 39/rad_full_ingest 43, 計~244件)。これらは RAD コーパス ingest の研究用途で出荷/記事裏付けでなく優先度低。dict[str,object]→Any 系の同パターンが多いと推測されるが各本substantial。incremental に対応可だが低優先。
   - **マイルストン**: 出荷ツール・記事裏付け・ベンチ・計測ハーネス・poc 系——**価値のあるスクリプトは全て strict-clean + CI gate enforce**。残るは rad_* 研究utilのみ。
+  - **★★ 完全達成(2026-06-22)** commits `d3b819f`(rad_* 7本)・`d-`(generate_properties)・`270b9a7`(CI単純化): RAD util 7本 + vnncomp_benchmark サブディレクトリも含め **scripts/ 全体が strict-clean**。`mypy src scripts --strict` = **126ファイル 0エラー**。rad_* は統一レシピ(dict[str,object]→Any 置換 + 全 type:ignore 除去 + 残差を最小注釈)で一掃。**CI を allowlist 廃止して whole-dir `mypy src scripts --strict` へ単純化**(新規スクリプトも strict 必須=より強いゲート)。allowlist ファイルは HISTORICAL note 化(削除せず保持)。
+  - **結論: src + scripts 全 126ファイルが mypy --strict クリーン。型債務は完済。** 残るローカル余地は research/ の ruff 805件(実験コード・低価値・据置)のみ。
 - **次の一手**: (a) human gate の A=Qiita公開 / B=needle GPU offload(push) / C=Kaggle push(B/C 押せば CI も初回実走し ci.yml を実地検証できる)。(b) 新題材があれば RAD 接地から。(c) ローカル余地: 残 dirty scripts(poc_0b 19/poc_ridge_unflatten 10/rad_* 30-65 等)は高工数の per-script strict 化候補=incremental に allowlist 拡張可。research/ ruff 805件は実験コードゆえ低価値・据置。
 - 方針: 指示なき薄い量産はしない(quality-over-volume)。
 
