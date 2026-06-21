@@ -1100,3 +1100,13 @@
 ### 2026-06-22 追記 — リポ全体 ruff 17件解消 (commit 31cd33c)
 - F401未使用import13(自動) / F841未使用ローカル2 (verifier/invariants: pre=緩いtanh上界採用で不要, assumed=fail-open名残でcontraction=None=fail-closedが正) / E741 I->eye(backends SDP)。ruff全クリア・verifier77テストgreen・回帰なし。
 - 既知債務(据置): mypy src --strict 59件(evolution型注釈欠落/scipy/z3 stubs)はCI未強制aspirational・未触モジュール大半=回帰リスク高につき将来per-module段階導入。
+
+## ★2026-06-22 EXIT — 再開地点
+- 全成果 local commit 済・push なし。HEAD=`b8bd651`。作業ツリーは `docs/SESSION_SUMMARY.md`(自動生成)以外 clean。ブランチ `feat/lm-recurrent`。
+- 本セッション成果(18 commit): アーキ編3軸(memory a8 32x曲線 / compute a7 latency p~1.37 / static床 a9 torch税~180MB)を実測・曲線・可視化(SVG2)・記事/正本(MEMORY_EFFICIENCY_FINDINGS)整合 → 計測基盤 RSS DRY 100%(`src/llcore/runtime/rss.py` 単一情報源、_PMC は全7本から集約) → int8 streaming latency 裏コストを交絡統制で決着(無圧力小モデルで ~x1.25 / 130M の x0.2〜x11 は RAM圧 thrashing) → リポ全体 ruff 17件解消 → フルユニット 1013 passed 検証。
+- **次の具体的な一手**:
+  1) (中断点) mypy strict 段階導入の安全2件: `invariants.py:35` に z3 import の `# type: ignore[import-untyped]` 付与で同ファイル strict-clean / `modes_meter.py:140,165` の `dict`→`dict[str,...]` 型引数付与。これだけは低リスク・module-clean 達成可。
+  2) 残る mypy strict 債務(計57件、minimal_ga26/refinement13/backends7/honest_eval5/ridge_readout3/changeop1/protocol1/rwkv2 等)は **gene/protocol 型システム(StateUpdateGene vs StateUpdateGeneLike 共変性・Protocol variance)の設計的不一致**で機械的でなく高判断・回帰リスク高 → 据置(将来 domain-careful に per-module)。
+  3) human gate: A=記事Qiita公開(SVG raw URL化) / B=needle・大規模latencyを高RAM/GPUオフロード(git push+gh workflow run) / C=Kaggle push。
+  4) 新規方向(別系統の実験軸・別題材)の指示があれば RAD 接地から着手。
+- 方針: 指示なき自律ループでの薄い量産はしない(quality-over-volume / feedback_benchmark_honest_disclosure)。
