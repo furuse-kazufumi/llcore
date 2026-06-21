@@ -632,3 +632,20 @@
   「いま測っているのはアルゴリズムか、それとも環境ノイズか」を切り分けよ(統制変数)。
 - **根拠**: `scripts/int8_streaming_infer.py`(`--forward-repeats`、小 config 再測)/ `docs/MEMORY_EFFICIENCY_FINDINGS.md` (c) 節 2026-06 追記。
 - **側面**: honest disclosure / 計測規律 / 教訓 / 現実接続(自宅低スペックの制約が計測限界を作る)/ 不確実性(交絡の統制)。
+
+## decode 軸: recurrent は「文脈が伸びても 1 トークンが一定」、Transformer は伸びる (2026-06-22)
+- **ネタ**: アーキ編はこれまで prefill/batch-forward 全体(a7)・peak メモリ(a8)・静的 RSS 床(a9)を測ってきた。
+  抜けていたのが **decode 軸 = streaming 生成の per-token コスト**:「既に長さ T の文脈がある状態で、次の 1
+  トークンを出すのに何 ms か」。ここがアーキ差が最も鋭く出る regime。
+- **実機結果(小モデル, `scripts/decode_latency_sweep.py`)**: context age T を 64→256 に増やすと、**recurrent /
+  RWKV の decode は flat**(~0.8ms / ~2.2ms 一定 = O(1)、文脈の長さに依らない)一方、**GPT の decode は増大**
+  (8.9→32.9ms)。recurrent は「熟成済みの定数状態に 1 step 足すだけ」、cache 無し GPT は「毎トークン全文脈を
+  再 forward」だから。
+- **honest 3点**: (1) cross-mode の絶対 ms は比較不可(recurrent=Python per-step ループ / GPT=vectorized)。
+  (2) この GPT は **KV cache を持たない**(production は cache で decode を O(T)/token に落とす)が、cache 有りでも
+  GPT decode は T とともに増え、recurrent の O(1) flat とは質的に異なる。(3) GPT 指数が O(T²) の 2 でなく ~0.95
+  に見えたのは T<n_embd で線形射影が支配する regime(a8 の「regime 依存」と同じ教訓)。
+- **側面**: アーキ本質(O(1) 状態 vs 増大文脈)/ 計測規律(prefill と decode を分けて測る)/ honest disclosure
+  (KV cache の有無を明示しないと不公平)/ 現実接続(チャットの体感遅延は decode 律速)/ 構造化(prefill/decode/
+  memory/static を別軸として直交させる)。
+- **根拠**: `scripts/decode_latency_sweep.py`(+回帰テスト7件 `tests/unit/test_decode_latency_sweep.py`)commit `11bdb4a`。
