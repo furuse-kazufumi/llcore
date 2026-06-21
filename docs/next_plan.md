@@ -808,7 +808,7 @@
 - **(B) rigorous tier HEADLINE (holdout)**: **verdict = suppressed** (`max optimism_gap 0.0652 > CI half-width floor 0.0204`)。winner's-curse 補正後の楽観バイアスがノイズ床を超えたため frontier 個別点の勝ち主張を抑制。
 - **HV gain (holdout)**: **+16.8% (95% CI 16.2..17.7%, p_memetic_wins 1.000)** = CI_lo>0 を満たすため HV 次元の memetic 優位だけ発火。→「個別 verdict は黙らせるが集約 HV の勝ちは CI が支持する限り残す」粒度別の誠実さ。
 - Kendall τ=1.00 (降格なし)。base nll 4.4155 (ppl≈82.72)。
-- **regime 依存** (83.9% genome context sweep): L=256 Δnll 0.761 → 512 1.012 → 1024 1.182 = 長文ほど劣化増大 (constant-state failure mode 兆候)。**inner context=1024 設計のため 2048 は構造上未出力** (旧 EXIT メモの「2048 まで」は誤記)。
+- **regime 依存** (83.9% genome context sweep): L=256 Δnll 0.761 → 512 1.012 → 1024 1.182 = 長文ほど劣化増大 (constant-state failure mode 兆候)。**2048 はこの走では未測** (走の `--context-sweep` が 1024 まで)。当初「inner-context=1024 設計で構造的未出力」と書いたが**誤りと訂正**: `context_sweep` (eval_proxy.py:461) は `make_windows` で inner-loop 長と独立に任意長窓を切れ、corpus 230 万トークンで 2048 窓は作成可能。単なる未測ギャップ。記事 b2 §5 / ARTICLE_SEEDS #62 に訂正反映済み。
 - **honest gap**: needle/passkey は `--needle` off で **UNTESTED**。attention-KL は診断専用 (mean 3.68 / max 7.67 layer 9, fitness 非配線)。
 
 ### 生成物・反映
