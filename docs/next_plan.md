@@ -1057,3 +1057,8 @@
 - `src/llcore/runtime/rss.py` 新設(単一情報源): `peak_working_set_bytes()`(PeakWS=プロセス生涯ピーク) / `working_set_bytes()`(WS=現時点, 非Win は /proc フォールバック)。回帰テスト4件(off-Windows時の0/フォールバック挙動含む)。
 - 両ハーネスを共有モジュール利用へ書換。mypy単独green(import-untyped は既存lm慣習に倣い type:ignore)、ruff/16テストgreen、実走smoke一致(torch_tax 179.5)。
 - **スコープ限定(honest)**: `_PMC`/GetProcessMemoryInfo は他5スクリプト(memory_footprint_harness/mmap_*/rad_scale_poc/int8_streaming_infer)にも既存重複するが、今セッションで未検証のため波及させず据え置き=**将来cleanup候補**(回帰リスク回避)。
+
+### 2026-06-22 追記 — RSS DRY集約を mmap 2本へ拡大(テスト有・低リスク分)
+- 前commitで新設した `llcore.runtime.rss` 利用を、同一ペアを持ちテスト有の `mmap_weights_poc.py` / `mmap_ram_exceed_poc.py` へ拡大。両者の `_PMC`+`_process_memory_info`+`_working_set_bytes`+`_peak_working_set_bytes` を撤去し共有import化(mmap_weights は ctypes import も不要化、mmap_ram_exceed は SetProcessWorkingSetSizeEx 用に ctypes 維持)。
+- 同一モジュール2名importは括弧形式1文に統合(import-untyped の type:ignore 重複回避)。ruff/mypy単独green、32テストgreen。
+- **残存重複(honest)**: `memory_footprint_harness`(_PMC を system snapshot で併用=混在)/ `rad_scale_poc`(テスト無・inline _PMC・MB返し別形)/ `int8_streaming_infer`(PagefileUsage も返す別形 + SetProcessWorkingSetSizeEx)の3本は形が異なる or 未テストのため据え置き=将来モジュール拡張(pagefile/MB helper)とセットで対応する候補。現時点で DRY 集約はテスト保証の付く範囲を出し切った。

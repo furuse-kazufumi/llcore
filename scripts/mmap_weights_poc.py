@@ -37,7 +37,6 @@ honest 留保
 from __future__ import annotations
 
 import argparse
-import ctypes
 import gc
 import json
 import subprocess
@@ -49,53 +48,14 @@ import torch
 from torch import Tensor
 
 from llcore.lm.model import CharGPT, GPTConfig  # type: ignore[import-untyped]
+from llcore.runtime.rss import (  # type: ignore[import-untyped]
+    peak_working_set_bytes as _peak_working_set_bytes,
+    working_set_bytes as _working_set_bytes,
+)
 
 # Sentinel prefix the worker prints its single JSON result line with, so the
 # parent can recover it even if torch emits warnings on stdout/stderr.
 RESULT_PREFIX = "RESULT_JSON="
-
-
-class _PMC(ctypes.Structure):
-    # PROCESS_MEMORY_COUNTERS — mirrors scripts/memory_footprint_harness.py so the
-    # two harnesses report the same working-set numbers from the same WinAPI call.
-    _fields_ = [
-        ("cb", ctypes.c_uint32), ("PageFaultCount", ctypes.c_uint32),
-        ("PeakWorkingSetSize", ctypes.c_size_t), ("WorkingSetSize", ctypes.c_size_t),
-        ("QuotaPeakPagedPoolUsage", ctypes.c_size_t), ("QuotaPagedPoolUsage", ctypes.c_size_t),
-        ("QuotaPeakNonPagedPoolUsage", ctypes.c_size_t), ("QuotaNonPagedPoolUsage", ctypes.c_size_t),
-        ("PagefileUsage", ctypes.c_size_t), ("PeakPagefileUsage", ctypes.c_size_t),
-    ]
-
-
-def _process_memory_info() -> _PMC | None:
-    """Windows の PROCESS_MEMORY_COUNTERS を返す(失敗時 None)。"""
-    try:
-        import ctypes.wintypes as wt
-
-        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
-        psapi = ctypes.WinDLL("psapi", use_last_error=True)
-        kernel32.GetCurrentProcess.restype = wt.HANDLE
-        psapi.GetProcessMemoryInfo.argtypes = [wt.HANDLE, ctypes.POINTER(_PMC), wt.DWORD]
-        psapi.GetProcessMemoryInfo.restype = wt.BOOL
-        c = _PMC()
-        c.cb = ctypes.sizeof(c)
-        h = kernel32.GetCurrentProcess()
-        ok = psapi.GetProcessMemoryInfo(h, ctypes.byref(c), c.cb)
-        return c if ok else None
-    except Exception:  # noqa: BLE001 - RSS は補助指標、取れなくても続行
-        return None
-
-
-def _working_set_bytes() -> int:
-    """現在の working set (RSS) バイト数(Windows; 失敗時 0)。"""
-    info = _process_memory_info()
-    return int(info.WorkingSetSize) if info is not None else 0
-
-
-def _peak_working_set_bytes() -> int:
-    """プロセス生涯の peak working set バイト数(Windows; 失敗時 0)。"""
-    info = _process_memory_info()
-    return int(info.PeakWorkingSetSize) if info is not None else 0
 
 
 def _state_dict_bytes(state: dict[str, Tensor]) -> int:

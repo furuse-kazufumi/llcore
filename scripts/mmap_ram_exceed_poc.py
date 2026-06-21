@@ -44,49 +44,15 @@ import torch
 from torch import Tensor, nn
 
 from llcore.lm.model import CharGPT, GPTConfig  # type: ignore[import-untyped]
+from llcore.runtime.rss import (  # type: ignore[import-untyped]
+    peak_working_set_bytes as _peak_working_set_bytes,
+    working_set_bytes as _working_set_bytes,
+)
 
 RESULT_PREFIX = "RESULT_JSON="
 # SetProcessWorkingSetSizeEx flags (winnt.h): hard-min off, hard-max on.
 QUOTA_LIMITS_HARDWS_MIN_DISABLE = 0x00000002
 QUOTA_LIMITS_HARDWS_MAX_ENABLE = 0x00000004
-
-
-class _PMC(ctypes.Structure):
-    # PROCESS_MEMORY_COUNTERS — mirrors the other memory harnesses for consistency.
-    _fields_ = [
-        ("cb", ctypes.c_uint32), ("PageFaultCount", ctypes.c_uint32),
-        ("PeakWorkingSetSize", ctypes.c_size_t), ("WorkingSetSize", ctypes.c_size_t),
-        ("QuotaPeakPagedPoolUsage", ctypes.c_size_t), ("QuotaPagedPoolUsage", ctypes.c_size_t),
-        ("QuotaPeakNonPagedPoolUsage", ctypes.c_size_t), ("QuotaNonPagedPoolUsage", ctypes.c_size_t),
-        ("PagefileUsage", ctypes.c_size_t), ("PeakPagefileUsage", ctypes.c_size_t),
-    ]
-
-
-def _process_memory_info() -> _PMC | None:
-    try:
-        import ctypes.wintypes as wt
-
-        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
-        psapi = ctypes.WinDLL("psapi", use_last_error=True)
-        kernel32.GetCurrentProcess.restype = wt.HANDLE
-        psapi.GetProcessMemoryInfo.argtypes = [wt.HANDLE, ctypes.POINTER(_PMC), wt.DWORD]
-        psapi.GetProcessMemoryInfo.restype = wt.BOOL
-        c = _PMC()
-        c.cb = ctypes.sizeof(c)
-        ok = psapi.GetProcessMemoryInfo(kernel32.GetCurrentProcess(), ctypes.byref(c), c.cb)
-        return c if ok else None
-    except Exception:  # noqa: BLE001 - RSS は補助指標、取れなくても続行
-        return None
-
-
-def _working_set_bytes() -> int:
-    info = _process_memory_info()
-    return int(info.WorkingSetSize) if info is not None else 0
-
-
-def _peak_working_set_bytes() -> int:
-    info = _process_memory_info()
-    return int(info.PeakWorkingSetSize) if info is not None else 0
 
 
 def _avail_phys_bytes() -> int:
