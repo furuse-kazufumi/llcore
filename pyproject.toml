@@ -84,3 +84,13 @@ target-version = "py311"
 [tool.mypy]
 python_version = "3.11"
 strict = true
+# RSS 計測等は Windows WinAPI(ctypes.WinDLL)を前提とするコードを含む。off-Windows では runtime
+# guard で回避するが、型検査は win32 ターゲットに固定して Linux CI でも Windows ローカルと一致させる
+# (さもないと ctypes.WinDLL が attr-defined になる)。
+platform = "win32"
+
+# onnx は poc_7a の optional 依存(lazy import)。インストール有無に依らず import エラーを抑制
+# (CI に onnx を入れない方針 + ローカルで入っていても untyped なので両対応)。
+[[tool.mypy.overrides]]
+module = ["onnx", "onnx.*"]
+ignore_missing_imports = true

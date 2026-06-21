@@ -13,7 +13,7 @@ from __future__ import annotations
 import glob
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import torch
 from torch import nn
@@ -46,7 +46,9 @@ def load_qwen2(model_dir: str | Path, dtype: torch.dtype = torch.float32) -> tup
         raise FileNotFoundError(f"no .safetensors in {model_dir}")
     with torch.no_grad():
         for fp in files:
-            with safe_open(fp, framework="pt") as f:  # type: ignore[no-untyped-call]  # lazy/mmap
+            # cast→Any: safetensors の版で safe_open が typed/untyped 両方あり得るため、
+            # no-untyped-call(untyped 版)も unused-ignore(typed 版)も出さない頑健形にする。
+            with cast("Any", safe_open)(fp, framework="pt") as f:  # lazy/mmap
                 for name in f.keys():  # noqa: SIM118
                     if name in own and tuple(f.get_slice(name).get_shape()) == tuple(own[name].shape):
                         own[name].copy_(f.get_tensor(name).to(dtype))
@@ -106,7 +108,7 @@ def load_qwen2_int8(model_dir: str | Path) -> tuple[Qwen2LM, Any, Qwen2Params]:
         raise FileNotFoundError(f"no .safetensors in {model_dir}")
     with torch.no_grad():
         for fp in files:
-            with safe_open(fp, framework="pt") as f:  # type: ignore[no-untyped-call]
+            with cast("Any", safe_open)(fp, framework="pt") as f:
                 for key in f.keys():  # noqa: SIM118
                     mod_path, _, leaf = key.rpartition(".")
                     mod = _module_by_path(model, mod_path) if mod_path else model
