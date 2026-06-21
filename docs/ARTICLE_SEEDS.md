@@ -640,13 +640,15 @@
 - **実機結果(小モデル n_embd=256/L4, `scripts/decode_latency_sweep.py`, T 128→2048・同一ラン内で prefill+decode 両計測)**:
   - **核心 = amortization を 1 ラン内で airtight に**: 別ラン比較(prefill は a7 run / decode は別 run)の弱点を排し、
     **同一プロセス・同一モデル・同一条件で prefill と decode を両方計時**。
-  - **recurrent / RWKV: prefill O(T) → decode O(1)**: prefill ×17.2/×17.3(p≈1.03)で右肩上がりなのに、decode は
-    ×1.09/×1.04(**p≈0.028/0.023 = 完全平坦**)に落ちる。状態構築(O(T))と 1 手追加(O(1))を分けて払える。
+  - **クリーン runner で再測**: ローカル 3.6GB 機は memory-pressure で GPT が contention スパイク(T=1024 等)を拾い
+    指数が暴れた(p≈1.7)。GitHub Actions 7GB runner(無圧力)で取り直すと単調・再現的に。
+  - **recurrent / RWKV: prefill O(T) → decode O(1)**: prefill ×15.6/×17.5(p≈1.0)で右肩上がりなのに、decode は
+    ×0.98/×1.10(**p≈-0.002/0.03 = 完全平坦**)に落ちる。状態構築(O(T))と 1 手追加(O(1))を分けて払える。
   - **GPT: prefill ≒ decode(分離不可)**: cache 無ゆえ decode 1 step も全文脈再 forward= prefill と同一計算。実測でも
-    各 T で prefill≒decode(例:81≒82ms / 950≒935ms)、両方 p≈1.7 で増大。amortize できない。
-  - **honest**: GPT の絶対 growth はこのランで system 混雑(T=1024 スパイク)でばらつくので、load-bearing は **特定の ×N でなく
-    「各モード内の指数」と「GPT prefill≒decode / recurrent だけ decode 平坦」という質的対比**。RWKV 小 T の startup 外れ値は
-    warmup 不足と特定し default warmup を引き上げて解消(消さず原因ごと記録)。
+    各 T で prefill≒decode(例:99≒96ms / 958≒957ms)、しかも **prefill 指数 1.372 ≒ decode 指数 1.365**(両方 ~1.37)。amortize できない。
+  - **honest**: load-bearing は特定の ×N でなく「各モード内の指数」と「GPT prefill≒decode / recurrent だけ decode 平坦」。
+    RWKV 小 T の startup 外れ値は warmup 不足と特定し default warmup を引き上げて解消(消さず原因ごと記録)。
+    GPT の prefill/decode 指数が一致(1.37)= cache 無し decode は prefill と同一計算、の決定的証拠。
   - 可視化: `assets/articles/llcore_decode_latency.svg`(prefill 右肩上がり vs decode 平坦の fork 図)。
 - **honest 3点**: (1) cross-mode の絶対 ms は比較不可(recurrent=Python per-step ループ / GPT=vectorized)。
   (2) この GPT は **KV cache を持たない**(production は cache で decode を O(T)/token に落とす)が、cache 有りでも

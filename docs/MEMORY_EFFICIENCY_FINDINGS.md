@@ -17,7 +17,7 @@
 | (0) 定数状態 vs 文脈線形 | `scripts/memory_footprint_harness.py` | recurrent state の実バイト vs GPT KV/attn | T を 16× にしても recurrent **×1.00**、GPT KV **×16**、attn **×256** |
 | (0') runtime peak RSS | `scripts/recurrent_runtime_rss.py` | 実生成ループの peak WS を文脈長スイープ | T ×8 で **GPT peak ×2.65 / Recurrent・RWKV ×1.00**(解析値を実機裏取り)。32×曲線で **regime 依存 ×1.11→×6.75**(`curve32`)|
 | (0'') runtime latency (prefill) | `scripts/recurrent_latency_sweep.py` | 推論 wall-clock の文脈長スケーリング指数 p | T ×16 で **GPT p≈1.37(超線形 O(T²)寄り)/ Recurrent・RWKV p≈0.99(線形 O(T))**。cross-mode 絶対比較不可・各モード内の指数のみ |
-| (0''b) decode + amortization | `scripts/decode_latency_sweep.py` | 同一ラン内で prefill(O(T))vs decode(per-token)を対比 | **Recurrent/RWKV: prefill p≈1.03(O(T))→ decode p≈0.02-0.03(O(1)に amortize)/ GPT: prefill≒decode(各 T 一致, p≈1.7)= 分離不可**。KV cache 無の明示・質的対比のみ load-bearing |
+| (0''b) decode + amortization | `scripts/decode_latency_sweep.py` | 同一ラン内で prefill(O(T))vs decode(per-token)を対比(clean runner) | **Recurrent/RWKV: prefill p≈1.0(O(T))→ decode p≈0.0(O(1)に amortize)/ GPT: prefill≒decode(各 T 一致, p≈1.37=prefill 指数と一致)= 分離不可**。KV cache 無の明示・質的対比のみ load-bearing |
 | (0''') static RSS 床 | `scripts/runtime_floor_rss.py` | python/+torch/+model の段階 RSS(別プロセス隔離) | **torch ランタイム税 ~180MB が支配**(別ラン再現、初回 197.3≒197.8)。足場比はモデル規模依存(1.51MB本体で142×) |
 | (a) mmap read-only 重み | `scripts/mmap_weights_poc.py` | load 時 RSS(別プロセス隔離) | eager は即全載、mmap は **load 時 ΔRSS を ~2.8% に遅延**(54MB モデル) |
 | (a') RAM 超 × mmap | `scripts/mmap_ram_exceed_poc.py` | working-set 上限 < モデルで forward 完走 | **522MB モデルを 358MB の WS 上限で完走**(出力一致)= 使える RAM < モデルでも回る |
@@ -93,14 +93,16 @@ time ∝ Tᵖ の指数 p を log-log 最小二乗で推定(別プロセス隔�
 1 ラン内で prefill(状態構築)と decode(context age T で次の 1 トークン)を両方計時**し、recurrent の amortization を
 **別ラン比較なしで直接対比**する(streaming 生成 regime、チャット体感遅延の支配項)。
 
+クリーンな runner(GitHub Actions 7GB、ローカル 3.6GB 機の contention を排除)で計測。
+
 | モード | prefill 伸び (T ×16) | prefill p (min) | decode 伸び | decode p (min) | 解釈 |
 |---|---|---|---|---|---|
-| Recurrent | **×17.2** | 1.03 | **×1.09** | **0.028** | prefill O(T) → decode **O(1) に amortize** |
-| RWKV | **×17.3** | 1.03 | **×1.04** | **0.023** | 同上(warmup=5 で startup 外れ値解消) |
-| GPT | ×42.5 | 1.73 | ×42.8 | 1.75 | **prefill ≒ decode(各 T で一致)= 分離不可** |
+| Recurrent | **×15.6** | 1.00 | **×0.98** | **-0.002** | prefill O(T) → decode **O(1) に amortize** |
+| RWKV | **×17.5** | 1.01 | **×1.10** | **0.03** | 同上(warmup=5 で startup 外れ値解消) |
+| GPT | ×45.6 | 1.372 | ×44.5 | 1.365 | **prefill ≒ decode(各 T 一致・指数も一致)= 分離不可** |
 
-- **核心 = recurrent の amortization**: recurrent は「状態構築(prefill, O(T)= T 回 step)」と「1 手追加(decode, O(1))」を分けて払える。GPT(cache 無)は decode 1 step も全文脈再 forward=**prefill と同一計算**ゆえ各 T で **prefill≒decode**(例:81≒82ms / 950≒935ms)= amortize 不可。**同一ラン計測なので「recurrent だけ O(T)→O(1) に落ち GPT は落ちない」が直接対比として出る**(別ラン比較の弱点を排除)。
-- honest: (1) cross-mode 絶対 ms 比較不可。(2) **この GPT は KV cache 無**(prod は cache で decode O(T)/token、cache 有でも T で増大 vs recurrent O(1) flat は質的に別物)。(3) **GPT 絶対 growth はこのランで system 混雑(T=1024 スパイク)でばらつく → load-bearing は「各モード内の指数」と「GPT prefill≒decode / recurrent だけ decode 平坦」の質的対比**(特定 ×N でない)。(4) GPT 指数 ~1.7 は二次項が完全支配しきらない小モデル regime。(5) RWKV 小 T startup 外れ値は warmup 不足と特定し default warmup 引き上げで解消。
+- **核心 = recurrent の amortization**: recurrent は「状態構築(prefill, O(T)= T 回 step)」と「1 手追加(decode, O(1))」を分けて払える。GPT(cache 無)は decode 1 step も全文脈再 forward=**prefill と同一計算**ゆえ各 T で **prefill≒decode**(例:99≒96ms / 958≒957ms、しかも **prefill 指数 1.372 ≒ decode 指数 1.365**)= amortize 不可。**同一ラン計測なので「recurrent だけ O(T)→O(1) に落ち GPT は落ちない」が直接対比として出る**(別ラン比較の弱点を排除)。
+- honest: (1) cross-mode 絶対 ms 比較不可。(2) **この GPT は KV cache 無**(prod は cache で decode O(T)/token、cache 有でも T で増大 vs recurrent O(1) flat は質的に別物)。(3) load-bearing は特定 ×N でなく「各モード内の指数」と「GPT prefill≒decode / recurrent だけ decode 平坦」の質的対比(クリーン runner で単調・再現的になり旧ローカルの contention スパイクは解消)。(4) GPT 指数 ~1.37 は二次項が完全支配しきらない小モデル regime。(5) RWKV 小 T startup 外れ値は warmup 不足と特定し default warmup 引き上げで解消。
 - 可視化: `assets/articles/llcore_decode_latency.svg`(amortization の fork 図、a7 記事に挿入済)。
 
 ## (0''') static RSS 床 — 文脈非依存の土台(`out/runtime_floor_rss.json`)
