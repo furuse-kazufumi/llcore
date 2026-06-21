@@ -1222,3 +1222,12 @@
   - **★新発見: b2 L115 の図キャプションにも `長距離検索は未検証(UNTESTED)` あり** → 統合時にここも実測へ更新要(EXIT(3)レシピに未記載だった)。
   - SVG `assets/articles/llcore_suppress_win.svg` L51-52(`needle → UNTESTED` / 「未検証は…開示する」)。
 - doc_0530(NIAH deceptive saturation)は needle 数値到着時に L138 留保へ併記。
+
+## ★2026-06-22 待機中追記 — 抽出スキーマ実コード検証(レシピの誤り2件を訂正)
+`src/llcore/runtime/eval_proxy.py` + `scripts/nas_pareto.py` を精査し、過去レシピの抽出キーに**無音破綻する誤りを2件**発見・訂正(データ到着前の de-risk):
+- **誤1: context_sweep のキーは文字列**。`build_proxy_v2_report`(eval_proxy.py:837)が `{str(k): v ...}` で出力 → JSON キーは `"2048"`(int の `[2048]` 添字は KeyError)。
+- **誤2: 値に `delta_nll` キーは無い**。`context_sweep`(eval_proxy.py:461-500)の値は `{"mean","ci_lo","ci_hi","p_worse","pos_frac","p_sign","n_windows"}`。**Δnll は `"mean"`**(paired bootstrap 平均)、CI は `ci_lo`/`ci_hi`。記事の 256:0.761… はこの `mean`。
+- needle: `needle_horizon`(eval_proxy.py:581-)の戻りは `{"horizon": int|None, "by_depth": {...}}`(horizon=最短失敗長, None=最後まで成功)。retrieval pass/fail の単純値ではない。
+- **訂正版 抽出ワンライナー**:
+  `py -3.11 -c "import json;r=json.load(open('out/needle_offload/nas_pareto.json'));p=r['proxy_v2'];cs=p['context_sweep'];print('2048',cs.get('2048'));print('needle',p['needle'])"`
+- 統合時: L137 の Δnll 列に `cs['2048']['mean']`(可能なら `±ci` も)を追記、L138/L115/SVG L51-52 の needle は `p['needle']['horizon']`(None なら「2048 まで失敗せず」、値ありなら「N tok で破綻」)で叙述。honest 留保(proxy nll / paired bootstrap)継承。
