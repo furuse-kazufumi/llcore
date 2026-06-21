@@ -1186,3 +1186,13 @@
   3. PEP 561 `py.typed` 追加(型を出荷)、test 1件可搬化(`729fdb3`)。
 - **human gate(未消化)**: A=Qiita 公開(SVG raw URL 化)/ C=Kaggle push。B=needle は実行中。
 - **方針**: 指示なき薄い量産はしない(quality-over-volume)。needle 完了通知 or 新題材指示で再開。
+
+## ★2026-06-22 待機中 追記 — needle 結果の抽出レシピ(下調べ完了 / context reset 耐性メモ)
+- run `27918958686`(needle-run-2)compute step 実行中(実経過 ~45min / 2-3h 想定内)。背景監視 `b5n1ng507`(`gh run watch`)が完了通知 → 旧 bb0w5sh47 はセッションリセットで消失済のため b5n1ng507 が現行シグナル。
+- **artifact 名 = `nas-needle-results`**(`nas_pareto.json` + `nas_pareto_report.md`)。DL 先は `out/needle_offload`。
+- **JSON 抽出キー(`scripts/nas_pareto.py` L229-233・L273 で確認)**: 結果は `report["proxy_v2"]` 配下。
+  - context-sweep: `report["proxy_v2"]["context_sweep"]` = `{length(int): {"delta_nll": float, ...}}`(256/512/1024/**2048**)。
+  - needle: `report["proxy_v2"]["needle"]`(`needle_horizon` 出力, 2048/4096 の retrieval)。
+  - 抽出ワンライナー: `py -3.11 -c "import json;r=json.load(open('out/needle_offload/nas_pareto.json'));p=r['proxy_v2'];print('sweep',p['context_sweep']);print('needle',p['needle'])"`
+- **統合アンカー(検証済・正確)**: `docs/articles/drafts/b2-suppress-your-win.md` **L137**(`256:0.761→512:1.012→1024:1.182` の続きに 2048 追記)+ **L138**(「GPU オフロード→未検証」叙述を「GH Actions 7GB で実測」に書換、loop 完結)。SVG `assets/articles/llcore_suppress_win.svg` **L51-52**(`needle→UNTESTED`)を実測へ。
+- 完了確認: 「Assert GA was resumed」step success = 26h 再走でなく eval_cache resume の証。
