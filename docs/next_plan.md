@@ -841,3 +841,9 @@
 - **resume 根拠**: run_meta (nas_pareto.py:353) は model/corpus/n_tokens/window/ref_context/proxy_v2/distill/inner_context/fast_windows/base_nll/n_layer のみ。context-sweep/needle/holdout-windows は含まないので、`--needle`+2048 を足しても GA キャッシュ (200 scalar + 200 vector evals) は再利用され GA 6.6h はスキップ、rigorous tier + 2048 sweep + needle のみ走る (CPU ~70 分見込み)。
 - **安全**: 既存 `nas_pareto.json` / `nas_pareto_report.md` / `eval_cache.json` は `.bak_pre_needle` でバックアップ済み。out 同一のため json は上書きされる。
 - 完了後の手: `nas_pareto_report.py` で再生成 → needle horizon と L=2048 の Δnll を読み、記事 b2 §5 の「UNTESTED」「2048 未測」を実数値へ更新 (honest gap を 1 つ埋める)。
+
+### 2026-06-21 追記 — 検証走を detached で再起動 (resume 成功確認)
+- 初回 background 起動 (task bxw5a3gvi) は **ポーリング用 shell セッション終了に道連れで kill** された (log/err 空 = Python 例外でなく外部 kill。全文トークン化途中で停止)。
+- `Start-Process -WindowStyle Hidden -PassThru` で**完全 detached** に再起動 (ランチャー PID 7744, 実ワーカー **PID 16960**)。PID は `out/nas_pareto_v2full/needle_run.pid` に記録。
+- **resume 成功確認**: `run_needle.log` = `[base] nll=4.4155` + `[resume] 386 scalar + 386 vector evals reused` → 前回 overnight の全 386 評価がキャッシュ復元され **GA は完全スキップ**。rigorous tier + 2048 sweep + needle のみ実行中 (ワーカー CPU 増加中)。
+- **次セッションの手**: `Get-Process -Id 16960` 生存 + `out/nas_pareto_v2full/nas_pareto.json` mtime が 22:37 から更新されたかで完了判定。完了したら `nas_pareto_report.py` で再生成し、`proxy_v2.needle` (needle horizon) と `context_sweep[2048]` の Δnll を読み、記事 b2 §5 の「needle UNTESTED」「2048 未測」を実数値へ更新。失敗時は `.bak_pre_needle` から復元。
