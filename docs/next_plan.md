@@ -1102,7 +1102,8 @@
 - 既知債務(据置): mypy src --strict 59件(evolution型注釈欠落/scipy/z3 stubs)はCI未強制aspirational・未触モジュール大半=回帰リスク高につき将来per-module段階導入。
 
 ## ★2026-06-22 EXIT — 再開地点
-- 全成果 local commit 済・push なし。HEAD=`b8bd651`。作業ツリーは `docs/SESSION_SUMMARY.md`(自動生成)以外 clean。ブランチ `feat/lm-recurrent`。
+- **(済) 中断点の mypy strict 安全2件を解消** commit `32a6e76`: `invariants.py:35` に z3 `# type: ignore[import-untyped]` / `modes_meter.py` is_adaptive_active 戻り値 `dict[str,object]`(140/165)。両モジュール `mypy --strict` green・26テスト green・ruff clean。残 strict 債務(gene/protocol 型系57件)は設計的不一致で据置のまま。
+- 全成果 local commit 済・push なし。HEAD=`32a6e76`。作業ツリーは `docs/SESSION_SUMMARY.md`(自動生成)以外 clean。ブランチ `feat/lm-recurrent`。
 - 本セッション成果(18 commit): アーキ編3軸(memory a8 32x曲線 / compute a7 latency p~1.37 / static床 a9 torch税~180MB)を実測・曲線・可視化(SVG2)・記事/正本(MEMORY_EFFICIENCY_FINDINGS)整合 → 計測基盤 RSS DRY 100%(`src/llcore/runtime/rss.py` 単一情報源、_PMC は全7本から集約) → int8 streaming latency 裏コストを交絡統制で決着(無圧力小モデルで ~x1.25 / 130M の x0.2〜x11 は RAM圧 thrashing) → リポ全体 ruff 17件解消 → フルユニット 1013 passed 検証。
 - **次の具体的な一手**:
   1) (中断点) mypy strict 段階導入の安全2件: `invariants.py:35` に z3 import の `# type: ignore[import-untyped]` 付与で同ファイル strict-clean / `modes_meter.py:140,165` の `dict`→`dict[str,...]` 型引数付与。これだけは低リスク・module-clean 達成可。
