@@ -823,3 +823,8 @@
 - `docs/articles/drafts/b2-suppress-your-win.md` (150 行) を新規執筆。連載 B部「主張を抑制する誠実さ」の次作。zero-shot +15.3% 勝利 → holdout optimism_gap でverdict suppress → HV gain +16.8% (CI_lo>0) のみ残す二段構造を実数値で全公開。先行研究 (MTF-PDNS 2407.20656) 差別化軸 + honest gap (needle UNTESTED 等) 明示。commit `2b6fad9`。
 - ARTICLE_SEEDS #62 に「本執筆済み」追記。
 - **残タスク**: 非エンジニア向け QIITA_GENERAL 版 #62 は未着手。Kaggle kernel push は引き続き human gate 待ち (本系統不介入)。push は人間承認待ちのまま (本セッション内コミットは全て local)。
+
+### 2026-06-21 追記 — #62 非エンジニア向け版も完了
+- `docs/articles/drafts/b2-suppress-your-win-general.md` (88 行) 新規。技術版 b2 のたとえ話版 (模試/健康診断アナロジー、専門用語排除)。commit `0a5118b`。
+- これで #62 は技術版 (b2) + 一般版 (b2-general) の両輪が揃った。記事ネタ #62 タスクは draft 完了。
+- **残: Kaggle kernel push は引き続き human gate 待ち (本系統不介入)。push は人間承認待ちのまま (本セッション内コミットは全て local)。** 次に着手すべき新規タスクは現時点で未定 — 新規実験を起こすか #62 の図版検討かは次セッション判断。
