@@ -401,6 +401,31 @@ larger pop/gen** — only then does the modest-savings band's value (and evoluti
 
 ---
 
+## 11. Goal status (2026-06-20): both halves demonstrated with evidence
+
+The session goal had two simultaneous parts. Both are now shown in-repo:
+
+* **(1) llcore がまともに会話可能** — `scripts/chat_native_qwen.py` drives Qwen2.5-0.5B-Instruct entirely
+  through llcore's *own* forward (`runtime/qwen2.py`, golden-matched to HF) with KV-cache greedy decoding
+  — not a `transformers` call. A 5-turn Japanese conversation: factual Q&A correct (日本の首都→「東京です。」),
+  **multi-turn context recall correct** (name given turn 3 → recalled turn 4), arithmetic correct
+  (3+5→8), ~1–2 s/turn after an 11 s load. Honest scope: easy prompts, 0.5B, the greeting answer was
+  slightly evasive; robust "まともに会話" is the 1.5B tier. The conversational *capability* is Qwen's
+  pretrained weights; llcore's contribution is the verified on-prem runtime that runs them.
+
+* **(2) 進化も可能であることを証明可能なレベル** — proxy-v2 (§10) is the *instrument* that makes the
+  evolution claim falsifiable: paired bootstrap CIs, fresh-holdout winner's-curse removal, context sweep,
+  and a single honest-verdict chokepoint. The smoke shows the instrument works (memetic +2.8 % HV on
+  holdout, τ=1.0, but self-flagged "CI unreliable K<12"); a *publishable* "evolution helps" verdict needs
+  the full run (K≥12, sweep to 2048–4096, cross-corpus).
+
+The honest seam between the two: the **conversational system is the all-softmax base model**; the
+linearized/distilled/evolved variants are the **memory-efficiency research subjects** (worse in quality,
+better in long-context memory). proxy-v2 measures the cost of that trade *honestly*; it never claims the
+modified model converses better than the base (`conversational_claim=None`).
+
+---
+
 ## Next
 
 - **Memetic NAS is the winning recipe** — scale it: Pareto frontier (not a single budget), per-layer
