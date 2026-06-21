@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 470" font-family="Segoe UI, Hiragino Kaku Gothic ProN, Meiryo, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0d1117"/><stop offset="1" stop-color="#161b22"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L7,3 L0,6 Z" fill="#8b949e"/>
+    </marker>
+  </defs>
+  <rect width="860" height="470" fill="url(#bg)"/>
+
+  <text x="34" y="42" fill="#e6edf3" font-size="23" font-weight="700">「勝った」を、自分のノイズ床で黙らせる</text>
+  <text x="34" y="68" fill="#8b949e" font-size="14">NAS proxy-v2 — 勝利宣言を粒度ごとに取捨する honest-disclosure 層 (Qwen2.5-0.5B / 386 real evals)</text>
+
+  <!-- STAGE 1: zero-shot win -->
+  <rect x="34" y="96" width="300" height="120" rx="10" fill="#161b22" stroke="#238636" stroke-width="2"/>
+  <text x="50" y="124" fill="#8b949e" font-size="12">STAGE 1 — 選抜窓 (探索に使った窓)</text>
+  <text x="50" y="158" fill="#3fb950" font-size="26" font-weight="700">memetic +15.3%</text>
+  <text x="50" y="184" fill="#e6edf3" font-size="14">「貪欲法に勝った」(HV 58.5 → 67.4)</text>
+  <text x="50" y="206" fill="#6e7681" font-size="12.5">…が、選抜窓の勝ちは “まぐれ込み”</text>
+
+  <!-- arrow down -->
+  <line x1="184" y1="216" x2="184" y2="258" stroke="#8b949e" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="198" y="242" fill="#d29922" font-size="13">fresh holdout で測り直す</text>
+  <text x="198" y="260" fill="#6e7681" font-size="11.5">(winner's curse 除去 / 8192tok ずらした別12窓)</text>
+
+  <!-- STAGE 2: the test -->
+  <rect x="34" y="276" width="300" height="92" rx="10" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+  <text x="50" y="302" fill="#8b949e" font-size="12">STAGE 2 — 楽観バイアス vs ノイズ床</text>
+  <text x="50" y="332" fill="#f0f6fc" font-size="15">max optimism_gap <tspan fill="#f85149" font-weight="700">0.0652</tspan></text>
+  <text x="50" y="356" fill="#f0f6fc" font-size="15">&gt; CI 半値幅の床 <tspan fill="#58a6ff" font-weight="700">0.0204</tspan></text>
+
+  <!-- divider arrow to verdicts -->
+  <line x1="334" y1="322" x2="392" y2="322" stroke="#8b949e" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="352" y="314" fill="#6e7681" font-size="11">判定を粒度で分ける</text>
+
+  <!-- VERDICT A: suppressed -->
+  <rect x="404" y="100" width="422" height="92" rx="10" fill="#2d1418" stroke="#f85149" stroke-width="2"/>
+  <text x="422" y="128" fill="#f85149" font-size="15" font-weight="700">✕ 個別フロンティア点 → SUPPRESSED</text>
+  <text x="422" y="152" fill="#e6edf3" font-size="13.5">まぐれ(楽観バイアス)がノイズ床を超える。</text>
+  <text x="422" y="174" fill="#e6edf3" font-size="13.5">「この点で勝った」とは言わせない = 勝利宣言を取り下げ。</text>
+
+  <!-- VERDICT B: kept -->
+  <rect x="404" y="204" width="422" height="92" rx="10" fill="#12261a" stroke="#3fb950" stroke-width="2"/>
+  <text x="422" y="232" fill="#3fb950" font-size="15" font-weight="700">○ 総合ハイパーボリューム → KEPT</text>
+  <text x="422" y="256" fill="#e6edf3" font-size="13.5">HV gain <tspan fill="#3fb950" font-weight="700">+16.8%</tspan> (95% CI 16.2..17.7%, CI_lo &gt; 0)</text>
+  <text x="422" y="278" fill="#e6edf3" font-size="13.5">誤差を引いても 0 を割らない勝ちだけは残す。</text>
+
+  <!-- VERDICT C: untested -->
+  <rect x="404" y="308" width="422" height="60" rx="10" fill="#161b22" stroke="#6e7681" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="422" y="334" fill="#8b949e" font-size="15" font-weight="700">— 長距離検索 (needle) → UNTESTED</text>
+  <text x="422" y="356" fill="#6e7681" font-size="13">未検証は「大丈夫」と言わず、未検証と開示する。</text>
+
+  <!-- footer -->
+  <line x1="34" y1="398" x2="826" y2="398" stroke="#21262d" stroke-width="1"/>
+  <text x="34" y="424" fill="#8b949e" font-size="13">先行研究が「proxy は noisy」と<tspan fill="#c9d1d9">認める</tspan>ところを、本作業は<tspan fill="#c9d1d9">「noisy さを測って主張のほうを抑制する」</tspan>段まで進める。</text>
+  <text x="34" y="448" fill="#6e7681" font-size="12">scope = next-token-nll proxy / 会話品質クレームは含まない。Kendall τ=1.00 で proxy-judge 整合(降格なし)。</text>
+</svg>

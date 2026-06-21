@@ -108,6 +108,10 @@ zero-shot の `+15.3%` は、まさに**選抜に使った窓(selection window)�
 
 「全部勝った」でも「全部黙る」でもなく、**主張ごとに証拠の強さを測って取捨する**。これが「勝った気になる前に内訳を疑う」を、訓話ではなく**機構**にした姿です。
 
+![選抜窓の +15.3% を fresh holdout で測り直し、個別点は SUPPRESSED・総合HVは KEPT・needleは UNTESTED と粒度ごとに取捨する図](../../../assets/articles/llcore_suppress_win.svg)
+
+*図:選抜窓で出た「+15.3% 勝ち」を fresh holdout で測り直す。楽観バイアス(最大 0.0652)がノイズ床(0.0204)を超えるので個別フロンティア点の勝ちは抑制(SUPPRESSED)、総合 HV gain +16.8%(CI_lo>0)だけは残す(KEPT)、長距離検索は未検証(UNTESTED)として開示。(公開時は SVG を raw 絶対 URL で参照すること)*
+
 ---
 
 ## 4. 抑制をかける 5 つの関門(まとめ)
