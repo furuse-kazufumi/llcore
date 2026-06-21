@@ -38,10 +38,10 @@ from typing import Any, cast
 
 import torch
 
-from llcore.lm.model import CharGPT, GPTConfig  # type: ignore[import-untyped]
-from llcore.lm.recurrent import RecurrentConfig, RecurrentLM  # type: ignore[import-untyped]
-from llcore.lm.rwkv import RWKVConfig, RWKVLM  # type: ignore[import-untyped]
-from llcore.runtime.rss import peak_working_set_bytes as _peak_working_set_bytes  # type: ignore[import-untyped]
+from llcore.lm.model import CharGPT, GPTConfig
+from llcore.lm.recurrent import RecurrentConfig, RecurrentLM
+from llcore.lm.rwkv import RWKVConfig, RWKVLayerState, RWKVLM
+from llcore.runtime.rss import peak_working_set_bytes as _peak_working_set_bytes
 
 RESULT_PREFIX = "RESULT_JSON="
 MODES = ("gpt", "recurrent", "rwkv")
@@ -51,30 +51,33 @@ MODES = ("gpt", "recurrent", "rwkv")
 def run_worker(mode: str, t: int, n_embd: int, n_layer: int, n_head: int, vocab: int) -> dict[str, Any]:
     """1 つの (mode, T) で実ワークロードを走らせ peak WS を測る(隔離 subprocess 内)。"""
     torch.manual_seed(1337)
+    model: CharGPT | RecurrentLM | RWKVLM
     if mode == "gpt":
         model = CharGPT(GPTConfig(vocab_size=vocab, block_size=t, n_layer=n_layer,
                                   n_head=n_head, n_embd=n_embd))
         model.eval()
         idx = torch.randint(0, vocab, (1, t))
-        out = cast(CharGPT, model).forward_logits(idx)  # 長さ T を厳密 attention
+        out = model.forward_logits(idx)  # 長さ T を厳密 attention
         sink = float(out.float().sum().item())
     elif mode == "recurrent":
         model = RecurrentLM(RecurrentConfig(vocab_size=vocab, block_size=t, n_layer=n_layer,
                                             n_embd=n_embd, state_size=n_embd))
         model.eval()
         idx = torch.randint(0, vocab, (1,))
-        state = None
+        rec_state: list[torch.Tensor] | None = None
         for _ in range(t):  # 定数サイズ状態を T ステップ更新
-            _, state = model.step(idx, state)
-        sink = float(model.state_bytes(state))
+            _, rec_state = model.step(idx, rec_state)
+        assert rec_state is not None  # t>=1 でループは必ず回る
+        sink = float(model.state_bytes(rec_state))
     else:  # rwkv
         model = RWKVLM(RWKVConfig(vocab_size=vocab, block_size=t, n_layer=n_layer, n_embd=n_embd))
         model.eval()
         idx = torch.randint(0, vocab, (1,))
-        state = None
+        rwkv_state: list[RWKVLayerState] | None = None
         for _ in range(t):
-            _, state = model.step(idx, state)
-        sink = float(model.state_bytes(state))
+            _, rwkv_state = model.step(idx, rwkv_state)
+        assert rwkv_state is not None
+        sink = float(model.state_bytes(rwkv_state))
     peak = _peak_working_set_bytes()
     return {"mode": mode, "t": t, "peak_ws_mb": round(peak / 1e6, 1), "sink": sink}
 

@@ -45,5 +45,6 @@ scripts/quant_bitwidth_sweep.py
 scripts/quant_group_compare.py
 scripts/rad_full_probes.py
 scripts/recurrent_latency_sweep.py
+scripts/recurrent_runtime_rss.py
 scripts/runtime_floor_rss.py
 scripts/train_recurrent_longctx.py
