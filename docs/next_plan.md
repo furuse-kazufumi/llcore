@@ -1086,3 +1086,9 @@
 - 実測: 倍率が 4ラン で ×1.46/×10.88/×11.72/×0.21 と桁違いに振れ方向反転=**本機(RAM3.6GB)では memory-pressure 雑音支配で信頼測定不能**。単一倍率は load-bearing にせず、findings (c) と script の honest 文言に「非再現・要オフロード」を明記。計時の仕組みは committed(安定環境で再走可)。
 - ARTICLE_SEEDS に記事ネタ追記(「勝ちのコストを測ろうとしたら計測自体が低RAM機で信用できなかった」=honest-disclosure/計測規律)。
 - これは `feedback_benchmark_honest_disclosure`(失敗を消さず教訓化)の実践。次に定量化するなら Kaggle/GH Actions の高RAM環境へオフロード(human gate)。
+
+### 2026-06-22 追記 — int8 streaming latency を交絡分離して決着(~×1.25)
+- 前追記の「130M で非再現(×0.2〜×11)」を、交絡変数=RAM圧を消す小モデル(n_embd256/L4、forward余裕常駐)で再測。
+- 結果: 5ラン中1件が dense側一過性スパイク(×0.18)を除き **4ラン ×1.20/1.22/1.27/1.31 に密集=純粋な層dequant再計算コストは安定 ~×1.25**。130M の振れは memory-pressure thrashing でアルゴリズムコストでないと確定。
+- findings (c) を「非結果」→「交絡統制済み結果(~×1.25 / 130Mは圧力ノイズ)」に更新、ARTICLE_SEEDS も交絡分離の教訓へ昇格。コード変更なし(既存 --forward-repeats を小configで使用)、テスト不変。
+- 計測規律の実例: 同一スクリプト・同一指標でも環境(RAM圧)が結論を×0.2〜×11動かす→「測っているのはアルゴリズムか環境ノイズか」を統制変数で切り分ける。

@@ -624,9 +624,11 @@
 - **気付き**: int8 streaming 推論は常駐を 72% 削るが、その裏コスト(層ごと dequant=再計算の latency)を
   測ろうと forward median 計時を足した。ところが本機(RAM ~3.6GB)では倍率が **4ラン で ×1.46 / ×10.88 /
   ×11.72 / ×0.21** と桁違いに振れ、**方向すら反転**(dense が page-fault で thrash すると逆に stream が速く見える)。
-- **教訓**: メモリ削減の対価を測る行為そのものが、メモリ圧の強い環境では memory-pressure 雑音に飲まれる。
-  「省メモリの代償は latency」という直感は正しい向きでも、**低RAM機では定量化できない**(単一倍率は cherry-pick)。
-  → 正しい対応は「本機では非再現と明示し、定量化は高RAM/GPU へオフロード」。失敗を消さず仕組みは残す。
-- **根拠**: `scripts/int8_streaming_infer.py`(`--forward-repeats`)/ `out/int8_streaming_infer.json` /
-  `docs/MEMORY_EFFICIENCY_FINDINGS.md` (c) 節 2026-06 追記。
-- **側面**: honest disclosure / 計測規律 / 教訓 / 現実接続(自宅低スペックの制約が計測限界を作る)。
+- **教訓(交絡分離)**: 130M ではカオスだったが、**交絡変数=RAM 圧を消すため小モデル(forward が余裕で常駐)で
+  再測**すると、4/5 ラン が **×1.20–1.31 に密集=純粋な dequant 再計算コストは安定 ~×1.25**。つまり ×0.2〜×11 の
+  振れは**アルゴリズムのコストでなく memory-pressure thrashing** だった。「省メモリの代償は latency」は正しい向きで、
+  圧力を統制して初めて本来の小さな定数(~×1.25)が見える。**交絡を消さずに測った単一倍率は嘘になる**という計測規律の実例。
+- **記事の山**: 同じスクリプト・同じ指標でも、計測環境(RAM 圧)が結論を ×0.2〜×11 まで動かす。結論を出す前に
+  「いま測っているのはアルゴリズムか、それとも環境ノイズか」を切り分けよ(統制変数)。
+- **根拠**: `scripts/int8_streaming_infer.py`(`--forward-repeats`、小 config 再測)/ `docs/MEMORY_EFFICIENCY_FINDINGS.md` (c) 節 2026-06 追記。
+- **側面**: honest disclosure / 計測規律 / 教訓 / 現実接続(自宅低スペックの制約が計測限界を作る)/ 不確実性(交絡の統制)。

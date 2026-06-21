@@ -192,13 +192,18 @@ stream(層ごと dequant)** を別プロセスで比較。
   (量子化誤差は別問題で (b) で測定済み)。
 - 留保: 量子化は `nn.Linear` のみ(Embedding/LN は fp32)。「resident ≈ 最大層」
   まで絞るには int8 自体も mmap でストリーム + 圧力が要る(本版は int8 を常駐保持)。
-- **2026-06 追記 — 裏コスト(latency)を測ろうとした honest 非結果**: stream は forward 毎に層ごと dequant=
-  再計算するので dense より遅いはず、と考え `int8_streaming_infer.py` に forward median 計時を追加(`--forward-repeats`)。
-  だが **本機(RAM ~3.6GB)では倍率が 4 ラン で ×1.46 / ×10.88 / ×11.72 / ×0.21 と桁違いに振れ、方向すら反転**
-  (130M forward が memory-pressure / page-fault 雑音に支配され、dense が thrash すると逆に stream が速く見える)。
-  → **「常駐 72% 削減の latency 対価」は本機では信頼測定不能。単一倍率を load-bearing にしない**(cherry-pick 回避)。
-  定量化は要・高RAM/GPU オフロード(`feedback_benchmark_honest_disclosure`: 失敗を消さず教訓として残す)。
-  計時の**仕組み自体は committed**(安定環境/オフロードで再走すれば取れる)。
+- **2026-06 追記 — 裏コスト(latency)を交絡分離して測った**: stream は forward 毎に層ごと dequant=再計算する分
+  dense より遅いはず、と考え `int8_streaming_infer.py` に forward median 計時を追加(`--forward-repeats`)。
+  - **(失敗→学び)130M(canonical config)では本機(RAM ~3.6GB)で倍率が 4 ラン で ×1.46 / ×10.88 / ×11.72 / ×0.21
+    と桁違いに振れ方向すら反転**(forward が memory-pressure / page-fault 雑音に支配、dense が thrash すると逆に
+    stream が速く見える)。→ この規模では単一倍率を load-bearing にしない(cherry-pick 回避)。
+  - **(統制)交絡変数=RAM 圧を消すため小モデル(n_embd=256/L=4、forward が余裕で常駐)で再測**: 5 ラン中
+    1 件が dense 側の一過性スパイク(×0.18)だったのを除く **4 ラン が ×1.20 / ×1.22 / ×1.27 / ×1.31 に密集**
+    (dense ~7-8ms / stream ~9.5-11ms)。→ **純粋な per-layer dequant 再計算コストは安定 ~×1.25**。
+  - **結論(honest)**: 「常駐 72% 削減」の latency 対価は、**圧力のない領域では ~×1.25 の小さな定数**。130M で見えた
+    ×0.2〜×11 のカオスは**アルゴリズムコストでなく RAM 圧 thrashing**。交絡(memory-pressure)を統制して初めて
+    アルゴリズム本来のコストが見える、という計測規律の実例。大規模での厳密定量化は要・高RAM/GPU オフロード。
+    計時の仕組みは committed。
 
 ## (b) int8 weight-only 量子化 footprint vs PPL (`out/int8_quant_footprint*.json`)
 
