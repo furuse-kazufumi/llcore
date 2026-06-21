@@ -856,3 +856,10 @@
 - WS 3872MB > 物理 RAM 3.6GB で thrashing 確定 (4096tok needle の O(T²) attention)。判断基準どおり kill (PID 16960/launcher 7744)。
 - `--needle-lengths 2048` のみで detached 再起動 (実ワーカー **PID 17624**, launcher 2484)。2048tok の attention メモリは 4096 の 1/4。起動直後 WS 2931MB で物理 RAM 内。run_meta 不変につき GA cache resume 継続。
 - これで「needle@2048」「context_sweep@2048」の両方が取れる。4096 needle は本機では非現実的 (記事には「2048 で実測、4096 はメモリ制約で未実施」と honest 開示する方針)。完了後 nas_pareto_report.py で再生成 → b2 §5 更新。
+
+### 2026-06-21 結論 — needle/2048 はローカル RAM 律速で断念、honest 開示で記事完結
+- needle 2048 のみの再走 (PID 17624) も WS 3935MB > 物理 3.6GB で thrashing 再発、CPU +12秒/分と完走見込み立たず。**2 度の thrash でローカル測定を断念**し kill (json は 22:37 完走版のまま無傷、`.bak_pre_needle` も健在)。
+- **honest 開示として記事完結**: b2 §5 / b2-general / ARTICLE_SEEDS #62 を「2048+ の sweep・needle は自宅 CPU(3.6GB RAM)では full-attention forward が WS 3.9GB に膨れ測定不能。GPU オフロードが次の正手」に更新。メタ皮肉(定数状態の長文脈メモリ爆発を測ろうとして測る側がメモリ爆発)を記事の核に昇格。commit `5fc7a58`。
+- **#62 はこれで完成形**: 技術版 b2 + 一般版 + 可視化 SVG + 挿絵プラン + honest gap(needle/2048 は GPU 待ちと明記)。実測 verdict(suppressed / HV+16.8% / regime 256-1024)は確定済み。
+- **次手(任意・将来)**: 2048/4096 の needle・sweep を実数値で得たい場合は **Kaggle GPU へオフロード**(nas_pareto + Qwen2.5-0.5B + corpus + eval_cache を bundle 化、internet で HF からモデル取得 or dataset 化)。ただし `kaggle kernels push` は外部公開につき **human gate**(LLTERM_CHOICE 必須)。本セッションでは bundle 構築まで未着手。
+- 既存の別系統 Kaggle (llcore-lm-compare kernel push) も従来どおり human gate 待ち。本セッションのコミットは全て local。
