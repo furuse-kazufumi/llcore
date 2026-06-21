@@ -771,3 +771,28 @@
 - ジョブ状態: PID 18620 稼働継続 (CPU 健全増加、rigorous tier 計算中)、`nas_pareto.json` 未着。バックグラウンド監視タスクが着地/プロセス終了を自動検知。
 - このセッションの staged 成果 (report ツール + test + 本 next_plan 追記) を **ローカルコミットで保全** (push は人間承認のまま)。`docs/SESSION_SUMMARY.md` は自動生成物として stage しない。
 - 次手: json 着地通知 → `py -3.11 scripts/nas_pareto_report.py out/nas_pareto_v2full/nas_pareto.json -o out/nas_pareto_v2full/nas_pareto_report.md` 実行 → verdict / regime / optimism_gap / hv_gain_ci を honest-disclosure 要約。
+
+---
+
+## ★2026-06-21 22:35 JST EXIT — NAS proxy-v2 走 まだ rigorous tier 継続中 (再開地点)
+
+> コンテキスト上限接近のため EXIT 準備のみ。`docs/SESSION_SUMMARY.md` は Stop hook 自動生成物につき手動編集せず、canonical handoff は本ファイル。
+
+### 現状 (22:35 時点)
+- **PID 18620 稼働継続** (15:57 起動、CPU ~89437s と健全に増加中、ハングではない)。GA/greedy 探索は完了済み (`run_light.log` 末尾 = `[zero-shot] 11 Pareto configs (386 real evals)`)。現在も **proxy-v2 rigorous tier** (`_proxy_v2_rigorous`: holdout 再評価 + context_sweep 256/512/1024/**2048**tok + attention_kl) を CPU 律速で実行中。**前セッション 21:54 から ~40 分以上 rigorous tier 継続**。`[proxy-v2 verdict]` 行 (= json 書込直前に print) は **未出力**。
+- `nas_pareto.json` は **未着** (rigorous tier 完了後に書かれる)。`eval_cache.json` は rigorous tier 非書込のため entries 不変が正常。
+- `git status --short` = `docs/SESSION_SUMMARY.md` のみ (自動生成・無視)。本 EXIT 追記分の `docs/next_plan.md` はこの後コミットする。
+- **バックグラウンド監視タスク `b2anr3f81`** が `out/nas_pareto_v2full/nas_pareto.json` 出現 or PID 18620 消滅を 60s 間隔で検知する設計だったが、**新セッションでは別プロセスにつき再度自前確認が必要**。
+
+### このセッションで確定済み (commit 済み、json 着地後に即使える)
+- **解析レポート生成器** `scripts/nas_pareto_report.py` (read-only, torch 非依存, holdout 主導 + **Prior-art positioning 常時開示**)。**commit `d791f78`**。
+- 回帰テスト `tests/unit/test_nas_pareto_report.py` = **13 passed** (positioning 不変条件 `test_prior_art_positioning_always_renders` 追加)。ruff / mypy (`MYPYPATH=src`) クリーン。
+- report 生成器の読み取りキーを `nas_pareto.py` / `build_proxy_v2_report` の実出力スキーマと突合し**完全一致を確認済み** (`right_shift` はトップレベル distill 専用、`proxy_v2.verdict` は別ブロック)。
+- 記事ネタ **#62** (`docs/ARTICLE_SEEDS.md`, NAS proxy-v2 honest-disclosure 層) を保全。**commit `9550ac6`**。実 verdict 数値は json 着地後に追記予定。
+
+### 次の具体的な一手 (新セッション)
+1. `ls out/nas_pareto_v2full/nas_pareto.json` で着地確認。
+   - **未着なら**: `Get-Process -Id 18620` で CPU 増加を確認 (継続中なら待機継続、重い計算をローカル新規起動しない)。`run_light.log` 末尾に `[proxy-v2 verdict]` 行が出たら json 書込直前。停止していれば `run_light.err` を確認。再度バックグラウンド監視 (`while [ ! -f nas_pareto.json ]; do sleep 60; ...`) を仕掛けてよい。
+   - **着地済みなら**: `py -3.11 scripts/nas_pareto_report.py out/nas_pareto_v2full/nas_pareto.json -o out/nas_pareto_v2full/nas_pareto_report.md` を実行 → `proxy_v2.verdict.memetic_vs_greedy` / `confidence`、`context_sweep` の regime 依存 (L=1024 vs 2048)、`frontier_holdout` の `optimism_gap`、`hv_gain_ci` (CI_lo>0 か) を honest-disclosure 観点で要約。
+2. レポート確定後、`out/nas_pareto_v2full/nas_pareto_report.md` を確認し、記事ネタ #62 に実数値を追記。生成物のコミット要否を判断 (push は人間承認)。
+3. 別系統の **Kaggle kernel push** は従来どおり human gate のまま (本セッションでは不介入)。
