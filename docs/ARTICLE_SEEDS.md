@@ -637,10 +637,15 @@
 - **ネタ**: アーキ編はこれまで prefill/batch-forward 全体(a7)・peak メモリ(a8)・静的 RSS 床(a9)を測ってきた。
   抜けていたのが **decode 軸 = streaming 生成の per-token コスト**:「既に長さ T の文脈がある状態で、次の 1
   トークンを出すのに何 ms か」。ここがアーキ差が最も鋭く出る regime。
-- **実機結果(小モデル, `scripts/decode_latency_sweep.py`)**: context age T を 64→256 に増やすと、**recurrent /
-  RWKV の decode は flat**(~0.8ms / ~2.2ms 一定 = O(1)、文脈の長さに依らない)一方、**GPT の decode は増大**
-  (8.9→32.9ms)。recurrent は「熟成済みの定数状態に 1 step 足すだけ」、cache 無し GPT は「毎トークン全文脈を
-  再 forward」だから。
+- **実機結果(小モデル n_embd=256/L4, `scripts/decode_latency_sweep.py`, T 128→2048・repeats=7)**:
+  - **recurrent decode = 完全 flat**: 0.787 / 0.781 / 0.771 / 0.757 / 0.783 ms(T を 16× 伸ばして **×0.995**、
+    指数 p≈**-0.006** = 純粋 O(1)、文脈の長さに一切依らない)。これが load-bearing。
+  - **GPT decode = ×77.7 の爆増**: 16.0 / 46.7 / 107.8 / 243.1 / **1242.1** ms(指数 p≈1.35〜1.49)。1024→2048 で
+    ×5.1 と跳ねるのは attention O(T²) が支配に入る regime(a8 の regime 依存と同じ:T が n_embd を超えると二次項が床を追い越す)。
+  - **RWKV**: 512 以降は flat(2.12 / 2.15 / 2.59 ms)だが、T=128/256 が startup 外れ値(19.97 / 6.72 ms、初回
+    subprocess の JIT/キャッシュ温まり)で指数 p≈-0.75 は汚染 → **構造結論には settled 値のみ使う**(a7 と同じ RWKV
+    startup ノイズの既知問題、honest に開示)。
+  - recurrent は「熟成済みの定数状態に 1 step 足すだけ」、cache 無し GPT は「毎トークン全文脈を再 forward」だから。
 - **honest 3点**: (1) cross-mode の絶対 ms は比較不可(recurrent=Python per-step ループ / GPT=vectorized)。
   (2) この GPT は **KV cache を持たない**(production は cache で decode を O(T)/token に落とす)が、cache 有りでも
   GPT decode は T とともに増え、recurrent の O(1) flat とは質的に異なる。(3) GPT 指数が O(T²) の 2 でなく ~0.95
