@@ -1080,3 +1080,9 @@
   - 新節 (0'')compute軸: GPT p≈1.37超線形 / recurrent・RWKV p≈0.99線形(cross-mode絶対比較不可・指数のみ、repeats=11でRWKVノイズ解消の経緯付)。
   - 新節 (0''')静的床: torch税~180MB支配(初回197.3≒再現197.8)、足場比はモデル規模依存(142×/73×)。
 - → 正本が記事(a7/a8/a9)と計測ハーネス(recurrent_latency_sweep/runtime_floor_rss/curve32)に整合。「記事の引用先が新測定に対し不完全」な状態を解消。artifact 実在確認済(out/ はgitignoreだが既存節と同方針)。
+
+### 2026-06-22 追記 — int8 streaming の「裏コスト=latency」を計測試行 → 本機で非再現(honest 非結果)
+- findings (c) は常駐72%削減のメモリ勝利のみで latency 対価が未測だったため、`int8_streaming_infer.py` に forward median 計時(`--forward-repeats`)+回帰テスト追加(6 passed, ruff/mypy green)。
+- 実測: 倍率が 4ラン で ×1.46/×10.88/×11.72/×0.21 と桁違いに振れ方向反転=**本機(RAM3.6GB)では memory-pressure 雑音支配で信頼測定不能**。単一倍率は load-bearing にせず、findings (c) と script の honest 文言に「非再現・要オフロード」を明記。計時の仕組みは committed(安定環境で再走可)。
+- ARTICLE_SEEDS に記事ネタ追記(「勝ちのコストを測ろうとしたら計測自体が低RAM機で信用できなかった」=honest-disclosure/計測規律)。
+- これは `feedback_benchmark_honest_disclosure`(失敗を消さず教訓化)の実践。次に定量化するなら Kaggle/GH Actions の高RAM環境へオフロード(human gate)。

@@ -83,13 +83,17 @@ def _save_tiny_int8(mod: Any, tmp_path: Path) -> Path:
 def test_run_worker_modes_agree(tmp_path: Path) -> None:
     mod = _load_script()
     ckpt = _save_tiny_int8(mod, tmp_path)
-    dense = mod.run_worker(ckpt, "dense")
-    stream = mod.run_worker(ckpt, "stream")
-    capped = mod.run_worker(ckpt, "stream", 512 * 1024 * 1024)  # high cap: no constraint
+    dense = mod.run_worker(ckpt, "dense", forward_repeats=2)
+    stream = mod.run_worker(ckpt, "stream", forward_repeats=2)
+    capped = mod.run_worker(ckpt, "stream", 512 * 1024 * 1024, forward_repeats=2)  # high cap: no constraint
     # All three start from the SAME int8 source -> identical logits.
     assert dense["checksum"] == stream["checksum"] == capped["checksum"]
     # int8 stream holds less resident than the dense fp32 materialization.
     assert stream["resident_mb"] < dense["resident_mb"]
+    # Latency is measured (>= 0) and the repeat count is honored.
+    for rec in (dense, stream, capped):
+        assert rec["forward_ms_median"] >= 0.0
+        assert rec["forward_repeats"] == 2
 
 
 def test_main_end_to_end_tiny(tmp_path: Path) -> None:
@@ -100,9 +104,11 @@ def test_main_end_to_end_tiny(tmp_path: Path) -> None:
     ])
     assert rc == 0
     payload = json.loads((tmp_path / "s.json").read_text(encoding="utf-8"))
-    assert set(payload) >= {"dense", "stream", "stream_capped", "checksum_match"}
+    assert set(payload) >= {"dense", "stream", "stream_capped", "checksum_match", "latency_overhead_x"}
     assert payload["checksum_match"] is True
     assert payload["resident_reduction_pct"] > 0.0  # int8 stream resident < dense fp32
+    assert payload["dense"]["forward_ms_median"] >= 0.0
+    assert payload["stream"]["forward_ms_median"] >= 0.0
 
 
 def test_worker_rejects_missing_checkpoint(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:

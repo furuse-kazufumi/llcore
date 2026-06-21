@@ -190,8 +190,15 @@ stream(層ごと dequant)** を別プロセスで比較。
   は dense が要求する RAM 未満で動かせる**((a') の RAM 超機構と同根)。
 - **正当性**: dense / stream / stream(capped) の logits checksum **全一致**(-192.1)= メモリ最適化は結果不変
   (量子化誤差は別問題で (b) で測定済み)。
-- 留保: 量子化は `nn.Linear` のみ(Embedding/LN は fp32)。simulated quant(速度未測)。「resident ≈ 最大層」
+- 留保: 量子化は `nn.Linear` のみ(Embedding/LN は fp32)。「resident ≈ 最大層」
   まで絞るには int8 自体も mmap でストリーム + 圧力が要る(本版は int8 を常駐保持)。
+- **2026-06 追記 — 裏コスト(latency)を測ろうとした honest 非結果**: stream は forward 毎に層ごと dequant=
+  再計算するので dense より遅いはず、と考え `int8_streaming_infer.py` に forward median 計時を追加(`--forward-repeats`)。
+  だが **本機(RAM ~3.6GB)では倍率が 4 ラン で ×1.46 / ×10.88 / ×11.72 / ×0.21 と桁違いに振れ、方向すら反転**
+  (130M forward が memory-pressure / page-fault 雑音に支配され、dense が thrash すると逆に stream が速く見える)。
+  → **「常駐 72% 削減の latency 対価」は本機では信頼測定不能。単一倍率を load-bearing にしない**(cherry-pick 回避)。
+  定量化は要・高RAM/GPU オフロード(`feedback_benchmark_honest_disclosure`: 失敗を消さず教訓として残す)。
+  計時の**仕組み自体は committed**(安定環境/オフロードで再走すれば取れる)。
 
 ## (b) int8 weight-only 量子化 footprint vs PPL (`out/int8_quant_footprint*.json`)
 

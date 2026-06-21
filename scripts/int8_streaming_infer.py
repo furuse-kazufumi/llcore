@@ -35,8 +35,10 @@ import argparse
 import ctypes
 import gc
 import json
+import statistics
 import subprocess
 import sys
+import time
 from pathlib import Path
 from typing import Any, cast
 
@@ -184,10 +186,14 @@ def _build_int8_skeleton(cfg: GPTConfig) -> nn.Module:
 
 
 @torch.no_grad()
-def run_worker(checkpoint: Path, mode: str, cap_bytes: int | None = None) -> dict[str, Any]:
-    """1 モード(dense / stream)で mmap-load + forward し peak WS / pagefile / checksum を返す。
+def run_worker(checkpoint: Path, mode: str, cap_bytes: int | None = None,
+               forward_repeats: int = 5) -> dict[str, Any]:
+    """1 モード(dense / stream)で mmap-load + forward し peak WS / pagefile / checksum / latency を返す。
 
     cap_bytes 指定時は load 前に working-set hard max を課す(圧力下の挙動を見る)。
+    最初の forward(checksum 兼 warmup)後に ``forward_repeats`` 回計時し中央値 ms を記録する。
+    これが「メモリ勝ち(常駐削減)の裏コスト」= stream は forward 毎に層ごと dequant=再計算する分
+    の latency を dense(load 時一括 dequant 済み)と比べるための信号。
     """
     cap_set = False
     if cap_bytes is not None:
@@ -204,8 +210,15 @@ def run_worker(checkpoint: Path, mode: str, cap_bytes: int | None = None) -> dic
     torch.manual_seed(0)
     t = min(64, cfg.block_size)
     idx = torch.randint(0, cfg.vocab_size, (1, t))
-    logits = cast(CharGPT, model).forward_logits(idx)
+    gpt = cast(CharGPT, model)
+    logits = gpt.forward_logits(idx)  # warmup 兼 checksum
     checksum = float(logits.double().sum().item())
+    samples: list[float] = []
+    for _ in range(max(1, forward_repeats)):
+        start = time.perf_counter()
+        out = gpt.forward_logits(idx)
+        _ = float(out.float().sum().item())  # 計算を実体化
+        samples.append(time.perf_counter() - start)
     peak_ws, peak_pf = _peak_mem()
     return {
         "mode": mode,
@@ -215,12 +228,15 @@ def run_worker(checkpoint: Path, mode: str, cap_bytes: int | None = None) -> dic
         "peak_ws_mb": round(peak_ws / 1e6, 1),
         "peak_pagefile_mb": round(peak_pf / 1e6, 1),
         "checksum": checksum,
+        "forward_ms_median": round(statistics.median(samples) * 1e3, 3),
+        "forward_repeats": len(samples),
     }
 
 
-def _spawn_worker(checkpoint: Path, mode: str, cap_bytes: int | None = None) -> dict[str, Any]:
+def _spawn_worker(checkpoint: Path, mode: str, cap_bytes: int | None = None,
+                  forward_repeats: int = 5) -> dict[str, Any]:
     cmd = [sys.executable, str(Path(__file__).resolve()), "--worker", mode,
-           "--checkpoint", str(checkpoint)]
+           "--checkpoint", str(checkpoint), "--forward-repeats", str(forward_repeats)]
     if cap_bytes is not None:
         cmd += ["--cap-bytes", str(cap_bytes)]
     proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8")
@@ -244,6 +260,8 @@ def _build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--worker", choices=["dense", "stream"], default=None)
     ap.add_argument("--checkpoint", default=None)
     ap.add_argument("--cap-bytes", type=int, default=None)
+    ap.add_argument("--forward-repeats", type=int, default=5,
+                    help="forward を計時する回数(中央値を記録、warmup は別途 1 回)")
     return ap
 
 
@@ -255,7 +273,8 @@ def main(argv: list[str] | None = None) -> int:
         if not args.checkpoint or not Path(args.checkpoint).exists():
             print(f"error: --worker needs an existing --checkpoint: {args.checkpoint}", file=sys.stderr)
             return 2
-        result = run_worker(Path(args.checkpoint), args.worker, args.cap_bytes)
+        result = run_worker(Path(args.checkpoint), args.worker, args.cap_bytes,
+                            forward_repeats=args.forward_repeats)
         print(RESULT_PREFIX + json.dumps(result, ensure_ascii=False))
         return 0
 
@@ -273,37 +292,51 @@ def main(argv: list[str] | None = None) -> int:
         f"(={sizes['int8_bytes']/sizes['fp32_bytes']:.3f})  int8 file={sizes['file_bytes']/1e6:.1f} MB"
     )
 
-    dense = _spawn_worker(ckpt, "dense")
-    stream = _spawn_worker(ckpt, "stream")
+    dense = _spawn_worker(ckpt, "dense", forward_repeats=args.forward_repeats)
+    stream = _spawn_worker(ckpt, "stream", forward_repeats=args.forward_repeats)
     # 圧力下の本番: dense の resident(全 fp32)未満の working-set 上限で stream を走らせる。
     # stream の必須常駐は int8(~1/4)なので、dense が収まらない上限でも完走できるはず。
     cap_bytes = int(sizes["int8_bytes"] / 1e6 + 220) * 1_000_000
-    stream_capped = _spawn_worker(ckpt, "stream", cap_bytes)
+    stream_capped = _spawn_worker(ckpt, "stream", cap_bytes, forward_repeats=args.forward_repeats)
     checksum_match = dense["checksum"] == stream["checksum"] == stream_capped["checksum"]
 
-    print("\n| mode | cap | resident | peak WS | peak pagefile | checksum |")
-    print("|" + "---|" * 6)
+    print("\n| mode | cap | resident | peak WS | peak pagefile | forward ms | checksum |")
+    print("|" + "---|" * 7)
     for rec in (dense, stream, stream_capped):
         cap = "none" if rec["cap_mb"] is None else f"{rec['cap_mb']}MB({'set' if rec['cap_set_ok'] else 'NOT'})"
         print(
             f"| {rec['mode']} | {cap} | {rec['resident_mb']} MB | {rec['peak_ws_mb']} MB | "
-            f"{rec['peak_pagefile_mb']} MB | {rec['checksum']:.4g} |"
+            f"{rec['peak_pagefile_mb']} MB | {rec['forward_ms_median']} ms | {rec['checksum']:.4g} |"
         )
 
     resident_red = (1.0 - stream["resident_mb"] / dense["resident_mb"]) * 100 if dense["resident_mb"] else 0.0
     capped_below_dense = stream_capped["peak_ws_mb"] < dense["resident_mb"]
+    # メモリ勝ちの裏コスト: stream は forward 毎に層 dequant=再計算するので dense より遅いはず。
+    dense_ms = dense["forward_ms_median"]
+    stream_ms = stream["forward_ms_median"]
+    latency_overhead_x = round(stream_ms / dense_ms, 2) if dense_ms > 0 else float("nan")
     print(
         f"\n[headline] **堅牢な勝ち = 常駐モデル {resident_red:.0f}% 削減**"
         f"(dense fp32 {dense['resident_mb']} MB → stream int8 {stream['resident_mb']} MB)。"
         f" 圧力なしの peak WS は torch allocator/transient 支配でほぼ不変だが、**working-set 上限 "
         f"{cap_bytes/1e6:.0f} MB(< dense 常駐 {dense['resident_mb']} MB)で stream は完走**"
         f"(capped peak WS {stream_capped['peak_ws_mb']} MB"
-        f"{' < dense 常駐 ✓' if capped_below_dense else ''})= 実 RAM 削減が顕在化。"
+        f"{' < dense 常駐 [OK]' if capped_below_dense else ''})= 実 RAM 削減が顕在化。"
+    )
+    print(
+        f"[cost] メモリ勝ちの裏コスト = latency(本ラン): stream forward {stream_ms} ms vs dense {dense_ms} ms "
+        f"= ×{latency_overhead_x}。理屈上 stream は forward 毎に層ごと dequant=再計算する分だけ遅いはず。"
+    )
+    print(
+        "[honest/latency] **この倍率は本機(低RAM)では信頼できない**: 複数ランで ×0.2〜×11 と桁違いに振れ、"
+        "方向すら反転した(130M forward が memory-pressure / page-fault 雑音に支配されるため。dense が thrash "
+        "すると逆に stream が速く見える)。**latency コストの定量化は要・高RAM/GPU オフロード**=本機の単一倍率は load-bearing にしない。"
     )
     print(f"[functional] dense / stream / stream(capped) の logits checksum 全一致: {checksum_match}。")
     print(
         "[honest] 圧力なしでは peak WS は減らない(allocator が解放 fp32 を OS へ返さない)= "
-        "削減は『常駐の下限』と『圧力下の完走可否』に出る。量子化は nn.Linear のみ・simulated quant(速度未測)。"
+        "削減は『常駐の下限』と『圧力下の完走可否』に出る。量子化は nn.Linear のみ。latency は "
+        "forward median を実測する仕組みは入れたが、本機では上記のとおり不安定で単一値は信頼しない。"
     )
 
     payload: dict[str, Any] = {
@@ -318,6 +351,7 @@ def main(argv: list[str] | None = None) -> int:
         "checksum_match": checksum_match,
         "resident_reduction_pct": round(resident_red, 1),
         "capped_peak_below_dense_resident": capped_below_dense,
+        "latency_overhead_x": latency_overhead_x,
     }
     outp = Path(args.json)
     outp.parent.mkdir(parents=True, exist_ok=True)

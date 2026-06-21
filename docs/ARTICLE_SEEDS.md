@@ -617,3 +617,16 @@
 - **気付き**: 自宅 RAM 3.6GB では 2048tok の full-attention forward が working set 3.9GB に膨れて thrash([a8]/#40 の構造が測る側に牙を剥いた)。GPU でなく **RAM が支配項**なので GH Actions 標準ランナー(7GB)で解ける。だが素朴にやると (a)GA を CI で fresh 実行=2 コアで ~26h>6h 上限、(b)9.8MB コーパス全文を repo にコミット、の二重苦。解は 3 点セット: **(1)GA 結果(eval_cache snapshot)を fixture 化して resume → GA をスキップ、(2)コーパスは base_nll を厳密再現し全 holdout/sweep/needle 窓(最大~32768tok)を満たす先頭 20 万字プレフィックス(580KB)だけコミット(全文 9.8MB 不要)、(3)resume 失敗(meta mismatch)時は 26h GA 再走の前に fail-fast(`grep [resume] || exit 1`)**。= 重いオフロードは「全部送る」でなく「再現に必要な最小集合 + 安全な早期失敗」で設計する。
 - **根拠(2026-06-21)**: `.github/workflows/nas-needle-offload.yml` + `ci/fixtures/`(corpus prefix 580KB / eval_cache 109KB)(commit `1853d0b`)。プレフィックスは 50k 文字 skip 後 171,918 tok を生成(必要 32,768 を大幅超過)。push 手前まで構築・ローカル resume 実証済み。**残: push=human gate(外部公開)**。#63 の cross-machine resume 堅牢化が前提。
 - **側面**: 技術設計 / 計算オフロード / 教訓 / honest disclosure(必要最小集合の見極め)。**フック=「問題は GPU 不足でなく RAM 不足。コーパスは全文でなく先頭 20 万字で足りた」**。[a8](動的支配項)/[a9](静的支配項)の実務的続編=「支配項を見極めて、それだけを攻める」をオフロード設計に適用。
+
+## 2026-06-22 (セッション: アーキ編 計測強化)
+
+### N. 「勝ちのコスト」を測ろうとしたら、計測自体が低RAM機で信用できなかった
+- **気付き**: int8 streaming 推論は常駐を 72% 削るが、その裏コスト(層ごと dequant=再計算の latency)を
+  測ろうと forward median 計時を足した。ところが本機(RAM ~3.6GB)では倍率が **4ラン で ×1.46 / ×10.88 /
+  ×11.72 / ×0.21** と桁違いに振れ、**方向すら反転**(dense が page-fault で thrash すると逆に stream が速く見える)。
+- **教訓**: メモリ削減の対価を測る行為そのものが、メモリ圧の強い環境では memory-pressure 雑音に飲まれる。
+  「省メモリの代償は latency」という直感は正しい向きでも、**低RAM機では定量化できない**(単一倍率は cherry-pick)。
+  → 正しい対応は「本機では非再現と明示し、定量化は高RAM/GPU へオフロード」。失敗を消さず仕組みは残す。
+- **根拠**: `scripts/int8_streaming_infer.py`(`--forward-repeats`)/ `out/int8_streaming_infer.json` /
+  `docs/MEMORY_EFFICIENCY_FINDINGS.md` (c) 節 2026-06 追記。
+- **側面**: honest disclosure / 計測規律 / 教訓 / 現実接続(自宅低スペックの制約が計測限界を作る)。
