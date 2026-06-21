@@ -30,6 +30,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 
@@ -55,7 +56,7 @@ def _rand_block(rng: np.random.Generator) -> StateUpdateGene:
     return StateUpdateGene(**{k: _rand_in_clip(rng, k) for k in _PARAMS})
 
 
-def _rand_changeop(rng: np.random.Generator, step: int) -> dict:
+def _rand_changeop(rng: np.random.Generator, step: int) -> dict[str, Any]:
     """A single in-clip reparam_inplace ChangeOp (the fully-supported family)."""
     key = _PARAMS[int(rng.integers(len(_PARAMS)))]
     return {
