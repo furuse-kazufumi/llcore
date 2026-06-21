@@ -15,7 +15,9 @@
 | 柱 | スクリプト | 何を実測したか | ヘッドライン |
 |---|---|---|---|
 | (0) 定数状態 vs 文脈線形 | `scripts/memory_footprint_harness.py` | recurrent state の実バイト vs GPT KV/attn | T を 16× にしても recurrent **×1.00**、GPT KV **×16**、attn **×256** |
-| (0') runtime peak RSS | `scripts/recurrent_runtime_rss.py` | 実生成ループの peak WS を文脈長スイープ | T ×8 で **GPT peak ×2.65 / Recurrent・RWKV ×1.00**(解析値を実機裏取り)|
+| (0') runtime peak RSS | `scripts/recurrent_runtime_rss.py` | 実生成ループの peak WS を文脈長スイープ | T ×8 で **GPT peak ×2.65 / Recurrent・RWKV ×1.00**(解析値を実機裏取り)。32×曲線で **regime 依存 ×1.11→×6.75**(`curve32`)|
+| (0'') runtime latency | `scripts/recurrent_latency_sweep.py` | 推論 wall-clock の文脈長スケーリング指数 p | T ×16 で **GPT p≈1.37(超線形 O(T²)寄り)/ Recurrent・RWKV p≈0.99(線形 O(T))**。cross-mode 絶対比較不可・各モード内の指数のみ |
+| (0''') static RSS 床 | `scripts/runtime_floor_rss.py` | python/+torch/+model の段階 RSS(別プロセス隔離) | **torch ランタイム税 ~180MB が支配**(別ラン再現、初回 197.3≒197.8)。足場比はモデル規模依存(1.51MB本体で142×) |
 | (a) mmap read-only 重み | `scripts/mmap_weights_poc.py` | load 時 RSS(別プロセス隔離) | eager は即全載、mmap は **load 時 ΔRSS を ~2.8% に遅延**(54MB モデル) |
 | (a') RAM 超 × mmap | `scripts/mmap_ram_exceed_poc.py` | working-set 上限 < モデルで forward 完走 | **522MB モデルを 358MB の WS 上限で完走**(出力一致)= 使える RAM < モデルでも回る |
 | (c) int8 streaming 推論 | `scripts/int8_streaming_infer.py` | dense vs 層ごと dequant の常駐/peak WS | **常駐 72% 削減**(539→149MB)/ stream は 368MB 上限で完走(出力一致)|
@@ -62,6 +64,45 @@ recurrent、(b) 量子化、の 3 つが本筋。
   大 T で支配、1024→2048 で +277MB)。**解析値(KV 線形・attn 二次)を実機 peak RSS で裏取り**。
 - honest: peak WS は torch + 固定重み + T 依存バッファの合算。クリーンな信号は増分トレンド。GPT.generate は
   block_size crop で実行上有界(本測は厳密長文脈想定)。
+- **2026-06 追記 — 32× 曲線へ拡張(`out/recurrent_runtime_rss_curve32.json`)**: 128→4096(×32)の 6 点で測ると、
+  GPT の膨張率は**計測レンジ依存**。128→512(×4)では **×1.11**(固定重み床が支配、O(T²)項は誤差に埋没)、
+  512→4096(×8)では **×6.75**(二次項が床を追い越す)、全域 128→4096 で **×7.53**。recurrent/RWKV は全域 205/216MB 平坦。
+  「×N で ×M」の M は起点で激変=単点でなく曲線で読む。1024/2048 は別ランと 0.1MB 差で一致(クロスラン再現)。
+
+## (0'') runtime latency スケーリング — compute 軸(`out/recurrent_latency_sweep.json`)
+
+メモリ(0)(0')の相補軸。`scripts/recurrent_latency_sweep.py` が**推論 wall-clock を文脈長 T で振り**、
+time ∝ Tᵖ の指数 p を log-log 最小二乗で推定(別プロセス隔離・各点 11 回・`torch.set_num_threads(1)`)。
+
+| モード | scaling 指数 p (min) | p (median) | 解釈 |
+|---|---|---|---|
+| GPT | **1.37** | 1.46 | 超線形(O(T²) 寄り) |
+| Recurrent | **0.99** | 0.96 | 線形(O(T)) |
+| RWKV | **0.99** | 1.00 | 線形(O(T)) |
+
+- **メモリで見えた「GPT は文脈で膨張 / recurrent 系は構造的に軽い」が compute 軸でも同じ向きで再現**。
+- honest(最重要): **cross-mode の絶対 ms は比較不可**。recurrent/RWKV は Python の per-step ループ(T 回の関数呼び出し)
+  =インタプリタ律速、GPT は 1 回の vectorized forward。読むのは**各モード内の scaling 指数のみ**。
+- 当初 repeats=7 では RWKV の T=128 が startup ノイズで外れ値(p≈0.5)になったが、repeats=11 で p≈0.99 に収束
+  (ノイズ点を消さず増やして潰した経緯ごと記録)。
+
+## (0''') static RSS 床 — 文脈非依存の土台(`out/runtime_floor_rss.json`)
+
+(0)(0')(0'')が**文脈長依存**コストなのに対し、こちらは**文脈に依存しない静的な土台**。
+`scripts/runtime_floor_rss.py` が python / +torch / +model を別プロセス隔離で段階測定(各 3 回中央値)。
+
+| stage | RSS (MB, median) |
+|---|---|
+| python(素) | 18.1 |
+| + import torch | 197.8 |
+| + 豆モデル(n_embd=176) | 207.4 |
+
+- **言語ランタイム税(torch − python)= ~180MB が支配項**。初回一回限り計測(197.3MB / 税 183.9MB, a9 本文)を
+  再走可能ハーネスで裏取りし、**197.8MB / 税 179.7MB(~2% 差)で再現**。
+- 足場比(プロセス RSS ÷ int8 重み実体)は**モデル規模依存**: 1.51MB 本体で 142×、2.8MB 本体(既定 config)で 73×。
+  比の絶対値は config 依存だが「本体より足場が桁違い」の構図は不変=「bit でなくランタイム床を攻めろ」の土台。
+- honest: RSS は測定時点の WorkingSetSize 実測。int8 MB は当 config の例示。Rust/candle の baseline RSS は未計測
+  (主張の最終確証は要 candle 実測)。
 
 ## (a) mmap read-only 重み PoC (`out/mmap_weights_poc.json`)
 

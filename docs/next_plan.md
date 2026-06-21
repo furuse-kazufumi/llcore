@@ -1073,3 +1073,10 @@
 - 共有モジュール `llcore.runtime.rss` は7スクリプトから import されるため、RSS関連サブセットだけでなく**全ユニットスイートを実行**: **1013 passed / 0 failed**(警告2件=build_kaggle/preflight の意図的な重複zipメンバー fixture、無害)。
 - → 本セッションの成果(a7/a8/a9 実測強化・3計測ハーネス・可視化2 SVG・RSS計測 DRY 100%集約・各種QA、計12 local commit)は**全コードベースで回帰なし**を確認。verification-before-completion 完了。
 - **現況**: ローカル完結の高価値タスクは出し切り、全成果は検証済み・local commit 済み・push なし。残るは human gate(A:Qiita公開/B:needle push/C:Kaggle push)のみ。新規方向の指示があれば即着手、無ければ薄い量産はせず待機が最善手(quality-over-volume / feedback_benchmark_honest_disclosure 準拠)。
+
+### 2026-06-22 追記 — canonical findings 正本に新3測定を反映(MEMORY_EFFICIENCY_FINDINGS.md)
+- 記事が引く正本 `docs/MEMORY_EFFICIENCY_FINDINGS.md` が今セッションの3新測定を欠いていたため反映:
+  - 3本柱サマリに (0'')runtime latency / (0''')static RSS床 の行追加、(0') に32×曲線(regime依存)注記。
+  - 新節 (0'')compute軸: GPT p≈1.37超線形 / recurrent・RWKV p≈0.99線形(cross-mode絶対比較不可・指数のみ、repeats=11でRWKVノイズ解消の経緯付)。
+  - 新節 (0''')静的床: torch税~180MB支配(初回197.3≒再現197.8)、足場比はモデル規模依存(142×/73×)。
+- → 正本が記事(a7/a8/a9)と計測ハーネス(recurrent_latency_sweep/runtime_floor_rss/curve32)に整合。「記事の引用先が新測定に対し不完全」な状態を解消。artifact 実在確認済(out/ はgitignoreだが既存節と同方針)。
