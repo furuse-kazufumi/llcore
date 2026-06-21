@@ -287,6 +287,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--needle", action="store_true",
                     help="proxy-v2 long-context passkey/needle retrieval probe (slow; frontier only)")
     ap.add_argument("--needle-lengths", default="2048,4096", help="proxy-v2 needle context lengths")
+    # --- resumability: snapshot eval caches so a kill/restart (ccr re-login, OOM) doesn't lose hours ---
+    ap.add_argument("--checkpoint-every", type=int, default=20,
+                    help="snapshot the eval caches to <out>/eval_cache.json every N new evaluations")
+    ap.add_argument("--no-resume", action="store_true",
+                    help="ignore any existing <out>/eval_cache.json (start the search from scratch)")
     args = ap.parse_args(argv)
 
     out = Path(args.out)
