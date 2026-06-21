@@ -137,7 +137,7 @@ class ModesMeter:
         active_threshold: float = 0.9,
         require_no_diversity_collapse: bool = True,
         diversity_collapse_threshold: float = 0.05,
-    ) -> tuple[bool, dict]:
+    ) -> tuple[bool, dict[str, object]]:
         """**AND gate** 形式の adaptive regime 判定 (Codex Q4 finding 対応).
 
         falsifiable に adaptive を主張するには A_new 単独でなく
@@ -162,7 +162,7 @@ class ModesMeter:
         """
         active = self.a_new_fraction_active()
         collapsed = self.diversity_collapsed(threshold=diversity_collapse_threshold)
-        info: dict = {
+        info: dict[str, object] = {
             "a_new_active_frac": active,
             "a_new_threshold": active_threshold,
             "diversity_collapsed": collapsed,

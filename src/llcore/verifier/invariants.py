@@ -32,7 +32,7 @@ from dataclasses import dataclass
 import numpy as np
 
 try:
-    import z3
+    import z3  # type: ignore[import-untyped]
     _HAS_Z3 = True
 except ImportError:
     _HAS_Z3 = False
