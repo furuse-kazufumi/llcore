@@ -1125,6 +1125,7 @@
   - **マイルストン**: 出荷ツール・記事裏付け・ベンチ・計測ハーネス・poc 系——**価値のあるスクリプトは全て strict-clean + CI gate enforce**。残るは rad_* 研究utilのみ。
   - **★★ 完全達成(2026-06-22)** commits `d3b819f`(rad_* 7本)・`d-`(generate_properties)・`270b9a7`(CI単純化): RAD util 7本 + vnncomp_benchmark サブディレクトリも含め **scripts/ 全体が strict-clean**。`mypy src scripts --strict` = **126ファイル 0エラー**。rad_* は統一レシピ(dict[str,object]→Any 置換 + 全 type:ignore 除去 + 残差を最小注釈)で一掃。**CI を allowlist 廃止して whole-dir `mypy src scripts --strict` へ単純化**(新規スクリプトも strict 必須=より強いゲート)。allowlist ファイルは HISTORICAL note 化(削除せず保持)。
   - **結論: src + scripts 全 126ファイルが mypy --strict クリーン。型債務は完済。** 残るローカル余地は research/ の ruff 805件(実験コード・低価値・据置)のみ。
+  - **(監査 2026-06-22) tests/ strict 化は非推奨と判定**: `mypy tests/unit --strict` は 286件だが、サンプル精査の結果 arg-type 105 はほぼ「kwargs 辞書 `**dict[str,float]` の splat」「固定 tuple `tuple[float,float]` vs 可変 `tuple[float,...]` の variance」「テストヘルパ(_RandomTargetTask 等)の Protocol 不一致」= strict 由来のノイズで**実バグは検出されず**。tests/ は production/CI gate 対象外であり、ここを strict 化しても得るのは型ノイズの黙殺のみ=quality-over-volume に反するため**据置**(将来 test ヘルパに本物の型不整合疑いが出た時だけ個別対応)。これは「無駄足回避のための監査記録」。
 - **次の一手**: (a) human gate の A=Qiita公開 / B=needle GPU offload(push) / C=Kaggle push(B/C 押せば CI も初回実走し ci.yml を実地検証できる)。(b) 新題材があれば RAD 接地から。(c) ローカル余地: 残 dirty scripts(poc_0b 19/poc_ridge_unflatten 10/rad_* 30-65 等)は高工数の per-script strict 化候補=incremental に allowlist 拡張可。research/ ruff 805件は実験コードゆえ低価値・据置。
 - 方針: 指示なき薄い量産はしない(quality-over-volume)。
 
