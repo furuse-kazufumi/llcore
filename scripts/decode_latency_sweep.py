@@ -226,7 +226,7 @@ def main(argv: list[str] | None = None) -> int:
         f"\n[headline] amortization (T {lengths[0]}->{lengths[-1]}, x{lengths[-1] / lengths[0]:.0f}; min ベース指数 p): "
         f"Recurrent prefill p~{prefill_exp['recurrent']}(x{prefill_growth['recurrent']}) -> "
         f"decode p~{decode_exp['recurrent']}(x{decode_growth['recurrent']}) = O(T) を O(1) に amortize / "
-        f"GPT prefill p~{prefill_exp['gpt']} ≈ decode p~{decode_exp['gpt']}(x{decode_growth['gpt']}) = 分離不可で decode も同重 / "
+        f"GPT prefill p~{prefill_exp['gpt']} =~ decode p~{decode_exp['gpt']}(x{decode_growth['gpt']}) = 分離不可で decode も同重 / "
         f"RWKV decode x{decode_growth['rwkv']}(p~{decode_exp['rwkv']})。"
     )
     print(
