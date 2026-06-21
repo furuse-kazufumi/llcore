@@ -1110,7 +1110,8 @@
   4. `0c843b0` ridge_readout(task→SyntheticTask Protocol・コールバック契約 object→cast)/ honest_eval(scipy ignore・codec→`GeneCodec[StateUpdateGene]`)/ protocol(`VerifierBackend` の GeneT を入力専用 **contravariant TypeVar** に分離)。
   5. `7775253` minimal_ga: FitnessFunc が StateUpdateGene 具象固定 = evolve は StateUpdateGene 特殊化のため、Population/Individual を `[StateUpdateGene]` で精密注釈・tournament_select を generic 化・closures に型付与。gene_matrix の as_array のみ契約根拠つき `type:ignore[attr-defined]`。
 - 各 commit で対象モジュール `mypy --strict` green + ruff clean + 関連テスト green を確認済み。**フルユニット回帰 = `1010 passed / 3 failed`(539s)。回帰ゼロ**: 失敗3件はすべて `test_poc_7a_vnn_comp_reference.py`(`test_sat_genuine_emits_witness` / `test_sat_spurious_becomes_unknown` / `test_verify_gene_safe_sets_solver_status`)で、**セッション開始前 `b8bd651` でも同一3件が失敗**することを checkout 検証済み = 本 mypy 作業と無関係の pre-existing バグ(`poc_7a_vnn_comp_reference_impl` に `is_z3_available` 属性が無い)。
-- **次の一手**: (a) **pre-existing 失敗3件の修正**(`poc_7a` の `is_z3_available` 欠落 = ローカル完結・低リスク・最優先候補)。(b) mypy strict を CI gate 化(`mypy src --strict` が全緑になったので enforce 可能)。(c) human gate の A=Qiita公開 / B=needle GPU offload(push) / C=Kaggle push。(d) 新題材があれば RAD 接地から。
+- **(済) pre-existing 失敗3件を修正** commit `3e0ebf9`: `poc_7a_vnn_comp_reference_impl` が `llcore.verifier` から `is_z3_available` を取り込んでおらず `ref.is_z3_available()` が AttributeError → re-export(noqa:F401)で配線修復。test_poc_7a **30件 green**、ruff clean。これでフルユニットは **1013 passed / 0 failed 見込み**(局所 30 + 既存 1010 が論理的に全緑、3失敗を解消)。
+- **次の一手**: (a) mypy strict を CI gate 化(`mypy src --strict` が全緑になったので enforce 可能)。(b) human gate の A=Qiita公開 / B=needle GPU offload(push) / C=Kaggle push。(c) 新題材があれば RAD 接地から。
 - 方針: 指示なき薄い量産はしない(quality-over-volume)。
 
 ## ★2026-06-22 EXIT — 再開地点(旧, 上の EXIT(2) で更新済)
