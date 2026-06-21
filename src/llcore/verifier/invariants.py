@@ -121,11 +121,8 @@ def verify_state_norm_invariant(
     solver.add(s >= -state_bound, s <= state_bound)
     solver.add(x >= -max_input_abs, x <= max_input_abs)
 
-    # tanh argument
-    pre = mix * x + gate_str * s
-    # tanh upper/lower (sound bound: |tanh(z)| <= min(|z|, 1))
-    # → upper = if |pre| <= 1: pre else sign(pre)
-    # 簡単のため tanh ∈ [-1, 1] で表現 (もっと厳しい近似)
+    # tanh argument は mix*x + gate_str*s。厳密には |tanh(z)| <= min(|z|, 1) の sound 上界が
+    # 使えるが、ここでは簡単のため緩い側の tanh ∈ [-1, 1] で表現する(より保守的=安全側の近似)。
     tanh_val = z3.Real("tanh_val")
     solver.add(tanh_val >= -1, tanh_val <= 1)
     # tanh は単調かつ符号一致なので: sign(pre) == sign(tanh_val) のヒント
@@ -390,9 +387,8 @@ def verify_lipschitz_contraction(
     l_bound = _lipschitz_upper_bound(g.decay, g.gate_str)
 
     if not _HAS_Z3:
-        # fail-safe: z3 不在では「数式上界による assumed」を返すが、検証ではない。
-        # 呼び出し側はゲートとして used_z3=False を未検証 (reject 側) に扱うこと。
-        assumed = l_bound < 1.0
+        # fail-closed: z3 不在では contraction を None(未決)で返す。数式上界 l_bound は参考値として
+        # L_upper_bound に載せるが判定には使わない。呼び出し側は used_z3=False を未検証(reject 側)に扱うこと。
         return LipschitzResult(
             contraction=None,
             L_upper_bound=l_bound,

@@ -22,7 +22,7 @@ verify_gene_safe 等) は一切変更しない (設計 doc §5 (D))。
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Protocol, TypeVar, runtime_checkable
 
 import numpy as np

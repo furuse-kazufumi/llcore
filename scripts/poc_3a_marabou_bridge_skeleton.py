@@ -48,10 +48,8 @@ if str(_SRC) not in sys.path:
 
 from llcore.state_update import StateUpdateGene  # noqa: E402
 from llcore.verifier import (  # noqa: E402
-    ChangeOp,
     ChangeOpSequence,
     decay_shift,
-    epsilon_for,
     gate_shift,
     get_bridge_status,
     is_marabou_available,

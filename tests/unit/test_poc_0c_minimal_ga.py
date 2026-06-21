@@ -17,7 +17,6 @@ from llcore.evolution import (
     Population,
     crossover_uniform,
     evolve,
-    initialize_random_population,
     tournament_select,
     uniform_mutate,
 )

@@ -22,7 +22,6 @@ from llcore.evolution.honest_eval import FalsificationResult, evolution_vs_rando
 from llcore.fitness import (
     AdditionTask,
     CopyTask,
-    FixedReadout,
     fit_ridge_readout,
     make_fixed_readout,
     make_ridge_eval_once,

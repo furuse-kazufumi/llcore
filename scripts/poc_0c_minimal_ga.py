@@ -59,7 +59,7 @@ _SRC = _PROJ_ROOT / "src"
 if str(_SRC) not in sys.path:
     sys.path.insert(0, str(_SRC))
 
-from llcore.evolution import evolve, initialize_random_population  # noqa: E402
+from llcore.evolution import evolve  # noqa: E402
 from llcore.fitness import (  # noqa: E402
     AdditionTask,
     CopyTask,

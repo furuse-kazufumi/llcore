@@ -46,7 +46,6 @@ from llcore.verifier.changeop import (
     mix_shift,
 )
 from llcore.verifier.refinement import (
-    epsilon_for,
     verify_refinement_single,
 )
 

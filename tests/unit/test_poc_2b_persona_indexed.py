@@ -22,7 +22,6 @@ from llcore.persona import (
     NUM_PERSONAS,
     PERSONA_LABELS,
     PERSONA_PRIORS,
-    PersonaPrior,
     persona_sample_gene,
 )
 from llcore.state_update import StateUpdateGene

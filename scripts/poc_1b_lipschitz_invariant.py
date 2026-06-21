@@ -59,7 +59,6 @@ if str(_SRC) not in sys.path:
 
 from llcore.state_update import StateUpdateGene, run_sequence  # noqa: E402
 from llcore.verifier import (  # noqa: E402
-    empirical_lipschitz,
     is_z3_available,
     verify_gene_safe,
     verify_lipschitz_contraction,

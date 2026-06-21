@@ -60,7 +60,6 @@ from llcore.evolution import (  # noqa: E402
     LineageReservoir,
     ModesMeter,
     crossover_uniform,
-    pairwise_l2_diversity,
     uniform_mutate,
 )
 from llcore.fitness import (  # noqa: E402
@@ -72,7 +71,6 @@ from llcore.fitness import (  # noqa: E402
 from llcore.persona import (  # noqa: E402
     NUM_PERSONAS,
     PERSONA_LABELS,
-    PERSONA_PRIORS,
     persona_sample_gene,
 )
 from llcore.state_update import StateUpdateGene  # noqa: E402

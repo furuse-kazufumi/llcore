@@ -5,7 +5,6 @@ from __future__ import annotations
 from dataclasses import replace as dc_replace
 
 import numpy as np
-import pytest
 
 from llcore.evolution import evolve
 from llcore.factor_hook import (

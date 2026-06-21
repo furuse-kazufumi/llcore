@@ -219,8 +219,8 @@ class SdpLyapunovBackend:
                 if float(np.max(np.abs(np.linalg.eigvals(J)))) >= 1.0:
                     return False
             P = _cp.Variable((n, n), symmetric=True)
-            I = np.eye(n)
-            cons = [P >> I] + [P - J.T @ P @ J >> margin * I for J in Js]
+            eye = np.eye(n)
+            cons = [P >> eye] + [P - J.T @ P @ J >> margin * eye for J in Js]
             _cp.Problem(_cp.Minimize(_cp.trace(P)), cons).solve(solver=_SDP_SOLVER)
             if P.value is None:
                 return False

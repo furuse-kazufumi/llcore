@@ -43,7 +43,6 @@ import sys
 import time
 from dataclasses import dataclass, field, replace
 from pathlib import Path
-from typing import Any
 
 import numpy as np
 
@@ -65,7 +64,6 @@ from llcore.state_update import StateUpdateGene  # noqa: E402
 from llcore.state_update.genes import eval_step  # noqa: E402
 from llcore.verifier import (  # noqa: E402
     InvariantResult,
-    is_z3_available,
     verify_gene_safe,
     verify_state_norm_invariant,
 )
