@@ -1,0 +1,54 @@
+# Latency sweeps on a clean runner — prefill (a7) + decode/amortization axes.
+#
+# Why: the author's 3.6GB local box thrashes under memory pressure, so the GPT latency
+# numbers picked up contention spikes (e.g. a noisy T=512/T=1024 point) that muddied the
+# absolute growth ratios. The GitHub runner (2 vCPU / 7GB, tiny char-level models => no
+# memory pressure) gives contention-free numbers. Only torch + llcore are needed (no
+# transformers/HF download), so this job is fast (~a few minutes).
+#
+# Trigger: push a tag `latency-run-*` (works without the workflow_dispatch / Actions:write
+# PAT permission). Artifacts: recurrent_latency_sweep.json + decode_latency_sweep.json.
+name: latency-offload
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "latency-run-*"
+
+permissions:
+  contents: read
+
+jobs:
+  latency:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install CPU torch + llcore (no transformers needed)
+        run: |
+          python -m pip install --upgrade pip
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -e .
+      - name: prefill latency sweep (a7 compute axis)
+        run: |
+          python scripts/recurrent_latency_sweep.py \
+            --lengths 128,256,512,1024,2048 --repeats 11 --warmup 3 \
+            --json out/recurrent_latency_sweep.json
+      - name: decode + amortization sweep
+        run: |
+          python scripts/decode_latency_sweep.py \
+            --lengths 128,256,512,1024,2048 --repeats 11 --warmup 5 \
+            --json out/decode_latency_sweep.json
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: latency-results
+          path: |
+            out/recurrent_latency_sweep.json
+            out/decode_latency_sweep.json
+          if-no-files-found: warn
