@@ -863,3 +863,9 @@
 - **#62 はこれで完成形**: 技術版 b2 + 一般版 + 可視化 SVG + 挿絵プラン + honest gap(needle/2048 は GPU 待ちと明記)。実測 verdict(suppressed / HV+16.8% / regime 256-1024)は確定済み。
 - **次手(任意・将来)**: 2048/4096 の needle・sweep を実数値で得たい場合は **Kaggle GPU へオフロード**(nas_pareto + Qwen2.5-0.5B + corpus + eval_cache を bundle 化、internet で HF からモデル取得 or dataset 化)。ただし `kaggle kernels push` は外部公開につき **human gate**(LLTERM_CHOICE 必須)。本セッションでは bundle 構築まで未着手。
 - 既存の別系統 Kaggle (llcore-lm-compare kernel push) も従来どおり human gate 待ち。本セッションのコミットは全て local。
+
+### 2026-06-21 追記 — needle/2048 を GH Actions で実測する案 (push gate 判断待ち)
+- **鍵となる気づき**: ローカル断念の原因は GPU 不在ではなく **RAM 不足** (WS 3.9GB > 物理 3.6GB)。リポジトリは PUBLIC なので **GH Actions 標準ランナー (7GB RAM, 2コア) なら thrash せず完走できる見込み。GPU すら不要**。
+- **実現性**: コーパスは `scripts/build_aozora_corpus.py` で再現可能。`eval_cache.json` (109KB) を CI fixture として持てば run_meta 一致で GA resume → 6.6h スキップ、rigorous tier + 2048 sweep + needle (2048,4096) のみ走る (7GB なら 4096 も収まる可能性)。HF から Qwen2.5-0.5B を取得 (internet on)。成果物 `nas_pareto.json` を artifact 化 → download → report 再生成 → b2 §5 を実数値更新。
+- **gate**: workflow (`.github/workflows/`) + fixtures (corpus 9.8MB + eval_cache 109KB) の **push が外部操作=human gate**。投機ビルドを避け、先に方針を人間に確認する。
+- 代替: (a) Kaggle GPU (push gate, bundle 構築が重い)、(b) #62 を現状の honest 開示 (RAM 律速で未測, GPU 待ち明記) のまま完成とする。
