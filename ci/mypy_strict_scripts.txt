@@ -1,67 +1,10 @@
-# mypy --strict allowlist for scripts/ (CI gate, ci.yml typecheck-test job).
+# [HISTORICAL / superseded 2026-06-22]
 #
-# scripts/ as a whole is NOT strict-clean (218 errors as of 2026-06-22), but these
-# files ARE — and several are load-bearing shipped tooling (the Kaggle bundle pipeline,
-# nas_pareto, the article-backing measurement harnesses). Gating them prevents regression.
+# This file was the incremental allowlist of strict-clean scripts while scripts/ was
+# being migrated to `mypy --strict` one file at a time. As of 2026-06-22 ALL of scripts/
+# (top-level + subdirectories) is strict-clean, so the CI gate (.github/workflows/ci.yml)
+# now runs `mypy src scripts --strict` directly — no allowlist needed. A newly added
+# script must pass --strict or CI fails.
 #
-# Invariant: `mypy src $(grep -v '^#' ci/mypy_strict_scripts.txt) --strict` must be 0 errors.
-# Add a script here once `mypy <file> --strict` (and the batch) is clean; never remove a file
-# to silence an error — fix the error instead.
-scripts/annotation_generation_poc.py
-scripts/annotation_poc.py
-scripts/build_aozora_corpus.py
-scripts/build_kaggle_lm_compare_bundle.py
-scripts/chat_endurance_probe.py
-scripts/chat_native_qwen.py
-scripts/chat_staged_smoke.py
-scripts/int8_streaming_infer.py
-scripts/mmap_ram_exceed_poc.py
-scripts/mmap_weights_poc.py
-scripts/clip_smoke.py
-scripts/connectivity_bench.py
-scripts/connectivity_retrieval_poc.py
-scripts/evolve_linearization.py
-scripts/gptq_compare.py
-scripts/int8_quant_footprint.py
-scripts/kaggle_bundle_preflight.py
-scripts/kaggle_push_readiness.py
-scripts/linearize_tolerance.py
-scripts/memory_footprint_harness.py
-scripts/nas_level2.py
-scripts/nas_pareto.py
-scripts/nas_pareto_report.py
-scripts/p1_compare.py
-scripts/p1_corpus_probe.py
-scripts/p1_manifest_inspect.py
-scripts/p1_manifest_reconcile.py
-scripts/p1_prepare_aozora.py
-scripts/poc_0a_state_update_gene.py
-scripts/poc_0b_synthetic_fitness.py
-scripts/poc_0c_minimal_ga.py
-scripts/poc_1a_z3_invariant.py
-scripts/poc_1b_lipschitz_invariant.py
-scripts/poc_2a_factor_hook_mock.py
-scripts/poc_2b_persona_indexed_verified_evolution.py
-scripts/poc_3a_marabou_bridge_skeleton.py
-scripts/poc_7a_vnn_comp_reference_impl.py
-scripts/poc_branch_a_memory_fitness.py
-scripts/poc_ridge_readout_unflatten.py
-scripts/prepare_kaggle_lm_compare_bundle.py
-scripts/qat_train.py
-scripts/quant_bitwidth_sweep.py
-scripts/quant_group_compare.py
-scripts/rad_ann_check.py
-scripts/rad_domain_filter_check.py
-scripts/rad_full_eval.py
-scripts/rad_full_ingest.py
-scripts/rad_full_probes.py
-scripts/rad_ingest_poc.py
-scripts/rad_role_filter_check.py
-scripts/rad_scale_poc.py
-scripts/rad_topic_overlap_poc.py
-scripts/recurrent_latency_sweep.py
-scripts/recurrent_longctx_eval.py
-scripts/retrieval_head_to_head.py
-scripts/recurrent_runtime_rss.py
-scripts/runtime_floor_rss.py
-scripts/train_recurrent_longctx.py
+# Kept (not deleted) for provenance. If you ever need to temporarily exempt a script,
+# prefer fixing it; this file is no longer read by CI.

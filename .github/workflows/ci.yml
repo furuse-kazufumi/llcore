@@ -48,7 +48,9 @@ jobs:
           # z3/sdp/chat bring the untyped libs whose type:ignore markers must match;
           # scipy/scikit-learn are imported by evolution/honest_eval and clip text encoders.
           pip install -e ".[dev,z3,sdp,chat,clip,text,ann]" scipy scikit-learn
-      - name: mypy --strict (src + strict-clean scripts allowlist; must stay 0 errors)
-        run: mypy src $(grep -v '^#' ci/mypy_strict_scripts.txt) --strict
+      - name: mypy --strict (src + all of scripts/; must stay 0 errors)
+        # 2026-06-22: scripts/ 全体が strict-clean になったため allowlist を廃し whole-dir 検査へ。
+        # 新規スクリプトも strict を満たさないと CI が落ちる(より強いゲート)。
+        run: mypy src scripts --strict
       - name: pytest (unit)
         run: pytest tests/unit -q
