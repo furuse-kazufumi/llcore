@@ -49,7 +49,7 @@
 
 > **compute 軸でも裏取り(メモリと同じ向きが時間にも出る):** メモリだけでなく **推論にかかる時間**も同じ T 掃引で測りました(`scripts/recurrent_latency_sweep.py` / `out/recurrent_latency_sweep.json`、各点 11 回測定、`torch.set_num_threads(1)`)。T を 128→2048(×16)に伸ばしたときの **scaling 指数 p**(time ∝ Tᵖ を log-log 最小二乗で推定。混雑に強い min ベース)は、**GPT が p≈1.37(明確に超線形、O(T²) 寄り)/ Recurrent が p≈0.99 / RWKV が p≈0.99(どちらもほぼ線形、O(T))**。メモリで見えた「Transformer は文脈で膨らむ / recurrent・RWKV は構造的に軽い」が、**時間軸でも同じ向き**で再現しました。
 >
-> ただし honest 留保。**cross-mode の絶対 ms は比較してはいけない。** recurrent/RWKV はここでは **Python の per-step ループ**(T 回の関数呼び出し)で測っており、インタプリタ呼び出しオーバーヘッドが支配的——「recurrent の方が速い/遅い」を絶対値で語るのは無意味で、読むのは **各モード内の伸び方(scaling 指数)だけ**。なお当初 repeats=7 では RWKV の T=128 が startup ノイズで外れ値になり傾きが汚れた(p≈0.5)が、**repeats=11 に増やすと RWKV も p≈0.99 に収束**——ノイズだった点を消さず、増やして潰した経緯ごと残します。
+> ただし honest 留保。**cross-mode の絶対 ms は比較してはいけない。** recurrent/RWKV はここでは **Python の per-step ループ**(T 回の関数呼び出し)で測っており、インタプリタ呼び出しオーバーヘッドが支配的——「recurrent の方が速い/遅い」を絶対値で語るのは無意味で、読むのは **各モード内の伸び方(scaling 指数)だけ**。なお当初 repeats=7 では RWKV の T=128 が startup ノイズで外れ値になり傾きが汚れた(p≈0.5)が、**repeats=11 に増やすと RWKV も p≈0.99 に収束**——ノイズだった点を消さず、増やして潰した経緯ごと残します。なお本計測は**メモリ圧のかからない小モデル**(最大でも attention 行列 ~134MB ≪ 3.6GB)で行っており、計時は安定領域にあります。別実験で 130M 級モデルの forward を測ると RAM 圧の page-fault に飲まれて倍率が ×0.2〜×11 まで暴れた(=同じ指標でも環境が結論を動かす)ので、ここで指数を load-bearing にできるのは「圧力のない regime で測ったから」です。
 
 ![推論レイテンシのスケーリング(両対数)。各モードを T=128 で正規化。GPT(赤)は ×16 の文脈で ×37 と理想線形(破線)より急に伸び、recurrent と RWKV(緑、ほぼ重なる)は ×16 文脈で ×16 と線形に乗る](../../../assets/articles/llcore_latency_scaling.svg)
 > 各モードを自分の T=128 で正規化しているので、見るのは「上がり方の急さ」だけ。GPT だけが理想線形(p=1 の破線)から上に外れる=超線形。recurrent と RWKV はほぼ重なって破線に沿う=線形。(公開時は SVG を raw 絶対 URL で参照すること)
