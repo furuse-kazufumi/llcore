@@ -1,0 +1,27 @@
+# mypy --strict allowlist for scripts/ (CI gate, ci.yml typecheck-test job).
+#
+# scripts/ as a whole is NOT strict-clean (218 errors as of 2026-06-22), but these
+# files ARE — and several are load-bearing shipped tooling (the Kaggle bundle pipeline,
+# nas_pareto, the article-backing measurement harnesses). Gating them prevents regression.
+#
+# Invariant: `mypy src $(grep -v '^#' ci/mypy_strict_scripts.txt) --strict` must be 0 errors.
+# Add a script here once `mypy <file> --strict` (and the batch) is clean; never remove a file
+# to silence an error — fix the error instead.
+scripts/annotation_generation_poc.py
+scripts/build_aozora_corpus.py
+scripts/build_kaggle_lm_compare_bundle.py
+scripts/chat_staged_smoke.py
+scripts/clip_smoke.py
+scripts/connectivity_retrieval_poc.py
+scripts/kaggle_bundle_preflight.py
+scripts/kaggle_push_readiness.py
+scripts/nas_pareto.py
+scripts/nas_pareto_report.py
+scripts/p1_compare.py
+scripts/p1_corpus_probe.py
+scripts/p1_manifest_inspect.py
+scripts/p1_manifest_reconcile.py
+scripts/p1_prepare_aozora.py
+scripts/prepare_kaggle_lm_compare_bundle.py
+scripts/rad_full_probes.py
+scripts/train_recurrent_longctx.py
