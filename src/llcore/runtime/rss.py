@@ -19,6 +19,16 @@ Linux. Any failure returns ``0`` (RSS is an auxiliary signal — never crash a b
 from __future__ import annotations
 
 import ctypes
+from typing import NamedTuple
+
+
+class ProcessMemory(NamedTuple):
+    """A snapshot of the four process-memory counters the harnesses care about (bytes)."""
+
+    working_set: int
+    peak_working_set: int
+    pagefile: int
+    peak_pagefile: int
 
 
 class _PMC(ctypes.Structure):
@@ -71,3 +81,36 @@ def working_set_bytes() -> int:
         return rss_pages * 4096
     except Exception:  # noqa: BLE001 - RSS is auxiliary; 0 keeps benchmarks running
         return 0
+
+
+def working_set_mb() -> float | None:
+    """Current working set in MB (1 decimal), or ``None`` if measurement is unavailable.
+
+    Use the ``None`` form when a caller needs to distinguish "couldn't measure" (fail-soft)
+    from a numeric reading — :func:`working_set_bytes` collapses both to ``0``.
+    """
+    b = working_set_bytes()
+    return round(b / (1024 * 1024), 1) if b > 0 else None
+
+
+def process_memory() -> ProcessMemory | None:
+    """All four process-memory counters in one WinAPI call, or ``None`` off-Windows/on failure.
+
+    Windows-only (no ``/proc`` fallback): the extra counters (pagefile) have no portable
+    equivalent and the callers that need them are Windows memory-pressure harnesses.
+    """
+    counters = _process_memory_counters()
+    if counters is None:
+        return None
+    return ProcessMemory(
+        working_set=int(counters.WorkingSetSize),
+        peak_working_set=int(counters.PeakWorkingSetSize),
+        pagefile=int(counters.PagefileUsage),
+        peak_pagefile=int(counters.PeakPagefileUsage),
+    )
+
+
+def peak_mem_bytes() -> tuple[int, int]:
+    """``(peak working set, peak pagefile)`` in bytes; ``(0, 0)`` if unavailable."""
+    pm = process_memory()
+    return (pm.peak_working_set, pm.peak_pagefile) if pm is not None else (0, 0)

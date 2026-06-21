@@ -45,42 +45,14 @@ from torch import Tensor, nn
 from torch.nn import functional as F
 
 from llcore.lm.model import CharGPT, GPTConfig  # type: ignore[import-untyped]
+from llcore.runtime.rss import peak_mem_bytes as _peak_mem  # type: ignore[import-untyped]
 
 RESULT_PREFIX = "RESULT_JSON="
 
-
-class _PMC(ctypes.Structure):
-    # PROCESS_MEMORY_COUNTERS — mirrors the other memory harnesses.
-    _fields_ = [
-        ("cb", ctypes.c_uint32), ("PageFaultCount", ctypes.c_uint32),
-        ("PeakWorkingSetSize", ctypes.c_size_t), ("WorkingSetSize", ctypes.c_size_t),
-        ("QuotaPeakPagedPoolUsage", ctypes.c_size_t), ("QuotaPagedPoolUsage", ctypes.c_size_t),
-        ("QuotaPeakNonPagedPoolUsage", ctypes.c_size_t), ("QuotaNonPagedPoolUsage", ctypes.c_size_t),
-        ("PagefileUsage", ctypes.c_size_t), ("PeakPagefileUsage", ctypes.c_size_t),
-    ]
-
-
-def _peak_mem() -> tuple[int, int]:
-    """(peak working set bytes, peak pagefile bytes) を返す(失敗時 (0,0))。
-
-    pagefile は「ダーティな anonymous ページの退避量」。stream は重みを int8(mmap で
-    file-backed=破棄可)に保つので圧力下でも pagefile が小さく、dense は dequant した
-    anonymous fp32 を退避するので大きい、という差を見るために併せて測る。
-    """
-    try:
-        import ctypes.wintypes as wt
-
-        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
-        psapi = ctypes.WinDLL("psapi", use_last_error=True)
-        kernel32.GetCurrentProcess.restype = wt.HANDLE
-        psapi.GetProcessMemoryInfo.argtypes = [wt.HANDLE, ctypes.POINTER(_PMC), wt.DWORD]
-        psapi.GetProcessMemoryInfo.restype = wt.BOOL
-        c = _PMC()
-        c.cb = ctypes.sizeof(c)
-        ok = psapi.GetProcessMemoryInfo(kernel32.GetCurrentProcess(), ctypes.byref(c), c.cb)
-        return (int(c.PeakWorkingSetSize), int(c.PeakPagefileUsage)) if ok else (0, 0)
-    except Exception:  # noqa: BLE001 - RSS は補助指標、取れなくても続行
-        return (0, 0)
+# _peak_mem() = (peak working set bytes, peak pagefile bytes), (0,0) on failure.
+# pagefile は「ダーティな anonymous ページの退避量」。stream は重みを int8(mmap で
+# file-backed=破棄可)に保つので圧力下でも pagefile が小さく、dense は dequant した
+# anonymous fp32 を退避するので大きい、という差を見るために併せて測る。
 
 
 def _set_working_set_cap(max_bytes: int) -> bool:

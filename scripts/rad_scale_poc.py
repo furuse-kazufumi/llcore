@@ -51,6 +51,7 @@ for p in (str(_SRC), str(_SCRIPTS)):
 from llcore.chat.__main__ import _ensure_utf8_stdout  # noqa: E402
 from llcore.clip import AnnotationStore, SentenceEncoderBackend  # noqa: E402
 from llcore.clip.annotations import split_annotations  # noqa: E402
+from llcore.runtime.rss import working_set_mb as _working_set_mb  # noqa: E402
 
 import connectivity_bench  # noqa: E402  (scripts/ 同居 — PROBES/ingest/rank_of/mrr を再利用)
 from rad_ingest_poc import WORLD_PROBES, strip_markdown  # noqa: E402  (M3.0 の流儀を再利用)
@@ -81,35 +82,11 @@ POC_FAILED_QUERIES: tuple[str, ...] = (
 
 
 def process_rss_mb() -> float | None:
-    """現プロセスの WorkingSetSize (MB)。Windows API 直叩き — 失敗時は None (fail-soft)。"""
-    try:
-        import ctypes
-        import ctypes.wintypes as wt
+    """現プロセスの WorkingSetSize (MB)。失敗時は None (fail-soft)。
 
-        class _PMC(ctypes.Structure):
-            _fields_ = [
-                ("cb", wt.DWORD), ("PageFaultCount", wt.DWORD),
-                ("PeakWorkingSetSize", ctypes.c_size_t), ("WorkingSetSize", ctypes.c_size_t),
-                ("QuotaPeakPagedPoolUsage", ctypes.c_size_t),
-                ("QuotaPagedPoolUsage", ctypes.c_size_t),
-                ("QuotaPeakNonPagedPoolUsage", ctypes.c_size_t),
-                ("QuotaNonPagedPoolUsage", ctypes.c_size_t),
-                ("PagefileUsage", ctypes.c_size_t), ("PeakPagefileUsage", ctypes.c_size_t),
-            ]
-
-        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
-        psapi = ctypes.WinDLL("psapi", use_last_error=True)
-        kernel32.GetCurrentProcess.restype = wt.HANDLE  # 64bit HANDLE 切詰め防止 (既知の罠)
-        fn = psapi.GetProcessMemoryInfo
-        fn.argtypes = [wt.HANDLE, ctypes.POINTER(_PMC), wt.DWORD]
-        fn.restype = wt.BOOL
-        pmc = _PMC()
-        pmc.cb = ctypes.sizeof(_PMC)
-        if fn(kernel32.GetCurrentProcess(), ctypes.byref(pmc), pmc.cb):
-            return round(pmc.WorkingSetSize / (1024 * 1024), 1)
-    except Exception:  # noqa: BLE001 - 計測の失敗で本体を落とさない
-        pass
-    return None
+    実体は単一情報源 :func:`llcore.runtime.rss.working_set_mb`(他ハーネスと同じ WinAPI 呼び出し)。
+    """
+    return _working_set_mb()
 
 
 # -- 多言語 encoder 用 prefix wrapper ------------------------------------------

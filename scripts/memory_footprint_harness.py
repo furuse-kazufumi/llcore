@@ -48,44 +48,10 @@ from torch import Tensor
 from llcore.lm.model import CharGPT, GPTConfig  # type: ignore[import-untyped]
 from llcore.lm.recurrent import RecurrentConfig, RecurrentLM  # type: ignore[import-untyped]
 from llcore.lm.rwkv import RWKVConfig, RWKVLM  # type: ignore[import-untyped]
-
-
-class _PMC(ctypes.Structure):
-    _fields_ = [
-        ("cb", ctypes.c_uint32), ("PageFaultCount", ctypes.c_uint32),
-        ("PeakWorkingSetSize", ctypes.c_size_t), ("WorkingSetSize", ctypes.c_size_t),
-        ("QuotaPeakPagedPoolUsage", ctypes.c_size_t), ("QuotaPagedPoolUsage", ctypes.c_size_t),
-        ("QuotaPeakNonPagedPoolUsage", ctypes.c_size_t), ("QuotaNonPagedPoolUsage", ctypes.c_size_t),
-        ("PagefileUsage", ctypes.c_size_t), ("PeakPagefileUsage", ctypes.c_size_t),
-    ]
-
-
-def _get_process_memory_info() -> _PMC | None:
-    """Windows の process memory info を返す。失敗時は None。"""
-    try:
-        import ctypes.wintypes as wt
-
-        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
-        psapi = ctypes.WinDLL("psapi", use_last_error=True)
-        kernel32.GetCurrentProcess.restype = wt.HANDLE
-        psapi.GetProcessMemoryInfo.argtypes = [wt.HANDLE, ctypes.POINTER(_PMC), wt.DWORD]
-        psapi.GetProcessMemoryInfo.restype = wt.BOOL
-        c = _PMC()
-        c.cb = ctypes.sizeof(c)
-        h = kernel32.GetCurrentProcess()
-        ok = psapi.GetProcessMemoryInfo(h, ctypes.byref(c), c.cb)
-        return c if ok else None
-    except Exception:  # noqa: BLE001 - RSS は補助情報、取れなくても続行
-        return None
-
-
-def _working_set_bytes() -> int:
-    """現在のプロセスの working set (RSS) バイト数を返す (Windows; 失敗時 0)。"""
-    try:
-        info = _get_process_memory_info()
-        return int(info.WorkingSetSize) if info is not None else 0
-    except Exception:  # noqa: BLE001 - RSS は補助情報、取れなくても続行
-        return 0
+from llcore.runtime.rss import (  # type: ignore[import-untyped]
+    process_memory as _process_memory,
+    working_set_bytes as _working_set_bytes,
+)
 
 
 def _system_memory_snapshot() -> dict[str, int] | None:
@@ -122,11 +88,11 @@ def _system_memory_snapshot() -> dict[str, int] | None:
             "total_commit_bytes": int(ms.ullTotalPageFile),
             "avail_commit_bytes": int(ms.ullAvailPageFile),
         }
-        pmc = _get_process_memory_info()
+        pmc = _process_memory()
         if pmc is not None:
-            snapshot["process_working_set_bytes"] = int(pmc.WorkingSetSize)
-            snapshot["process_pagefile_bytes"] = int(pmc.PagefileUsage)
-            snapshot["process_peak_pagefile_bytes"] = int(pmc.PeakPagefileUsage)
+            snapshot["process_working_set_bytes"] = pmc.working_set
+            snapshot["process_pagefile_bytes"] = pmc.pagefile
+            snapshot["process_peak_pagefile_bytes"] = pmc.peak_pagefile
         return snapshot
     except Exception:  # noqa: BLE001 - 補助 telemetry が取れなくても本体を落とさない
         return None

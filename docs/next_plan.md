@@ -1062,3 +1062,9 @@
 - 前commitで新設した `llcore.runtime.rss` 利用を、同一ペアを持ちテスト有の `mmap_weights_poc.py` / `mmap_ram_exceed_poc.py` へ拡大。両者の `_PMC`+`_process_memory_info`+`_working_set_bytes`+`_peak_working_set_bytes` を撤去し共有import化(mmap_weights は ctypes import も不要化、mmap_ram_exceed は SetProcessWorkingSetSizeEx 用に ctypes 維持)。
 - 同一モジュール2名importは括弧形式1文に統合(import-untyped の type:ignore 重複回避)。ruff/mypy単独green、32テストgreen。
 - **残存重複(honest)**: `memory_footprint_harness`(_PMC を system snapshot で併用=混在)/ `rad_scale_poc`(テスト無・inline _PMC・MB返し別形)/ `int8_streaming_infer`(PagefileUsage も返す別形 + SetProcessWorkingSetSizeEx)の3本は形が異なる or 未テストのため据え置き=将来モジュール拡張(pagefile/MB helper)とセットで対応する候補。現時点で DRY 集約はテスト保証の付く範囲を出し切った。
+
+### 2026-06-22 追記 — RSS計測 DRY集約を完了(_PMC を rss.py 一箇所に集約=全7本)
+- `llcore.runtime.rss` を後方互換拡張: `ProcessMemory` NamedTuple + `process_memory()`(4カウンタ一括)/ `peak_mem_bytes()`(WS+pagefile)/ `working_set_mb()`(None返し)を追加。既存スカラー関数名は不変(集約済み4本に影響なし)。
+- 残3本を集約: `int8_streaming_infer`(_peak_mem→peak_mem_bytes、ctypes は SetProcessWorkingSetSizeEx 用に維持)/ `rad_scale_poc`(process_rss_mb→working_set_mb 委譲、inline _PMC 撤去)/ `memory_footprint_harness`(_PMC/_get_process_memory_info 撤去、snapshot は process_memory()利用、ctypes は GlobalMemoryStatusEx 用に維持)。
+- テスト: test_runtime_rss に新API 6件追加、test_memory_footprint の monkeypatch 対象を _process_memory へ更新。**RSS関連 50テスト green**、ruff/mypy単独green、py_compile OK。
+- **結果: `class _PMC` は `src/llcore/runtime/rss.py` のみ(全スクリプトから重複消滅)= DRY 100% 達成**。WinAPI 計測の単一情報源化により今後の drift リスクを根絶。

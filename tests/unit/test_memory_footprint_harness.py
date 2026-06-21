@@ -61,7 +61,7 @@ def test_system_memory_snapshot_keeps_system_values_when_process_probe_fails(
             return getattr(self._kernel, name)
 
     monkeypatch.setattr(harness.ctypes, "WinDLL", _FakeWinDLL)
-    monkeypatch.setattr(harness, "_get_process_memory_info", lambda: None)
+    monkeypatch.setattr(harness, "_process_memory", lambda: None)
 
     snapshot = harness._system_memory_snapshot()
     assert snapshot is not None
