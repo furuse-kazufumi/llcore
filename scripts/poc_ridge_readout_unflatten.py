@@ -49,6 +49,7 @@ from llcore.fitness import (  # noqa: E402
     make_fixed_readout,
     make_ridge_eval_once,
     ridge_fitness,
+    SyntheticTask,
 )
 from llcore.state_update import StateUpdateGene  # noqa: E402
 
@@ -80,7 +81,7 @@ def p1_unflatten() -> bool:
     print(f"  fixed : mean={fixed.mean():.4f} std={fixed.std():.4f} max={fixed.max():.4f}")
     print(f"  ridge : mean={ridge.mean():.4f} std={ridge.std():.4f} max={ridge.max():.4f}")
     print(f"  spread ratio (ridge/fixed std) = {ridge.std()/max(fixed.std(),1e-9):.2f}")
-    ok = ridge.std() > fixed.std() and ridge.max() > 0.9 > fixed.max()
+    ok = bool(ridge.std() > fixed.std() and ridge.max() > 0.9 > fixed.max())
     print(f"  [P1] un-flatten holds: {ok}")
     return ok
 
@@ -117,10 +118,11 @@ def p3_no_useful_signal_regime() -> bool:
     """
     print("\n=== P3: delay≥4 / addition は clip 後 fitness 平坦 (raw R² は負) ===")
     genes = _random_genes(20, seed=1)
-    for name, task in [
+    p3_tasks: list[tuple[str, SyntheticTask]] = [
         ("copy delay=4", CopyTask(state_dim=8, out_dim=8, seq_len=32, delay=4)),
         ("addition    ", AdditionTask(state_dim=8, out_dim=1, seq_len=32)),
-    ]:
+    ]
+    for name, task in p3_tasks:
         clipped = np.array(
             [ridge_fitness(g, task, n_train=64, n_eval=64, rng=np.random.default_rng(7)) for g in genes]
         )
@@ -141,7 +143,7 @@ def p3_no_useful_signal_regime() -> bool:
         [ridge_fitness(g, AdditionTask(state_dim=8, out_dim=1, seq_len=32),
                        n_train=64, n_eval=64, rng=np.random.default_rng(7)) for g in genes]
     )
-    ok = copy4.max() < 0.1 and addv.max() < 0.15
+    ok = bool(copy4.max() < 0.1 and addv.max() < 0.15)
     print(f"  [P3] no usable selection signal (post-clip) holds: {ok}")
     return ok
 

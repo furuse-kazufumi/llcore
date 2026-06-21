@@ -38,6 +38,7 @@ import sys
 import time
 from dataclasses import dataclass, field, replace
 from pathlib import Path
+from typing import Callable
 
 import numpy as np
 
@@ -64,6 +65,7 @@ from llcore.evolution import (  # noqa: E402
 )
 from llcore.fitness import (  # noqa: E402
     CopyTask,
+    FixedReadout,
     calibrate_baseline,
     evaluate_gene,
     make_fixed_readout,
@@ -114,7 +116,9 @@ class EvolutionTrace:
     reinject_events: list[set[int]] = field(default_factory=list)
 
 
-def _fitness_fn(gene: StateUpdateGene, task: CopyTask, readout, rng: np.random.Generator) -> float:
+def _fitness_fn(
+    gene: StateUpdateGene, task: CopyTask, readout: FixedReadout, rng: np.random.Generator
+) -> float:
     """gene fitness (CopyTask) — PoC 2b は decay=0 task のみ評価対象."""
     return evaluate_gene(gene, task, readout, rng, n_trials=3)
 
@@ -142,7 +146,7 @@ def run_persona_evolution(
     pop_per_persona: int,
     n_generations: int,
     task: CopyTask,
-    readout,
+    readout: FixedReadout,
     rng: np.random.Generator,
     mutation_sigma: float = 0.15,
     crossover_rate: float = 0.5,
@@ -546,7 +550,7 @@ def main() -> int:
     print("-" * 76)
     print("破綻ゲート評価")
     print("-" * 76)
-    gates = [
+    gates: list[tuple[str, Callable[[], tuple[bool, str]]]] = [
         ("G1: kernel coverage (specialist > control)", lambda: gate_g1_kernel_coverage(specialist_trace, control_trace)),
         ("G2: verifier rejection differentiation", lambda: gate_g2_verifier_differentiation(specialist_trace)),
         ("G3: all personas survive 50 generations", lambda: gate_g3_all_personas_survive(specialist_trace)),
