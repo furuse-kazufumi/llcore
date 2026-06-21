@@ -99,7 +99,7 @@ Recurrent は熟成済み定数状態に 1 step 足すだけ=**O(1)**、この G
 | RWKV | **×1.02** | ~0(warmup=5) | **完全 flat = O(1)** |
 | GPT | **×77.7** | 1.49 / 1.35 | 超線形(O(T²) 寄り、1024→2048 で ×5.1) |
 
-- **decode regime では差が prefill よりさらに極端**(recurrent flat ×0.995 vs GPT ×77.7)。長い対話の per-token 遅延差。
+- **この軸の核心は recurrent の amortization(honest な読み方)**: cache 無し GPT では decode 1 step = 全文脈 full forward = **prefill と同一計算**。よって GPT decode(×77.7)は (0'') prefill の GPT 線の測り直し(×37 との差は run 間ばらつき。prefill 走は T=512 外れ値で非単調、decode 走は単調)。**新規性は recurrent 側**: 同じ recurrent を **prefill で測ると ×14(126→1784ms, O(T)= T 回 step で状態構築)/ decode では ×0.995(0.79ms 一定, O(1)= 構築済み状態に 1 手)**。「状態構築(O(T))と 1 手追加(O(1))を分けて払える」のが recurrent、GPT はこの分離不可。**非対称 = GPT は decode も prefill と同重 / recurrent だけ O(T)→O(1) に落ちる**。
 - honest: (1) cross-mode 絶対 ms 比較不可(同上)。(2) **この GPT は KV cache 無**(prod は cache で O(T)/token に落とすが、cache 有でも T で増大 vs recurrent O(1) flat は質的に別物)。(3) GPT 指数が 2 でなく ~1.4 は T<n_embd で二次項が未支配の regime((0')メモリと同じ regime 依存)。(4) RWKV の小 T startup 外れ値は **warmup 不足が原因**と特定し warmup=5 で全 T flat に収束(構造でない)。
 - 可視化: `assets/articles/llcore_decode_latency.svg`(a7 記事に挿入済)。
 

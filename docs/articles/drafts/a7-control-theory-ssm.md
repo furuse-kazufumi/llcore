@@ -58,7 +58,9 @@
 >
 > ![decode-step レイテンシ(両対数、各モードを T=128 で正規化)。recurrent / RWKV(緑)は ×1 に完全平坦=O(1)、GPT(赤)は理想線形(破線)を超えて ×77.6 へ超線形](../../../assets/articles/llcore_decode_latency.svg)
 >
-> **honest 留保(3点、重要):** (1) prefill と同じく **cross-mode の絶対 ms は比較不可**(recurrent/RWKV は Python per-step ループ計測)。読むのは各モード内の傾きだけ。(2) **この GPT は KV cache を持ちません**(毎 step 全文脈を再 forward=O(T²))。production の LLM serving は KV cache で decode を O(T)/token に落としますが、**cache を入れても GPT の decode は T とともに増え続け、recurrent の O(1) 平坦とは質的に別物**です。「平坦 vs 増大」という向きが load-bearing で、GPT 側の指数の絶対値は実装依存。(3) GPT の指数が理論上の 2(O(T²))でなく ~1.4 に見えるのは、この小モデル(n_embd=256)では T が n_embd を超える領域でようやく二次項が支配に入るため(§0 のメモリ regime 依存と同じ理屈)。なお当初 RWKV の小 T が startup の外れ値で傾きが汚れたが、**warmup を増やす(初回 lazy init を吸収する)と全 T が平坦に収束**した ── これも消さず、原因を特定して潰した経緯ごと残します。
+> **この軸の本当の主役は「recurrent の amortization」です(honest な読み方):** cache を持たないこの GPT では、**decode の 1 step は結局「全文脈を 1 回 forward する」= prefill とまったく同じ計算**です。だから上の GPT decode(×77.7)は、prefill チャートの GPT 線の**測り直し**にすぎません(prefill 側で示した ×37 との差は run 間ばらつき。prefill の走は T=512 が外れ値気味で非単調、decode の走は単調できれい)。**新しいのは recurrent 側**です:同じ recurrent を prefill で測ると **×14(126→1784ms、O(T)= T 個のトークンで状態を T 回更新するから)**伸びるのに、decode では **×0.995(0.79ms 一定、O(1))** に化ける。「状態を作る(prefill, O(T))」と「作った状態に 1 手足す(decode, O(1))」を分けて払えるのが recurrent で、GPT はこの分離ができない(毎回ぜんぶ読み直す)。**この非対称 ── GPT は decode も prefill と同じ重さ / recurrent だけ O(T)→O(1) に落ちる ── が decode 軸の核心**です。
+>
+> **その他の honest 留保:** (1) prefill と同じく **cross-mode の絶対 ms は比較不可**(recurrent/RWKV は Python per-step ループ計測)。読むのは各モード内の傾きだけ。(2) **この GPT は KV cache を持ちません**。production の LLM serving は KV cache で decode を O(T)/token に落としますが、**cache を入れても GPT の decode は T とともに増え続け、recurrent の O(1) 平坦とは質的に別物**です。「平坦 vs 増大」という向きが load-bearing。(3) GPT の指数が理論上の 2(O(T²))でなく ~1.4 に見えるのは、この小モデル(n_embd=256)では T が n_embd を超える領域でようやく二次項が支配に入るため(§0 のメモリ regime 依存と同じ理屈)。(4) 当初 RWKV の小 T が startup の外れ値で傾きが汚れたが、**warmup を増やす(初回 lazy init を吸収する)と全 T が平坦に収束**した ── これも消さず、原因を特定して潰した経緯ごと残します。
 
 この差を見たとき、私はそれを「新しい発見」だと一瞬思いました。でも違いました。これは **1960 年代の制御工学が「可観測な系を、有界な状態で運ぶ」問題として(A の枠組みについては)整理し尽くしていた**ことの再演です。RWKV や Mamba が属する **状態空間モデル(State-Space Model, SSM)** の「S」は、State(状態)の S です。偶然ではありません。
 
