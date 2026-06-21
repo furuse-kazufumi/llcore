@@ -1120,7 +1120,9 @@
   - 含む load-bearing: Kaggle bundle pipeline 全体・nas_pareto(±report/level2)・量子化系(int8/gptq/qat/quant_*)・記事裏付け poc(0a/0c/1a/1b/2a/3a/branch_a)・記事ハーネス(latency/floor/mmap/streaming)・chat 系。allowlist 不変条件=「消して黙らせず直して追加」。各 commit で複合 strict 0 + ruff + 関連テスト green 実測。
   - **(追加) allowlist 47本へ** commits `236d785`(recurrent_runtime_rss)・`6e40e97`(poc_2b/ridge_unflatten)・`ed972b1`(connectivity_bench/retrieval_head_to_head=「型引数なしdict→object連鎖」を dict[str,Any]+Callable注釈で一括解消)・`9d3552e`(poc_0b, SyntheticTask波及で1件残→gates注釈)・`559b79f`(poc_7a VNN-COMP=S式パーサ/ChangeOp 注釈補完)。計 **src 67 + scripts 47 = 114ファイル strict 0**。
   - **カバー完了**: 記事裏付け poc 系 **全部**(0a/0b/0c/1a/1b/2a/2b/3a/7a/branch_a/ridge_unflatten)+ 計測ハーネス3軸(latency/floor/runtime)+ connectivity/retrieval ベンチ + Kaggle pipeline + 量子化系 + nas 系。
-  - **残 dirty(高工数 or 低優先)**: recurrent_longctx_eval(18, arg-type/call-overload=実型修正要・難)・rad_*(11〜52, research utility で出荷/記事裏付けでなく優先度低)。これらは unused-ignore でなく実型整備が要る。出荷/記事の strict カバーは一段落。
+  - **(追加) allowlist 51本へ** commits `51e1c3b`(recurrent_longctx_eval=dict[str,object]→Any+curve注釈)・`243b7a7`(memory_footprint_harness/rad_ingest_poc/linearize_tolerance)。計 **src 67 + scripts 51 = 118ファイル strict 0**。
+  - **★ rad_* を除く全 scripts が strict gate 配下に到達**。残 dirty は **rad_* 研究ユーティリティ7本のみ**(rad_scale_poc 19/rad_topic_overlap_poc 31/rad_role_filter_check 35/rad_domain_filter_check 38/rad_ann_check 39/rad_full_eval 39/rad_full_ingest 43, 計~244件)。これらは RAD コーパス ingest の研究用途で出荷/記事裏付けでなく優先度低。dict[str,object]→Any 系の同パターンが多いと推測されるが各本substantial。incremental に対応可だが低優先。
+  - **マイルストン**: 出荷ツール・記事裏付け・ベンチ・計測ハーネス・poc 系——**価値のあるスクリプトは全て strict-clean + CI gate enforce**。残るは rad_* 研究utilのみ。
 - **次の一手**: (a) human gate の A=Qiita公開 / B=needle GPU offload(push) / C=Kaggle push(B/C 押せば CI も初回実走し ci.yml を実地検証できる)。(b) 新題材があれば RAD 接地から。(c) ローカル余地: 残 dirty scripts(poc_0b 19/poc_ridge_unflatten 10/rad_* 30-65 等)は高工数の per-script strict 化候補=incremental に allowlist 拡張可。research/ ruff 805件は実験コードゆえ低価値・据置。
 - 方針: 指示なき薄い量産はしない(quality-over-volume)。
 
