@@ -828,3 +828,9 @@
 - `docs/articles/drafts/b2-suppress-your-win-general.md` (88 行) 新規。技術版 b2 のたとえ話版 (模試/健康診断アナロジー、専門用語排除)。commit `0a5118b`。
 - これで #62 は技術版 (b2) + 一般版 (b2-general) の両輪が揃った。記事ネタ #62 タスクは draft 完了。
 - **残: Kaggle kernel push は引き続き human gate 待ち (本系統不介入)。push は人間承認待ちのまま (本セッション内コミットは全て local)。** 次に着手すべき新規タスクは現時点で未定 — 新規実験を起こすか #62 の図版検討かは次セッション判断。
+
+### 2026-06-21 追記 — #62 b2 に可視化SVG + 挿絵プラン (commit fd47d29)
+- `assets/articles/llcore_suppress_win.svg` 新規(静的フレーム完成形=Qiitaアニメ不可ルール準拠、XML検証済み43要素)。選抜窓+15.3% → fresh holdout測り直し → 個別点SUPPRESSED / 総合HV+16.8%KEPT / needle UNTESTED の粒度別verdict取捨を1枚で可視化。技術版 b2 §3直後に配置。
+- PANEL_PLACEMENT_PLAN に b2 挿絵候補4点を追加(verify-by-content 未実施=埋込前に bazue_all 実画像の目視確認が必要、これは画像確認を伴うので次セッションか人手で)。
+- **#62 の draft 一式は完成**: 技術版(b2)+一般版(b2-general)+可視化SVG+挿絵プラン。残るは (a) 挿絵の verify-by-content と実埋込、(b) Qiita 公開時の SVG raw 絶対URL化 + 公開操作(=外部公開につき human gate)。
+- Kaggle kernel push は引き続き human gate 待ち(本系統不介入)。本セッションのコミットは全て local(push 未実施)。
