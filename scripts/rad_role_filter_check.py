@@ -23,6 +23,7 @@ import json
 import statistics
 import sys
 import time
+from typing import Any
 from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parents[1]
@@ -44,17 +45,17 @@ _ensure_utf8_stdout()
 def run_probes_filtered(
     store: AnnotationStore,
     probes: list[tuple[str, list[str]]],
-    **query_kwargs: object,
-) -> dict[str, object]:
+    **query_kwargs: Any,
+) -> dict[str, Any]:
     """rad_scale_poc.run_probes_timed と同一計算だが query() のフィルタ引数を渡せる版。"""
     ann = store.annotations
     ranks: list[int] = []
-    per_probe: list[dict[str, object]] = []
+    per_probe: list[dict[str, Any]] = []
     latencies: list[float] = []
     for q, gold in probes:
         t0 = time.perf_counter()
         hits = [ann[i] for i, _ in store.query(q, k=10, exclude_questions=True,
-                                               **query_kwargs)]  # type: ignore[arg-type]
+                                               **query_kwargs)]
         latencies.append(time.perf_counter() - t0)
         r = connectivity_bench.rank_of(hits, gold)
         ranks.append(r)
@@ -82,7 +83,7 @@ def main() -> int:
     scan = dry_scan(OVERLAP_CORPUS)
     sel800 = nested_even_selection(len(scan), [100, 400, 800])[2]
     store, base_info = build_poc_store(SentenceEncoderBackend())
-    di = base_info["n_loop_docs"]  # type: ignore[assignment]
+    di = base_info["n_loop_docs"]
     for i in sel800:
         doc = scan[i][0]
         store.add_text(strip_markdown(doc.read_text(encoding="utf-8")),

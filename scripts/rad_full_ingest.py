@@ -48,6 +48,7 @@ import json
 import statistics
 import sys
 import time
+from typing import Any
 from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parents[1]
@@ -95,13 +96,14 @@ def corpus_domains() -> list[tuple[Path, str]]:
     return pairs
 
 
-def load_progress(path: Path) -> dict[str, object]:
+def load_progress(path: Path) -> dict[str, Any]:
     if path.exists():
-        return json.loads(path.read_text(encoding="utf-8"))
+        data: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
+        return data
     return {"done_domains": [], "per_corpus": []}
 
 
-def checkpoint(store: AnnotationStore, progress: dict[str, object], path: Path) -> float:
+def checkpoint(store: AnnotationStore, progress: dict[str, Any], path: Path) -> float:
     """store save + progress JSON を同時更新 (resume の整合性条件)。返り値 = save 秒。"""
     t0 = time.perf_counter()
     store.save()
@@ -112,11 +114,11 @@ def checkpoint(store: AnnotationStore, progress: dict[str, object], path: Path) 
 def ingest_full(
     store: AnnotationStore,
     pairs: list[tuple[Path, str]],
-    progress: dict[str, object],
+    progress: dict[str, Any],
     progress_path: Path,
-) -> dict[str, object]:
+) -> dict[str, Any]:
     """全 corpus を取込む。corpus 単位で進捗 log + RSS 記録、+50k ann ごとに checkpoint。"""
-    done: set[str] = set(progress["done_domains"])  # type: ignore[arg-type]
+    done: set[str] = set(progress["done_domains"])
     last_saved_rows = len(store.annotations)
     last_saved_t = time.perf_counter()
     t_all = time.perf_counter()
@@ -145,7 +147,7 @@ def ingest_full(
             "ingest_seconds": round(time.perf_counter() - t0, 1),
             "rss_mb": process_rss_mb(),
         }
-        progress["per_corpus"].append(info)  # type: ignore[union-attr]
+        progress["per_corpus"].append(info)
         done.add(dom)
         progress["done_domains"] = sorted(done)
         print(f"[{ci}/{len(pairs)}] {dom}: {info['docs']} docs, +{n_ann} ann "
@@ -163,7 +165,7 @@ def ingest_full(
     print(f"[checkpoint] final {len(store.annotations)} 行 save ({s}s)", flush=True)
     return {
         "n_corpora": len(pairs),
-        "docs_total": sum(int(c["docs"]) for c in progress["per_corpus"]),  # type: ignore[union-attr,call-overload]
+        "docs_total": sum(int(c["docs"]) for c in progress["per_corpus"]),
         "n_store_rows": len(store.annotations),
         "ingest_seconds_total": round(time.perf_counter() - t_all, 1),
         "rss_mb_final": process_rss_mb(),
@@ -172,7 +174,7 @@ def ingest_full(
 
 def compare_exact_vs_ann(
     store: AnnotationStore, probes: list[tuple[str, list[str]]], k: int = 10
-) -> dict[str, object]:
+) -> dict[str, Any]:
     """exact / ann の top-k 再現率と latency (rad_ann_check.compare_recall と同一計算)。"""
     recalls: list[float] = []
     exact_lat: list[float] = []
@@ -216,7 +218,7 @@ def main() -> int:
     if args.resume and args.store.exists():
         store = AnnotationStore(SentenceEncoderBackend(), path=args.store)
         progress = load_progress(progress_path)
-        n_done = len(progress['done_domains'])  # type: ignore[arg-type]
+        n_done = len(progress['done_domains'])
         print(f"[resume] {len(store.annotations)} 行 / 完了 {n_done} corpus から再開",
               flush=True)
     else:

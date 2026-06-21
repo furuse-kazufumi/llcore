@@ -31,6 +31,7 @@ import argparse
 import json
 import sys
 import time
+from typing import Any
 from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parents[1]
@@ -50,7 +51,7 @@ from rad_topic_overlap_poc import OVERLAP_CORPUS, nested_even_selection  # noqa:
 _ensure_utf8_stdout()
 
 
-def build_domain_tagged_store(encoder: object) -> tuple[AnnotationStore, dict[str, object]]:
+def build_domain_tagged_store(encoder: object) -> tuple[AnnotationStore, dict[str, Any]]:
     """(iii) +800 と同一構成の store を domain タグ付きで作る。
 
     会話 (domain=None) + loop corpus (domain="loop") + astro 800 docs (domain="astro")。

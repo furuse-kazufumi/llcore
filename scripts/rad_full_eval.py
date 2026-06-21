@@ -32,6 +32,7 @@ import json
 import statistics
 import sys
 import time
+from typing import Any
 from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parents[1]
@@ -51,7 +52,9 @@ from rad_scale_poc import _fmt, process_rss_mb  # noqa: E402
 _ensure_utf8_stdout()
 
 
-def compare_exact_vs_ann(store, probes, k: int = 10) -> dict[str, object]:
+def compare_exact_vs_ann(
+    store: Any, probes: list[tuple[str, list[str]]], k: int = 10
+) -> dict[str, Any]:
     """exact / ann の top-k 再現率と latency (rad_full_ingest と同一計算)。"""
     recalls: list[float] = []
     e_lat: list[float] = []
@@ -92,8 +95,8 @@ def main() -> int:
     print(f"[load] {len(store.annotations)} 行 ({load_s}s, RSS {process_rss_mb()}MB)",
           flush=True)
 
-    results: dict = {"n_annotations": len(store.annotations), "load_seconds": load_s,
-                     "domains": {}}
+    results: dict[str, Any] = {"n_annotations": len(store.annotations), "load_seconds": load_s,
+                               "domains": {}}
 
     # E1: 世界知識 30 probe — nofilter vs domain スコープ
     for dom, probes in FULL_PROBES.items():

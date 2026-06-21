@@ -162,7 +162,8 @@ def plan_subsample(
     if full <= cap:
         return sel_full, full
     lo, hi = 0.0, 1.0  # lo = 可行, hi = 不可行 (full > cap)
-    best_sel, best_n = [[] for _ in scans], len(base_unique)
+    best_sel: list[list[int]] = [[] for _ in scans]
+    best_n = len(base_unique)
     for _ in range(20):  # 1/2^20 << 1/1998 doc — doc 粒度では十分収束
         mid = (lo + hi) / 2
         n, sel = union_size(mid)
@@ -179,11 +180,11 @@ def ingest_scale_corpora(
     selected: list[list[int]],
     roots: list[Path],
     group_start: int,
-) -> dict[str, object]:
+) -> dict[str, Any]:
     """選択済み docs を取込む。group は全 corpus 通しの doc 連番 × 10 (M3.0 と同じ 10 刻み —
     adjacency_window=1 の共起が doc を跨がない)。取込/除外数を corpus ごとに必ず log する。"""
     di = group_start
-    per_corpus: list[dict[str, object]] = []
+    per_corpus: list[dict[str, Any]] = []
     t_all = time.perf_counter()
     for root, scan, idx in zip(roots, scans, selected):
         t0 = time.perf_counter()
@@ -218,7 +219,7 @@ def ingest_scale_corpora(
 
 def run_probes_timed(
     store: AnnotationStore, probes: list[tuple[str, list[str]]]
-) -> dict[str, object]:
+) -> dict[str, Any]:
     """cosine 経路 (query, k=10, 事実のみ) で R@1/R@3/MRR + query レイテンシを測る。
 
     rank 計算は connectivity_bench.rank_of / mrr (M3.0 と同一)。レイテンシは store.query
@@ -226,7 +227,7 @@ def run_probes_timed(
     """
     ann = store.annotations
     ranks: list[int] = []
-    per_probe: list[dict[str, object]] = []
+    per_probe: list[dict[str, Any]] = []
     latencies: list[float] = []
     for q, gold in probes:
         t0 = time.perf_counter()
@@ -247,7 +248,7 @@ def run_probes_timed(
     }
 
 
-def build_poc_store(encoder: Any) -> tuple[AnnotationStore, dict[str, object]]:
+def build_poc_store(encoder: Any) -> tuple[AnnotationStore, dict[str, Any]]:
     """M3.0 と同構成の store (会話 + loop_engineering corpus) を作る。"""
     store = AnnotationStore(encoder)
     t0 = time.perf_counter()
@@ -265,7 +266,7 @@ def build_poc_store(encoder: Any) -> tuple[AnnotationStore, dict[str, object]]:
     return store, info
 
 
-def store_size(store: AnnotationStore) -> dict[str, object]:
+def store_size(store: AnnotationStore) -> dict[str, Any]:
     """store 規模 (annotations / 共起エッジ / 埋め込み行列メモリ / プロセス RSS)。"""
     mat = store.embedding_matrix()
     return {
@@ -278,17 +279,17 @@ def store_size(store: AnnotationStore) -> dict[str, object]:
     }
 
 
-def _fmt(c: dict[str, object]) -> str:
+def _fmt(c: dict[str, Any]) -> str:
     return (f"R@1 {c['R@1']:.3f}  R@3 {c['R@3']:.3f}  MRR {c['MRR']:.4f}  "
-            f"lat {c['query_latency_mean_s']*1000:.1f}ms")  # type: ignore[operator]
+            f"lat {c['query_latency_mean_s']*1000:.1f}ms")
 
 
 # -- 検証 (i): 大規模化 ---------------------------------------------------------
 
 
 def verify_scale(minilm_poc_store: AnnotationStore,
-                 poc_world: dict[str, object], poc_conv: dict[str, object],
-                 cap: int) -> dict[str, object]:
+                 poc_world: dict[str, Any], poc_conv: dict[str, Any],
+                 cap: int) -> dict[str, Any]:
     """conv + loop + 3 corpora (cap=60k) の大規模 store で会話干渉と世界知識劣化を測る。"""
     print(f"\n=== (i) scale: corpora dry-scan (cap={cap}) ===", flush=True)
     scans = [dry_scan(root) for root in SCALE_CORPORA]
@@ -301,7 +302,7 @@ def verify_scale(minilm_poc_store: AnnotationStore,
     encoder = SentenceEncoderBackend()  # MiniLM 固定 (M1/M3.0 と同一)
     store, poc_info = build_poc_store(encoder)
     scale_info = ingest_scale_corpora(store, scans, selected, SCALE_CORPORA,
-                                      group_start=poc_info["n_loop_docs"])  # type: ignore[arg-type]
+                                      group_start=poc_info["n_loop_docs"])
     size = store_size(store)
     assert size["n_annotations"] == simulated_total, "dry-scan シミュレートと実取込が不一致"
     print(f"[big store] {size['n_annotations']} annotations, "
@@ -314,15 +315,15 @@ def verify_scale(minilm_poc_store: AnnotationStore,
     print(f"[big store] world 18 probes: {_fmt(world)}", flush=True)
 
     # per-probe の劣化点 (in-run baseline = 会話+loop store との差分)
-    base_conv_ranks = {p["query"]: p["rank"] for p in poc_conv["per_probe"]}  # type: ignore[index]
-    base_world_ranks = {p["query"]: p["rank"] for p in poc_world["per_probe"]}  # type: ignore[index]
+    base_conv_ranks = {p["query"]: p["rank"] for p in poc_conv["per_probe"]}
+    base_world_ranks = {p["query"]: p["rank"] for p in poc_world["per_probe"]}
     conv_changed = [
         {"query": p["query"], "rank_poc": base_conv_ranks[p["query"]], "rank_scale": p["rank"]}
-        for p in conv["per_probe"] if p["rank"] != base_conv_ranks[p["query"]]  # type: ignore[index]
+        for p in conv["per_probe"] if p["rank"] != base_conv_ranks[p["query"]]
     ]
     world_changed = [
         {"query": p["query"], "rank_poc": base_world_ranks[p["query"]], "rank_scale": p["rank"]}
-        for p in world["per_probe"] if p["rank"] != base_world_ranks[p["query"]]  # type: ignore[index]
+        for p in world["per_probe"] if p["rank"] != base_world_ranks[p["query"]]
     ]
     return {
         "cap": cap,
@@ -343,10 +344,10 @@ def verify_scale(minilm_poc_store: AnnotationStore,
 # -- 検証 (ii): 多言語 encoder head-to-head -------------------------------------
 
 
-def verify_multilingual() -> dict[str, object]:
+def verify_multilingual() -> dict[str, Any]:
     """会話 + loop store (M3.0 構成) を 3 encoder 構成で作り、世界知識 18 + 会話 22 を測る。"""
     print("\n=== (ii) multilingual head-to-head (conv + loop store) ===", flush=True)
-    configs: dict[str, object] = {}
+    configs: dict[str, Any] = {}
     minilm_store: AnnotationStore | None = None
 
     def run_config(name: str, encoder: Any, query_mode: bool = False) -> AnnotationStore:
@@ -372,9 +373,9 @@ def verify_multilingual() -> dict[str, object]:
     # M3.0 失敗 5 問の per-probe 改善有無 (3 構成横並び)
     failed5 = []
     for q in POC_FAILED_QUERIES:
-        row: dict[str, object] = {"query": q}
+        row: dict[str, Any] = {"query": q}
         for name, cfg in configs.items():
-            rank = next(p["rank"] for p in cfg["world_probes"]["per_probe"]  # type: ignore[index]
+            rank = next(p["rank"] for p in cfg["world_probes"]["per_probe"]
                         if p["query"] == q)
             row[name] = rank
         failed5.append(row)
@@ -397,7 +398,7 @@ def main() -> int:
     args = parser.parse_args()
 
     t_start = time.perf_counter()
-    results: dict[str, object] = {
+    results: dict[str, Any] = {
         "poc_reference": {
             "source": "out/rad_ingest_poc.json (M3.0 正本)",
             "world_MRR": 0.6389, "conv_MRR": 0.9470, "n_annotations": 1071,
@@ -414,7 +415,7 @@ def main() -> int:
         minilm_store, _ = build_poc_store(SentenceEncoderBackend())
 
     if not args.skip_scale:
-        minilm_cfg = (multilingual or {}).get("configs", {}).get("minilm")  # type: ignore[union-attr]
+        minilm_cfg = (multilingual or {}).get("configs", {}).get("minilm")
         if minilm_cfg is None:  # --skip-multilingual 時は in-run baseline をここで測る
             minilm_cfg = {"world_probes": run_probes_timed(minilm_store, WORLD_PROBES),
                           "conv_probes": run_probes_timed(minilm_store, connectivity_bench.PROBES)}

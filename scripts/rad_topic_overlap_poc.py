@@ -38,6 +38,7 @@ import argparse
 import json
 import sys
 import time
+from typing import Any
 from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parents[1]
@@ -88,20 +89,20 @@ def nested_even_selection(n_docs: int, stages: list[int]) -> list[list[int]]:
 
 
 def rank_changes(
-    base: dict[str, object], now: dict[str, object]
-) -> list[dict[str, object]]:
-    base_ranks = {p["query"]: p["rank"] for p in base["per_probe"]}  # type: ignore[index]
+    base: dict[str, Any], now: dict[str, Any]
+) -> list[dict[str, Any]]:
+    base_ranks = {p["query"]: p["rank"] for p in base["per_probe"]}
     return [
         {"query": p["query"], "rank_base": base_ranks[p["query"]], "rank_now": p["rank"]}
-        for p in now["per_probe"]  # type: ignore[index]
+        for p in now["per_probe"]
         if p["rank"] != base_ranks[p["query"]]
     ]
 
 
-def astro_ranks(conv: dict[str, object]) -> dict[str, int]:
+def astro_ranks(conv: dict[str, Any]) -> dict[str, int]:
     return {
-        p["query"]: p["rank"]  # type: ignore[misc]
-        for p in conv["per_probe"]  # type: ignore[index]
+        p["query"]: p["rank"]
+        for p in conv["per_probe"]
         if p["query"] in ASTRO_QUERIES
     }
 
@@ -134,7 +135,7 @@ def main() -> int:
     print(f"[base ] loop 18: {_fmt(base_world)}", flush=True)
     print(f"[base ] astro probes: {astro_ranks(base_conv)}", flush=True)
 
-    results: dict[str, object] = {
+    results: dict[str, Any] = {
         "overlap_corpus": str(OVERLAP_CORPUS),
         "corpus_docs_total": len(scan),
         "encoder": "sentence-transformers/all-MiniLM-L6-v2",
@@ -147,7 +148,7 @@ def main() -> int:
     }
 
     ingested: set[int] = set()
-    di = base_info["n_loop_docs"]  # type: ignore[assignment]
+    di = base_info["n_loop_docs"]
     for want, sel in zip(stages, sels):
         new = [i for i in sel if i not in ingested]
         t0 = time.perf_counter()
@@ -175,7 +176,7 @@ def main() -> int:
             "world_rank_changes_vs_base": rank_changes(base_world, world),
             "astro_probe_ranks": astro_ranks(conv),
         }
-        results["stages"].append(stage_result)  # type: ignore[union-attr]
+        results["stages"].append(stage_result)
         print(f"[{want:>4} docs] store {size['n_annotations']} ann "
               f"(+{len(new)} docs in {ingest_s}s)", flush=True)
         print(f"[{want:>4} docs] conv 22: {_fmt(conv)}", flush=True)

@@ -26,6 +26,7 @@ import json
 import statistics
 import sys
 import time
+from typing import Any
 from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parents[1]
@@ -45,8 +46,8 @@ from rad_scale_poc import _fmt  # noqa: E402
 _ensure_utf8_stdout()
 
 
-def compare_recall(store: object, probes: list[tuple[str, list[str]]],
-                   k: int = 10) -> dict[str, object]:
+def compare_recall(store: Any, probes: list[tuple[str, list[str]]],
+                   k: int = 10) -> dict[str, Any]:
     """各 probe で exact / ann の top-k 行集合を比較する。"""
     recalls: list[float] = []
     exact_lat: list[float] = []
@@ -54,10 +55,10 @@ def compare_recall(store: object, probes: list[tuple[str, list[str]]],
     n_order_match = 0
     for q, _gold in probes:
         t0 = time.perf_counter()
-        exact = store.query(q, k=k, exclude_questions=True)  # type: ignore[attr-defined]
+        exact = store.query(q, k=k, exclude_questions=True)
         exact_lat.append(time.perf_counter() - t0)
         t0 = time.perf_counter()
-        approx = store.query(q, k=k, ann=True, exclude_questions=True)  # type: ignore[attr-defined]
+        approx = store.query(q, k=k, ann=True, exclude_questions=True)
         ann_lat.append(time.perf_counter() - t0)
         e_rows = [r for r, _ in exact]
         a_rows = [r for r, _ in approx]

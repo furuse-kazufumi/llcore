@@ -50,8 +50,15 @@ scripts/prepare_kaggle_lm_compare_bundle.py
 scripts/qat_train.py
 scripts/quant_bitwidth_sweep.py
 scripts/quant_group_compare.py
+scripts/rad_ann_check.py
+scripts/rad_domain_filter_check.py
+scripts/rad_full_eval.py
+scripts/rad_full_ingest.py
 scripts/rad_full_probes.py
 scripts/rad_ingest_poc.py
+scripts/rad_role_filter_check.py
+scripts/rad_scale_poc.py
+scripts/rad_topic_overlap_poc.py
 scripts/recurrent_latency_sweep.py
 scripts/recurrent_longctx_eval.py
 scripts/retrieval_head_to_head.py
