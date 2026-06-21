@@ -893,3 +893,10 @@
 - fail-fast: resume 失敗(meta mismatch)時は 26h GA 再走前に exit 1。
 - **残るは #3 のみ = push (外部公開)**。`.github/workflows/` + `ci/fixtures/` を public remote へ push する human gate。push 後は `gh workflow run nas-needle-offload`(または Actions UI)→ `gh run watch` → `gh run download` で nas_pareto.json 取得 → report 再生成 → b2 §5 を実数値更新。
 - **残存リスク(honest)**: (a) base_nll の cross-platform 差が 1e-3 を超えると resume 失敗(fail-fast で検知、その場合 tolerance 緩和 or 別手)、(b) 2コアで rigorous+needle が 350min 超過の可能性(その場合 needle-lengths を 2048 のみに絞る)。いずれも壊滅ではなく次の調整で対応可能。
+
+### 2026-06-21 追記 — offload の resume 経路をローカル事前検証 (push 前の de-risk)
+- CI を焼く前に、プレフィックス fixture が base_nll を再現し CI 相当 meta で resume するかをローカル実証 (256tok 1 forward, 低 RAM):
+  - **prefix base_nll=4.415451 == cache meta 4.415451 (diff 4.98e-08)** — プレフィックスは base_nll を厳密再現。
+  - **CI 相当 run_meta (model_dir=`model/Qwen2.5-0.5B-Instruct`, text_file=`out/corpus_aozora_multi.txt` の relocated パス) で `load_eval_cache` → OK、scalar 386 + vector 386 復元**。basename 一致 + 1e-3 tolerance が relocated パスを正しく受理し GA resume する (=CI で GA スキップ) ことを確認。
+- 残存リスクは cross-OS BLAS の base_nll drift (≤1e-3 で吸収見込み、超過時は workflow が fail-fast) と 2 コア実行時間のみ。検証スクリプトはローカルパス直書きのため commit せず削除 (証拠は本記録)。
+- **結論: workflow は push さえ通れば走る状態まで de-risk 済み。残ゲートは #3 (push) のみで human 承認待ち** (LLTERM_CHOICE 既出、未回答)。
