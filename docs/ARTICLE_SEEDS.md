@@ -537,7 +537,7 @@
 ### 50. open weights ライセンスの実務地図 — Gemma4 Apache 2.0 化・Cosmos OpenMDW・Qwen 障壁
 - **気付き**: 同週のリリースで **open モデルのライセンスが 3 種に割れた**:(a)**Gemma 4 = Apache 2.0**(Gemma 1/2/3 の独自 Gemma Terms of Use から**変更**=本物の前進、商用障壁ゼロ)(b)**Cosmos 3 = OpenMDW 1.1**(Linux Foundation の model-centric ライセンス=**OSI 認定の古典的 OSS ではない**「open model」ライセンス、商用条件・派生物条項は要条文実読)(c)**PaddleOCR = Apache 2.0**(ただし ERNIE-4.5 ベースで派生ライセンス要確認)。FullSense は Apache-2.0 + Commercial dual-license で、かつ `feedback_qwen_commercial_barrier`(Qwen 依存は商用障壁)を回避したい立場。→ **「Apache 2.0 のローカル実行可能モデルが増えた」は llmesh on-prem hub のローカルバックエンド選択肢を増やす追い風**であると同時に、llcore がモデルで競合しない判断を補強する。
 - **根拠**: Gemma4 HF model card(Apache 2.0)/ Cosmos3 HF blog(OpenMDW 1.1)/ PaddleOCR HF(Apache-2.0)。FullSense 側= `feedback_qwen_commercial_barrier` / `project_fullsense_brand`(dual-license)。
-- **側面**: 戦略 / ライセンス / エコシステム / 業界比較。llmesh のローカルバックエンド戦略に直結。
+- **側面**: 戦略 / ライセンス / エコシステム / 業界比較。llmesh のローカルバックエンド戦略に直結。 **本執筆済み (2026-06-21)**: 技術版 `c1-open-weights-license-map.md` + 非エンジニア版 `c1-open-weights-license-map-general.md`(レンタル品の条件のたとえ)。連載 C系(エコシステム/戦略)を新設。3種分類(Gemma4 Apache2.0化/Cosmos3 OpenMDW=非OSI/PaddleOCR Apache+ERNIE継承注意)/openを3問い(種類・商用条件・派生継承)に分解/llmesh on-prem追い風+llcore非競合の補強/「束縛力は条文・法的助言でない」留保を反映。
 
 ### 51. ★連載素材: 強豪5社の手法 × 我々との共通点(専用 doc に詳細)
 - **気付き**: ユーザー指示(2026-06-18「強豪のやり方を解析して記事に・特に我々との共通点・記事ネタ集めに情報収集も」)を受け、Gemma4/Cosmos3/PaddleOCR/MangaFlow/Hermes の**手法を一次情報で deep-read → FullSense/llcore との共通点を抽出 → honest 監査**した濃い記事素材を別 doc に用意。記事の核 = 3 グループ(引き算/再利用/責任を持って育つ)。最強の切り口 = 「自宅 CPU の小実験が frontier の何を**再導出**でき、どこが本当に**違う**(差別化)のかを honest に切り分ける」= career-grade で信頼を生む([[feedback_articles_career_advancement]])。
