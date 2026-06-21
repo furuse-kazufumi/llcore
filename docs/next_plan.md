@@ -847,3 +847,7 @@
 - `Start-Process -WindowStyle Hidden -PassThru` で**完全 detached** に再起動 (ランチャー PID 7744, 実ワーカー **PID 16960**)。PID は `out/nas_pareto_v2full/needle_run.pid` に記録。
 - **resume 成功確認**: `run_needle.log` = `[base] nll=4.4155` + `[resume] 386 scalar + 386 vector evals reused` → 前回 overnight の全 386 評価がキャッシュ復元され **GA は完全スキップ**。rigorous tier + 2048 sweep + needle のみ実行中 (ワーカー CPU 増加中)。
 - **次セッションの手**: `Get-Process -Id 16960` 生存 + `out/nas_pareto_v2full/nas_pareto.json` mtime が 22:37 から更新されたかで完了判定。完了したら `nas_pareto_report.py` で再生成し、`proxy_v2.needle` (needle horizon) と `context_sweep[2048]` の Δnll を読み、記事 b2 §5 の「needle UNTESTED」「2048 未測」を実数値へ更新。失敗時は `.bak_pre_needle` から復元。
+
+### 2026-06-21 23:36 追記 — 検証走が needle 4096tok でメモリ律速
+- PID 16960 生存継続だが CPU 増加が鈍化 (687→884→1080 / 各25分 ≈ +8 CPU秒/分)。needle の 4096tok 長文脈 forward が RAM 3.6GB 機でスワップ気味=メモリ律速。停止ではないが当初 ~70分見込みを超過 (wall ~75分経過、json 未更新)。
+- rigorous tier は cache 非書込なので kill すると recompute も失う。**判断**: もう1サイクル (〜25分) 待つ。次回チェックでも json 未更新かつ進捗僅少なら、kill して `--needle-lengths 2048` (4096 を落とす) で再起動し局所性を確保する fallback を採る。2048 sweep だけは確実に取りたいので、最悪 `--needle` を外して 2048 sweep のみ取得する案も可。
