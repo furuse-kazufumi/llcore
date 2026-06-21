@@ -41,6 +41,7 @@ scripts/poc_1b_lipschitz_invariant.py
 scripts/poc_2a_factor_hook_mock.py
 scripts/poc_2b_persona_indexed_verified_evolution.py
 scripts/poc_3a_marabou_bridge_skeleton.py
+scripts/poc_7a_vnn_comp_reference_impl.py
 scripts/poc_branch_a_memory_fitness.py
 scripts/poc_ridge_readout_unflatten.py
 scripts/prepare_kaggle_lm_compare_bundle.py

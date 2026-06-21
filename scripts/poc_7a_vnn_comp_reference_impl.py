@@ -43,6 +43,7 @@ import sys
 import time
 from dataclasses import dataclass, field, replace
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 
@@ -136,7 +137,7 @@ _RWKV_OP = "RwkvTimeMix"
 _RWKV_DOMAIN = "llcore.rwkv"
 
 
-def _require_onnx():  # noqa: ANN202
+def _require_onnx() -> tuple[Any, Any, Any]:
     """Lazy-import onnx so the JSON-dummy path works without the dependency."""
     try:
         import onnx  # noqa: PLC0415
@@ -222,16 +223,16 @@ def _tokenize_sexpr(text: str) -> list[str]:
     return flat.split()
 
 
-def _parse_sexpr(tokens: list[str]) -> list:
+def _parse_sexpr(tokens: list[str]) -> list[Any]:
     """Parse tokens into a list of top-level S-expression forms (nested lists)."""
     pos = 0
 
-    def parse_one():  # noqa: ANN202
+    def parse_one() -> Any:
         nonlocal pos
         tok = tokens[pos]
         pos += 1
         if tok == "(":
-            lst: list = []
+            lst: list[Any] = []
             while pos < len(tokens) and tokens[pos] != ")":
                 lst.append(parse_one())
             if pos >= len(tokens):
@@ -240,13 +241,13 @@ def _parse_sexpr(tokens: list[str]) -> list:
             return lst
         return tok
 
-    forms: list = []
+    forms: list[Any] = []
     while pos < len(tokens):
         forms.append(parse_one())
     return forms
 
 
-def _sexpr_num(node) -> float:  # noqa: ANN001
+def _sexpr_num(node: Any) -> float:
     """Convert an atom number or ``(- c)`` negation to float."""
     if isinstance(node, list) and len(node) == 2 and node[0] == "-":
         return -float(node[1])
@@ -285,7 +286,7 @@ def parse_invariant_vnnlib(path: Path) -> tuple[float, float]:
         max_input_abs: float | None = None
         state_bound: float | None = None
 
-        def walk(node) -> None:  # noqa: ANN001
+        def walk(node: Any) -> None:
             nonlocal max_input_abs, state_bound
             if not isinstance(node, list):
                 return
@@ -315,7 +316,9 @@ def parse_invariant_vnnlib(path: Path) -> tuple[float, float]:
 # ---------------------------------------------------------------------------
 
 
-def _apply_reparam(net: NetworkState, target: dict, args: dict) -> tuple[NetworkState, str | None]:
+def _apply_reparam(
+    net: NetworkState, target: dict[str, Any], args: dict[str, Any]
+) -> tuple[NetworkState, str | None]:
     """Apply reparam_inplace. Returns (new_net, error_msg_if_any)."""
     layer_idx = 0  # mock: target.layer name maps to index 0 for now
     if not net.blocks:
@@ -337,7 +340,9 @@ def _apply_reparam(net: NetworkState, target: dict, args: dict) -> tuple[Network
     return new_net, None
 
 
-def _apply_insert(net: NetworkState, target: dict, args: dict) -> tuple[NetworkState, str | None]:
+def _apply_insert(
+    net: NetworkState, target: dict[str, Any], args: dict[str, Any]
+) -> tuple[NetworkState, str | None]:
     """Apply insert_subblock. Only RwkvTimeMix kernel supported."""
     kernel = args.get("kernel", "")
     if kernel != "RwkvTimeMix":
@@ -356,7 +361,9 @@ def _apply_insert(net: NetworkState, target: dict, args: dict) -> tuple[NetworkS
     return new_net, None
 
 
-def apply_changeop(net: NetworkState, changeop: dict) -> tuple[NetworkState | None, str, str | None]:
+def apply_changeop(
+    net: NetworkState, changeop: dict[str, Any]
+) -> tuple[NetworkState | None, str, str | None]:
     """Apply one ChangeOp to the network.
 
     Returns (new_net, verdict, error_msg). verdict ∈ {"continue", "error",
@@ -522,7 +529,7 @@ def write_sat_witness(
 
 def step_once(
     net: NetworkState,
-    changeop: dict,
+    changeop: dict[str, Any],
     witness_dir: Path,
     step_id: int,
     per_step_budget_ms: int = PER_STEP_BUDGET_MS,
