@@ -51,7 +51,8 @@ class FixedReadout:
 
     def __call__(self, state: np.ndarray) -> np.ndarray:
         """state を readout する: ``state @ matrix.T``."""
-        return state @ self.matrix.T
+        out: np.ndarray = state @ self.matrix.T
+        return out
 
 
 def make_fixed_readout(state_dim: int, out_dim: int, *, seed: int) -> FixedReadout:

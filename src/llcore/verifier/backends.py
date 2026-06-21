@@ -47,7 +47,7 @@ try:
     # environment must NOT silently fall back to ``_SDP_SOLVER = None`` == cvxpy default == SCS.
     # We therefore track CLARABEL presence separately: ``SdpLyapunovBackend.available`` is False
     # unless cvxpy AND CLARABEL are BOTH present, and the SDP solve path is never reached under SCS.
-    _CLARABEL_AVAILABLE = "CLARABEL" in _cp.installed_solvers()
+    _CLARABEL_AVAILABLE = "CLARABEL" in _cp.installed_solvers()  # type: ignore[no-untyped-call]
     _SDP_SOLVER = "CLARABEL" if _CLARABEL_AVAILABLE else None
 except Exception:  # pragma: no cover - environment dependent
     _CVXPY_AVAILABLE = False
@@ -95,11 +95,13 @@ def _coupled_arrays(gene: Any) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
 
 def _t_min(decay: np.ndarray, W: np.ndarray, V: np.ndarray, max_input_abs: float) -> np.ndarray:
     M = np.abs(W).sum(axis=1) + max_input_abs * np.abs(V).sum(axis=1)
-    return 1.0 - np.tanh(M) ** 2
+    out: np.ndarray = 1.0 - np.tanh(M) ** 2
+    return out
 
 
 def _jac_at_t(decay: np.ndarray, W: np.ndarray, t: np.ndarray) -> np.ndarray:
-    return np.diag(decay) + np.diag((1.0 - decay) * t) @ W
+    out: np.ndarray = np.diag(decay) + np.diag((1.0 - decay) * t) @ W
+    return out
 
 
 def _box_vertices(t_lo: np.ndarray) -> list[np.ndarray]:
@@ -221,7 +223,7 @@ class SdpLyapunovBackend:
             P = _cp.Variable((n, n), symmetric=True)
             eye = np.eye(n)
             cons = [P >> eye] + [P - J.T @ P @ J >> margin * eye for J in Js]
-            _cp.Problem(_cp.Minimize(_cp.trace(P)), cons).solve(solver=_SDP_SOLVER)
+            _cp.Problem(_cp.Minimize(_cp.trace(P)), cons).solve(solver=_SDP_SOLVER)  # type: ignore[no-untyped-call,attr-defined]
             if P.value is None:
                 return False
             Pv = 0.5 * (P.value + P.value.T)
@@ -236,7 +238,7 @@ class SdpLyapunovBackend:
             return False
 
 
-_REGISTRY = {
+_REGISTRY: dict[str, type[VerifierBackend]] = {
     "closed_form_scalar": ClosedFormScalarBackend,
     "inf_norm": InfNormBackend,
     "two_norm": TwoNormBackend,
