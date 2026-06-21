@@ -1265,7 +1265,7 @@ run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extr
 ### (2) b2 L138(段落まるごと書換、未検証→実測 loop 完結)
 - 旧: 「自宅 CPU では測れない壁 / GPU オフロード(Kaggle等)が次の一手 / 2048+ は未検証」。
 - 新骨子: 「その次の一手を実行した —— **GitHub Actions のクリーン runner(7GB)に 2048 スイープ + needle 検索をオフロードして実測した**。結果: 2048 の Δnll=<MEAN>(<CI>)、needle horizon=<HZ>。」
-  - `<HZ>` が None: 「needle は 2048 まで一度も retrieval 失敗せず —— Δnll の劣化(代数的減衰, doc_0592)はあっても、この長さ・この深さでは passkey 抽出自体は保てた」。**ただし doc_0530(NIAH の学習ダイナミクス: 表層一致で見かけ上飽和し深層の検索能力を過大評価しうる "deceptive saturation")を一文引用し、「horizon=None は "壊れなかった" の証明ではなく "この深さ設定では破綻が観測されなかった" に留まる」と honest 留保**。
+  - `<HZ>` が None: 「needle は 2048 まで一度も retrieval 失敗せず —— Δnll の劣化(代数的減衰, doc_0592)はあっても、この長さ・この深さでは passkey 抽出自体は保てた」。**ただし doc_0530(*Revealing the Learning Dynamics of Long-Context Continual Pre-training*, arXiv:2604.02650)を一文引用し honest 留保: 同研究は NIAH スコアが内在的収束より早く「見かけの飽和(deceptive saturation)」を示し PPL 等の内在指標や downstream 能力を正しく反映しないことを示した → よって「horizon=None(needle pass)」も真の長文脈頑健性の弱いシグナルに過ぎず、"壊れなかった証明" ではなく "この深さ設定で破綻が観測されなかった" に留まる**。※一次資料検証済(2026-06-22): 原典の主旨は「飽和シグナルの早期偽陽性」。arXiv 番号は doc_0592(2604.07658)と混同しないこと。
   - `<HZ>` が int: 「needle は <HZ> tok で retrieval 破綻 —— Δnll の代数的減衰(doc_0592)が実際の検索失敗として顕在化した。定数状態の長距離メモリ限界が経験的に確認された」。doc_0530 は「破綻長は深さ/distractor 設定依存ゆえ単一の hard limit ではない」と留保。
 - 自分の機械が壊れたオチは残す(皮肉として有効)が、「測れなかった」→「クリーン runner で測り切った」に時制を進める。
 
