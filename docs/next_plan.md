@@ -878,3 +878,9 @@
 - Kaggle GPU 案も bundle 構築 (model/corpus/cache 同梱) + kernel push gate で同様に重い。
 - **結論**: needle/2048 の実数値化は「marginal な記事改善」に対して投機的かつ脆弱なインフラ構築を要するため、本ループでは着手しない。**#62 は現状の honest 開示 (2048+ は自宅 RAM 3.6GB 律速で未測、GPU/高RAM オフロードが正手だが cross-platform resume の堅牢化 or GA の CI 分割チェックポイントが前提) で完成扱い**とする。確定済みの実測 (verdict=suppressed / HV+16.8% / regime 256→1024) で記事の主張は十分成立。
 - 将来 needle/2048 を本当に取るなら: (a) resume を base_nll 厳密一致でなく tolerance 許容に改修 (code 変更) → CI 分割実行、または (b) 高RAM self-hosted runner / Colab。いずれも独立タスクとして起票が必要。
+
+### 2026-06-21 追記 — オフロード障害#2 を解消 (eval_cache cross-machine resume)
+- `eval_cache_io._meta_matches` を新設 (commit `b11a235`)。meta 厳密一致を緩和し cross-machine resume を可能に: path 系 (model_dir/text_file) は basename 比較、base_nll は 1e-3 tolerance、他は厳密一致 + キー集合一致。別 model は base_nll が tolerance 超で reject (content 安全網)。回帰テスト 6 件追加 (12 passed)、ruff/mypy green。唯一の利用者は nas_pareto.py で回帰範囲は閉。
+- これで前掲「三重障害」のうち **#2 (cross-platform resume 脆弱性) は解消**。残るは #1 (2 コア GA 26h>6h) と #3 (push gate)。
+- #1 への対処案: GH Actions で **GA を CI 分割チェックポイント実行** (eval_cache を job 間 artifact で受け渡し、各 job <6h で resume 継続) が現実的になった (resume が堅牢化されたため)。または高 RAM self-hosted/Colab。
+- ただし依然 #3 (workflow+fixtures の push = human gate) が残るため、実走は人間承認待ち。本コミットは resume 堅牢化のみで独立に価値がある (この project は candidate dir を頻繁に移動するため path 相対の resume は実用的)。
