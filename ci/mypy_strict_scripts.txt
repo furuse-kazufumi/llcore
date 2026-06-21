@@ -11,7 +11,11 @@ scripts/annotation_generation_poc.py
 scripts/build_aozora_corpus.py
 scripts/build_kaggle_lm_compare_bundle.py
 scripts/chat_endurance_probe.py
+scripts/chat_native_qwen.py
 scripts/chat_staged_smoke.py
+scripts/int8_streaming_infer.py
+scripts/mmap_ram_exceed_poc.py
+scripts/mmap_weights_poc.py
 scripts/clip_smoke.py
 scripts/connectivity_retrieval_poc.py
 scripts/kaggle_bundle_preflight.py
@@ -29,4 +33,6 @@ scripts/poc_1b_lipschitz_invariant.py
 scripts/poc_3a_marabou_bridge_skeleton.py
 scripts/prepare_kaggle_lm_compare_bundle.py
 scripts/rad_full_probes.py
+scripts/recurrent_latency_sweep.py
+scripts/runtime_floor_rss.py
 scripts/train_recurrent_longctx.py

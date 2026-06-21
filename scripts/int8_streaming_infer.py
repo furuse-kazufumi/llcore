@@ -46,8 +46,8 @@ import torch
 from torch import Tensor, nn
 from torch.nn import functional as F
 
-from llcore.lm.model import CharGPT, GPTConfig  # type: ignore[import-untyped]
-from llcore.runtime.rss import peak_mem_bytes as _peak_mem  # type: ignore[import-untyped]
+from llcore.lm.model import CharGPT, GPTConfig
+from llcore.runtime.rss import peak_mem_bytes as _peak_mem
 
 RESULT_PREFIX = "RESULT_JSON="
 

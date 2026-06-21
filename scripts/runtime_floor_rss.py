@@ -37,7 +37,7 @@ import sys
 from pathlib import Path
 from typing import Any, cast
 
-from llcore.runtime.rss import working_set_bytes as _working_set_bytes  # type: ignore[import-untyped]
+from llcore.runtime.rss import working_set_bytes as _working_set_bytes
 
 RESULT_PREFIX = "RESULT_JSON="
 STAGES = ("python", "torch", "model")
@@ -53,8 +53,8 @@ def run_stage(stage: str, n_embd: int, n_layer: int, n_head: int, vocab: int) ->
     else:  # model
         import torch  # noqa: F401
 
-        from llcore.lm.model import CharGPT, GPTConfig  # type: ignore[import-untyped]
-        from llcore.lm.quant import int8_footprint_bytes  # type: ignore[import-untyped]
+        from llcore.lm.model import CharGPT, GPTConfig
+        from llcore.lm.quant import int8_footprint_bytes
 
         torch.manual_seed(1337)
         model = CharGPT(GPTConfig(vocab_size=vocab, block_size=256, n_layer=n_layer,

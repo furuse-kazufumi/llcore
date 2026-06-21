@@ -36,9 +36,9 @@ from typing import Any, cast
 
 import torch
 
-from llcore.lm.model import CharGPT, GPTConfig  # type: ignore[import-untyped]
-from llcore.lm.recurrent import RecurrentConfig, RecurrentLM  # type: ignore[import-untyped]
-from llcore.lm.rwkv import RWKVConfig, RWKVLM  # type: ignore[import-untyped]
+from llcore.lm.model import CharGPT, GPTConfig
+from llcore.lm.recurrent import RecurrentConfig, RecurrentLM
+from llcore.lm.rwkv import RWKVConfig, RWKVLM
 
 RESULT_PREFIX = "RESULT_JSON="
 MODES = ("gpt", "recurrent", "rwkv")

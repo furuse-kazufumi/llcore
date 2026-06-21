@@ -43,8 +43,8 @@ from typing import Any, cast
 import torch
 from torch import Tensor, nn
 
-from llcore.lm.model import CharGPT, GPTConfig  # type: ignore[import-untyped]
-from llcore.runtime.rss import (  # type: ignore[import-untyped]
+from llcore.lm.model import CharGPT, GPTConfig
+from llcore.runtime.rss import (
     peak_working_set_bytes as _peak_working_set_bytes,
     working_set_bytes as _working_set_bytes,
 )
