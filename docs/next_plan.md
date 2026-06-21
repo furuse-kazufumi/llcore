@@ -900,3 +900,12 @@
   - **CI 相当 run_meta (model_dir=`model/Qwen2.5-0.5B-Instruct`, text_file=`out/corpus_aozora_multi.txt` の relocated パス) で `load_eval_cache` → OK、scalar 386 + vector 386 復元**。basename 一致 + 1e-3 tolerance が relocated パスを正しく受理し GA resume する (=CI で GA スキップ) ことを確認。
 - 残存リスクは cross-OS BLAS の base_nll drift (≤1e-3 で吸収見込み、超過時は workflow が fail-fast) と 2 コア実行時間のみ。検証スクリプトはローカルパス直書きのため commit せず削除 (証拠は本記録)。
 - **結論: workflow は push さえ通れば走る状態まで de-risk 済み。残ゲートは #3 (push) のみで human 承認待ち** (LLTERM_CHOICE 既出、未回答)。
+
+### 2026-06-21 追記 — 連載 完全両輪化 + 公開前 QA 合格
+- **全 13 記事が技術版+非エンジニア版の両輪で完成**(s1/s2/b1/a7/b5/a8/a9/b3/b4/b7/b2/b6/a11)。`docs/articles/drafts/` に計 26 ドラフト + `SERIES_INDEX.md`。
+- 本セッション新規: 9 seed 両輪執筆(#62/#61/#59/#57/#55/#60/#56/#54/#58)+ 既存4記事(a7/s1/s2/b1)の一般版 + SERIES_INDEX。
+- **公開前 QA 合格**(local 検証):
+  - ドラフト間の相互参照リンク(`](xxx.md)` 計13本)は**全て実在ファイルを指す=リンク切れゼロ**。
+  - 技術版↔一般版の headline 数値整合確認: a8(331.9/607.8/1673/×5.04/205 ⇄ 丸め 332/608/1673/5倍/205)、b2(15.3/16.8 一致)、a9(184/1.51/142/213.6 ⇄ 丸め)いずれも**矛盾なし**(一般版は丸め表記)。
+- **記事生産ワークストリームは公開可能状態で完了**。残るは外部公開フェーズ(Qiita 投稿 / SVG raw URL 化 / 挿絵 verify-by-content)= いずれも human gate。
+- 連載アーク外の未ドラフト seed は #50(ライセンス・外部調査要)/ #48/#49(他プロジェクト題材)のみ。
