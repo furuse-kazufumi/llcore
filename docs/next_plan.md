@@ -1143,3 +1143,9 @@
   3) human gate: A=記事Qiita公開(SVG raw URL化) / B=needle・大規模latencyを高RAM/GPUオフロード(git push+gh workflow run) / C=Kaggle push。
   4) 新規方向(別系統の実験軸・別題材)の指示があれば RAD 接地から着手。
 - 方針: 指示なき自律ループでの薄い量産はしない(quality-over-volume / feedback_benchmark_honest_disclosure)。
+
+## ★2026-06-22 人間承認 — GH Actions オフロード実行(選択1)
+- **承認内容**: human-gate B「needle/2048 を GH Actions(7GB RAM, GPU 不要, public repo 無料)で実測」を**選択1で承認**。workflow + fixtures の push を許可された。
+- **決定の実行計画**: (1) `feat/lm-recurrent`(origin 比 **131 commit ahead**、`.github/workflows/nas-needle-offload.yml` + `ci/fixtures/`(corpus_aozora_multi.txt / eval_cache.json)含む)を `origin`(public `github.com/furuse-kazufumi/llcore`)へ push。(2) `gh workflow run nas-needle-offload.yml --ref feat/lm-recurrent`(workflow_dispatch、2048 含む context-sweep + needle、committed eval_cache から resume=GA 再走しない)。(3) `gh run watch` で監視 → `gh run download` で `nas_pareto.json` + report 取得。(4) 結果で needle/2048 を実数値化(b2 §5)。
+- **副次**: push は `ci.yml`(push: feat/**)も初回実走 → strict-clean CI gate(`mypy src scripts --strict` + ruff + pytest, フル optional 依存)が実環境で初検証される。
+- **fail-closed 順守**: push=外部公開は人間承認済ゆえ実行。以降の monitor/download は非破壊。
