@@ -91,3 +91,76 @@ def test_roundtrip_with_empty_vector_v1(tmp_path) -> None:
     s2, v2 = out
     assert s2 == scalar
     assert v2 == {}
+
+
+# --- cross-machine resume robustness (base_nll float drift + relocated model/corpus paths) -------
+# A snapshot taken on one machine must still resume on another (e.g. local Windows -> Linux CI /
+# Kaggle / a moved candidate dir) where (a) BLAS rounding shifts base_nll in the ~6th decimal and
+# (b) the absolute model/corpus paths differ but name the SAME artifact. The identity guard must
+# tolerate those two while still rejecting a genuinely different run.
+
+
+def test_resume_tolerates_base_nll_float_drift(tmp_path) -> None:
+    from llcore.runtime.eval_cache_io import load_eval_cache, save_eval_cache
+
+    p = tmp_path / "eval_cache.json"
+    save_eval_cache(p, {((0,), False): (1.0, 2.0)}, {}, _meta())
+
+    drifted = {**_meta(), "base_nll": 4.415499}  # ~1e-6 BLAS drift — same logical run
+    assert load_eval_cache(p, drifted) is not None
+
+
+def test_resume_rejects_base_nll_beyond_tolerance(tmp_path) -> None:
+    from llcore.runtime.eval_cache_io import load_eval_cache, save_eval_cache
+
+    p = tmp_path / "eval_cache.json"
+    save_eval_cache(p, {((0,), False): (1.0, 2.0)}, {}, _meta())
+
+    # 0.0045 >> float drift => a different corpus/model => must NOT resume
+    assert load_eval_cache(p, {**_meta(), "base_nll": 4.42}) is None
+
+
+def test_resume_tolerates_relocated_model_and_corpus_paths(tmp_path) -> None:
+    from llcore.runtime.eval_cache_io import load_eval_cache, save_eval_cache
+
+    saved = {**_meta(), "text_file": "out/corpus_aozora_multi.txt"}
+    p = tmp_path / "eval_cache.json"
+    save_eval_cache(p, {((0,), False): (1.0, 2.0)}, {}, saved)
+
+    relocated = {
+        **saved,
+        "model_dir": "/kaggle/input/qwen25/Qwen2.5-0.5B-Instruct",  # same basename
+        "text_file": "/tmp/data/corpus_aozora_multi.txt",           # same basename
+    }
+    assert load_eval_cache(p, relocated) is not None
+
+
+def test_resume_rejects_different_model_basename(tmp_path) -> None:
+    from llcore.runtime.eval_cache_io import load_eval_cache, save_eval_cache
+
+    p = tmp_path / "eval_cache.json"
+    save_eval_cache(p, {((0,), False): (1.0, 2.0)}, {}, _meta())
+
+    bigger = {**_meta(), "model_dir": "D:/models/Qwen2.5-1.5B-Instruct"}  # different artifact
+    assert load_eval_cache(p, bigger) is None
+
+
+def test_resume_rejects_extra_or_missing_meta_key(tmp_path) -> None:
+    from llcore.runtime.eval_cache_io import load_eval_cache, save_eval_cache
+
+    p = tmp_path / "eval_cache.json"
+    save_eval_cache(p, {((0,), False): (1.0, 2.0)}, {}, _meta())
+
+    assert load_eval_cache(p, {**_meta(), "fast_windows": 8}) is None  # extra key
+    missing = {k: v for k, v in _meta().items() if k != "n_layer"}
+    assert load_eval_cache(p, missing) is None  # missing key
+
+
+def test_resume_rejects_non_numeric_base_nll_mismatch(tmp_path) -> None:
+    from llcore.runtime.eval_cache_io import load_eval_cache, save_eval_cache
+
+    p = tmp_path / "eval_cache.json"
+    save_eval_cache(p, {((0,), False): (1.0, 2.0)}, {}, _meta())
+
+    # a corrupt/non-numeric base_nll must not slip through the tolerance branch
+    assert load_eval_cache(p, {**_meta(), "base_nll": "4.4155"}) is None

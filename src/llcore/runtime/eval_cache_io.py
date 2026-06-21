@@ -6,7 +6,11 @@ per ``(genome, use_distill)`` and, under ``--proxy-v2``, the per-window Δnll **
 scalar. The script writes its report only once at the end, so a kill/restart (ccr re-login, OOM,
 power) discards every forward pass. This module snapshots both caches atomically and reloads them on
 restart — but only when the run parameters match (``meta``), so a *different* run never resumes a
-stale cache. Pure ``json`` + ``numpy``; no model dependency.
+stale cache. The match is strict on every identity field except two, so a snapshot survives being
+moved between machines while still rejecting a genuinely different run: filesystem paths
+(``model_dir`` / ``text_file``) are compared by basename (relocation-tolerant) and ``base_nll`` within
+a small tolerance (cross-platform BLAS float drift) — see :func:`_meta_matches`. Pure ``json`` +
+``numpy``; no model dependency.
 
 Format (one JSON object)::
 
@@ -29,6 +33,42 @@ CatGenome = tuple[int, ...]
 Key = tuple[CatGenome, bool]
 Scalar = dict[Key, tuple[float, float]]
 Vector = dict[Key, np.ndarray]
+
+
+# Fields that name a filesystem artifact: compared by basename so a snapshot survives the artifact
+# being relocated (local Windows -> Linux CI / Kaggle / a moved candidate dir) as long as it is the
+# SAME file. ``base_nll`` (a float) acts as the content check that backs this up: a different model
+# behind the same basename shifts base_nll far past the tolerance and is rejected anyway.
+_PATH_META_KEYS = frozenset({"model_dir", "text_file"})
+# Cross-platform BLAS rounding shifts a single forward's mean CE in the ~6th decimal; this tolerance
+# absorbs that drift while staying orders of magnitude below any genuine corpus/model difference.
+_BASE_NLL_TOL = 1e-3
+
+
+def _meta_matches(saved: object, expected: dict[str, object]) -> bool:
+    """True iff ``saved`` identifies the same run as ``expected`` (resume is then safe).
+
+    Strict equality on every field EXCEPT: path fields compared by basename (relocation-tolerant)
+    and ``base_nll`` compared within :data:`_BASE_NLL_TOL` (float-drift-tolerant). The key SET must
+    match exactly, so an added/removed identity field never silently resumes a stale cache.
+    """
+    if not isinstance(saved, dict) or saved.keys() != expected.keys():
+        return False
+    for key, exp_val in expected.items():
+        saved_val = saved[key]
+        if key in _PATH_META_KEYS:
+            if os.path.basename(str(saved_val)) != os.path.basename(str(exp_val)):
+                return False
+        elif key == "base_nll":
+            if not (isinstance(saved_val, (int, float)) and isinstance(exp_val, (int, float))):
+                # a non-numeric base_nll is malformed; fall back to strict equality (fail-closed)
+                if saved_val != exp_val:
+                    return False
+            elif abs(float(saved_val) - float(exp_val)) > _BASE_NLL_TOL:
+                return False
+        elif saved_val != exp_val:
+            return False
+    return True
 
 
 def _key_to_str(genome: CatGenome, use_distill: bool) -> str:
@@ -74,7 +114,7 @@ def load_eval_cache(
         payload = json.loads(p.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError, ValueError):
         return None
-    if not isinstance(payload, dict) or payload.get("meta") != meta:
+    if not isinstance(payload, dict) or not _meta_matches(payload.get("meta"), meta):
         return None
     scalar: Scalar = {}
     vector: Vector = {}
