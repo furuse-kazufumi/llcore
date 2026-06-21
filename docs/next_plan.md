@@ -1255,3 +1255,25 @@
   - `09ffade` **`scripts/extract_needle_results.py` + `tests/unit/test_extract_needle_results.py`(4件)** 新規: 訂正済み proxy_v2 スキーマを固定し統合を決定的1コマンド化。純 ASCII 出力(cp932 罠回避)。mypy src scripts --strict green / ruff clean / pytest green。
 - **human gate(未消化)**: A=Qiita 公開(SVG raw URL 化)/ C=Kaggle push。B=needle は実行中。
 - **方針**: 指示なき薄い量産はしない(quality-over-volume)。needle 完了 or 新題材指示で再開。
+
+## ★2026-06-22 待機中追記 — needle 統合のペースト可能テンプレート(データ到着後を純機械化)
+run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extract_needle_results.py` の出力を受けて以下を当てはめるだけにする。`<MEAN>`=`cs['2048']['mean']`、`<CI>`=`[ci_lo,ci_hi]`、`<HZ>`=`p['needle']['horizon']`。
+
+### (1) b2 L137 末尾(`…1024:1.182 と長文ほど劣化が増大しました` の数列に 2048 を追記)
+- horizon/mean を見て: `256:0.761 → 512:1.012 → 1024:1.182 → 2048:<MEAN>`(±CI 併記可)に置換。劣化が続伸なら「定数状態の弱点が長文ほど伸びる」既存叙述がそのまま強化される。
+
+### (2) b2 L138(段落まるごと書換、未検証→実測 loop 完結)
+- 旧: 「自宅 CPU では測れない壁 / GPU オフロード(Kaggle等)が次の一手 / 2048+ は未検証」。
+- 新骨子: 「その次の一手を実行した —— **GitHub Actions のクリーン runner(7GB)に 2048 スイープ + needle 検索をオフロードして実測した**。結果: 2048 の Δnll=<MEAN>(<CI>)、needle horizon=<HZ>。」
+  - `<HZ>` が None: 「needle は 2048 まで一度も retrieval 失敗せず —— Δnll の劣化(代数的減衰, doc_0592)はあっても、この長さ・この深さでは passkey 抽出自体は保てた」。**ただし doc_0530(NIAH の学習ダイナミクス: 表層一致で見かけ上飽和し深層の検索能力を過大評価しうる "deceptive saturation")を一文引用し、「horizon=None は "壊れなかった" の証明ではなく "この深さ設定では破綻が観測されなかった" に留まる」と honest 留保**。
+  - `<HZ>` が int: 「needle は <HZ> tok で retrieval 破綻 —— Δnll の代数的減衰(doc_0592)が実際の検索失敗として顕在化した。定数状態の長距離メモリ限界が経験的に確認された」。doc_0530 は「破綻長は深さ/distractor 設定依存ゆえ単一の hard limit ではない」と留保。
+- 自分の機械が壊れたオチは残す(皮肉として有効)が、「測れなかった」→「クリーン runner で測り切った」に時制を進める。
+
+### (3) b2 L114-115 図キャプション + SVG L51-52
+- `needleは UNTESTED` / `長距離検索は未検証(UNTESTED)` / SVG `needle → UNTESTED`「未検証は…開示する」を、`<HZ>` に応じて:
+  - None: `needle → PASSED(2048)`(ただし深さ依存の留保つき、と SVG 副文)。
+  - int: `needle → BROKE@<HZ>`。
+- SVG は VERDICT C の rect 色/dash も実測 verdict 色へ(PASSED=緑系 #2ea043 / BROKE=赤系、UNTESTED の灰 dash を実線へ)。
+
+### 共通
+- 数値は `nas_pareto_report.md` と JSON で二重照合。proxy nll / paired bootstrap CI の honest 留保は全箇所で継承。「だから長距離検索は大丈夫とは言わない」のトーンは horizon=None でも維持(doc_0530 留保がこれを支える)。
