@@ -920,3 +920,10 @@
 - **git 整合チェック合格**: 作業ツリーは `docs/SESSION_SUMMARY.md`(自動生成・無視)以外 clean。markdown は実体 8〜19KB(`du` の 1.0M 表示は Windows ブロックサイズの癖で肥大化なし)。意図的な大容量追加は `ci/fixtures/corpus_aozora_multi.txt`(~580KB, offload用)のみ。b2 の SVG 参照パス(`../../../assets/articles/llcore_suppress_win.svg`)も実在解決。本セッション 31 コミット、全て local。
 - **収束点**: ローカル完結の高価値作業(NAS完了処理 / eval_cache resume堅牢化+991テスト / needle offload を push手前まで+ローカル実証 / 連載13側面を両輪+索引+三層QA / git整合)は出し切った。
 - 残: 他プロジェクト題材 #48(MangaFlow)/#49(Hermes Agent)= llcore一次データに乏しくアーク外 / 外部公開・push = human gate。
+
+### 2026-06-21 追記 — 番号付きseed記事化 完了 + 全体QA再合格
+- #48(c3)で番号付きseedの記事化対象(#48-#62, #51/#52メタ除く)を全消化。**全16記事 × 技術/一般 = 32ドラフト + SERIES_INDEX**。
+- **全体QA再合格**: クロスリンク切れゼロ(C系 c1/c2/c3 の a7/a9/b1/s1/s2 参照も実在)、技術16+一般16=32本が SERIES_INDEX の表16行と完全一致。
+- 連載構成: A系 a7/a8/a9/a11(理論・教訓)/ B系 b1-b7(honest-disclosure)/ S系 s1/s2(計測規律)/ C系 c1/c2/c3(エコシステム・戦略)。13側面を網羅。
+- **記事生産ワークストリームは公開可能状態で完全終了**。ローカル完結の高価値タスク(NAS完了処理/eval_cache resume堅牢化+991テスト/needle offload push手前まで+ローカル実証/連載32ドラフト+索引+三層QA/git整合)を全て出し切った。
+- 残: 外部公開(Qiita投稿/SVG raw URL化/挿絵verify-by-content)= human gate / needle push = human gate / C系の外部事実(arXiv ID・ライセンス・star数)は公開フェーズで再確認(ドラフトには「2026-06理解・要確認」留保済み)。
