@@ -851,3 +851,8 @@
 ### 2026-06-21 23:36 追記 — 検証走が needle 4096tok でメモリ律速
 - PID 16960 生存継続だが CPU 増加が鈍化 (687→884→1080 / 各25分 ≈ +8 CPU秒/分)。needle の 4096tok 長文脈 forward が RAM 3.6GB 機でスワップ気味=メモリ律速。停止ではないが当初 ~70分見込みを超過 (wall ~75分経過、json 未更新)。
 - rigorous tier は cache 非書込なので kill すると recompute も失う。**判断**: もう1サイクル (〜25分) 待つ。次回チェックでも json 未更新かつ進捗僅少なら、kill して `--needle-lengths 2048` (4096 を落とす) で再起動し局所性を確保する fallback を採る。2048 sweep だけは確実に取りたいので、最悪 `--needle` を外して 2048 sweep のみ取得する案も可。
+
+### 2026-06-21 23:40 追記 — fallback 実行: needle 4096 を落として再起動
+- WS 3872MB > 物理 RAM 3.6GB で thrashing 確定 (4096tok needle の O(T²) attention)。判断基準どおり kill (PID 16960/launcher 7744)。
+- `--needle-lengths 2048` のみで detached 再起動 (実ワーカー **PID 17624**, launcher 2484)。2048tok の attention メモリは 4096 の 1/4。起動直後 WS 2931MB で物理 RAM 内。run_meta 不変につき GA cache resume 継続。
+- これで「needle@2048」「context_sweep@2048」の両方が取れる。4096 needle は本機では非現実的 (記事には「2048 で実測、4096 はメモリ制約で未実施」と honest 開示する方針)。完了後 nas_pareto_report.py で再生成 → b2 §5 更新。
