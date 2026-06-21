@@ -1155,3 +1155,9 @@
 - **CI が cross-platform ギャップを検出 → 修正で green 化**: (1) mypy strict-clean は Windows 限定だった(`ctypes.WinDLL` attr-defined / onnx 未インストール / safetensors `safe_open` 版差)→ pyproject `platform='win32'` + onnx override + loader を `cast('Any',...)` 化で解消(`67cc98a`)。(2) full unit suite は Linux 非可搬(Windows API + HF モデル DL)ゆえ pytest を CI から外し lint+mypy gate に(`06102f4`)。**CI run 27918777818 = lint+typecheck success(green)**。strict-clean gate が実環境で検証された。
 - **needle dispatch のブロッカーと workaround**: `gh workflow run nas-needle-offload.yml` は **403(fine-grained PAT が Actions:write/workflow_dispatch 権限を持たない)**。回避として workflow に **tag-push トリガ `needle-run-*`** を追加(tag push=repo write で起動可、inputs は既定値フォールバック)。tag `needle-run-1` を push して nas_pareto(2048 context-sweep + needle, committed eval_cache から resume)を 7GB runner で起動する。
 - 次: tag push → `gh run watch` 監視 → `gh run download` で nas_pareto.json + report 取得 → needle/2048 を実数値化(b2 §5)。**恒久対応**: 今後 dispatch を使うなら PAT に Actions:write を付与(人間操作)。
+
+## ★2026-06-22 実行中 — needle-run-2(GH Actions オフロード本計測)
+- **needle-run-1 は model DL で失敗**(`huggingface-cli` 廃止)→ `hf download` に修正(`652d584`)→ **needle-run-2 で再起動**。
+- **現在 run 27918958686(needle-run-2)が実行中**: install/model DL/corpus+eval_cache staging を通過し、**「rigorous tier + needle + 2048 sweep」step が in_progress**(~1-3h 見込み、committed eval_cache から GA resume)。
+- **結果取得手順(完了後)**: `gh run view 27918958686 --json status,conclusion` で完了確認 → `gh run download 27918958686 -D out/needle_offload` で `nas_pareto.json` + `nas_pareto_report.md` + `run_offload.log` 取得 → 「Assert GA was resumed」step が success なら GA 再走でなく resume が効いた証 → needle/2048 を b2 §5 に実数値化。
+- **恒久メモ**: tag-push トリガ `needle-run-*` で起動する導線が機能(PAT に Actions:write が無くても可)。次回以降の再起動も新 tag `needle-run-N` を push すればよい。
