@@ -6,53 +6,59 @@
   </defs>
   <rect width="760" height="440" fill="url(#bg)"/>
 
-  <text x="34" y="40" fill="#e6edf3" font-size="22" font-weight="700">文脈4倍でメモリ5倍 — でも recurrent は動かない</text>
-  <text x="34" y="64" fill="#8b949e" font-size="13.5">peak working set 実測(極小モデル / CPU)。読むのは絶対値でなく「増え方のトレンド」</text>
+  <text x="34" y="40" fill="#e6edf3" font-size="22" font-weight="700">膨らみ方は一定でない — 短文脈は平坦、長文脈で急騰</text>
+  <text x="34" y="64" fill="#8b949e" font-size="13.5">peak working set 実測(極小モデル / CPU、横軸は対数)。読むのは絶対値でなく「増え方の形」</text>
 
-  <!-- plot area: x 90..700, y 100..360 -->
-  <!-- axes -->
+  <!-- plot area: x 90..710 (log2 T 128..4096), y 100..360 (linear 0..1800 MB) -->
   <line x1="90" y1="360" x2="710" y2="360" stroke="#30363d" stroke-width="2"/>
   <line x1="90" y1="100" x2="90" y2="360" stroke="#30363d" stroke-width="2"/>
-  <text x="700" y="384" fill="#6e7681" font-size="12" text-anchor="end">文脈長 L (tok)</text>
+  <text x="700" y="384" fill="#6e7681" font-size="12" text-anchor="end">文脈長 L (tok, 対数)</text>
   <text x="34" y="108" fill="#6e7681" font-size="12">peak WS (MB)</text>
 
-  <!-- y gridlines: 0,500,1000,1500,1800 mapped; max ~1800 -> y100, 0 -> y360 -->
-  <!-- scale: y = 360 - (val/1800)*260 -->
-  <line x1="90" y1="288.8" x2="710" y2="288.8" stroke="#21262d" stroke-width="1" stroke-dasharray="4 4"/>
-  <text x="84" y="293" fill="#6e7681" font-size="11" text-anchor="end">500</text>
+  <!-- y gridlines 500/1000/1500 -->
+  <line x1="90" y1="287.8" x2="710" y2="287.8" stroke="#21262d" stroke-width="1" stroke-dasharray="4 4"/>
+  <text x="84" y="292" fill="#6e7681" font-size="11" text-anchor="end">500</text>
   <line x1="90" y1="215.6" x2="710" y2="215.6" stroke="#21262d" stroke-width="1" stroke-dasharray="4 4"/>
   <text x="84" y="220" fill="#6e7681" font-size="11" text-anchor="end">1000</text>
-  <line x1="90" y1="142.3" x2="710" y2="142.3" stroke="#21262d" stroke-width="1" stroke-dasharray="4 4"/>
+  <line x1="90" y1="143.3" x2="710" y2="143.3" stroke="#21262d" stroke-width="1" stroke-dasharray="4 4"/>
   <text x="84" y="147" fill="#6e7681" font-size="11" text-anchor="end">1500</text>
 
-  <!-- x ticks at 1024,2048,4096 -> x 170, 400, 660 -->
-  <text x="170" y="378" fill="#6e7681" font-size="11" text-anchor="middle">1024</text>
-  <text x="400" y="378" fill="#6e7681" font-size="11" text-anchor="middle">2048</text>
-  <text x="660" y="378" fill="#6e7681" font-size="11" text-anchor="middle">4096</text>
+  <!-- x ticks 128..4096 -->
+  <text x="90"  y="378" fill="#6e7681" font-size="11" text-anchor="middle">128</text>
+  <text x="214" y="378" fill="#6e7681" font-size="11" text-anchor="middle">256</text>
+  <text x="338" y="378" fill="#6e7681" font-size="11" text-anchor="middle">512</text>
+  <text x="462" y="378" fill="#6e7681" font-size="11" text-anchor="middle">1024</text>
+  <text x="586" y="378" fill="#6e7681" font-size="11" text-anchor="middle">2048</text>
+  <text x="710" y="378" fill="#6e7681" font-size="11" text-anchor="middle">4096</text>
 
-  <!-- GPT curve: (1024,331.9)->(170,312.1) (2048,607.8)->(400,272.2) (4096,1673.0)->(660,118.4) -->
-  <polyline points="170,312.1 400,272.2 660,118.4" fill="none" stroke="#f85149" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="170" cy="312.1" r="5" fill="#f85149"/>
-  <circle cx="400" cy="272.2" r="5" fill="#f85149"/>
-  <circle cx="660" cy="118.4" r="5" fill="#f85149"/>
-  <text x="170" y="304" fill="#f85149" font-size="11" text-anchor="middle">332</text>
-  <text x="400" y="264" fill="#f85149" font-size="11" text-anchor="middle">608</text>
-  <text x="648" y="112" fill="#f85149" font-size="12" font-weight="700" text-anchor="end">1673 MB</text>
+  <!-- annotate regimes -->
+  <text x="214" y="344" fill="#6e7681" font-size="10.5" text-anchor="middle">←固定重み床が支配(×1.11)</text>
+  <text x="586" y="240" fill="#d29922" font-size="10.5" text-anchor="middle">二次項が顕在化(×6.75)→</text>
 
-  <!-- recurrent curve: ~205 flat -> y = 360-(205/1800)*260 = 330.4 -->
-  <polyline points="170,330.4 400,330.4 660,330.1" fill="none" stroke="#3fb950" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="170" cy="330.4" r="5" fill="#3fb950"/>
-  <circle cx="400" cy="330.4" r="5" fill="#3fb950"/>
-  <circle cx="660" cy="330.1" r="5" fill="#3fb950"/>
-  <text x="660" y="346" fill="#3fb950" font-size="12" font-weight="700" text-anchor="end">205 MB(平坦)</text>
+  <!-- GPT curve 6 points -->
+  <polyline points="90,327.9 214,326.7 338,324.2 462,312.1 586,272.2 710,118.3" fill="none" stroke="#f85149" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="90"  cy="327.9" r="4.5" fill="#f85149"/>
+  <circle cx="214" cy="326.7" r="4.5" fill="#f85149"/>
+  <circle cx="338" cy="324.2" r="4.5" fill="#f85149"/>
+  <circle cx="462" cy="312.1" r="4.5" fill="#f85149"/>
+  <circle cx="586" cy="272.2" r="4.5" fill="#f85149"/>
+  <circle cx="710" cy="118.3" r="4.5" fill="#f85149"/>
+  <text x="586" y="264" fill="#f85149" font-size="11" text-anchor="middle">608</text>
+  <text x="700" y="112" fill="#f85149" font-size="12" font-weight="700" text-anchor="end">1673 MB</text>
+
+  <!-- recurrent ~205 flat -->
+  <polyline points="90,330.3 214,330.4 338,330.3 462,330.3 586,330.3 710,330.3" fill="none" stroke="#3fb950" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="90"  cy="330.3" r="4.5" fill="#3fb950"/>
+  <circle cx="710" cy="330.3" r="4.5" fill="#3fb950"/>
+  <text x="710" y="346" fill="#3fb950" font-size="12" font-weight="700" text-anchor="end">205 MB(平坦)</text>
 
   <!-- legend -->
   <rect x="110" y="120" width="14" height="14" rx="3" fill="#f85149"/>
-  <text x="130" y="132" fill="#e6edf3" font-size="13">GPT(Transformer)= 文脈長で超線形に膨張(×5.04)</text>
+  <text x="130" y="132" fill="#e6edf3" font-size="13">GPT(Transformer)= 128→4096(×32)で ×7.53、伸び方が加速</text>
   <rect x="110" y="144" width="14" height="14" rx="3" fill="#3fb950"/>
   <text x="130" y="156" fill="#e6edf3" font-size="13">recurrent / RWKV = 定数状態で平坦(×1.00)</text>
 
   <!-- footer -->
   <line x1="34" y1="398" x2="726" y2="398" stroke="#21262d" stroke-width="1"/>
-  <text x="34" y="420" fill="#8b949e" font-size="12.5">attention は O(L²)・KV は O(L) で増える / 定数状態は文脈長に依存する項を持たない。T=4096 で GPT は recurrent の <tspan fill="#c9d1d9" font-weight="700">8.1×</tspan>。</text>
+  <text x="34" y="420" fill="#8b949e" font-size="12.5">「×N でメモリ ×M」の M は<tspan fill="#c9d1d9" font-weight="700">起点で激変</tspan>(128→512 で ×1.11、512→4096 で ×6.75)。だから点でなく曲線で読む。</text>
 </svg>

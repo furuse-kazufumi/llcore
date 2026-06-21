@@ -1034,3 +1034,8 @@
 - **両対数 + 各モード T=128 正規化**で「上がり方の形」だけを見せる(cross-mode絶対比較を避ける honest 構図)。GPT は理想線形(破線 p=1)から上に外れ ×37(p≈1.37)、recurrent/RWKV は破線に沿って ×16(p≈0.99、両者ほぼ重なる)。
 - a7 技術版の compute軸ブロック直後に図+キャプション挿入(XML valid 確認済)。
 - 残(公開フェーズ=human gate): 全SVGを raw絶対URL化、a8 SVGを6点曲線へ更新。可視化2軸(メモリ=context_memory.svg / compute=latency_scaling.svg)が揃った。
+
+### 2026-06-22 追記 — a8 メモリ図を3点→6点曲線へ更新(表と整合)
+- `assets/articles/llcore_context_memory.svg` を 6点(128→4096, 対数横軸)へ刷新。記事の新核心=regime依存(128→512 平坦 ×1.11 / 512→4096 急騰 ×6.75)を図で可視化。GPT ×7.53(全域)/ recurrent 平坦を注記付きで表示。
+- a8 の図 alt+キャプションを6点・対数軸・regime依存に整合更新(旧「1024→4096を抜き出し」を解消)。XML valid。
+- これでアーキ編の可視化2軸(メモリ context_memory.svg / compute latency_scaling.svg)が共に最新データと整合。残: 公開フェーズで全SVGを raw絶対URL化(human gate)。
