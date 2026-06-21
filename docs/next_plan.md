@@ -960,3 +960,11 @@
 
 ### 次セッションの最初の一手
 - 上記 A/B/C いずれかの human 承認があれば即実行。無ければ、ローカル完結の高価値タスクは枯渇しているため、新規方向(新実験/新記事ネタ)の指示を待つのが妥当。低価値タスクの量産は `feedback_benchmark_honest_disclosure` / quality-over-volume に反するため行わない。
+
+### 2026-06-21 追記 — RAD コーパス接地(差別化軸の再確認 + 引用候補)
+連載の prior-art 主張を RAD コーパス(`D:/docs/*_corpus_v2/`)と突合(車輪の再発明チェック)。**差別化軸は健全=本連載の新規性は手法でなく「honest-disclosure 層/運用 gate/会計規律」にある**ことを再確認。以下は filename レベル一致の**引用候補(未精読・公開前に要精読)**:
+- **b2/b7(proxy NAS)**: `evolutionary_computation_corpus_v2/.../doc_0055 Efficient Multi-Objective NAS`(MTF-PDNS 系、seed 既出と整合)。差別化=proxy の不確実性を測って verdict を律する層。
+- **a7/a8(定数状態 long-context)**: `llm_corpus_v2/.../doc_1139 From History to State: Constant-Context Skill Learning`(constant-context、近接)、`llm_corpus_v2/cluster_00_quantization/doc_0469 TurboESM 3-Bit KV Cache`(KV cache メモリ)。差別化=自宅 CPU 実機 peak RSS でのトレンド実証。
+- **b4(Z3/SDP 収縮 gate)**: `formal_methods_corpus_v2/2604.03017 Compositionality of Lyapunov functions via assume-guarantee`(Lyapunov、直結)。差別化=学習ループの安全 gate への応用 + 経験 gate 84% vs sound 0% の判別力計測。
+- **b7(CEGIS)**: `formal_methods_corpus_v2/2604.24540 Counterexample-Guided Interval Weakening`(CEGIS 系)。
+- **注**: いずれも **filename 一致のみで本文未精読**。公開フェーズで該当 doc を精読し、正確な引用形へ昇格すること(未読のまま引用断定はしない=honest disclosure)。差別化軸自体は本確認で揺らがず。
