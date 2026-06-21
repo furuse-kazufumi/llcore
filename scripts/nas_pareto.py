@@ -348,6 +348,25 @@ def main(argv: list[str] | None = None) -> int:
     # rigorous tier so the holdout re-eval and hypervolume-gain CI need no extra inner-loop forwards).
     fast_delta_cache: dict[tuple[CatGenome, bool], np.ndarray] = {}
 
+    # resume: a snapshot is only reused when the run identity (model/corpus/context/base-nll) matches,
+    # so a different run never inherits a stale cache. measure() writes back every --checkpoint-every.
+    run_meta: dict[str, object] = {
+        "model_dir": args.model_dir, "text_file": args.text_file, "n_tokens": args.n_tokens,
+        "window": args.window, "ref_context": tref, "proxy_v2": args.proxy_v2, "distill": args.distill,
+        "inner_context": args.inner_context if args.proxy_v2 else None,
+        "fast_windows": args.fast_windows if args.proxy_v2 else None,
+        "base_nll": round(base, 6), "n_layer": n_layer,
+    }
+    cache_path = out / "eval_cache.json"
+    eval_counter = [0]
+    if not args.no_resume:
+        restored = load_eval_cache(cache_path, run_meta)
+        if restored is not None:
+            cache.update(restored[0])
+            fast_delta_cache.update(restored[1])
+            print(f"[resume] {len(restored[0])} scalar + {len(restored[1])} vector evals "
+                  f"reused from {cache_path}", flush=True)
+
     ids_all = tok(text, return_tensors="pt").input_ids
     fast_windows: list[torch.Tensor] = []
     fast_base: list[torch.Tensor] = []
