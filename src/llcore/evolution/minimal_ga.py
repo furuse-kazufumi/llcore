@@ -66,7 +66,7 @@ class Population(Generic[GeneT]):
         return len(self.individuals)
 
     @property
-    def best(self) -> Individual:
+    def best(self) -> Individual[GeneT]:
         return max(self.individuals, key=lambda ind: ind.fitness)
 
     @property
@@ -76,7 +76,10 @@ class Population(Generic[GeneT]):
     @property
     def gene_matrix(self) -> np.ndarray:
         """shape (N, 3): (decay, mix, gate_str) per row."""
-        return np.array([ind.gene.as_array() for ind in self.individuals])
+        # GeneT は unbounded だが、本 property は ``as_array`` を持つ gene 型 (RWKV/LIF)
+        # でのみ呼ばれる契約 (docstring 参照)。持たない gene は evolve 側が codec 経由で
+        # diversity を計算するため到達しない。
+        return np.array([ind.gene.as_array() for ind in self.individuals])  # type: ignore[attr-defined]
 
 
 # ---------------------------------------------------------------------------
@@ -85,8 +88,8 @@ class Population(Generic[GeneT]):
 
 
 def tournament_select(
-    pop: Population, k: int, rng: np.random.Generator
-) -> Individual:
+    pop: Population[GeneT], k: int, rng: np.random.Generator
+) -> Individual[GeneT]:
     """k 個体を random sampling し最大 fitness を返す.
 
     k=1 で random 選択、k=size で best (greedy)。標準は k=3。
@@ -337,9 +340,9 @@ def evaluate_population(
     genes: list[StateUpdateGene],
     fitness_func: FitnessFunc,
     rng: np.random.Generator,
-) -> Population:
+) -> Population[StateUpdateGene]:
     """全個体の fitness 計算 → Population を返す."""
-    individuals: list[Individual] = []
+    individuals: list[Individual[StateUpdateGene]] = []
     for gene in genes:
         f = fitness_func(gene, rng)
         individuals.append(Individual(gene=gene, fitness=float(f)))
@@ -377,13 +380,13 @@ class EvolutionResult:
         (additive; 既存呼び出しと後方互換)。gated mode 時のみ :class:`GateStats` が入る。
     """
 
-    generations: tuple[Population, ...]
+    generations: tuple[Population[StateUpdateGene], ...]
     best_fitness_curve: tuple[float, ...]
     diversity_curve: tuple[float, ...]
     gate_stats: "GateStats | None" = field(default=None)
 
     @property
-    def final_best(self) -> Individual:
+    def final_best(self) -> Individual[StateUpdateGene]:
         return self.generations[-1].best
 
 
@@ -398,7 +401,7 @@ def evolve(
     elitism: int = 1,
     rng: np.random.Generator | None = None,
     initial_pop: list[StateUpdateGene] | None = None,
-    codec: "GeneCodec | None" = None,
+    codec: "GeneCodec[StateUpdateGene] | None" = None,
     gate_mode: GateMode = "none",
     resample_cap: int = 50,
     w_bar: float | None = None,
@@ -493,28 +496,32 @@ def evolve(
 
     # S2: operator 選択 (codec=None は旧 RWKV パスを完全保存 = byte-identical)。
     if codec is None:
-        def _init(n: int, r: np.random.Generator):
+        def _init(n: int, r: np.random.Generator) -> list[StateUpdateGene]:
             return initialize_random_population(n, r)
 
-        def _mut(g, r: np.random.Generator):
+        def _mut(g: StateUpdateGene, r: np.random.Generator) -> StateUpdateGene:
             return uniform_mutate(g, mutation_sigma, r)
 
-        def _cx(a, b, r: np.random.Generator):
+        def _cx(
+            a: StateUpdateGene, b: StateUpdateGene, r: np.random.Generator
+        ) -> StateUpdateGene:
             return crossover_uniform(a, b, r)
 
-        def _div(p: Population) -> float:
+        def _div(p: Population[StateUpdateGene]) -> float:
             return float(p.gene_matrix.var())
     else:
-        def _init(n: int, r: np.random.Generator):
+        def _init(n: int, r: np.random.Generator) -> list[StateUpdateGene]:
             return initialize_random_population_g(n, codec, r)
 
-        def _mut(g, r: np.random.Generator):
+        def _mut(g: StateUpdateGene, r: np.random.Generator) -> StateUpdateGene:
             return uniform_mutate_g(g, codec, mutation_sigma, r)
 
-        def _cx(a, b, r: np.random.Generator):
+        def _cx(
+            a: StateUpdateGene, b: StateUpdateGene, r: np.random.Generator
+        ) -> StateUpdateGene:
             return crossover_uniform_g(a, b, codec, r)
 
-        def _div(p: Population) -> float:
+        def _div(p: Population[StateUpdateGene]) -> float:
             mat = np.array([codec.to_array(ind.gene) for ind in p.individuals])
             return float(mat.var())
 
@@ -524,7 +531,7 @@ def evolve(
     elif len(initial_pop) != pop_size:
         raise ValueError(f"initial_pop size {len(initial_pop)} != pop_size {pop_size}")
 
-    def _make_child(p: Population):
+    def _make_child(p: Population[StateUpdateGene]) -> StateUpdateGene:
         """tournament(+crossover)+mutate で子 gene を 1 個生成する.
 
         RNG draw 順は ``"none"`` mode で旧 ``evolve()`` と完全一致:
@@ -539,7 +546,7 @@ def evolve(
         return _mut(child, rng)
 
     pop = evaluate_population(initial_pop, fitness_func, rng)
-    generations: list[Population] = [pop]
+    generations: list[Population[StateUpdateGene]] = [pop]
     best_curve: list[float] = [pop.best.fitness]
     diversity_curve: list[float] = [_div(pop)]
 
@@ -556,10 +563,10 @@ def evolve(
         # elite を再評価すると fitness が変動して best 単調性が崩れる。
         # → elite は前世代の Individual (gene + fitness) をそのまま次世代に。
         sorted_inds = sorted(pop.individuals, key=lambda ind: -ind.fitness)
-        elites: list[Individual] = list(sorted_inds[:elitism])
+        elites: list[Individual[StateUpdateGene]] = list(sorted_inds[:elitism])
 
         # 残り (pop_size - elitism) を tournament + mutation/crossover で生成し新評価
-        new_genes: list = []
+        new_genes: list[StateUpdateGene] = []
         while len(new_genes) < pop_size - elitism:
             child = _make_child(pop)
             if gate_mode == "none":
