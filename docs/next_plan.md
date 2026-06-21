@@ -1111,7 +1111,8 @@
   5. `7775253` minimal_ga: FitnessFunc が StateUpdateGene 具象固定 = evolve は StateUpdateGene 特殊化のため、Population/Individual を `[StateUpdateGene]` で精密注釈・tournament_select を generic 化・closures に型付与。gene_matrix の as_array のみ契約根拠つき `type:ignore[attr-defined]`。
 - 各 commit で対象モジュール `mypy --strict` green + ruff clean + 関連テスト green を確認済み。**フルユニット回帰 = `1010 passed / 3 failed`(539s)。回帰ゼロ**: 失敗3件はすべて `test_poc_7a_vnn_comp_reference.py`(`test_sat_genuine_emits_witness` / `test_sat_spurious_becomes_unknown` / `test_verify_gene_safe_sets_solver_status`)で、**セッション開始前 `b8bd651` でも同一3件が失敗**することを checkout 検証済み = 本 mypy 作業と無関係の pre-existing バグ(`poc_7a_vnn_comp_reference_impl` に `is_z3_available` 属性が無い)。
 - **(済) pre-existing 失敗3件を修正** commit `3e0ebf9`: `poc_7a_vnn_comp_reference_impl` が `llcore.verifier` から `is_z3_available` を取り込んでおらず `ref.is_z3_available()` が AttributeError → re-export(noqa:F401)で配線修復。test_poc_7a **30件 green**、ruff clean。これでフルユニットは **1013 passed / 0 failed 見込み**(局所 30 + 既存 1010 が論理的に全緑、3失敗を解消)。
-- **次の一手**: (a) mypy strict を CI gate 化(`mypy src --strict` が全緑になったので enforce 可能)。(b) human gate の A=Qiita公開 / B=needle GPU offload(push) / C=Kaggle push。(c) 新題材があれば RAD 接地から。
+- **(済) CI gate 化** commit `ea0a33f`: `.github/workflows/ci.yml` 新設。lint job=`ruff check src scripts tests ci`(research/ は実験コードで lint 対象外=既知805件)、typecheck-test job=フル optional 依存(z3/sdp/chat/clip/text/ann+scipy/scikit-learn+CPU torch)で `mypy src --strict`(0エラー必須)+`pytest tests/unit`。warn_unused_ignores と z3/cvxpy/scipy の type:ignore 整合のため当該ライブラリ実在が必要なのでフル依存を入れる設計。YAML 検証済・各コマンドはローカル全green確認済。**CI 実走は push=human gate のため未検証**(honest)。
+- **次の一手**: (a) human gate の A=Qiita公開 / B=needle GPU offload(push) / C=Kaggle push(B/C 押せば CI も初回実走し ci.yml を実地検証できる)。(b) 新題材があれば RAD 接地から。(c) ローカル余地: research/ の ruff 805件は実験コードゆえ低価値・据置が妥当。
 - 方針: 指示なき薄い量産はしない(quality-over-volume)。
 
 ## ★2026-06-22 EXIT — 再開地点(旧, 上の EXIT(2) で更新済)
