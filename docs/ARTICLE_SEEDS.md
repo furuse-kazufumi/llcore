@@ -658,3 +658,9 @@
   (KV cache の有無を明示しないと不公平)/ 現実接続(チャットの体感遅延は decode 律速)/ 構造化(prefill/decode/
   memory/static を別軸として直交させる)。
 - **根拠**: `scripts/decode_latency_sweep.py`(+回帰テスト7件 `tests/unit/test_decode_latency_sweep.py`)commit `11bdb4a`。
+
+## 2026-06-22 RAD 接地 — b2(suppress-your-win)の「定数状態モデル長文脈劣化」を理論で補強できる先行研究
+needle-run-2 待機中に RAD コーパス(llm_corpus_v2)を grep。b2 §137 の実測(Δnll 256:0.761→512:1.012→1024:1.182=長文ほど劣化増大)を裏付ける先行研究2件を発見。公開前に「関連研究」として一文足すと、自前の実測が理論側と接続して強くなる(車輪の再発明でなく独立実測の裏取り):
+- **doc_0592 "Optimal Decay Spectra for Linear Recurrences"(arXiv 2604.07658)**: 線形再帰モデル(Mamba-2/RWKV-7/Gated DeltaNet/GLA/RetNet)の長距離メモリ劣化を **decay spectrum** に帰着し、ランダム初期化で最小スペクトルギャップが O(N^-2) に潰れ、長文脈で誤差が **実質代数的(sub-exponential)** に劣化すると証明。PoST で緩和。→ b2 の「定数状態は長文ほど効かなくなる」を**理論的に裏付ける一次文献**。a7/SUPRA に並べて引用可。
+- **doc_0530 "Revealing the Learning Dynamics of Long-Context Continual Pre-training"(arXiv 2604.02650)**: NIAH(needle-in-a-haystack)スコアは早期に "deceptive saturation(偽の飽和)" を示し、PPL ベース分析の方が内在的改善を正しく追えると報告。→ **honest 枠組みの補強**: 「needle が満点でも内実は飽和していない」=b2 の needle 結果を読むときの留保として強い。needle 数値が良くても過信しない叙述に使える。
+- 使い所: b2 §137-138(needle 統合後)の「関連研究」脚注、または findings の needle 節。あくまで実測が主・引用は接地。
