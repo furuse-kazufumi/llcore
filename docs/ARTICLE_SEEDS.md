@@ -637,16 +637,17 @@
 - **ネタ**: アーキ編はこれまで prefill/batch-forward 全体(a7)・peak メモリ(a8)・静的 RSS 床(a9)を測ってきた。
   抜けていたのが **decode 軸 = streaming 生成の per-token コスト**:「既に長さ T の文脈がある状態で、次の 1
   トークンを出すのに何 ms か」。ここがアーキ差が最も鋭く出る regime。
-- **実機結果(小モデル n_embd=256/L4, `scripts/decode_latency_sweep.py`, T 128→2048・repeats=7)**:
-  - **recurrent decode = 完全 flat**: 0.787 / 0.781 / 0.771 / 0.757 / 0.783 ms(T を 16× 伸ばして **×0.995**、
-    指数 p≈**-0.006** = 純粋 O(1)、文脈の長さに一切依らない)。これが load-bearing。
-  - **GPT decode = ×77.7 の爆増**: 16.0 / 46.7 / 107.8 / 243.1 / **1242.1** ms(指数 p≈1.35〜1.49)。1024→2048 で
-    ×5.1 と跳ねるのは attention O(T²) が支配に入る regime(a8 の regime 依存と同じ:T が n_embd を超えると二次項が床を追い越す)。
-  - **RWKV も完全 flat(warmup を足せば)**: warmup=2 では T=128/256 が startup 外れ値(min 5.15/3.70ms)だったが、
-    **warmup=5 で再走すると全 T が flat**(min 2.10/2.05/2.14/2.10/2.14ms、×1.02 over 16×)。外れ値は構造ではなく
-    **初回呼び出しの lazy init を warmup が吸収しきれていなかった**だけと判明(honest disclosure: 原因を特定して解消)。
-    → 結論は「**recurrent も RWKV も decode は O(1)=flat**、GPT だけ ×77 増大」とクリーンに確定。
-  - recurrent は「熟成済みの定数状態に 1 step 足すだけ」、cache 無し GPT は「毎トークン全文脈を再 forward」だから。
+- **実機結果(小モデル n_embd=256/L4, `scripts/decode_latency_sweep.py`, T 128→2048・同一ラン内で prefill+decode 両計測)**:
+  - **核心 = amortization を 1 ラン内で airtight に**: 別ラン比較(prefill は a7 run / decode は別 run)の弱点を排し、
+    **同一プロセス・同一モデル・同一条件で prefill と decode を両方計時**。
+  - **recurrent / RWKV: prefill O(T) → decode O(1)**: prefill ×17.2/×17.3(p≈1.03)で右肩上がりなのに、decode は
+    ×1.09/×1.04(**p≈0.028/0.023 = 完全平坦**)に落ちる。状態構築(O(T))と 1 手追加(O(1))を分けて払える。
+  - **GPT: prefill ≒ decode(分離不可)**: cache 無ゆえ decode 1 step も全文脈再 forward= prefill と同一計算。実測でも
+    各 T で prefill≒decode(例:81≒82ms / 950≒935ms)、両方 p≈1.7 で増大。amortize できない。
+  - **honest**: GPT の絶対 growth はこのランで system 混雑(T=1024 スパイク)でばらつくので、load-bearing は **特定の ×N でなく
+    「各モード内の指数」と「GPT prefill≒decode / recurrent だけ decode 平坦」という質的対比**。RWKV 小 T の startup 外れ値は
+    warmup 不足と特定し default warmup を引き上げて解消(消さず原因ごと記録)。
+  - 可視化: `assets/articles/llcore_decode_latency.svg`(prefill 右肩上がり vs decode 平坦の fork 図)。
 - **honest 3点**: (1) cross-mode の絶対 ms は比較不可(recurrent=Python per-step ループ / GPT=vectorized)。
   (2) この GPT は **KV cache を持たない**(production は cache で decode を O(T)/token に落とす)が、cache 有りでも
   GPT decode は T とともに増え、recurrent の O(1) flat とは質的に異なる。(3) GPT 指数が O(T²) の 2 でなく ~0.95

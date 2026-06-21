@@ -17,7 +17,7 @@
 | (0) 定数状態 vs 文脈線形 | `scripts/memory_footprint_harness.py` | recurrent state の実バイト vs GPT KV/attn | T を 16× にしても recurrent **×1.00**、GPT KV **×16**、attn **×256** |
 | (0') runtime peak RSS | `scripts/recurrent_runtime_rss.py` | 実生成ループの peak WS を文脈長スイープ | T ×8 で **GPT peak ×2.65 / Recurrent・RWKV ×1.00**(解析値を実機裏取り)。32×曲線で **regime 依存 ×1.11→×6.75**(`curve32`)|
 | (0'') runtime latency (prefill) | `scripts/recurrent_latency_sweep.py` | 推論 wall-clock の文脈長スケーリング指数 p | T ×16 で **GPT p≈1.37(超線形 O(T²)寄り)/ Recurrent・RWKV p≈0.99(線形 O(T))**。cross-mode 絶対比較不可・各モード内の指数のみ |
-| (0''b) decode (per-token) | `scripts/decode_latency_sweep.py` | context age T での 1 トークン生成コスト | T ×16 で **Recurrent ×0.995 / RWKV ×1.02(両者 flat=O(1))/ GPT ×77.7(p≈1.4)**。KV cache 無の明示・各モード内のみ |
+| (0''b) decode + amortization | `scripts/decode_latency_sweep.py` | 同一ラン内で prefill(O(T))vs decode(per-token)を対比 | **Recurrent/RWKV: prefill p≈1.03(O(T))→ decode p≈0.02-0.03(O(1)に amortize)/ GPT: prefill≒decode(各 T 一致, p≈1.7)= 分離不可**。KV cache 無の明示・質的対比のみ load-bearing |
 | (0''') static RSS 床 | `scripts/runtime_floor_rss.py` | python/+torch/+model の段階 RSS(別プロセス隔離) | **torch ランタイム税 ~180MB が支配**(別ラン再現、初回 197.3≒197.8)。足場比はモデル規模依存(1.51MB本体で142×) |
 | (a) mmap read-only 重み | `scripts/mmap_weights_poc.py` | load 時 RSS(別プロセス隔離) | eager は即全載、mmap は **load 時 ΔRSS を ~2.8% に遅延**(54MB モデル) |
 | (a') RAM 超 × mmap | `scripts/mmap_ram_exceed_poc.py` | working-set 上限 < モデルで forward 完走 | **522MB モデルを 358MB の WS 上限で完走**(出力一致)= 使える RAM < モデルでも回る |
@@ -87,21 +87,21 @@ time ∝ Tᵖ の指数 p を log-log 最小二乗で推定(別プロセス隔�
 - 当初 repeats=7 では RWKV の T=128 が startup ノイズで外れ値(p≈0.5)になったが、repeats=11 で p≈0.99 に収束
   (ノイズ点を消さず増やして潰した経緯ごと記録)。
 
-### (0''b) decode サブ軸 — per-token 生成コスト(`out/decode_latency_sweep.json`)
+### (0''b) decode サブ軸 + amortization — prefill vs decode を同一ラン内で対比(`out/decode_latency_sweep.json`)
 
-(0'') が **prefill/batch-forward 全体**(長さ T を 1 回 forward)だったのに対し、`scripts/decode_latency_sweep.py` は
-**context age T で次の 1 トークンを出す** decode コストを測る(streaming 生成 regime、チャット体感遅延の支配項)。
-Recurrent は熟成済み定数状態に 1 step 足すだけ=**O(1)**、この GPT 実装は KV cache 無で毎 step 全文脈を再 forward。
+(0'') が **prefill/batch-forward 全体**だったのに対し、`scripts/decode_latency_sweep.py` は **同一プロセス・同一モデル・同一条件の
+1 ラン内で prefill(状態構築)と decode(context age T で次の 1 トークン)を両方計時**し、recurrent の amortization を
+**別ラン比較なしで直接対比**する(streaming 生成 regime、チャット体感遅延の支配項)。
 
-| モード | decode 伸び (T 128→2048, ×16) | 指数 p (median/min) | 解釈 |
-|---|---|---|---|
-| Recurrent | **×0.995** | -0.006 / -0.006 | **完全 flat = O(1)**(文脈長に依らず一定) |
-| RWKV | **×1.02** | ~0(warmup=5) | **完全 flat = O(1)** |
-| GPT | **×77.7** | 1.49 / 1.35 | 超線形(O(T²) 寄り、1024→2048 で ×5.1) |
+| モード | prefill 伸び (T ×16) | prefill p (min) | decode 伸び | decode p (min) | 解釈 |
+|---|---|---|---|---|---|
+| Recurrent | **×17.2** | 1.03 | **×1.09** | **0.028** | prefill O(T) → decode **O(1) に amortize** |
+| RWKV | **×17.3** | 1.03 | **×1.04** | **0.023** | 同上(warmup=5 で startup 外れ値解消) |
+| GPT | ×42.5 | 1.73 | ×42.8 | 1.75 | **prefill ≒ decode(各 T で一致)= 分離不可** |
 
-- **この軸の核心は recurrent の amortization(honest な読み方)**: cache 無し GPT では decode 1 step = 全文脈 full forward = **prefill と同一計算**。よって GPT decode(×77.7)は (0'') prefill の GPT 線の測り直し(×37 との差は run 間ばらつき。prefill 走は T=512 外れ値で非単調、decode 走は単調)。**新規性は recurrent 側**: 同じ recurrent を **prefill で測ると ×14(126→1784ms, O(T)= T 回 step で状態構築)/ decode では ×0.995(0.79ms 一定, O(1)= 構築済み状態に 1 手)**。「状態構築(O(T))と 1 手追加(O(1))を分けて払える」のが recurrent、GPT はこの分離不可。**非対称 = GPT は decode も prefill と同重 / recurrent だけ O(T)→O(1) に落ちる**。
-- honest: (1) cross-mode 絶対 ms 比較不可(同上)。(2) **この GPT は KV cache 無**(prod は cache で O(T)/token に落とすが、cache 有でも T で増大 vs recurrent O(1) flat は質的に別物)。(3) GPT 指数が 2 でなく ~1.4 は T<n_embd で二次項が未支配の regime((0')メモリと同じ regime 依存)。(4) RWKV の小 T startup 外れ値は **warmup 不足が原因**と特定し warmup=5 で全 T flat に収束(構造でない)。
-- 可視化: `assets/articles/llcore_decode_latency.svg`(a7 記事に挿入済)。
+- **核心 = recurrent の amortization**: recurrent は「状態構築(prefill, O(T)= T 回 step)」と「1 手追加(decode, O(1))」を分けて払える。GPT(cache 無)は decode 1 step も全文脈再 forward=**prefill と同一計算**ゆえ各 T で **prefill≒decode**(例:81≒82ms / 950≒935ms)= amortize 不可。**同一ラン計測なので「recurrent だけ O(T)→O(1) に落ち GPT は落ちない」が直接対比として出る**(別ラン比較の弱点を排除)。
+- honest: (1) cross-mode 絶対 ms 比較不可。(2) **この GPT は KV cache 無**(prod は cache で decode O(T)/token、cache 有でも T で増大 vs recurrent O(1) flat は質的に別物)。(3) **GPT 絶対 growth はこのランで system 混雑(T=1024 スパイク)でばらつく → load-bearing は「各モード内の指数」と「GPT prefill≒decode / recurrent だけ decode 平坦」の質的対比**(特定 ×N でない)。(4) GPT 指数 ~1.7 は二次項が完全支配しきらない小モデル regime。(5) RWKV 小 T startup 外れ値は warmup 不足と特定し default warmup 引き上げで解消。
+- 可視化: `assets/articles/llcore_decode_latency.svg`(amortization の fork 図、a7 記事に挿入済)。
 
 ## (0''') static RSS 床 — 文脈非依存の土台(`out/runtime_floor_rss.json`)
 
