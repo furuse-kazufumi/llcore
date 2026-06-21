@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" font-family="Segoe UI, Hiragino Kaku Gothic ProN, Meiryo, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0d1117"/><stop offset="1" stop-color="#161b22"/>
+    </linearGradient>
+  </defs>
+  <rect width="760" height="440" fill="url(#bg)"/>
+
+  <text x="34" y="40" fill="#e6edf3" font-size="22" font-weight="700">文脈4倍でメモリ5倍 — でも recurrent は動かない</text>
+  <text x="34" y="64" fill="#8b949e" font-size="13.5">peak working set 実測(極小モデル / CPU)。読むのは絶対値でなく「増え方のトレンド」</text>
+
+  <!-- plot area: x 90..700, y 100..360 -->
+  <!-- axes -->
+  <line x1="90" y1="360" x2="710" y2="360" stroke="#30363d" stroke-width="2"/>
+  <line x1="90" y1="100" x2="90" y2="360" stroke="#30363d" stroke-width="2"/>
+  <text x="700" y="384" fill="#6e7681" font-size="12" text-anchor="end">文脈長 L (tok)</text>
+  <text x="34" y="108" fill="#6e7681" font-size="12">peak WS (MB)</text>
+
+  <!-- y gridlines: 0,500,1000,1500,1800 mapped; max ~1800 -> y100, 0 -> y360 -->
+  <!-- scale: y = 360 - (val/1800)*260 -->
+  <line x1="90" y1="288.8" x2="710" y2="288.8" stroke="#21262d" stroke-width="1" stroke-dasharray="4 4"/>
+  <text x="84" y="293" fill="#6e7681" font-size="11" text-anchor="end">500</text>
+  <line x1="90" y1="215.6" x2="710" y2="215.6" stroke="#21262d" stroke-width="1" stroke-dasharray="4 4"/>
+  <text x="84" y="220" fill="#6e7681" font-size="11" text-anchor="end">1000</text>
+  <line x1="90" y1="142.3" x2="710" y2="142.3" stroke="#21262d" stroke-width="1" stroke-dasharray="4 4"/>
+  <text x="84" y="147" fill="#6e7681" font-size="11" text-anchor="end">1500</text>
+
+  <!-- x ticks at 1024,2048,4096 -> x 170, 400, 660 -->
+  <text x="170" y="378" fill="#6e7681" font-size="11" text-anchor="middle">1024</text>
+  <text x="400" y="378" fill="#6e7681" font-size="11" text-anchor="middle">2048</text>
+  <text x="660" y="378" fill="#6e7681" font-size="11" text-anchor="middle">4096</text>
+
+  <!-- GPT curve: (1024,331.9)->(170,312.1) (2048,607.8)->(400,272.2) (4096,1673.0)->(660,118.4) -->
+  <polyline points="170,312.1 400,272.2 660,118.4" fill="none" stroke="#f85149" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="170" cy="312.1" r="5" fill="#f85149"/>
+  <circle cx="400" cy="272.2" r="5" fill="#f85149"/>
+  <circle cx="660" cy="118.4" r="5" fill="#f85149"/>
+  <text x="170" y="304" fill="#f85149" font-size="11" text-anchor="middle">332</text>
+  <text x="400" y="264" fill="#f85149" font-size="11" text-anchor="middle">608</text>
+  <text x="648" y="112" fill="#f85149" font-size="12" font-weight="700" text-anchor="end">1673 MB</text>
+
+  <!-- recurrent curve: ~205 flat -> y = 360-(205/1800)*260 = 330.4 -->
+  <polyline points="170,330.4 400,330.4 660,330.1" fill="none" stroke="#3fb950" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="170" cy="330.4" r="5" fill="#3fb950"/>
+  <circle cx="400" cy="330.4" r="5" fill="#3fb950"/>
+  <circle cx="660" cy="330.1" r="5" fill="#3fb950"/>
+  <text x="660" y="346" fill="#3fb950" font-size="12" font-weight="700" text-anchor="end">205 MB(平坦)</text>
+
+  <!-- legend -->
+  <rect x="110" y="120" width="14" height="14" rx="3" fill="#f85149"/>
+  <text x="130" y="132" fill="#e6edf3" font-size="13">GPT(Transformer)= 文脈長で超線形に膨張(×5.04)</text>
+  <rect x="110" y="144" width="14" height="14" rx="3" fill="#3fb950"/>
+  <text x="130" y="156" fill="#e6edf3" font-size="13">recurrent / RWKV = 定数状態で平坦(×1.00)</text>
+
+  <!-- footer -->
+  <line x1="34" y1="398" x2="726" y2="398" stroke="#21262d" stroke-width="1"/>
+  <text x="34" y="420" fill="#8b949e" font-size="12.5">attention は O(L²)・KV は O(L) で増える / 定数状態は文脈長に依存する項を持たない。T=4096 で GPT は recurrent の <tspan fill="#c9d1d9" font-weight="700">8.1×</tspan>。</text>
+</svg>
