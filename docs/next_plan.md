@@ -1231,3 +1231,27 @@
 - **訂正版 抽出ワンライナー**:
   `py -3.11 -c "import json;r=json.load(open('out/needle_offload/nas_pareto.json'));p=r['proxy_v2'];cs=p['context_sweep'];print('2048',cs.get('2048'));print('needle',p['needle'])"`
 - 統合時: L137 の Δnll 列に `cs['2048']['mean']`(可能なら `±ci` も)を追記、L138/L115/SVG L51-52 の needle は `p['needle']['horizon']`(None なら「2048 まで失敗せず」、値ありなら「N tok で破綻」)で叙述。honest 留保(proxy nll / paired bootstrap)継承。
+
+## ★2026-06-22 EXIT(4) — 再開地点(canonical / コンテキスト上限近接で退避)
+- **HEAD=`09ffade`。全成果 local commit 済、push なし。作業ツリーは `docs/SESSION_SUMMARY.md`(自動生成)以外 clean。** ブランチ `feat/lm-recurrent`。
+- **最優先の継続タスク = needle 結果の回収と統合(ジョブ実行中)**:
+  - **GH Actions run `27918958686`(tag needle-run-2)= まだ `in_progress`**(本セッション 23:37Z 時点で compute step「Run rigorous tier + needle + 2048 sweep」が ~1h31m 継続。2-3h 想定の範囲内、6h上限まで余裕、停滞ではなく正常な長時間ラン)。startedAt=22:07:14Z。
+  - **背景監視は再起動が必要**: 本セッションで起動した `gh run watch` タスク `byl2kmcn0` はセッション終了で失われる。**新セッション開始時に必ず `gh run view 27918958686 --json status,conclusion` で生死確認** → まだ in_progress なら `gh run watch 27918958686 --exit-status` を background 起動し直す。
+  - **完了後の統合手順(下調べ + 実コード検証 + ツール化まで完了済)**:
+    1. `gh run download 27918958686 -D out/needle_offload`(artifact 名 `nas-needle-results` = `nas_pareto.json` + `nas_pareto_report.md`)。
+    2. 「Assert GA was resumed」step success 確認(26h 再走でなく eval_cache resume の証)。
+    3. **`py -3.11 scripts/extract_needle_results.py out/needle_offload/nas_pareto.json`**(本セッションで新規作成・テスト済 commit `09ffade`)で context_sweep(str キー / Δnll=`mean`+CI)と needle(`horizon` int|None)を整形出力。※生ワンライナーは使わない — レシピの誤り(int キー/`delta_nll` キー)を訂正済で、スクリプトが訂正済みスキーマを内蔵。
+    4. **`docs/articles/drafts/b2-suppress-your-win.md` の3箇所を更新**:
+       - **L137**(`256:0.761→512:1.012→1024:1.182` の続きに 2048 の `mean` を追記、可能なら ±CI)。doc_0592 理論接地は既に L137 内に追記済(commit `322b769`)。
+       - **L138**(「2048 未検証 / GPU オフロード」叙述を「GH Actions 7GB で実測」に書換、loop 完結 + **doc_0530**「NIAH deceptive saturation」留保を needle 数値の読み方として一文追記)。
+       - **L115**(図キャプションの `長距離検索は未検証(UNTESTED)` を実測へ)。
+    5. **`assets/articles/llcore_suppress_win.svg` L51-52**(`needle → UNTESTED` / 「未検証は…開示する」)を実測へ。
+    6. 数値は report/JSON と一致検証、honest 留保(proxy nll / paired bootstrap CI)継承。needle horizon=None なら「2048 まで失敗せず」、値ありなら「N tok で破綻」で叙述。
+  - **run が失敗していたら**: `gh run view 27918958686 --log-failed`。既知の落とし穴は解消済(huggingface-cli→hf, dispatch 403→tag-trigger)。新 tag `needle-run-3` push で再起動可。
+- **本セッションの成果(commit、すべて待機中の準備=コード/記事の de-risk)**:
+  - `322b769` b2 L137 に doc_0592(線形再帰の代数的減衰 arXiv:2604.07658)の理論接地。
+  - `5743faf` 統合アンカー再検証(doc_0592 追記後も L138 不変)+ L115 キャプション更新要を記録。
+  - `fa03249` 抽出スキーマを実コード検証しレシピ誤り2件訂正(str キー / `mean`=Δnll / needle=`horizon`)。
+  - `09ffade` **`scripts/extract_needle_results.py` + `tests/unit/test_extract_needle_results.py`(4件)** 新規: 訂正済み proxy_v2 スキーマを固定し統合を決定的1コマンド化。純 ASCII 出力(cp932 罠回避)。mypy src scripts --strict green / ruff clean / pytest green。
+- **human gate(未消化)**: A=Qiita 公開(SVG raw URL 化)/ C=Kaggle push。B=needle は実行中。
+- **方針**: 指示なき薄い量産はしない(quality-over-volume)。needle 完了 or 新題材指示で再開。
