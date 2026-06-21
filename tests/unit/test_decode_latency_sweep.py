@@ -54,9 +54,22 @@ def test_run_worker_each_mode() -> None:
                              repeats=1, warmup=0)
         assert rec["mode"] == mode
         assert rec["t"] == 8
-        assert rec["median_ms"] >= 0.0
-        assert rec["min_ms"] >= 0.0
+        # 同一ランで prefill / decode の両方を報告する
+        for key in ("prefill_median_ms", "prefill_min_ms", "decode_median_ms", "decode_min_ms"):
+            assert rec[key] >= 0.0
         assert rec["repeats"] == 1
+
+
+def test_time_prefill_decode_returns_pair() -> None:
+    mod = _load_script()
+    import torch
+    from llcore.lm.recurrent import RecurrentConfig, RecurrentLM
+    model = RecurrentLM(RecurrentConfig(vocab_size=32, block_size=8, n_layer=1,
+                                        n_embd=16, state_size=16))
+    model.eval()
+    with torch.no_grad():
+        prefill, decode = mod._time_prefill_decode("recurrent", model, t=8, vocab=32)
+    assert prefill >= 0.0 and decode >= 0.0
 
 
 def test_worker_mode_prints_result_json(capsys: pytest.CaptureFixture[str]) -> None:
@@ -87,8 +100,11 @@ def test_main_end_to_end_tiny(tmp_path: Path) -> None:
     assert set(payload["records"]) == {"gpt", "recurrent", "rwkv"}
     for mode in ("gpt", "recurrent", "rwkv"):
         assert [r["t"] for r in payload["records"][mode]] == [8, 16]
-    assert set(payload["scaling_exponent"]) == {"gpt", "recurrent", "rwkv"}
-    assert "axis" in payload and "honest" in payload  # decode axis + honest caveats persisted
+        for r in payload["records"][mode]:  # 各レコードが prefill/decode 両方を持つ
+            assert "prefill_median_ms" in r and "decode_median_ms" in r
+    assert set(payload["prefill_growth_ratio"]) == {"gpt", "recurrent", "rwkv"}
+    assert set(payload["decode_growth_ratio"]) == {"gpt", "recurrent", "rwkv"}
+    assert "axis" in payload and "honest" in payload  # amortization axis + honest caveats persisted
 
 
 def test_main_rejects_bad_lengths(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:

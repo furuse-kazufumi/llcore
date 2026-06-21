@@ -51,27 +51,40 @@ MODES = ("gpt", "recurrent", "rwkv")
 
 
 @torch.no_grad()
-def _decode_step_once(mode: str, model: Any, t: int, vocab: int) -> float:
-    """context age T での **1 decode step** の wall-clock(秒)を返す。
+def _time_prefill_decode(mode: str, model: Any, t: int, vocab: int) -> tuple[float, float]:
+    """**同一条件で (prefill_total_s, decode_1step_s) を両方**返す(amortization を 1 ラン内で示す)。
 
-    GPT は cache 無しゆえ「長さ T の forward 1 回」が 1 decode step。recurrent/RWKV は T step の
-    warmup(非計測)で状態を熟成させてから **追加 1 step** だけ計時する。
+    - prefill = 長さ T の文脈を「作る」コスト。GPT=長さ T の forward 1 回 / recurrent・RWKV=T step で状態構築。
+    - decode  = その後「次の 1 トークン」を出すコスト。GPT は cache 無ゆえ **全文脈をもう一度 forward(=prefill と同一計算)** /
+      recurrent・RWKV は **構築済み状態に 1 step だけ**。
+    核心: recurrent 系は prefill が O(T) でも decode は **O(1) に落ちる(amortization)**。GPT は decode も prefill と同重。
+    別ラン比較でなく **1 回の計測で prefill と decode を直接対比**できる(honest: 同一プロセス・同一モデル・同一条件)。
     """
     if mode == "gpt":
         idx = torch.randint(0, vocab, (1, t))
         start = time.perf_counter()
         out = cast(CharGPT, model).forward_logits(idx)
         _ = float(out[:, -1, :].float().sum().item())  # 末尾 logits を実体化(lazy 回避)
-        return time.perf_counter() - start
-    # recurrent / rwkv: T step 進めて状態を熟成(非計測)→ 追加 1 step だけ計時。
+        prefill = time.perf_counter() - start
+        # cache 無 GPT の「次トークン」= 同じ全文脈を再 forward(= prefill と同一計算)
+        start = time.perf_counter()
+        out = cast(CharGPT, model).forward_logits(idx)
+        _ = float(out[:, -1, :].float().sum().item())
+        decode = time.perf_counter() - start
+        return prefill, decode
+    # recurrent / rwkv: prefill = T step で状態構築(計時)→ decode = 構築済み状態に 1 step。
     idx = torch.randint(0, vocab, (1,))
     state: Any = None
+    start = time.perf_counter()
     for _ in range(t):
         _, state = model.step(idx, state)
+    _ = float(model.state_bytes(state))  # 実体化
+    prefill = time.perf_counter() - start
     start = time.perf_counter()
     _, state = model.step(idx, state)
-    _ = float(model.state_bytes(state))  # 実体化
-    return time.perf_counter() - start
+    _ = float(model.state_bytes(state))
+    decode = time.perf_counter() - start
+    return prefill, decode
 
 
 @torch.no_grad()
@@ -91,12 +104,16 @@ def run_worker(mode: str, t: int, n_embd: int, n_layer: int, n_head: int,
     model.eval()
 
     for _ in range(max(0, warmup)):
-        _decode_step_once(mode, model, t, vocab)
-    samples = [_decode_step_once(mode, model, t, vocab) for _ in range(max(1, repeats))]
+        _time_prefill_decode(mode, model, t, vocab)
+    samples = [_time_prefill_decode(mode, model, t, vocab) for _ in range(max(1, repeats))]
+    prefills = [s[0] for s in samples]
+    decodes = [s[1] for s in samples]
     return {
         "mode": mode, "t": t,
-        "median_ms": round(statistics.median(samples) * 1e3, 4),
-        "min_ms": round(min(samples) * 1e3, 4),
+        "prefill_median_ms": round(statistics.median(prefills) * 1e3, 4),
+        "prefill_min_ms": round(min(prefills) * 1e3, 4),
+        "decode_median_ms": round(statistics.median(decodes) * 1e3, 4),
+        "decode_min_ms": round(min(decodes) * 1e3, 4),
         "repeats": len(samples),
     }
 
@@ -179,40 +196,44 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     print(f"config: n_embd={args.n_embd} L={args.n_layer} H={args.n_head} vocab={args.vocab}  "
-          f"lengths={lengths} repeats={args.repeats} (decode 1-step @ context age T)")
+          f"lengths={lengths} repeats={args.repeats} (prefill build + decode 1-step @ context age T)")
     records: dict[str, list[dict[str, Any]]] = {m: [] for m in MODES}
     for t in lengths:
         for mode in MODES:
             records[mode].append(_spawn_worker(mode, t, args))
 
-    print("\n| T (context age) | GPT decode ms | Recurrent decode ms | RWKV decode ms |")
+    print("\n| T | GPT prefill / decode ms | Recurrent prefill / decode ms | RWKV prefill / decode ms |")
     print("|" + "---|" * 4)
     for i, t in enumerate(lengths):
-        print(f"| {t} | {records['gpt'][i]['median_ms']} | "
-              f"{records['recurrent'][i]['median_ms']} | {records['rwkv'][i]['median_ms']} |")
+        def _pd(m: str) -> str:
+            return f"{records[m][i]['prefill_median_ms']} / {records[m][i]['decode_median_ms']}"
+        print(f"| {t} | {_pd('gpt')} | {_pd('recurrent')} | {_pd('rwkv')} |")
 
-    def _growth(mode: str) -> float:
-        lo = records[mode][0]["median_ms"]
-        hi = records[mode][-1]["median_ms"]
+    def _growth(mode: str, key: str) -> float:
+        lo = records[mode][0][key]
+        hi = records[mode][-1][key]
         return (hi / lo) if lo > 0 else float("nan")
 
-    exponents = {m: round(_scaling_exponent(lengths, [r["median_ms"] for r in records[m]]), 3)
-                 for m in MODES}
-    exponents_min = {m: round(_scaling_exponent(lengths, [r["min_ms"] for r in records[m]]), 3)
-                     for m in MODES}
-    growth = {m: round(_growth(m), 3) for m in MODES}
+    def _exps(key: str) -> dict[str, float]:
+        return {m: round(_scaling_exponent(lengths, [r[key] for r in records[m]]), 3) for m in MODES}
+
+    prefill_exp = _exps("prefill_min_ms")
+    decode_exp = _exps("decode_min_ms")
+    prefill_growth = {m: round(_growth(m, "prefill_median_ms"), 3) for m in MODES}
+    decode_growth = {m: round(_growth(m, "decode_median_ms"), 3) for m in MODES}
 
     print(
-        f"\n[headline] decode-step: T {lengths[0]}->{lengths[-1]}(x{lengths[-1] / lengths[0]:.0f}) "
-        f"scaling 指数 p (min ベース / 括弧内 median): "
-        f"GPT p~{exponents_min['gpt']}({exponents['gpt']}, KV cache 無=O(T^2)寄りで増大)/ "
-        f"Recurrent p~{exponents_min['recurrent']}({exponents['recurrent']}, O(1)=flat 想定)/ "
-        f"RWKV p~{exponents_min['rwkv']}({exponents['rwkv']})。"
+        f"\n[headline] amortization (T {lengths[0]}->{lengths[-1]}, x{lengths[-1] / lengths[0]:.0f}; min ベース指数 p): "
+        f"Recurrent prefill p~{prefill_exp['recurrent']}(x{prefill_growth['recurrent']}) -> "
+        f"decode p~{decode_exp['recurrent']}(x{decode_growth['recurrent']}) = O(T) を O(1) に amortize / "
+        f"GPT prefill p~{prefill_exp['gpt']} ≈ decode p~{decode_exp['gpt']}(x{decode_growth['gpt']}) = 分離不可で decode も同重 / "
+        f"RWKV decode x{decode_growth['rwkv']}(p~{decode_exp['rwkv']})。"
     )
     print(
-        "[honest] (1) cross-mode の絶対 ms は比較不可(recurrent=Python per-step / GPT=vectorized forward)。"
-        " (2) この GPT は KV cache 無=毎 step 全文脈を再 forward。production は cache で decode を O(T)/token に"
-        "落とすが、それでも T とともに増大し、recurrent の O(1) flat とは質的に異なる。読むのは各モード内の指数のみ。"
+        "[honest] (1) cross-mode の絶対 ms は比較不可(recurrent=Python per-step / GPT=vectorized forward)。同一プロセス・"
+        "同一条件で prefill と decode を 1 ラン内計測=核心の amortization を別ラン比較なしで直接対比。"
+        " (2) この GPT は KV cache 無=decode 1 step も全文脈再 forward(=prefill と同一計算)。production は cache で "
+        "decode を O(T)/token に落とすが、cache 有でも T で増大 vs recurrent O(1) flat は質的に別物。読むのは各モード内のみ。"
     )
 
     outp = Path(args.json)
@@ -220,16 +241,20 @@ def main(argv: list[str] | None = None) -> int:
     payload: dict[str, Any] = {
         "config": {"n_embd": args.n_embd, "n_layer": args.n_layer, "n_head": args.n_head,
                    "vocab": args.vocab, "lengths": lengths, "repeats": args.repeats},
-        "axis": "decode-step latency vs context age T (complements recurrent_latency_sweep's prefill/batch-forward axis)",
+        "axis": "prefill (state build, O(T)) vs decode (1 step at context age T) per-token cost, measured in one run "
+                "to show recurrent amortization (O(T) prefill -> O(1) decode) directly; GPT (no KV cache) decode == prefill",
         "records": records,
-        "growth_ratio": growth,
-        "scaling_exponent": exponents,
-        "scaling_exponent_min": exponents_min,
+        "prefill_growth_ratio": prefill_growth,
+        "decode_growth_ratio": decode_growth,
+        "prefill_scaling_exponent_min": prefill_exp,
+        "decode_scaling_exponent_min": decode_exp,
         "honest": [
             "cross-mode absolute ms not comparable (recurrent=Python per-step loop vs GPT=vectorized forward)",
-            "this GPT has NO KV cache (re-forwards full context each decode step => O(T^2)); production serving "
-            "uses a KV cache making decode O(T)/token, but even cached GPT decode grows with T while recurrent "
-            "stays O(1) flat. Only within-mode scaling exponent is load-bearing.",
+            "prefill and decode measured in the SAME run/process/config so the recurrent amortization "
+            "(O(T) prefill -> O(1) decode) is a direct within-run contrast, not a cross-run comparison",
+            "this GPT has NO KV cache: a decode step is a full re-forward of the whole context (== prefill, no "
+            "amortization). production serving uses a KV cache (decode O(T)/token), but even cached GPT decode "
+            "grows with T while recurrent stays O(1) flat. Only within-mode scaling is load-bearing.",
         ],
     }
     outp.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
