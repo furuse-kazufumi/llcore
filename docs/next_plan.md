@@ -909,3 +909,8 @@
   - 技術版↔一般版の headline 数値整合確認: a8(331.9/607.8/1673/×5.04/205 ⇄ 丸め 332/608/1673/5倍/205)、b2(15.3/16.8 一致)、a9(184/1.51/142/213.6 ⇄ 丸め)いずれも**矛盾なし**(一般版は丸め表記)。
 - **記事生産ワークストリームは公開可能状態で完了**。残るは外部公開フェーズ(Qiita 投稿 / SVG raw URL 化 / 挿絵 verify-by-content)= いずれも human gate。
 - 連載アーク外の未ドラフト seed は #50(ライセンス・外部調査要)/ #48/#49(他プロジェクト題材)のみ。
+
+### 2026-06-21 追記 — 連載ドラフトの引用整合 QA(深部)合格
+- ドラフトの技術注記が引用する **ファイルパス 14 本(src/scripts/tests)は全て実在**(MISS ゼロ)。
+- 引用コードシンボル 8 個(`_should_promote`/`measure_memory`/`MemoryReport`/`MemoryEfficiencyObjective`/`state_boundedness_footprint`/`passes_capability_gate`/`int8_footprint_bytes`/`streaming_nll`)も **全て実コードに def/class として解決**(MISS ゼロ)。
+- → 連載は「リンク切れゼロ + 技術/一般の数値整合 + 引用パス/シンボル実在」の三層 QA を通過。**存在しないファイル/関数を技術注記で引く公開事故のリスクは解消**。記事生産ワークストリームは公開可能状態で確定。
