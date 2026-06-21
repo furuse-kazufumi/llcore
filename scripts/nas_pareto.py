@@ -45,6 +45,7 @@ import numpy as np
 import torch
 
 from llcore.runtime.distill import distill_all_layers
+from llcore.runtime.eval_cache_io import load_eval_cache, save_eval_cache
 from llcore.runtime.eval_proxy import (
     base_window_losses,
     bootstrap_hv_gain,
