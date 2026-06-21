@@ -1068,3 +1068,8 @@
 - 残3本を集約: `int8_streaming_infer`(_peak_mem→peak_mem_bytes、ctypes は SetProcessWorkingSetSizeEx 用に維持)/ `rad_scale_poc`(process_rss_mb→working_set_mb 委譲、inline _PMC 撤去)/ `memory_footprint_harness`(_PMC/_get_process_memory_info 撤去、snapshot は process_memory()利用、ctypes は GlobalMemoryStatusEx 用に維持)。
 - テスト: test_runtime_rss に新API 6件追加、test_memory_footprint の monkeypatch 対象を _process_memory へ更新。**RSS関連 50テスト green**、ruff/mypy単独green、py_compile OK。
 - **結果: `class _PMC` は `src/llcore/runtime/rss.py` のみ(全スクリプトから重複消滅)= DRY 100% 達成**。WinAPI 計測の単一情報源化により今後の drift リスクを根絶。
+
+### 2026-06-22 追記 — セッション全12commitをフルユニットスイートで検証(回帰ゼロ)
+- 共有モジュール `llcore.runtime.rss` は7スクリプトから import されるため、RSS関連サブセットだけでなく**全ユニットスイートを実行**: **1013 passed / 0 failed**(警告2件=build_kaggle/preflight の意図的な重複zipメンバー fixture、無害)。
+- → 本セッションの成果(a7/a8/a9 実測強化・3計測ハーネス・可視化2 SVG・RSS計測 DRY 100%集約・各種QA、計12 local commit)は**全コードベースで回帰なし**を確認。verification-before-completion 完了。
+- **現況**: ローカル完結の高価値タスクは出し切り、全成果は検証済み・local commit 済み・push なし。残るは human gate(A:Qiita公開/B:needle push/C:Kaggle push)のみ。新規方向の指示があれば即着手、無ければ薄い量産はせず待機が最善手(quality-over-volume / feedback_benchmark_honest_disclosure 準拠)。
