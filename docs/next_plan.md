@@ -869,3 +869,12 @@
 - **実現性**: コーパスは `scripts/build_aozora_corpus.py` で再現可能。`eval_cache.json` (109KB) を CI fixture として持てば run_meta 一致で GA resume → 6.6h スキップ、rigorous tier + 2048 sweep + needle (2048,4096) のみ走る (7GB なら 4096 も収まる可能性)。HF から Qwen2.5-0.5B を取得 (internet on)。成果物 `nas_pareto.json` を artifact 化 → download → report 再生成 → b2 §5 を実数値更新。
 - **gate**: workflow (`.github/workflows/`) + fixtures (corpus 9.8MB + eval_cache 109KB) の **push が外部操作=human gate**。投機ビルドを避け、先に方針を人間に確認する。
 - 代替: (a) Kaggle GPU (push gate, bundle 構築が重い)、(b) #62 を現状の honest 開示 (RAM 律速で未測, GPU 待ち明記) のまま完成とする。
+
+### 2026-06-21 実現性評価の結論 — needle/2048 オフロードは三重障害、#62 は現状で完成扱い
+- GH Actions 案を精査した結果、低コストではなかった。**三重障害**:
+  1. **2 コア GA タイムアウト**: ローカルは 8 コアで 6.6h。GH 標準ランナーは 2 コア → GA fresh 実行は ~26h 見込みで **CI 6h 上限を大幅超過**。→ resume 必須。
+  2. **cross-platform resume 脆弱性**: `load_eval_cache` は `meta` 厳密一致 (base_nll 6桁含む) を要求 (eval_cache_io.py:77)。base_nll は Windows ローカル生成、CI は Linux で BLAS 差により 6 桁目がずれ得る → resume 失敗 → GA 再走 → タイムアウト。コーパスも aozora 動的 DL で CI 再現が非決定的。
+  3. **push gate**: workflow + fixtures (corpus 9.8MB + eval_cache) の push は外部操作=human 承認必須。
+- Kaggle GPU 案も bundle 構築 (model/corpus/cache 同梱) + kernel push gate で同様に重い。
+- **結論**: needle/2048 の実数値化は「marginal な記事改善」に対して投機的かつ脆弱なインフラ構築を要するため、本ループでは着手しない。**#62 は現状の honest 開示 (2048+ は自宅 RAM 3.6GB 律速で未測、GPU/高RAM オフロードが正手だが cross-platform resume の堅牢化 or GA の CI 分割チェックポイントが前提) で完成扱い**とする。確定済みの実測 (verdict=suppressed / HV+16.8% / regime 256→1024) で記事の主張は十分成立。
+- 将来 needle/2048 を本当に取るなら: (a) resume を base_nll 厳密一致でなく tolerance 許容に改修 (code 変更) → CI 分割実行、または (b) 高RAM self-hosted runner / Colab。いずれも独立タスクとして起票が必要。
