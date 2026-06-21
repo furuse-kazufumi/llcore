@@ -29,6 +29,7 @@ from __future__ import annotations
 import sys
 from dataclasses import replace
 from pathlib import Path
+from typing import Callable
 
 import numpy as np
 
@@ -239,7 +240,7 @@ def main() -> int:
     print("=" * 72)
     rng = np.random.default_rng(20260529)
 
-    gates = [
+    gates: list[tuple[str, Callable[[], tuple[bool, str]]]] = [
         ("G1: fitness range [0, 1] + finite", lambda: gate_g1_fitness_range(rng)),
         ("G2: determinism (seed=42)", gate_g2_determinism),
         ("G3: non-degenerate random pop N=20", lambda: gate_g3_non_degenerate(rng)),
