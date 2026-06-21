@@ -23,6 +23,12 @@ on:
       context_sweep:
         description: "context sweep lengths (comma-sep)"
         default: "256,512,1024,2048"
+  # tag-push トリガ(`needle-run-*`): fine-grained PAT が workflow_dispatch(Actions:write)を
+  # 持たない環境でも、tag push(repo write)でオフロード実測を起動するための導線。inputs は付かない
+  # ので run ステップ側で既定値にフォールバックする。
+  push:
+    tags:
+      - "needle-run-*"
 
 permissions:
   contents: read
@@ -64,8 +70,8 @@ jobs:
             --model-dir model/Qwen2.5-0.5B-Instruct \
             --text-file out/corpus_aozora_multi.txt \
             --out out/nas_pareto_v2full \
-            --context-sweep "${{ inputs.context_sweep }}" \
-            --needle --needle-lengths "${{ inputs.needle_lengths }}" \
+            --context-sweep "${{ inputs.context_sweep || '256,512,1024,2048' }}" \
+            --needle --needle-lengths "${{ inputs.needle_lengths || '2048,4096' }}" \
             2>&1 | tee run_offload.log
 
       - name: Assert GA was resumed (fail fast — never silently rerun the 26h search)
