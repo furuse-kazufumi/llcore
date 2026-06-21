@@ -408,6 +408,9 @@ def main(argv: list[str] | None = None) -> int:
         mem = sum(mem_opt[o] for o in genome)
         pct = 100.0 * (mem_all_softmax - mem) / mem_all_softmax
         cache[key] = (pct, dn)
+        eval_counter[0] += 1
+        if eval_counter[0] % args.checkpoint_every == 0:
+            save_eval_cache(cache_path, cache, fast_delta_cache, run_meta)
         return pct, dn
 
     # build per-layer distilled students from a HELD-OUT calibration window (disjoint from eval ids)
