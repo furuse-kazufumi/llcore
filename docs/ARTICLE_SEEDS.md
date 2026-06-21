@@ -125,6 +125,7 @@
   シェルの `&` やエージェントの background とは生存スコープが違う — 「ジョブの寿命 >
   セッションの寿命」なら detached 一択。監視はログファイル経由で行う。
 - **根拠**: 2026-06-12 実損 2 回 (b73itrccl / btve2wjrh の死亡ログ)。
+- **2026-06-21 一次再確認**: nas_pareto の needle/2048 resume 走を harness の `run_in_background=true` で起動したら、**ポーリング用シェルのターン終了で kill**(log/err が完全に空=Python 例外でなく外部 kill が決め手)。同一コマンドを `Start-Process -WindowStyle Hidden -RedirectStandardOutput/Error -PassThru` で**完全 detached** 再起動 → 生存継続を確認。この seed の教訓が別ジョブ・別月で再現=「ジョブ寿命>セッション寿命なら detached 一択」の汎用性が強化された。**検出シグナル=background ジョブが消えたとき log/err が空なら外部 kill を疑う(traceback があればクラッシュ)**。
 - **側面**: 教訓 / 実装報告 / ユーザー体験 (AI 駆動開発の実務的罠)。
 
 ### 11. 「floor を仮説族に包含させる」— 識別力設計の一般原理
@@ -606,3 +607,13 @@
 - **2026-06-21 訂正**: 当初「2048 は inner-context=1024 設計のため構造的に未出力」と書いたが**誤り**。`context_sweep` (src/llcore/runtime/eval_proxy.py:461) は `make_windows` で inner-loop 長と独立にコーパスから任意長窓を切る実装、コーパスも 230 万トークンと十分長いので 2048 窓は作成可能。実際は**その走の `--context-sweep` 設定が 256/512/1024 までだった=単なる未測ギャップ**。b2 §5 に訂正済み(訂正自体を「未検証を構造のせいにしない」実演として記事化)。2048 sweep + needle は次走で埋める課題。
 
   - **2026-06-21 続報(ハードウェア律速 + メタ皮肉)**: needle/2048 の honest gap を埋めようと resume 走(GA は eval_cache から 386 evals 復元でスキップ、rigorous tier + 2048 sweep + needle のみ)を 2 度起動。だが **2048tok の full-attention forward が working set 3.9GB に膨れ、物理 RAM 3.6GB を超えてスワップ thrashing**(needle-lengths を 4096→2048 に落としても再発)。2 度とも完走せず kill。→ **「2048+ は測れない壁ではなく、このハードウェアでは測れない壁」**。記事級のメタ皮肉=「定数状態が長文脈でメモリを溢れさせる失敗モードを測ろうとして、測る側の自宅 CPU が長文脈でメモリを溢れさせた」。b2 §5 / b2-general を「RAM 律速で未実測、GPU オフロードが次の正手」に更新。元 nas_pareto.json(22:37 完走版、context_sweep=256/512/1024)は未上書きで無傷。
+
+### 63. cross-machine な resume は「厳密一致」をやめて「basename + tolerance」で開く — でも安全網は残す
+- **気付き**: 長時間ジョブの再開キャッシュ(eval_cache)が **別マシンで resume できない**問題に当たった。原因は identity 判定の `meta` 厳密一致(`==`)で、(1)`model_dir`/`text_file` の**絶対パスがマシンごとに違う**、(2)`base_nll`(1 forward の平均 CE)が **Windows↔Linux の BLAS 差で 6 桁目がずれる**。これを `_meta_matches` に置換: **path 系は basename 比較・base_nll は 1e-3 tolerance・他は厳密一致 + キー集合一致**。緩めすぎない安全網=別モデルを同名 basename で渡しても base_nll が tolerance を超えて reject(content チェック)。=「resume identity は厳密一致が安全」という素朴な実装が、移植性を殺す。**識別に効く軸(model 種別・corpus・config)だけ厳密にし、環境依存の軸(絶対パス・float 丸め)は寛容に**するのが正しい設計。
+- **根拠(2026-06-21)**: `src/llcore/runtime/eval_cache_io.py` `_meta_matches`(commit `b11a235`)、回帰テスト `tests/unit/test_eval_cache_io.py` 12 passed(cross-machine 6 件追加)、ruff/mypy strict green、全 unit 991 passed で回帰なし。ローカル事前検証=prefix fixture の base_nll が cache meta と diff 4.98e-08 で一致 + CI 相当 relocated meta で resume OK(scalar 386/vector 386 復元)。
+- **側面**: 技術設計 / 教訓 / honest disclosure(安全網の設計)/ 計算オフロード。**フック=「resume が別マシンで落ちる本当の理由は、コードでなく『絶対パスと float の 6 桁目』だった」**。計算オフロード(GH Actions/Kaggle)を現実にする地味な前提条件。
+
+### 64. RAM 律速のジョブをオフロードするとき、コーパス全文は要らない — 「先頭プレフィックス + resume snapshot + fail-fast」
+- **気付き**: 自宅 RAM 3.6GB では 2048tok の full-attention forward が working set 3.9GB に膨れて thrash([a8]/#40 の構造が測る側に牙を剥いた)。GPU でなく **RAM が支配項**なので GH Actions 標準ランナー(7GB)で解ける。だが素朴にやると (a)GA を CI で fresh 実行=2 コアで ~26h>6h 上限、(b)9.8MB コーパス全文を repo にコミット、の二重苦。解は 3 点セット: **(1)GA 結果(eval_cache snapshot)を fixture 化して resume → GA をスキップ、(2)コーパスは base_nll を厳密再現し全 holdout/sweep/needle 窓(最大~32768tok)を満たす先頭 20 万字プレフィックス(580KB)だけコミット(全文 9.8MB 不要)、(3)resume 失敗(meta mismatch)時は 26h GA 再走の前に fail-fast(`grep [resume] || exit 1`)**。= 重いオフロードは「全部送る」でなく「再現に必要な最小集合 + 安全な早期失敗」で設計する。
+- **根拠(2026-06-21)**: `.github/workflows/nas-needle-offload.yml` + `ci/fixtures/`(corpus prefix 580KB / eval_cache 109KB)(commit `1853d0b`)。プレフィックスは 50k 文字 skip 後 171,918 tok を生成(必要 32,768 を大幅超過)。push 手前まで構築・ローカル resume 実証済み。**残: push=human gate(外部公開)**。#63 の cross-machine resume 堅牢化が前提。
+- **側面**: 技術設計 / 計算オフロード / 教訓 / honest disclosure(必要最小集合の見極め)。**フック=「問題は GPU 不足でなく RAM 不足。コーパスは全文でなく先頭 20 万字で足りた」**。[a8](動的支配項)/[a9](静的支配項)の実務的続編=「支配項を見極めて、それだけを攻める」をオフロード設計に適用。
