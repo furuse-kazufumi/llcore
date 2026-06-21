@@ -968,3 +968,30 @@
 - **b4(Z3/SDP 収縮 gate)**: `formal_methods_corpus_v2/2604.03017 Compositionality of Lyapunov functions via assume-guarantee`(Lyapunov、直結)。差別化=学習ループの安全 gate への応用 + 経験 gate 84% vs sound 0% の判別力計測。
 - **b7(CEGIS)**: `formal_methods_corpus_v2/2604.24540 Counterexample-Guided Interval Weakening`(CEGIS 系)。
 - **注**: いずれも **filename 一致のみで本文未精読**。公開フェーズで該当 doc を精読し、正確な引用形へ昇格すること(未読のまま引用断定はしない=honest disclosure)。差別化軸自体は本確認で揺らがず。
+
+---
+
+## ★2026-06-21 EXIT(コンテキスト上限接近) — 再開地点
+
+> 新規作業はせず EXIT 準備のみ。canonical handoff は本ファイル上方の「セッション収束 handoff サマリ」(commit `84b7289`)+ 以下の追補。`docs/SESSION_SUMMARY.md` は Stop hook 自動生成につき手動編集は正本にしない。
+
+### 現状(EXIT 時点)
+- 作業ツリー clean(`docs/SESSION_SUMMARY.md` のみ dirty=自動生成・無視)。本セッションの全成果は **local commit 済み・push なし**。最新 commit = `d6c4562`。
+- ブランチ `feat/lm-recurrent`。push / 外部公開は一切未実行(安全弁最優先を維持)。
+
+### 確定成果(このセッション)
+1. NAS proxy-v2 走 完了処理: verdict=suppressed / HV gain +16.8% / regime 256→1024 + `nas_pareto_report.py` レポート。
+2. eval_cache cross-machine resume 堅牢化(`_meta_matches`, commit `b11a235`)+ 全 unit **991 passed**。
+3. needle/2048 offload を push 手前まで(`.github/workflows/nas-needle-offload.yml` + `ci/fixtures/` prefix580KB+cache、fail-fast、resume ローカル実証)commit `1853d0b`。
+4. 連載「自宅CPUから見た2026年6月のLLM業界」= **全16記事 × 技術/一般 = 32ドラフト + `docs/articles/SERIES_INDEX.md`**(A:a7/a8/a9/a11 B:b1-b7 S:s1/s2 C:c1/c2/c3)。
+5. 三層内部QA(リンク0切れ/技術↔一般 数値整合/引用パス14・シンボル8 全実在)。
+6. 外部事実 web 検証(MangaFlow/Gemma4/Cosmos3/PaddleOCR/Hermes、**誤り2件訂正**=Hermes star196554→数万・作成2025-07→2026-02 / Gemma4「同じ週」→4月)。
+7. 可視化SVG 2本: `assets/articles/llcore_suppress_win.svg`(b2) / `llcore_context_memory.svg`(a8)。
+8. RAD 一次精読接地: a7←doc_1139(arXiv:2605.05413) / b2←doc_0055=MTF-PDNS(arXiv:2407.20656)。弱一致(b4 Lyapunov合成/a8 KV量子化/b7 CEGIS-interval)はこじつけ回避で見送り。
+9. seed bank: #63(cross-machine resume)/#64(RAM律速offload最小集合)/#12 一次再確認。
+
+### 次の具体的な一手(新セッション)— すべて human gate / 新規方向待ち
+- **A. 記事の外部公開(Qiita)**: 着手するなら SVG を raw 絶対URL化 → 挿絵 verify-by-content(`docs/articles/PANEL_PLACEMENT_PLAN.md`、番号でなく内容照合)→ C系の残 prior-art を公開前に精読 → **公開操作は human gate**。
+- **B. needle/2048 実測**: `git push` で workflow+fixtures を public remote へ → `gh workflow run nas-needle-offload` → `gh run watch`/`download` → 結果で b2 §5 の needle/2048 を実数値化。**push=外部公開=human gate**(LLTERM_CHOICE 既出・未回答)。
+- **C. Kaggle kernel push**(llcore-lm-compare 別系統): 従来どおり `kaggle kernels push -p "D:\projects\llcore_kaggle_livecheck_20260617g"` の human gate 継続。
+- **新規方向が無くローカル継続する場合**: 弱RAD候補の無理な引用や薄い早期seed(#1-32)の記事化は quality-over-volume に反するため**しない**。新実験/新題材の指示を待つのが妥当。
