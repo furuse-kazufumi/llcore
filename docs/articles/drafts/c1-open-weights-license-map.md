@@ -81,4 +81,4 @@ PaddleOCR-VL は Apache 2.0。素直に見えますが、**ERNIE-4.5 をベー�
 
 ---
 
-_出典・確認状況(2026-06-21 web 再照合): Gemma 4(Apache 2.0、2026-04-02 リリース、Google 公式 blog「Expanding the Gemmaverse with Apache 2.0」で独自規約→Apache 2.0 の変更=商用制約撤廃を確認。サイズは E2B/E4B/26B MoE/31B Dense)/ Cosmos 3(HF/blog = OpenMDW 1.1、Linux Foundation 系 model ライセンス)/ PaddleOCR-VL(HF = Apache 2.0、ERNIE-4.5 ベース)。いずれも 2026-06 時点の理解で、**条文の逐条確認は採用前に各自で必要**。FullSense 側の文脈 = Apache-2.0 + Commercial dual-license / llmesh on-prem バックエンド戦略 / Qwen 商用障壁の回避方針。本記事は法的助言ではない。_
+_出典・確認状況(2026-06-21 web 再照合): Gemma 4(Apache 2.0、2026-04-02 リリース、Google 公式 blog「Expanding the Gemmaverse with Apache 2.0」で独自規約→Apache 2.0 の変更=商用制約撤廃を確認。サイズは E2B/E4B/26B MoE/31B Dense)/ Cosmos 3(arXiv:2606.02800、NVIDIA 2026-06-01、OpenMDW-1.1 License=Linux Foundation。web 確認済み)/ PaddleOCR-VL(arXiv:2606.03264、Apache 2.0、NaViT+ERNIE-4.5-0.3B、OmniDocBench v1.6 96.33%。web 確認済み)。いずれも 2026-06 時点の理解で、**条文の逐条確認は採用前に各自で必要**。FullSense 側の文脈 = Apache-2.0 + Commercial dual-license / llmesh on-prem バックエンド戦略 / Qwen 商用障壁の回避方針。本記事は法的助言ではない。_

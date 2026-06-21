@@ -927,3 +927,14 @@
 - 連載構成: A系 a7/a8/a9/a11(理論・教訓)/ B系 b1-b7(honest-disclosure)/ S系 s1/s2(計測規律)/ C系 c1/c2/c3(エコシステム・戦略)。13側面を網羅。
 - **記事生産ワークストリームは公開可能状態で完全終了**。ローカル完結の高価値タスク(NAS完了処理/eval_cache resume堅牢化+991テスト/needle offload push手前まで+ローカル実証/連載32ドラフト+索引+三層QA/git整合)を全て出し切った。
 - 残: 外部公開(Qiita投稿/SVG raw URL化/挿絵verify-by-content)= human gate / needle push = human gate / C系の外部事実(arXiv ID・ライセンス・star数)は公開フェーズで再確認(ドラフトには「2026-06理解・要確認」留保済み)。
+
+### 2026-06-21 追記 — C系 外部事実の web 検証 完了
+- C系(c1/c2/c3)+ s2 の load-bearing な外部事実を WebSearch で全件照合:
+  - c3 MangaFlow arXiv:2605.28173 + story section memory = 確認 ✓
+  - c1 Gemma4 Apache 2.0(独自規約→Apache、2026-04-02)= 確認 ✓(時系列「同じ週」を訂正済み)
+  - c2 Hermes(MIT/learning loop/独立ベンチ欠如)= 確認、ただし star 196,554→数万・作成 2025-07→2026-02 を**訂正** ✓
+  - c1/s2 Cosmos 3 arXiv:2606.02800 + OpenMDW-1.1 = 確認 ✓
+  - c1/s2 PaddleOCR-VL arXiv:2606.03264 + Apache + ERNIE-4.5-0.3B + OmniDocBench 96.33% = 確認 ✓
+- **捕捉・訂正した誤り 2 件**(Hermes 数値/Gemma 時系列)はいずれも seed 由来。「数字を疑う」(s2)を自分の引用に適用し実検証で潰した。
+- 残る未照合は s2 の Cosmos Table 10 個別スコア(Driving 79.3 等)のみで、これは s2 本文で「一次未照合」と明示済み(技報 PDF 取得が前提)。
+- → **連載は内部整合(リンク/数値/引用シンボル)+ 外部事実(arXiv ID/ライセンス/主要数値)の両面で検証済み**。公開前 QA は実質完了。残るは外部公開(human gate)のみ。
