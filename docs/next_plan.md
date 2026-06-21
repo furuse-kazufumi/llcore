@@ -1101,7 +1101,19 @@
 - F401未使用import13(自動) / F841未使用ローカル2 (verifier/invariants: pre=緩いtanh上界採用で不要, assumed=fail-open名残でcontraction=None=fail-closedが正) / E741 I->eye(backends SDP)。ruff全クリア・verifier77テストgreen・回帰なし。
 - 既知債務(据置): mypy src --strict 59件(evolution型注釈欠落/scipy/z3 stubs)はCI未強制aspirational・未触モジュール大半=回帰リスク高につき将来per-module段階導入。
 
-## ★2026-06-22 EXIT — 再開地点
+## ★2026-06-22 EXIT(2) — mypy strict を src 全体で 0 エラー達成
+- **据置だった「設計的不一致・高判断」債務を正攻法で解消し、`mypy src --strict` を 67 ファイル全 green 化(59→0)。** 全 local commit 済・push なし。HEAD=`7775253`。作業ツリーは `docs/SESSION_SUMMARY.md`(自動生成)以外 clean。
+- 解消の要点(Any 退避でなく型として正しい修正):
+  1. `32a6e76` invariants(z3 ignore)/ modes_meter(dict[str,object])。
+  2. `36f83e6` tasks(no-any-return)/ backends(cvxpy ignore・numpy no-any-return・`_REGISTRY: dict[str,type[VerifierBackend]]`)。
+  3. `8c5f5b6` **中核債務を設計解消**: `StateUpdateGeneLike` を素の class → `@runtime_checkable Protocol` 化。frozen dataclass(read-only属性)が構造適合するよう members を **read-only @property** で宣言(settable な素の `decay:float` だと frozen と不一致になる mypy 仕様)。`apply_changeop` 戻り型を実挙動どおり concrete `StateUpdateGene` に精緻化 → refinement/rwkv の arg-type/return-value が連鎖解消。refinement の z3 ヘルパは Any 注釈で typed 化。
+  4. `0c843b0` ridge_readout(task→SyntheticTask Protocol・コールバック契約 object→cast)/ honest_eval(scipy ignore・codec→`GeneCodec[StateUpdateGene]`)/ protocol(`VerifierBackend` の GeneT を入力専用 **contravariant TypeVar** に分離)。
+  5. `7775253` minimal_ga: FitnessFunc が StateUpdateGene 具象固定 = evolve は StateUpdateGene 特殊化のため、Population/Individual を `[StateUpdateGene]` で精密注釈・tournament_select を generic 化・closures に型付与。gene_matrix の as_array のみ契約根拠つき `type:ignore[attr-defined]`。
+- 各 commit で対象モジュール `mypy --strict` green + ruff clean + 関連テスト green を確認済み。**フルユニット回帰は実行中(結果は SESSION_SUMMARY 参照)**。pre-existing 失敗 1 件 `test_poc_7a_vnn_comp_reference.py::test_verify_gene_safe_sets_solver_status`(`poc_7a_..._impl` に `is_z3_available` 無し)は本変更と無関係(stash 後も再現)= 別 issue。
+- **次の一手**: (a) mypy strict を CI gate 化(per-module でなく `mypy src --strict` が緑になったので enforce 候補)。(b) pre-existing test 失敗の修正。(c) human gate の A=Qiita公開 / B=needle GPU offload(push) / C=Kaggle push。(d) 新題材があれば RAD 接地から。
+- 方針: 指示なき薄い量産はしない(quality-over-volume)。
+
+## ★2026-06-22 EXIT — 再開地点(旧, 上の EXIT(2) で更新済)
 - **(済) 中断点の mypy strict 安全2件を解消** commit `32a6e76`: `invariants.py:35` に z3 `# type: ignore[import-untyped]` / `modes_meter.py` is_adaptive_active 戻り値 `dict[str,object]`(140/165)。両モジュール `mypy --strict` green・26テスト green・ruff clean。残 strict 債務(gene/protocol 型系57件)は設計的不一致で据置のまま。
 - 全成果 local commit 済・push なし。HEAD=`32a6e76`。作業ツリーは `docs/SESSION_SUMMARY.md`(自動生成)以外 clean。ブランチ `feat/lm-recurrent`。
 - 本セッション成果(18 commit): アーキ編3軸(memory a8 32x曲線 / compute a7 latency p~1.37 / static床 a9 torch税~180MB)を実測・曲線・可視化(SVG2)・記事/正本(MEMORY_EFFICIENCY_FINDINGS)整合 → 計測基盤 RSS DRY 100%(`src/llcore/runtime/rss.py` 単一情報源、_PMC は全7本から集約) → int8 streaming latency 裏コストを交絡統制で決着(無圧力小モデルで ~x1.25 / 130M の x0.2〜x11 は RAM圧 thrashing) → リポ全体 ruff 17件解消 → フルユニット 1013 passed 検証。
