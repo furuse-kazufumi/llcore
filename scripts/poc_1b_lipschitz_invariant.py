@@ -40,6 +40,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+from typing import Callable
 
 import numpy as np
 
@@ -243,7 +244,7 @@ def main() -> int:
     # 代表 200 gene サンプル (BG1/BG2 共有, seed=7)
     sample_genes = _random_genes(200, seed=7)
 
-    gates = [
+    gates: list[tuple[str, Callable[[], tuple[bool, str]]]] = [
         ("BG1: per-gene Z3 timing (<1s, 200 genes)", lambda: gate_bg1_timeout(sample_genes)),
         ("BG2: reject rate non-degenerate (0%<r<100%)", lambda: gate_bg2_reject_rate(sample_genes)),
         ("BG3: sim contraction (certified shrink, non-cert diverge)", gate_bg3_sim_contraction),

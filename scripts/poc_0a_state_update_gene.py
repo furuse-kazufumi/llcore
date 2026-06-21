@@ -37,6 +37,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
+from typing import Callable
 
 import numpy as np
 
@@ -274,7 +275,7 @@ def main() -> int:
     print("=" * 72)
     rng = np.random.default_rng(20260529)
 
-    gates = [
+    gates: list[tuple[str, Callable[[], tuple[bool, str]]]] = [
         ("G1: single-step finite", lambda: gate_g1_single_step_finite(rng)),
         ("G2: bounded norm L=256 (K=10)", lambda: gate_g2_bounded_norm(rng)),
         ("G3: determinism (seed=42)", gate_g3_determinism),

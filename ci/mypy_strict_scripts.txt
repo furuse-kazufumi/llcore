@@ -10,6 +10,7 @@
 scripts/annotation_generation_poc.py
 scripts/build_aozora_corpus.py
 scripts/build_kaggle_lm_compare_bundle.py
+scripts/chat_endurance_probe.py
 scripts/chat_staged_smoke.py
 scripts/clip_smoke.py
 scripts/connectivity_retrieval_poc.py
@@ -22,6 +23,10 @@ scripts/p1_corpus_probe.py
 scripts/p1_manifest_inspect.py
 scripts/p1_manifest_reconcile.py
 scripts/p1_prepare_aozora.py
+scripts/poc_0a_state_update_gene.py
+scripts/poc_1a_z3_invariant.py
+scripts/poc_1b_lipschitz_invariant.py
+scripts/poc_3a_marabou_bridge_skeleton.py
 scripts/prepare_kaggle_lm_compare_bundle.py
 scripts/rad_full_probes.py
 scripts/train_recurrent_longctx.py

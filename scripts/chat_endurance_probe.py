@@ -74,11 +74,13 @@ def main() -> int:
     )
 
     results: list[dict[str, object]] = []
+    elapsed_times: list[float] = []  # typed parallel accumulator (results values are object)
     n_ref_ok = n_ref_ng = 0
     for i, (prompt, expect) in enumerate(TURNS, start=1):
         t0 = time.time()
         reply = session.ask(prompt)
         elapsed = time.time() - t0
+        elapsed_times.append(elapsed)
         verdict = "open_ended"
         if expect is not None:
             low = reply.lower()
@@ -100,8 +102,8 @@ def main() -> int:
             }
         )
 
-    first_half = [r["elapsed_s"] for r in results[:10]]
-    second_half = [r["elapsed_s"] for r in results[10:]]
+    first_half = elapsed_times[:10]
+    second_half = elapsed_times[10:]
     payload = {
         "model": backend.model_id,
         "seed": args.seed,

@@ -154,7 +154,7 @@ def gate_g4_pathological_changeop_caught() -> tuple[bool, str]:
         ここでは Z3 を直接呼んで "decay=2.0 unstable" のシナリオで反例が出ることを
         既に確認している G3 (PoC 1a) と同様の sound 反例検出を再確認する。
     """
-    import z3
+    import z3  # type: ignore[import-untyped]
     solver = z3.Solver()
     solver.set("timeout", 500)
     decay_after = z3.Real("decay_after")

@@ -83,7 +83,7 @@ def gate_g3_illegal_range_finds_counterexample() -> tuple[bool, str]:
     invariants module は clip 範囲固定なので、本ゲートでは Z3 を直接呼んで
     "decay > 1 で state が伸びる" 反例を確認する (soundness sanity)。
     """
-    import z3
+    import z3  # type: ignore[import-untyped]
 
     solver = z3.Solver()
     solver.set("timeout", 2000)
