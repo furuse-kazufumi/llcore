@@ -27,8 +27,12 @@ import json
 import sys
 import time
 from pathlib import Path
+from typing import Any, Callable
 
 import numpy as np
+
+# encoder: 文字列リストを (n, d) 埋め込み行列(array-like)へ写す関数
+Encode = Callable[[list[str]], Any]
 
 _ROOT = Path(__file__).resolve().parents[1]
 _SRC = _ROOT / "src"
@@ -65,7 +69,7 @@ PREFIX_SCHEMES = {
 }
 
 
-def evaluate(corpus_vecs: np.ndarray, query_vecs: np.ndarray, gold: list[int]) -> dict:
+def evaluate(corpus_vecs: np.ndarray, query_vecs: np.ndarray, gold: list[int]) -> dict[str, Any]:
     """各クエリの正解 (gold[i]) コーパス文の順位から Recall@1/3 と MRR を計算。"""
     sims = query_vecs @ corpus_vecs.T          # (n_query, n_corpus), 全て単位ノルム
     r1 = r3 = 0
@@ -94,7 +98,7 @@ HARD_GOLD: list[tuple[str, str]] = [
 ]
 
 
-def run_hard_benchmark(encode, corpus: list[str]) -> dict | None:
+def run_hard_benchmark(encode: Encode, corpus: list[str]) -> dict[str, Any] | None:
     """実会話アノテーション corpus 上で HARD_GOLD の検索順位を測る (gold 不在はスキップ)。"""
     gold_rows: list[int] = []
     queries: list[str] = []
@@ -117,7 +121,8 @@ def run_hard_benchmark(encode, corpus: list[str]) -> dict | None:
 
 
 def l2(a: np.ndarray) -> np.ndarray:
-    return a / np.maximum(np.linalg.norm(a, axis=-1, keepdims=True), 1e-12)
+    out: np.ndarray = a / np.maximum(np.linalg.norm(a, axis=-1, keepdims=True), 1e-12)
+    return out
 
 
 def main() -> int:
@@ -142,12 +147,12 @@ def main() -> int:
         hard_corpus = [a for a in meta.get("annotations", []) if a]
         print(f"[hard] 実会話アノテーション corpus={len(hard_corpus)} (多数の似た短句)", flush=True)
 
-    results: dict[str, object] = {
+    results: dict[str, Any] = {
         "easy_corpus_size": len(corpus), "n_easy_queries": len(queries),
         "hard_corpus_size": len(hard_corpus), "models": {},
     }
 
-    def record(name: str, encode) -> None:  # type: ignore[no-untyped-def]
+    def record(name: str, encode: Encode) -> None:
         t0 = time.time()
         cv = l2(np.asarray(encode(corpus), dtype=np.float64))
         qv = l2(np.asarray(encode(queries), dtype=np.float64))
@@ -196,7 +201,7 @@ def main() -> int:
         record(name, enc)
 
     # --- verdict (hard ベンチで判定; easy は飽和して無情報) ---
-    def hard_mrr(v: dict) -> float:
+    def hard_mrr(v: dict[str, Any]) -> float:
         return v["hard"]["mrr"] if v.get("hard") else -1.0
 
     clip_mrr = hard_mrr(results["models"][clip_key])
@@ -227,7 +232,7 @@ def main() -> int:
     return 0
 
 
-def _write(path: Path, results: dict) -> None:
+def _write(path: Path, results: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
 

@@ -18,6 +18,7 @@ scripts/int8_streaming_infer.py
 scripts/mmap_ram_exceed_poc.py
 scripts/mmap_weights_poc.py
 scripts/clip_smoke.py
+scripts/connectivity_bench.py
 scripts/connectivity_retrieval_poc.py
 scripts/evolve_linearization.py
 scripts/gptq_compare.py
@@ -47,6 +48,7 @@ scripts/quant_bitwidth_sweep.py
 scripts/quant_group_compare.py
 scripts/rad_full_probes.py
 scripts/recurrent_latency_sweep.py
+scripts/retrieval_head_to_head.py
 scripts/recurrent_runtime_rss.py
 scripts/runtime_floor_rss.py
 scripts/train_recurrent_longctx.py

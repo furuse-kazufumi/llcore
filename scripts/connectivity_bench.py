@@ -25,6 +25,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
+from typing import Any, Callable
 
 _ROOT = Path(__file__).resolve().parents[1]
 _SRC = _ROOT / "src"
@@ -113,7 +114,7 @@ def main() -> int:
     print(f"ingested {n_turns} turns, {len(ann)} annotations, {store.n_cooccur_edges} edges, "
           f"{len(PROBES)} probes", flush=True)
 
-    methods = {
+    methods: dict[str, Callable[[str], list[Any]]] = {
         "cosine": lambda q: [ann[i] for i, _ in store.query(q, k=10, exclude_questions=True)],
         "connected_noIDF": lambda q: [ann[r] for r, _, _ in
                                       store.query_connected(q, k=10, hub_suppression=False)],
@@ -122,13 +123,13 @@ def main() -> int:
         "entity": lambda q: [ann[r] for r, _, _ in
                              store.query_connected(q, k=10, entity_hop=True)],
     }
-    results: dict[str, object] = {"encoder": args.encoder,
+    results: dict[str, Any] = {"encoder": args.encoder,
                                   "n_turns": n_turns, "n_annotations": len(ann),
                                   "n_edges": store.n_cooccur_edges, "n_probes": len(PROBES),
                                   "methods": {}, "per_probe": []}
     ranks_by_method: dict[str, list[int]] = {m: [] for m in methods}
     for q, expect in PROBES:
-        row = {"query": q, "gold": expect}
+        row: dict[str, Any] = {"query": q, "gold": expect}
         for m, fn in methods.items():
             r = rank_of(fn(q), expect)
             ranks_by_method[m].append(r)
