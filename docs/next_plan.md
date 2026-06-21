@@ -1096,3 +1096,7 @@
 ### 2026-06-22 追記 — a7 compute軸に regime credibility 注記(交絡発見の波及健全性チェック)
 - 今回の latency 交絡発見(130M で ×0.2〜×11)が a7 の compute軸結果(p≈1.37/0.99)を脅かさないか確認: a7 は同じ無圧力小config(n_embd256/L4、max attn 134MB ≪ 3.6GB)で測定済み=安定 regime → a7 の指数は load-bearing のまま健全。
 - a7 技術版に一文追記「本計測は圧力のかからない小モデルで行い計時は安定領域。130M では RAM 圧で倍率が暴れるので、ここで指数を load-bearing にできるのは圧力のない regime で測ったから」。読者の「latency 不安定では?」を先回りで潰す + 2つの latency 発見を honest に接続。一般版は既存「回数を増やしたら収束」で整合のため据置。
+
+### 2026-06-22 追記 — リポ全体 ruff 17件解消 (commit 31cd33c)
+- F401未使用import13(自動) / F841未使用ローカル2 (verifier/invariants: pre=緩いtanh上界採用で不要, assumed=fail-open名残でcontraction=None=fail-closedが正) / E741 I->eye(backends SDP)。ruff全クリア・verifier77テストgreen・回帰なし。
+- 既知債務(据置): mypy src --strict 59件(evolution型注釈欠落/scipy/z3 stubs)はCI未強制aspirational・未触モジュール大半=回帰リスク高につき将来per-module段階導入。
