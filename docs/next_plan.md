@@ -1028,3 +1028,9 @@
 - 直前公開の compute軸データの唯一の弱所(RWKV T=128 startup外れ値, p≈0.5)を、repeats=7→11・warmup=3 で再測して解消。min ベース(混雑に強い)を主指標へ。
 - 結果(min/median): **GPT p≈1.37/1.46(超線形)・Recurrent p≈0.99/0.96(線形)・RWKV p≈0.99/1.00(線形)**。3モード整合=「Transformer超線形 vs recurrent系線形」がクリーンに確定。
 - a7 技術/一般版を更新(「ノイズを消さず repeats増で潰した」経緯ごと記載=honest-disclosure)。harness の headline も min主・median括弧に変更。回帰テスト不変(7 passed)。
+
+### 2026-06-22 追記 — compute軸の可視化SVG新規 + a7 へ挿入
+- a8 メモリ図に相当する compute 軸の可視化が欠落していたため、`assets/articles/llcore_latency_scaling.svg`(既存SVGと同スタイル=GitHubダーク/viewBox760×440/静的フレーム完成形)を新規作成。
+- **両対数 + 各モード T=128 正規化**で「上がり方の形」だけを見せる(cross-mode絶対比較を避ける honest 構図)。GPT は理想線形(破線 p=1)から上に外れ ×37(p≈1.37)、recurrent/RWKV は破線に沿って ×16(p≈0.99、両者ほぼ重なる)。
+- a7 技術版の compute軸ブロック直後に図+キャプション挿入(XML valid 確認済)。
+- 残(公開フェーズ=human gate): 全SVGを raw絶対URL化、a8 SVGを6点曲線へ更新。可視化2軸(メモリ=context_memory.svg / compute=latency_scaling.svg)が揃った。

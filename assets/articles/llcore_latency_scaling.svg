@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" font-family="Segoe UI, Hiragino Kaku Gothic ProN, Meiryo, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0d1117"/><stop offset="1" stop-color="#161b22"/>
+    </linearGradient>
+  </defs>
+  <rect width="760" height="440" fill="url(#bg)"/>
+
+  <text x="34" y="40" fill="#e6edf3" font-size="22" font-weight="700">時間でも同じ向き — GPT は超線形、recurrent 系は線形</text>
+  <text x="34" y="64" fill="#8b949e" font-size="13.5">推論レイテンシのスケーリング(両対数)。各モードを T=128 で正規化=増え方の「形」だけを比較</text>
+
+  <!-- plot area: x 90..710, y 100..360 ; log2 x (128..2048), log10 y (norm 1..~40) -->
+  <line x1="90" y1="360" x2="710" y2="360" stroke="#30363d" stroke-width="2"/>
+  <line x1="90" y1="100" x2="90" y2="360" stroke="#30363d" stroke-width="2"/>
+  <text x="700" y="384" fill="#6e7681" font-size="12" text-anchor="end">文脈長 T (tok, 対数)</text>
+  <text x="34" y="108" fill="#6e7681" font-size="12">相対レイテンシ (×, 対数)</text>
+
+  <!-- y gridlines at norm 1,3,10,30 -->
+  <line x1="90" y1="360.0" x2="710" y2="360.0" stroke="#21262d" stroke-width="1" stroke-dasharray="4 4"/>
+  <text x="84" y="364" fill="#6e7681" font-size="11" text-anchor="end">×1</text>
+  <line x1="90" y1="284.8" x2="710" y2="284.8" stroke="#21262d" stroke-width="1" stroke-dasharray="4 4"/>
+  <text x="84" y="289" fill="#6e7681" font-size="11" text-anchor="end">×3</text>
+  <line x1="90" y1="202.4" x2="710" y2="202.4" stroke="#21262d" stroke-width="1" stroke-dasharray="4 4"/>
+  <text x="84" y="207" fill="#6e7681" font-size="11" text-anchor="end">×10</text>
+  <line x1="90" y1="127.2" x2="710" y2="127.2" stroke="#21262d" stroke-width="1" stroke-dasharray="4 4"/>
+  <text x="84" y="131" fill="#6e7681" font-size="11" text-anchor="end">×30</text>
+
+  <!-- x ticks 128,256,512,1024,2048 -->
+  <text x="90"  y="378" fill="#6e7681" font-size="11" text-anchor="middle">128</text>
+  <text x="245" y="378" fill="#6e7681" font-size="11" text-anchor="middle">256</text>
+  <text x="400" y="378" fill="#6e7681" font-size="11" text-anchor="middle">512</text>
+  <text x="555" y="378" fill="#6e7681" font-size="11" text-anchor="middle">1024</text>
+  <text x="710" y="378" fill="#6e7681" font-size="11" text-anchor="middle">2048</text>
+
+  <!-- reference: ideal linear (p=1) from (90,360) to (710, y for ×16) ; ×16 -> log10 1.204 -> y=360-1.204/1.65*260=170.3 -->
+  <line x1="90" y1="360" x2="710" y2="170.3" stroke="#6e7681" stroke-width="1.2" stroke-dasharray="2 5"/>
+  <text x="690" y="186" fill="#6e7681" font-size="10.5" text-anchor="end">理想 線形 p=1(×16 で ×16)</text>
+
+  <!-- recurrent + RWKV (overlap, both ~linear p≈0.99) -->
+  <polyline points="90,360.0 245,313.7 400,268.5 555,221.6 710,171.9" fill="none" stroke="#3fb950" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="90" cy="360.0" r="4.5" fill="#3fb950"/>
+  <circle cx="245" cy="313.7" r="4.5" fill="#3fb950"/>
+  <circle cx="400" cy="268.5" r="4.5" fill="#3fb950"/>
+  <circle cx="555" cy="221.6" r="4.5" fill="#3fb950"/>
+  <circle cx="710" cy="171.9" r="4.5" fill="#3fb950"/>
+  <text x="710" y="190" fill="#3fb950" font-size="12" font-weight="700" text-anchor="end">recurrent ≈ RWKV ×16(p≈0.99)</text>
+
+  <!-- GPT (superlinear p≈1.37) -->
+  <polyline points="90,360.0 245,320.3 400,182.0 555,168.5 710,112.2" fill="none" stroke="#f85149" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="90" cy="360.0" r="4.5" fill="#f85149"/>
+  <circle cx="245" cy="320.3" r="4.5" fill="#f85149"/>
+  <circle cx="400" cy="182.0" r="4.5" fill="#f85149"/>
+  <circle cx="555" cy="168.5" r="4.5" fill="#f85149"/>
+  <circle cx="710" cy="112.2" r="4.5" fill="#f85149"/>
+  <text x="700" y="106" fill="#f85149" font-size="12" font-weight="700" text-anchor="end">GPT ×37(p≈1.37)</text>
+
+  <!-- legend -->
+  <rect x="110" y="120" width="14" height="14" rx="3" fill="#f85149"/>
+  <text x="130" y="132" fill="#e6edf3" font-size="13">GPT(Transformer)= 文脈長で超線形(O(T²)寄り)</text>
+  <rect x="110" y="144" width="14" height="14" rx="3" fill="#3fb950"/>
+  <text x="130" y="156" fill="#e6edf3" font-size="13">recurrent / RWKV = ほぼ線形(O(T)、両者ほぼ重なる)</text>
+
+  <!-- footer -->
+  <line x1="34" y1="398" x2="726" y2="398" stroke="#21262d" stroke-width="1"/>
+  <text x="34" y="420" fill="#8b949e" font-size="12.5">honest: cross-mode の<tspan fill="#c9d1d9" font-weight="700">絶対時間は比較不可</tspan>(recurrent 系は Python per-step ループ計測)。読むのは各モード内の傾き(scaling 指数)だけ。</text>
+</svg>
