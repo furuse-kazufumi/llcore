@@ -1118,7 +1118,8 @@
   - 大半は py.typed(e2da2fa)で不要化した `type:ignore[import-untyped/operator]`(llcore import 限定)の除去 = 純機械。+軽微な実型修正(no-any-return を float()/注釈、bare list→list[Any]、gates リスト Callable 注釈、chat_endurance の typed accumulator)。
   - **src の設計修正も1件**: `SyntheticTask` Protocol の settable 素属性を read-only @property 化(`6c6cd76`)= frozen dataclass(CopyTask/AdditionTask)が構造適合せず poc_2a/poc_branch_a で arg-type だった件を解消(StateUpdateGeneLike と同パターン)。波及で poc_0c も clean 化。src 67ファイル strict 0 は全工程で維持。
   - 含む load-bearing: Kaggle bundle pipeline 全体・nas_pareto(±report/level2)・量子化系(int8/gptq/qat/quant_*)・記事裏付け poc(0a/0c/1a/1b/2a/3a/branch_a)・記事ハーネス(latency/floor/mmap/streaming)・chat 系。allowlist 不変条件=「消して黙らせず直して追加」。各 commit で複合 strict 0 + ruff + 関連テスト green 実測。
-  - **残 dirty(高工数=実型修正要)**: recurrent_runtime_rss(assignment/operator/redundant-cast)・recurrent_longctx_eval(18)・poc_0b(19)・poc_ridge_unflatten(10)・retrieval_head_to_head(10)・connectivity_bench(9)・rad_*(11〜52, 大量)。これらは unused-ignore でなく実型整備が要るため incremental に要工数。
+  - **(追加) allowlist 43本へ** commits `236d785`(recurrent_runtime_rss=a8ハーネス, union narrow+state分離)・`6e40e97`(poc_2b/poc_ridge_unflatten)。計 **src 67 + scripts 43 = 110ファイル strict 0**。記事裏付け poc 系(0a/0c/1a/1b/2a/2b/3a/branch_a/ridge_unflatten)と計測ハーネス3軸(latency/floor/runtime)が**全て gate 配下**に。
+  - **残 dirty(高工数=実型修正要)**: poc_0b(19)・recurrent_longctx_eval(18)・retrieval_head_to_head(10, type-arg/index系)・connectivity_bench(9, index系)・rad_*(11〜52, 大量=research utility で優先度低)。unused-ignore でなく実型整備が要る。rad_* は研究用ユーティリティで出荷/記事裏付けでないため優先度低。
 - **次の一手**: (a) human gate の A=Qiita公開 / B=needle GPU offload(push) / C=Kaggle push(B/C 押せば CI も初回実走し ci.yml を実地検証できる)。(b) 新題材があれば RAD 接地から。(c) ローカル余地: 残 dirty scripts(poc_0b 19/poc_ridge_unflatten 10/rad_* 30-65 等)は高工数の per-script strict 化候補=incremental に allowlist 拡張可。research/ ruff 805件は実験コードゆえ低価値・据置。
 - 方針: 指示なき薄い量産はしない(quality-over-volume)。
 
