@@ -1214,3 +1214,11 @@
 - **本セッションの追加成果(commit)**: `ba845e8`(needle 抽出レシピ + 統合アンカーを下調べ・記録)/ `6238d3d`(b2 を裏付ける RAD 先行研究2件を ARTICLE_SEEDS に記録)。いずれも待機中の準備作業。コード変更なし・回帰なし。
 - **human gate(未消化)**: A=Qiita 公開(SVG raw URL 化)/ C=Kaggle push。B=needle は実行中。
 - **方針**: 指示なき薄い量産はしない(quality-over-volume)。needle 完了 or 新題材指示で再開。
+
+## ★2026-06-22 待機中追記 — needle 統合アンカー再検証(doc_0592 追記後)
+- run 27918958686 は compute step 実行中(23:11Z 時点 ~1h 経過 / 2-3h 想定内、正常)。背景 watch `byl2kmcn0`。
+- doc_0592 接地(commit `322b769`)は b2 L137 内に収まり **L138 は不変** → 既存統合手順そのまま有効。検証済み現在地:
+  - b2 L137 = sweep 数値(256:0.761→512:1.012→1024:1.182)、L138 = 「2048 未検証 / GPU オフロード」叙述(needle 実測値で書換 + doc_0530 留保追記)。
+  - **★新発見: b2 L115 の図キャプションにも `長距離検索は未検証(UNTESTED)` あり** → 統合時にここも実測へ更新要(EXIT(3)レシピに未記載だった)。
+  - SVG `assets/articles/llcore_suppress_win.svg` L51-52(`needle → UNTESTED` / 「未検証は…開示する」)。
+- doc_0530(NIAH deceptive saturation)は needle 数値到着時に L138 留保へ併記。
