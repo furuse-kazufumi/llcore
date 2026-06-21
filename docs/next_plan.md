@@ -796,3 +796,25 @@
    - **着地済みなら**: `py -3.11 scripts/nas_pareto_report.py out/nas_pareto_v2full/nas_pareto.json -o out/nas_pareto_v2full/nas_pareto_report.md` を実行 → `proxy_v2.verdict.memetic_vs_greedy` / `confidence`、`context_sweep` の regime 依存 (L=1024 vs 2048)、`frontier_holdout` の `optimism_gap`、`hv_gain_ci` (CI_lo>0 か) を honest-disclosure 観点で要約。
 2. レポート確定後、`out/nas_pareto_v2full/nas_pareto_report.md` を確認し、記事ネタ #62 に実数値を追記。生成物のコミット要否を判断 (push は人間承認)。
 3. 別系統の **Kaggle kernel push** は従来どおり human gate のまま (本セッションでは不介入)。
+
+---
+
+## ★2026-06-21 完了 — NAS proxy-v2 走 着地 + レポート生成 + 記事ネタ #62 実数値追記
+
+> PID 18620 (15:57 起動) は 22:37 に `nas_pareto.json` を書いて完走 (386 real evals / 23,849s)。rigorous tier も完了。
+
+### 着地した結果 (honest-disclosure の核 = 二段構造)
+- **(A) zero-shot (selection 窓)**: `memetic frontier dominates greedy: HV +15.3%` (greedy 58.47 → evolved 67.44) = memetic 勝ち。
+- **(B) rigorous tier HEADLINE (holdout)**: **verdict = suppressed** (`max optimism_gap 0.0652 > CI half-width floor 0.0204`)。winner's-curse 補正後の楽観バイアスがノイズ床を超えたため frontier 個別点の勝ち主張を抑制。
+- **HV gain (holdout)**: **+16.8% (95% CI 16.2..17.7%, p_memetic_wins 1.000)** = CI_lo>0 を満たすため HV 次元の memetic 優位だけ発火。→「個別 verdict は黙らせるが集約 HV の勝ちは CI が支持する限り残す」粒度別の誠実さ。
+- Kendall τ=1.00 (降格なし)。base nll 4.4155 (ppl≈82.72)。
+- **regime 依存** (83.9% genome context sweep): L=256 Δnll 0.761 → 512 1.012 → 1024 1.182 = 長文ほど劣化増大 (constant-state failure mode 兆候)。**inner context=1024 設計のため 2048 は構造上未出力** (旧 EXIT メモの「2048 まで」は誤記)。
+- **honest gap**: needle/passkey は `--needle` off で **UNTESTED**。attention-KL は診断専用 (mean 3.68 / max 7.67 layer 9, fitness 非配線)。
+
+### 生成物・反映
+- レポート `out/nas_pareto_v2full/nas_pareto_report.md` (5338 chars, RC=0)。**out/ は gitignore 配下につき非コミット**。
+- 記事ネタ **#62** (`docs/ARTICLE_SEEDS.md`) に実数値追記済み。
+
+### 残タスク
+- 記事 #62 本執筆 (QIITA_SUMMARY/GENERAL) は未着手。実数値は揃ったので執筆可能。
+- Kaggle kernel push は引き続き human gate 待ち (本系統では不介入)。
