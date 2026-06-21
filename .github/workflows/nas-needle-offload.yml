@@ -53,7 +53,8 @@ jobs:
 
       - name: Download Qwen2.5-0.5B-Instruct (basename must match eval_cache meta)
         run: |
-          huggingface-cli download Qwen/Qwen2.5-0.5B-Instruct \
+          # 新しい huggingface_hub では `huggingface-cli` が廃止され `hf` に置換された。
+          hf download Qwen/Qwen2.5-0.5B-Instruct \
             --local-dir model/Qwen2.5-0.5B-Instruct
 
       - name: Stage corpus prefix + resumable eval_cache snapshot
