@@ -1023,3 +1023,8 @@
   - **honest 開示2点**: (1) cross-mode 絶対 ms は比較不可(recurrent は Python per-step ループ=インタプリタ律速 / GPT は1回 vectorized forward)→ 読むのは各モード内の scaling 指数のみ。(2) RWKV は T=128 が startup 外れ値(1587ms)でノイズ汚染 → p≈0.5 は計測ノイズで構造結論に使わないと明示。GPT vs Recurrent のみ load-bearing。
 - a7 技術版に compute 軸サブセクション + honest留保 + harness参照、一般版に平易版を追記。両版整合。RAD接地済(latency vs seq の先行研究は KV量子化/MoE推論=accelerator寄り、本実験の差別化軸=自宅CPU実機 wall-clock の scaling 指数対比、車輪の再発明でない)。
 - 残: RWKV のノイズを取るなら repeats増 or 大T(要RAM/時間)。GPT/recurrent の対比は確定。SVG化は公開フェーズ(human gate)。
+
+### 2026-06-22 追記 — latency データを repeats=11 で堅牢化(RWKVノイズ解消)
+- 直前公開の compute軸データの唯一の弱所(RWKV T=128 startup外れ値, p≈0.5)を、repeats=7→11・warmup=3 で再測して解消。min ベース(混雑に強い)を主指標へ。
+- 結果(min/median): **GPT p≈1.37/1.46(超線形)・Recurrent p≈0.99/0.96(線形)・RWKV p≈0.99/1.00(線形)**。3モード整合=「Transformer超線形 vs recurrent系線形」がクリーンに確定。
+- a7 技術/一般版を更新(「ノイズを消さず repeats増で潰した」経緯ごと記載=honest-disclosure)。harness の headline も min主・median括弧に変更。回帰テスト不変(7 passed)。

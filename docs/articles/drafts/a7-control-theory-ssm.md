@@ -47,9 +47,9 @@
 > **項分解して実測したわけではありません**。観測事実は「Transformer の文脈依存コストが超線形に伸びた」までで、
 > 「その超線形が二次項の顕在化である」は解析モデルに基づく解釈である、と区別しておきます。
 
-> **compute 軸でも裏取り(メモリと同じ向きが時間にも出る):** メモリだけでなく **推論にかかる時間**も同じ T 掃引で測りました(`scripts/recurrent_latency_sweep.py` / `out/recurrent_latency_sweep.json`、各点 7 回測定の中央値、`torch.set_num_threads(1)`)。T を 128→2048(×16)に伸ばしたときの **scaling 指数 p**(time ∝ Tᵖ を log-log 最小二乗で推定)は、**GPT が p≈1.6(min ベースで 1.4。明確に超線形、O(T²) 寄り)/ Recurrent が p≈0.94(ほぼ線形、O(T))**。メモリで見えた「Transformer は文脈で膨らむ / recurrent は構造的に軽い」が、**時間軸でも同じ向き**で再現しました。
+> **compute 軸でも裏取り(メモリと同じ向きが時間にも出る):** メモリだけでなく **推論にかかる時間**も同じ T 掃引で測りました(`scripts/recurrent_latency_sweep.py` / `out/recurrent_latency_sweep.json`、各点 11 回測定、`torch.set_num_threads(1)`)。T を 128→2048(×16)に伸ばしたときの **scaling 指数 p**(time ∝ Tᵖ を log-log 最小二乗で推定。混雑に強い min ベース)は、**GPT が p≈1.37(明確に超線形、O(T²) 寄り)/ Recurrent が p≈0.99 / RWKV が p≈0.99(どちらもほぼ線形、O(T))**。メモリで見えた「Transformer は文脈で膨らむ / recurrent・RWKV は構造的に軽い」が、**時間軸でも同じ向き**で再現しました。
 >
-> ただし強い honest 留保が 2 つ。**(1) cross-mode の絶対 ms は比較してはいけない。** recurrent/RWKV はここでは **Python の per-step ループ**(T 回の関数呼び出し)で測っており、インタプリタ呼び出しオーバーヘッドが支配的——「recurrent の方が速い/遅い」を絶対値で語るのは無意味で、読むのは **各モード内の伸び方(scaling 指数)だけ**。**(2) RWKV は T=128 の点が startup ノイズで外れ値**(1587ms)になり、傾き推定が汚れた(p≈0.5 と出たが、これは計測ノイズで構造的結論には使えない)ので、ここでは GPT と Recurrent の対比のみを load-bearing とします。汚れた点を消さず、結論に使わないと明示するのが規律です。
+> ただし honest 留保。**cross-mode の絶対 ms は比較してはいけない。** recurrent/RWKV はここでは **Python の per-step ループ**(T 回の関数呼び出し)で測っており、インタプリタ呼び出しオーバーヘッドが支配的——「recurrent の方が速い/遅い」を絶対値で語るのは無意味で、読むのは **各モード内の伸び方(scaling 指数)だけ**。なお当初 repeats=7 では RWKV の T=128 が startup ノイズで外れ値になり傾きが汚れた(p≈0.5)が、**repeats=11 に増やすと RWKV も p≈0.99 に収束**——ノイズだった点を消さず、増やして潰した経緯ごと残します。
 
 この差を見たとき、私はそれを「新しい発見」だと一瞬思いました。でも違いました。これは **1960 年代の制御工学が「可観測な系を、有界な状態で運ぶ」問題として(A の枠組みについては)整理し尽くしていた**ことの再演です。RWKV や Mamba が属する **状態空間モデル(State-Space Model, SSM)** の「S」は、State(状態)の S です。偶然ではありません。
 

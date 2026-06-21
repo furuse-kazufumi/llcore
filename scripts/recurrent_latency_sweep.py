@@ -189,10 +189,11 @@ def main(argv: list[str] | None = None) -> int:
     growth = {m: round(_growth(m), 3) for m in MODES}
 
     print(
-        f"\n[headline] T {lengths[0]}->{lengths[-1]}(x{lengths[-1] / lengths[0]:.0f})の median latency 倍率: "
-        f"GPT x{growth['gpt']}(scaling 指数 p~{exponents['gpt']}, O(T^2)寄り)/ "
-        f"Recurrent x{growth['recurrent']}(p~{exponents['recurrent']}, 線形寄り)/ "
-        f"RWKV x{growth['rwkv']}(p~{exponents['rwkv']})。"
+        f"\n[headline] T {lengths[0]}->{lengths[-1]}(x{lengths[-1] / lengths[0]:.0f}) scaling 指数 p "
+        f"(min ベース=混雑に強い / 括弧内 median): "
+        f"GPT p~{exponents_min['gpt']}({exponents['gpt']}, O(T^2)寄り)/ "
+        f"Recurrent p~{exponents_min['recurrent']}({exponents['recurrent']}, 線形寄り)/ "
+        f"RWKV p~{exponents_min['rwkv']}({exponents['rwkv']})。"
     )
     print(
         "[honest] cross-mode の絶対 ms は比較不可(recurrent は Python per-step ループ=インタプリタ律速、"
