@@ -938,3 +938,25 @@
 - **捕捉・訂正した誤り 2 件**(Hermes 数値/Gemma 時系列)はいずれも seed 由来。「数字を疑う」(s2)を自分の引用に適用し実検証で潰した。
 - 残る未照合は s2 の Cosmos Table 10 個別スコア(Driving 79.3 等)のみで、これは s2 本文で「一次未照合」と明示済み(技報 PDF 取得が前提)。
 - → **連載は内部整合(リンク/数値/引用シンボル)+ 外部事実(arXiv ID/ライセンス/主要数値)の両面で検証済み**。公開前 QA は実質完了。残るは外部公開(human gate)のみ。
+
+---
+
+## ★2026-06-21 セッション収束 — handoff サマリ(次セッション/人間はここだけ読めば足りる)
+
+### このセッションで完了(全て local commit、push なし)
+1. **NAS proxy-v2 走** 完了処理: verdict=suppressed / HV gain +16.8% / regime 256→1024、`nas_pareto_report.py` でレポート生成。
+2. **eval_cache cross-machine resume 堅牢化**(`_meta_matches`: path basename + base_nll 1e-3 tol)。回帰6件 + 全unit **991 passed**。commit `b11a235`。
+3. **needle/2048 offload** を push 手前まで構築(GH Actions `nas-needle-offload.yml` + `ci/fixtures/` 580KB prefix + eval_cache、fail-fast、resume をローカル実証)。commit `1853d0b`。
+4. **連載「自宅CPUから見た2026年6月のLLM業界」= 全16記事 × 技術/一般 = 32ドラフト + SERIES_INDEX**。A系(a7/a8/a9/a11)/ B系(b1-b7)/ S系(s1/s2)/ C系(c1/c2/c3)。
+5. **三層内部QA**(リンク切れ0 / 技術↔一般 数値整合 / 引用パス14・シンボル8 全実在)合格。
+6. **外部事実 web 検証**: MangaFlow/Gemma4/Cosmos3/PaddleOCR/Hermes を照合、**誤り2件訂正**(Hermes star 196,554→数万・作成2025-07→2026-02 / Gemma4「同じ週」→4月)。
+7. **可視化SVG 2本**(b2 二段構造図 / a8 メモリ膨張グラフ、静的フレーム完成形)。
+8. **seed bank 保全**: #63(cross-machine resume)/ #64(RAM律速offloadの最小集合化)/ #12 一次再確認。
+
+### 人間承認が必要な保留事項(= 次に人間が決めること)
+- **A. 記事の外部公開**(Qiita 投稿): SVG を raw 絶対URL化 + 挿絵 verify-by-content(`PANEL_PLACEMENT_PLAN.md`)+ C系外部事実の最終条文確認。**外部公開=human gate**。
+- **B. needle/2048 実走**: `git push` で workflow+fixtures を public remote へ → `gh workflow run nas-needle-offload` → 結果で b2 §5 の needle/2048 を実数値化。**push=human gate**(LLTERM_CHOICE 既出・未回答)。
+- **C. Kaggle kernel push**(llcore-lm-compare、別系統): 従来どおり human gate 継続。
+
+### 次セッションの最初の一手
+- 上記 A/B/C いずれかの human 承認があれば即実行。無ければ、ローカル完結の高価値タスクは枯渇しているため、新規方向(新実験/新記事ネタ)の指示を待つのが妥当。低価値タスクの量産は `feedback_benchmark_honest_disclosure` / quality-over-volume に反するため行わない。
