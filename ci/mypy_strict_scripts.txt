@@ -8,6 +8,7 @@
 # Add a script here once `mypy <file> --strict` (and the batch) is clean; never remove a file
 # to silence an error — fix the error instead.
 scripts/annotation_generation_poc.py
+scripts/annotation_poc.py
 scripts/build_aozora_corpus.py
 scripts/build_kaggle_lm_compare_bundle.py
 scripts/chat_endurance_probe.py
@@ -34,7 +35,9 @@ scripts/p1_prepare_aozora.py
 scripts/poc_0a_state_update_gene.py
 scripts/poc_1a_z3_invariant.py
 scripts/poc_1b_lipschitz_invariant.py
+scripts/poc_2a_factor_hook_mock.py
 scripts/poc_3a_marabou_bridge_skeleton.py
+scripts/poc_branch_a_memory_fitness.py
 scripts/prepare_kaggle_lm_compare_bundle.py
 scripts/qat_train.py
 scripts/quant_bitwidth_sweep.py

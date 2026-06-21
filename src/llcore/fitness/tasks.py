@@ -81,10 +81,16 @@ class SyntheticTask(Protocol):
     の task-specific error は raw_error 内で定義し、score もそれを使う)。
     """
 
-    name: str
-    seq_len: int
-    state_dim: int
-    out_dim: int
+    # read-only property で宣言する: 実装側 (CopyTask/AdditionTask) は frozen dataclass
+    # (read-only 属性) なので、settable な素の ``name: str`` だと構造的に適合しない。
+    @property
+    def name(self) -> str: ...
+    @property
+    def seq_len(self) -> int: ...
+    @property
+    def state_dim(self) -> int: ...
+    @property
+    def out_dim(self) -> int: ...
 
     def generate(self, rng: np.random.Generator) -> tuple[np.ndarray, np.ndarray]:
         """入力列 (L, state_dim) と target (..., out_dim) を返す."""

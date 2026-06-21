@@ -27,6 +27,7 @@ import json
 import sys
 import time
 from pathlib import Path
+from typing import Any
 
 _ROOT = Path(__file__).resolve().parents[1]
 _SRC = _ROOT / "src"
@@ -109,7 +110,7 @@ def main() -> int:
 
     # 2. 連結性クエリ (定性)
     ann = store.annotations
-    connectivity: dict[str, list] = {}
+    connectivity: dict[str, list[Any]] = {}
     print("\n=== 連結性クエリ (近傍 top3) ===", flush=True)
     for q in CONNECTIVITY_QUERIES:
         hits = [(ann[i], round(s, 4)) for i, s in store.query(q, k=3)]
@@ -119,7 +120,7 @@ def main() -> int:
             print(f"     {s:+.4f}  {a[:70]}", flush=True)
 
     # 3. cross-modal: 図形画像 → 最近傍アノテーション (同一空間の確認)
-    cross_modal: dict[str, list] = {}
+    cross_modal: dict[str, list[Any]] = {}
     if SHAPE_IMAGES:
         import numpy as np
 
