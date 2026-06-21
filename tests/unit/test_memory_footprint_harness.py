@@ -60,7 +60,9 @@ def test_system_memory_snapshot_keeps_system_values_when_process_probe_fails(
         def __getattr__(self, name: str) -> Any:
             return getattr(self._kernel, name)
 
-    monkeypatch.setattr(harness.ctypes, "WinDLL", _FakeWinDLL)
+    # raising=False: off-Windows(Linux CI 等)では ctypes に WinDLL 属性が無いので、
+    # 既存属性の置換でなく新規注入を許す。偽 WinDLL を入れるテストなので OS 非依存に動く。
+    monkeypatch.setattr(harness.ctypes, "WinDLL", _FakeWinDLL, raising=False)
     monkeypatch.setattr(harness, "_process_memory", lambda: None)
 
     snapshot = harness._system_memory_snapshot()
