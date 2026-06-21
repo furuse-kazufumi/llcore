@@ -1196,3 +1196,21 @@
   - 抽出ワンライナー: `py -3.11 -c "import json;r=json.load(open('out/needle_offload/nas_pareto.json'));p=r['proxy_v2'];print('sweep',p['context_sweep']);print('needle',p['needle'])"`
 - **統合アンカー(検証済・正確)**: `docs/articles/drafts/b2-suppress-your-win.md` **L137**(`256:0.761→512:1.012→1024:1.182` の続きに 2048 追記)+ **L138**(「GPU オフロード→未検証」叙述を「GH Actions 7GB で実測」に書換、loop 完結)。SVG `assets/articles/llcore_suppress_win.svg` **L51-52**(`needle→UNTESTED`)を実測へ。
 - 完了確認: 「Assert GA was resumed」step success = 26h 再走でなく eval_cache resume の証。
+
+## ★2026-06-22 EXIT(3) — 再開地点(canonical / コンテキスト上限近接で退避)
+- **HEAD=`6238d3d`。全成果 local commit 済、push なし。作業ツリーは `docs/SESSION_SUMMARY.md`(自動生成)以外 clean。** ブランチ `feat/lm-recurrent`。
+- **最優先の継続タスク = needle 結果の回収と統合(ジョブ実行中)**:
+  - **GH Actions run `27918958686`(tag needle-run-2)= まだ `in_progress`**(本セッション通算 ~1h 監視、compute step「Run rigorous tier + needle + 2048 sweep」が長時間継続中。2-3h 想定の範囲内)。
+  - **背景監視は再起動が必要**: 本セッションで起動した `gh run watch` タスク `b5n1ng507` はセッション終了で失われる(前任 bb0w5sh47 も同様に消失した)。**新セッション開始時に必ず `gh run view 27918958686 --json status,conclusion` で生死確認** → まだ in_progress なら `gh run watch 27918958686 --exit-status` を background 起動し直す。
+  - **完了後の統合手順(下調べ完了・このファイル上部の『needle 結果の抽出レシピ』節に詳細)**:
+    1. `gh run download 27918958686 -D out/needle_offload`(artifact 名 `nas-needle-results` = `nas_pareto.json` + `nas_pareto_report.md`)。
+    2. 「Assert GA was resumed」step success 確認(26h 再走でなく eval_cache resume の証)。
+    3. 抽出ワンライナー: `py -3.11 -c "import json;r=json.load(open('out/needle_offload/nas_pareto.json'));p=r['proxy_v2'];print('sweep',p['context_sweep']);print('needle',p['needle'])"` → context_sweep の **2048**(+4096)Δnll と needle/passkey retrieval を取得。
+    4. **`docs/articles/drafts/b2-suppress-your-win.md` L137**(`256:0.761→512:1.012→1024:1.182` の続きに 2048 追記)+ **L138**(「GPU オフロード→未検証」を「GH Actions 7GB で実測」に書換、loop 完結)。
+    5. **`assets/articles/llcore_suppress_win.svg` L51-52**(`needle→UNTESTED`)を実測へ。
+    6. 数値は report/JSON と一致検証、honest 留保(proxy nll / paired bootstrap CI)継承。
+    7. **公開前の補強候補**(任意): `docs/ARTICLE_SEEDS.md` 末尾に記録した RAD 先行研究2件(doc_0592 線形再帰の代数的減衰証明 / doc_0530 NIAH deceptive saturation)を b2 §137 の関連研究 or needle 留保に一文引用。
+  - **run が失敗していたら**: `gh run view 27918958686 --log-failed`。既知の落とし穴は解消済(huggingface-cli→hf, dispatch 403→tag-trigger)。新 tag `needle-run-3` push で再起動可。
+- **本セッションの追加成果(commit)**: `ba845e8`(needle 抽出レシピ + 統合アンカーを下調べ・記録)/ `6238d3d`(b2 を裏付ける RAD 先行研究2件を ARTICLE_SEEDS に記録)。いずれも待機中の準備作業。コード変更なし・回帰なし。
+- **human gate(未消化)**: A=Qiita 公開(SVG raw URL 化)/ C=Kaggle push。B=needle は実行中。
+- **方針**: 指示なき薄い量産はしない(quality-over-volume)。needle 完了 or 新題材指示で再開。
