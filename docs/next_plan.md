@@ -963,7 +963,7 @@
 
 ### 2026-06-21 追記 — RAD コーパス接地(差別化軸の再確認 + 引用候補)
 連載の prior-art 主張を RAD コーパス(`D:/docs/*_corpus_v2/`)と突合(車輪の再発明チェック)。**差別化軸は健全=本連載の新規性は手法でなく「honest-disclosure 層/運用 gate/会計規律」にある**ことを再確認。以下は filename レベル一致の**引用候補(未精読・公開前に要精読)**:
-- **b2/b7(proxy NAS)**: `evolutionary_computation_corpus_v2/.../doc_0055 Efficient Multi-Objective NAS`(MTF-PDNS 系、seed 既出と整合)。差別化=proxy の不確実性を測って verdict を律する層。
+- **b2/b7(proxy NAS)**: `evolutionary_computation_corpus_v2/.../doc_0055 Efficient Multi-Objective NAS`(MTF-PDNS 系、seed 既出と整合)。差別化=proxy の不確実性を測って verdict を律する層。 → **2026-06-21 精読(=arXiv:2407.20656 Vo&Luong 2024 本体と確認)。abstract が proxy-noise trade-off を明言、MTF-PDNS の対処は novelty/多様性探索 ⇄ b2 は不確実性定量化+verdict 抑制=解の系統が別、を b2 本文に読了根拠付きで反映。**
 - **a7/a8(定数状態 long-context)**: `llm_corpus_v2/.../doc_1139 From History to State: Constant-Context Skill Learning`(constant-context、近接) → **2026-06-21 精読し a7 参照節に正確引用へ昇格(arXiv:2605.05413, context-to-weights で prompt token 2-7×削減, クロスドメイン傍証)**、`llm_corpus_v2/cluster_00_quantization/doc_0469 TurboESM 3-Bit KV Cache`(KV cache メモリ)。差別化=自宅 CPU 実機 peak RSS でのトレンド実証。
 - **b4(Z3/SDP 収縮 gate)**: `formal_methods_corpus_v2/2604.03017 Compositionality of Lyapunov functions via assume-guarantee`(Lyapunov、直結)。差別化=学習ループの安全 gate への応用 + 経験 gate 84% vs sound 0% の判別力計測。
 - **b7(CEGIS)**: `formal_methods_corpus_v2/2604.24540 Counterexample-Guided Interval Weakening`(CEGIS 系)。

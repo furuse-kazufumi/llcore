@@ -50,7 +50,9 @@
 
 メモリvs品質の探索で、一つ一つの候補を本気で評価する(長文を生成させて人間が品質を見る)のは高すぎる。だから **proxy(代理指標)**を使います。今回は「次トークンの予測困惑度」。これは安いが**ノイジー**で、実性能とよくズレます。
 
-多目的 Pareto NAS・novelty/QD 探索・training-free な fitness proxy は、もう確立領域です(例:MTF-PDNS, arXiv:2407.20656)。そしてその文献自身が **「training-free / proxy 指標は actual performance としばしば乖離する(proxy-noise trade-off)」**とはっきり書いています。つまり「proxy が勝ちと言った」だけでは、何も確定していない。
+多目的 Pareto NAS・novelty/QD 探索・training-free な fitness proxy は、もう確立領域です(例:MTF-PDNS = Pareto Dominance-based Novelty Search with Multiple Training-Free metrics, Vo & Luong, arXiv:2407.20656, 2024)。そしてその論文自身が **「performance objectives do not fully align with the actual performance ... as is often the case with training-free metrics(proxy 指標は actual performance としばしば乖離する=proxy-noise trade-off)」**とはっきり書いています。つまり「proxy が勝ちと言った」だけでは、何も確定していない。
+
+ここで車輪の再発明でないことを明確にしておきます。**MTF-PDNS のこの問題への対処は「novelty/多様性スコアで探索空間を広く保つ」**こと —— noisy な proxy に引きずられて早期収束しないよう、多様性で逃げる戦略です。**本作業の対処はまったく別方向で、「proxy の不確実性そのものを定量化して、勝ちの主張を抑制する」**(後述の bootstrap CI / holdout / verdict 抑制)。同じ「proxy は noisy」という既知の出発点に対し、片や**多様性で対処**、片や**不確実性を測って主張を律する**。解の系統が違うので、これは確立領域の焼き直しではありません。
 
 ### 落とし穴 B:winner's curse(勝者の呪い)
 
