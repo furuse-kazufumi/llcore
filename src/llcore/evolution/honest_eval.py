@@ -22,7 +22,11 @@ semver: 新規追加のみ。既存シンボル不変。
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Callable, Optional
+from typing import TYPE_CHECKING, Callable, Optional
+
+if TYPE_CHECKING:
+    from llcore.kernel.protocol import GeneCodec
+    from llcore.state_update import StateUpdateGene
 
 import numpy as np
 
@@ -33,7 +37,7 @@ from .minimal_ga import (
 )
 
 try:
-    from scipy.stats import wilcoxon as _scipy_wilcoxon
+    from scipy.stats import wilcoxon as _scipy_wilcoxon  # type: ignore[import-untyped]
     _HAS_SCIPY = True
 except ImportError:  # pragma: no cover - scipy は optional
     _HAS_SCIPY = False
@@ -173,7 +177,7 @@ def _paired_p(ga: np.ndarray, rand: np.ndarray) -> float:
 def evolution_vs_random(
     eval_once: EvalOnce,
     *,
-    codec: Optional[object] = None,
+    codec: Optional[GeneCodec[StateUpdateGene]] = None,
     pop_size: int = 10,
     n_generations: int = 10,
     elitism: int = 1,

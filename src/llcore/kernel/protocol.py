@@ -31,6 +31,8 @@ from llcore.verifier import ChangeOp, InvariantResult
 
 # gene 型は kernel ごとに異なる (RWKV=StateUpdateGene, SNN=LIFGene, ...)。
 GeneT = TypeVar("GeneT")
+# VerifierBackend は gene を入力位置でのみ使う (戻り値に出さない) ため contravariant 版を使う。
+GeneT_contra = TypeVar("GeneT_contra", contravariant=True)
 
 
 @dataclass(frozen=True, eq=False)
@@ -147,7 +149,7 @@ class Kernel(Protocol[GeneT]):
 
 
 @runtime_checkable
-class VerifierBackend(Protocol[GeneT]):
+class VerifierBackend(Protocol[GeneT_contra]):
     """per-gene online gate. 進化ループから 1 gene ずつ呼ばれる Z3 invariant 検査.
 
     戻り値は本流 :class:`InvariantResult` に正規化する (設計 doc 補足 Finding:
@@ -156,7 +158,7 @@ class VerifierBackend(Protocol[GeneT]):
 
     name: str
 
-    def verify_gene_safe(self, gene: GeneT) -> InvariantResult:
+    def verify_gene_safe(self, gene: GeneT_contra) -> InvariantResult:
         """gene が安全 invariant を破らないか検査. ``ok=True`` で進化集団に admit."""
         ...
 

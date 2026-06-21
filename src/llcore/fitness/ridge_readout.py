@@ -37,10 +37,11 @@ semver: 新規 module 追加のみ。既存シンボル不変。
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Callable
+from typing import Callable, cast
 
 import numpy as np
 
+from llcore.fitness.tasks import SyntheticTask
 from llcore.state_update import StateUpdateGene, run_sequence
 
 # ridge fitness を falsification harness (honest_eval.evolution_vs_random) に渡すための
@@ -84,7 +85,8 @@ class RidgeReadout:
             )
         aug = np.concatenate([s, np.ones((s.shape[0], 1))], axis=1)  # (N, D+1)
         pred = aug @ self.weight_aug  # (N, out_dim)
-        return pred[0] if single else pred
+        out: np.ndarray = pred[0] if single else pred
+        return out
 
 
 def fit_ridge_readout(
@@ -143,7 +145,7 @@ def fit_ridge_readout(
 
 def _collect_states_targets(
     gene: StateUpdateGene,
-    task: object,
+    task: SyntheticTask,
     n: int,
     rng: np.random.Generator,
 ) -> tuple[np.ndarray, np.ndarray]:
@@ -160,7 +162,7 @@ def _collect_states_targets(
 
 def ridge_fitness(
     gene: StateUpdateGene,
-    task: object,
+    task: SyntheticTask,
     *,
     n_train: int = 64,
     n_eval: int = 64,
@@ -212,7 +214,7 @@ def ridge_fitness(
 
 
 def make_ridge_eval_once(
-    task: object,
+    task: SyntheticTask,
     *,
     n_train: int = 64,
     n_eval: int = 64,
@@ -233,8 +235,10 @@ def make_ridge_eval_once(
     """
 
     def eval_once(gene: object, rng: np.random.Generator) -> float:
+        # コールバック契約は gene: object (任意 gene 型を受ける); 進化ループは常に
+        # StateUpdateGene を渡すため cast で具体型へ narrow する。
         return ridge_fitness(
-            gene, task,
+            cast(StateUpdateGene, gene), task,
             n_train=n_train, n_eval=n_eval, ridge_lambda=ridge_lambda, rng=rng,
         )
 
