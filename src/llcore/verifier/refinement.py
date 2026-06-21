@@ -61,9 +61,10 @@ honest 留保:
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Any
 
 try:
-    import z3
+    import z3  # type: ignore[import-untyped]
     _HAS_Z3 = True
 except ImportError:
     _HAS_Z3 = False
@@ -146,7 +147,7 @@ def _build_state_next(  # type: ignore[no-untyped-def]
     return decay * s + (1 - decay) * tanh_val
 
 
-def _add_tanh_bounds(solver, tanh_val):  # type: ignore[no-untyped-def]
+def _add_tanh_bounds(solver: Any, tanh_val: Any) -> None:
     """tanh の sound bound を solver に加える: |tanh| <= 1.
 
     PoC 1a の全域証明と同様、free in [-1,1] で sound over-approx を使う。
@@ -154,9 +155,9 @@ def _add_tanh_bounds(solver, tanh_val):  # type: ignore[no-untyped-def]
     solver.add(tanh_val >= -1, tanh_val <= 1)
 
 
-def _state_next_expr(  # type: ignore[no-untyped-def]
-    gene_decay, gene_mix, gene_gate, s, x, tanh_val
-):
+def _state_next_expr(
+    gene_decay: Any, gene_mix: Any, gene_gate: Any, s: Any, x: Any, tanh_val: Any
+) -> Any:
     """sound 上界用の |s_next| 表現を返す.
 
     gene_* は z3 RealVal (具体 gene)、s/x/tanh_val は z3 Real (自由変数)。
@@ -257,7 +258,7 @@ def verify_refinement_single(
     if result == z3.sat:
         m = solver.model()
 
-        def _f(v):  # type: ignore[no-untyped-def]
+        def _f(v: Any) -> Any:
             ev = m.eval(v, model_completion=True)
             try:
                 return float(ev.as_decimal(10).rstrip("?"))
@@ -366,7 +367,7 @@ def verify_composition(
     if result == z3.sat:
         m = solver.model()
 
-        def _f(v):  # type: ignore[no-untyped-def]
+        def _f(v: Any) -> Any:
             ev = m.eval(v, model_completion=True)
             try:
                 return float(ev.as_decimal(10).rstrip("?"))

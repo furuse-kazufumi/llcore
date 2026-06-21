@@ -26,7 +26,10 @@ honest 留保:
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Sequence
+from typing import TYPE_CHECKING, Protocol, Sequence, runtime_checkable
+
+if TYPE_CHECKING:
+    from llcore.state_update import StateUpdateGene
 
 
 # ChangeOp op_type 値域。enum でなく文字列 literal で扱う (Z3 構築側で
@@ -159,7 +162,7 @@ def kernel_swap_mock(swap: bool) -> ChangeOp:
 
 def apply_changeop(
     gene: "StateUpdateGeneLike", op: ChangeOp
-) -> "StateUpdateGeneLike":
+) -> "StateUpdateGene":
     """ChangeOp を gene に適用した新 gene を返す (純関数, side effect なし).
 
     Parameters
@@ -203,12 +206,18 @@ def apply_sequence(
     return g
 
 
-# Type alias を表す Protocol は同 module 内では不要 (StateUpdateGene 自体を使う)。
-# 静的解析向けに forward reference を残す。
-class StateUpdateGeneLike:  # pragma: no cover - typing-only proto
-    decay: float
-    mix: float
-    gate_str: float
+# 構造的 (duck) typing 用 Protocol。``decay`` / ``mix`` / ``gate_str`` を持つ任意の
+# gene (``StateUpdateGene`` 等) が nominal 継承なしに適合する。typing 専用で実体化しない。
+@runtime_checkable
+class StateUpdateGeneLike(Protocol):  # pragma: no cover - typing-only proto
+    # read-only property で宣言する点が重要: ``StateUpdateGene`` は frozen dataclass
+    # (read-only 属性) なので、settable な素の ``decay: float`` 宣言だと構造的に適合しない。
+    @property
+    def decay(self) -> float: ...
+    @property
+    def mix(self) -> float: ...
+    @property
+    def gate_str(self) -> float: ...
 
 
 # Convenience: arbitrary length sequence generator (curriculum 等で使う)
