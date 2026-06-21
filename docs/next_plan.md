@@ -1173,3 +1173,16 @@
   6. b2 一般版は needle 非言及ゆえ原則据置(必要なら平易に一文追記)。
   7. 数値は report/JSON と一致検証、honest 留保(proxy nll / paired bootstrap CI 等)を継承。
 - 一般版 b2 は needle/2048 を引用していないため対象外。findings は needle 専用節が無ければ b2 側で完結。
+
+## ★2026-06-22 EXIT — 再開地点(canonical)
+- **全成果 local commit 済。HEAD=`729fdb3`。** push 済(承認範囲): `feat/lm-recurrent`(origin) + tags `needle-run-1/2`・`latency-run-1`、`main` に nas-needle workflow 登録。作業ツリーは `docs/SESSION_SUMMARY.md`(自動生成)以外 clean。
+- **最優先の継続タスク = needle 結果の回収と統合(進行中ジョブ待ち)**:
+  - **GH Actions run `27918958686`(tag needle-run-2)= 実行中**(rigorous tier + 2048 context-sweep + needle、committed eval_cache から resume)。実時間で 2-3h step の途中。背景タスク **bb0w5sh47**(`gh run watch`)が完了時に自動再呼び出し。
+  - **完了後の手順(既に上の『needle 結果の統合ポイント』節に7手順で詳細化済)**: `gh run view 27918958686 --json conclusion` 確認 → `gh run download 27918958686 -D out/needle_offload` → 「Assert GA was resumed」success 確認 → nas_pareto.json から **2048(4096)Δnll + needle/passkey retrieval** 抽出 → **`docs/articles/drafts/b2-suppress-your-win.md` §137-138 の「未検証」を実測値へ**(256:0.761→512:1.012→1024:1.182 の続きに 2048 追記、honest 叙述「溢れを測る機械が溢れた→オフロードで実測」で loop 完結)→ **`assets/articles/llcore_suppress_win.svg`** の `needle→UNTESTED/未検証`(line 51-52)更新 → 数値一致検証。
+  - **もし run が失敗していたら**: ログ確認(`gh run view 27918958686 --log-failed`)。既知の落とし穴は解消済(huggingface-cli→hf, dispatch 403→tag-trigger)。新 tag `needle-run-3` を push して再起動可。
+- **本セッションの主要成果(参考)**:
+  1. **mypy --strict を src+scripts 全 126ファイルで 0 達成**(allowlist 廃止 → `mypy src scripts` whole-dir、pyproject `platform='win32'`/onnx override/loader cast で cross-platform 対応)。**CI(`.github/workflows/ci.yml`)= lint+mypy strict が Linux で green** 実証。full unit suite は Windows API+モデル DL で非可搬ゆえローカル担保(1013 passed)。
+  2. **decode 軸新設 + amortization を 1 ラン airtight 計測**(`scripts/decode_latency_sweep.py` + テスト): recurrent/RWKV は prefill O(T)→decode O(1)、GPT は prefill≒decode(分離不可)。**クリーン runner(GH Actions 7GB)で再測**し contention 排除、**GPT prefill 指数 1.372 ≒ decode 1.365 一致**=「cache 無 decode は prefill と同一計算」の決定的証拠。a7/findings/SVG2枚/seed を clean 値で整合更新。
+  3. PEP 561 `py.typed` 追加(型を出荷)、test 1件可搬化(`729fdb3`)。
+- **human gate(未消化)**: A=Qiita 公開(SVG raw URL 化)/ C=Kaggle push。B=needle は実行中。
+- **方針**: 指示なき薄い量産はしない(quality-over-volume)。needle 完了通知 or 新題材指示で再開。
