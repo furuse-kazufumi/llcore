@@ -18,8 +18,12 @@ scripts/mmap_ram_exceed_poc.py
 scripts/mmap_weights_poc.py
 scripts/clip_smoke.py
 scripts/connectivity_retrieval_poc.py
+scripts/evolve_linearization.py
+scripts/gptq_compare.py
+scripts/int8_quant_footprint.py
 scripts/kaggle_bundle_preflight.py
 scripts/kaggle_push_readiness.py
+scripts/nas_level2.py
 scripts/nas_pareto.py
 scripts/nas_pareto_report.py
 scripts/p1_compare.py
@@ -32,6 +36,9 @@ scripts/poc_1a_z3_invariant.py
 scripts/poc_1b_lipschitz_invariant.py
 scripts/poc_3a_marabou_bridge_skeleton.py
 scripts/prepare_kaggle_lm_compare_bundle.py
+scripts/qat_train.py
+scripts/quant_bitwidth_sweep.py
+scripts/quant_group_compare.py
 scripts/rad_full_probes.py
 scripts/recurrent_latency_sweep.py
 scripts/runtime_floor_rss.py

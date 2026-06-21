@@ -43,16 +43,16 @@ import torch
 from torch import Tensor, nn
 from torch.nn import functional as F
 
-from llcore.lm.data import encode_corpus, train_val_split  # type: ignore[import-untyped]
-from llcore.lm.eval import (  # type: ignore[import-untyped]
+from llcore.lm.data import encode_corpus, train_val_split
+from llcore.lm.eval import (
     held_out_report_any,
     held_out_top1_report,
     passes_capability_gate,
     passes_gate,
 )
-from llcore.lm.model import CharGPT, GPTConfig  # type: ignore[import-untyped]
-from llcore.lm.tokenizer import CharTokenizer  # type: ignore[import-untyped]
-from llcore.lm.trainer import Trainer, TrainConfig  # type: ignore[import-untyped]
+from llcore.lm.model import CharGPT, GPTConfig
+from llcore.lm.tokenizer import CharTokenizer
+from llcore.lm.trainer import Trainer, TrainConfig
 
 MODEL_PRESETS = {
     "smoke": {"n_layer": 4, "n_head": 4, "n_embd": 128, "block_size": 64},

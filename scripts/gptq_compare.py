@@ -41,15 +41,15 @@ from typing import Any
 import torch
 from torch import Tensor, nn
 
-from llcore.lm.data import train_val_split  # type: ignore[import-untyped]
-from llcore.lm.eval import (  # type: ignore[import-untyped]
+from llcore.lm.data import train_val_split
+from llcore.lm.eval import (
     held_out_report_any,
     held_out_top1_report,
     passes_capability_gate,
     passes_gate,
 )
-from llcore.lm.model import CharGPT, GPTConfig  # type: ignore[import-untyped]
-from llcore.lm.tokenizer import CharTokenizer  # type: ignore[import-untyped]
+from llcore.lm.model import CharGPT, GPTConfig
+from llcore.lm.tokenizer import CharTokenizer
 
 
 def _per_row_scale(w: Tensor, bits: int) -> Tensor:

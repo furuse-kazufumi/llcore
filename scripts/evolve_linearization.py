@@ -78,7 +78,7 @@ def main(argv: list[str] | None = None) -> int:
     print(f"[load] {n_layer} layers in {time.perf_counter()-t0:.0f}s", flush=True)
 
     text = Path(args.text_file).read_text(encoding="utf-8")[50000:]
-    ids = tok(text, return_tensors="pt").input_ids[:, : args.n_tokens]  # type: ignore[operator]
+    ids = tok(text, return_tensors="pt").input_ids[:, : args.n_tokens]
     base = _nll(model, ids)
     print(f"[base] softmax nll={base:.4f} ppl={torch.tensor(base).exp():.2f}  eval_tokens={ids.size(1)}", flush=True)
 
@@ -100,7 +100,7 @@ def main(argv: list[str] | None = None) -> int:
         saved = _set_linear(model, idxs)
         dn = _nll(model, ids) - base
         _restore(model, saved)
-        f = float(len(idxs)) - args.penalty * max(0.0, dn - args.budget)
+        f: float = float(len(idxs)) - args.penalty * max(0.0, dn - args.budget)
         cache[genome] = f
         evals["n"] += 1
         return f

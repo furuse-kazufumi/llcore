@@ -42,10 +42,10 @@ from typing import Any
 import torch
 from torch import Tensor, nn
 
-from llcore.lm.data import train_val_split  # type: ignore[import-untyped]
-from llcore.lm.eval import held_out_report_any, passes_gate  # type: ignore[import-untyped]
-from llcore.lm.model import CharGPT, GPTConfig  # type: ignore[import-untyped]
-from llcore.lm.tokenizer import CharTokenizer  # type: ignore[import-untyped]
+from llcore.lm.data import train_val_split
+from llcore.lm.eval import held_out_report_any, passes_gate
+from llcore.lm.model import CharGPT, GPTConfig
+from llcore.lm.tokenizer import CharTokenizer
 
 INT8_MAX = 127
 SCHEMES = ("per_tensor", "per_channel")
