@@ -568,6 +568,7 @@ def main(argv: list[str] | None = None) -> int:
 
     elapsed = time.perf_counter() - te
     report["elapsed_s"] = elapsed
+    save_eval_cache(cache_path, cache, fast_delta_cache, run_meta)  # final snapshot (resume future re-runs)
     (out / "nas_pareto.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
 
     print("\n[zero-shot greedy frontier]")
