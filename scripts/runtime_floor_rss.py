@@ -31,51 +31,16 @@ honest 留保
 from __future__ import annotations
 
 import argparse
-import ctypes
 import json
 import statistics
 import sys
 from pathlib import Path
 from typing import Any, cast
 
+from llcore.runtime.rss import working_set_bytes as _working_set_bytes  # type: ignore[import-untyped]
+
 RESULT_PREFIX = "RESULT_JSON="
 STAGES = ("python", "torch", "model")
-
-
-class _PMC(ctypes.Structure):
-    # PROCESS_MEMORY_COUNTERS — mirrors recurrent_runtime_rss.py.
-    _fields_ = [
-        ("cb", ctypes.c_uint32), ("PageFaultCount", ctypes.c_uint32),
-        ("PeakWorkingSetSize", ctypes.c_size_t), ("WorkingSetSize", ctypes.c_size_t),
-        ("QuotaPeakPagedPoolUsage", ctypes.c_size_t), ("QuotaPagedPoolUsage", ctypes.c_size_t),
-        ("QuotaPeakNonPagedPoolUsage", ctypes.c_size_t), ("QuotaNonPagedPoolUsage", ctypes.c_size_t),
-        ("PagefileUsage", ctypes.c_size_t), ("PeakPagefileUsage", ctypes.c_size_t),
-    ]
-
-
-def _working_set_bytes() -> int:
-    """現在の working set(RSS)バイト。Windows 優先、非 Windows は /proc フォールバック。"""
-    try:
-        import ctypes.wintypes as wt
-
-        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
-        psapi = ctypes.WinDLL("psapi", use_last_error=True)
-        kernel32.GetCurrentProcess.restype = wt.HANDLE
-        psapi.GetProcessMemoryInfo.argtypes = [wt.HANDLE, ctypes.POINTER(_PMC), wt.DWORD]
-        psapi.GetProcessMemoryInfo.restype = wt.BOOL
-        c = _PMC()
-        c.cb = ctypes.sizeof(c)
-        ok = psapi.GetProcessMemoryInfo(kernel32.GetCurrentProcess(), ctypes.byref(c), c.cb)
-        if ok:
-            return int(c.WorkingSetSize)
-    except Exception:  # noqa: BLE001 - 非 Windows / 取得失敗時はフォールバックへ
-        pass
-    try:
-        with open("/proc/self/statm", encoding="ascii") as fh:
-            rss_pages = int(fh.read().split()[1])
-        return rss_pages * 4096
-    except Exception:  # noqa: BLE001 - RSS は取れなくても 0 で続行
-        return 0
 
 
 def run_stage(stage: str, n_embd: int, n_layer: int, n_head: int, vocab: int) -> dict[str, Any]:

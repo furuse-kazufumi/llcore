@@ -31,7 +31,6 @@ honest 留保
 from __future__ import annotations
 
 import argparse
-import ctypes
 import json
 import sys
 from pathlib import Path
@@ -42,37 +41,10 @@ import torch
 from llcore.lm.model import CharGPT, GPTConfig  # type: ignore[import-untyped]
 from llcore.lm.recurrent import RecurrentConfig, RecurrentLM  # type: ignore[import-untyped]
 from llcore.lm.rwkv import RWKVConfig, RWKVLM  # type: ignore[import-untyped]
+from llcore.runtime.rss import peak_working_set_bytes as _peak_working_set_bytes  # type: ignore[import-untyped]
 
 RESULT_PREFIX = "RESULT_JSON="
 MODES = ("gpt", "recurrent", "rwkv")
-
-
-class _PMC(ctypes.Structure):
-    # PROCESS_MEMORY_COUNTERS — mirrors the other memory harnesses.
-    _fields_ = [
-        ("cb", ctypes.c_uint32), ("PageFaultCount", ctypes.c_uint32),
-        ("PeakWorkingSetSize", ctypes.c_size_t), ("WorkingSetSize", ctypes.c_size_t),
-        ("QuotaPeakPagedPoolUsage", ctypes.c_size_t), ("QuotaPagedPoolUsage", ctypes.c_size_t),
-        ("QuotaPeakNonPagedPoolUsage", ctypes.c_size_t), ("QuotaNonPagedPoolUsage", ctypes.c_size_t),
-        ("PagefileUsage", ctypes.c_size_t), ("PeakPagefileUsage", ctypes.c_size_t),
-    ]
-
-
-def _peak_working_set_bytes() -> int:
-    try:
-        import ctypes.wintypes as wt
-
-        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
-        psapi = ctypes.WinDLL("psapi", use_last_error=True)
-        kernel32.GetCurrentProcess.restype = wt.HANDLE
-        psapi.GetProcessMemoryInfo.argtypes = [wt.HANDLE, ctypes.POINTER(_PMC), wt.DWORD]
-        psapi.GetProcessMemoryInfo.restype = wt.BOOL
-        c = _PMC()
-        c.cb = ctypes.sizeof(c)
-        ok = psapi.GetProcessMemoryInfo(kernel32.GetCurrentProcess(), ctypes.byref(c), c.cb)
-        return int(c.PeakWorkingSetSize) if ok else 0
-    except Exception:  # noqa: BLE001 - RSS は補助指標、取れなくても続行
-        return 0
 
 
 @torch.no_grad()

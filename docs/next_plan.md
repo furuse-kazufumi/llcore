@@ -1051,3 +1051,9 @@
   - SERIES_INDEX の a7/a8/a9 見出し(a8「文脈4倍でメモリ5倍」=1024→4096区間で正、a9「torch 184MB」=再現~180で整合)は **stale でない**。
   - 他記事(b1/s1 等)に現れる「0.85倍/183/163.9%/5倍」は各記事自身の量子化ゲート数値で、a7/a8/a9 の scaling 値とは別系統 → **クロス記事の数値矛盾ゼロ**。
 - → アーキ編3軸の強化(8 commit)は内部整合を保ったまま着地。架空数値/stale参照の公開事故リスクなし。**変更不要を確認した監査記録**(本ループの成果物はこの検証それ自体)。
+
+### 2026-06-22 追記 — RSS計測の重複を共有モジュールへDRY集約(今セッション分のみ)
+- 今セッションで作った/触れた2ハーネス(recurrent_runtime_rss / runtime_floor_rss)が `_PMC` ctypes構造体 + WinAPI GetProcessMemoryInfo を重複保持していた負債を解消。
+- `src/llcore/runtime/rss.py` 新設(単一情報源): `peak_working_set_bytes()`(PeakWS=プロセス生涯ピーク) / `working_set_bytes()`(WS=現時点, 非Win は /proc フォールバック)。回帰テスト4件(off-Windows時の0/フォールバック挙動含む)。
+- 両ハーネスを共有モジュール利用へ書換。mypy単独green(import-untyped は既存lm慣習に倣い type:ignore)、ruff/16テストgreen、実走smoke一致(torch_tax 179.5)。
+- **スコープ限定(honest)**: `_PMC`/GetProcessMemoryInfo は他5スクリプト(memory_footprint_harness/mmap_*/rad_scale_poc/int8_streaming_infer)にも既存重複するが、今セッションで未検証のため波及させず据え置き=**将来cleanup候補**(回帰リスク回避)。
