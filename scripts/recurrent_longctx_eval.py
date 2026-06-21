@@ -33,6 +33,7 @@ import math
 import statistics
 import sys
 from pathlib import Path
+from typing import Any
 
 import torch
 
@@ -74,7 +75,7 @@ def _disjoint_chunks(ids: torch.Tensor, n_chunks: int, chunk_tokens: int) -> lis
     return out
 
 
-def _correctness_gates(model: RecurrentLM | RWKVLM, probe: torch.Tensor) -> dict[str, object]:
+def _correctness_gates(model: RecurrentLM | RWKVLM, probe: torch.Tensor) -> dict[str, Any]:
     a, _ = model.streaming_nll(probe, chunk_size=64)
     b, _ = model.streaming_nll(probe, chunk_size=256)
     c, _ = model.streaming_nll(probe, chunk_size=1024)
@@ -91,20 +92,20 @@ def _correctness_gates(model: RecurrentLM | RWKVLM, probe: torch.Tensor) -> dict
     }
 
 
-def _aggregate_bands(per_chunk: list[dict[str, object]]) -> list[dict[str, object]]:
+def _aggregate_bands(per_chunk: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Mean +/- std across chunks of each band's mean_nll / ppl / top1 / beats_unigram rate."""
-    by_lo: dict[int, list[dict[str, object]]] = {}
+    by_lo: dict[int, list[dict[str, Any]]] = {}
     for res in per_chunk:
-        for band in res["bands"]:  # type: ignore[index]
-            by_lo.setdefault(int(band["lo"]), []).append(band)  # type: ignore[index,arg-type]
-    out: list[dict[str, object]] = []
+        for band in res["bands"]:
+            by_lo.setdefault(int(band["lo"]), []).append(band)
+    out: list[dict[str, Any]] = []
     for lo in sorted(by_lo):
         bands = by_lo[lo]
         nlls = [float(b["mean_nll"]) for b in bands]
         top1s = [float(b["top1"]) for b in bands]
         n_tok = sum(int(b["n_tok"]) for b in bands)
         mean_nll = statistics.fmean(nlls)
-        row: dict[str, object] = {
+        row: dict[str, Any] = {
             "lo": lo,
             "hi": bands[0]["hi"],
             "n_chunks": len(nlls),
@@ -124,7 +125,7 @@ def _aggregate_bands(per_chunk: list[dict[str, object]]) -> list[dict[str, objec
     return out
 
 
-def _render_band_svg(rows: list[dict[str, object]], gpt_ref: float | None, block_size: int) -> str:
+def _render_band_svg(rows: list[dict[str, Any]], gpt_ref: float | None, block_size: int) -> str:
     xs = [int(r["lo"]) for r in rows]
     ys = [float(r["mean_nll"]) for r in rows]
     if not xs:
@@ -244,17 +245,17 @@ def main(argv: list[str] | None = None) -> int:
     # 1. context-length curve (primary, confound-free) -------------------------------------
     context_lens = _parse_int_list(args.context_lens)
     context_lens = [c for c in context_lens if c < val_ids.numel() - 1]
-    curve = context_length_curve(model, val_ids, context_lens, args.n_positions, args.seed)
+    curve: dict[str, Any] = context_length_curve(model, val_ids, context_lens, args.n_positions, args.seed)
     print("[curve] NLL by available context length (same fixed positions):", flush=True)
-    for c in curve["context_lens"]:  # type: ignore[union-attr]
-        nll = curve["nll_by_context"][c]  # type: ignore[index]
+    for c in curve["context_lens"]:
+        nll = curve["nll_by_context"][c]
         marker = "  <- block_size" if c == block_size else ("  (> block_size = OOD)" if c > block_size else "")
         print(f"        c={c:>5}  nll={nll:.4f}  ppl={math.exp(nll):.2f}{marker}", flush=True)
 
     # 2. banded streaming over disjoint chunks (non-degradation + dispersion) ---------------
     band_edges = _parse_int_list(args.band_edges)
     chunks = _disjoint_chunks(val_ids, args.n_chunks, args.chunk_tokens)
-    per_chunk_bands: list[dict[str, object]] = []
+    per_chunk_bands: list[dict[str, Any]] = []
     carry_vals: list[float] = []
     reset_vals: list[float] = []
     for ch in chunks:
@@ -290,7 +291,7 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     # 4. optional GPT sliding-window baseline ---------------------------------------------
-    gpt_baseline: dict[str, object] | None = None
+    gpt_baseline: dict[str, Any] | None = None
     if args.gpt_checkpoint:
         gpt, _ = load_lm_checkpoint(args.gpt_checkpoint)
         if not isinstance(gpt, CharGPT):
@@ -331,6 +332,7 @@ def main(argv: list[str] | None = None) -> int:
     max_beyond = max((float(r["mean_nll"]) for r in beyond), default=None)
     nondegrade: bool | None = None
     if ref_band is not None and beyond:
+        assert max_beyond is not None  # beyond 非空ゆえ max は default(None) に落ちない
         ref = float(ref_band["mean_nll"])
         std_ref = max([float(r["std_nll"]) for r in beyond] + [float(ref_band["std_nll"])])
         nondegrade = bool(max_beyond <= ref + 2 * std_ref + 0.05)
@@ -382,7 +384,7 @@ def main(argv: list[str] | None = None) -> int:
     }
     (out / "longctx_eval.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     (out / "longctx_curve.svg").write_text(
-        _render_band_svg(band_rows, (gpt_baseline["stride_block_nll_mean"] if gpt_baseline else None), block_size),  # type: ignore[arg-type]
+        _render_band_svg(band_rows, (gpt_baseline["stride_block_nll_mean"] if gpt_baseline else None), block_size),
         encoding="utf-8",
     )
     print(f"\n[done] wrote {out}/longctx_eval.json + longctx_curve.svg", flush=True)

@@ -50,6 +50,7 @@ scripts/quant_bitwidth_sweep.py
 scripts/quant_group_compare.py
 scripts/rad_full_probes.py
 scripts/recurrent_latency_sweep.py
+scripts/recurrent_longctx_eval.py
 scripts/retrieval_head_to_head.py
 scripts/recurrent_runtime_rss.py
 scripts/runtime_floor_rss.py
