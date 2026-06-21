@@ -700,3 +700,74 @@
 - 2026-06-17 20:49 JST EXIT 追記: コンテキスト上限接近のため、ここで **EXIT 準備のみ**を実施して停止する。現時点の `git status --short` は **`docs/SESSION_SUMMARY.md` と `docs/next_plan.md` の 2 件が dirty**。ただし `docs/SESSION_SUMMARY.md` は Stop hook 自動生成物であり、**canonical な手動差分は `docs/next_plan.md`** と読む。current canonical candidate は **`D:\projects\llcore_kaggle_livecheck_20260617g`**、current canonical 未実行の不可逆操作は **この candidate への `kaggle kernels push -p "D:\projects\llcore_kaggle_livecheck_20260617g"`** のみである。historical に `...20260617c` へ push 実行済み記録はあるが、現 handoff の target ではない。
 - 2026-06-17 20:49 JST EXIT 追記: 再開時に参照すべき fresh 証跡の正本は **`D:\projects\llcore_kaggle_livecheck_20260617g\prepare_report.json`**、**`D:\projects\llcore_kaggle_livecheck_20260617g\preflight_report.json`**、**`D:\projects\llcore_kaggle_livecheck_20260617g_readiness_run_runner.json`**、**`D:\projects\llcore_kaggle_livecheck_20260617g_verify_20260617_201928.json`**、**`D:\projects\llcore_kaggle_livecheck_20260617g_remote_download_smoke.txt`**。dataset 側は `kaggle datasets version ...` 実行済みで、`ready` 証跡と remote file list 証跡は既存の `...dataset_status_post_reversion.txt` / `...dataset_files_post_reversion.csv` を参照する。
 - 2026-06-17 20:49 JST EXIT 追記: **次の具体的な一手**は kernel push の human gate 継続のみ。順序は `(1)` 必要なら `py -3.11 scripts/kaggle_push_readiness.py --bundle-dir D:\projects\llcore_kaggle_livecheck_20260617g --verify-push-payload-json D:\projects\llcore_kaggle_livecheck_20260617g_readiness_run_runner.json --json D:\projects\llcore_kaggle_livecheck_20260617g_verify_<timestamp>.json` を取り直して `rc=0` と `auth.*` / `dataset.*` / `kernel_id` を再確認、`(2)` `kaggle kernels get furusekazufumi/llcore-lm-compare -p <new-empty-temp>` と Web UI `https://www.kaggle.com/code/furusekazufumi/llcore-lm-compare` で owner/license/remote diff の手動 gate、`(3)` それでも owner/identity 未証明・TOCTOU 残存を受容する場合に限り `kaggle kernels push -p "D:\projects\llcore_kaggle_livecheck_20260617g"`。ここより先の不可逆操作は **次セッションで `docs/next_plan.md` 更新後に `⟦LLTERM_CHOICE⟧` を出してから**進める。
+
+---
+
+## ★2026-06-21 セッション — NAS proxy-v2 overnight 走の状態把握 + honest-disclosure 監査
+
+> このセッションの正本タスクは 06-17 系 Kaggle push gate ではなく、06-21 の最新作業 `scripts/nas_pareto.py` proxy-v2 フル走。Kaggle push は引き続き human gate 待ちで本セッションでは触れていない。
+
+- 実行中ジョブの生死確認: `out/nas_pareto_v2full` の overnight 走 (commit `2957d1a` で resume snapshot 保存) は別プロセス PID 18620 (15:57 起動) で稼働中。CPU を 8 秒で +34s 消費 = 複数コアで実計算継続中(ハングではない)。`eval_cache.json` は 360 entries (resume 200 + 新規 160)、最終 disk 書込 20:46。
+- 「cache 25 分無更新」は正常と判定: `run_light.log` に `[zero-shot]` 行が未出力 → プロセスは `build_frontier(False)` 内の GA 探索中。proxy-v2 1 評価 = 8 windows x 1024 tok の forward (CPU 0.5B で数十秒〜) x `--checkpoint-every 20` なので disk checkpoint は約 50 分間隔。20:46 からの無更新は次 20-eval バッチの途中で、停止ではない。
+- honest-disclosure 監査 (`src/llcore/runtime/eval_proxy.py` 852 行 + `pareto_metrics.py` を精読): methodology は健全と結論。
+  - paired bootstrap CI / 二側 sign test (exact binomial) / Wilcoxon 符号順位 (n<=12 は exact 列挙) / Kendall tau-b はいずれも正しい実装。
+  - HV bootstrap (`bootstrap_hv_gain` / `right_shift_ci` / `hypervolume_2d_ci`) は paired window 再標本(1 本の窓 index ベクトルを全ゲノムへ適用)で CI 過大化を回避。参照点は点推定 means の nadir に固定 = 共有参照 HV 比較として正当。懸念点: bootstrap replicate 平均が ref_y を下回るとその点が HV から脱落し得るが、ref はワースト点の 1e-9 下でワースト点寄与が構造的に ~0 のため失う面積は無視可能 = 実バグではない。
+  - winner's curse 対策: GA 選抜窓 (offset=0) と disjoint な fresh holdout 窓 (offset=fast_windows x inner_context=8192) で再評価し `optimism_gap = selection - heldout` を開示。`honest_verdict` は optimism_gap > CI 半幅で verdict 抑制を最優先 → CI が 0 を跨げば null → CI<0 で greedy 勝ち → tau<0.7 で significant→suggestive 降格、と保守的。
+  - scope は `next_token_nll_proxy` 固定、`conversational_claim=None`。attention-KL は 256 tok hard-cap の診断専用で fitness 未配線。needle probe は base_acc>=1 のセルのみ失敗判定 = false attribution 回避。
+  - 結論: 走行中ジョブの統計設計は信頼でき是正不要。実行中プロセスには一切干渉せず read-only audit のみ。
+- 次の一手 (本タスク): ジョブ完了で `out/nas_pareto_v2full/nas_pareto.json` が出たら `proxy_v2.verdict.memetic_vs_greedy` / `confidence`、`context_sweep` の regime 依存、`frontier_holdout` の optimism_gap を読み honest-disclosure レポート化する。それまで別の重い計算をローカル起動して競合させない。Kaggle push gate は従来どおり別系統で human 承認待ち。
+
+### 2026-06-21 追記 — 解析レポート生成器を先行整備 (選択 1: 完了待ち + 定期監視)
+
+- `scripts/nas_pareto_report.py` を新規作成。`out/nas_pareto_v2full/nas_pareto.json` を読み、honest-disclosure 重視の Markdown レポートを生成する read-only ツール (torch 非依存、実行中プロセスに非干渉)。
+  - 使い方: `py -3.11 scripts/nas_pareto_report.py out/nas_pareto_v2full/nas_pareto.json -o out/nas_pareto_v2full/nas_pareto_report.md`
+  - 着地点: headline は holdout Δnll (selection ではない) / `optimism_gap` 開示 / hv_gain CI + `p_memetic_wins` / `scope=next_token_nll_proxy`・conversational_claim 拒否明記 / context sweep の regime 依存 / K<12 の CI 信頼性警告 / needle・cross_corpus・attention_kl は欠損時に「未実施=未検証ギャップ」と明示。
+  - 検証: 合成フィクスチャ 2 系統 (null verdict + suggestive/needle/K<12) で RC 0・全セクション描画を確認、未着 json で RC 2、不正 JSON で RC 2、Windows cp932 stdout は utf-8 reconfigure で回避。ruff 通過。
+- ジョブ状態 (21:14 時点): PID 18620 稼働中、CPU 増加継続、json 未着、`run_light.log` は GA 探索段階のまま。完了は GA + rigorous tier (context_sweep 〜2048tok) のぶん数時間先の見込み。
+- 次手: json 着地を検知したら上記コマンドでレポート生成 → `proxy_v2.verdict` / regime / optimism_gap を要約。それまで重い計算をローカル起動しない。
+
+### 2026-06-21 追記 (続) — レポート生成器の回帰テスト追加
+
+- `tests/unit/test_nas_pareto_report.py` を新規追加 (12 tests, `12 passed`)。disclosure-critical 不変条件を固定: headline が holdout Δnll を引く / `optimism_gap` 開示 / `scope=next_token_nll_proxy` と conversational 拒否文の常時描画 / suggestive 降格 + K<12 CI 警告 / regime sweep 行 / needle 欠損は "UNTESTED" として開示 / v1 (proxy_v2 無) でも描画 / CLI の missing・malformed JSON は rc=2 / `-o` ファイル出力 / 符号付き float。
+- `scripts/nas_pareto_report.py` は mypy (`MYPYPATH=src`) / ruff 通過。stdout の不要 type-ignore も除去済み。
+- ジョブ状態 (21:21): entries 380 のまま、json 未着、PID 18620 稼働継続。監視は 21:50 自動起動を維持。
+
+### 2026-06-21 追記 (続2) — RAD 研究接地: proxy-v2 NAS の差別化軸
+
+レポートの先行研究位置づけ用に RAD コーパスを確認 (車輪の再発明チェック):
+- `evolutionary_computation_corpus_v2/.../c_01_nas_fitn` (SKILL + doc_0055 MTF-PDNS 2407.20656): 多目的 Pareto NAS / novelty / QD / supernet fitness 推定は確立済み領域。**「training-free / proxy 指標は actual performance と整合しないことが多い (noise trade-off)」**を明示している。
+- `llm_corpus_v2` (doc_0530 long-context dynamics, doc_0118 linear-attention decay design): 定状態 (constant-state) 線形注意の long-context 劣化と decay 設計は既知。context-sweep の regime 依存 (L=1024 では過小検出、2048+ で顕在化) の根拠を裏付け。
+- **差別化軸 (本作業の新規性)**: 新しい探索演算子ではなく **proxy の不確実性を定量化して verdict を律する honest-disclosure 層**。具体的には (1) proxy に paired bootstrap CI、(2) fresh holdout による winner's-curse 除去 + `optimism_gap` 開示、(3) proxy-vs-judge Kendall τ<0.7 で verdict 降格、(4) HV gain の CI_lo>0 でのみ「memetic 勝ち」発火、(5) memetic≈greedy は「separable landscape の honest negative」として明示。先行研究が「proxy は noisy」と認める所を、本作業は「noisy さを測って主張を抑制する」段まで進めている点が差分。
+- 結論: 車輪の再発明ではない。レポートの positioning セクションに上記を載せる。
+
+---
+
+## ★2026-06-21 21:54 JST EXIT — NAS proxy-v2 走の再開地点
+
+> コンテキスト上限接近のため EXIT 準備のみ実施。`docs/SESSION_SUMMARY.md` は Stop hook 自動生成物なので手動編集せず、canonical handoff は本ファイル。
+
+### 現状 (21:54 時点)
+- **PID 18620 稼働継続** (15:57 起動, CPU ~81290s, 健全に増加中)。GA/greedy 探索は完了済み (`run_light.log` = `[zero-shot] 11 Pareto configs (386 real evals)`)。現在は **proxy-v2 rigorous tier** (`_proxy_v2_rigorous`) を実行中で、これは holdout 再評価 (11 mem + greedy genomes) + context_sweep (256/512/1024/**2048** tok × holdout_windows) + attention_kl を回す重い段。**~29 分経過、CPU 律速で進行中 (ハングではない)**。
+- `eval_cache.json` は disk 上 380 entries (rigorous tier は cache 非書込なので増えないのが正常)。`nas_pareto.json` は **未着** (rigorous tier 完了後に書かれる)。
+- `git status --short`: `docs/SESSION_SUMMARY.md` (自動生成・無視) / `docs/next_plan.md` (handoff) / 新規 `scripts/nas_pareto_report.py` / `tests/unit/test_nas_pareto_report.py`。未コミットで残置 (push せず)。
+
+### このセッションで整備済み (json 着地後に即使える)
+- **解析レポート生成器** `scripts/nas_pareto_report.py` (read-only, torch 非依存, mypy/ruff 通過)。回帰テスト `tests/unit/test_nas_pareto_report.py` = **12 passed**。
+- `eval_proxy.py` (852行) + `pareto_metrics.py` の honest-disclosure 監査済み = methodology 健全 (paired bootstrap CI / exact sign test / Wilcoxon / Kendall τ / winner's-curse holdout / 共有参照 HV)。是正不要。
+- RAD 先行研究 positioning 整理済み (本ファイル上方「続2」参照)。差別化軸 = proxy の不確実性を定量化して verdict を律する honest-disclosure 層。
+
+### 次の具体的な一手 (新セッション)
+1. `ls out/nas_pareto_v2full/nas_pareto.json` で着地確認。
+   - **着地済みなら**: `py -3.11 scripts/nas_pareto_report.py out/nas_pareto_v2full/nas_pareto.json -o out/nas_pareto_v2full/nas_pareto_report.md` を実行 → `proxy_v2.verdict.memetic_vs_greedy` / `confidence`、`context_sweep` の regime 依存 (L=1024 vs 2048)、`frontier_holdout` の `optimism_gap`、`hv_gain_ci` (CI_lo>0 か) を honest-disclosure 観点で要約。先行研究 positioning も添える。
+   - **未着なら**: PID 18620 の CPU 増加と `run_light.log` 最新行を確認 (rigorous tier 継続中)。停止していれば `run_light.err` を確認。重い計算をローカル新規起動して競合させない。
+2. レポート確定後、`scripts/nas_pareto_report.py` + test + docs を適切な単位でコミット (push は人間承認)。
+3. 別系統の **Kaggle kernel push** は従来どおり human gate のまま (本セッションでは不介入)。
+
+### 2026-06-21 追記 (続3) — positioning セクション追加 + ローカルコミット保全 (json 着地待ち継続)
+
+- `scripts/nas_pareto_report.py` に「Prior-art positioning」セクションを追加 (proxy_v2 ブロック内、常時描画)。RAD コーパス接地の差別化軸を 5 点で明示: (1) paired bootstrap CI, (2) fresh holdout winner's-curse 除去 + optimism_gap 開示, (3) proxy-vs-judge Kendall τ<0.7 で verdict 降格, (4) HV gain CI_lo>0 でのみ memetic 勝ち発火, (5) memetic≈greedy は separable landscape の honest negative。先行研究 (MTF-PDNS 2407.20656 等) が「proxy は noisy」と認める所を「noisy さを測って主張を抑制する」段まで進めた点を新規性として記載。
+- 回帰テスト `test_prior_art_positioning_always_renders` を追加 → **13 passed** (旧 12 + 1)、ruff / mypy (`MYPYPATH=src`) クリーン。
+- report 生成器の読み取りキーを `nas_pareto.py` / `build_proxy_v2_report` の実出力スキーマと突合し完全一致を確認 (`right_shift` はトップレベル distill 専用、proxy_v2 verdict は別ブロック、を正しく処理)。json 着地後に描画破綻しない保証を二重化。
+- ジョブ状態: PID 18620 稼働継続 (CPU 健全増加、rigorous tier 計算中)、`nas_pareto.json` 未着。バックグラウンド監視タスクが着地/プロセス終了を自動検知。
+- このセッションの staged 成果 (report ツール + test + 本 next_plan 追記) を **ローカルコミットで保全** (push は人間承認のまま)。`docs/SESSION_SUMMARY.md` は自動生成物として stage しない。
+- 次手: json 着地通知 → `py -3.11 scripts/nas_pareto_report.py out/nas_pareto_v2full/nas_pareto.json -o out/nas_pareto_v2full/nas_pareto_report.md` 実行 → verdict / regime / optimism_gap / hv_gain_ci を honest-disclosure 要約。
