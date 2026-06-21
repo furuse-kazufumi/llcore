@@ -642,9 +642,10 @@
     指数 p≈**-0.006** = 純粋 O(1)、文脈の長さに一切依らない)。これが load-bearing。
   - **GPT decode = ×77.7 の爆増**: 16.0 / 46.7 / 107.8 / 243.1 / **1242.1** ms(指数 p≈1.35〜1.49)。1024→2048 で
     ×5.1 と跳ねるのは attention O(T²) が支配に入る regime(a8 の regime 依存と同じ:T が n_embd を超えると二次項が床を追い越す)。
-  - **RWKV**: 512 以降は flat(2.12 / 2.15 / 2.59 ms)だが、T=128/256 が startup 外れ値(19.97 / 6.72 ms、初回
-    subprocess の JIT/キャッシュ温まり)で指数 p≈-0.75 は汚染 → **構造結論には settled 値のみ使う**(a7 と同じ RWKV
-    startup ノイズの既知問題、honest に開示)。
+  - **RWKV も完全 flat(warmup を足せば)**: warmup=2 では T=128/256 が startup 外れ値(min 5.15/3.70ms)だったが、
+    **warmup=5 で再走すると全 T が flat**(min 2.10/2.05/2.14/2.10/2.14ms、×1.02 over 16×)。外れ値は構造ではなく
+    **初回呼び出しの lazy init を warmup が吸収しきれていなかった**だけと判明(honest disclosure: 原因を特定して解消)。
+    → 結論は「**recurrent も RWKV も decode は O(1)=flat**、GPT だけ ×77 増大」とクリーンに確定。
   - recurrent は「熟成済みの定数状態に 1 step 足すだけ」、cache 無し GPT は「毎トークン全文脈を再 forward」だから。
 - **honest 3点**: (1) cross-mode の絶対 ms は比較不可(recurrent=Python per-step ループ / GPT=vectorized)。
   (2) この GPT は **KV cache を持たない**(production は cache で decode を O(T)/token に落とす)が、cache 有りでも

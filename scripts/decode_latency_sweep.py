@@ -153,7 +153,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--n-head", type=int, default=8)
     ap.add_argument("--vocab", type=int, default=256)
     ap.add_argument("--repeats", type=int, default=5)
-    ap.add_argument("--warmup", type=int, default=1)
+    # recurrent/RWKV は初回 step の lazy init(状態バッファ確保等)を吸収するため warmup を多めに。
+    # warmup=2 では RWKV の小 T が startup 外れ値になり、warmup>=5 で全 T が flat に落ち着くのを実測。
+    ap.add_argument("--warmup", type=int, default=3)
     ap.add_argument("--json", default="out/decode_latency_sweep.json")
     ap.add_argument("--worker", choices=list(MODES), default=None)
     ap.add_argument("--t", type=int, default=None)

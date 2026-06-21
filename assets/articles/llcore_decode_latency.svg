@@ -60,7 +60,7 @@
   <rect x="110" y="120" width="14" height="14" rx="3" fill="#f85149"/>
   <text x="130" y="132" fill="#e6edf3" font-size="13">GPT(Transformer, KV cache 無)= 毎トークン全文脈を再 forward → 増大</text>
   <rect x="110" y="144" width="14" height="14" rx="3" fill="#3fb950"/>
-  <text x="130" y="156" fill="#e6edf3" font-size="13">recurrent = 定数状態に 1 step 足すだけ → 文脈長に依らず一定(RWKV も settled は flat)</text>
+  <text x="130" y="156" fill="#e6edf3" font-size="13">recurrent / RWKV = 定数状態に 1 step 足すだけ → 文脈長に依らず一定(両者 flat = O(1))</text>
 
   <!-- footer -->
   <line x1="34" y1="398" x2="726" y2="398" stroke="#21262d" stroke-width="1"/>
