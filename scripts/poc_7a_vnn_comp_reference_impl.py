@@ -64,6 +64,7 @@ from llcore.state_update import StateUpdateGene  # noqa: E402
 from llcore.state_update.genes import eval_step  # noqa: E402
 from llcore.verifier import (  # noqa: E402
     InvariantResult,
+    is_z3_available,  # noqa: F401 — re-export: test (ref.is_z3_available) が z3 skip 判定に使う
     verify_gene_safe,
     verify_state_norm_invariant,
 )
