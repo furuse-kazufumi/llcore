@@ -1161,3 +1161,15 @@
 - **現在 run 27918958686(needle-run-2)が実行中**: install/model DL/corpus+eval_cache staging を通過し、**「rigorous tier + needle + 2048 sweep」step が in_progress**(~1-3h 見込み、committed eval_cache から GA resume)。
 - **結果取得手順(完了後)**: `gh run view 27918958686 --json status,conclusion` で完了確認 → `gh run download 27918958686 -D out/needle_offload` で `nas_pareto.json` + `nas_pareto_report.md` + `run_offload.log` 取得 → 「Assert GA was resumed」step が success なら GA 再走でなく resume が効いた証 → needle/2048 を b2 §5 に実数値化。
 - **恒久メモ**: tag-push トリガ `needle-run-*` で起動する導線が機能(PAT に Actions:write が無くても可)。次回以降の再起動も新 tag `needle-run-N` を push すればよい。
+
+## ★2026-06-22 待機中 — needle 結果の統合ポイント(下調べ完了)
+- needle-run-2(run 27918958686)は compute step 実行中(序盤、~2-3h)。背景監視 bb0w5sh47 が完了通知。
+- **結果到着時の統合手順(確定)**:
+  1. `gh run download 27918958686 -D out/needle_offload` → `nas_pareto.json` + `nas_pareto_report.md` + `run_offload.log`。
+  2. 「Assert GA was resumed」step が success = committed eval_cache から resume した証(26h GA 再走でない)を確認。
+  3. nas_pareto.json から **context-sweep の 2048(と 4096)Δnll** と **needle/passkey retrieval 結果(2048/4096)** を抽出。
+  4. **`docs/articles/drafts/b2-suppress-your-win.md` §137-138 を更新**: 現状「2048+ の long-context retrieval は**未検証**。ローカル RAM 3.6GB が thrashing で測れず、次の一手は GPU/Kaggle オフロード」→ **GH Actions 7GB で実測した数値**に置換(honest 叙述は維持・強化: 「溢れを測る機械が溢れた → より大きな機械にオフロードして実測し、未検証を埋めた」で loop 完結)。256:0.761→512:1.012→1024:1.182 の続きに 2048(4096)を追記。
+  5. **`assets/articles/llcore_suppress_win.svg`** の `needle → UNTESTED / 未検証`(line 51-52)を測定結果へ更新。
+  6. b2 一般版は needle 非言及ゆえ原則据置(必要なら平易に一文追記)。
+  7. 数値は report/JSON と一致検証、honest 留保(proxy nll / paired bootstrap CI 等)を継承。
+- 一般版 b2 は needle/2048 を引用していないため対象外。findings は needle 専用節が無ければ b2 側で完結。
