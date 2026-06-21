@@ -884,3 +884,12 @@
 - これで前掲「三重障害」のうち **#2 (cross-platform resume 脆弱性) は解消**。残るは #1 (2 コア GA 26h>6h) と #3 (push gate)。
 - #1 への対処案: GH Actions で **GA を CI 分割チェックポイント実行** (eval_cache を job 間 artifact で受け渡し、各 job <6h で resume 継続) が現実的になった (resume が堅牢化されたため)。または高 RAM self-hosted/Colab。
 - ただし依然 #3 (workflow+fixtures の push = human gate) が残るため、実走は人間承認待ち。本コミットは resume 堅牢化のみで独立に価値がある (この project は candidate dir を頻繁に移動するため path 相対の resume は実用的)。
+
+### 2026-06-21 追記 — needle/2048 オフロード workflow を push 手前まで構築 (commit 1853d0b)
+- 三重障害を解消する単一ジョブ GH Actions を用意:
+  - **#1 (GA 26h)**: eval_cache snapshot を fixture 化し resume → GA スキップ、rigorous+needle のみ (~2-3h、単一ジョブで 350min 上限内)。
+  - **#2 (cross-platform resume)**: 先のコミット b11a235 (_meta_matches) で解消済み。
+  - **bloat 回避**: corpus は先頭20万字プレフィックス(580KB)。base_nll 厳密再現 + 全窓(最大~32768tok, プレフィックスは~171918tok)充足。9.8MB全文コミット不要。
+- fail-fast: resume 失敗(meta mismatch)時は 26h GA 再走前に exit 1。
+- **残るは #3 のみ = push (外部公開)**。`.github/workflows/` + `ci/fixtures/` を public remote へ push する human gate。push 後は `gh workflow run nas-needle-offload`(または Actions UI)→ `gh run watch` → `gh run download` で nas_pareto.json 取得 → report 再生成 → b2 §5 を実数値更新。
+- **残存リスク(honest)**: (a) base_nll の cross-platform 差が 1e-3 を超えると resume 失敗(fail-fast で検知、その場合 tolerance 緩和 or 別手)、(b) 2コアで rigorous+needle が 350min 超過の可能性(その場合 needle-lengths を 2048 のみに絞る)。いずれも壊滅ではなく次の調整で対応可能。
