@@ -1,0 +1,54 @@
+# CI gate — ruff lint, mypy --strict, and the unit test suite.
+#
+# Why this exists: `mypy src --strict` reached 0 errors across all 67 source files
+# (session 2026-06-22). This workflow enforces that going forward so the strict-clean
+# state cannot silently regress.
+#
+# mypy strict + warn_unused_ignores means the `# type: ignore[import-untyped]` markers
+# (z3 / cvxpy / scipy) only match when those libs are installed-but-untyped. So the
+# typecheck job installs the full optional dependency set to reproduce the developer's
+# environment exactly — otherwise an absent lib turns `import-untyped` into
+# `import-not-found` and the ignore becomes "unused" (a strict error).
+name: ci
+
+on:
+  push:
+    branches: ["main", "feat/**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install ruff
+        run: python -m pip install --upgrade pip "ruff>=0.5"
+      - name: ruff check (maintained trees; research/ is experimental, lint-exempt)
+        run: ruff check src scripts tests ci
+
+  typecheck-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install llcore + dev + optional deps (CPU torch)
+        run: |
+          python -m pip install --upgrade pip
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          # z3/sdp/chat bring the untyped libs whose type:ignore markers must match;
+          # scipy/scikit-learn are imported by evolution/honest_eval and clip text encoders.
+          pip install -e ".[dev,z3,sdp,chat,clip,text,ann]" scipy scikit-learn
+      - name: mypy --strict (must stay 0 errors)
+        run: mypy src --strict
+      - name: pytest (unit)
+        run: pytest tests/unit -q
