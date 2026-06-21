@@ -47,6 +47,8 @@
 
 私は int8 量子化で「重みを 4 分の 1!」と数 MB を削ることに集中していました。でも全体像は、**1.51MB の本体の周りに、212MB の"足場"が組まれている**状態だったのです。数 MB の節約は、142 倍の足場の前では誤差に近い。
 
+> **再現性(コミット済みハーネスで裏取り):** この一回限りの計測を、後日 **再走可能なハーネス**(`scripts/runtime_floor_rss.py` / `out/runtime_floor_rss.json`、各ステージを別プロセス隔離で 3 回測定の中央値)に固めて測り直しました。結果は **`import torch` 後 197.8 MB(初回 197.3 とほぼ完全一致)/ torch 税 179.7 MB(初回 +183.9 と ~2% 差)** ——主役である **torch ランタイム税が ~180MB であること**は別ランでも揺るぎませんでした。一方 baseline は 13.4→18.1 MB と少し上振れし(Python/プロセス環境差)、足場比は **モデルの大きさで変わります**:本文の 1.51MB モデルでは 142×、ハーネス既定の 2.8MB モデル(n_embd=176)では 73× でした。比の絶対値は config 依存ですが、**「本体より足場が桁違いに大きい」という構図は不変**——そこが load-bearing です。
+
 ---
 
 ## 2. 「支配項を攻めろ」— どの項を削るかが全て
@@ -87,4 +89,4 @@
 
 ---
 
-_技術注記:`ctypes` 経由 `GetProcessMemoryInfo` WorkingSetSize の実測(2026-06-19)= baseline 13.4MB / `import torch` 後 197.3MB(税 +183.9MB)/ モデルロード後 213.6MB。`int8_footprint_bytes` = 1.51MB → プロセス RSS は本体の 142×。Rust/candle の baseline RSS は未計測(主張の最終確証は要 candle 実測)。移植するなら「Python 成熟後に hot path のみ native 化」の規律に沿う。_
+_技術注記:`ctypes` 経由 `GetProcessMemoryInfo` WorkingSetSize の実測(初回 2026-06-19)= baseline 13.4MB / `import torch` 後 197.3MB(税 +183.9MB)/ モデルロード後 213.6MB。`int8_footprint_bytes` = 1.51MB → プロセス RSS は本体の 142×。**再現(コミット済みハーネス `scripts/runtime_floor_rss.py` / `out/runtime_floor_rss.json`、別プロセス隔離×3 中央値)**: torch 後 197.8MB / 税 179.7MB(初回と ~2% 差)で torch 税の支配は再現。baseline は 18.1MB に上振れ、足場比はモデル規模依存(1.51MB 本体で 142× / 2.8MB 本体で 73×)。Rust/candle の baseline RSS は未計測(主張の最終確証は要 candle 実測)。移植するなら「Python 成熟後に hot path のみ native 化」の規律に沿う。_

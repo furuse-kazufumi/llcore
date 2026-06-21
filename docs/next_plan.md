@@ -1039,3 +1039,9 @@
 - `assets/articles/llcore_context_memory.svg` を 6点(128→4096, 対数横軸)へ刷新。記事の新核心=regime依存(128→512 平坦 ×1.11 / 512→4096 急騰 ×6.75)を図で可視化。GPT ×7.53(全域)/ recurrent 平坦を注記付きで表示。
 - a8 の図 alt+キャプションを6点・対数軸・regime依存に整合更新(旧「1024→4096を抜き出し」を解消)。XML valid。
 - これでアーキ編の可視化2軸(メモリ context_memory.svg / compute latency_scaling.svg)が共に最新データと整合。残: 公開フェーズで全SVGを raw絶対URL化(human gate)。
+
+### 2026-06-22 追記 — a9 静的RSS床をコミット済みハーネス化+再現検証(アーキ編 第3軸)
+- a9 の load-bearing 数値(torch税~184MB/baseline/足場比)は一回限り ctypes 計測で再走不能だった。これを `scripts/runtime_floor_rss.py`(+回帰6件)としてハーネス化:python/+torch/+model を別プロセス隔離で測り中央値、torch税・足場比を算出。commit 予定。
+- 再測結果: **import torch 後 197.8MB(初回197.3とほぼ一致)/ torch税 179.7MB(初回183.9と~2%差)= 主題(torch税~180MBが支配)を再現確認**。baseline 13.4→18.1 に上振れ、足場比はモデル規模依存(1.51MB本体で142× / 2.8MB本体で73×)。
+- a9 技術/一般版に再現性ノート追記(数値はround内で整合、訂正不要)。RAD接地済(static runtime floor の先行研究は systolic/MoE推論=accelerator寄り、本実験の差別化軸=自宅CPU実機の段階RSS床、車輪の再発明でない)。
+- これでアーキ編 3軸(動的メモリ a8 / compute a7 / 静的床 a9)が全て **コミット済み再走可能ハーネス + クロスラン/再現検証**で裏打ちされた。可視化2軸(context_memory/latency_scaling)も最新整合。
