@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" font-family="Segoe UI, Hiragino Kaku Gothic ProN, Meiryo, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0d1117"/><stop offset="1" stop-color="#161b22"/>
+    </linearGradient>
+  </defs>
+  <rect width="760" height="440" fill="url(#bg)"/>
+
+  <text x="34" y="40" fill="#e6edf3" font-size="22" font-weight="700">自分の「20/20 勝利」を、自分のメタゲートが叩き落とした</text>
+  <text x="34" y="64" fill="#8b949e" font-size="13.5">進化 vs 勾配(凍結 SmolLM2-135M 由来の CE 地形、自宅 PoC)。弱い相手で勝ち→強い相手で逆転。</text>
+
+  <!-- LEFT: held-out fitness bars. plot x 96..360, baseline(top of bars) ref y, lower fitness = lower bar -->
+  <!-- fitness (= -CE), range mapped: -1.49 .. -1.44 over y 320..130 -->
+  <line x1="96" y1="320" x2="360" y2="320" stroke="#30363d" stroke-width="2"/>
+  <line x1="96" y1="120" x2="96" y2="320" stroke="#30363d" stroke-width="2"/>
+  <text x="34" y="112" fill="#6e7681" font-size="12">held-out 平均 fitness (= −CE、高いほど良い)</text>
+
+  <!-- gridlines at -1.44 / -1.46 / -1.48 -->
+  <line x1="96" y1="130" x2="360" y2="130" stroke="#21262d" stroke-width="1" stroke-dasharray="4 4"/>
+  <text x="90" y="134" fill="#6e7681" font-size="11" text-anchor="end">−1.44</text>
+  <line x1="96" y1="206" x2="360" y2="206" stroke="#21262d" stroke-width="1" stroke-dasharray="4 4"/>
+  <text x="90" y="210" fill="#6e7681" font-size="11" text-anchor="end">−1.46</text>
+  <line x1="96" y1="282" x2="360" y2="282" stroke="#21262d" stroke-width="1" stroke-dasharray="4 4"/>
+  <text x="90" y="286" fill="#6e7681" font-size="11" text-anchor="end">−1.48</text>
+
+  <!-- mapping: y = 130 + (v - (-1.44)) / (-0.04) * 190 ; baseline 320 ~= -1.4874 -->
+  <!-- strong gradient -1.446 -> y=152.8 ; bar h=167.2 -->
+  <rect x="112" y="152.8" width="44" height="167.2" rx="3" fill="#3fb950"/>
+  <text x="134" y="145" fill="#3fb950" font-size="13" font-weight="700" text-anchor="middle">−1.446</text>
+  <!-- MAP-Elites -1.454 -> y=183.2 ; bar h=136.8 -->
+  <rect x="172" y="183.2" width="44" height="136.8" rx="3" fill="#f85149"/>
+  <text x="194" y="175.5" fill="#f85149" font-size="13" font-weight="700" text-anchor="middle">−1.454</text>
+  <!-- random -1.473 -> y=255.4 ; bar h=64.6 -->
+  <rect x="232" y="255.4" width="44" height="64.6" rx="3" fill="#6e7681"/>
+  <text x="254" y="247.7" fill="#8b949e" font-size="13" font-weight="700" text-anchor="middle">−1.473</text>
+  <!-- finite-diff -1.483 -> y=293.4 ; bar h=26.6 -->
+  <rect x="292" y="293.4" width="44" height="26.6" rx="3" fill="#6e7681"/>
+  <text x="314" y="285.7" fill="#8b949e" font-size="13" font-weight="700" text-anchor="middle">−1.483</text>
+
+  <!-- x labels -->
+  <text x="134" y="336" fill="#c9d1d9" font-size="11" text-anchor="middle">強い解析勾配</text>
+  <text x="134" y="350" fill="#6e7681" font-size="10" text-anchor="middle">torch Adam</text>
+  <text x="194" y="336" fill="#c9d1d9" font-size="11" text-anchor="middle">進化</text>
+  <text x="194" y="350" fill="#6e7681" font-size="10" text-anchor="middle">MAP-Elites</text>
+  <text x="254" y="336" fill="#8b949e" font-size="11" text-anchor="middle">random</text>
+  <text x="314" y="336" fill="#8b949e" font-size="11" text-anchor="middle">finite-diff</text>
+
+  <!-- callout: gradient beats evolution -->
+  <text x="134" y="370" fill="#3fb950" font-size="11.5" font-weight="700" text-anchor="middle">最良</text>
+  <path d="M156 165 q22 4 30 18" fill="none" stroke="#d29922" stroke-width="2" stroke-dasharray="5 4"/>
+  <text x="228" y="124" fill="#d29922" font-size="11.5" font-weight="700">強い勾配が進化を抜き返す</text>
+
+  <!-- RIGHT: the verdict flip -->
+  <text x="404" y="112" fill="#e6edf3" font-size="14" font-weight="700">同じ実験、2 段の審判</text>
+
+  <!-- stage 1: apparent win -->
+  <rect x="404" y="128" width="322" height="74" rx="8" fill="#161b22" stroke="#238636" stroke-width="1.5"/>
+  <text x="420" y="152" fill="#3fb950" font-size="13.5" font-weight="700">弱い相手(finite-diff)で測ると</text>
+  <text x="420" y="174" fill="#c9d1d9" font-size="13">進化が <tspan fill="#3fb950" font-weight="700">20/20 で勝利</tspan>(p=9.5e-7)</text>
+  <text x="420" y="193" fill="#8b949e" font-size="11.5">→ ここで記事を書けば「進化が勾配に勝った」</text>
+
+  <!-- arrow down: meta-gate fires -->
+  <path d="M565 202 L565 220" fill="none" stroke="#d29922" stroke-width="2"/>
+  <path d="M565 222 l-5 -8 l10 0 z" fill="#d29922"/>
+  <text x="575" y="217" fill="#d29922" font-size="11" font-weight="700">メタゲートが強い相手を自動召喚</text>
+
+  <!-- stage 2: reversal / artifact -->
+  <rect x="404" y="226" width="322" height="92" rx="8" fill="#161b22" stroke="#da3633" stroke-width="1.5"/>
+  <text x="420" y="250" fill="#f85149" font-size="13.5" font-weight="700">強い相手(backprop 勾配)で測り直すと</text>
+  <text x="420" y="272" fill="#c9d1d9" font-size="13"><tspan fill="#f85149" font-weight="700">19/20 で逆転</tspan>(p=3.5e-4)→ 判定 ARTIFACT</text>
+  <text x="420" y="292" fill="#8b949e" font-size="11.5">正体=更新回数の非対称:勾配 2000 step vs 進化 約 95 step</text>
+  <text x="420" y="310" fill="#8b949e" font-size="11.5">公開前に自分の手柄を 1 件、自分の枠組みが止めた。</text>
+
+  <!-- footer -->
+  <line x1="34" y1="398" x2="726" y2="398" stroke="#21262d" stroke-width="1"/>
+  <text x="34" y="420" fill="#8b949e" font-size="12.5">勝った瞬間に<tspan fill="#c9d1d9" font-weight="700">「強い相手」を自動でぶつけ直す</tspan>装置を仕込む。差 0.008 の見かけの勝ちは、弱いベースラインの artifact だった。</text>
+</svg>

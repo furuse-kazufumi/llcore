@@ -1,23 +1,18 @@
-"""Kaggle CPU offload -- NAS proxy-v2 long-context needle/passkey + 2048 sweep.
+"""Fallback offload -- 2048 context sweep ONLY (needle dropped entirely).
 
-Why Kaggle CPU (not GPU): llcore's model loader pins the model to CPU
-(`loader.py: model.to_empty(device="cpu")`, custom Int8Linear path), so a GPU
-instance would sit idle. The bottleneck for the 2048/4096 full-attention forward
-is RAM, not compute: the author's local box (3.6 GB) thrashes and the GitHub
-Actions runner (7 GB, 350-min job cap) timed out mid-needle on run-2
-(27918958686). A Kaggle CPU notebook has ~30 GB RAM and a 12 h runtime, which
-clears the ~3.9 GB working set with huge margin.
+Escalation target for EXIT(53): if even the v3 retry (needle 2048-only +
+sweep) zombies past the 12 h cap, the single remaining heavy leg is the
+2048 full-attention *needle* forward. This variant drops `--needle`
+altogether and keeps just the context sweep up to 2048, which alone still
+anchors b2's long-context decay claim (Delta-nll 256->512->1024->2048,
+L115/L137-138). needle stays honestly UNTESTED in the article.
 
-History: v1 ran needle at BOTH 2048 AND 4096 but blew past the 12 h cap and stuck
-in RUNNING for >29 h wall (zombie). The 4096 full-attention needle is the single
-heaviest leg, so the v3 retry drops it -- needle 2048-only -- to fit the budget
-(see step 5). 2048 still anchors b2's long-context decay claim (L115/L137-138).
+To deploy: copy this over runner.py (or point kernel-metadata code_file
+here) and `kaggle kernels push -p ci/kaggle/needle_offload`. Computation
+offload is autonomously permitted; this is not a git push, so no human gate.
 
-Faithful port of `.github/workflows/nas-needle-offload.yml` (resume mechanics):
-  resume from the committed eval_cache snapshot (no 6.6 h GA rerun) - rigorous
-  tier + 2048 context sweep + needle at 2048 - emit nas_pareto.json.
-
-Output: /kaggle/working/nas_pareto.json (+ report + log) for `kaggle kernels output`.
+Faithful port of runner.py minus the needle leg. Output:
+/kaggle/working/nas_pareto.json (+ report + log).
 """
 from __future__ import annotations
 
@@ -61,11 +56,8 @@ def main() -> int:
     shutil.copy("ci/fixtures/corpus_aozora_multi.txt", "out/corpus_aozora_multi.txt")
     shutil.copy("ci/fixtures/eval_cache.json", "out/nas_pareto_v2full/eval_cache.json")
 
-    # 5. Rigorous tier + needle (2048 only) + 2048 sweep, GA resumed.
-    #    v1 (needle 2048 AND 4096) ran >29 h wall past the 12 h cap = zombie;
-    #    the 4096 full-attention forward is the heaviest leg, so this retry
-    #    drops it to fit inside the 12 h budget. 2048 still anchors b2's
-    #    long-context decay claim (L115/L137-138).
+    # 5. Rigorous tier + 2048 sweep, GA resumed. NO needle (dropped to fit the
+    #    12 h budget after the needle 2048 leg itself zombied).
     log = os.path.join(WORK, "run_offload.log")
     with open(log, "w", encoding="utf-8") as fh:
         proc = subprocess.Popen(
@@ -74,8 +66,7 @@ def main() -> int:
              "--model-dir", "model/Qwen2.5-0.5B-Instruct",
              "--text-file", "out/corpus_aozora_multi.txt",
              "--out", "out/nas_pareto_v2full",
-             "--context-sweep", "256,512,1024,2048",
-             "--needle", "--needle-lengths", "2048"],
+             "--context-sweep", "256,512,1024,2048"],
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
         )
         assert proc.stdout is not None

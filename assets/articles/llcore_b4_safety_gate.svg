@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" font-family="Segoe UI, Hiragino Kaku Gothic ProN, Meiryo, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0d1117"/><stop offset="1" stop-color="#161b22"/>
+    </linearGradient>
+  </defs>
+  <rect width="760" height="440" fill="url(#bg)"/>
+
+  <text x="34" y="40" fill="#e6edf3" font-size="22" font-weight="700">「6%→100%」のはずが「95%→100%」— ゲートの出番が無かった</text>
+  <text x="34" y="64" fill="#8b949e" font-size="13.5">Z3 で発散しない構造だけ通す安全ゲート(自宅 CPU PoC)。目的関数が既に安全側を報酬 → ゲートは冗長に。</text>
+
+  <!-- left panel: 設計時の主張(G2) -->
+  <text x="60" y="104" fill="#8b949e" font-size="13" font-weight="700">設計時の主張(G2・反証された)</text>
+  <!-- plot area: baseline y330, top y120 (0..100%) -->
+  <line x1="60" y1="330" x2="340" y2="330" stroke="#30363d" stroke-width="2"/>
+  <line x1="60" y1="120" x2="60" y2="330" stroke="#30363d" stroke-width="2"/>
+  <text x="36" y="116" fill="#6e7681" font-size="11.5">safe_rate (%)</text>
+
+  <!-- gridlines 50/100 at left (0->330, 100->120, scale 2.1 px/% ) -->
+  <line x1="60" y1="225" x2="340" y2="225" stroke="#21262d" stroke-width="1" stroke-dasharray="4 4"/>
+  <text x="54" y="229" fill="#6e7681" font-size="11" text-anchor="end">50</text>
+  <line x1="60" y1="120" x2="340" y2="120" stroke="#21262d" stroke-width="1" stroke-dasharray="4 4"/>
+  <text x="54" y="124" fill="#6e7681" font-size="11" text-anchor="end">100</text>
+
+  <!-- bar L1: ゲート無し 6% -> h=12.6, top y=317.4 -->
+  <rect x="110" y="317.4" width="70" height="12.6" rx="3" fill="#f85149"/>
+  <text x="145" y="309" fill="#f85149" font-size="14" font-weight="700" text-anchor="middle">~6%</text>
+  <text x="145" y="350" fill="#8b949e" font-size="12" text-anchor="middle">ゲート無し</text>
+
+  <!-- bar L2: ゲート有り 100% -> h=210, top y=120 -->
+  <rect x="230" y="120" width="70" height="210" rx="3" fill="#3fb950"/>
+  <text x="265" y="112" fill="#3fb950" font-size="14" font-weight="700" text-anchor="middle">~100%</text>
+  <text x="265" y="350" fill="#8b949e" font-size="12" text-anchor="middle">ゲート有り</text>
+
+  <!-- big jump annotation -->
+  <text x="200" y="380" fill="#d29922" font-size="12" font-weight="700" text-anchor="middle">主張: +94pp の劇的効果 → 必須</text>
+
+  <!-- divider -->
+  <line x1="390" y1="92" x2="390" y2="360" stroke="#30363d" stroke-width="1.5" stroke-dasharray="3 5"/>
+
+  <!-- right panel: 実測 -->
+  <text x="416" y="104" fill="#8b949e" font-size="13" font-weight="700">実測(retention アーム)</text>
+  <line x1="416" y1="330" x2="696" y2="330" stroke="#30363d" stroke-width="2"/>
+  <line x1="416" y1="120" x2="416" y2="330" stroke="#30363d" stroke-width="2"/>
+  <text x="392" y="116" fill="#6e7681" font-size="11.5">safe_rate (%)</text>
+
+  <line x1="416" y1="225" x2="696" y2="225" stroke="#21262d" stroke-width="1" stroke-dasharray="4 4"/>
+  <text x="410" y="229" fill="#6e7681" font-size="11" text-anchor="end">50</text>
+  <line x1="416" y1="120" x2="696" y2="120" stroke="#21262d" stroke-width="1" stroke-dasharray="4 4"/>
+  <text x="410" y="124" fill="#6e7681" font-size="11" text-anchor="end">100</text>
+
+  <!-- bar R1: none 0.95 = 95% -> h=199.5, top y=130.5 -->
+  <rect x="466" y="130.5" width="70" height="199.5" rx="3" fill="#3fb950" opacity="0.85"/>
+  <text x="501" y="122" fill="#3fb950" font-size="14" font-weight="700" text-anchor="middle">0.95</text>
+  <text x="501" y="350" fill="#8b949e" font-size="12" text-anchor="middle">ゲート無し</text>
+
+  <!-- bar R2: gate 1.00 = 100% -> h=210, top y=120 -->
+  <rect x="586" y="120" width="70" height="210" rx="3" fill="#3fb950"/>
+  <text x="621" y="112" fill="#3fb950" font-size="14" font-weight="700" text-anchor="middle">1.00</text>
+  <text x="621" y="350" fill="#8b949e" font-size="12" text-anchor="middle">ゲート有り</text>
+
+  <text x="556" y="380" fill="#c9d1d9" font-size="12" font-weight="700" text-anchor="middle">実測: +5pp だけ → ほぼ冗長</text>
+
+  <!-- footer -->
+  <line x1="34" y1="398" x2="726" y2="398" stroke="#21262d" stroke-width="1"/>
+  <text x="34" y="420" fill="#8b949e" font-size="12.5">安全ゲートが効くのは<tspan fill="#c9d1d9" font-weight="700">目的関数が危険(発散)側を好むとき</tspan>。目的が既に安全を報酬していれば、ゲートは出番が無い(Z3 は健全に稼働・196 中 71 棄却)。</text>
+</svg>

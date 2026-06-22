@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" font-family="Segoe UI, Hiragino Kaku Gothic ProN, Meiryo, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0d1117"/><stop offset="1" stop-color="#161b22"/>
+    </linearGradient>
+  </defs>
+  <rect width="760" height="440" fill="url(#bg)"/>
+
+  <text x="34" y="40" fill="#e6edf3" font-size="22" font-weight="700">削っていた項が、支配項ではなかった</text>
+  <text x="34" y="64" fill="#8b949e" font-size="13.5">プロセス RSS の内訳実測(自宅 CPU / GetProcessMemoryInfo)。本体 1.51MB の隣で torch 税が 183.9MB。</text>
+
+  <!-- ===== left: stacked composition bar of process RSS (213.6 MB) ===== -->
+  <!-- scale: 0..213.6 MB over x 90..440 (350px). 1 MB = 1.6386 px -->
+  <text x="90" y="108" fill="#6e7681" font-size="12">モデルロード後 プロセス RSS = 213.6 MB の内訳</text>
+
+  <!-- axis baseline -->
+  <line x1="90" y1="280" x2="440" y2="280" stroke="#30363d" stroke-width="2"/>
+  <text x="90"  y="300" fill="#6e7681" font-size="11" text-anchor="middle">0</text>
+  <text x="218" y="300" fill="#6e7681" font-size="11" text-anchor="middle">78</text>
+  <text x="346" y="300" fill="#6e7681" font-size="11" text-anchor="middle">156</text>
+  <text x="440" y="300" fill="#6e7681" font-size="11" text-anchor="end">213.6 MB</text>
+
+  <!-- segment 1: Python baseline 13.4 MB -> width 21.96 (x 90..112.0) -->
+  <rect x="90" y="150" width="21.96" height="90" rx="2" fill="#8b949e"/>
+  <!-- segment 2: torch tax 183.9 MB -> width 301.4 (x 112.0..413.3) -->
+  <rect x="111.96" y="150" width="301.35" height="90" fill="#f85149"/>
+  <!-- segment 3: model load extra 14.8 MB (213.6-197.3-? )  197.3->213.6 = 16.3 MB -> width 26.71 (x 413.3..440.0) -->
+  <rect x="413.31" y="150" width="26.71" height="90" rx="2" fill="#3fb950"/>
+
+  <!-- segment labels above/below -->
+  <text x="346" y="143" fill="#f85149" font-size="14" font-weight="700" text-anchor="middle">import torch = +183.9 MB</text>
+  <text x="346" y="200" fill="#0d1117" font-size="12.5" font-weight="700" text-anchor="middle">"torch 税"(言語ランタイム)</text>
+
+  <!-- baseline callout -->
+  <line x1="101" y1="240" x2="101" y2="266" stroke="#8b949e" stroke-width="1"/>
+  <text x="101" y="262" fill="#8b949e" font-size="10.5" text-anchor="middle"></text>
+  <text x="118" y="334" fill="#8b949e" font-size="11.5">Python だけ = 13.4 MB</text>
+  <line x1="101" y1="240" x2="118" y2="324" stroke="#8b949e" stroke-width="1" stroke-dasharray="3 3"/>
+
+  <!-- model load extra callout -->
+  <text x="426" y="334" fill="#3fb950" font-size="11.5" text-anchor="end">+ロード 16.3 MB</text>
+  <line x1="427" y1="240" x2="427" y2="324" stroke="#3fb950" stroke-width="1" stroke-dasharray="3 3"/>
+
+  <!-- the int8 body, drawn to true scale (1.51 MB -> 2.47 px) so it nearly vanishes -->
+  <rect x="90" y="352" width="2.47" height="22" fill="#3fb950"/>
+  <text x="100" y="368" fill="#3fb950" font-size="12.5" font-weight="700">int8 重みの実体 = 1.51 MB</text>
+  <text x="100" y="386" fill="#8b949e" font-size="11">↑ 同じ横スケールだと、ほぼ線になる(削っていた項)</text>
+
+  <!-- ===== right: the ratio verdict ===== -->
+  <text x="478" y="108" fill="#e6edf3" font-size="14" font-weight="700">支配項はどっち?</text>
+
+  <!-- 142x big callout box -->
+  <rect x="478" y="124" width="248" height="96" rx="8" fill="#161b22" stroke="#da3633" stroke-width="1.5"/>
+  <text x="602" y="170" fill="#f85149" font-size="40" font-weight="700" text-anchor="middle">142×</text>
+  <text x="602" y="196" fill="#c9d1d9" font-size="12.5" text-anchor="middle">プロセス RSS 213.6MB は</text>
+  <text x="602" y="212" fill="#c9d1d9" font-size="12.5" text-anchor="middle">本体 1.51MB の約 142 倍の"足場"</text>
+
+  <!-- reproduction box (honest) -->
+  <rect x="478" y="232" width="248" height="86" rx="8" fill="#161b22" stroke="#238636" stroke-width="1.5"/>
+  <text x="494" y="254" fill="#3fb950" font-size="13" font-weight="700">✓ 別ランで再現(コミット済)</text>
+  <text x="494" y="276" fill="#c9d1d9" font-size="12">torch 後 197.8MB / 税 179.7MB(初回と ~2% 差)</text>
+  <text x="494" y="296" fill="#8b949e" font-size="11.5">足場比は規模依存:1.51MB 本体=142×、</text>
+  <text x="494" y="312" fill="#8b949e" font-size="11.5">2.8MB 本体=73×。「本体&lt;&lt;足場」は不変。</text>
+
+  <!-- footer -->
+  <line x1="34" y1="398" x2="726" y2="398" stroke="#21262d" stroke-width="1"/>
+  <text x="34" y="420" fill="#8b949e" font-size="12.5">「Rust にすれば効率↑」の前に<tspan fill="#c9d1d9" font-weight="700">今の支配項を測れ</tspan>。攻めるべきは int8 の数 MB でなく、torch 税 183.9MB の足場。</text>
+</svg>

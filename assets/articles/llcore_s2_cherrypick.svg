@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" font-family="Segoe UI, Hiragino Kaku Gothic ProN, Meiryo, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0d1117"/><stop offset="1" stop-color="#161b22"/>
+    </linearGradient>
+  </defs>
+  <rect width="760" height="440" fill="url(#bg)"/>
+
+  <text x="34" y="40" fill="#e6edf3" font-size="22" font-weight="700">「proprietary 超え」を盛る 5 つの型 — 同じ刃を自分にも向ける</text>
+  <text x="34" y="64" fill="#8b949e" font-size="13.5">2026-06 の実例(他社=self-report・一次未照合含む)。数字は本物、でも主張の射程は見出しより狭い。</text>
+
+  <!-- column headers -->
+  <text x="48"  y="92" fill="#6e7681" font-size="11.5">型(cherry-pick）</text>
+  <text x="232" y="92" fill="#6e7681" font-size="11.5">他社の実例(2026-06）</text>
+  <text x="486" y="92" fill="#d29922" font-size="11.5">同じ刃を llcore（自宅 CPU PoC）に</text>
+  <line x1="34" y1="100" x2="726" y2="100" stroke="#30363d" stroke-width="1.5"/>
+  <line x1="218" y1="100" x2="218" y2="388" stroke="#21262d" stroke-width="1"/>
+  <line x1="472" y1="100" x2="472" y2="388" stroke="#21262d" stroke-width="1"/>
+
+  <!-- row geometry: 5 rows, top 108, step 56, center offset 28 -->
+
+  <!-- row1 型1 負け軸省略 -->
+  <text x="48"  y="124" fill="#f85149" font-size="13.5" font-weight="700">型1 負け軸省略</text>
+  <text x="48"  y="142" fill="#8b949e" font-size="11">勝った軸だけ前面化</text>
+  <text x="232" y="124" fill="#c9d1d9" font-size="12">Cosmos 3: Driving だけ出す</text>
+  <text x="232" y="142" fill="#8b949e" font-size="11">79.3 vs 47.2(勝）／ 4 軸中 1 勝 2 敗 1 不明</text>
+  <text x="486" y="124" fill="#c9d1d9" font-size="12">「int8 3.9×」は基準を黙ると盛れる</text>
+  <text x="486" y="142" fill="#8b949e" font-size="11">fp32 比 3.9×／fp16 比は <tspan fill="#d29922" font-weight="700">1.9×</tspan> を併記</text>
+  <line x1="34" y1="152" x2="726" y2="152" stroke="#21262d" stroke-width="1" stroke-dasharray="4 4"/>
+
+  <!-- row2 型2 専用ベンチ -->
+  <text x="48"  y="176" fill="#f85149" font-size="13.5" font-weight="700">型2 専用ベンチ</text>
+  <text x="48"  y="194" fill="#8b949e" font-size="11">得意タスク勝利を汎用に</text>
+  <text x="232" y="176" fill="#c9d1d9" font-size="12">PaddleOCR 0.9B: OmniDocBench</text>
+  <text x="232" y="194" fill="#8b949e" font-size="11">96.33%(文書解析専用ベンチ・self-report）</text>
+  <text x="486" y="176" fill="#c9d1d9" font-size="12">char-LM も超ニッチな土俵</text>
+  <text x="486" y="194" fill="#8b949e" font-size="11">文字単位 LM の PPL=汎用能力ではない</text>
+  <line x1="34" y1="204" x2="726" y2="204" stroke="#21262d" stroke-width="1" stroke-dasharray="4 4"/>
+
+  <!-- row3 型3 自前測定 -->
+  <text x="48"  y="228" fill="#f85149" font-size="13.5" font-weight="700">型3 自前測定</text>
+  <text x="48"  y="246" fill="#8b949e" font-size="11">全数値が発表者環境</text>
+  <text x="232" y="228" fill="#c9d1d9" font-size="12">Cosmos / PaddleOCR は self-report</text>
+  <text x="232" y="246" fill="#8b949e" font-size="11">第三者再現なし(Gemma は数表すら無い）</text>
+  <text x="486" y="228" fill="#c9d1d9" font-size="12">全部 self-report・しかも極小</text>
+  <text x="486" y="246" fill="#8b949e" font-size="11">Gemma 比 <tspan fill="#d29922" font-weight="700">約 15,000×</tspan> 小(RAM デモは 92×）</text>
+  <line x1="34" y1="256" x2="726" y2="256" stroke="#21262d" stroke-width="1" stroke-dasharray="4 4"/>
+
+  <!-- row4 型4 母数小 -->
+  <text x="48"  y="280" fill="#f85149" font-size="13.5" font-weight="700">型4 母数小</text>
+  <text x="48"  y="298" fill="#8b949e" font-size="11">標本が少なく順位がノイズ</text>
+  <text x="232" y="280" fill="#c9d1d9" font-size="12">Cosmos Driving = <tspan fill="#d29922" font-weight="700">3 ベンチ</tspan>の平均</text>
+  <text x="232" y="298" fill="#8b949e" font-size="11">±(分散）が報告されない(軸数 4 とは別）</text>
+  <text x="486" y="280" fill="#c9d1d9" font-size="12">コーパス小・観測は最大 11.9M まで</text>
+  <text x="486" y="298" fill="#8b949e" font-size="11">12B〜64B への外挿は未保証(方向のみ整合）</text>
+  <line x1="34" y1="308" x2="726" y2="308" stroke="#21262d" stroke-width="1" stroke-dasharray="4 4"/>
+
+  <!-- row5 型5 二次拡大解釈 -->
+  <text x="48"  y="332" fill="#f85149" font-size="13.5" font-weight="700">型5 二次拡大解釈</text>
+  <text x="48"  y="350" fill="#8b949e" font-size="11">公式の限定が伝言で剥がれる</text>
+  <text x="232" y="332" fill="#c9d1d9" font-size="12">NVIDIA「open 内 1 位」</text>
+  <text x="232" y="350" fill="#8b949e" font-size="11">→ 二次メディアで「Gemini 超え」に膨張</text>
+  <text x="486" y="332" fill="#c9d1d9" font-size="12">自分が膨張の発生源になりうる</text>
+  <text x="486" y="350" fill="#8b949e" font-size="11">「RAM 超で回る」に自分で限定語を貼り続ける</text>
+  <line x1="34" y1="360" x2="726" y2="360" stroke="#21262d" stroke-width="1" stroke-dasharray="4 4"/>
+
+  <!-- self-audit closing band -->
+  <text x="48"  y="382" fill="#3fb950" font-size="12" font-weight="700">差し出す負け</text>
+  <text x="232" y="382" fill="#8b949e" font-size="11.5">2bit QAT は top-1 retention <tspan fill="#c9d1d9" font-weight="700">82.9%</tspan> で自前 strict ゲート <tspan fill="#f85149" font-weight="700">97%</tspan> に未達。速度は一切未測。</text>
+
+  <!-- footer -->
+  <line x1="34" y1="398" x2="726" y2="398" stroke="#21262d" stroke-width="1"/>
+  <text x="34" y="420" fill="#8b949e" font-size="12.5">5 型は他人を叩く武器でなく<tspan fill="#c9d1d9" font-weight="700">自分に返る鏡</tspan>。当てはまる型を数えるほど、主張の射程は狭い。全員が「self-report(段2）」にいる。</text>
+</svg>
