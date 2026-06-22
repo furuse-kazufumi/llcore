@@ -1761,3 +1761,83 @@ run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extr
   3. **GH lite が failure(resume 失敗 = `[resume]` 不在 / timeout)** → log 確認。Kaggle v3 を主系統として継続。
   4. **両系統とも固着/失敗** → 2048 sweep 単独(needle 完全除外)へさらに縮小して再投入を検討。
 - **残 human gate = A(Qiita 公開・全16記事 publish-ready)のみ**。needle 回収は gate 不要・非 blocker。b2 は実測値なしでも publish-ready(L137-138 が honest 留保を narrative 化済)。
+
+---
+
+## ★2026-06-22 EXIT(49) — 再開地点(冗長2系統 RUNNING 待機・状態不変)
+
+- **HEAD=`037b540`**(本セッション変化なし)、ブランチ `feat/lm-recurrent`。作業ツリーは自動生成2ファイルのみ。push なし・コード変更ゼロ。
+- **本セッションの実態**: EXIT(48) から状態不変。冗長2系統を確認、いずれも健全 RUNNING:
+  - **GH lite** run `27945009359`: `in_progress`、startedAt 10:05:19Z → now **12:04Z** で経過 ~2h、timeout 16:05Z まで ~4h 余裕。
+  - **Kaggle v3** `furusekazufumi/llcore-needle-offload`: `RUNNING`、投入 ~10:00Z、12h wall=~22:00Z まで余裕。
+- **次の具体的な一手(EXIT(48) と不変・先着優先)**:
+  1. **GH lite が success** → `gh run download 27945009359 -D out/needle_lite` → `py -3.11 scripts/extract_needle_results.py out/needle_lite/nas-needle-results/nas_pareto.json` → b2 L115/L137/L138 + SVG L51-52 差替。
+  2. **Kaggle v3 が COMPLETE** → `kaggle kernels output ... -p out/needle_kaggle` → 同 extract → 同差替。
+  3. **GH lite が failure/timeout** → log 確認、Kaggle v3 を主系統に。
+  4. **両系統固着/失敗** → 2048 sweep 単独へさらに縮小再投入を検討。
+- **残 human gate = A(Qiita 公開・全16記事 publish-ready)のみ**。needle 回収は gate 不要・非 blocker。
+
+---
+
+## ★2026-06-22 EXIT(50) — 再開地点(冗長2系統 RUNNING 待機・状態不変)
+
+- **HEAD=`037b540`**(本セッション変化なし)、ブランチ `feat/lm-recurrent`。作業ツリーは自動生成2ファイル(SESSION_SUMMARY.md / next_plan.md)以外 clean。push なし・コード変更ゼロ。
+- **本セッションの実態**: EXIT(48/49) から状態不変。llterm ループが ~1分/サイクルで高頻度発火するも実時間進行は遅く、複数回 status 確認(12:04〜12:19Z)→ **冗長2系統とも一貫して RUNNING/in_progress**(状態遷移ゼロ)。
+  - **GH lite** run `27945009359`: `in_progress`、startedAt 10:05:19Z → 12:19Z で経過 ~2h14m、timeout 350min(=~16:05Z)まで余裕、健全。
+  - **Kaggle v3** `furusekazufumi/llcore-needle-offload`: `RUNNING`、投入 ~10:00Z、12h wall=~22:00Z まで余裕、健全。
+- **次の具体的な一手(EXIT(48) と不変・先着優先)**:
+  1. **GH lite が success** → `gh run download 27945009359 -D out/needle_lite` → `py -3.11 scripts/extract_needle_results.py out/needle_lite/nas-needle-results/nas_pareto.json` → `cs['2048']['mean']`/CI/`p['needle']['horizon']` を b2 **L115/L137/L138** + SVG **L51-52** に差替。
+  2. **Kaggle v3 が COMPLETE** → `kaggle kernels output furusekazufumi/llcore-needle-offload -p out/needle_kaggle` → 同 extract → 同差替。
+  3. **GH lite が failure/timeout** → log 確認、Kaggle v3 を主系統に。
+  4. **両系統固着/失敗** → 2048 sweep 単独(needle 完全除外)へさらに縮小再投入を検討。
+- **⚠ 高頻度ループ注意**: 実時間進行が遅いため短時間ポーリングは無意味。再確認は ~30分間隔で十分(ScheduleWakeup 済)。
+- **残 human gate = A(Qiita 公開・全16記事 publish-ready)のみ**。needle 回収は gate 不要・非 blocker。b2 は実測値なしでも publish-ready(L137-138 が honest 留保を narrative 化済)。
+
+## ★2026-06-22 EXIT(51) — 再開地点(冗長2系統 RUNNING 待機・状態不変)
+
+- **HEAD=`037b540`**(本セッション変化なし)、ブランチ `feat/lm-recurrent`。push なし・コード変更ゼロ。
+- **本セッションの実態**: EXIT(48-50) から状態不変。両系統 RUNNING:
+  - **GH lite** run `27945009359`: `in_progress`、startedAt 10:05:19Z、timeout 350min(=~16:05Z)まで余裕、健全。
+  - **Kaggle v3** `furusekazufumi/llcore-needle-offload`: `RUNNING`、12h wall=~22:00Z まで余裕、健全。
+- **次の一手(EXIT(48) と不変・先着優先)**: GH lite success → `gh run download 27945009359 -D out/needle_lite` → `extract_needle_results.py out/needle_lite/nas-needle-results/nas_pareto.json` → b2 L115/L137/L138 + SVG L51-52 差替 / Kaggle v3 COMPLETE → `kaggle kernels output ... -p out/needle_kaggle` → 同 extract → 同差替 / 両系統固着・失敗 → 2048 sweep 単独へ縮小再投入。
+- **残 human gate = A(Qiita 公開)のみ**。needle 回収は gate 不要・非 blocker。
+
+## ★2026-06-22 EXIT(52) — 人間承認: Kaggle v3 一本化(GH lite キャンセル)
+
+- **人間の選択(LLTERM_CHOICE 応答)= 選択肢3「Kaggle v3 に一本化し GH lite はキャンセル」を承認**。
+- **決定内容**: 冗長2系統のうち **GH lite run `27945009359` を `gh run cancel` で停止**し、**Kaggle v3**(`furusekazufumi/llcore-needle-offload`、最新 version=v3、10:02Z 更新・RUNNING)を唯一の主系統として needle 結果を待つ。GH Actions 分数の無駄消費を止め監視を1本化する。
+- **補足(ユーザー質問への回答)**: 「llcore-needle-offload が3つ」は誤解で、Kaggle は同一 slug の最新 version のみ実行(v1/v2/v3 は版数履歴であり並走ではない)。実走は Kaggle v3 ×1 + GH lite ×1 の2系統だった。
+- **次の一手**: ① GH lite cancel 実行 ② Kaggle v3 を継続ポーリング(~30分間隔)③ COMPLETE → `kaggle kernels output furusekazufumi/llcore-needle-offload -p out/needle_kaggle` → `extract_needle_results.py` → b2 L115/L137/L138 + SVG L51-52 差替 ④ v3 が 12h wall(~22:00Z)超で固着なら 2048 sweep 単独へ縮小再投入。
+- **残 human gate = A(Qiita 公開)のみ**。
+
+### EXIT(52) 追補 — GH lite cancel は 403 で不能(honest)
+- gh run cancel 27945009359 = HTTP 403(PAT に workflow scope なし)。CLI 停止不能。
+- GH lite は public 無料・timeout 350min で ~16:05Z 自然終了=実害なし。選択3の主目的(Kaggle v3 一本化)は GH lite を無視して達成。放置を自律採用。
+
+## ★2026-06-22 EXIT(53) — 再開地点(Kaggle v3 一本化・GH lite 放置)
+
+- **HEAD=`037b540`**、ブランチ `feat/lm-recurrent`。作業ツリーは自動生成2ファイル(SESSION_SUMMARY.md / next_plan.md)以外 clean。push なし・コード変更ゼロ。
+- **本セッションの決定(人間承認 EXIT52)**: ユーザー選択3「**Kaggle v3 に一本化し GH lite はキャンセル**」を受領。実行結果:
+  1. `gh run cancel 27945009359`(GH lite)= **HTTP 403**(PAT に workflow scope なし)で**停止不能**。GH lite は public 無料・timeout 350min で **~16:05Z 自然終了**するため放置を自律採用(実害なし)。
+  2. 監視を **Kaggle v3**(`furusekazufumi/llcore-needle-offload`、最新 version=v3、10:02Z 更新)に一本化。最終確認 **12:40Z = RUNNING**(12h wall ~22:00Z まで余裕、健全)。
+- **ユーザー質問への回答(記録)**: 「llcore-needle-offload が3つ走っている?」→ 誤解。Kaggle は同一 slug の最新 version のみ実行(v1/v2/v3 は版数履歴であり並走ではない)。実走は Kaggle v3 ×1 + GH lite ×1 の2系統だった。
+- **次の具体的な一手(優先順)**:
+  1. `kaggle kernels status furusekazufumi/llcore-needle-offload`
+  2. **COMPLETE** → `kaggle kernels output furusekazufumi/llcore-needle-offload -p out/needle_kaggle` → `py -3.11 scripts/extract_needle_results.py out/needle_kaggle/nas_pareto.json` → `cs['2048']['mean']`/CI/`p['needle']['horizon']` を b2(`docs/articles/drafts/b2-suppress-your-win.md`)**L115 / L137 / L138** + SVG **L51-52** に差替(任意 polish・publish blocker ではない)。
+  3. **RUNNING 継続** → ~30分間隔で待機。12h wall ~22:00Z 超で固着なら zombie とみなし **2048 sweep 単独(needle 完全除外)へさらに縮小再投入**を検討。
+  4. **ERROR/CANCELLED** → output の run_offload.log で死因確認(`[resume]` 不在=メタ不一致)。
+  5. **GH lite**(run 27945009359)は監視対象外。気になれば結果を拾ってもよいが、cancel には `gh auth refresh -s workflow` か Web UI が必要(認証変更=人間操作)。
+- **統合パス de-risk 済**: `scripts/extract_needle_results.py` 実在(引数でパス受取=Kaggle/GH 両対応)/ b2 アンカー L113・L115・L137・L138 present・UNTESTED 開示 narrative 込み。**b2 は実測値なしでも publish-ready**。
+- **残 human gate = A(Qiita 公開・全16記事 publish-ready)のみ**。needle 回収は gate 不要・非 blocker。
+
+## ★2026-06-22 EXIT(54) — Kaggle v3 RUNNING 継続・fallback runner 事前準備
+
+- **HEAD=`037b540`**、ブランチ `feat/lm-recurrent`。push なし。Kaggle v3 `furusekazufumi/llcore-needle-offload` = 12:44Z **RUNNING**(12h wall ~22:00Z まで ~9h 余裕、健全)。
+- **待機中 de-risk**: EXIT(53) の最終 fallback「2048 sweep 単独(needle 完全除外)へ縮小再投入」を即実行できるよう **`ci/kaggle/needle_offload/runner_sweep_only.py` を事前作成**(v3 runner から `--needle` を除去した variant・ローカルファイル作成のみ・push なし)。
+- **fallback 投入手順(v3 が ~22:00Z 超で zombie 固着時のみ)**: `cp ci/kaggle/needle_offload/runner_sweep_only.py ci/kaggle/needle_offload/runner.py`(または kernel-metadata の code_file を差替)→ `kaggle kernels push -p ci/kaggle/needle_offload`(計算オフロード自律許可・git push ではないので gate 不要・version 採番注意)。sweep 単独でも b2 L115/L137-138 の長文脈劣化主張を裏付け可能、needle は honest に UNTESTED 維持。
+- **次の一手**: ① `kaggle kernels status ...` ② COMPLETE → output 回収 → extract → b2 差替 ③ RUNNING → ~30分間隔待機 ④ ~22:00Z 超固着 → 上記 fallback 投入。
+- **残 human gate = A(Qiita 公開)のみ**。
+
+### EXIT(54) 追補 — extract→b2 統合パイプライン end-to-end ドライラン済
+- v3 出力スキーマ(`proxy_v2.context_sweep` str-key + `proxy_v2.needle.horizon`)を模した合成 nas_pareto.json で `extract_needle_results.py` をドライラン。**両 honest-disclosure outcome を確認**: (a) horizon=int → "horizon=N tok - shortest length where retrieval breaks..." (b) horizon=None → "never failed retrieval within swept lengths"。256/512/1024/2048 の delta_nll mean+95%CI 行も期待通り描画。
+- 結論: 実データ到着時の統合は `extract_needle_results.py <json>` 一発で b2 L115/L137-138 に転記可能。ユニットテスト(4 passed)に加え full-pipeline dry-run でも de-risk 完了。
