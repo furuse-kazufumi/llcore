@@ -1360,3 +1360,16 @@ run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extr
 - b2 draft 精査(L113/L115/L137/L138)で判明: needle/2048 ギャップは**既に honest-disclosure として完結**。SVG caption=UNTESTED、L137=2048+未実測の申告、**L138=「自宅CPUでは測れずGPUオフロードが次の一手、2048+ retrievalは未検証、だから大丈夫とは言わない」という narrative の山場**(記事主題の長文脈メモリ溢れが自機で再現した皮肉)を書き切っている。
 - → **lite 投入は publish blocker ではなく任意の polish**。horizon 値が出れば「未検証」を具体値化できるが、出なくても b2 は内部整合・publish 可能。L138 の honest punchline は honest-disclosure 哲学に合致し乾いた数値より訴求力が高い面もある。
 - 選択の再枠組み: (1)lite投入=数値で補強する polish / (3)据え置き=既に honest な記事を今 ship(=実質ロスなし)。push する/しないは「必須 vs 諦め」ではなく「polish するか否か」。
+
+## ★2026-06-22 EXIT(11) — 再開地点(canonical / needle 決着後・連載 publish-ready)
+- **HEAD=`1261f40`。全成果 local commit 済、push なし。** 作業ツリーは `docs/SESSION_SUMMARY.md`(自動生成)以外 clean。ブランチ `feat/lm-recurrent`。
+- **needle 決着済み**: run-2(`27918958686`)は 03:56:26Z に `timeout-minutes:350` で kill → conclusion=cancelled。回収結果ゼロ(`nas_pareto.json` 未生成、`run_offload.log` のみ)。lite ワークフロー(`09c9842`)が検証済み保険。
+- **重要: needle は b2 の publish blocker ではない**。b2 L137-138 は「自宅CPUでは測れず GPU offload が次の一手、2048+ retrieval は未検証」を narrative の山場として既に honest 開示済み。lite は任意の polish。
+- **本セッションの確定成果**:
+  - `1261f40` b2 needle 節に doc_0530(NIAH deceptive saturation/arXiv:2604.02650)留保を追加(doc_0592 と両面で RAD 接地)+ EXIT(10) 記録。
+  - publish-readiness 監査(全クリーン): 内部リンク 0 broken / 参照アセット 0 欠損 / b2 SVG 実在 / SERIES_INDEX 16 記事(s1,s2,b1-b7,a7/a8/a9/a11,c1-c3)完全網羅・整合。
+- **連載は全 16 記事が技術+一般の両輪で publish-ready**。残るは人間 gate のみ:
+  - **A=Qiita 公開**(SVG raw URL 化 / `feedback_qiita_svg_path_and_cache` チェックリスト適用)。
+  - **B=lite push**(needle 数値補強・任意。`git push origin feat/lm-recurrent` + `git tag needle-lite-1 && git push origin needle-lite-1`)。コード解析で 350分内に収まる公算大(O(4096²) needle を除去)。
+  - **C=Kaggle push**(GPU で needle を正攻法計測する代替路、b2 L138 の「次の正しい一手」)。
+- **方針**: 非 gate の価値ある作業は出し切った(quality-over-volume)。いずれかの gate 承認 or 新題材指示で再開。
