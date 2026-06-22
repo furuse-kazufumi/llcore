@@ -1490,3 +1490,12 @@ run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extr
   - 一般版 L33「約36%。3文字に1文字ちょっと」→「約29%。3〜4文字に1文字」
 - **未修正で human flag**: b5 L72「realp1=青空文庫マルチ作品」は b1「日本語単一書籍」と食い違う(corpus_aozora.txt の単一/複数は生成元ログだけで未確定)。描写差のため要 human 判断。
 - **公開キュー QA 進捗**: s1✓/s2✓/b1✓/b5✓(誤記修正)/b2✓。次候補: a7(#5)→ a8(#6)…。
+
+## ★2026-06-22 EXIT(24) — 公開キュー QA: a7(公開順#5)数値突合 全一致
+- **a7 load-bearing 数値 → 全一致**:
+  - メモリ表(`recurrent_runtime_rss.json`): gpt t256/512/1024/2048=229.8/247.3/330.5/607.9MB、recurrent t256=205.0、rwkv t256=215.3。×2.65=607.9/229.8=2.645。
+  - prefill latency(`recurrent_latency_sweep.json`): scaling_exponent gpt 1.372(≈1.37)/recurrent 1.002(≈1.00)/rwkv 0.994(≈0.99)、growth_ratio gpt 45.604(×45.6)。
+  - decode(`decode_latency_sweep.json`): prefill exp gpt 1.372/decode exp gpt 1.365、decode_growth gpt 44.533(×44.5)、recurrent prefill growth 15.636(×15.6)/decode 0.983(×0.98)、rwkv decode 1.101(×1.10)。
+- **a7 引用**: arXiv `2605.05413`(From History to State)= EXIT(17) 検証済。ρ<1/ρ≈1 の (A)規範 vs (B)観測 分離は honest disclosure として明示。
+- **結論**: a7 publish-ready。
+- **公開キュー QA 進捗**: s1✓/s2✓/b1✓/b5✓(修正)/a7✓/b2✓。次候補: a8(#6)→a9(#7)→b3(#8)…。
