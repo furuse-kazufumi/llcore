@@ -1599,3 +1599,136 @@ run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extr
   3. **RUNNING** → ~1h 間隔で待機(ScheduleWakeup `<<autonomous-loop-dynamic>>`)。純ポーリング禁止(EXIT14 教訓)。投入から 12h 超で RUNNING 固着なら output 確認→再投入判断。
 - **残 human gate**: A=Qiita 公開(全16記事は publish-ready)。s1/b1 の 28.66 修正済につき 28.65 記載は残っていない。
 - **注意**: 公開キュー QA は完了済。新セッションで重複検収は不要(各記事の検証結果は EXIT16-36 に記録)。新規 arXiv 引用や数値を draft に追加した場合のみ同手順で再検証。
+
+## ★2026-06-22 EXIT(38) — 再開地点(canonical / コンテキスト上限による退避・純待機セッション)
+- **HEAD=`8b7a36d`。push なし。** ブランチ `feat/lm-recurrent`。作業ツリーは自動生成2ファイル(SESSION_SUMMARY.md / next_plan.md)以外 clean。**本セッションはコード変更ゼロ**=Kaggle needle のポーリング待機のみ。
+- **本セッションの確認事項**: ① needle `furusekazufumi/llcore-needle-offload` は投入 04:18Z → 07:03Z 時点で経過 ~2.75h・一貫して `RUNNING`(CPU 30GB/12h、full needle 2048+4096、4096² full-attn が数時間規模=健全。12h 上限に余裕)。② 統合 drop-in パスを再 de-risk 済: `scripts/extract_needle_results.py` 実在(3912B)、b2 `docs/articles/drafts/b2-suppress-your-win.md` のアンカー L113/L115/L137/L138 すべて「未検証(UNTESTED)」narrative 込みで present → needle 完了時はフリクションゼロで実測値へ差替可能。
+- **未対応 QA flag: ゼロ**(EXIT16-37 で全16記事の公開キュー QA 完遂・検出 finding は全消化済)。新規 actionable なし。
+- **★新セッションの具体的な一手(不変)**:
+  1. `kaggle kernels status furusekazufumi/llcore-needle-offload`
+  2. **COMPLETE** → `kaggle kernels output furusekazufumi/llcore-needle-offload -p out/needle_kaggle` → `py -3.11 scripts/extract_needle_results.py out/needle_kaggle/nas_pareto.json` → b2 の L115/L137/L138 + SVG L51-52 を needle 実測値で差替(horizon=None/int 両 outcome 準備済)。**これは任意 polish=publish blocker ではない**。
+  3. **RUNNING** → ~1h 間隔で待機(ScheduleWakeup `<<autonomous-loop-dynamic>>`)。純ポーリング禁止(EXIT14 教訓)。投入 04:18Z から 12h 超(=16:18Z 以降)で RUNNING 固着なら `kaggle kernels output` の run_offload.log で死因確認 → 再投入判断。
+  4. **ERROR/CANCELLED** → output の run_offload.log で死因確認(`[resume]` 不在=メタ不一致)。
+- **残 human gate**: A=Qiita 公開(全16記事 publish-ready)。
+- **注意**: 公開キュー QA は完了済。新セッションで重複検収は不要(各記事の検証結果は EXIT16-36 に記録)。新規 draft 追加時のみ同手順で再検証。
+
+## ★2026-06-22 EXIT(39) — 再開地点(canonical / コンテキスト上限による退避・純待機セッション)
+- **HEAD=`8b7a36d`。push なし。** ブランチ `feat/lm-recurrent`。作業ツリーは自動生成2ファイル(SESSION_SUMMARY.md / next_plan.md)以外 clean。**本セッションもコード変更ゼロ**=Kaggle needle のポーリング待機のみ。
+- **本セッションの確認事項**: ① needle `furusekazufumi/llcore-needle-offload` は投入 04:18Z → 07:24Z 時点で経過 ~3.1h・一貫して `RUNNING`(CPU 30GB/12h、full needle 2048+4096、4096² full-attn が数時間規模=健全。12h 上限=16:18Z に余裕)。② 統合 drop-in パスを再 de-risk 済: `scripts/extract_needle_results.py` 実在(3912B)、b2 ドラフト `docs/articles/drafts/b2-suppress-your-win.md` + general 版とも present。
+- **未対応 QA flag: ゼロ**(EXIT16-37 で全16記事の公開キュー QA 完遂・検出 finding は全消化済)。新規 actionable なし。
+- **★新セッションの具体的な一手(不変)**:
+  1. `kaggle kernels status furusekazufumi/llcore-needle-offload`
+  2. **COMPLETE** → `kaggle kernels output furusekazufumi/llcore-needle-offload -p out/needle_kaggle` → `py -3.11 scripts/extract_needle_results.py out/needle_kaggle/nas_pareto.json` → b2 の L115/L137/L138 + SVG L51-52 を needle 実測値で差替(horizon=None/int 両 outcome 準備済)。**任意 polish=publish blocker ではない**。
+  3. **RUNNING** → ~1h 間隔で待機(ScheduleWakeup `<<autonomous-loop-dynamic>>`)。純ポーリング禁止(EXIT14 教訓)。投入 04:18Z から 12h 超(=16:18Z 以降)で RUNNING 固着なら `kaggle kernels output` の run_offload.log で死因確認 → 再投入判断。
+  4. **ERROR/CANCELLED** → output の run_offload.log で死因確認(`[resume]` 不在=メタ不一致)。
+- **残 human gate**: A=Qiita 公開(全16記事 publish-ready)。
+- **注意**: 公開キュー QA は完了済。新セッションで重複検収は不要。新規 draft 追加時のみ同手順で再検証。
+
+---
+
+## ★2026-06-22 EXIT(40) — 再開地点(canonical)
+
+- **HEAD**: `8b7a36d`(本セッション変化なし)、ブランチ `feat/lm-recurrent`。作業ツリーは自動生成2ファイル(SESSION_SUMMARY.md / next_plan.md)以外 clean。push なし。
+- **本セッションもコード変更ゼロ** = Kaggle needle `furusekazufumi/llcore-needle-offload` のポーリング待機のみ(EXIT39 から状態不変)。
+- **needle 状況**: 投入 04:18Z → 07:54Z 時点で経過 ~3.6h・一貫して `RUNNING`(CPU 30GB/12h、full needle 2048+4096、4096² full-attn が数時間規模=健全。12h 上限=16:18Z にまだ ~8h 余裕)。死因兆候なし。
+- **未対応 QA flag: ゼロ**。新規 actionable なし。残 human gate=A(Qiita 公開・全16記事 publish-ready)のみ。Kaggle 回収は gate 不要。
+- **★新セッションの具体的な一手(不変)**:
+  1. `kaggle kernels status furusekazufumi/llcore-needle-offload`
+  2. **COMPLETE** → `kaggle kernels output furusekazufumi/llcore-needle-offload -p out/needle_kaggle` → `py -3.11 scripts/extract_needle_results.py out/needle_kaggle/nas_pareto.json` → b2 の L115/L137/L138 + SVG L51-52 を needle 実測値で差替(horizon=None/int 両 outcome 準備済)。任意 polish=publish blocker ではない。
+  3. **RUNNING** → ~1h 間隔で待機(ScheduleWakeup `<<autonomous-loop-dynamic>>`)。純ポーリング禁止。16:18Z 以降も RUNNING 固着なら output の run_offload.log で死因確認 → 再投入判断。
+  4. **ERROR/CANCELLED** → output の run_offload.log で死因確認(`[resume]` 不在=メタ不一致)。
+
+## ★2026-06-22 EXIT(41) — 再開地点(canonical, 状態不変)
+
+- Kaggle needle `furusekazufumi/llcore-needle-offload` = 依然 `RUNNING`(投入 04:18Z、12h 上限=16:18Z まで余裕)。コード変更ゼロ・未対応 QA flag ゼロ。
+- 次の一手は EXIT(40) と不変。COMPLETE 時のみ output 回収 → `extract_needle_results.py` → b2 L115/L137/L138+SVG 差替(任意 polish)。RUNNING なら ~20分間隔で待機継続。残 human gate=A(Qiita 公開)。
+
+## ★2026-06-22 EXIT(42) — 再開地点(canonical, 状態不変)
+
+- **HEAD**: `8b7a36d`、ブランチ `feat/lm-recurrent`。作業ツリーは自動生成2ファイル(SESSION_SUMMARY.md / next_plan.md)以外 clean。push なし。本セッションもコード変更ゼロ(EXIT(41) 追記のみ)。
+- **needle 状況**: Kaggle `furusekazufumi/llcore-needle-offload` = 一貫して `RUNNING`。投入 04:18Z → 08:21Z 時点で実経過 **~4h**(12h 上限=16:18Z まで ~8h 余裕、健全・死因兆候なし)。※過去 EXIT で「~12h 経過」と誤記した区間があったが、実 UTC 確認(08:1x〜08:21Z)で実経過は ~4h と確定済。
+- **統合 drop-in 再確認済**: `scripts/extract_needle_results.py` 実在 OK。未対応 QA flag ゼロ。残 human gate=A(Qiita 公開・全16記事 publish-ready)のみ。Kaggle 回収は gate 不要。
+- **★新セッションの具体的な一手(不変)**:
+  1. `kaggle kernels status furusekazufumi/llcore-needle-offload`
+  2. **COMPLETE** → `kaggle kernels output furusekazufumi/llcore-needle-offload -p out/needle_kaggle` → `py -3.11 scripts/extract_needle_results.py out/needle_kaggle/nas_pareto.json` → b2 の L115/L137/L138 + SVG L51-52 を needle 実測値で差替(horizon=None/int 両 outcome 準備済)。任意 polish=publish blocker ではない。
+  3. **RUNNING** → ~30分間隔で待機(ScheduleWakeup `<<autonomous-loop-dynamic>>`、純ポーリング禁止)。loop が毎分再発火しても実経過は分単位でしか進まないため、直近確認から間もなければ status 再取得を省くこと。16:18Z 以降も RUNNING 固着なら output の run_offload.log で死因確認 → 再投入判断。
+  4. **ERROR/CANCELLED** → output の run_offload.log で死因確認(`[resume]` 不在=メタ不一致)。
+
+---
+
+## ★2026-06-22 EXIT(43) — 再開地点
+
+- **HEAD**: `8b7a36d`(本セッション変化なし)、ブランチ `feat/lm-recurrent`。作業ツリーは自動生成2ファイル(SESSION_SUMMARY.md / next_plan.md)以外 clean。push なし・コード変更ゼロ。
+- **本セッションの実作業**: Kaggle needle `furusekazufumi/llcore-needle-offload` のポーリング監視のみ。一貫して `RUNNING`。
+  - 投入 04:18Z → 最終確認 **08:41Z**(実経過 ~4h23m)。CPU 30GB/12h、12h 上限=**16:18Z** まで ~7.5h 余裕、健全。
+  - 待機中の de-risk 再確認(完了): `scripts/extract_needle_results.py` + `tests/unit/test_extract_needle_results.py` 実在 ✅ / b2 統合アンカー `docs/articles/drafts/b2-suppress-your-win.md` L113・L115(SVG参照+図キャプション, needle=UNTESTED開示込み)/ L137(context スイープ未実測 + 先行研究 arXiv:2604.07658 decay spectra / arXiv:2604.02650 deceptive saturation を narrative化)/ L138(2048=「このハードウェアでは測れない壁」honest オチ + GPU オフロード方針)すべて present ✅。
+  - **b2 は needle 実測値なしでも publish-ready**(未検証ギャップが narrative 化済)。Kaggle 結果は UNTESTED→実測値の polish のみ。
+- **未対応 QA flag ゼロ**(EXIT16-37 で全16記事の公開キュー QA 完遂済)。
+- **次の具体的な一手**(優先順):
+  1. `kaggle kernels status furusekazufumi/llcore-needle-offload`
+  2. **COMPLETE** → `kaggle kernels output furusekazufumi/llcore-needle-offload -p out/needle_kaggle` → `py -3.11 scripts/extract_needle_results.py out/needle_kaggle/nas_pareto.json` → 出力の `cs['2048']['mean']`=`<MEAN>` / CI=`<CI>` / `p['needle']['horizon']`=`<HZ>` を b2 **L115 / L137 / L138** + SVG **L51-52** に差替(任意 polish・publish blocker ではない)。horizon=None/int 両 outcome 文面とも準備済。
+  3. **RUNNING** → ~30分間隔で待機(直近確認から間もなければ status 取得を省く)。16:18Z 超で RUNNING 固着なら output の run_offload.log で死因確認→再投入判断。
+  4. **ERROR/CANCELLED** → `kaggle kernels output ... -p out/needle_kaggle` の run_offload.log で死因確認。
+- **残 human gate = A(Qiita 公開・全16記事 publish-ready)のみ**。Kaggle 回収は gate 不要。
+
+---
+
+## ★2026-06-22 EXIT(44) — 再開地点(canonical, 状態不変)
+
+- **HEAD**: `8b7a36d`(本セッション変化なし)、ブランチ `feat/lm-recurrent`。作業ツリーは自動生成2ファイル(SESSION_SUMMARY.md / next_plan.md)以外 clean。push なし・コード変更ゼロ。
+- **本セッションの実作業**: Kaggle needle `furusekazufumi/llcore-needle-offload` のポーリング監視のみ(EXIT43 から状態不変)。一貫して `RUNNING`。
+  - 投入 04:18Z → 最終確認 **08:57Z**(実経過 ~4h39m)。CPU 30GB/12h、12h 上限=**16:18Z** まで ~7.3h 余裕、健全・死因兆候なし。
+  - 待機中の de-risk(完了): `py -3.11 -m pytest tests/unit/test_extract_needle_results.py` = **4 passed**(統合パス動作保証)/ b2 統合アンカー L113・L115・L137・L138 すべて present・UNTESTED 開示 narrative 込みで再確認済 ✅。
+  - **b2 は needle 実測値なしでも publish-ready**。Kaggle 結果は UNTESTED→実測値の polish のみ。
+- **未対応 QA flag ゼロ**(EXIT16-37 で全16記事の公開キュー QA 完遂済)。
+- **次の具体的な一手**(優先順):
+  1. `kaggle kernels status furusekazufumi/llcore-needle-offload`
+  2. **COMPLETE** → `kaggle kernels output furusekazufumi/llcore-needle-offload -p out/needle_kaggle` → `py -3.11 scripts/extract_needle_results.py out/needle_kaggle/nas_pareto.json` → 出力の `cs['2048']['mean']`=`<MEAN>` / CI=`<CI>` / `p['needle']['horizon']`=`<HZ>` を b2 **L115 / L137 / L138** + SVG **L51-52** に差替(任意 polish・publish blocker ではない)。horizon=None/int 両 outcome 文面とも準備済。
+  3. **RUNNING** → ~30分間隔で待機(直近確認から間もなければ status 取得を省く)。16:18Z 超で RUNNING 固着なら output の run_offload.log で死因確認→再投入判断。
+  4. **ERROR/CANCELLED** → `kaggle kernels output ... -p out/needle_kaggle` の run_offload.log で死因確認(`[resume]` 不在=メタ不一致)。
+- **残 human gate = A(Qiita 公開・全16記事 publish-ready)のみ**。Kaggle 回収は gate 不要。
+
+---
+
+## ★2026-06-22 EXIT(45) — 再開地点(canonical, 状態不変)
+
+- **HEAD**: `8b7a36d`(本セッション変化なし)、ブランチ `feat/lm-recurrent`。作業ツリーは自動生成2ファイル(SESSION_SUMMARY.md / next_plan.md)以外 clean。push なし・コード変更ゼロ。
+- **本セッションの実作業**: Kaggle needle `furusekazufumi/llcore-needle-offload` のポーリング監視のみ。本セッション中、複数回 status 確認し **すべて `RUNNING`**(状態不変)。
+- **⚠ 注意点(EXIT45 で更新)**: 投入 04:18Z の 12h 上限=16:18Z は **既に経過**しているが status は依然 `RUNNING`。Kaggle の 12h 制限は実時間ではなく実 CPU 稼働時間ベースのため超過とは限らないが、**RUNNING 固着の可能性も否定できない**。次セッションでは status だけで判断せず、必要に応じ `kaggle kernels output ... -p out/needle_kaggle` で run_offload.log を取得して「正常進行中」か「ハング/メタ不一致で固着」かを切り分けること。
+- **b2 は needle 実測値なしでも publish-ready**(L137-138 が honest 留保を narrative 化済)。Kaggle 結果は UNTESTED→実測値の polish のみ。未対応 QA flag ゼロ。
+- **次の具体的な一手**(優先順):
+  1. `kaggle kernels status furusekazufumi/llcore-needle-offload`
+  2. **COMPLETE** → `kaggle kernels output furusekazufumi/llcore-needle-offload -p out/needle_kaggle` → `py -3.11 scripts/extract_needle_results.py out/needle_kaggle/nas_pareto.json` → 出力の `cs['2048']['mean']`=`<MEAN>` / CI=`<CI>` / `p['needle']['horizon']`=`<HZ>` を b2 **L115 / L137 / L138** + SVG **L51-52** に差替(任意 polish・publish blocker ではない)。
+  3. **RUNNING 継続** → ~30分間隔で待機。ただし 16:18Z を既に超過しているため、次回確認時に依然 RUNNING なら run_offload.log を取得して固着判定 → 固着なら再投入を判断。
+  4. **ERROR/CANCELLED** → `kaggle kernels output ... -p out/needle_kaggle` の run_offload.log で死因確認(`[resume]` 不在=メタ不一致)。
+- **残 human gate = A(Qiita 公開・全16記事 publish-ready)のみ**。Kaggle 回収は gate 不要。
+
+---
+
+## ★2026-06-22 EXIT(46) — 再開地点(本セッション)
+
+- **HEAD=`8b7a36d`**(本セッション変化なし)、ブランチ `feat/lm-recurrent`。作業ツリーは自動生成2ファイル(SESSION_SUMMARY.md / next_plan.md)以外 clean。push なし・コード変更ゼロ。
+- **本セッションの実態**: Kaggle needle `furusekazufumi/llcore-needle-offload` を ~30回以上ポーリング(60分間隔)→ **全て一貫して RUNNING**。状態遷移ゼロ。
+- **新知見(zombie 疑い濃厚)**: 投入 04:18Z の 12h wall 上限(16:18Z)を大幅超過しても status は `RUNNING` 固着。`kaggle kernels output -p out/needle_kaggle` は **終了状態まで何も返さない**ため、進行中か zombie かの切り分けは**ログ取得不能**=確証は得られず。盲目的再投入は (a) 近完了の進捗を捨てるリスク (b) 既に GH Actions timeout でも失敗済の同一ワークロード再現リスク、の両面で却下し低頻度監視を継続した。
+- **次の具体的な一手**:
+  1. `kaggle kernels status furusekazufumi/llcore-needle-offload`
+  2. **COMPLETE** → `kaggle kernels output furusekazufumi/llcore-needle-offload -p out/needle_kaggle` → `py -3.11 scripts/extract_needle_results.py out/needle_kaggle/nas_pareto.json` → b2 L115/L137/L138 + SVG L51-52 差替(任意 polish・publish blocker ではない)。
+  3. **依然 RUNNING(zombie 濃厚)** → **再投入を本格判断すべき段階**。推奨は「同一ワークロード盲目再投入」ではなく **needle config を縮小**(2048 のみ等)して 12h 内完了を狙う改修版を `kaggle kernels push`(計算オフロード=自律許可)。push 操作自体は git push ではないので gate 不要だが、既存版を上書きするため version 採番に注意。
+  4. **ERROR/CANCELLED** → run_offload.log で死因確認。
+- **残 human gate = A(Qiita 公開・全16記事 publish-ready)のみ**。Kaggle 回収は gate 不要・非 blocker。b2 は実測値なしでも publish-ready(L137-138 が honest 留保を narrative 化済)。
+
+---
+
+## ★2026-06-22 EXIT(47) — 再開地点(本セッション)
+
+- **HEAD=`8b7a36d`**(本セッション変化なし)、ブランチ `feat/lm-recurrent`。作業ツリーは自動生成2ファイル + `ci/kaggle/needle_offload/runner.py`(縮小版改修・未コミット)。push なし。
+- **本セッションの決定的アクション**: EXIT(46) の zombie 判定を実行に移した。現在 **06-22 09:59Z = 投入 06-21 04:18Z から約 29h 経過**(12h wall を大幅超過)で v1 は zombie 確定的、`output` も空(終了状態まで返らず)。よって EXIT(46)③ に従い **needle 縮小版を再投入**:
+  - `runner.py` L70 を `--needle-lengths 2048,4096` → **`2048` のみ**に変更(最重量の 4096 full-attention forward を削り 12h budget 内完了を狙う)。縮小理由は runner にコメント記録(honest disclosure)。
+  - `kaggle kernels push` で **version 3** 投入(v2 も同一縮小版・重複 push 無害)。status=**RUNNING** で新 run 開始を確認。
+- **次の具体的な一手**:
+  1. `kaggle kernels status furusekazufumi/llcore-needle-offload`
+  2. **COMPLETE** → `kaggle kernels output furusekazufumi/llcore-needle-offload -p out/needle_kaggle` → `py -3.11 scripts/extract_needle_results.py out/needle_kaggle/nas_pareto.json` → `cs['2048']['mean']`/CI/`p['needle']['horizon']` を b2 **L115/L137/L138** + SVG **L51-52** に差替(任意 polish・publish blocker ではない)。
+  3. **RUNNING 継続** → ~20-30分間隔で待機。縮小版投入は本セッション ~10:00Z 起点なので 12h wall = 翌 ~22:00Z。これを超えて固着なら v1 同様 zombie とみなし、2048 sweep 単独(needle 完全除外)へさらに縮小 or GH lite workflow 再検討。
+  4. **ERROR/CANCELLED** → run_offload.log で死因確認(`[resume]` 不在=メタ不一致)。
+- **残 human gate = A(Qiita 公開・全16記事 publish-ready)のみ**。Kaggle 回収は gate 不要・非 blocker。b2 は実測値なしでも publish-ready(L137-138 が honest 留保を narrative 化済)。
+- **未コミットの `runner.py` 改修**: ローカル commit は安全(push gate に非該当)。次ターンで `git add ci/kaggle/needle_offload/runner.py && git commit` を実施してよい。

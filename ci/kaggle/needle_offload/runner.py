@@ -57,7 +57,11 @@ def main() -> int:
     shutil.copy("ci/fixtures/corpus_aozora_multi.txt", "out/corpus_aozora_multi.txt")
     shutil.copy("ci/fixtures/eval_cache.json", "out/nas_pareto_v2full/eval_cache.json")
 
-    # 5. Rigorous tier + needle (2048 AND 4096) + 2048 sweep, GA resumed.
+    # 5. Rigorous tier + needle (2048 only) + 2048 sweep, GA resumed.
+    #    v1 (needle 2048 AND 4096) ran >29 h wall past the 12 h cap = zombie;
+    #    the 4096 full-attention forward is the heaviest leg, so this retry
+    #    drops it to fit inside the 12 h budget. 2048 still anchors b2's
+    #    long-context decay claim (L115/L137-138).
     log = os.path.join(WORK, "run_offload.log")
     with open(log, "w", encoding="utf-8") as fh:
         proc = subprocess.Popen(
@@ -67,7 +71,7 @@ def main() -> int:
              "--text-file", "out/corpus_aozora_multi.txt",
              "--out", "out/nas_pareto_v2full",
              "--context-sweep", "256,512,1024,2048",
-             "--needle", "--needle-lengths", "2048,4096"],
+             "--needle", "--needle-lengths", "2048"],
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
         )
         assert proc.stdout is not None
