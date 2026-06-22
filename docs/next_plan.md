@@ -1521,3 +1521,13 @@ run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extr
 - **⚠️ flag(human 判断・中核は不変)**: title/L9 の my-tool int8 **「13.97MB」が再現不可**。記事自身の分解では my-tool int8 = critic int8(12.10)+ mask(1.57)= **13.68MB** のはず。生成元 `int8_quant_footprint_realp1.json` int8_bytes 12,103,056 + mask 1,572,864 = 13,675,920 = 13.68MB。13.97 に厳密一致する committed 値なし(landscape_spec の "13.97" は無関係 float の偶然)。削減率 71.6% は 1−13.97/49.23 で自己整合だが、13.97 を 13.68 にすると 72.2% になる。**対応案**: int8 footprint を mask 込みで実測し直して title を 13.68(or 実測値)へ訂正、または 13.97 の出所(別 int8 scheme/buffer)を特定。
 - **b3 引用**: arXiv なし。検証規律(外部 finding を一次検証)に自己準拠。
 - **公開キュー QA 進捗**: s1✓/s2✓/b1✓/b5✓(修正)/a7✓/a8✓/a9✓/b3✓/b2✓。次候補: b4(#9)→b7(#10)→b6(#12)…。
+
+## ★2026-06-22 EXIT(28) — 公開キュー QA: b4(公開順#9)中核全一致 + L19 metric 誤ラベルを flag
+- **b4 中核数値 → 全一致**(`out/poc_branch_a_memory_fitness.json`, 2×2):
+  - safe_rate: none_retention 0.95 / none_memory 1.0 / contraction_* 1.0 →「ゲート無しでも 95〜100%」✓
+  - footprint: none_retention 0.375 / none_memory 0.1492 →「0.375→0.149」✓
+  - capability diff: retention_diff 0.01157(+0.012, passes=true)/ memory_diff 0.00419(+0.004, passes=false)✓
+  - Z3: n_rejections 71 / fallback 0 ✓
+- **⚠️ flag(human 判断・thesis 不変)**: L19「ゲートを足しても **retention(遅延再現性能)が 0.95→1.00** に僅かに上がるだけ」は metric 取り違え。0.95→1.00 は **safe_rate**(none_retention 0.95 → contraction_retention 1.0)であり、retention 実値 mean_retention は 0.6416→0.6382 と**むしろ微減**。**対応案**: L19 を「safe_rate が 0.95→1.00」に訂正(retention の語と定義を別途保持)、または「gate の効果は retention 個体群の safe_rate を 0.95→1.00 にする僅少分のみ」と明確化。
+- **公開キュー QA 進捗**: s1✓/s2✓/b1✓/b5✓(修正)/a7✓/a8✓/a9✓/b3✓/b4✓/b2✓。次候補: b7(#10)→b6(#12)→a11(#13)…。
+- **findings 累計**: 修正1(b5 別モデル値)/ human flag 4(s1 丸め28.65・a9 one-shot 1.51MB・b3 title int8 13.97・b4 L19 retention/safe_rate ラベル)。
