@@ -1451,3 +1451,9 @@ run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extr
   - base_nll 4.4155 / verdict「hypervolume +15.3%」/ real_evals 386 / hv_gain_ci mean 16.81%・ci 16.23..17.68%・p_memetic_wins 1.0(記事 +16.8%/16.2..17.7%/1.000)/ proxy_vs_judge_tau 1.0(τ=1.00)/ holdout_offset 8192・windows 12 / verdict notes「max optimism_gap 0.0652 > CI half-width floor 0.0204」逐語一致 / frontier_holdout optimism_gap(0.0014/0.0271/0.0652)+CI 一致。
 - **含意**: b2 は citation-integrity(EXIT16/17)に加え内部数値整合性も検証済 = 数値ミスマッチ由来の publish blocker なし。残 publish 依存=A(Qiita 公開=human gate)+ 任意 needle 補強のみ。
 - **本セッション累積健全性**: mypy strict 全67 green / pytest 0 failures / b2 ship-ready / arXiv 引用7件 verified / b2 数値 生成元一致。非ゲート engineering work は実在せず、live thread=needle 完了待ち + A gate。
+
+## ★2026-06-22 EXIT(19) — b2 一般版整合 + SVG 図版 QA 完了(publish-ready 全次元検証)
+- **needle 投入時刻を実測訂正**: kaggle push コミット `04f8fd3`=04:18Z 投入、本ターン時点で経過 ~1.4h のみ(12h 上限に程遠い)。過去の「複数セッション RUNNING=12h 超過疑い」は誤りで、多数 re-prompt が実時間 ~1.4h に圧縮されただけ。4096² CPU needle は数時間が正常 = 健全 RUNNING、再投入不要。
+- **b2-general(非エンジニア版)整合**: 「約6.6時間/386通り」「15.3%勝った(選抜)」「+16.8%総合・誤差引いても0割らない(HV holdout CI_lo>0)」= 技術版 b2 / 生成元データと一致、矛盾数値なし。daily_articles_policy の並走品質クリア。
+- **SVG 図版 QA**(memory `feedback_qiita_svg_path_and_cache` 適合): `assets/articles/llcore_suppress_win.svg` 実在(4571B)、埋め込みテキスト SUPPRESSED/KEPT/UNTESTED/15.3/16.8/0.0652/0.0204/holdout/optimism すべて記事キャプション(L113-115)と整合。公開時 raw 絶対 URL 参照の留意は L115 で human 向け明記済。
+- **b2 publish-ready 検証 総括**: ① arXiv 引用7件(EXIT16/17)② 技術版 headline 数値=生成元一致(EXIT18)③ 一般版整合 ④ SVG アセット&ラベル整合。残 publish 依存=A(Qiita公開=human gate)+ 任意 needle 数値補強のみ。非ゲート QA は出尽くし。
