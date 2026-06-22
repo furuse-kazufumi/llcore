@@ -37,10 +37,10 @@
   <rect x="296" y="98" width="424" height="118" rx="10" fill="#161b22" stroke="#da3633" stroke-width="1.5"/>
   <text x="316" y="124" fill="#f85149" font-size="15" font-weight="700">✗ 賢さ(capability)を追う道</text>
   <text x="316" y="148" fill="#c9d1d9" font-size="12.5">top-1≈29% では意味の通る文・質問への回答は構造的に出ない</text>
-  <text x="316" y="168" fill="#c9d1d9" font-size="12.5">「漱石の幽霊」= 文体の断片は出るが会話は不成立</text>
+  <text x="316" y="168" fill="#c9d1d9" font-size="12.5">「漱石の幽霊」= 文体の断片は出るが会話は不成立(富士山も出ず)</text>
   <!-- closed ceiling row -->
   <line x1="316" y1="182" x2="700" y2="182" stroke="#30363d" stroke-width="1" stroke-dasharray="4 4"/>
-  <text x="316" y="202" fill="#f85149" font-size="12.5" font-weight="700">天井は環境でなく本質 <tspan fill="#8b949e" font-weight="400" font-size="12">— 文字単位・極小params・データ。賢くする道は閉</tspan></text>
+  <text x="316" y="202" fill="#f85149" font-size="12.5" font-weight="700">天井は環境でなく本質 <tspan fill="#8b949e" font-weight="400" font-size="12">— 文字単位・極小params・データ。賢くする道は閉じている</tspan></text>
 
   <!-- PATH B: memory efficiency (open / green) -->
   <rect x="296" y="252" width="424" height="118" rx="10" fill="#161b22" stroke="#238636" stroke-width="1.5"/>

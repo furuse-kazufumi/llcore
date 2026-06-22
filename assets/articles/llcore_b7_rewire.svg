@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" font-family="Segoe UI, Hiragino Kaku Gothic ProN, Meiryo, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0d1117"/><stop offset="1" stop-color="#161b22"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#8b949e"/>
+    </marker>
+  </defs>
+  <rect width="760" height="440" fill="url(#bg)"/>
+
+  <text x="34" y="40" fill="#e6edf3" font-size="22" font-weight="700">北極星だけ載せ替える — 道具は捨てない</text>
+  <text x="34" y="64" fill="#8b949e" font-size="13.5">負けた賢さ探索で作った機構3点はそのまま、目標(北極星)だけ capability→memory に差し替える。</text>
+
+  <!-- ===== left: the 3 preserved tools (kept) ===== -->
+  <text x="34" y="96" fill="#6e7681" font-size="12">残った機構資産(北極星に依存しない汎用の道具)</text>
+
+  <rect x="34" y="106" width="270" height="52" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+  <text x="50" y="130" fill="#c9d1d9" font-size="13.5" font-weight="700">minimal_ga</text>
+  <text x="50" y="148" fill="#8b949e" font-size="11.5">最小限の進化探索エンジン</text>
+
+  <rect x="34" y="166" width="270" height="52" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+  <text x="50" y="190" fill="#c9d1d9" font-size="13.5" font-weight="700">verified-plasticity gate</text>
+  <text x="50" y="208" fill="#8b949e" font-size="11.5">Z3 / SDP で収縮を数学的に証明</text>
+
+  <rect x="34" y="226" width="270" height="52" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+  <text x="50" y="250" fill="#c9d1d9" font-size="13.5" font-weight="700">falsification harness</text>
+  <text x="50" y="268" fill="#8b949e" font-size="11.5">主張を反証しにかかる検証台</text>
+
+  <text x="169" y="300" fill="#3fb950" font-size="13" font-weight="700" text-anchor="middle">✓ 3点とも 1つも捨てない</text>
+
+  <!-- ===== middle: north-star swap ===== -->
+  <text x="468" y="96" fill="#6e7681" font-size="12" text-anchor="middle">載せ替えるのは北極星だけ</text>
+
+  <!-- old north-star: capability (struck, lost) -->
+  <rect x="356" y="116" width="224" height="50" rx="8" fill="#161b22" stroke="#da3633" stroke-width="1.5"/>
+  <text x="372" y="139" fill="#f85149" font-size="13.5" font-weight="700">✗ 旧:capability(賢さ)</text>
+  <text x="372" y="158" fill="#8b949e" font-size="11">進化 ≒ ランダム / passes = False</text>
+  <line x1="366" y1="124" x2="570" y2="158" stroke="#f85149" stroke-width="1.5" opacity="0.7"/>
+
+  <!-- swap arrow down -->
+  <line x1="468" y1="170" x2="468" y2="196" stroke="#8b949e" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="490" y="187" fill="#d29922" font-size="11.5" font-weight="700">差し替え</text>
+
+  <!-- new north-star: memory (win) -->
+  <rect x="356" y="200" width="224" height="50" rx="8" fill="#161b22" stroke="#238636" stroke-width="1.5"/>
+  <text x="372" y="223" fill="#3fb950" font-size="13.5" font-weight="700">✓ 新:memory(メモリ効率)</text>
+  <text x="372" y="242" fill="#8b949e" font-size="11">適応度をメモリ指標へ・道具は再利用</text>
+
+  <!-- tools feed into new north-star -->
+  <line x1="304" y1="225" x2="350" y2="225" stroke="#8b949e" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="327" y="217" fill="#6e7681" font-size="10.5" text-anchor="middle">そのまま</text>
+
+  <!-- ===== payoff: measured discriminative power 84% vs 0% ===== -->
+  <text x="624" y="96" fill="#6e7681" font-size="12" text-anchor="middle">効いた数字:false-admit</text>
+  <text x="624" y="110" fill="#8b949e" font-size="10.5" text-anchor="middle">(危険を安全と誤認した率)</text>
+
+  <!-- baseline -->
+  <line x1="600" y1="280" x2="710" y2="280" stroke="#30363d" stroke-width="2"/>
+
+  <!-- bar A: experience gate 84% -> h=126 (84%->1.5px/% *84=126), top y=154 -->
+  <rect x="608" y="154" width="38" height="126" rx="3" fill="#f85149"/>
+  <text x="627" y="146" fill="#f85149" font-size="14" font-weight="700" text-anchor="middle">84%</text>
+  <text x="627" y="298" fill="#8b949e" font-size="10.5" text-anchor="middle">経験</text>
+  <text x="627" y="312" fill="#8b949e" font-size="10.5" text-anchor="middle">ゲート</text>
+
+  <!-- bar B: sound proof 0% -> draw a thin marker at baseline -->
+  <rect x="666" y="276" width="38" height="4" rx="2" fill="#3fb950"/>
+  <text x="685" y="268" fill="#3fb950" font-size="14" font-weight="700" text-anchor="middle">0%</text>
+  <text x="685" y="298" fill="#8b949e" font-size="10.5" text-anchor="middle">sound</text>
+  <text x="685" y="312" fill="#8b949e" font-size="10.5" text-anchor="middle">証明</text>
+
+  <text x="655" y="338" fill="#d29922" font-size="11.5" font-weight="700" text-anchor="middle">8割超の取りこぼし → 0</text>
+
+  <!-- ===== bottom note band: honest scope ===== -->
+  <text x="34" y="338" fill="#8b949e" font-size="12.5">価値は <tspan fill="#c9d1d9" font-weight="700">guarantee(保証)</tspan> 側。賢さ(capability)は取り戻さない — capability と guarantee は直交。</text>
+  <text x="34" y="360" fill="#8b949e" font-size="12.5">独自性は「進化 × sound 収縮ゲート × メモリ北極星 × recurrent」の <tspan fill="#c9d1d9" font-weight="700">狭い四点結合</tspan> のみ。大半は既知手法の再導出。</text>
+
+  <!-- footer -->
+  <line x1="34" y1="398" x2="726" y2="398" stroke="#21262d" stroke-width="1"/>
+  <text x="34" y="420" fill="#8b949e" font-size="12.5">負けたのは<tspan fill="#c9d1d9" font-weight="700">目標(賢さ)</tspan>であって道具ではない。北極星だけ載せ替えれば、証明ゲートは保証装置として生き返る。</text>
+</svg>
