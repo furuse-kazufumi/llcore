@@ -69,7 +69,7 @@
   <text x="685" y="298" fill="#8b949e" font-size="10.5" text-anchor="middle">sound</text>
   <text x="685" y="312" fill="#8b949e" font-size="10.5" text-anchor="middle">証明</text>
 
-  <text x="655" y="338" fill="#d29922" font-size="11.5" font-weight="700" text-anchor="middle">8割超の取りこぼし → 0</text>
+  <text x="655" y="332" fill="#d29922" font-size="11" font-weight="700" text-anchor="middle">8割超の取りこぼし → 0</text>
 
   <!-- ===== bottom note band: honest scope ===== -->
   <text x="34" y="338" fill="#8b949e" font-size="12.5">価値は <tspan fill="#c9d1d9" font-weight="700">guarantee(保証)</tspan> 側。賢さ(capability)は取り戻さない — capability と guarantee は直交。</text>
