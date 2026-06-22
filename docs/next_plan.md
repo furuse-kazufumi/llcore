@@ -1853,3 +1853,11 @@ run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extr
 - **結論: needle/b2 統合経路は三重 de-risk + 公開資産確認まで完了。残るは v3 の状態変化待ちのみ**(これ以上の準備作業は不要・over-engineering 回避)。
 - **次の一手(EXIT(54) と不変)**: ① `kaggle kernels status ...` ② COMPLETE → `kaggle kernels output ... -p out/needle_kaggle` → `py -3.11 scripts/extract_needle_results.py out/needle_kaggle/nas_pareto.json` → b2 L115/L137/L138 + SVG L51-52 差替 ③ RUNNING → ~30分間隔待機 ④ ~22:00Z 超固着 → `cp ci/kaggle/needle_offload/runner_sweep_only.py ci/kaggle/needle_offload/runner.py` → `kaggle kernels push -p ci/kaggle/needle_offload`(gate 不要)⑤ ERROR → run_offload.log で死因確認。
 - **残 human gate = A(Qiita 公開・全16記事 publish-ready)のみ**。needle 回収は gate 不要・非 blocker。
+
+## ★2026-06-22 EXIT(56) — 再開地点(a7 hybrid 接地完了・v3 RUNNING 待機)
+
+- **HEAD=`2c3fe6a`**、ブランチ `feat/lm-recurrent`。push なし。Kaggle v3 `furusekazufumi/llcore-needle-offload` = 13:10Z **RUNNING**(12h wall ~22:00Z まで余裕、健全)。
+- **本セッション成果(ローカルコミット済)**: `2c3fe6a` — seed 推奨だが未統合だった hybrid 解の定量文献 doc_0095(TransXSSM, arXiv:2506.09507)を a7 参考文献 L297 に接地。Jamba(定性)に加え定量例(4K で訓練/推論 42.3%/29.5% 高速化・LM +4%)で「純定数状態は long-range で弱い→hybrid 化が解」の業界方向を補強。honest 枠(未検証の外部知識)明示維持。これで a7 の RAD 三段(実測→理論 2604.07658→hybrid 解 2506.09507)が記事本体に揃った。
+- **b2 への hybrid 接地は据置**: seed 上 optional(「または」)で b2 主題は honest disclosure ゆえ過剰編集回避。b2 は既に理論2件(2604.07658/2604.02650)を L137 に引用済・publish-ready。
+- **次の一手(EXIT(55) と不変)**: ① `kaggle kernels status ...` ② COMPLETE → `kaggle kernels output ... -p out/needle_kaggle` → `py -3.11 scripts/extract_needle_results.py out/needle_kaggle/nas_pareto.json` → b2 L115/L137/L138 + SVG L113 差替 ③ RUNNING → ~30分間隔待機 ④ ~22:00Z 超固着 → `cp ci/kaggle/needle_offload/runner_sweep_only.py ci/kaggle/needle_offload/runner.py` → `kaggle kernels push -p ci/kaggle/needle_offload`(gate 不要)⑤ ERROR → run_offload.log で死因確認。
+- **残 human gate = A(Qiita 公開)のみ**。needle 回収は gate 不要・非 blocker。
