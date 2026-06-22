@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" font-family="Segoe UI, Hiragino Kaku Gothic ProN, Meiryo, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0d1117"/><stop offset="1" stop-color="#161b22"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#6e7681"/>
+    </marker>
+    <marker id="arrowG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#3fb950"/>
+    </marker>
+    <marker id="arrowR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#f85149"/>
+    </marker>
+  </defs>
+  <rect width="760" height="440" fill="url(#bg)"/>
+
+  <text x="34" y="40" fill="#e6edf3" font-size="22" font-weight="700">散らばった勝ち筋を 1 行で検収できる道具に畳む</text>
+  <text x="34" y="64" fill="#8b949e" font-size="13.5">measure_memory() に fp32 モデルを 1 個渡す → 3 軸を 1 枚に。独自は cap-gate の fail-closed 検収だけ。</text>
+
+  <!-- ===== left: scattered primitives (再導出) ===== -->
+  <text x="34" y="104" fill="#6e7681" font-size="12" font-weight="700">バラバラのプリミティブ(llama.cpp/GGUF の再導出)</text>
+  <rect x="34" y="116" width="150" height="30" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1.2"/>
+  <text x="109" y="135" fill="#c9d1d9" font-size="12" text-anchor="middle">int8 量子化</text>
+  <rect x="34" y="152" width="150" height="30" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1.2"/>
+  <text x="109" y="171" fill="#c9d1d9" font-size="12" text-anchor="middle">mmap ロード</text>
+  <rect x="34" y="188" width="150" height="30" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1.2"/>
+  <text x="109" y="207" fill="#c9d1d9" font-size="12" text-anchor="middle">定数状態 recurrent</text>
+  <rect x="34" y="224" width="150" height="30" rx="6" fill="#161b22" stroke="#d29922" stroke-width="1.5"/>
+  <text x="109" y="243" fill="#d29922" font-size="12" font-weight="700" text-anchor="middle">cap-gate(唯一の独自)</text>
+
+  <!-- arrows into facade -->
+  <line x1="184" y1="131" x2="236" y2="200" stroke="#6e7681" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <line x1="184" y1="167" x2="236" y2="204" stroke="#6e7681" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <line x1="184" y1="203" x2="236" y2="208" stroke="#6e7681" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <line x1="184" y1="239" x2="236" y2="214" stroke="#d29922" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- ===== facade ===== -->
+  <rect x="240" y="170" width="118" height="80" rx="10" fill="#161b22" stroke="#388bfd" stroke-width="2"/>
+  <text x="299" y="200" fill="#e6edf3" font-size="13.5" font-weight="700" text-anchor="middle">facade</text>
+  <text x="299" y="220" fill="#c9d1d9" font-size="11.5" text-anchor="middle">llcore.memory</text>
+  <text x="299" y="238" fill="#8b949e" font-size="11" text-anchor="middle">measure_memory()</text>
+
+  <!-- facade -> 3 axes -->
+  <line x1="358" y1="186" x2="430" y2="142" stroke="#6e7681" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <line x1="358" y1="210" x2="430" y2="210" stroke="#6e7681" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <line x1="358" y1="234" x2="430" y2="278" stroke="#6e7681" stroke-width="1.4" marker-end="url(#arrow)"/>
+
+  <!-- ===== 3 axes of MemoryReport ===== -->
+  <text x="430" y="104" fill="#6e7681" font-size="12" font-weight="700">MemoryReport = 3 軸を 1 枚に(実機実測)</text>
+
+  <!-- axis 1: footprint -->
+  <rect x="430" y="116" width="296" height="52" rx="8" fill="#161b22" stroke="#238636" stroke-width="1.3"/>
+  <text x="444" y="136" fill="#3fb950" font-size="12.5" font-weight="700">① 量子化 footprint(静的)</text>
+  <text x="444" y="156" fill="#c9d1d9" font-size="11.5">realp1 49.23 → 13.97 MB(<tspan fill="#3fb950" font-weight="700">71.6%減</tspan>)</text>
+
+  <!-- axis 2: capability -->
+  <rect x="430" y="184" width="296" height="52" rx="8" fill="#161b22" stroke="#238636" stroke-width="1.3"/>
+  <text x="444" y="204" fill="#3fb950" font-size="12.5" font-weight="700">② capability retention + cap-gate</text>
+  <text x="444" y="224" fill="#c9d1d9" font-size="11.5">330,368 tok で top-1 <tspan fill="#3fb950" font-weight="700">100.0%</tspan> 維持・PASS</text>
+
+  <!-- axis 3: KV growth -->
+  <rect x="430" y="252" width="296" height="52" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1.3"/>
+  <text x="444" y="272" fill="#c9d1d9" font-size="12.5" font-weight="700">③ 文脈長 KV 成長(動的)</text>
+  <text x="444" y="292" fill="#c9d1d9" font-size="11.5">T=256 4.72MB → T=2048 37.75MB(<tspan fill="#d29922" font-weight="700">×8.0 線形</tspan>)</text>
+
+  <!-- ===== cap-gate decision (bottom) ===== -->
+  <text x="299" y="290" fill="#d29922" font-size="11.5" font-weight="700" text-anchor="middle">cap-gate 検収</text>
+  <line x1="299" y1="298" x2="299" y2="318" stroke="#d29922" stroke-width="1.6"/>
+  <line x1="240" y1="318" x2="358" y2="318" stroke="#d29922" stroke-width="1.6"/>
+
+  <!-- PASS branch -->
+  <line x1="240" y1="318" x2="240" y2="338" stroke="#3fb950" stroke-width="1.6" marker-end="url(#arrowG)"/>
+  <rect x="120" y="340" width="240" height="44" rx="8" fill="#161b22" stroke="#238636" stroke-width="1.5"/>
+  <text x="240" y="360" fill="#3fb950" font-size="12.5" font-weight="700" text-anchor="middle">✓ PASS → --save-int8 で書き出し</text>
+  <text x="240" y="378" fill="#8b949e" font-size="11" text-anchor="middle">能力が壊れていない時だけ int8 を emit</text>
+
+  <!-- FAIL branch -->
+  <line x1="358" y1="318" x2="358" y2="338" stroke="#f85149" stroke-width="1.6" marker-end="url(#arrowR)"/>
+  <rect x="378" y="340" width="290" height="44" rx="8" fill="#161b22" stroke="#da3633" stroke-width="1.5"/>
+  <text x="523" y="360" fill="#f85149" font-size="12.5" font-weight="700" text-anchor="middle">✗ FAIL / コーパス無 → 書き込み拒否</text>
+  <text x="523" y="378" fill="#8b949e" font-size="11" text-anchor="middle">fail-closed(--force で運用者が明示上書き)</text>
+
+  <!-- footer -->
+  <line x1="34" y1="398" x2="726" y2="398" stroke="#21262d" stroke-width="1"/>
+  <text x="34" y="420" fill="#8b949e" font-size="12.5">プリミティブは既存手法の再導出。新しいのは<tspan fill="#c9d1d9" font-weight="700">「footprint の勝ちを能力ゲートで fail-closed に検収する運用」</tspan>1 点だけ。</text>
+</svg>

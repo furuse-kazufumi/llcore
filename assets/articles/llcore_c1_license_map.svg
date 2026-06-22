@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" font-family="Segoe UI, Hiragino Kaku Gothic ProN, Meiryo, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0d1117"/><stop offset="1" stop-color="#161b22"/>
+    </linearGradient>
+  </defs>
+  <rect width="760" height="440" fill="url(#bg)"/>
+
+  <text x="34" y="40" fill="#e6edf3" font-size="22" font-weight="700">「open」は 1 つではない — 商用ローカル可否で 3 種に割れる</text>
+  <text x="34" y="64" fill="#8b949e" font-size="13.5">2026 年前半の実例 3 モデル。重みが落とせること(技術)と商用に使えること(ライセンス)は別の検収。</text>
+
+  <!-- top source box: "open weights = 重みが落とせる、だけ" -->
+  <rect x="34" y="84" width="692" height="34" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+  <text x="380" y="106" fill="#c9d1d9" font-size="13.5" font-weight="700" text-anchor="middle">「open weights」=重みが落とせる、それだけ → 商用ローカル可否は別問い</text>
+
+  <!-- three arrows down to columns -->
+  <path d="M155 118 L155 134" stroke="#6e7681" stroke-width="1.5" marker-end="url(#ah)"/>
+  <path d="M380 118 L380 134" stroke="#6e7681" stroke-width="1.5" marker-end="url(#ah)"/>
+  <path d="M605 118 L605 134" stroke="#6e7681" stroke-width="1.5" marker-end="url(#ah)"/>
+  <defs>
+    <marker id="ah" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+      <path d="M0 0 L8 4 L0 8 Z" fill="#6e7681"/>
+    </marker>
+  </defs>
+
+  <!-- ===== Column 1: OSI 認定 OSS (Apache 2.0) ===== -->
+  <rect x="34" y="138" width="242" height="178" rx="10" fill="#161b22" stroke="#238636" stroke-width="1.5"/>
+  <text x="155" y="162" fill="#3fb950" font-size="14" font-weight="700" text-anchor="middle">種類 1 — OSI 認定 OSS</text>
+  <text x="155" y="182" fill="#8b949e" font-size="12" text-anchor="middle">Apache 2.0 / MIT(素直な OSS)</text>
+
+  <rect x="50" y="194" width="210" height="48" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
+  <text x="62" y="214" fill="#e6edf3" font-size="13" font-weight="700">Gemma 4(Google)</text>
+  <text x="62" y="232" fill="#8b949e" font-size="11.5">Apache 2.0(独自規約から変更)</text>
+
+  <rect x="50" y="250" width="210" height="48" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
+  <text x="62" y="270" fill="#e6edf3" font-size="13" font-weight="700">PaddleOCR-VL(Baidu)</text>
+  <text x="62" y="288" fill="#d29922" font-size="11.5">Apache だが ERNIE-4.5 ベース要確認</text>
+
+  <!-- ===== Column 2: open model ライセンス (非 OSS) ===== -->
+  <rect x="288" y="138" width="184" height="178" rx="10" fill="#161b22" stroke="#9e6a03" stroke-width="1.5"/>
+  <text x="380" y="162" fill="#d29922" font-size="14" font-weight="700" text-anchor="middle">種類 2 — open model</text>
+  <text x="380" y="182" fill="#8b949e" font-size="12" text-anchor="middle">OSI 認定の古典 OSS ではない</text>
+
+  <rect x="304" y="200" width="152" height="92" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
+  <text x="380" y="222" fill="#e6edf3" font-size="13" font-weight="700" text-anchor="middle">Cosmos 3(NVIDIA)</text>
+  <text x="380" y="244" fill="#8b949e" font-size="11.5" text-anchor="middle">OpenMDW 1.1</text>
+  <text x="380" y="266" fill="#d29922" font-size="11.5" text-anchor="middle">商用条件・派生物条項</text>
+  <text x="380" y="283" fill="#d29922" font-size="11.5" text-anchor="middle">→ 条文を実読してから</text>
+
+  <!-- ===== Column 3: 独自規約 (旧 Gemma 等) ===== -->
+  <rect x="484" y="138" width="242" height="178" rx="10" fill="#161b22" stroke="#5a3a3a" stroke-width="1.5"/>
+  <text x="605" y="162" fill="#c9d1d9" font-size="14" font-weight="700" text-anchor="middle">種類 3 — 独自規約 / 条件付き</text>
+  <text x="605" y="182" fill="#8b949e" font-size="12" text-anchor="middle">利用制限・商用条件が付きうる</text>
+
+  <rect x="500" y="194" width="210" height="48" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
+  <text x="512" y="214" fill="#e6edf3" font-size="13" font-weight="700">旧 Gemma Terms of Use</text>
+  <text x="512" y="232" fill="#8b949e" font-size="11.5">Gemma 1/2/3 の独自規約(→4 で脱却)</text>
+
+  <rect x="500" y="250" width="210" height="48" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
+  <text x="512" y="270" fill="#e6edf3" font-size="13" font-weight="700">Qwen 系の商用条件 等</text>
+  <text x="512" y="288" fill="#f85149" font-size="11.5">依存しすぎないのが dual-license 安全側</text>
+
+  <!-- verdict band: 3 questions to ask before adoption -->
+  <text x="34" y="338" fill="#e6edf3" font-size="13.5" font-weight="700">採用前に「open かどうか」でなく、3 つを別々に確認する:</text>
+  <rect x="34" y="346" width="224" height="40" rx="6" fill="#0d1117" stroke="#238636" stroke-width="1.2"/>
+  <text x="146" y="364" fill="#3fb950" font-size="12" font-weight="700" text-anchor="middle">(1) ライセンスの種類</text>
+  <text x="146" y="380" fill="#8b949e" font-size="11" text-anchor="middle">OSI 認定 OSS か / 独自規約か</text>
+  <rect x="268" y="346" width="224" height="40" rx="6" fill="#0d1117" stroke="#9e6a03" stroke-width="1.2"/>
+  <text x="380" y="364" fill="#d29922" font-size="12" font-weight="700" text-anchor="middle">(2) 商用利用の条件</text>
+  <text x="380" y="380" fill="#8b949e" font-size="11" text-anchor="middle">用途制限・帰属義務の範囲</text>
+  <rect x="502" y="346" width="224" height="40" rx="6" fill="#0d1117" stroke="#5a3a3a" stroke-width="1.2"/>
+  <text x="614" y="364" fill="#c9d1d9" font-size="12" font-weight="700" text-anchor="middle">(3) 派生物とベースの継承</text>
+  <text x="614" y="380" fill="#8b949e" font-size="11" text-anchor="middle">ベースのライセンスを一段たどる</text>
+
+  <!-- footer -->
+  <line x1="34" y1="398" x2="726" y2="398" stroke="#21262d" stroke-width="1"/>
+  <text x="34" y="420" fill="#8b949e" font-size="12.5">束縛力を持つのは記事でなく<tspan fill="#c9d1d9" font-weight="700">各モデルの条文そのもの</tspan>。OSI 認定 OSS でなければ採用前に必ず実読(法的助言ではない)。</text>
+</svg>
