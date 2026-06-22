@@ -51,6 +51,10 @@ _should_promote(report, force) -> (bool, reason)
 
 flaky は消えました。テストにリトライを足したのではなく、**判定と I/O を分離した**から。
 
+![BEFORE/AFTER 比較図。左(BEFORE)は「判定」と「ファイル書込」が 1 関数に癒着し、int8 ノイズで top-1 が境界をまたいで CLI 丸ごとテストが PASS/FAIL を揺らす。右(AFTER)は判定だけを純関数 _should_promote → (bool, reason) に切り出し、判定の単体テスト(gate=PASS/FAIL/未測定 × force)と CLI の決定的経路のみに分離して flaky が消滅。要点=テストの揺れは「設計を分けろ」という無料のレビュアー。](../../../assets/articles/llcore_a11_test_smell.svg)
+
+_判定と I/O の癒着(左)を、判定の純関数化で分離(右)した前後比較。_
+
 ---
 
 ## 4. 教訓 — flaky を「テストの不運」で片付けない
