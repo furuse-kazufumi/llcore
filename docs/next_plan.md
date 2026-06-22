@@ -1309,3 +1309,16 @@ run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extr
   - **run が失敗していたら**: `gh run view 27918958686 --log-failed`。新 tag `needle-run-3` push で再起動可。
 - **human gate(未消化)**: A=Qiita 公開(SVG raw URL 化)/ C=Kaggle push。B=needle は実行中。
 - **方針**: 指示なき薄い量産はしない(quality-over-volume)。needle 完了 or 新題材指示で再開。
+
+## ★2026-06-22 EXIT(7) — 再開地点(canonical / コンテキスト上限近接で退避)
+- **HEAD=`75244ab`。全成果 local commit 済、push なし。作業ツリーは `docs/SESSION_SUMMARY.md`(自動生成)以外 clean。** ブランチ `feat/lm-recurrent`。
+- **状態変化なし(EXIT(6) から純待機)**: GH Actions run `27918958686`(needle-run-2)は **00:46Z 時点で依然 `in_progress`**(startedAt=22:06:26Z から ~2h40m)。
+  - **重要な訂正(EXIT(6) の読み違い修正)**: ジョブ step を `gh run view 27918958686 --json jobs --jq '.jobs[].steps[]'` で精査した結果、**compute step「Run rigorous tier + needle + 2048 sweep (GA resumed from snapshot)」が依然 in_progress**。後続 step(Assert GA was resumed / Generate report / Upload results / Post Run *)は**全て pending**。つまり teardown ではなく**本計算が継続中**(2048 full-attention スイープが重い)。2-3h 想定・6h 上限の範囲内で正常。`gh run watch` 出力に見えた "Post Run" 行は実行中ではなく予定step一覧だった。
+- **本セッションの作業(commit なし、待機中の de-risk のみ)**: ① run 生死確認を反復 ② 統合ツール `extract_needle_results.py` の pytest 4件 green を再確認(環境健全性) ③ b2 draft アンカー行 L113-115/L136-139 + SVG L50-53 が想定文面どおり存在することを再検証(テンプレ差替が確実に当たる)。コード/記事の変更なし。
+- **最優先の継続 = needle 結果の回収と統合**(手順は EXIT(5)/(6) と「★ ペースト可能テンプレート」節のまま不変):
+  1. 新セッションで `gh run view 27918958686 --json status,conclusion` 生死確認 → in_progress なら `gh run watch 27918958686 --exit-status` を background 再起動(背景 watch `b22bknb41` は本セッション終了で失われる)。毎ターンのポーリングは避ける。
+  2. completed 後: `gh run download 27918958686 -D out/needle_offload` → 「Assert GA was resumed」success 確認 → `py -3.11 scripts/extract_needle_results.py out/needle_offload/nas_pareto.json`(commit `09ffade`、訂正済みスキーマ内蔵)。
+  3. **next_plan「★ needle 統合のペースト可能テンプレート」節**の `<MEAN>`=`cs['2048']['mean']` / `<CI>`=`[ci_lo,ci_hi]` / `<HZ>`=`p['needle']['horizon']` を差し替えるだけで **b2 L115/L137/L138 + SVG L51-52** が確定(horizon=None/int 両 outcome の文面・doc_0530[arXiv:2604.02650]/doc_0592[arXiv:2604.07658]引用とも訂正済)。
+  - **run が失敗していたら**: `gh run view 27918958686 --log-failed`。新 tag `needle-run-3` push で再起動可。
+- **human gate(未消化)**: A=Qiita 公開(SVG raw URL 化)/ C=Kaggle push。B=needle は実行中。
+- **方針**: 指示なき薄い量産はしない(quality-over-volume)。needle 完了 or 新題材指示で再開。
