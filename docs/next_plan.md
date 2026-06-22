@@ -1587,3 +1587,15 @@ run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extr
 - **データで決着**: `corpus_aozora_multi_manifest.json` は n_works=84 / vocab 4358 / 3.3M chars = **multi_smoke** のコーパス。realp1 は `corpus_aozora.txt`(vocab 3044 / 320,730 chars)で別物の小規模単一作品。b1「日本語単一書籍」が正、b5「青空文庫マルチ作品」は誤り(b5 が realp1 を multi_smoke と混同した残り。0.3629 誤記=EXIT23 と同根)。
 - **修正**: b5 L72「realp1 = 青空文庫マルチ作品」→「青空文庫(単一作品、語彙 3044・約32万字)」。b1 と整合。
 - **finding 完全消化**: 修正済4(b5 top1値・b4 L19・s1+b1 28.66丸め・b5 コーパス記述)/ 過剰flag解消2(b3・a9)/ **未対応 flag ゼロ**。公開キュー QA は検出した全 finding を解消し終了。
+
+## ★2026-06-22 EXIT(37) — 再開地点(canonical / コンテキスト上限による退避)
+- **HEAD=`3d860d3`。push なし。** ブランチ `feat/lm-recurrent`。作業ツリーは自動生成ファイル以外 clean。
+- **本セッションの確定成果(公開キュー QA 完遂)**: 連載全16記事を数値(実測JSON突合)/ arXiv引用7件 / web事実(Gemma4・Hermes Agent)/ コード参照 / SVGアセット / 一般版整合 の全次元で検収。検出 finding を全消化 = 修正4(b5 top1 0.3629→0.2866 / b4 L19 retention→safe_rate / s1+b1 28.65→28.66丸め / b5 コーパス記述マルチ→単一)+ 過剰flag実測解消2(b3 13.97MB・a9 1.51MB は正規ツール出力で正当)。クロス記事一貫性も確認済(28.65 残存ゼロ・0.3629 は b6 で multi_smoke に正しく帰属)。リポジトリ mypy strict 全67 green / pytest 0 failures。
+- **未対応 QA flag: ゼロ**。
+- **唯一の live thread = Kaggle needle `furusekazufumi/llcore-needle-offload`**: 投入 04:18Z、本セッション終盤(06:34Z)時点で経過 ~2.3h・一貫して `RUNNING`(CPU 30GB/12h, full needle 2048+4096、4096² full-attn が数時間規模=健全。12h 上限に余裕)。
+- **★新セッションの具体的な一手(不変)**:
+  1. `kaggle kernels status furusekazufumi/llcore-needle-offload`
+  2. **COMPLETE** → `kaggle kernels output furusekazufumi/llcore-needle-offload -p out/needle_kaggle` → `py -3.11 scripts/extract_needle_results.py out/needle_kaggle/nas_pareto.json` → b2 `docs/articles/drafts/b2-suppress-your-win.md` の L115/L137/L138 + SVG L51-52 を needle 実測値で差替(horizon=None/int 両 outcome 準備済)。**これは任意 polish=publish blocker ではない**。
+  3. **RUNNING** → ~1h 間隔で待機(ScheduleWakeup `<<autonomous-loop-dynamic>>`)。純ポーリング禁止(EXIT14 教訓)。投入から 12h 超で RUNNING 固着なら output 確認→再投入判断。
+- **残 human gate**: A=Qiita 公開(全16記事は publish-ready)。s1/b1 の 28.66 修正済につき 28.65 記載は残っていない。
+- **注意**: 公開キュー QA は完了済。新セッションで重複検収は不要(各記事の検証結果は EXIT16-36 に記録)。新規 arXiv 引用や数値を draft に追加した場合のみ同手順で再検証。
