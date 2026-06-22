@@ -1,4 +1,4 @@
-"""Kaggle CPU offload — NAS proxy-v2 long-context needle/passkey + 2048 sweep.
+"""Kaggle CPU offload -- NAS proxy-v2 long-context needle/passkey + 2048 sweep.
 
 Why Kaggle CPU (not GPU): llcore's model loader pins the model to CPU
 (`loader.py: model.to_empty(device="cpu")`, custom Int8Linear path), so a GPU
@@ -10,8 +10,8 @@ clears the ~3.9 GB working set with huge margin and has time for the FULL needle
 sweep (2048 AND 4096) that the GH lite contingency had to drop.
 
 Faithful port of `.github/workflows/nas-needle-offload.yml`:
-  resume from the committed eval_cache snapshot (no 6.6 h GA rerun) → rigorous
-  tier + 2048 context sweep + needle at 2048,4096 → emit nas_pareto.json.
+  resume from the committed eval_cache snapshot (no 6.6 h GA rerun) - rigorous
+  tier + 2048 context sweep + needle at 2048,4096 - emit nas_pareto.json.
 
 Output: /kaggle/working/nas_pareto.json (+ report + log) for `kaggle kernels output`.
 """
@@ -82,7 +82,7 @@ def main() -> int:
     with open(log, encoding="utf-8") as fh:
         resumed = "[resume]" in fh.read()
     if not resumed:
-        print("::error:: eval_cache did NOT resume — meta mismatch.", flush=True)
+        print("::error:: eval_cache did NOT resume -- meta mismatch.", flush=True)
 
     # 7. Honest-disclosure report (best-effort).
     try:
