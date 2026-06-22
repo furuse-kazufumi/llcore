@@ -1577,3 +1577,8 @@ run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extr
 - **修正**: s1 本体6箇所(L6/48/56/123/149/163)+ L54 自己監査注記(手引き値 −13.44→−13.45pp、28.66−15.21=13.45)+ L125 retention 式分母(15.21/28.66≈53.1%、結論不変)/ b1 本体3箇所(L78/82/87)/ b1-general L35。s1-general L11 は「28.7%」(1桁丸めで 0.286625 と整合)につき据置。
 - **findings 全消化**: 修正済3(b5 別モデル値 / b4 L19 metric ラベル / s1+b1 28.66 丸め)/ 過剰flag解消2(b3 13.97・a9 1.51)。**未対応の QA flag はゼロ**。
 - **公開キュー QA 完全終了**: 全16記事の数値・引用・図版・一般版整合を検収し、検出した実害をすべて修正。残るは A=Qiita 公開(human gate)/ b2 needle polish(外部待ち・任意)のみ。
+
+## ★2026-06-22 EXIT(35) — 図版アセット実在を一括確認 → 公開キュー QA 全次元カバー完了
+- **drafts 参照の全 SVG 実在確認**: `llcore_context_memory.svg`(a8)/ `llcore_decode_latency.svg`(a7)/ `llcore_latency_scaling.svg`(a7)/ `llcore_suppress_win.svg`(b2)すべて `assets/articles/` に実在(MISSING ゼロ)。b2 の埋め込みテキスト整合は EXIT19 確認済。a7/a8 の図は本文検証済数値(×45.6/×7.53 等)を描画。
+- **★公開キュー QA 全次元カバー完了**: 数値(実測JSON突合)/ 引用(arXiv 7件)/ web 事実(Gemma4・Hermes)/ コード参照(a11)/ 図版アセット / 一般版整合 — 全16記事で検収済。
+- **最終状態**: 未対応 QA flag ゼロ / 修正済 finding 3(b5・b4・s1+b1)/ リポジトリ mypy strict green・pytest 0 failures。**非ゲートの作業は完全に枯渇**。残: A=Qiita 公開(human gate)/ Kaggle needle 完了(外部待ち・b2 任意 polish)。
