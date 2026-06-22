@@ -1508,3 +1508,10 @@ run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extr
 - **a8 引用**: arXiv なし。
 - **微小注記(flag 不要レベル)**: L45「1024/2048 は別ランと 0.1MB 差で一致」は gpt で厳密(331.8 vs 331.9)、recurrent は 0.3MB 差(205.4 vs 205.1)。質的結論(recurrent 平坦 ~205)に影響なし。
 - **公開キュー QA 進捗**: s1✓/s2✓/b1✓/b5✓(修正)/a7✓/a8✓/b2✓。次候補: a9(#7)→b3(#8)→b4(#9)…。
+
+## ★2026-06-22 EXIT(26) — 公開キュー QA: a9(公開順#7)数値突合(再現ハーネス全一致 + 軽微 flag)
+- **a9 再現ハーネス値 → 全一致**(`runtime_floor_rss.json`): torch rss_median 197.8MB / torch_tax_mb 179.7 / python baseline 18.1 / scaffold_ratio 73.4(記事 73×)/ int8_mb 2.825(2.8MB モデル)。load-bearing な「torch 税 ~180MB」「足場≫本体」は別ランで再現確認。
+- **one-shot 値**(L23-42, ctypes 初回 2026-06-19): baseline 13.4 / import torch 197.3(税+183.9)/ load 213.6 / int8 1.51MB / 142×。内部整合(213.6/1.51=141.5→142、197.3−13.4=183.9)。
+- **⚠️ 軽微 flag(human 判断・publish blocker ではない)**: one-shot の int8 **1.51MB / 142×** に厳密一致する committed 成果物が無い(最近接 `int8_quant_footprint.json` int8_bytes=1.38MB≈1.32MiB は別 config モデル)。記事は「初回・一回限り」と明示し再現ハーネスで主役(torch 税)を裏取り済のため disclosure 上は妥当だが、1.51/142× 自体は repo から独立再現不可。気になるなら one-shot 数値を harness 由来(2.8MB/73×)に寄せるか、1.51MB モデルの footprint を別途コミットすると完全になる。
+- **a9 引用**: arXiv なし(Rust/candle baseline は「未計測・要実測」と本文明示)。
+- **公開キュー QA 進捗**: s1✓/s2✓/b1✓/b5✓(修正)/a7✓/a8✓/a9✓/b2✓。次候補: b3(#8)→b4(#9)→b7(#10)…。
