@@ -664,3 +664,8 @@ needle-run-2 待機中に RAD コーパス(llm_corpus_v2)を grep。b2 §137 の
 - **doc_0592 "Optimal Decay Spectra for Linear Recurrences"(arXiv 2604.07658)**: 線形再帰モデル(Mamba-2/RWKV-7/Gated DeltaNet/GLA/RetNet)の長距離メモリ劣化を **decay spectrum** に帰着し、ランダム初期化で最小スペクトルギャップが O(N^-2) に潰れ、長文脈で誤差が **実質代数的(sub-exponential)** に劣化すると証明。PoST で緩和。→ b2 の「定数状態は長文ほど効かなくなる」を**理論的に裏付ける一次文献**。a7/SUPRA に並べて引用可。
 - **doc_0530 "Revealing the Learning Dynamics of Long-Context Continual Pre-training"(arXiv 2604.02650)**: NIAH(needle-in-a-haystack)スコアは早期に "deceptive saturation(偽の飽和)" を示し、PPL ベース分析の方が内在的改善を正しく追えると報告。→ **honest 枠組みの補強**: 「needle が満点でも内実は飽和していない」=b2 の needle 結果を読むときの留保として強い。needle 数値が良くても過信しない叙述に使える。
 - 使い所: b2 §137-138(needle 統合後)の「関連研究」脚注、または findings の needle 節。あくまで実測が主・引用は接地。
+
+## 2026-06-22 RAD 接地(追補) — b2/a7 の「定数状態の長文脈弱点 → hybrid 化が解」軸の差別化アンカー
+Kaggle v3 needle 待機中に llm_corpus_v2 を追加 grep。上記2件(劣化を「理論で裏付ける」)に対し、これは「劣化への解決策」を示す対の文献:
+- **doc_0095 "TransXSSM: A Hybrid Transformer State Space Model with Unified RoPE"(arXiv 2506.09507)**: 純 SSM(線形時間=定数状態)は long-range 依存で弱い、という前提に立ち、Transformer 層と SSM 層を **Unified RoPE** で整合させた hybrid。4K 長で訓練/推論が 42.3%/29.5% 高速かつ LM ベンチで Transformer baseline を +4% 超。→ b2 の「定数状態は長文ほど効かなくなる」の **自然な続き=「だから純定数状態に拘らず attention を戻す/hybrid 化する」** という業界の解決方向を示す一次文献。a7(control-theory SSM)の締めや b2 の「ではどうするか」節で「劣化を実測で確認(本稿)→ 理論で帰着(2604.07658)→ 解は hybrid 化(2506.09507)」と三段で並べると、独立実測が先行研究の文脈に正しく位置づく。
+- 使い所: a7 の SSM 限界→hybrid 展望、または b2 の needle 統合後の「この弱点は既知で、解も提案されている」一文。実測が主・引用は接地の原則は維持。
