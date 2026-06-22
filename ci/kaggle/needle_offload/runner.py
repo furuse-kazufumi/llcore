@@ -6,12 +6,16 @@ instance would sit idle. The bottleneck for the 2048/4096 full-attention forward
 is RAM, not compute: the author's local box (3.6 GB) thrashes and the GitHub
 Actions runner (7 GB, 350-min job cap) timed out mid-needle on run-2
 (27918958686). A Kaggle CPU notebook has ~30 GB RAM and a 12 h runtime, which
-clears the ~3.9 GB working set with huge margin and has time for the FULL needle
-sweep (2048 AND 4096) that the GH lite contingency had to drop.
+clears the ~3.9 GB working set with huge margin.
 
-Faithful port of `.github/workflows/nas-needle-offload.yml`:
+History: v1 ran needle at BOTH 2048 AND 4096 but blew past the 12 h cap and stuck
+in RUNNING for >29 h wall (zombie). The 4096 full-attention needle is the single
+heaviest leg, so the v3 retry drops it -- needle 2048-only -- to fit the budget
+(see step 5). 2048 still anchors b2's long-context decay claim (L115/L137-138).
+
+Faithful port of `.github/workflows/nas-needle-offload.yml` (resume mechanics):
   resume from the committed eval_cache snapshot (no 6.6 h GA rerun) - rigorous
-  tier + 2048 context sweep + needle at 2048,4096 - emit nas_pareto.json.
+  tier + 2048 context sweep + needle at 2048 - emit nas_pareto.json.
 
 Output: /kaggle/working/nas_pareto.json (+ report + log) for `kaggle kernels output`.
 """
