@@ -29,6 +29,9 @@ llcore には、メモリ効率の**検証済みプリミティブ**がいくつ
 2. **capability retention + cap-gate**: 能力が保たれているか(壊れていれば検収で止める)。
 3. **文脈長 KV 成長(動的)**: 文脈を伸ばすとメモリがどう増えるか。
 
+![散らばった int8 / mmap / 定数状態 / cap-gate のプリミティブを facade(llcore.memory)に畳み、measure_memory() が footprint・capability・KV 成長の 3 軸を 1 枚にまとめる図。独自性は cap-gate PASS 時だけ int8 を書き出し FAIL/コーパス無では fail-closed で拒否する検収運用 1 点だけ、という構図を示す。](../../../assets/articles/llcore_b6_packaging.svg)
+_既存手法の再導出を 1 つの受付窓口に畳み、唯一の独自性である cap-gate 検収を fail-closed の分岐として組み込んだ全体像。_
+
 ---
 
 ## 2. 実機の正直な数字
