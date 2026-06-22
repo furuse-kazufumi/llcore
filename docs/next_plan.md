@@ -1582,3 +1582,8 @@ run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extr
 - **drafts 参照の全 SVG 実在確認**: `llcore_context_memory.svg`(a8)/ `llcore_decode_latency.svg`(a7)/ `llcore_latency_scaling.svg`(a7)/ `llcore_suppress_win.svg`(b2)すべて `assets/articles/` に実在(MISSING ゼロ)。b2 の埋め込みテキスト整合は EXIT19 確認済。a7/a8 の図は本文検証済数値(×45.6/×7.53 等)を描画。
 - **★公開キュー QA 全次元カバー完了**: 数値(実測JSON突合)/ 引用(arXiv 7件)/ web 事実(Gemma4・Hermes)/ コード参照(a11)/ 図版アセット / 一般版整合 — 全16記事で検収済。
 - **最終状態**: 未対応 QA flag ゼロ / 修正済 finding 3(b5・b4・s1+b1)/ リポジトリ mypy strict green・pytest 0 failures。**非ゲートの作業は完全に枯渇**。残: A=Qiita 公開(human gate)/ Kaggle needle 完了(外部待ち・b2 任意 polish)。
+
+## ★2026-06-22 EXIT(36) — b5 のコーパス記述「マルチ作品」を「単一作品」に訂正(realp1/multi_smoke 混同の残り)
+- **データで決着**: `corpus_aozora_multi_manifest.json` は n_works=84 / vocab 4358 / 3.3M chars = **multi_smoke** のコーパス。realp1 は `corpus_aozora.txt`(vocab 3044 / 320,730 chars)で別物の小規模単一作品。b1「日本語単一書籍」が正、b5「青空文庫マルチ作品」は誤り(b5 が realp1 を multi_smoke と混同した残り。0.3629 誤記=EXIT23 と同根)。
+- **修正**: b5 L72「realp1 = 青空文庫マルチ作品」→「青空文庫(単一作品、語彙 3044・約32万字)」。b1 と整合。
+- **finding 完全消化**: 修正済4(b5 top1値・b4 L19・s1+b1 28.66丸め・b5 コーパス記述)/ 過剰flag解消2(b3・a9)/ **未対応 flag ゼロ**。公開キュー QA は検出した全 finding を解消し終了。

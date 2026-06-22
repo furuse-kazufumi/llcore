@@ -69,4 +69,4 @@ CPU の文字単位 tiny LM で **capability(賢さ)を追うのは、構造的�
 
 ---
 
-_技術注記:`py -3.11 -m llcore.lm generate out/lm_aozora_realp1/model.pt`(seed 1/2, temp 0.8, top-k 40)で実生成(2026-06-19)。`realp1` = 青空文庫マルチ作品、11.9M params、文字単位、top-1 次文字 0.2866。pivot の正本は memory `project_llcore_memory_efficiency_pivot`。会話 LLM が要る用途は FullSense 設計では llmesh 経由で既存 LLM を on-prem 実行する分担。_
+_技術注記:`py -3.11 -m llcore.lm generate out/lm_aozora_realp1/model.pt`(seed 1/2, temp 0.8, top-k 40)で実生成(2026-06-19)。`realp1` = 青空文庫(単一作品、語彙 3044・約 32 万字)、11.9M params、文字単位、top-1 次文字 0.2866。pivot の正本は memory `project_llcore_memory_efficiency_pivot`。会話 LLM が要る用途は FullSense 設計では llmesh 経由で既存 LLM を on-prem 実行する分担。_
