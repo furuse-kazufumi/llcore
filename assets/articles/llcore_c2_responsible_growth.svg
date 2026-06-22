@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" font-family="Segoe UI, Hiragino Kaku Gothic ProN, Meiryo, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0d1117"/><stop offset="1" stop-color="#161b22"/>
+    </linearGradient>
+    <marker id="ar" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#8b949e"/>
+    </marker>
+    <marker id="arR" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#f85149"/>
+    </marker>
+    <marker id="arG" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#3fb950"/>
+    </marker>
+  </defs>
+  <rect width="760" height="440" fill="url(#bg)"/>
+
+  <text x="34" y="40" fill="#e6edf3" font-size="22" font-weight="700">同じ学習ループ、分岐は「止める機構」が architecture にあるか</text>
+  <text x="34" y="64" fill="#8b949e" font-size="13.5">「成長する」vs「責任を持って成長する」。育つ ≠ 良くなる。ゲートが無ければ学習ループは汚染ループに反転する。</text>
+
+  <!-- shared source box: learning loop -->
+  <rect x="34" y="150" width="186" height="150" rx="10" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+  <text x="127" y="176" fill="#e6edf3" font-size="14" font-weight="700" text-anchor="middle">内蔵 学習ループ</text>
+  <text x="127" y="194" fill="#8b949e" font-size="11" text-anchor="middle">(両社に共通する出発点)</text>
+  <text x="48" y="218" fill="#c9d1d9" font-size="11.5">1. skill を自動生成</text>
+  <text x="48" y="237" fill="#c9d1d9" font-size="11.5">2. 使用中に skill 改善</text>
+  <text x="48" y="256" fill="#c9d1d9" font-size="11.5">3. 記憶を永続化</text>
+  <text x="48" y="275" fill="#c9d1d9" font-size="11.5">4. FTS5 全文検索</text>
+  <text x="48" y="294" fill="#c9d1d9" font-size="11.5">5. user modeling</text>
+
+  <!-- branch label -->
+  <text x="127" y="326" fill="#6e7681" font-size="11" text-anchor="middle">同じループが二方向に開く</text>
+
+  <!-- top path: grow without gate -> contamination -->
+  <line x1="220" y1="195" x2="300" y2="148" stroke="#f85149" stroke-width="2" marker-end="url(#arR)"/>
+  <text x="300" y="118" fill="#f85149" font-size="13.5" font-weight="700">成長する(ゲート無し)</text>
+  <text x="300" y="136" fill="#8b949e" font-size="11">無条件に skill / 記憶を採用</text>
+
+  <rect x="300" y="150" width="186" height="58" rx="8" fill="#161b22" stroke="#da3633" stroke-width="1.5"/>
+  <text x="393" y="174" fill="#f85149" font-size="13" font-weight="700" text-anchor="middle">⚠ 汚染ループ</text>
+  <text x="393" y="195" fill="#c9d1d9" font-size="11" text-anchor="middle">誤りが自己増殖 → 使うほど劣化</text>
+
+  <!-- bottom path: responsibly grow -> gate -> stops -->
+  <line x1="220" y1="255" x2="300" y2="302" stroke="#3fb950" stroke-width="2" marker-end="url(#arG)"/>
+  <text x="300" y="338" fill="#3fb950" font-size="13.5" font-weight="700">責任を持って成長する</text>
+  <text x="300" y="356" fill="#8b949e" font-size="11">採否を architecture の関所に通す</text>
+
+  <rect x="300" y="232" width="186" height="86" rx="8" fill="#161b22" stroke="#238636" stroke-width="1.5"/>
+  <text x="393" y="255" fill="#3fb950" font-size="13" font-weight="700" text-anchor="middle">承認ゲート(fail-closed)</text>
+  <text x="314" y="277" fill="#c9d1d9" font-size="11">・Approval Bus(採用の関所)</text>
+  <text x="314" y="295" fill="#c9d1d9" font-size="11">・HITL(人/上位検証を挟む)</text>
+  <text x="314" y="313" fill="#c9d1d9" font-size="11">・honest disclosure(内訳開示)</text>
+
+  <!-- gate stops contamination: from gate up to contamination box with a STOP -->
+  <path d="M486 250 q44 -8 44 -52 q0 -38 -40 -42" fill="none" stroke="#d29922" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#ar)"/>
+  <text x="540" y="200" fill="#d29922" font-size="12" font-weight="700" text-anchor="middle">黙って通さず</text>
+  <text x="540" y="217" fill="#d29922" font-size="12" font-weight="700" text-anchor="middle">止める</text>
+
+  <!-- honest column: both unproven -->
+  <line x1="558" y1="150" x2="558" y2="318" stroke="#30363d" stroke-width="1"/>
+  <text x="576" y="120" fill="#e6edf3" font-size="13.5" font-weight="700">honest: 両者とも未証明</text>
+
+  <rect x="576" y="138" width="150" height="80" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+  <text x="590" y="160" fill="#c9d1d9" font-size="12" font-weight="700">Hermes(公開情報)</text>
+  <text x="590" y="180" fill="#8b949e" font-size="11">MIT / 2026-02 公開</text>
+  <text x="590" y="197" fill="#8b949e" font-size="11">★ 47k〜57k(数万規模)</text>
+  <text x="590" y="212" fill="#f85149" font-size="11">独立ベンチ・査読 = 0 件</text>
+
+  <rect x="576" y="228" width="150" height="80" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+  <text x="590" y="250" fill="#c9d1d9" font-size="12" font-weight="700">llive(自分)</text>
+  <text x="590" y="270" fill="#8b949e" font-size="11">止める機構を architecture に</text>
+  <text x="590" y="287" fill="#8b949e" font-size="11">最初から内蔵する側に賭け</text>
+  <text x="590" y="302" fill="#f85149" font-size="11">機構の有効性 = 検証待ち</text>
+
+  <!-- footer -->
+  <line x1="34" y1="398" x2="726" y2="398" stroke="#21262d" stroke-width="1"/>
+  <text x="34" y="420" fill="#8b949e" font-size="12.5">分岐点は「学べる量」でなく<tspan fill="#c9d1d9" font-weight="700">「誤って学んだとき止められるか」</tspan>。違うのは賭けた設計だけ — 有効性は両者まだ未証明。</text>
+</svg>
