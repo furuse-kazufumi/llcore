@@ -1515,3 +1515,9 @@ run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extr
 - **⚠️ 軽微 flag(human 判断・publish blocker ではない)**: one-shot の int8 **1.51MB / 142×** に厳密一致する committed 成果物が無い(最近接 `int8_quant_footprint.json` int8_bytes=1.38MB≈1.32MiB は別 config モデル)。記事は「初回・一回限り」と明示し再現ハーネスで主役(torch 税)を裏取り済のため disclosure 上は妥当だが、1.51/142× 自体は repo から独立再現不可。気になるなら one-shot 数値を harness 由来(2.8MB/73×)に寄せるか、1.51MB モデルの footprint を別途コミットすると完全になる。
 - **a9 引用**: arXiv なし(Rust/candle baseline は「未計測・要実測」と本文明示)。
 - **公開キュー QA 進捗**: s1✓/s2✓/b1✓/b5✓(修正)/a7✓/a8✓/a9✓/b2✓。次候補: b3(#8)→b4(#9)→b7(#10)…。
+
+## ★2026-06-22 EXIT(27) — 公開キュー QA: b3(公開順#8)中核検証 + title int8 値の不整合を flag
+- **b3 中核論証 → 算術で厳密検証**: params 11,914,752×4=47,659,008B(realp1 一致)/ mask 6×256×256×4=1,572,864B / fp32 合計 47,659,008+1,572,864=49,231,872B。会計基準 decimal MB(49,231,872/1e6=49.23 / 47,659,008/1e6=47.66 / int8 12,103,056/1e6=12.10)。「差1.57MB=causal-mask buffer、捏造でなく params-only vs params+buffers の会計差」は完全に正しい。
+- **⚠️ flag(human 判断・中核は不変)**: title/L9 の my-tool int8 **「13.97MB」が再現不可**。記事自身の分解では my-tool int8 = critic int8(12.10)+ mask(1.57)= **13.68MB** のはず。生成元 `int8_quant_footprint_realp1.json` int8_bytes 12,103,056 + mask 1,572,864 = 13,675,920 = 13.68MB。13.97 に厳密一致する committed 値なし(landscape_spec の "13.97" は無関係 float の偶然)。削減率 71.6% は 1−13.97/49.23 で自己整合だが、13.97 を 13.68 にすると 72.2% になる。**対応案**: int8 footprint を mask 込みで実測し直して title を 13.68(or 実測値)へ訂正、または 13.97 の出所(別 int8 scheme/buffer)を特定。
+- **b3 引用**: arXiv なし。検証規律(外部 finding を一次検証)に自己準拠。
+- **公開キュー QA 進捗**: s1✓/s2✓/b1✓/b5✓(修正)/a7✓/a8✓/a9✓/b3✓/b2✓。次候補: b4(#9)→b7(#10)→b6(#12)…。
