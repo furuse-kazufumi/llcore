@@ -1546,3 +1546,12 @@ run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extr
 - **b6 KV 成長**: CLI で T=256 4,718,592(4.72MB)→ T=2048 37,748,736(37.75MB)×8.0 を再現(b6 L51 一致)。
 - **公開キュー QA 進捗**: #1-#12(s1/s2/b1/b5/a7/a8/a9/b3/b4/b7/b2/b6)検収完了。残: a11(#13)/c1(#14)/c2(#15)/c3(#16・引用済)。
 - **findings 更新**: 修正1(b5・実測で正当性確認)/ flag 解消2(b3 13.97・a9 1.51)/ flag 残2(s1+b1 の 28.65→28.66 丸め・b4 L19 retention/safe_rate ラベル)。
+
+## ★2026-06-22 EXIT(31) — 公開キュー QA: a11(#13)・c1(#14)検証完了(Gemma4 を web 裏取り)
+- **a11(#13)**: 定量主張なし。コード構造参照を確認 — `_should_promote` 純関数実在(`src/llcore/memory.py:247` `tuple[bool,str]` 返却・CLI:298 で使用)、`tests/unit/test_memory_facade.py` 実在。publish-ready。
+- **c1(#14)外部事実 全検証**:
+  - arXiv 済(EXIT17): Cosmos 3 = OpenMDW-1.1 / NVIDIA 2026-06-01、PaddleOCR-VL = OmniDocBench v1.6 96.33%。
+  - ★Gemma 4 を WebSearch 裏取り: **Apache 2.0 / 2026-04-02 リリース / 4サイズ E2B・E4B・26B MoE・31B Dense / 独自 Gemma Terms→Apache 2.0 の変更 / Google 公式 blog「Expanding the Gemmaverse with Apache 2.0」**すべて記事(L27/L33/L84)と一致。ソース: opensource.googleblog.com 2026/03 + slashdot 26/04/02。
+  - 記事は「方向性の地図・要条文実読・法的助言でない」と適切に hedge。publish-ready。
+- **公開キュー QA 進捗**: #1-#14 検収完了。残: c2(#15)/ c3(#16・引用 EXIT17 検証済・本文は MangaFlow クロスドメイン傍証)。
+- **findings 確定**: 修正1(b5)/ flag 解消2(b3 13.97・a9 1.51)/ flag 残2(s1+b1 28.65→28.66 丸め・b4 L19 retention/safe_rate ラベル)。
