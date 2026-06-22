@@ -1296,3 +1296,16 @@ run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extr
   - 検証のみ(コミットなし): latency-run-1(`27919132385`)は decode/amort 成果が既統合・コミット済(`f97a461`系、a7 に反映)で未回収成果なし。b2 publish 点検 = needle ギャップ以外に blocker なし(TODO/placeholder ゼロ、SVG raw URL 化は gate A で対応)。
 - **human gate(未消化)**: A=Qiita 公開(SVG raw URL 化)/ C=Kaggle push。B=needle は実行中。
 - **方針**: 指示なき薄い量産はしない(quality-over-volume)。needle 完了 or 新題材指示で再開。
+
+## ★2026-06-22 EXIT(6) — 再開地点(canonical / コンテキスト上限近接で退避)
+- **HEAD=`acabd3c`。全成果 local commit 済、push なし。作業ツリーは `docs/SESSION_SUMMARY.md`(自動生成)以外 clean。** ブランチ `feat/lm-recurrent`。
+- **状態変化なし(EXIT(5) から純待機)**: GH Actions run `27918958686`(needle-run-2)は **00:24Z 時点で依然 `in_progress`**(startedAt=22:06:26Z から ~2h18m、compute step 7「Run rigorous tier + needle + 2048 sweep」継続中)。2-3h 想定の範囲内・6h 上限まで余裕で正常。本セッションは EXIT(5) 退避後すぐに再開された短いループで、コード/記事の変更は一切していない(検証のみ実施)。
+- **本セッションの検証結果(commit なし)**:
+  - draft 記事の `未検証/UNTESTED/TODO` を全 grep → b2(needle 待ちで既知)以外は **b1 L211 / a7 L235,L272 のみ**で、いずれも**意図的な honest-disclosure 表現**(「第三者未検証」「外部の未検証一般化」=ソース境界の明示)であり修正不要。残る統合作業は **b2 の needle 統合のみ**で確定。
+- **最優先の継続 = needle 結果の回収と統合**(手順は EXIT(5) と「ペースト可能テンプレート」節のまま不変):
+  1. 新セッションで `gh run view 27918958686 --json status,conclusion` 生死確認 → in_progress なら `gh run watch 27918958686 --exit-status` を background 再起動(毎ターンのポーリングは避け ScheduleWakeup~1800s に委ねる)。背景 watch `b8qdb3trr` は本セッション終了で失われる。
+  2. completed 後: `gh run download 27918958686 -D out/needle_offload` → 「Assert GA was resumed」success 確認 → `py -3.11 scripts/extract_needle_results.py out/needle_offload/nas_pareto.json`(commit `09ffade`、訂正済みスキーマ内蔵)。
+  3. **next_plan「★ needle 統合のペースト可能テンプレート」節**の `<MEAN>`=`cs['2048']['mean']` / `<CI>`=`[ci_lo,ci_hi]` / `<HZ>`=`p['needle']['horizon']` を差し替えるだけで **b2 L115/L137/L138 + SVG L51-52** が確定(horizon=None/int 両 outcome の文面・doc_0530[arXiv:2604.02650]/doc_0592[arXiv:2604.07658]引用とも訂正済)。
+  - **run が失敗していたら**: `gh run view 27918958686 --log-failed`。新 tag `needle-run-3` push で再起動可。
+- **human gate(未消化)**: A=Qiita 公開(SVG raw URL 化)/ C=Kaggle push。B=needle は実行中。
+- **方針**: 指示なき薄い量産はしない(quality-over-volume)。needle 完了 or 新題材指示で再開。
