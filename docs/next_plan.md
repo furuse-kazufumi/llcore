@@ -1903,3 +1903,20 @@ run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extr
   4. **~22:02Z 以降も RUNNING 固着(zombie 疑い)** → `cp ci/kaggle/needle_offload/runner_sweep_only.py ci/kaggle/needle_offload/runner.py` → `kaggle kernels push -p ci/kaggle/needle_offload`(計算オフロード=gate 不要、version 採番注意)で 2048 sweep 単独を完了狙い
   5. **ERROR/CANCELLED** → `kaggle kernels output` の run_offload.log で死因確認
 - **残 human gate = A(Qiita 公開・全16記事 publish-ready)のみ**。Kaggle 結果回収は gate 不要・b2 は実測値なしでも publish-ready。
+
+---
+
+## ★2026-06-22 EXIT(61) — 再開地点
+
+- **HEAD**: `25b0a31`、ブランチ `feat/lm-recurrent`。作業ツリーは自動生成 SESSION_SUMMARY.md 以外 clean。push なし・本セッションもコード変更ゼロ。
+- **状況**: Kaggle v3 `furusekazufumi/llcore-needle-offload` を 14:13〜14:28Z に複数回ポーリング=すべて `RUNNING`(状態遷移ゼロ)。固着判定閾値 ~22:02Z まで ~7.6h 余裕=健全。
+- **本セッション検証(待機 de-risk)**:
+  - 統合経路の資産健在: `scripts/extract_needle_results.py` / `ci/kaggle/needle_offload/runner_sweep_only.py`(fallback)/ b2 draft 実在。b2 アンカー L113(SVG)・L115(図キャプション)・L138(honest gap narrative)すべて UNTESTED narrative 込みで present → b2 は実測値なしでも **publish-ready**。
+  - RAD 接地確認: `llm_corpus_v2` grep で b2 既参照の doc_0530(長文脈 SSM 学習動態)+ doc_0095=TransXSSM(arXiv:2506.09507, hybrid 解)が最関連=接地十分。新ヒット doc_1029/doc_1131(SSM MoE 系)は周辺的で差別化を強めず=追加不要(scope creep 回避)。
+- **次の具体的な一手**(EXIT60 から不変):
+  1. `kaggle kernels status furusekazufumi/llcore-needle-offload`
+  2. COMPLETE → `kaggle kernels output furusekazufumi/llcore-needle-offload -p out/needle_kaggle` → `py -3.11 scripts/extract_needle_results.py out/needle_kaggle/nas_pareto.json` → b2(`docs/articles/drafts/b2-suppress-your-win.md`)L115/L138 + SVG L113 を実測値に差替
+  3. RUNNING → ~30分間隔で待機(純ポーリング禁止・ScheduleWakeup `<<autonomous-loop-dynamic>>` 利用)
+  4. ~22:02Z 超固着 → `cp ci/kaggle/needle_offload/runner_sweep_only.py ci/kaggle/needle_offload/runner.py` → `kaggle kernels push -p ci/kaggle/needle_offload`(計算オフロード=gate 不要、version 採番注意)
+  5. ERROR → `kaggle kernels output` の run_offload.log で死因確認
+- **残 human gate = A(Qiita 公開・全16記事 publish-ready)のみ**。Kaggle 結果回収は gate 不要(実測値は b2 を「未検証」から実測へ格上げする polish)。
