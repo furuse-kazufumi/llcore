@@ -1277,3 +1277,22 @@ run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extr
 
 ### 共通
 - 数値は `nas_pareto_report.md` と JSON で二重照合。proxy nll / paired bootstrap CI の honest 留保は全箇所で継承。「だから長距離検索は大丈夫とは言わない」のトーンは horizon=None でも維持(doc_0530 留保がこれを支える)。
+
+## ★2026-06-22 EXIT(5) — 再開地点(canonical / コンテキスト上限近接で退避)
+- **HEAD=`acabd3c`。全成果 local commit 済、push なし。作業ツリーは `docs/SESSION_SUMMARY.md`(自動生成)以外 clean。** ブランチ `feat/lm-recurrent`。
+- **最優先の継続 = needle 結果の回収と統合(ジョブ実行中)**:
+  - **GH Actions run `27918958686`(tag needle-run-2)= まだ `in_progress`**(00:05Z 時点で startedAt=22:06:26Z から ~1h59m、compute step 7「Run rigorous tier + needle + 2048 sweep」継続中。2-3h 想定の範囲内、6h上限まで余裕、正常な長時間ラン)。
+  - **背景監視は再起動が必要**: 本セッションの `gh run watch` タスク(`bjv0o6c79` 等)はセッション終了で失われる。**新セッション開始時に必ず `gh run view 27918958686 --json status,conclusion` で生死確認** → in_progress なら `gh run watch 27918958686 --exit-status` を background 再起動。毎ターンのポーリングは無駄なので避け、ScheduleWakeup(~1200s)+背景watch に委ねる。
+  - **完了後の統合手順(下調べ + 実コード検証 + ツール化 + 両outcomeテンプレートまで完了済)**:
+    1. `gh run download 27918958686 -D out/needle_offload`(artifact 名 `nas-needle-results` = `nas_pareto.json` + `nas_pareto_report.md`)。
+    2. 「Assert GA was resumed」step success 確認(26h 再走でなく eval_cache resume の証)。
+    3. **`py -3.11 scripts/extract_needle_results.py out/needle_offload/nas_pareto.json`**(commit `09ffade`、訂正済みスキーマ内蔵)で context_sweep(str キー / Δnll=`mean`+CI)と needle(`horizon` int|None)を整形出力。
+    4. **`docs/articles/drafts/b2-suppress-your-win.md` の3箇所を更新** + **SVG L51-52** = **next_plan 末尾近くの「★2026-06-22 待機中追記 — needle 統合のペースト可能テンプレート」節**の `<MEAN>`/`<CI>`/`<HZ>` を差し替えるだけ。horizon=None/int の両 outcome 別に文面確定済。doc_0530 留保(arXiv:2604.02650, NIAH 早期偽飽和)・doc_0592(arXiv:2604.07658, 代数的減衰)の引用文も訂正済で当てはめ可能。
+    5. 数値は report/JSON と二重照合、honest 留保(proxy nll / paired bootstrap CI)継承。
+  - **run が失敗していたら**: `gh run view 27918958686 --log-failed`。新 tag `needle-run-3` push で再起動可(既知の落とし穴=huggingface-cli→hf, dispatch 403→tag-trigger は解消済)。
+- **本セッション(EXIT(4)→(5))の成果(commit、すべて待機中の de-risk)**:
+  - `8d17162` needle 統合のペースト可能テンプレート(horizon=None/int 両 outcome + doc_0530 留保配線)を next_plan に整備。
+  - `acabd3c` doc_0530 引用を一次資料(`D:/docs/llm_corpus_v2/.../doc_0530_...md`)で検証し訂正: arXiv=**2604.02650**(doc_0592 の 2604.07658 と別)、主旨=「NIAH は内在的収束より早く見かけの飽和(deceptive saturation)を示す」。
+  - 検証のみ(コミットなし): latency-run-1(`27919132385`)は decode/amort 成果が既統合・コミット済(`f97a461`系、a7 に反映)で未回収成果なし。b2 publish 点検 = needle ギャップ以外に blocker なし(TODO/placeholder ゼロ、SVG raw URL 化は gate A で対応)。
+- **human gate(未消化)**: A=Qiita 公開(SVG raw URL 化)/ C=Kaggle push。B=needle は実行中。
+- **方針**: 指示なき薄い量産はしない(quality-over-volume)。needle 完了 or 新題材指示で再開。
