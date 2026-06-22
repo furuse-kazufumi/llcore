@@ -1,0 +1,96 @@
+# NAS proxy-v2 long-context offload — LITE contingency (needle 2048-only).
+#
+# Why this exists: the full offload (`nas-needle-offload.yml`, tag `needle-run-*`) sweeps
+# needle at BOTH 2048 and 4096. The 4096 full-attention needle search is the single heaviest
+# step and pushed run-2 (27918958686) toward the 350-min job ceiling. This LITE variant drops
+# the 4096 needle (keeps the 2048 sweep + 2048 needle), roughly halving the long-context cost so
+# it fits comfortably under the timeout while still producing everything the b2 article needs:
+# context_sweep[2048] Δnll and a needle horizon at the swept length the narrative is about (2048).
+#
+# Identical resume mechanics to the full workflow (committed eval_cache snapshot → no 26h GA rerun).
+# Separate tag (`needle-lite-*`) so it does NOT collide with the full `needle-run-*` trigger.
+#
+# Manual trigger only (workflow_dispatch) or tag-push `needle-lite-*`.
+name: nas-needle-offload-lite
+
+on:
+  workflow_dispatch:
+    inputs:
+      needle_lengths:
+        description: "needle context lengths (comma-sep)"
+        default: "2048"
+      context_sweep:
+        description: "context sweep lengths (comma-sep)"
+        default: "256,512,1024,2048"
+  push:
+    tags:
+      - "needle-lite-*"
+
+permissions:
+  contents: read
+
+jobs:
+  offload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install CPU torch + llcore + transformers
+        run: |
+          python -m pip install --upgrade pip
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -e .
+          pip install "transformers>=4.46" safetensors "huggingface_hub[cli]"
+
+      - name: Download Qwen2.5-0.5B-Instruct (basename must match eval_cache meta)
+        run: |
+          hf download Qwen/Qwen2.5-0.5B-Instruct \
+            --local-dir model/Qwen2.5-0.5B-Instruct
+
+      - name: Stage corpus prefix + resumable eval_cache snapshot
+        run: |
+          mkdir -p out out/nas_pareto_v2full
+          cp ci/fixtures/corpus_aozora_multi.txt out/corpus_aozora_multi.txt
+          cp ci/fixtures/eval_cache.json out/nas_pareto_v2full/eval_cache.json
+
+      - name: Run rigorous tier + needle + 2048 sweep (GA resumed from snapshot)
+        run: |
+          set -o pipefail
+          python scripts/nas_pareto.py \
+            --proxy-v2 \
+            --model-dir model/Qwen2.5-0.5B-Instruct \
+            --text-file out/corpus_aozora_multi.txt \
+            --out out/nas_pareto_v2full \
+            --context-sweep "${{ inputs.context_sweep || '256,512,1024,2048' }}" \
+            --needle --needle-lengths "${{ inputs.needle_lengths || '2048' }}" \
+            2>&1 | tee run_offload.log
+
+      - name: Assert GA was resumed (fail fast — never silently rerun the 26h search)
+        run: |
+          grep -q "\[resume\]" run_offload.log || {
+            echo "::error::eval_cache did NOT resume — meta mismatch. Aborting before a full GA rerun."
+            exit 1
+          }
+
+      - name: Generate honest-disclosure report
+        if: always()
+        run: |
+          python scripts/nas_pareto_report.py \
+            out/nas_pareto_v2full/nas_pareto.json \
+            -o out/nas_pareto_v2full/nas_pareto_report.md || true
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nas-needle-results
+          path: |
+            out/nas_pareto_v2full/nas_pareto.json
+            out/nas_pareto_v2full/nas_pareto_report.md
+            run_offload.log
+          if-no-files-found: warn
