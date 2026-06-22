@@ -33,7 +33,7 @@
   <text x="265" y="350" fill="#8b949e" font-size="12" text-anchor="middle">ゲート有り</text>
 
   <!-- big jump annotation -->
-  <text x="200" y="380" fill="#d29922" font-size="12" font-weight="700" text-anchor="middle">主張: +94pp の劇的効果 → 必須</text>
+  <text x="200" y="380" fill="#d29922" font-size="12" font-weight="700" text-anchor="middle">主張: 6% → 100% の劇的効果 → 必須</text>
 
   <!-- divider -->
   <line x1="390" y1="92" x2="390" y2="360" stroke="#30363d" stroke-width="1.5" stroke-dasharray="3 5"/>
