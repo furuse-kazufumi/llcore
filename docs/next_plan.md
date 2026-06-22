@@ -1331,3 +1331,14 @@ run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extr
   1. **run-2 が 04:06Z 前に success**: 既定手順どおり `gh run download 27918958686 -D out/needle_offload` → `extract_needle_results.py` → b2 テンプレ差替。lite は不要(削除候補)。
   2. **run-2 が timeout(conclusion=failure/cancelled)**: lite ワークフローを push して再投入する必要 → **push は人間 gate**。⟦LLTERM_CHOICE⟧ で `git push origin feat/lm-recurrent` + `git tag needle-lite-1 && git push origin needle-lite-1` の承認を取ってから実行。
 - **human gate(未消化)**: A=Qiita 公開 / C=Kaggle push / D(新規)=lite 再投入の push(run-2 timeout 時のみ)。
+
+## ★2026-06-22 EXIT(9) — 再開地点(canonical / コンテキスト上限近接で退避)
+- **HEAD=`8d8dafd`。全成果 local commit 済、push なし。** ブランチ `feat/lm-recurrent`。作業ツリーは `docs/SESSION_SUMMARY.md`(自動生成)以外 clean。
+- **run `27918958686`(needle-run-2)= 03:47Z 時点で依然 `in_progress`**(startedAt 22:06:26Z から ~5h41m)。**`timeout-minutes: 350` により 04:06:26Z で job 自動 kill 確定**(残り ~19分)。compute step「rigorous tier + needle + 2048 sweep」が継続中・後続全 pending。
+- **本セッション(EXIT(8)→(9))成果**: `09c9842` タイムアウト保険 `nas-needle-offload-lite.yml`(needle 2048-only、別タグ `needle-lite-*`)新規作成 + `8d8dafd` EXIT(8) 記録。以降はコード変更なし(run 生死確認を反復したのみ)。
+- **次の具体的な一手(新セッション開始時の分岐判定)**:
+  1. **まず `gh run view 27918958686 --json status,conclusion` で決着確認**。
+  2. **conclusion=success**: `gh run download 27918958686 -D out/needle_offload` → 「Assert GA was resumed」success 確認 → `py -3.11 scripts/extract_needle_results.py out/needle_offload/nas_pareto.json` → next_plan「★ ペースト可能テンプレート」節の `<MEAN>`=`cs['2048']['mean']` / `<CI>`=`[ci_lo,ci_hi]` / `<HZ>`=`p['needle']['horizon']` を差替で **b2 L115/L137/L138 + SVG L51-52** 確定。lite は不要(削除候補)。
+  3. **conclusion=failure/cancelled(=04:06Z timeout の公算大)**: `gh run view 27918958686 --log-failed` で死因確認。timeout 確定なら **lite ワークフロー(`09c9842`)を投入**する必要。手順=`git push origin feat/lm-recurrent` + `git tag needle-lite-1 && git push origin needle-lite-1`。**push は人間 gate** → ⟦LLTERM_CHOICE⟧ で承認を取ってから実行(承認後 next_plan に決定を1段落追記)。
+- **human gate(未消化)**: A=Qiita 公開(SVG raw URL 化)/ C=Kaggle push / D=lite 再投入の push(run-2 timeout 時のみ)。
+- **方針**: 指示なき薄い量産はしない(quality-over-volume)。needle 決着 or 新題材指示で再開。
