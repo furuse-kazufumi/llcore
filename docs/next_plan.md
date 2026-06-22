@@ -1869,3 +1869,24 @@ run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extr
 - **結論: 待機 de-risk 完全に出尽くし。残るは v3 状態変化待ちのみ**(追加準備は over-engineering)。
 - **次の具体的な一手(不変)**: ① `kaggle kernels status furusekazufumi/llcore-needle-offload` ② COMPLETE → `kaggle kernels output ... -p out/needle_kaggle` → `py -3.11 scripts/extract_needle_results.py out/needle_kaggle/nas_pareto.json` → b2(`docs/articles/drafts/b2-suppress-your-win.md`)L115/L137/L138 + SVG L113 差替 ③ RUNNING → ~30分間隔待機 ④ ~22:00Z 超固着 → `cp ci/kaggle/needle_offload/runner_sweep_only.py ci/kaggle/needle_offload/runner.py` → `kaggle kernels push -p ci/kaggle/needle_offload`(gate 不要)⑤ ERROR → run_offload.log で死因確認。
 - **残 human gate = A(Qiita 公開・全16記事 publish-ready)のみ**。needle 回収は gate 不要・非 blocker。
+
+---
+
+## ★2026-06-22 EXIT(57) — 再開地点
+
+- **HEAD**: `1364473`(ブランチ `feat/lm-recurrent`)。push なし。作業ツリーは自動生成2ファイル(SESSION_SUMMARY.md / next_plan.md)以外 clean。
+- **本セッション**: コード変更ゼロ。Kaggle v3 `furusekazufumi/llcore-needle-offload` を ~30回ポーリング=すべて一貫して `RUNNING`(状態遷移ゼロ)。投入 13:24Z、12h wall ~01:24Z 目安。
+- **状況**: needle/b2 統合経路は EXIT(55)-(57) で三重 de-risk + 公開資産確認まで完了済。fallback `runner_sweep_only.py` も準備済。**残るは v3 状態変化待ちのみ**。これ以上の準備は over-engineering。
+- **次の具体的な一手**:
+  1. `kaggle kernels status furusekazufumi/llcore-needle-offload`
+  2. **COMPLETE** → `kaggle kernels output furusekazufumi/llcore-needle-offload -p out/needle_kaggle` → `py -3.11 scripts/extract_needle_results.py out/needle_kaggle/nas_pareto.json` → b2(`docs/articles/drafts/b2-suppress-your-win.md`)の L115 / L137 / L138 + SVG L113 を実測値に差替(`<MEAN>`=`cs['2048']['mean']` / `<CI>` / `<HZ>`=`p['needle']['horizon']`、horizon=None/int 両 outcome 文面準備済)
+  3. **RUNNING** → ~30分間隔で待機(ScheduleWakeup、純ポーリング回避)
+  4. **~22:00Z 以降も RUNNING 固着(zombie 疑い)** → `cp ci/kaggle/needle_offload/runner_sweep_only.py ci/kaggle/needle_offload/runner.py` → `kaggle kernels push -p ci/kaggle/needle_offload`(計算オフロード=人間 gate 不要、version 採番注意)で 2048 sweep 単独を 12h 内完了狙い
+  5. **ERROR/CANCELLED** → `kaggle kernels output` の run_offload.log で死因確認(`[resume]` 不在=メタ不一致)
+- **残 human gate**: A(Qiita 公開・全16記事 publish-ready)のみ。Kaggle 結果回収は gate 不要・b2 は実測値なしでも publish-ready(L137-138 が honest 留保を narrative 化済)。
+
+## ★2026-06-22 EXIT(59) 追補 — v3 実投入時刻の確定(wall-clock 訂正)
+
+- `kaggle kernels list -s llcore-needle-offload --mine` で **lastRunTime = 2026-06-22 10:02Z** を確認。これが v3 の実投入時刻。EXIT(57) の「13:24Z 投入」は status 確認時刻の誤記。
+- **12h wall = ~22:02Z(6/22)**。13:58Z 時点で経過 ~4h=健全範囲、zombie ではない。
+- **fallback(sweep_only 再投入)判定ライン = 22:02Z 以降も RUNNING 固着の場合**(計算オフロード=gate 不要)。それまでは ~30分間隔ポーリング待機。
