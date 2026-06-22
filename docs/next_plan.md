@@ -1841,3 +1841,15 @@ run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extr
 ### EXIT(54) 追補 — extract→b2 統合パイプライン end-to-end ドライラン済
 - v3 出力スキーマ(`proxy_v2.context_sweep` str-key + `proxy_v2.needle.horizon`)を模した合成 nas_pareto.json で `extract_needle_results.py` をドライラン。**両 honest-disclosure outcome を確認**: (a) horizon=int → "horizon=N tok - shortest length where retrieval breaks..." (b) horizon=None → "never failed retrieval within swept lengths"。256/512/1024/2048 の delta_nll mean+95%CI 行も期待通り描画。
 - 結論: 実データ到着時の統合は `extract_needle_results.py <json>` 一発で b2 L115/L137-138 に転記可能。ユニットテスト(4 passed)に加え full-pipeline dry-run でも de-risk 完了。
+
+## ★2026-06-22 EXIT(55) — 再開地点(待機 de-risk 出尽くし・純ポーリング待機のみ)
+
+- **HEAD=`d593e67`**、ブランチ `feat/lm-recurrent`。push なし。Kaggle v3 `furusekazufumi/llcore-needle-offload` = 12:56Z **RUNNING**(12h wall ~22:00Z まで余裕、健全)。
+- **本セッションで完了した待機 de-risk(全てローカルコミット済)**:
+  1. `c338e72` — fallback `runner_sweep_only.py`(needle 除外の 2048 sweep 単独版)事前作成 + 構文検証。
+  2. `c338e72`/EXIT(54)追補 — extract→b2 統合を合成 v3 スキーマで **end-to-end dry-run**(horizon int/None 両 outcome 確認)。
+  3. `d593e67` — RAD 接地: TransXSSM(arXiv:2506.09507)を b2/a7「定数状態長文脈弱点→hybrid 解」軸の差別化アンカーとして ARTICLE_SEEDS に追補。
+  4. b2 SVG アセット(`assets/articles/llcore_suppress_win.svg`)実在 + 差替アンカー L51-52 健在を確認。
+- **結論: needle/b2 統合経路は三重 de-risk + 公開資産確認まで完了。残るは v3 の状態変化待ちのみ**(これ以上の準備作業は不要・over-engineering 回避)。
+- **次の一手(EXIT(54) と不変)**: ① `kaggle kernels status ...` ② COMPLETE → `kaggle kernels output ... -p out/needle_kaggle` → `py -3.11 scripts/extract_needle_results.py out/needle_kaggle/nas_pareto.json` → b2 L115/L137/L138 + SVG L51-52 差替 ③ RUNNING → ~30分間隔待機 ④ ~22:00Z 超固着 → `cp ci/kaggle/needle_offload/runner_sweep_only.py ci/kaggle/needle_offload/runner.py` → `kaggle kernels push -p ci/kaggle/needle_offload`(gate 不要)⑤ ERROR → run_offload.log で死因確認。
+- **残 human gate = A(Qiita 公開・全16記事 publish-ready)のみ**。needle 回収は gate 不要・非 blocker。
