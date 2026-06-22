@@ -1861,3 +1861,11 @@ run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extr
 - **b2 への hybrid 接地は据置**: seed 上 optional(「または」)で b2 主題は honest disclosure ゆえ過剰編集回避。b2 は既に理論2件(2604.07658/2604.02650)を L137 に引用済・publish-ready。
 - **次の一手(EXIT(55) と不変)**: ① `kaggle kernels status ...` ② COMPLETE → `kaggle kernels output ... -p out/needle_kaggle` → `py -3.11 scripts/extract_needle_results.py out/needle_kaggle/nas_pareto.json` → b2 L115/L137/L138 + SVG L113 差替 ③ RUNNING → ~30分間隔待機 ④ ~22:00Z 超固着 → `cp ci/kaggle/needle_offload/runner_sweep_only.py ci/kaggle/needle_offload/runner.py` → `kaggle kernels push -p ci/kaggle/needle_offload`(gate 不要)⑤ ERROR → run_offload.log で死因確認。
 - **残 human gate = A(Qiita 公開)のみ**。needle 回収は gate 不要・非 blocker。
+
+## ★2026-06-22 EXIT(57) — 再開地点(EXIT準備・コンテキスト上限近接で集約)
+
+- **HEAD=`221eb0f`**(本 EXIT のサマリ更新コミット後は要再確認)、ブランチ `feat/lm-recurrent`。push なし。Kaggle v3 `furusekazufumi/llcore-needle-offload` = 13:24Z **RUNNING**(12h wall ~22:00Z まで余裕、健全)。
+- **本セッション成果**: `2c3fe6a`(a7 L297 に hybrid 解 TransXSSM=arXiv:2506.09507 を定量接地・honest 外部知識明示)/ `221eb0f`(next_plan EXIT56)。待機中検証で a7 一般版は hybrid 追加不要(技術版/一般版の意図的棲み分け)・b2 アンカー健在を確認。
+- **結論: 待機 de-risk 完全に出尽くし。残るは v3 状態変化待ちのみ**(追加準備は over-engineering)。
+- **次の具体的な一手(不変)**: ① `kaggle kernels status furusekazufumi/llcore-needle-offload` ② COMPLETE → `kaggle kernels output ... -p out/needle_kaggle` → `py -3.11 scripts/extract_needle_results.py out/needle_kaggle/nas_pareto.json` → b2(`docs/articles/drafts/b2-suppress-your-win.md`)L115/L137/L138 + SVG L113 差替 ③ RUNNING → ~30分間隔待機 ④ ~22:00Z 超固着 → `cp ci/kaggle/needle_offload/runner_sweep_only.py ci/kaggle/needle_offload/runner.py` → `kaggle kernels push -p ci/kaggle/needle_offload`(gate 不要)⑤ ERROR → run_offload.log で死因確認。
+- **残 human gate = A(Qiita 公開・全16記事 publish-ready)のみ**。needle 回収は gate 不要・非 blocker。
