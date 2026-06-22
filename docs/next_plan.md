@@ -1342,3 +1342,21 @@ run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extr
   3. **conclusion=failure/cancelled(=04:06Z timeout の公算大)**: `gh run view 27918958686 --log-failed` で死因確認。timeout 確定なら **lite ワークフロー(`09c9842`)を投入**する必要。手順=`git push origin feat/lm-recurrent` + `git tag needle-lite-1 && git push origin needle-lite-1`。**push は人間 gate** → ⟦LLTERM_CHOICE⟧ で承認を取ってから実行(承認後 next_plan に決定を1段落追記)。
 - **human gate(未消化)**: A=Qiita 公開(SVG raw URL 化)/ C=Kaggle push / D=lite 再投入の push(run-2 timeout 時のみ)。
 - **方針**: 指示なき薄い量産はしない(quality-over-volume)。needle 決着 or 新題材指示で再開。
+
+## ★2026-06-22 EXIT(10) — needle-run-2 決着(timeout/cancelled)→ lite 投入 gate
+- **run `27918958686`(needle-run-2)= 03:56:26Z に `timeout-minutes: 350` で自動 kill → conclusion=`cancelled`**(GitHub は timeout を cancelled と報告)。**算術訂正**: 350分 = 22:06:26Z+5h50m = **03:56:26Z**(EXIT(8)(9) の「04:06」は 360分との取り違え)。
+- **回収結果ゼロ**: artifact は `run_offload.log` のみ、`nas_pareto.json` 未生成(compute は JSON 書出し前に kill)。resume は成功(`[resume] 386+386 evals reused`=26h GA 再走は回避)、base まで計算後 inner-loop pool 設定直後でログ途切れ(tee 未フラッシュ)。
+- **死因**: needle-run-2 タグに後続 run なし=concurrency キャンセルではなく純粋な job timeout。5h50m は base+sweep+needle(2048+4096)に費消、4096 full-attention needle(O(n²))が主因(EXIT(8) 判断と整合)。
+- **次の一手 = 検証済み lite ワークフロー投入(needle 2048-only、4096 を落とし時間半減)**。full との diff は name/tag/needle_lengths の4点のみ・resume 機構とアサートは忠実なサブセット(本セッションで diff 検証済)。
+- **push は人間 gate(safety-valve)**: `git push origin feat/lm-recurrent`(lite workflow を remote に載せる)+ `git tag needle-lite-1 && git push origin needle-lite-1`(tag-push で起動)。⟦LLTERM_CHOICE⟧ で承認取得 → 決定を本ファイルに1段落追記してから実行。
+- **残リスク(honest)**: full が 350分で sweep+needle 完了前に死んだため、lite(4096 needle 除去)でも 350分超過の可能性は残る。4096 needle が支配的なら収まる公算大だが保証はない。timeout 再発時は sweep を `1024,2048` に削る等の更なる軽量化が次案。
+
+### EXIT(10) 補強: lite が timeout 内に収まる定量根拠(コード解析)
+- `nas_pareto.py:198-217` needle = `nlens` × `depths(0,0.5,0.9)` で base_acc + `needle_horizon` が各 length で agg genome を複数回 eval。attention O(n²) ゆえ **4096 forward ≈ 2048 の4倍**。run 全体の単独最重量処理。
+- `nas_pareto.py:151` context_sweep は max length **2048 止まり**(lite が保持)。各 length×K windows でも O(2048²) で 4096 needle より遥かに軽い。
+- 結論: lite が O(4096²) needle を丸ごと除去 → 350分内に収まる公算大。**選択肢1(lite そのまま)が最善**。選択肢2の sweep 削減は不要(sweep[2048] は b2 必須・256/512 は安価)。
+
+### EXIT(10) 重要発見: needle は b2 の publish blocker ではない(任意アップグレード)
+- b2 draft 精査(L113/L115/L137/L138)で判明: needle/2048 ギャップは**既に honest-disclosure として完結**。SVG caption=UNTESTED、L137=2048+未実測の申告、**L138=「自宅CPUでは測れずGPUオフロードが次の一手、2048+ retrievalは未検証、だから大丈夫とは言わない」という narrative の山場**(記事主題の長文脈メモリ溢れが自機で再現した皮肉)を書き切っている。
+- → **lite 投入は publish blocker ではなく任意の polish**。horizon 値が出れば「未検証」を具体値化できるが、出なくても b2 は内部整合・publish 可能。L138 の honest punchline は honest-disclosure 哲学に合致し乾いた数値より訴求力が高い面もある。
+- 選択の再枠組み: (1)lite投入=数値で補強する polish / (3)据え置き=既に honest な記事を今 ship(=実質ロスなし)。push する/しないは「必須 vs 諦め」ではなく「polish するか否か」。
