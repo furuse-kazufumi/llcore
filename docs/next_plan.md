@@ -1890,3 +1890,16 @@ run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extr
 - `kaggle kernels list -s llcore-needle-offload --mine` で **lastRunTime = 2026-06-22 10:02Z** を確認。これが v3 の実投入時刻。EXIT(57) の「13:24Z 投入」は status 確認時刻の誤記。
 - **12h wall = ~22:02Z(6/22)**。13:58Z 時点で経過 ~4h=健全範囲、zombie ではない。
 - **fallback(sweep_only 再投入)判定ライン = 22:02Z 以降も RUNNING 固着の場合**(計算オフロード=gate 不要)。それまでは ~30分間隔ポーリング待機。
+
+## ★2026-06-22 EXIT(60) — 再開地点(v3 RUNNING 待機継続・wall-clock 確定済)
+
+- **HEAD=`f96f6a8`**、ブランチ `feat/lm-recurrent`。push なし。作業ツリーは自動生成 SESSION_SUMMARY.md 以外 clean。
+- **本セッション成果**: ① `f96f6a8` で v3 実投入時刻を **lastRunTime=2026-06-22 10:02Z** と確定(`kaggle kernels list -s llcore-needle-offload --mine` で取得)→ 12h wall を **~22:02Z** に訂正(EXIT(57) の「13:24Z 投入」は status 確認時刻の誤記)。② 記事16本(技術版+一般版)が全て publish-ready・RAD 接地(doc_0592/doc_0530/doc_0095)も ARTICLE_SEEDS 統合済を再確認。③ v3 を複数回ポーリング(14:01〜14:12Z)=すべて `RUNNING`(状態遷移ゼロ)。
+- **結論**: 待機 de-risk は EXIT(55)〜(57) で出尽くし、ローカルでゲート不要に進められる新規作業はゼロ。残るは v3 状態変化待ちのみ。
+- **次の具体的な一手(不変)**:
+  1. `kaggle kernels status furusekazufumi/llcore-needle-offload`
+  2. **COMPLETE** → `kaggle kernels output furusekazufumi/llcore-needle-offload -p out/needle_kaggle` → `py -3.11 scripts/extract_needle_results.py out/needle_kaggle/nas_pareto.json` → b2(`docs/articles/drafts/b2-suppress-your-win.md`)L115/L137/L138 + SVG L113 を実測値に差替(`<MEAN>`=`cs['2048']['mean']`/`<CI>`/`<HZ>`=`p['needle']['horizon']`、horizon=None/int 両 outcome 文面準備済)
+  3. **RUNNING** → ~30分間隔待機(ScheduleWakeup、純ポーリング回避)
+  4. **~22:02Z 以降も RUNNING 固着(zombie 疑い)** → `cp ci/kaggle/needle_offload/runner_sweep_only.py ci/kaggle/needle_offload/runner.py` → `kaggle kernels push -p ci/kaggle/needle_offload`(計算オフロード=gate 不要、version 採番注意)で 2048 sweep 単独を完了狙い
+  5. **ERROR/CANCELLED** → `kaggle kernels output` の run_offload.log で死因確認
+- **残 human gate = A(Qiita 公開・全16記事 publish-ready)のみ**。Kaggle 結果回収は gate 不要・b2 は実測値なしでも publish-ready。
