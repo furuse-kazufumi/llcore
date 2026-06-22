@@ -28,7 +28,7 @@
 
 ## 2. なぜこうなるのか — 文字単位 tiny LM の正直な天井
 
-このモデルは**文字単位(char-level)**で「次の 1 文字」を予測します。その的中率(top-1)は **約 36%(0.3629)**。3 文字に 1 文字ちょっと当たる程度です。
+このモデルは**文字単位(char-level)**で「次の 1 文字」を予測します。その的中率(top-1)は **約 29%(0.2866)**。3〜4 文字に 1 文字あたる程度です。
 
 この精度では、「それっぽい字面」は連なっても、**意味の通る文・質問への回答**は構造的に出てきません。語彙も知識も足りない。富士山という事実を持っていないのだから、答えられないのは当然です。
 
@@ -69,4 +69,4 @@ CPU の文字単位 tiny LM で **capability(賢さ)を追うのは、構造的�
 
 ---
 
-_技術注記:`py -3.11 -m llcore.lm generate out/lm_aozora_realp1/model.pt`(seed 1/2, temp 0.8, top-k 40)で実生成(2026-06-19)。`realp1` = 青空文庫マルチ作品、11.9M params、文字単位、top-1 次文字 0.3629。pivot の正本は memory `project_llcore_memory_efficiency_pivot`。会話 LLM が要る用途は FullSense 設計では llmesh 経由で既存 LLM を on-prem 実行する分担。_
+_技術注記:`py -3.11 -m llcore.lm generate out/lm_aozora_realp1/model.pt`(seed 1/2, temp 0.8, top-k 40)で実生成(2026-06-19)。`realp1` = 青空文庫マルチ作品、11.9M params、文字単位、top-1 次文字 0.2866。pivot の正本は memory `project_llcore_memory_efficiency_pivot`。会話 LLM が要る用途は FullSense 設計では llmesh 経由で既存 LLM を on-prem 実行する分担。_
