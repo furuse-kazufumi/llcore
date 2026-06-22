@@ -1732,3 +1732,11 @@ run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extr
   4. **ERROR/CANCELLED** → run_offload.log で死因確認(`[resume]` 不在=メタ不一致)。
 - **残 human gate = A(Qiita 公開・全16記事 publish-ready)のみ**。Kaggle 回収は gate 不要・非 blocker。b2 は実測値なしでも publish-ready(L137-138 が honest 留保を narrative 化済)。
 - **未コミットの `runner.py` 改修**: ローカル commit は安全(push gate に非該当)。次ターンで `git add ci/kaggle/needle_offload/runner.py && git commit` を実施してよい。
+
+---
+
+## ★2026-06-22 EXIT(47b) — 人間承認: GH lite workflow 投入(push gate 解除)
+
+- **人間の選択(LLTERM_CHOICE 応答)= 選択肢1「lite をそのまま投入」を承認**。決定内容: `nas-needle-offload-lite.yml`(needle 2048-only + 2048 sweep、timeout 350min、public repo 分数無料、GH artifact で結果回収容易)を tag-push `needle-lite-1` でトリガする。これは EXIT(46/47) の Kaggle v3(縮小版)と**並走する冗長計算パス**であり、どちらか先に COMPLETE した方を b2 L115/L137/L138 + SVG L51-52 に統合する。push 操作(branch + tag)はこの人間承認に基づき実行する(従来 403/gate で閉じていた GH 経路をこれで開く)。
+- **実行コマンド**: `git push origin feat/lm-recurrent` → `git tag needle-lite-1` → `git push origin needle-lite-1`。
+- **次の一手**: ① `gh run list --workflow nas-needle-offload-lite.yml` で run id 取得 → `gh run watch <id>` ② COMPLETE → `gh run download <id> -D out/needle_lite` → `extract_needle_results.py` → b2 統合 ③ Kaggle v3 も継続ポーリング、先着優先。
