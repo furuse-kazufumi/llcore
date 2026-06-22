@@ -1565,3 +1565,9 @@ run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extr
   - human flag 残 2: **(i) s1+b1 の realp1 fp32 top1「28.65%」→ 0.2866=28.66% が正**(連載横断慣習・要協調修正)。**(ii) b4 L19「retention 0.95→1.00」は safe_rate の値**(retention 実値は 0.64・要 metric 再ラベル)。
   - 過剰 flag 解消 2: b3/b6 int8 13.97MB(CLI 実測 13,969,808 で正当)/ a9 1.51MB(multi_smoke resident int8)。
 - **残タスク**: 上記 human flag 2件の最終判断(著者=人間)/ needle 完了時の b2 統合(任意 polish)/ A=Qiita 公開(human gate)。**非ゲートの QA は完遂、新規 actionable なし**。
+
+## ★2026-06-22 EXIT(33) — b4 L19 metric 誤ラベルを修正(safe_rate を retention と誤記していた件)
+- **修正**: b4 技術版 L19「ゲートを足しても **retention(遅延再現性能)が 0.95→1.00** に僅かに上がるだけ」→「**safe_rate が 0.95→1.00** に僅かに上がるだけ(retention 重視アームの safe_rate が none 0.95→gate 1.00)」。生成元 `poc_branch_a_memory_fitness.json` で 0.95→1.00 は safe_rate(none_retention 0.95→contraction_retention 1.0)、mean_retention は 0.6416→0.6382 と別物だったため。読者誤誘導の明確な誤りにつき auto-fix(b5 と同種)。b4-general は metric 混同なしで修正不要。
+- **s1+b1 の「28.65%」flag は据置(human 判断)**: 正解 28.66(0.286625)だが差 0.01pp、結論(retention 53.1%・−13.46pp 生値・半減)不変。11箇所+自己監査注記の協調編集はリスク>利得、かつ意図的截断の可能性も残るため b5/b4 と異なり auto-fix せず著者判断に委ねる。
+- **findings 最終確定**: 修正済2(b5 別モデル値 / b4 L19 metric ラベル)/ human flag 残1(s1+b1 28.65→28.66 丸め・結論不変)/ 過剰flag解消2(b3 13.97・a9 1.51)。
+- **公開キュー QA 完全終了**: 全16記事検収 + 実害系の修正完了。残るは s1/b1 の 0.01pp 丸め(任意)・b2 needle polish(外部待ち)・A=Qiita 公開(human gate)のみ。
