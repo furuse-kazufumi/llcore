@@ -1322,3 +1322,12 @@ run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extr
   - **run が失敗していたら**: `gh run view 27918958686 --log-failed`。新 tag `needle-run-3` push で再起動可。
 - **human gate(未消化)**: A=Qiita 公開(SVG raw URL 化)/ C=Kaggle push。B=needle は実行中。
 - **方針**: 指示なき薄い量産はしない(quality-over-volume)。needle 完了 or 新題材指示で再開。
+
+## ★2026-06-22 EXIT(8) — 再開地点(canonical)
+- **HEAD=`09c9842`。全成果 local commit 済、push なし。** ブランチ `feat/lm-recurrent`。
+- **run `27918958686`(needle-run-2)= 03:34Z 時点で依然 `in_progress`**(startedAt 22:06:26Z から ~5h28m)。**`timeout-minutes: 350` により 04:06:26Z で job 自動 kill 確定**。compute step「rigorous tier + needle + 2048 sweep」が長引いた主因 = needle を **2048+4096 両方**でスイープしている(4096 full-attention が最重量)と判断。
+- **本セッションの de-risk 成果(commit `09c9842`)**: タイムアウト保険として `nas-needle-offload-lite.yml` を新規作成。**needle を 2048-only に絞り(4096 を落とし)長文脈コストを半減**、350分上限に余裕で収める。別タグ `needle-lite-*`(既存 `needle-run-*` と非衝突)。記事 b2 の主張(2048 スイープまでの頑健性)は 2048-only でも成立、horizon=None は doc_0530 留保つきで使用可。
+- **分岐した次の一手**:
+  1. **run-2 が 04:06Z 前に success**: 既定手順どおり `gh run download 27918958686 -D out/needle_offload` → `extract_needle_results.py` → b2 テンプレ差替。lite は不要(削除候補)。
+  2. **run-2 が timeout(conclusion=failure/cancelled)**: lite ワークフローを push して再投入する必要 → **push は人間 gate**。⟦LLTERM_CHOICE⟧ で `git push origin feat/lm-recurrent` + `git tag needle-lite-1 && git push origin needle-lite-1` の承認を取ってから実行。
+- **human gate(未消化)**: A=Qiita 公開 / C=Kaggle push / D(新規)=lite 再投入の push(run-2 timeout 時のみ)。
