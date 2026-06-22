@@ -28,6 +28,10 @@
 | **Cosmos 3**(NVIDIA) | **OpenMDW 1.1** | open model ライセンス(OSI 認定の古典的 OSS ではない) | 商用条件・派生物条項を**条文実読**してから |
 | **PaddleOCR-VL**(Baidu) | **Apache 2.0**(ただしベースに注意) | OSI 認定 OSS | Apache だが ERNIE-4.5 ベースの**派生ライセンス要確認** |
 
+![2026 年前半の 3 モデルをライセンス軸で 3 種(OSI 認定 OSS / open model / 独自規約・条件付き)に振り分けた地図。Gemma 4 は Apache 2.0、Cosmos 3 は OpenMDW 1.1(非 OSS=条文実読が必要)、PaddleOCR-VL は Apache だが ERNIE-4.5 ベース要確認。要点は「重みが落とせること(技術)と商用に使えること(ライセンス)は別の検収」で、採用前に種類・商用条件・ベース継承の 3 つを別々に確認する。](../../../assets/articles/llcore_c1_license_map.svg)
+
+_「open」の一語を 3 種に割り、採用前に確認すべき 3 つの問いまで一枚で示した地図。_
+
 ### (a) Gemma 4 = Apache 2.0 への「変更」が本物の前進
 
 Gemma は 1/2/3 まで、Google 独自の **Gemma Terms of Use** で配布されていました。これが Gemma 4 で **Apache 2.0 に変わった**のが大きい。独自規約には利用制限や再配布条件が付きがちですが、Apache 2.0 は OSI 認定の素直な OSS。**商用ローカル利用の障壁が実質ゼロ**になりました。「マイナーアップデート」ではなく、ライセンス面では**質的な前進**です。
