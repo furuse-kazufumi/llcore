@@ -1531,3 +1531,9 @@ run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extr
 - **⚠️ flag(human 判断・thesis 不変)**: L19「ゲートを足しても **retention(遅延再現性能)が 0.95→1.00** に僅かに上がるだけ」は metric 取り違え。0.95→1.00 は **safe_rate**(none_retention 0.95 → contraction_retention 1.0)であり、retention 実値 mean_retention は 0.6416→0.6382 と**むしろ微減**。**対応案**: L19 を「safe_rate が 0.95→1.00」に訂正(retention の語と定義を別途保持)、または「gate の効果は retention 個体群の safe_rate を 0.95→1.00 にする僅少分のみ」と明確化。
 - **公開キュー QA 進捗**: s1✓/s2✓/b1✓/b5✓(修正)/a7✓/a8✓/a9✓/b3✓/b4✓/b2✓。次候補: b7(#10)→b6(#12)→a11(#13)…。
 - **findings 累計**: 修正1(b5 別モデル値)/ human flag 4(s1 丸め28.65・a9 one-shot 1.51MB・b3 title int8 13.97・b4 L19 retention/safe_rate ラベル)。
+
+## ★2026-06-22 EXIT(29) — 公開キュー QA: b7(公開順#10)中核数値 一致
+- **b7 中核 → 一致**(`out/m2_gate_comparison.json`, 15 runs): 経験ゲート(stable_exp)false-admit = n_admitted_rho≥1/archive_size の平均 **0.8359 ≈ 84%**(記事「84%」)、sound 証明ゲート(cert_inf)false-admit = **0.0 = 0%**(記事「0%」)。verdict.G1_stable_exp_admits_divergent=True とも整合。
+- **b7 引用**: arXiv なし(prior-art = MnasNet/HAQ/NSGA-II/Deb2000/CEGIS/Dohare2024 の手法名のみ)。
+- **公開キュー QA 進捗**: s1✓/s2✓/b1✓/b5✓(修正)/a7✓/a8✓/a9✓/b3✓/b4✓/b7✓/b2✓ = 公開順 #1-#10 + #11(b2)を全て検収完了。残: b6(#12)/a11(#13)/c1(#14)/c2(#15)/c3(#16・引用検証済)。
+- **findings 累計**: 修正1(b5)/ human flag 4(s1 28.65・a9 1.51MB・b3 13.97・b4 retention/safe_rate)。#1-#11 の数値はこの4 flag 以外すべて生成元一致。
