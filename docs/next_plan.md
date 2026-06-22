@@ -1457,3 +1457,10 @@ run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extr
 - **b2-general(非エンジニア版)整合**: 「約6.6時間/386通り」「15.3%勝った(選抜)」「+16.8%総合・誤差引いても0割らない(HV holdout CI_lo>0)」= 技術版 b2 / 生成元データと一致、矛盾数値なし。daily_articles_policy の並走品質クリア。
 - **SVG 図版 QA**(memory `feedback_qiita_svg_path_and_cache` 適合): `assets/articles/llcore_suppress_win.svg` 実在(4571B)、埋め込みテキスト SUPPRESSED/KEPT/UNTESTED/15.3/16.8/0.0652/0.0204/holdout/optimism すべて記事キャプション(L113-115)と整合。公開時 raw 絶対 URL 参照の留意は L115 で human 向け明記済。
 - **b2 publish-ready 検証 総括**: ① arXiv 引用7件(EXIT16/17)② 技術版 headline 数値=生成元一致(EXIT18)③ 一般版整合 ④ SVG アセット&ラベル整合。残 publish 依存=A(Qiita公開=human gate)+ 任意 needle 数値補強のみ。非ゲート QA は出尽くし。
+
+## ★2026-06-22 EXIT(20) — 公開キュー QA を s1(公開順#1)へ拡張・数値突合 全一致
+- **方針**: needle 完了待ち中、b2 だけでなく SERIES_INDEX の公開順で先頭の記事から publish-readiness チェック(本文数値=実測JSON 三者整合 / arXiv 引用 / SVG / 一般版)を前倒し。b2 は #11、その前に s1→s2→b1→b5→a7→a8→a9→b3→b4→b7 が公開されるため s1 が真の next 候補。
+- **s1 数値突合(生成元 `out/quant_bitwidth_sweep_realp1.json`)→ 全一致**: fp32 model_ppl 38.3152(記事38.32)/ top1 0.286625(28.65%)/ unigram_ppl 215.0577(≈215)/ 2bit model_ppl 101.1143(101.114)/ delta_ppl_pct 163.902(+163.90%)/ top1 0.152062(15.21%)/ delta_top1_pp −13.456(−13.46pp、表示13.44との丸め差を記事が self-audit 済)/ retention 53.05%(53.1%)/ gate 0.85×215.06=182.8(≈183)→101.114<183 PASS。
+- **s1 引用**: PaddleOCR-VL-1.6 `2606.03264`(OmniDocBench 96.33)は EXIT(17) で arXiv 検証済。
+- **結論**: s1 は数値・引用次元で publish-ready。残: s1 SVG/挿絵(PANEL_PLACEMENT_PLAN, verify-by-content)と一般版整合は未チェック(次ターン候補)。
+- **次の QA 候補(公開順)**: s1 残(SVG/一般版)→ s2 → b1 …。needle 完了時は割込みで b2 統合を優先。
