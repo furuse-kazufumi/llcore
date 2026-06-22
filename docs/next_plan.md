@@ -1555,3 +1555,13 @@ run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extr
   - 記事は「方向性の地図・要条文実読・法的助言でない」と適切に hedge。publish-ready。
 - **公開キュー QA 進捗**: #1-#14 検収完了。残: c2(#15)/ c3(#16・引用 EXIT17 検証済・本文は MangaFlow クロスドメイン傍証)。
 - **findings 確定**: 修正1(b5)/ flag 解消2(b3 13.97・a9 1.51)/ flag 残2(s1+b1 28.65→28.66 丸め・b4 L19 retention/safe_rate ラベル)。
+
+## ★2026-06-22 EXIT(32) — 公開キュー QA 完遂: c2(#15)・c3(#16)検証 → 全16記事の publish 前ファクトチェック完了
+- **c2(#15)**: Hermes Agent を WebSearch 裏取り → **Nous Research / MIT / 2026年2月リリース(記事「初頭」)/ built-in closed learning loop(Markdown skill+永続メモリ)/ GitHub 64,200+ stars** すべて記事と一致。「独立ベンチ・査読 0件」negative claim も web 整合(自称のみ)。自社 llive にも同じ未証明の刃を当てる hedge 完備。publish-ready。
+- **c3(#16)**: 引用 arXiv:2605.28173 + story section memory + 著者所属(東大 Nakayama/HKUST広州 Xie)は EXIT17 検証済。Table 数値(CIDS 0.619→0.582 / CSD 0.668→0.547 / Layout IoU 100% / Coverage 99.98%)は「論文 self-report・査読前v1・自作メトリクス土俵違い」と明示 hedge。thesis は「方向性の傍証(SOTA 主張でない)」。disclosure 妥当で publish-ready(Table 値の一次照合は paper PDF 要・任意)。
+- **★公開キュー QA 完遂(全16記事 #1-#16)**: s1/s2/b1/b5/a7/a8/a9/b3/b4/b7/b2/b6/a11/c1/c2/c3 を本文数値=実測JSON/コード/arXiv/web の三〜四者で検収完了。
+- **findings 最終**:
+  - 修正済 1: **b5** realp1 top1「約36%(0.3629)」→「約29%(0.2866)」(別モデル multi_smoke 値の混入。技術版+一般版、実測 CLI で正当性確認)。
+  - human flag 残 2: **(i) s1+b1 の realp1 fp32 top1「28.65%」→ 0.2866=28.66% が正**(連載横断慣習・要協調修正)。**(ii) b4 L19「retention 0.95→1.00」は safe_rate の値**(retention 実値は 0.64・要 metric 再ラベル)。
+  - 過剰 flag 解消 2: b3/b6 int8 13.97MB(CLI 実測 13,969,808 で正当)/ a9 1.51MB(multi_smoke resident int8)。
+- **残タスク**: 上記 human flag 2件の最終判断(著者=人間)/ needle 完了時の b2 統合(任意 polish)/ A=Qiita 公開(human gate)。**非ゲートの QA は完遂、新規 actionable なし**。
