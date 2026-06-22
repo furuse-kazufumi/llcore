@@ -1537,3 +1537,12 @@ run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extr
 - **b7 引用**: arXiv なし(prior-art = MnasNet/HAQ/NSGA-II/Deb2000/CEGIS/Dohare2024 の手法名のみ)。
 - **公開キュー QA 進捗**: s1✓/s2✓/b1✓/b5✓(修正)/a7✓/a8✓/a9✓/b3✓/b4✓/b7✓/b2✓ = 公開順 #1-#10 + #11(b2)を全て検収完了。残: b6(#12)/a11(#13)/c1(#14)/c2(#15)/c3(#16・引用検証済)。
 - **findings 累計**: 修正1(b5)/ human flag 4(s1 28.65・a9 1.51MB・b3 13.97・b4 retention/safe_rate)。#1-#11 の数値はこの4 flag 以外すべて生成元一致。
+
+## ★2026-06-22 EXIT(30) — 公開キュー QA: b6(公開順#12)全一致 + b3/a9 flag を実測で解消
+- **b6 multi_smoke → `mem_report_multi_smoke.json` 全一致**: fp32 5,502,976(5.50MB)/ int8 1,506,072(1.51MB)/ percent_smaller 72.63(72.6%)/ fp32_top1 0.3629 / int8_top1 0.3631 / retention 1.0004(100.0%)/ 330,368 tok / cap-gate PASS。
+- **★b3/b6 の 13.97MB flag(EXIT27)を実測で解消**: `py -3.11 -m llcore.memory report out/lm_aozora_realp1/model.pt --corpus-file out/corpus_aozora.txt --context-lens 256,512,1024,2048` を実行 → **int8 resident 13,969,808=13.97MB(ratio 0.284, 71.6% smaller)を再現**。手計算 13.68 は resident int8 の per-channel scale 等を過小評価していた誤り。13.97 は正規ツール出力で**正しい**。未コミットだった realp1 resident レポートを `out/mem_report_realp1.json` として保存(b3/b6 の数値を再現可能化)。
+- **★realp1 top1=0.2866 を実測再確認**(CLI: fp32_top1 0.2866 / int8 0.2863 / retention 99.9%)→ b5 修正(0.3629→0.2866)の正当性を実証。s1/b1 の「28.65%」は 0.2866=28.66% が正(EXIT21 丸め flag 据置)。
+- **★a9 1.51MB flag(EXIT26)を解消**: 1.51MB は multi_smoke の resident int8(1,506,072)で committed 源あり。a9 one-shot beanmodel = multi_smoke 相当。
+- **b6 KV 成長**: CLI で T=256 4,718,592(4.72MB)→ T=2048 37,748,736(37.75MB)×8.0 を再現(b6 L51 一致)。
+- **公開キュー QA 進捗**: #1-#12(s1/s2/b1/b5/a7/a8/a9/b3/b4/b7/b2/b6)検収完了。残: a11(#13)/c1(#14)/c2(#15)/c3(#16・引用済)。
+- **findings 更新**: 修正1(b5・実測で正当性確認)/ flag 解消2(b3 13.97・a9 1.51)/ flag 残2(s1+b1 の 28.65→28.66 丸め・b4 L19 retention/safe_rate ラベル)。
