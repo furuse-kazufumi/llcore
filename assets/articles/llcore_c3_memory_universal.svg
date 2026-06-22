@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" font-family="Segoe UI, Hiragino Kaku Gothic ProN, Meiryo, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0d1117"/><stop offset="1" stop-color="#161b22"/>
+    </linearGradient>
+    <marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L7,3 L0,6 Z" fill="#6e7681"/>
+    </marker>
+  </defs>
+  <rect width="760" height="440" fill="url(#bg)"/>
+
+  <text x="34" y="40" fill="#e6edf3" font-size="22" font-weight="700">同じ骨格が、分野を超えて再演される</text>
+  <text x="34" y="64" fill="#8b949e" font-size="13.5">「過去を記憶に畳んで、後で引く」は LLM 固有の小技でなく、一貫性を支えるドメイン横断の普遍部品。</text>
+
+  <!-- central universal-part node -->
+  <rect x="40" y="120" width="210" height="150" rx="10" fill="#161b22" stroke="#d29922" stroke-width="1.8"/>
+  <text x="145" y="148" fill="#d29922" font-size="13.5" font-weight="700" text-anchor="middle">★普遍部品(骨格)</text>
+  <text x="145" y="178" fill="#e6edf3" font-size="14.5" font-weight="700" text-anchor="middle">過去を記憶に畳んで</text>
+  <text x="145" y="200" fill="#e6edf3" font-size="14.5" font-weight="700" text-anchor="middle">後で引く</text>
+  <line x1="68" y1="218" x2="222" y2="218" stroke="#21262d" stroke-width="1"/>
+  <text x="145" y="240" fill="#8b949e" font-size="12" text-anchor="middle">→ 一貫性は「過去を保持して</text>
+  <text x="145" y="258" fill="#8b949e" font-size="12" text-anchor="middle">再利用」して得る</text>
+
+  <!-- arrows central -> three domains -->
+  <line x1="250" y1="160" x2="318" y2="142" stroke="#6e7681" stroke-width="1.6" marker-end="url(#arr)"/>
+  <line x1="250" y1="195" x2="318" y2="227" stroke="#6e7681" stroke-width="1.6" marker-end="url(#arr)"/>
+  <line x1="250" y1="232" x2="318" y2="312" stroke="#6e7681" stroke-width="1.6" marker-end="url(#arr)"/>
+
+  <!-- domain 1: LLM long-context -->
+  <rect x="322" y="112" width="404" height="62" rx="8" fill="#161b22" stroke="#3fb950" stroke-width="1.4"/>
+  <text x="338" y="135" fill="#3fb950" font-size="13.5" font-weight="700">LLM の長文脈(llcore / a7)</text>
+  <text x="338" y="158" fill="#c9d1d9" font-size="12.5">定数状態 recurrent / SSM = 過去を固定サイズ状態に畳み、後の予測に使う</text>
+
+  <!-- domain 2: manga generation -->
+  <rect x="322" y="198" width="404" height="62" rx="8" fill="#161b22" stroke="#58a6ff" stroke-width="1.4"/>
+  <text x="338" y="221" fill="#58a6ff" font-size="13.5" font-weight="700">マンガ生成(MangaFlow / arXiv:2605.28173)</text>
+  <text x="338" y="244" fill="#c9d1d9" font-size="12.5">story section memory = キャラ参照を外部記憶に畳み、後のコマで引く</text>
+
+  <!-- domain 3: cognitive OS -->
+  <rect x="322" y="284" width="404" height="62" rx="8" fill="#161b22" stroke="#a371f7" stroke-width="1.4"/>
+  <text x="338" y="307" fill="#a371f7" font-size="13.5" font-weight="700">認知 OS(llive の 4 層メモリ)</text>
+  <text x="338" y="330" fill="#c9d1d9" font-size="12.5">経験を階層化した記憶に畳み、後のタスクで引く</text>
+
+  <!-- honest ablation chip on the MangaFlow row -->
+  <rect x="46" y="296" width="204" height="76" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1.2"/>
+  <text x="58" y="316" fill="#8b949e" font-size="11.5">MangaFlow ablation(self-report)</text>
+  <text x="58" y="338" fill="#c9d1d9" font-size="12">CIDS  <tspan fill="#3fb950" font-weight="700">0.619</tspan> → <tspan fill="#f85149" font-weight="700">0.582</tspan>(記憶を外すと低下)</text>
+  <text x="58" y="358" fill="#c9d1d9" font-size="12">CSD   <tspan fill="#3fb950" font-weight="700">0.668</tspan> → <tspan fill="#f85149" font-weight="700">0.547</tspan>(記憶を外すと低下)</text>
+
+  <!-- footer -->
+  <line x1="34" y1="398" x2="726" y2="398" stroke="#21262d" stroke-width="1"/>
+  <text x="34" y="420" fill="#8b949e" font-size="12.5">傍証として使えるのは<tspan fill="#c9d1d9" font-weight="700">「記憶が一貫性に効く方向性」まで</tspan>。査読前 self-report の数字を SOTA 主張に読み替えない。</text>
+</svg>
