@@ -1393,3 +1393,61 @@ run 27918958686 待機中(23:43Z ~1h37m / 完了見込み ~00:06-01:06Z)。`extr
   2. COMPLETE: `kaggle kernels output furusekazufumi/llcore-needle-offload -p out/needle_kaggle` → `py -3.11 scripts/extract_needle_results.py out/needle_kaggle/nas_pareto.json` → b2 L115/L137/L138 + SVG L51-52 を「★ ペースト可能テンプレート」で差替(horizon=None/int 両 outcome 準備済)。
   3. ERROR: `kaggle kernels output ... ` の run_offload.log で死因確認。`[resume]` 不在ならメタ不一致(fixtures/モデル basename)。
 - **commit**: `df5dcd3`(B2 記録)→ kernel `04f8fd3` + ASCII 修正。HEAD は本追記でさらに進む。
+
+## ★2026-06-22 EXIT(13) — 再開地点(canonical / Kaggle needle なお RUNNING)
+- **HEAD=`5738bd3`(EXIT(12) から変化なし)。push なし。** ブランチ `feat/lm-recurrent`。作業ツリーは `docs/SESSION_SUMMARY.md`(自動生成)以外 clean。
+- **Kaggle needle ジョブ `furusekazufumi/llcore-needle-offload` は本セッション全ポーリングで一貫して `RUNNING`**(version 1, CPU 30GB/12h, full needle 2048+4096)。COMPLETE/ERROR への遷移なし=まだ計算中(4096 full-attention O(n²) が支配的・想定内)。
+- **本セッションの実作業**: コード変更ゼロ。`kaggle kernels status` を反復ポーリング(全て RUNNING)+ 統合パスの de-risk 確認のみ。確認済み: `scripts/extract_needle_results.py` 実在(3912B)/ b2 統合アンカー L113(SVG caption UNTESTED)・L115・L137(2048未実測+RAD接地)・L138(honest punchline)すべて配置済。回収即統合できる状態。
+- **新セッションの具体的な一手(EXIT(12) と同一・不変)**:
+  1. `kaggle kernels status furusekazufumi/llcore-needle-offload`。
+  2. **COMPLETE** → `kaggle kernels output furusekazufumi/llcore-needle-offload -p out/needle_kaggle` → `py -3.11 scripts/extract_needle_results.py out/needle_kaggle/nas_pareto.json` → b2 `docs/articles/drafts/b2-suppress-your-win.md` の L115/L137/L138 + SVG L51-52 を「★ ペースト可能テンプレート」で差替(`<MEAN>`=`cs['2048']['mean']`/`<CI>`/`<HZ>`=`p['needle']['horizon']`、horizon=None/int 両 outcome 準備済)。
+  3. **RUNNING** → 再度 status を待つ(ポーリング間隔は ~1h で十分、4096 needle は長時間)。
+  4. **ERROR** → `kaggle kernels output ...` の `run_offload.log` で死因確認(`[resume]` 不在=メタ不一致)。
+- **重要(不変)**: needle は b2 の publish blocker ではない(L138 が honest 留保を narrative 化済)。Kaggle 結果は「未検証」を実測値へ格上げする任意 polish。**残 human gate = A(Qiita 公開)のみ / Kaggle 結果回収は gate 不要**。
+- **方針**: 指示なき薄い量産はしない(quality-over-volume)。needle 決着 or 新題材指示で再開。
+
+## ★2026-06-22 EXIT(14) — 再開地点(canonical / Kaggle needle なお RUNNING・長期化)
+- **HEAD=`5738bd3`(EXIT(12)〜(14) 変化なし)。push なし。** ブランチ `feat/lm-recurrent`。作業ツリーは自動生成2ファイル(`docs/SESSION_SUMMARY.md` / `docs/next_plan.md`)以外 clean。
+- **Kaggle needle ジョブ `furusekazufumi/llcore-needle-offload` は本セッションでも多数回ポーリング全て `RUNNING`**(version 1, CPU 30GB/12h, full needle 2048+4096)。COMPLETE/ERROR への遷移は依然なし。EXIT(12) 投入から相当時間が経過しているため、**新セッションでは経過時間を意識せよ**: 12h 上限を超えても RUNNING のままなら Kaggle 側で自動 CANCELLED 済みの可能性 → `kaggle kernels output` を試み run_offload.log を確認し、結果が無ければ再投入(`kaggle kernels push -p ci/kaggle/needle_offload`)を検討。
+- **本セッションの実作業**: コード変更ゼロ。`kaggle kernels status` 反復ポーリング(全 RUNNING)+ ScheduleWakeup による ~1h 間隔の待機ループのみ。統合パスは de-risk 済(変更なし)。
+- **新セッションの具体的な一手(EXIT(13) と同一・不変)**:
+  1. `kaggle kernels status furusekazufumi/llcore-needle-offload`。
+  2. **COMPLETE** → `kaggle kernels output furusekazufumi/llcore-needle-offload -p out/needle_kaggle` → `py -3.11 scripts/extract_needle_results.py out/needle_kaggle/nas_pareto.json` → b2 `docs/articles/drafts/b2-suppress-your-win.md` の L115/L137/L138 + SVG L51-52 を「★ ペースト可能テンプレート」で差替。
+  3. **RUNNING のまま** → ~1h 間隔で待機継続(ScheduleWakeup `<<autonomous-loop-dynamic>>`)。ただし投入から 12h 超なら ERROR 扱いで output 確認 → 再投入判断。
+  4. **ERROR/CANCELLED** → `kaggle kernels output ...` の `run_offload.log` で死因確認(`[resume]` 不在=メタ不一致)。
+- **重要(不変)**: needle は b2 の publish blocker ではない。残 human gate = A(Qiita 公開)のみ / Kaggle 回収は gate 不要。
+- **教訓**: 外部ジョブ待機の純ポーリングループは context/token を浪費する。次回 RUNNING 継続を確認したら、過度な反復ポーリングより SESSION_SUMMARY 更新 + EXIT を優先し、長め(~1h+)の wakeup 1本に集約せよ。
+
+## ★2026-06-22 EXIT(15) — 再開地点(canonical / Kaggle needle なお RUNNING・実体は計算中)
+- **HEAD=`5738bd3`(EXIT(12)〜(15) 変化なし)。push なし。** ブランチ `feat/lm-recurrent`。作業ツリーは自動生成2ファイル以外 clean。
+- **Kaggle needle `furusekazufumi/llcore-needle-offload`: status=RUNNING / output=空(run_offload.log すら無し)**。Kaggle は完了時のみ output を返すため空=未完了=genuine RUNNING。EXIT(12) 系コミットは全て本日(06-22)で実 wall-clock は 12h 以内の公算 → 4096² full-attn needle の CPU 計算が legitimately 継続中(zombie ではない)。
+- **stale 項目を解消**: SESSION_SUMMARY EXIT 追記の「次の一手=mypy strict 安全2件(invariants.py:35 / modes_meter dict型)」は `py -3.11 -m mypy --strict` で**既に green**(no issues)。完了済のため再開対象から除外。残債務(gene/protocol型系)は据置のまま。
+- **非ブロックの actionable work は現状なし**: 型債務は parked、A(Qiita公開)は human gate、needle 回収は gate 不要だが完了待ち。よって live thread は needle 待機のみ。
+- **新セッションの一手(不変)**: ① `kaggle kernels status furusekazufumi/llcore-needle-offload` ② COMPLETE → `kaggle kernels output ... -p out/needle_kaggle` → `py -3.11 scripts/extract_needle_results.py out/needle_kaggle/nas_pareto.json` → b2 L115/L137/L138+SVG L51-52 差替 ③ RUNNING → ~1h wakeup 継続(純ポーリング禁止・EXIT(14) 教訓)④ 投入から 12h 超で RUNNING 固着なら Kaggle 側 auto-cancel 疑い → 再投入(`kaggle kernels push -p ci/kaggle/needle_offload`)。
+
+## ★2026-06-22 EXIT(16) — b2 引用の一次検証完了(publish 前 QA・非ゲート前進)
+- **HEAD=`5738bd3` 不変。push なし。** Kaggle needle はなお RUNNING(legitimate・完了待ち)。
+- **b2 の arXiv 引用3件を arxiv MCP で一次検証 → 全件実在かつ主張正確**(honest-disclosure 原則「一次情報で検証してから採用」を publish 前に適用):
+  - `2407.20656` MTF-PDNS (Vo & Luong 2024): 引用句「performance objectives do not fully align … training-free metrics」abstract に逐語一致。論文正式名は "Efficient Multi-Objective NAS via Pareto Dominance-based Novelty Search" だが method 名 MTF-PDNS は論文準拠で記事の用法は正確。
+  - `2604.07658` Optimal Decay Spectra for Linear Recurrences (2026-04-08): 「min spectral gap O(N⁻²) collapse→sub-exponential/algebraic long-context degradation」abstract 一致。
+  - `2604.02650` Revealing the Learning Dynamics of Long-Context Continual Pre-training (Liang et al. 2026-04-03): 「deceptive saturation / NIAH fake saturation early / PPL tracks intrinsic improvement」abstract 一致。
+- **含意**: b2 は citation-integrity 次元で publish-safe。残る publish 依存は A(Qiita 公開=human gate)と任意の needle 数値補強のみ。本検証で記事の研究接地リスクが1つ閉じた。
+- **本セッション確認済の健全性**: mypy strict 全67ファイル green / pytest 0 failures(600+ pass)/ b2 draft ship-ready / arXiv 引用3件 verified。非ゲート engineering work は実在せず、live thread は needle 完了待ち + A gate のみ。
+
+## ★2026-06-22 EXIT(17) — 連載全体の arXiv 引用 一次検証 完了(7件全 verified・非ゲート前進)
+- **HEAD=`5738bd3` 不変。push なし。** Kaggle needle なお RUNNING(legitimate)。
+- **drafts 全体の arXiv 引用 ユニーク7件を arxiv MCP で一次検証 → 全件実在かつ主張・所属正確**(honest-disclosure: 一次情報で検証してから採用):
+  - b2: `2407.20656`(MTF-PDNS)/`2604.07658`(Optimal Decay Spectra)/`2604.02650`(Long-Context CPT deceptive saturation)= EXIT(16) で確認済。
+  - a7: `2605.05413`(From History to State, Xie et al. 2026-05-06)— prompt token 2–7×削減/context-to-weights/ALFWorld・WebShop・SciWorld/privacy-cost-capability すべて abstract 一致。
+  - c1,s2: `2606.02800`(Cosmos 3, NVIDIA 2026-06-01, OpenMDW-1.1 License)一致。
+  - c1,s1,s2: `2606.03264`(PaddleOCR-VL-1.6, OmniDocBench v1.6 96.33%)一致。
+  - c3: `2605.28173`(MangaFlow, story section memory, Nakayama=東大/Xie=HKUST広州)一致。記事側に査読前v1・self-report 注記あり。
+- **含意**: 連載 C/A/B/S 系の全 arXiv 引用が citation-integrity 次元で publish-safe。各記事の研究接地リスクが一掃された。残 publish 依存=A(Qiita 公開=human gate)+ b2 任意 needle 数値補強のみ。
+- **将来セッションへ**: この7件は検証済。再検証不要(arXiv ID/主張に変更がなければ)。新規 arXiv 引用を draft に追加した場合のみ同手順で検証せよ。
+
+## ★2026-06-22 EXIT(18) — b2 内部数値の生成元突合 完了(全一致・非ゲート前進)
+- **HEAD=`5738bd3` 不変。push なし。** Kaggle needle なお RUNNING。
+- **b2 の headline 数値を生成元 `out/nas_pareto_v2full/nas_pareto.json` と突合 → 全件一致**:
+  - base_nll 4.4155 / verdict「hypervolume +15.3%」/ real_evals 386 / hv_gain_ci mean 16.81%・ci 16.23..17.68%・p_memetic_wins 1.0(記事 +16.8%/16.2..17.7%/1.000)/ proxy_vs_judge_tau 1.0(τ=1.00)/ holdout_offset 8192・windows 12 / verdict notes「max optimism_gap 0.0652 > CI half-width floor 0.0204」逐語一致 / frontier_holdout optimism_gap(0.0014/0.0271/0.0652)+CI 一致。
+- **含意**: b2 は citation-integrity(EXIT16/17)に加え内部数値整合性も検証済 = 数値ミスマッチ由来の publish blocker なし。残 publish 依存=A(Qiita 公開=human gate)+ 任意 needle 補強のみ。
+- **本セッション累積健全性**: mypy strict 全67 green / pytest 0 failures / b2 ship-ready / arXiv 引用7件 verified / b2 数値 生成元一致。非ゲート engineering work は実在せず、live thread=needle 完了待ち + A gate。
