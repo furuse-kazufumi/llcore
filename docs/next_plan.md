@@ -13,7 +13,12 @@
 - **メモリ効率 R&D**: 層別 linearization-tolerance profile → 蒸留で gap **96–101% 回復**（~4 params/head, held-out 汎化）。
 - **進化×構造**: memetic NSGA-II が greedy を **+34.3% HV** 支配、蒸留 frontier **+16.4%**、**proxy-v2**（統計的に正直な eval）で
   「単一 256tok 窓は constant-state 劣化を検出不能」を実証。両 Goal（会話可能＋進化が証明可能）実証済。
-- **記事 32 本（技術 16 + 一般 16）= publish-ready**。drafts に実在、敵対レビューの指摘は一次照合で過剰検出と確認済。
+- **記事 32 本（技術 16 + 一般 16, JA）**。**2026-06-23 ccr が C フェーズ（挿絵）+ 内容監査を完遂**:
+  全 16 トピックに house-style 静的 SVG 概念図を embed（旧 3 → 全 16、33 枚／全 32 ドラフト網羅）+ 監査 punch-list の
+  content 修正を適用・検証（b1 数値 84.0% 整合 / a8 callout 331.8・205.4 整合 / a7・a8・b2 の制作メモ全削除 /
+  用語注・敬称・免責バナー・噛み砕き肉付け）。leaked note 0・TODO 0・全 SVG Qiita-safe 静止。
+- **次フェーズ B（合意済・未着手）= アーク 4 本（S/A/B/C）へ圧縮 → en/zh/ko 多言語展開**。多言語スコープ（全 16 ×4=64 vs
+  アーク 4 ×4=16 vs 旗艦 3–5 のみ翻訳）はユーザー判断ポイント。姉妹相互参照リンクは公開時 URL マッピング作業（B 後）。
 - Kaggle needle offload は **任意 polish**（b2 の 2048 実測値差替のみ）。**2026-06-23 ccr が sweep-only(needle 除去) v5 に切替済**。
 
 ---
