@@ -27,8 +27,9 @@ from torch.nn import functional as F
 from llcore.lm.eval import estimate_loss
 from llcore.lm.recurrent import RecurrentLM
 from llcore.lm.rwkv import RWKVLM
+from llcore.lm.ttt import TTTLinearLM
 
-ConstantStateLM = RecurrentLM | RWKVLM
+ConstantStateLM = RecurrentLM | RWKVLM | TTTLinearLM
 TBPTTHistoryItem = dict[str, float | int]
 EvalHook = Callable[[int, float, float], None]
 
