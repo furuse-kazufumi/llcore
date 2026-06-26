@@ -77,3 +77,32 @@
   resume 手順: `out/nas_pareto_v2full_local/RESUME_INSTRUCTIONS.md`(無ければ本節のコマンドで再起動、`--out` 同一で自動 resume)。
 - **記事は非ブロック**: b2/B アークは needle UNTESTED + smoke decay で publish-ready。full verdict は GPU 走後に b2 の 2048 narrative を実測差替で polish(任意)。
 - 次の P1 候補(CPU でも可): 1.5B linearization-tolerance + per-layer 蒸留 / joint 多層蒸留(frontier 再評価を伴わない単発検証は CPU でも現実的)。
+
+---
+
+## P1 研究プログラム再編 — 効率アーキ・ランドスケープ調査を受けて (2026-06-26)
+
+ユーザー指示「他に面白いモデルが出てないか調べて」→ 並列リサーチ 8 本(全 arXiv 一次裏取り)。
+正本 = `docs/MODEL_LANDSCAPE_2026_06.md`(記事ネタ兼リファレンス) + memory `project_llcore_efficient_arch_landscape_2026_06_26`。
+**重要な気づき**: llcore のコア(feature-map → softmax 出力 MSE 蒸留 → base 凍結)は **LoLCATs Step1 とほぼ同一=車輪の再発明リスク**。
+**真に新規な軸 = memetic NAS による層別「線形化 vs 温存」探索**(先行は全て固定ヒューリスティック)。
+**plateau null の本命 = TTT(test-time training)**(BPTT=128 credit-assignment を迂回。StateX は容量拡張のみで未解決)。
+
+### research leads(優先順・全て CPU 実行可)
+- **L1 [本命] TTT-Linear 層を試作 → plateau が右に動くか × StateX baseline 対照 ablation**
+  根拠: TTT(2407.04620)が「Mamba 16k 停止 / TTT 下がり続ける」を 125M-1.3B 同条件実証。
+  実装: 線形 inner state + 1 GD step + chunk 更新。利得が「容量由来か更新則由来か」を切り分け(honest)。
+- **L2 LoLCATs レシピ採用**(出力 MSE attention transfer → LoRA 回復、base 凍結) + **memetic NAS の allele に「層温存」を明示追加**、目的関数に **5-shot MMLU + 長文脈** を必ず入れる。
+  根拠: pure 全層線形(SUPRA)は MMLU 28 vs 62 で崩壊。ファミリーは hybrid(SWA)に決着済。NAS で「最小限どの層が softmax/SWA を要求するか」を探索=唯一の新規軸。
+- **L3 CPU 速度(0.7tok/s)改善 = GGUF Q4_K_M + imatrix を CPU ベースライン化**して現行 streaming-int8 と直接比較。
+  根拠: 律速は「低ビット格納 + fp32 計算」のアンチパターン。ネイティブ int カーネル(GGUF K-quant / bitnet.cpp)が解。
+- **L4 KIVI 型 KV 2-bit を long-context に追加**(重み非依存・直交、無調整でピークメモリ 2.6×減)。
+- **L5 3B スケールはライセンス切替**: Qwen2.5-3B(非商用)/Gemma 3(derivative)を回避し **Qwen3-4B / Ministral-3-3B / Gemma 4(2026 Apache)** へ。int8≈3-4GB。
+- **L6 数学アシスタント②**: Z3 形式検証 × 長文脈 RAG × on-prem を「検証可能部分の誠実な切り分け」に限定設計(DeepSeek は LLM 自己検証/Lean=谷間)。誇張禁止(仁ゲート)。
+- **L7 Hedgehog ablation**: 4-param アフィン恒等初期化で **spiky(低エントロピー)+monotonic** が出るか検証(表現力天井の警告)。
+
+### 着手順(2026-06-26 セッション)
+1. まず **L7(Hedgehog ablation)** か **L1(TTT-Linear PoC)** を CPU で(plateau/feature-map の本質に直結、既存 linearize.py/distill.py 上に additive)。
+2. 並行で **L3(GGUF Q4_K_M ベースライン)** = 速度の実用的 quick-win。
+3. L2 の NAS allele 拡張は proxy-v2 本走(GPU 待ち)と統合。
+- 規律: TDD / mypy strict / ruff / 既存非破壊 / **保護領域(fitness/evolution/persona/verifier)非接触** / **no-push** / 回復率は条件併記。
