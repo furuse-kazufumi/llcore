@@ -344,3 +344,21 @@ def linearize_qwen2(
                 attn, model.params, chunk_size=chunk_size
             )
     return model
+
+
+def hybridize_qwen2(
+    model: Qwen2LM, layer_indices: Sequence[int], window: int = 64
+) -> Qwen2LM:
+    """In-place swap: replace ``self_attn`` with :class:`WindowLinearAttention` for the given layers.
+
+    The LoLCATs-SW / Liger intra-layer hybrid — recent ``window`` keys keep softmax, older keys go
+    to the constant-state linear branch. Reuses each layer's pretrained projections; returns the
+    same (mutated) model for chaining. ``window`` covering the sequence leaves a layer numerically
+    identical to softmax, so this is a strictly safe, capacity-preserving swap.
+    """
+    layers = model.model.layers
+    for i in layer_indices:
+        attn = layers[i].self_attn
+        if isinstance(attn, Qwen2Attention):
+            layers[i].self_attn = WindowLinearAttention.from_attention(attn, model.params, window)
+    return model

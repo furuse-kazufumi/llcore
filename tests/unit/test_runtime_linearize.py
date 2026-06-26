@@ -244,3 +244,36 @@ def test_full_feature_map_is_trainable() -> None:
         loss.backward()
         opt.step()
     assert not torch.allclose(full.q_map.detach(), before, atol=1e-5)
+
+
+def test_hybridize_qwen2_swaps_layers_and_large_window_matches_softmax() -> None:
+    """hybridize_qwen2 swaps to WindowLinearAttention; with a window covering the sequence the
+    model output is unchanged (strict generalization), so it is a safe capacity-preserving swap."""
+    import copy
+
+    from llcore.runtime.linearize import WindowLinearAttention, hybridize_qwen2
+
+    model = _tiny()
+    ids = torch.randint(0, 48, (1, 12))
+    with torch.no_grad():
+        before = model(ids)
+    hy = hybridize_qwen2(copy.deepcopy(model), [0, 2], window=1000)  # window >> T=12
+    assert isinstance(hy.model.layers[0].self_attn, WindowLinearAttention)
+    assert isinstance(hy.model.layers[1].self_attn, Qwen2Attention)
+    with torch.no_grad():
+        after = hy(ids)
+    assert torch.allclose(before, after, atol=1e-5)
+
+
+def test_hybridize_qwen2_small_window_changes_output() -> None:
+    import copy
+
+    from llcore.runtime.linearize import hybridize_qwen2
+
+    model = _tiny()
+    ids = torch.randint(0, 48, (1, 24))
+    with torch.no_grad():
+        before = model(ids)
+        after = hybridize_qwen2(copy.deepcopy(model), list(range(model.params.n_layer)), window=2)(ids)
+    assert after.shape == before.shape and torch.isfinite(after).all()
+    assert not torch.allclose(before, after, atol=1e-2)
