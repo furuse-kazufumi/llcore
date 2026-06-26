@@ -191,10 +191,16 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"error: {exc}", file=sys.stderr, flush=True)
         return 2
     model_id = resolve_model_id(args.model)
-    backend = TransformersBackend(model_id=model_id, seed=args.seed)
+    if args.native:
+        from llcore.chat.native_backend import NativeQwenBackend
+
+        backend = NativeQwenBackend(model_id, seed=args.seed, int8=args.int8)
+    else:
+        backend = TransformersBackend(model_id=model_id, seed=args.seed)
     session = ChatSession(backend, system_prompt=args.system, settings=settings)
 
-    print(f"model: {model_id} (CPU)", flush=True)
+    runtime = "llcore 自前 forward" if args.native else "HF transformers"
+    print(f"model: {model_id} (CPU, {runtime})", flush=True)
     exit_code = 0
     try:
         if args.prompt:
