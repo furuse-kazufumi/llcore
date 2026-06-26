@@ -175,8 +175,9 @@ def main(argv: list[str] | None = None) -> int:
     per_layer: list[dict[str, Any]] = []
     for i in range(p.n_layer):
         x = captured[i]
-        attn = model.model.layers[i].self_attn
-        xn = model.model.layers[i].input_layernorm(x)
+        layer = cast(Qwen2DecoderLayer, model.model.layers[i])
+        attn = cast(Qwen2Attention, layer.self_attn)
+        xn = layer.input_layernorm(x)
         q = attn.q_proj(xn).view(1, n_tok, p.n_head, p.head_dim).transpose(1, 2)
         k = attn.k_proj(xn).view(1, n_tok, p.n_kv_head, p.head_dim).transpose(1, 2)
         q, k = _apply_rope(q, k, cos, sin)
