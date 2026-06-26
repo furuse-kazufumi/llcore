@@ -56,7 +56,13 @@ def hf_greedy(model: Any, tok: Any, user: str, max_new: int) -> list[int]:
         out = model.generate(
             **inp, max_new_tokens=max_new, do_sample=False, repetition_penalty=1.0
         )
-    return [int(t) for t in out[0, inp["input_ids"].shape[1] :].tolist()]
+    toks = [int(t) for t in out[0, inp["input_ids"].shape[1] :].tolist()]
+    # HF generate は停止時に EOS を出力列へ含めるが、native は EOS で break して含めない。
+    # コンテンツトークンを揃えて比較するため、末尾の EOS を 1 つだけ取り除く。
+    eos = getattr(tok, "eos_token_id", None)
+    if toks and eos is not None and toks[-1] == eos:
+        toks = toks[:-1]
+    return toks
 
 
 def native_greedy(model: Any, tok: Any, user: str, max_new: int) -> tuple[list[int], Any]:
