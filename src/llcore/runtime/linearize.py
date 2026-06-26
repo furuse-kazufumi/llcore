@@ -126,7 +126,9 @@ class LinearAttention(nn.Module):
         """The trainable feature-map parameters (empty unless ``learnable``)."""
         if not self.learnable:
             return []
-        return [self.q_scale, self.q_bias, self.k_scale, self.k_bias]
+        if self.feature_map == "diag":
+            return [self.q_scale, self.q_bias, self.k_scale, self.k_bias]
+        return [self.q_map, self.q_bias, self.k_map, self.k_bias]
 
     def state_bytes(self) -> int:
         """Bytes of the per-head running state (S + z), float32 — constant in sequence length."""
