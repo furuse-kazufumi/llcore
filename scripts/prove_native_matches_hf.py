@@ -41,7 +41,7 @@ PROMPTS = [
 def _ensure_utf8_stdout() -> None:
     for stream in (sys.stdout, sys.stderr):
         if hasattr(stream, "reconfigure"):
-            stream.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[union-attr]
+            stream.reconfigure(encoding="utf-8", errors="replace")
 
 
 def _messages(user: str) -> list[dict[str, str]]:
