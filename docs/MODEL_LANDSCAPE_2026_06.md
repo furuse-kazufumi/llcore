@@ -224,6 +224,18 @@ recurrent LM の有効文脈 plateau を、context_length_curve の `past_block_
 - **honest 注記（重要）**: この実験と carry-on 実験は、**忠実 Gated DeltaNet パッチ（データ依存ゲート, §14）を当てる前に起動**＝**静的ゲート版**をテスト。M が「データ依存ゲートが plateau に本質的」と指摘した**忠実版は未テスト**。carry-on（state-carry 訓練, `out/tbptt_plateau/`）は recurrent-wide まで gain≈0、static gated-deltanet arm 走行中。**真の検証＝忠実版 × carry-on の再走**が必要。
 - honest 規律: 単一 seed・CPU・小型・`past_block_gain` は粗い2点差分（[[feedback_benchmark_honest_disclosure]]）。
 
+### (4) ★plateau ablation — carry-on（state-carry TBPTT, seg_len 2048, `out/tbptt_plateau/`）
+| arch（carry-on, 静的ゲート版） | held-out ppl | past_block_gain | ppl_by_ctx(16→1024) |
+|---|---|---|---|
+| recurrent | 32.41 | 0.0003 | 22.9→22.9（フラット） |
+| recurrent-wide | 33.33 | 0.0001 | 23.0→23.0（フラット） |
+| gated-deltanet（静的） | **25.23** | 0.0 | **17.9→17.9（フラット）** |
+
+- **2×3 確定 = 全 honest null**: carry-off / carry-on × 3 arch すべて past_block_gain ≈ 0。**state-carry TBPTT 訓練でも plateau は動かなかった**＝「訓練法が主因」仮説（N/Codex）はこの設定では**支持されず**。
+- **副次の真の信号**: gated-deltanet（delta-rule セル）は ppl が顕著に低い（17.9 vs recurrent 22.9）＝**より良い mixer**。ただし長文脈活用（plateau）とは**直交**＝ppl は良いが依然 c>16 を使わない。
+- **★重大な交絡（設計上の見落とし）**: 実験は `chunk_size=block_size=128`。state は持ち越すが**勾配は依然 128 で truncate**＝「128 先のために何を保持すべきか」の credit assignment はやはり切れている（N が §2c で警告した点）。**∴ 今回は「state-carry が plateau を動かすか」を完全には検証できていない**。真の検証 = (a) `chunk_size>128`（勾配をより遠くまで）+ (b) 忠実なデータ依存ゲート版（静的ゲートは窓統計に最適化される）。両方とも未実施＝**次の本当の実験**。
+- honest 結論: 容量・セル・state-carry のどれ単体でも、この（交絡含みの）設定では plateau は動かせなかった。誇張せず「まだ動かせていない／設計に交絡があった」と記録する。
+
 > 検証レベル ◎=一次確認 / ○=要追検証。
 
 ## 14. 実装済み機能（2026-06-26 goal セッション「発見機能を自律実装」・全 no-push・既存非破壊）
