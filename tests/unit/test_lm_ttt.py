@@ -96,7 +96,7 @@ def test_one_optimizer_step_reduces_loss() -> None:
         loss.backward()
         opt.step()
     _, loss1 = m(idx, tgt)
-    assert loss1 is not None and float(loss1) < float(loss0)
+    assert loss1 is not None and float(loss1.detach()) < float(loss0.detach())
 
 
 def test_core_step_state_shape() -> None:
