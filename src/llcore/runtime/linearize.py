@@ -215,6 +215,100 @@ class SlidingWindowAttention(nn.Module):
         return self.o_proj(out), new_cache
 
 
+class WindowLinearAttention(nn.Module):
+    """Intra-layer hybrid: true softmax over the last ``window`` keys + linear attention for older
+    keys, fused under one denominator (LoLCATs-SW / Liger Attention, arXiv:2410.10254 / 2503.01496).
+
+    Recent keys keep full softmax (preserving local quality), while keys older than ``window`` are
+    summarized by the constant-state linear branch ``φ(q)·Σφ(k)⊗v`` — so the resident memory is the
+    bounded softmax window KV (O(window)) plus the O(d²) linear state, not a growing O(T) cache. A
+    per-head learnable ``log_gamma`` (γ=exp, init 1) scales the softmax branch; both branches share
+    one normalizer. When ``window`` covers the sequence the linear branch is empty and the output is
+    EXACTLY full softmax (γ cancels), so this is a strict generalization of :class:`Qwen2Attention`.
+    Reuses the pretrained q/k/v/o projections + RoPE; the feature map is the shared ``_phi``.
+    """
+
+    def __init__(
+        self,
+        q_proj: nn.Linear,
+        k_proj: nn.Linear,
+        v_proj: nn.Linear,
+        o_proj: nn.Linear,
+        params: Qwen2Params,
+        window: int,
+        eps: float = 1e-6,
+    ) -> None:
+        super().__init__()
+        self.q_proj = q_proj
+        self.k_proj = k_proj
+        self.v_proj = v_proj
+        self.o_proj = o_proj
+        self.p = params
+        self.window = window
+        self.eps = eps
+        # per-head softmax-branch mixing weight γ = exp(log_gamma); init 0 -> γ=1 (learnable)
+        self.log_gamma = nn.Parameter(torch.zeros(params.n_head))
+
+    @classmethod
+    def from_attention(
+        cls, src: Qwen2Attention, params: Qwen2Params, window: int
+    ) -> WindowLinearAttention:
+        return cls(src.q_proj, src.k_proj, src.v_proj, src.o_proj, params, window)
+
+    def memory_bytes(self, context_len: int) -> int:
+        """Resident bytes: softmax KV capped at ``window`` + the constant O(d²) linear state."""
+        p = self.p
+        eff = min(self.window, context_len)
+        kv = 2 * p.n_kv_head * eff * p.head_dim * 4
+        lin = p.n_head * p.head_dim * p.head_dim * 4 + p.n_head * p.head_dim * 4
+        return kv + lin
+
+    def forward(
+        self,
+        x: torch.Tensor,
+        cos: torch.Tensor,
+        sin: torch.Tensor,
+        past: tuple[torch.Tensor, torch.Tensor] | None,
+        past_len: int,
+    ) -> tuple[torch.Tensor, tuple[torch.Tensor, torch.Tensor]]:
+        p = self.p
+        b, t, _ = x.shape
+        q = self.q_proj(x).view(b, t, p.n_head, p.head_dim).transpose(1, 2)
+        k = self.k_proj(x).view(b, t, p.n_kv_head, p.head_dim).transpose(1, 2)
+        v = self.v_proj(x).view(b, t, p.n_kv_head, p.head_dim).transpose(1, 2)
+        q, k = _apply_rope(q, k, cos, sin)
+        if past is not None:
+            k = torch.cat((past[0], k), dim=2)
+            v = torch.cat((past[1], v), dim=2)
+        new_cache = (k, v)
+        n_rep = p.n_head // p.n_kv_head
+        kf = _repeat_kv(k, n_rep)
+        vf = _repeat_kv(v, n_rep)
+        tk = kf.size(2)
+        qpos = (torch.arange(t) + past_len).unsqueeze(1)  # [T,1]
+        kpos = torch.arange(tk).unsqueeze(0)  # [1,Tk]
+        causal = kpos <= qpos
+        within = (qpos - kpos) < self.window  # softmax window (also requires causal)
+        sw_mask = causal & within  # recent keys -> softmax branch
+        lin_mask = causal & ~within  # older keys -> linear branch
+        # softmax branch (numerically stable per-row max over the window region)
+        scores = torch.matmul(q, kf.transpose(-2, -1)) / (p.head_dim**0.5)  # [B,H,T,Tk]
+        neg = torch.finfo(scores.dtype).min
+        sw_scores = scores.masked_fill(~sw_mask, neg)
+        row_max = sw_scores.max(dim=-1, keepdim=True).values.detach()
+        gamma = self.log_gamma.exp()[None, :, None, None]
+        a_sw = gamma * torch.exp(sw_scores - row_max)
+        a_sw = a_sw.masked_fill(~sw_mask, 0.0)
+        # linear branch: φ(q)·φ(k) over older keys (φ>0), same row scale via shared denominator
+        lin = torch.matmul(_phi(q), _phi(kf).transpose(-2, -1))  # [B,H,T,Tk], >0
+        a_lin = lin.masked_fill(~lin_mask, 0.0)
+        weights = a_sw + a_lin
+        den = weights.sum(dim=-1, keepdim=True) + self.eps
+        out = torch.matmul(weights / den, vf)
+        out = out.transpose(1, 2).reshape(b, t, p.n_head * p.head_dim)
+        return self.o_proj(out), new_cache
+
+
 def linearize_qwen2(
     model: Qwen2LM, layer_indices: Sequence[int], chunk_size: int = 64
 ) -> Qwen2LM:

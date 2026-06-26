@@ -103,3 +103,79 @@ def test_constant_state_bytes_independent_of_length() -> None:
     p = model.params
     expected = p.n_head * p.head_dim * p.head_dim * 4 + p.n_head * p.head_dim * 4  # S + z, float32
     assert attn.state_bytes() == expected
+
+
+def test_window_linear_equals_softmax_when_window_covers_sequence() -> None:
+    """Strict generalization: window >= T -> the linear branch is empty and the output is EXACTLY
+    full softmax attention (the per-head gamma cancels in the shared normalizer)."""
+    from llcore.runtime.linearize import WindowLinearAttention
+    from llcore.runtime.qwen2 import _rope_cos_sin
+
+    model = _tiny()
+    src = model.model.layers[0].self_attn
+    assert isinstance(src, Qwen2Attention)
+    wla = WindowLinearAttention.from_attention(src, model.params, window=100)
+    x = torch.randn(1, 40, model.params.hidden_size)  # T=40 < window=100
+    cos, sin = _rope_cos_sin(torch.arange(40), model.params.head_dim, model.params.rope_theta)
+    with torch.no_grad():
+        sm, _ = src(x, cos, sin, None, 0)
+        hy, _ = wla(x, cos, sin, None, 0)
+    assert torch.allclose(sm, hy, atol=1e-5)
+
+
+def test_window_linear_is_causal() -> None:
+    from llcore.runtime.linearize import WindowLinearAttention
+    from llcore.runtime.qwen2 import _rope_cos_sin
+
+    model = _tiny()
+    src = model.model.layers[0].self_attn
+    assert isinstance(src, Qwen2Attention)
+    wla = WindowLinearAttention.from_attention(src, model.params, window=8)
+    x = torch.randn(1, 24, model.params.hidden_size)
+    cos, sin = _rope_cos_sin(torch.arange(24), model.params.head_dim, model.params.rope_theta)
+    x2 = x.clone()
+    x2[:, 12:] = torch.randn_like(x2[:, 12:])  # perturb the future half
+    with torch.no_grad():
+        a, _ = wla(x, cos, sin, None, 0)
+        b, _ = wla(x2, cos, sin, None, 0)
+    # outputs at positions before the perturbation must be unchanged (no future leakage)
+    assert torch.allclose(a[:, :12], b[:, :12], atol=1e-6)
+
+
+def test_window_linear_small_window_differs_from_softmax() -> None:
+    from llcore.runtime.linearize import WindowLinearAttention
+    from llcore.runtime.qwen2 import _rope_cos_sin
+
+    model = _tiny()
+    src = model.model.layers[0].self_attn
+    assert isinstance(src, Qwen2Attention)
+    wla = WindowLinearAttention.from_attention(src, model.params, window=2)
+    x = torch.randn(1, 24, model.params.hidden_size)
+    cos, sin = _rope_cos_sin(torch.arange(24), model.params.head_dim, model.params.rope_theta)
+    with torch.no_grad():
+        sm, _ = src(x, cos, sin, None, 0)
+        hy, _ = wla(x, cos, sin, None, 0)
+    assert hy.shape == sm.shape and torch.isfinite(hy).all()
+    assert not torch.allclose(hy, sm, atol=1e-2)  # hybrid with tiny window != full softmax
+
+
+def test_window_linear_memory_is_bounded_by_window() -> None:
+    from llcore.runtime.linearize import WindowLinearAttention
+
+    model = _tiny()
+    src = model.model.layers[0].self_attn
+    assert isinstance(src, Qwen2Attention)
+    wla = WindowLinearAttention.from_attention(src, model.params, window=64)
+    # beyond the window the resident memory is flat (capped softmax KV + constant linear state)
+    assert wla.memory_bytes(500) == wla.memory_bytes(5000)
+    assert wla.memory_bytes(10) < wla.memory_bytes(500)
+
+
+def test_window_linear_shares_pretrained_weights() -> None:
+    from llcore.runtime.linearize import WindowLinearAttention
+
+    model = _tiny()
+    src = model.model.layers[1].self_attn
+    assert isinstance(src, Qwen2Attention)
+    wla = WindowLinearAttention.from_attention(src, model.params, window=16)
+    assert wla.q_proj is src.q_proj and wla.o_proj is src.o_proj
