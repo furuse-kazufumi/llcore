@@ -11,6 +11,7 @@ is what makes the swap a surgery on a *capable* model rather than a fresh untrai
 """
 from __future__ import annotations
 
+import pytest
 import torch
 
 from llcore.runtime.qwen2 import Qwen2Attention, Qwen2LM, Qwen2Params
