@@ -7,6 +7,8 @@ and that one training step reduces the loss — so the L1 plateau experiment run
 """
 from __future__ import annotations
 
+import math
+
 import pytest
 import torch
 
