@@ -209,6 +209,20 @@ llcore の現行 feature map（`_phi=elu+1`、`learnable` 時の per-head アフ
 - **rank 相関 ρ ≈ +0.39（0.16–0.60）**＝線形は softmax のキー順序を弱くしか保存しない（非 monotonic 寄り）。
 - **★honest null: corr(entropy_gap, 耐性Δnll) = -0.016 ≈ 0**＝spikiness gap は層別線形化耐性を**予測しない**。「非耐性層＝spiky な層」という誘惑的仮説は**反証**（耐性は spikiness 以外＝L0 の残差流役割等が支配）。スクリプト note の事前予測（正相関）も外れ＝honest に記録。
 - **含意（L7 → 設計判断）**: llcore の 4-param アフィン恒等初期化は**ほぼ一様な出発点**で、蒸留が回復すべき距離が大きい（elu+1 は構造的に diffuse）。→ **spiky な feature map（Hedgehog 流 learnable MLP / exp 系 / softmax 正規化 feature map）の追加**を強く動機づける（L2/L7 統合）。ただし耐性の主因は spikiness でないため、**「どの層を温存するか」（memetic NAS, L2）と「feature map をどう spiky にするか」（L7）は別軸として両方追う**。
+- ★補正（Codex review）: `rank_corr` を tie-aware Spearman に修正して再走 → ρ・gap・corr とも**数値不変**（tie の歪みは実際には効かず結論頑健）。「spikiness gap が耐性を予測しない」は**この 1 条件（0.5B/256tok/1断片/zero-shot/単一 Pearson）での観測**であり「反証」と一般化はしない（過剰主張の緩和）。
+
+### (3) ★plateau ablation — carry-off（state-reset 訓練, `out/ttt_plateau/`, 0.5B/2層/block128, 1200 iters）
+recurrent LM の有効文脈 plateau を、context_length_curve の `past_block_gain`（block_size 超で NLL が下がり続けるか）で測定:
+
+| arch（carry-off） | held-out ppl | past_block_gain | ppl_by_ctx(16→1024) |
+|---|---|---|---|
+| recurrent | 32.47 | **−0.0001** | 22.4→22.3（フラット） |
+| recurrent-wide（容量拡張=StateX 流） | 31.76 | **0.0** | 22.3→22.2（フラット） |
+| ttt-linear（**静的ゲート版**） | 31.52 | **0.0** | 22.4→22.2（フラット） |
+
+- **発見**: **state-reset 訓練下では 3 arm すべてフラット**＝容量拡張も delta-rule セルも plateau を動かさない。plateau は「訓練中に >block_size 依存を経験しない」**訓練法アーティファクト**である可能性を強く支持（N/Codex 予測どおり）。
+- **honest 注記（重要）**: この実験と carry-on 実験は、**忠実 Gated DeltaNet パッチ（データ依存ゲート, §14）を当てる前に起動**＝**静的ゲート版**をテスト。M が「データ依存ゲートが plateau に本質的」と指摘した**忠実版は未テスト**。carry-on（state-carry 訓練, `out/tbptt_plateau/`）は recurrent-wide まで gain≈0、static gated-deltanet arm 走行中。**真の検証＝忠実版 × carry-on の再走**が必要。
+- honest 規律: 単一 seed・CPU・小型・`past_block_gain` は粗い2点差分（[[feedback_benchmark_honest_disclosure]]）。
 
 > 検証レベル ◎=一次確認 / ○=要追検証。
 
