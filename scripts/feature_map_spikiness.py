@@ -34,7 +34,6 @@ import torch
 
 from llcore.runtime.linearize import _phi
 from llcore.runtime.qwen2 import (
-    Qwen2Attention,
     Qwen2DecoderLayer,
     Qwen2LM,
     Qwen2Params,
