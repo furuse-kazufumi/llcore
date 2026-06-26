@@ -28,12 +28,20 @@ import json
 import sys
 import time
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import torch
 
 from llcore.runtime.linearize import _phi
-from llcore.runtime.qwen2 import Qwen2LM, Qwen2Params, _apply_rope, _repeat_kv, _rope_cos_sin
+from llcore.runtime.qwen2 import (
+    Qwen2Attention,
+    Qwen2DecoderLayer,
+    Qwen2LM,
+    Qwen2Params,
+    _apply_rope,
+    _repeat_kv,
+    _rope_cos_sin,
+)
 
 
 def softmax_weights(q: torch.Tensor, kf: torch.Tensor, head_dim: int) -> torch.Tensor:
