@@ -143,7 +143,7 @@ def main(argv: list[str] | None = None) -> int:
         train_min = (time.perf_counter() - t0) / 60.0
         report = held_out_report_any(model, train_ids, val_ids, tok.vocab_size, args.block_size)
         curve = context_length_curve(model, val_ids, context_lens, args.n_positions, args.seed)
-        nllbc = {int(k): float(v) for k, v in curve["nll_by_context"].items()}  # type: ignore[union-attr]
+        nllbc = {int(k): float(v) for k, v in cast("dict[int, float]", curve["nll_by_context"]).items()}
         gain = past_block_gain(nllbc, args.block_size)
         results[arch] = {
             "n_params": n_params,
