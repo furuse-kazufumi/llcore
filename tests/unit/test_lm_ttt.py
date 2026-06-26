@@ -108,3 +108,32 @@ def test_core_step_state_shape() -> None:
     assert next_h.shape == (4, 32)
     assert next_s.shape == (4, 16, 16)
     assert torch.isfinite(next_s).all()
+
+
+def test_long_sequence_state_norm_bounded() -> None:
+    # Codex review #5: the data-dependent decay α∈(0,1) must keep the fast-weight state from
+    # blowing up over a long carry. Stream 2000 random tokens through the core and check the
+    # state norm stays finite and bounded (not monotonically diverging).
+    torch.manual_seed(6)
+    m = TTTLinearLM(_cfg(state_dim=24, n_embd=48))
+    m.eval()
+    state = m.init_state(2)
+    idx = torch.randint(0, 23, (2000,))
+    norms = []
+    with torch.no_grad():
+        for t in range(2000):
+            _, state = m.step(idx[t : t + 1].expand(2), state)
+            if t % 200 == 0:
+                n = max(float(s.norm()) for s in state)
+                assert math.isfinite(n)
+                norms.append(n)
+    # late-sequence state norm must not exceed an early-sequence norm by a runaway factor
+    assert norms[-1] < 50.0 * (norms[1] + 1.0)
+
+
+def test_streaming_nll_finite_on_long_sequence() -> None:
+    torch.manual_seed(7)
+    m = TTTLinearLM(_cfg(block_size=64))
+    ids = torch.randint(0, 23, (3000,))  # >> block_size
+    nll, n = m.streaming_nll(ids, chunk_size=256)
+    assert n == 2999 and math.isfinite(nll) and nll > 0
