@@ -97,25 +97,37 @@ class TTTLinearCore(nn.Module):
         self.v_proj = nn.Linear(d, sd, bias=config.bias)
         self.q_proj = nn.Linear(d, sd, bias=config.bias)
         self.out_proj = nn.Linear(sd, d, bias=config.bias)
+        # data-dependent decay α_t = exp(-exp(A_log)·softplus(a_proj(h)+dt_bias)) ∈ (0,1)
+        # (Mamba2 parameterization; faithful Gated DeltaNet, arXiv:2412.06464 §3.3) — per-sample scalar
+        self.a_proj = nn.Linear(d, 1, bias=True)
+        self.A_log = nn.Parameter(torch.log(torch.empty(1).uniform_(1.0, 16.0)))
+        dt = torch.tensor([0.05])
+        self.dt_bias = nn.Parameter(torch.log(torch.expm1(dt)))  # inverse-softplus(0.05)
+        # data-dependent write strength β_t = sigmoid(b_proj(h)) ∈ (0,1) — per-sample scalar
+        self.b_proj = nn.Linear(d, 1, bias=True)
+        # output gate + gated RMSNorm (Mamba2/fla output normalization)
+        self.g_proj = nn.Linear(d, sd, bias=config.bias)
+        self.o_norm_w = nn.Parameter(torch.ones(sd))
         self.norm = nn.LayerNorm(d, bias=config.bias)
-        # forget gate per state-row (~0.9 init) and bounded inner learning rate (~0.5 init)
-        self.raw_decay = nn.Parameter(torch.full((sd,), 2.2))
-        self.raw_eta = nn.Parameter(torch.zeros(sd))
 
     def step(self, h: torch.Tensor, state: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
-        # state: [B, sd, sd] fast weight; h: [B, d]
+        # state: [B, sd, sd] fast weight; h: [B, d]. Faithful Gated DeltaNet update (Eq.8):
+        #   S_t = α_t·S_{t-1} + β_t·(v_t − α_t·S_{t-1}k̂_t)·k̂_tᵀ   (prediction taken AFTER decay)
         k = self.k_proj(h)
         v = self.v_proj(h)
         q = self.q_proj(h)
-        khat = k / (k.norm(dim=-1, keepdim=True) + 1e-6)  # [B, sd]
+        khat = F.normalize(k, p=2.0, dim=-1, eps=1e-6)  # [B, sd]
+        qhat = F.normalize(q, p=2.0, dim=-1, eps=1e-6)  # [B, sd] (canon: q also L2-normalized)
+        alpha = torch.exp(-self.A_log.exp() * F.softplus(self.a_proj(h) + self.dt_bias))  # [B,1]
+        beta = torch.sigmoid(self.b_proj(h))  # [B,1]
         pred = torch.einsum("bij,bj->bi", state, khat)  # S k̂  -> [B, sd]
-        err = pred - v  # [B, sd]
-        grad = torch.einsum("bi,bj->bij", err, khat)  # (S k̂ − v) ⊗ k̂  -> [B, sd, sd]
-        decay = torch.sigmoid(self.raw_decay)  # [sd]
-        eta = torch.sigmoid(self.raw_eta)  # [sd]
-        next_state = decay[None, :, None] * state - eta[None, :, None] * grad
-        out = torch.einsum("bij,bj->bi", next_state, q)  # S' q -> [B, sd]
-        next_h = self.norm(h + self.out_proj(out))
+        err = v - alpha * pred  # v − α·S k̂  (decayed prediction) -> [B, sd]
+        write = torch.einsum("bi,bj->bij", err, khat)  # (·) ⊗ k̂  -> [B, sd, sd]
+        next_state = alpha[:, :, None] * state + beta[:, :, None] * write
+        out = torch.einsum("bij,bj->bi", next_state, qhat)  # S' q̂ -> [B, sd]
+        gated = out * F.silu(self.g_proj(h))  # output gate
+        gated = gated * torch.rsqrt(gated.pow(2).mean(-1, keepdim=True) + 1e-6) * self.o_norm_w
+        next_h = self.norm(h + self.out_proj(gated))
         return next_h, next_state
 
 
