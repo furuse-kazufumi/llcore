@@ -56,11 +56,14 @@ def distill_layer(
     lr: float = 5e-2,
     seed: int = 0,
     chunk_size: int = 64,
+    feature_map: str = "diag",
 ) -> dict[str, float]:
     """Distill layer ``layer``'s linear attention to match its softmax teacher; install it on ``model``.
 
     Returns ``{mse_before, mse_after, steps}``. ``mse_before`` is the zero-shot linear-vs-softmax
     output gap (identity-init feature map); ``mse_after`` is after training the feature map.
+    ``feature_map`` selects the learnable map: ``"diag"`` (per-head affine, original) or ``"full"``
+    (per-head full-linear matrix — higher capacity, the L7/Hedgehog-motivated upgrade).
     """
     torch.manual_seed(seed)
     src = model.model.layers[layer].self_attn
@@ -70,7 +73,9 @@ def distill_layer(
     t = x_norm.size(1)
     cos, sin = _rope_cos_sin(torch.arange(t), model.params.head_dim, model.params.rope_theta)
 
-    student = LinearAttention.from_attention(src, model.params, learnable=True, chunk_size=chunk_size)
+    student = LinearAttention.from_attention(
+        src, model.params, learnable=True, chunk_size=chunk_size, feature_map=feature_map
+    )
     opt = torch.optim.AdamW(student.feature_parameters(), lr=lr)
 
     with torch.no_grad():
