@@ -34,8 +34,9 @@ from llcore.lm.eval import passes_gate
 from llcore.lm.model import CharGPT
 from llcore.lm.recurrent import RecurrentLM
 from llcore.lm.rwkv import RWKVLM
+from llcore.lm.ttt import TTTLinearLM
 
-ConstantStateLM: TypeAlias = RecurrentLM | RWKVLM
+ConstantStateLM: TypeAlias = RecurrentLM | RWKVLM | TTTLinearLM
 
 
 @torch.no_grad()
