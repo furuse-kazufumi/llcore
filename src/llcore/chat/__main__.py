@@ -71,6 +71,17 @@ def build_parser() -> argparse.ArgumentParser:
         "--seed", type=int, default=None, help="再現性用 seed (generate 毎に適用)"
     )
     parser.add_argument(
+        "--native",
+        action="store_true",
+        help="llcore 自前 forward (runtime/qwen2.py) で推論する "
+        "(HF transformers ラッパーでなく。--model はローカルディレクトリ要)",
+    )
+    parser.add_argument(
+        "--int8",
+        action="store_true",
+        help="--native 時に streaming-int8 ロード (RAM 削減・CPU は遅い)",
+    )
+    parser.add_argument(
         "--transcript",
         type=Path,
         default=None,
