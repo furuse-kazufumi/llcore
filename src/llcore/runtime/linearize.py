@@ -152,9 +152,12 @@ class LinearAttention(nn.Module):
         n_rep = p.n_head // p.n_kv_head
         kf = _repeat_kv(k, n_rep)
         vf = _repeat_kv(v, n_rep)
-        if self.learnable:
+        if self.learnable and self.feature_map == "diag":
             qf_in = q * self.q_scale[None, :, None, :] + self.q_bias[None, :, None, :]
             kf_in = kf * self.k_scale[None, :, None, :] + self.k_bias[None, :, None, :]
+        elif self.learnable:  # "full": per-head full-linear map W·x + b
+            qf_in = torch.einsum("hef,bhtf->bhte", self.q_map, q) + self.q_bias[None, :, None, :]
+            kf_in = torch.einsum("hef,bhtf->bhte", self.k_map, kf) + self.k_bias[None, :, None, :]
         else:
             qf_in, kf_in = q, kf
         out = _causal_linear_attn(_phi(qf_in), _phi(kf_in), vf, self.chunk_size, self.eps)

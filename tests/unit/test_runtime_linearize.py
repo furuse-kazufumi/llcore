@@ -179,3 +179,67 @@ def test_window_linear_shares_pretrained_weights() -> None:
     assert isinstance(src, Qwen2Attention)
     wla = WindowLinearAttention.from_attention(src, model.params, window=16)
     assert wla.q_proj is src.q_proj and wla.o_proj is src.o_proj
+
+
+def test_full_feature_map_identity_init_matches_fixed() -> None:
+    """The 'full' learnable feature map is identity-initialized, so at init it reproduces the
+    fixed (non-learnable) linear attention exactly (LoLCATs-style warm start)."""
+    from llcore.runtime.linearize import LinearAttention
+    from llcore.runtime.qwen2 import _rope_cos_sin
+
+    model = _tiny()
+    src = model.model.layers[0].self_attn
+    fixed = LinearAttention.from_attention(src, model.params)
+    full = LinearAttention.from_attention(src, model.params, learnable=True, feature_map="full")
+    x = torch.randn(1, 20, model.params.hidden_size)
+    cos, sin = _rope_cos_sin(torch.arange(20), model.params.head_dim, model.params.rope_theta)
+    with torch.no_grad():
+        a, _ = fixed(x, cos, sin, None, 0)
+        b, _ = full(x, cos, sin, None, 0)
+    assert torch.allclose(a, b, atol=1e-6)
+
+
+def test_full_feature_map_params_and_shapes() -> None:
+    from llcore.runtime.linearize import LinearAttention
+
+    model = _tiny()
+    full = LinearAttention.from_attention(
+        model.model.layers[0].self_attn, model.params, learnable=True, feature_map="full"
+    )
+    params = full.feature_parameters()
+    assert len(params) == 4
+    p = model.params
+    assert tuple(full.q_map.shape) == (p.n_head, p.head_dim, p.head_dim)
+
+
+def test_invalid_feature_map_rejected() -> None:
+    from llcore.runtime.linearize import LinearAttention
+
+    model = _tiny()
+    with pytest.raises(ValueError):
+        LinearAttention.from_attention(
+            model.model.layers[0].self_attn, model.params, learnable=True, feature_map="bogus"
+        )
+
+
+def test_full_feature_map_is_trainable() -> None:
+    """A gradient step on the full feature map moves it off identity (so distillation can shape φ)."""
+    from llcore.runtime.linearize import LinearAttention
+    from llcore.runtime.qwen2 import _rope_cos_sin
+
+    model = _tiny()
+    full = LinearAttention.from_attention(
+        model.model.layers[0].self_attn, model.params, learnable=True, feature_map="full"
+    )
+    x = torch.randn(1, 16, model.params.hidden_size)
+    cos, sin = _rope_cos_sin(torch.arange(16), model.params.head_dim, model.params.rope_theta)
+    opt = torch.optim.Adam(full.feature_parameters(), lr=1e-2)
+    target = torch.randn(1, 16, model.params.hidden_size)
+    before = full.q_map.detach().clone()
+    for _ in range(5):
+        opt.zero_grad()
+        out, _ = full(x, cos, sin, None, 0)
+        loss = torch.nn.functional.mse_loss(out, target)
+        loss.backward()
+        opt.step()
+    assert not torch.allclose(full.q_map.detach(), before, atol=1e-5)
