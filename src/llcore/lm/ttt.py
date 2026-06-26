@@ -1,5 +1,24 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Test-Time-Training (TTT-Linear) constant-state char LM — L1 plateau-null experiment.
+"""Delta-rule fast-weight constant-state char LM — L1 plateau-null experiment.
+
+⚠ HONEST NAMING CORRECTION (2026-06-26, cross-review by Codex + a faithfulness deep-read of
+arXiv:2407.04620 / 2412.06464): the cell below is, by construction, a **Gated DeltaNet**
+(delta rule + L2-normalized key + per-channel decay gate) — equivalently the ``b=1`` /
+no-inner-LayerNorm limit of TTT-Linear. It is **NOT faithful TTT-Linear**: it has no inner
+LayerNorm+residual, no input-dependent learning rate ``η(x)``, and no mini-batch dual form, and
+its L2-norm key + decay are DeltaNet/GLA-derived (TTT normalizes nothing and has no decay). The
+delta-rule gradient ``∇_S ½‖S k̂ − v‖² = (S k̂ − v)⊗k̂`` is mathematically correct and the
+simplification is a legitimate established architecture; only the *name* "TTT" was an overclaim.
+The class is still called ``TTTLinearLM`` pending a rename — read it as "Gated-DeltaNet-style
+delta-rule core". A faithful TTT-Linear variant (inner LN, η(x), dual form) is future work.
+
+KNOWN LIMITATION (Codex + faithfulness review): to actually move the effective-context plateau the
+OUTER training must carry the state across blocks (truncated BPTT with state-carry, ``tbptt.py``);
+with the stock ``Trainer`` (state reset every ``block_size``) this model never sees >block_size
+dependencies during training, so ``context_length_curve`` past ``block_size`` measures the
+recurrence's *extrapolation inductive bias*, not learned long-context. Interpret accordingly.
+
+----- original motivation (kept) -----
 
 Motivation (docs/MODEL_LANDSCAPE_2026_06.md §10): llcore's gated-RNN (``recurrent.py``) plateaus
 at an effective context ≈ ``block_size`` because its mixing matrix ``W`` is *learned once* and the
