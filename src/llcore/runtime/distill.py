@@ -101,6 +101,7 @@ def distill_all_layers(
     lr: float = 5e-2,
     seed: int = 0,
     chunk_size: int = 64,
+    feature_map: str = "diag",
     on_layer: Callable[[int, dict[str, float]], None] | None = None,
 ) -> dict[int, LinearAttention]:
     """Distill every layer independently from the pristine all-softmax teacher.
