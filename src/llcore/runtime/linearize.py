@@ -84,6 +84,7 @@ class LinearAttention(nn.Module):
         chunk_size: int = 64,
         eps: float = 1e-6,
         learnable: bool = False,
+        feature_map: str = "diag",
     ) -> None:
         super().__init__()
         self.q_proj = q_proj
@@ -94,14 +95,27 @@ class LinearAttention(nn.Module):
         self.chunk_size = chunk_size
         self.eps = eps
         self.learnable = learnable
+        if feature_map not in ("diag", "full"):
+            raise ValueError(f"feature_map must be 'diag' or 'full', got {feature_map!r}")
+        self.feature_map = feature_map
         if learnable:
-            # per-head affine on q/k BEFORE the feature map φ; identity at init so a freshly
-            # learnable linear attention == the fixed one until distillation moves it (LoLCATs-style
-            # learnable feature map, with the pretrained projections frozen).
-            self.q_scale = nn.Parameter(torch.ones(params.n_head, params.head_dim))
-            self.q_bias = nn.Parameter(torch.zeros(params.n_head, params.head_dim))
-            self.k_scale = nn.Parameter(torch.ones(params.n_head, params.head_dim))
-            self.k_bias = nn.Parameter(torch.zeros(params.n_head, params.head_dim))
+            # Learnable feature map on q/k BEFORE φ, identity-initialized so a fresh learnable linear
+            # attention == the fixed one until distillation moves it (LoLCATs-style, projections
+            # frozen). "diag" = per-head diagonal affine (4 params/head — the original, weak per the
+            # L7 Hedgehog ablation); "full" = per-head full-linear map W∈[H,d,d] (identity init) +
+            # bias, the LoLCATs/Hedgehog-style higher-capacity map that can learn a spikier φ.
+            h, d = params.n_head, params.head_dim
+            if feature_map == "diag":
+                self.q_scale = nn.Parameter(torch.ones(h, d))
+                self.q_bias = nn.Parameter(torch.zeros(h, d))
+                self.k_scale = nn.Parameter(torch.ones(h, d))
+                self.k_bias = nn.Parameter(torch.zeros(h, d))
+            else:  # "full": W identity-init -> reduces to the fixed map at init
+                eye = torch.eye(d).unsqueeze(0).repeat(h, 1, 1)
+                self.q_map = nn.Parameter(eye.clone())
+                self.q_bias = nn.Parameter(torch.zeros(h, d))
+                self.k_map = nn.Parameter(eye.clone())
+                self.k_bias = nn.Parameter(torch.zeros(h, d))
 
     @classmethod
     def from_attention(cls, src: Qwen2Attention, params: Qwen2Params, **kw: object) -> LinearAttention:
