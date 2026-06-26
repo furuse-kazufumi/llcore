@@ -196,7 +196,18 @@ llcore の最大 null＝「定数状態 recurrent が block_size=128 で有効�
 
 > 全 lead に共通の honest 規律: 回復率・ベンチは**条件併記**、pure 全層線形の MMLU/長文脈崩壊を**目的関数に明示**、異常に良い結果は内訳を疑う（[[feedback_benchmark_honest_disclosure]] / [[feedback_llive_measurement_purity]]）。
 
-## 13. 1.5B linearization-tolerance profile（本セッション実走・補遺）
-`out/linearize_tolerance_1.5b/`（28層、aozora 1024tok）。0.5B（24層, `out/linearize_tolerance/`）との比較で「モデルが大きいほど線形化耐性が上がるか（Liger の規模↑で gap↓と整合するか）」を確認するための実測。完走値は同 json 参照。
+## 13. 本セッション実走結果（2026-06-26, CPU・no-push・既存非破壊）
+
+### (1) 1.5B linearization-tolerance profile（`out/linearize_tolerance_1.5b/`, 28層, aozora 1024tok）
+base ppl **32.07**。最耐性 **L10（Δnll +0.0033）** / 最非耐性 **L0（Δnll +13.76 壊滅）**。cumulative top-k Δnll: 1→+0.003, 4→+0.066, 6→+0.267, 8→+0.349, 12→+1.24, 28→+12.5。
+- **0.5B（24層）比較**: 1.5B の top-4 (+0.066) < 0.5B top-4 (+0.099)、top-1 (+0.003) < 0.5B (+0.014)。**規模が大きいほど少数層線形化への耐性が高い**＝Liger「規模↑で gap↓」と整合。L0 は両モデル共通の壊滅的非耐性層（residual stream 入口の役割）。
+
+### (2) ★L7 Hedgehog ablation（`scripts/feature_map_spikiness.py`, `out/feature_map_spikiness/`, 0.5B 256tok, 7 unit tests green）
+llcore の現行 feature map（`_phi=elu+1`、`learnable` 時の per-head アフィンは恒等初期化＝固定 φ と同一）が softmax の spiky+monotonic を再現するか実測:
+- **エントロピー gap（線形−softmax）= +2.70 nats（全層で大きく正）**。線形は各行ほぼ一様（H≈4.64）、softmax は spiky（H 0.86–3.39）。
+- **top-1 mass: softmax 0.18–0.82（集中）vs 線形 ~0.017（ほぼ一様）**＝elu+1 はキーに質量を集中できない（Hedgehog 警告を一次実証）。
+- **rank 相関 ρ ≈ +0.39（0.16–0.60）**＝線形は softmax のキー順序を弱くしか保存しない（非 monotonic 寄り）。
+- **★honest null: corr(entropy_gap, 耐性Δnll) = -0.016 ≈ 0**＝spikiness gap は層別線形化耐性を**予測しない**。「非耐性層＝spiky な層」という誘惑的仮説は**反証**（耐性は spikiness 以外＝L0 の残差流役割等が支配）。スクリプト note の事前予測（正相関）も外れ＝honest に記録。
+- **含意（L7 → 設計判断）**: llcore の 4-param アフィン恒等初期化は**ほぼ一様な出発点**で、蒸留が回復すべき距離が大きい（elu+1 は構造的に diffuse）。→ **spiky な feature map（Hedgehog 流 learnable MLP / exp 系 / softmax 正規化 feature map）の追加**を強く動機づける（L2/L7 統合）。ただし耐性の主因は spikiness でないため、**「どの層を温存するか」（memetic NAS, L2）と「feature map をどう spiky にするか」（L7）は別軸として両方追う**。
 
 > 検証レベル ◎=一次確認 / ○=要追検証。未確認で残った点（honest）: xLSTM 蒸留 α* の指標向き・コード公開、TransMamba 規模/ライセンス、Prover-V2 重みライセンス条文。採用前に一次直読で一件ずつ裏取り。
