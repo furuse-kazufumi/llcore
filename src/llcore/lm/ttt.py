@@ -1,16 +1,18 @@
 # SPDX-License-Identifier: Apache-2.0
 """Delta-rule fast-weight constant-state char LM — L1 plateau-null experiment.
 
-⚠ HONEST NAMING CORRECTION (2026-06-26, cross-review by Codex + a faithfulness deep-read of
-arXiv:2407.04620 / 2412.06464): the cell below is, by construction, a **Gated DeltaNet**
-(delta rule + L2-normalized key + per-channel decay gate) — equivalently the ``b=1`` /
-no-inner-LayerNorm limit of TTT-Linear. It is **NOT faithful TTT-Linear**: it has no inner
-LayerNorm+residual, no input-dependent learning rate ``η(x)``, and no mini-batch dual form, and
-its L2-norm key + decay are DeltaNet/GLA-derived (TTT normalizes nothing and has no decay). The
-delta-rule gradient ``∇_S ½‖S k̂ − v‖² = (S k̂ − v)⊗k̂`` is mathematically correct and the
-simplification is a legitimate established architecture; only the *name* "TTT" was an overclaim.
-The class is still called ``TTTLinearLM`` pending a rename — read it as "Gated-DeltaNet-style
-delta-rule core". A faithful TTT-Linear variant (inner LN, η(x), dual form) is future work.
+⚠ HONEST NAMING CORRECTION (2026-06-26, cross-review by Codex + faithfulness deep-reads of
+arXiv:2407.04620 / 2412.06464 / 2406.06484): this cell is a **Gated DeltaNet**, NOT TTT-Linear.
+As of the 2026-06-26 patch the core follows the canonical Gated DeltaNet update (Eq.8 of
+arXiv:2412.06464): ``S_t = α_t·S_{t-1} + β_t·(v_t − α_t·S_{t-1}k̂_t)k̂_tᵀ`` with **data-dependent**
+scalar decay ``α_t = exp(-exp(A_log)·softplus(a_proj(h)+dt_bias))`` (Mamba2 parameterization) and
+write strength ``β_t = sigmoid(b_proj(h))``, L2-normalized q,k, and a gated-RMSNorm output. This
+replaced the earlier static per-channel ``decay/eta`` (which made it merely a constant-decay
+DeltaNet). Remaining gap vs the canonical block: single-head (no multi-head), no short depthwise
+conv. The class is still named ``TTTLinearLM`` pending a mechanical rename to ``GatedDeltaNetLM``
+— read it as the latter. A faithful TTT-Linear variant (inner LN, η(x), mini-batch dual form) is
+separate future work; the running ``out/ttt_plateau`` result used the pre-patch *static-gate*
+cell and is the static-gate baseline.
 
 KNOWN LIMITATION (Codex + faithfulness review): to actually move the effective-context plateau the
 OUTER training must carry the state across blocks (truncated BPTT with state-carry, ``tbptt.py``);
