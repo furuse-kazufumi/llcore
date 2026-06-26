@@ -176,7 +176,7 @@ def main(argv: list[str] | None = None) -> int:
     for i in range(p.n_layer):
         x = captured[i]
         layer = cast(Qwen2DecoderLayer, model.model.layers[i])
-        attn = cast(Qwen2Attention, layer.self_attn)
+        attn = layer.self_attn
         xn = layer.input_layernorm(x)
         q = attn.q_proj(xn).view(1, n_tok, p.n_head, p.head_dim).transpose(1, 2)
         k = attn.k_proj(xn).view(1, n_tok, p.n_kv_head, p.head_dim).transpose(1, 2)
