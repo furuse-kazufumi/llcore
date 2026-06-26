@@ -53,18 +53,26 @@ def detach_state(state: list[object]) -> list[object]:
 def reset_state_slots(
     model: ConstantStateLM, state: list[object], mask: torch.Tensor
 ) -> list[object]:
-    """Reset the batch rows selected by ``mask`` (bool ``[B]``) to a fresh zero/init state."""
+    """Reset the batch rows selected by ``mask`` (bool ``[B]``) to a fresh zero/init state.
+
+    The per-row ``mask`` is broadcast to each state tensor's rank, so this works for 2-D states
+    (``RecurrentLM`` ``[B,S]``) and higher-rank states alike (``TTTLinearLM`` fast weight
+    ``[B,S,S]``) — a fixed ``view(-1, 1)`` would mis-broadcast the 3-D case.
+    """
     fresh = cast("list[object]", model.init_state(int(mask.size(0))))
-    m = mask.view(-1, 1)
+
+    def _bcast(ref: torch.Tensor) -> torch.Tensor:
+        return mask.view(-1, *([1] * (ref.dim() - 1)))
+
     out: list[object] = []
     for s, f in zip(state, fresh, strict=True):
         if isinstance(s, torch.Tensor):
             assert isinstance(f, torch.Tensor)
-            out.append(torch.where(m, f, s))
+            out.append(torch.where(_bcast(s), f, s))
         else:
             sf = cast("tuple[torch.Tensor, ...]", s)
             ff = cast("tuple[torch.Tensor, ...]", f)
-            out.append(type(s)(*[torch.where(m, b, a) for a, b in zip(sf, ff, strict=True)]))
+            out.append(type(s)(*[torch.where(_bcast(a), b, a) for a, b in zip(sf, ff, strict=True)]))
     return out
 
 
