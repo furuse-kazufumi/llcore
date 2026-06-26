@@ -125,9 +125,25 @@
 - 小型: HF SmolLM3-3B / Ministral-3-3B-2512 / Phi-4-mini-instruct / Gemma 4（Apache, VentureBeat）/ Qwen3
 - 拡散: DyLLM 2603.08026 / SparseD 2509.24014 / サーベイ「Speed Always Wins」2508.09834
 
-## 9. 追記予定（background 調査・2026-06-26 起動中）
+## 9. 量子化・低ビットフロンティア（◎ 追加調査 2026-06-26）
+
+llcore 現状: streaming-int8 で Qwen2.5-1.5B を 5.7GB→2.44GB（embed/lm_head fp32 維持）、CPU 0.7tok/s・dequant 律速。
+
+- **BitNet b1.58 / bitnet.cpp**（MS, arXiv 2402.17764 / 2B4T 2504.12285, MIT）: 重み ternary {-1,0,+1} ≈1.58bit。**学習時量子化（QAT, from scratch）＝事後量子化ではない**。3B で FP16 比 GPU メモリ 3.55×減・2.71×速、品質同等。CPU 推論可（ternary 専用カーネル）。**★既存 Qwen を事後 1.58bit 化は不可（QAT 専用）＝llcore 現行パイプに後付け不能**（最重要 honest）。
+- **AWQ / GPTQ**（int4 PTQ）: AWQ は salient ~1% weight 保護（MLSys2024 Best Paper, MIT）。int4 で重み 4×減だが **GPU カーネル前提・CPU は不得手**、実 VRAM 削減は KV/活性込みで 45-55%。
+- **KV-cache 量子化（長文脈の主削減レバー・重み量子化と直交）**: **KIVI**（2402.02750, **無調整 2-bit**, ピークメモリ 2.6×減・スループット 2.35-3.47×, 既存モデルにプラグイン）/ **KVQuant**（2401.18079, 3-bit で <0.1 ppl 劣化, 1M-10M tokens 文脈）。
+- **sub-4bit**: **QuIP#**（2402.04396, E8 格子, 2-bit で初の実用品質・3-bit が理論ロスレス 4-bit 超）/ AQLM（コードブック L1 非搭載で推論遅い）。**いずれも GPU 専用カーネル前提**。
+- **llama.cpp / GGUF**: Q4_K_M（~4.5bit 混合, コミュニティ・デファクト, +0.0535 ppl@7B）/ Q8_0（<0.5% 劣化）/ imatrix（同 bit で 2-4% 改善）。**K-quant はネイティブ int カーネルで CPU 実速**（dequant→fp32→matmul ではない）。
+
+**llcore 含意（量子化）**:
+- (a) **int4（GGUF Q4_K_M / AWQ）で int8 比ほぼ半減**（2.44GB→~1.3-1.5GB 目安）。1.5B 級なら劣化小・費用対効果高。BitNet は QAT 専用で後付け不能（採用するなら BitNet 系モデル丸ごと or 自前 QAT を別プロジェクト化）。
+- (b) **KIVI 型 KV 2-bit が long-context メモリ削減の最低リスク手段**（重みを触らず直交追加）。llcore の定数状態路線と併用で相乗。
+- (c) **★CPU 0.7tok/s の律速＝「低ビット格納 + fp32 計算」のアンチパターン**。解 = **低ビットのまま積和するネイティブ整数カーネル**（bitnet.cpp / GGUF Q4_K_M）。AWQ/GPTQ/QuIP# は GPU 前提で CPU 速度に直結しない。**推奨検証順: ①GGUF Q4_K_M+imatrix を CPU ベースライン化し 0.7tok/s と直接比較 → ②KIVI 型 KV 2-bit 追加 → ③本気の 1.58bit は BitNet 採用/QAT を別建て**。
+
+主要出典: BitNet 2402.17764 / 2504.12285、AWQ 2306.00978、KVQuant 2401.18079、KIVI 2402.02750、QuIP# 2402.04396、llama.cpp quantize README。
+
+## 10. 追記予定（background 調査・2026-06-26 継続中）
 - 線形化/uptraining 先行研究（LoLCATs / SUPRA / Mamba-in-Llama / Liger / Hedgehog）
 - Test-time-training & 長文脈記憶（Titans / TTT / MesaNet / RecurrentGemma）
-- 量子化フロンティア（BitNet b1.58 / AWQ/GPTQ / KV-cache 量子化 / sub-4bit）
 
 > 検証レベル ◎=一次確認 / ○=要追検証。未確認で残った点（honest）: xLSTM 蒸留 α* の指標向き・コード公開、TransMamba 規模/ライセンス、Prover-V2 重みライセンス条文。採用前に一次直読で一件ずつ裏取り。
