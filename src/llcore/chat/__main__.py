@@ -24,6 +24,7 @@ from llcore.chat.backend import (
     TransformersBackend,
     resolve_model_id,
 )
+from llcore.chat.native_backend import NativeQwenBackend
 from llcore.chat.session import DEFAULT_SYSTEM_PROMPT, ChatSession, GenerationSettings
 
 
