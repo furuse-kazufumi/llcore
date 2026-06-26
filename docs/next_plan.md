@@ -106,3 +106,9 @@
 2. 並行で **L3(GGUF Q4_K_M ベースライン)** = 速度の実用的 quick-win。
 3. L2 の NAS allele 拡張は proxy-v2 本走(GPU 待ち)と統合。
 - 規律: TDD / mypy strict / ruff / 既存非破壊 / **保護領域(fitness/evolution/persona/verifier)非接触** / **no-push** / 回復率は条件併記。
+
+### 実装進捗(2026-06-26 セッション)
+- **L7 DONE(計測)**: `scripts/feature_map_spikiness.py`(+7 tests)。0.5B 実走=elu+1 はほぼ一様(top1 0.017 vs softmax 0.18-0.82、entropy gap +2.70 nats)で Hedgehog 警告を実証、**ただし spikiness gap は耐性を予測しない(corr -0.016)=honest null**。`out/feature_map_spikiness/`。→ spiky feature map 追加(L7 後段)を動機づけ。doc §13(2)。
+- **L1 実装 DONE / 検証 in-progress**: `src/llcore/lm/ttt.py`=`TTTLinearLM`(delta-rule fast-weight, L2 正規化 key, 学習可能 decay/η, RecurrentLM 互換, +9 tests)。`longctx_eval.ConstantStateLM` union に追加(既存非回帰)。`scripts/ttt_plateau_experiment.py`(+4 tests)=3 arm 対照(recurrent baseline / recurrent-wide=StateX 流容量 / ttt-linear=更新則)を `context_length_curve` で `past_block_gain`(block_size 超で NLL が下がり続けるか)比較。smoke 検証済 → **本走 background 実行中**(`out/ttt_plateau/`, max-iters 1200, params 1.22M/1.38M/1.22M 整合)。完了後: ttt-linear の gain を recurrent / recurrent-wide と対照し「容量 vs 更新則」を切り分け、doc §13 + memory に honest 記録。
+- **1.5B linearization-tolerance profile DONE**: `out/linearize_tolerance_1.5b/`。doc §13(1)。
+- 全規律クリア(mypy strict / ruff / 計 20+ 新 tests green / 保護領域非接触 / no-push)。
