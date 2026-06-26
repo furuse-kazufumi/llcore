@@ -192,9 +192,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"error: {exc}", file=sys.stderr, flush=True)
         return 2
     model_id = resolve_model_id(args.model)
+    backend: TransformersBackend | NativeQwenBackend
     if args.native:
-        from llcore.chat.native_backend import NativeQwenBackend
-
         backend = NativeQwenBackend(model_id, seed=args.seed, int8=args.int8)
     else:
         backend = TransformersBackend(model_id=model_id, seed=args.seed)
