@@ -88,12 +88,37 @@ def mean_top1_mass(weights: torch.Tensor, min_keys: int) -> float:
     return float(sum(vals) / len(vals)) if vals else 0.0
 
 
+def _avg_ranks(x: torch.Tensor) -> torch.Tensor:
+    """Fractional (tie-aware) ranks of a 1-D tensor: tied values share their mean rank.
+
+    Plain ``argsort().argsort()`` breaks ties arbitrarily, which biases the rank correlation in
+    the near-uniform regime this ablation probes; averaging tied ranks is the standard Spearman
+    treatment and is exact for the (frequent) zero / identical-weight ties.
+    """
+    n = x.numel()
+    order = x.argsort()
+    sorted_x = x[order]
+    base = torch.arange(1, n + 1, dtype=torch.float32)
+    avg = base.clone()
+    i = 0
+    while i < n:
+        j = i
+        while j + 1 < n and bool(sorted_x[j + 1] == sorted_x[i]):
+            j += 1
+        if j > i:
+            avg[i : j + 1] = base[i : j + 1].mean()
+        i = j + 1
+    out = torch.empty(n, dtype=torch.float32)
+    out[order] = avg
+    return out
+
+
 def _spearman(a: torch.Tensor, b: torch.Tensor) -> float:
-    """Spearman rank correlation between two 1-D tensors (Pearson on ranks)."""
+    """Tie-aware Spearman rank correlation between two 1-D tensors (Pearson on average ranks)."""
     if a.numel() < 2:
         return 1.0
-    ra = a.argsort().argsort().float()
-    rb = b.argsort().argsort().float()
+    ra = _avg_ranks(a)
+    rb = _avg_ranks(b)
     ra = ra - ra.mean()
     rb = rb - rb.mean()
     denom = (ra.norm() * rb.norm()).clamp_min(1e-12)
