@@ -210,4 +210,18 @@ llcore の現行 feature map（`_phi=elu+1`、`learnable` 時の per-head アフ
 - **★honest null: corr(entropy_gap, 耐性Δnll) = -0.016 ≈ 0**＝spikiness gap は層別線形化耐性を**予測しない**。「非耐性層＝spiky な層」という誘惑的仮説は**反証**（耐性は spikiness 以外＝L0 の残差流役割等が支配）。スクリプト note の事前予測（正相関）も外れ＝honest に記録。
 - **含意（L7 → 設計判断）**: llcore の 4-param アフィン恒等初期化は**ほぼ一様な出発点**で、蒸留が回復すべき距離が大きい（elu+1 は構造的に diffuse）。→ **spiky な feature map（Hedgehog 流 learnable MLP / exp 系 / softmax 正規化 feature map）の追加**を強く動機づける（L2/L7 統合）。ただし耐性の主因は spikiness でないため、**「どの層を温存するか」（memetic NAS, L2）と「feature map をどう spiky にするか」（L7）は別軸として両方追う**。
 
-> 検証レベル ◎=一次確認 / ○=要追検証。未確認で残った点（honest）: xLSTM 蒸留 α* の指標向き・コード公開、TransMamba 規模/ライセンス、Prover-V2 重みライセンス条文。採用前に一次直読で一件ずつ裏取り。
+> 検証レベル ◎=一次確認 / ○=要追検証。
+
+## 14. 実装済み機能（2026-06-26 goal セッション「発見機能を自律実装」・全 no-push・既存非破壊）
+
+深掘りで発見した機能を実コードに組み込み、各々テストで検証（実装状況: **実装+単体検証済 / 実走検証は別**）。
+
+- **忠実 Gated DeltaNet セル**（`src/llcore/lm/ttt.py` `TTTLinearCore`、M の正典照合パッチ）: 静的 per-channel ゲート → **データ依存スカラ α_t=exp(−exp(A_log)·softplus(a_proj(h)+dt_bias))（Mamba2 化）/ β_t=sigmoid(b_proj(h))**、減衰後予測（Eq.8）、q/k L2 正規化、gated RMSNorm。**11 tests**（含 2000-step 状態ノルム有界性=Codex #5 を実証で閉鎖、3000-tok streaming finiteness）。クラス名は `GatedDeltaNetLM` へ機械リネーム予定（docstring で誤称訂正済）。残: multi-head / short-conv 未。
+- **`tbptt.py` state-carry 3-D 対応**（N）: `reset_state_slots` を state 次元に一般化（2-D RecurrentLM / 3-D fast-weight 両対応）+ union に追加。
+- **carry-on plateau 実験**（`scripts/tbptt_plateau_experiment.py`、N 設計）: carry on/off × 3 arch、seg_len=2048 で >1024 文脈を訓練中に経験、token 予算一致。smoke 検証済→本走中。
+- **WindowLinearAttention**（`src/llcore/runtime/linearize.py`、LoLCATs-SW/Liger hybrid）: 直近 window=softmax + 古い key=線形、単一分母で融合、per-head 学習可能 γ。**メモリ=O(window)KV + O(d²)状態**。**10 tests**（主アンカー: window≥T で完全 softmax 一致＝厳密な一般化、causal 性、メモリ有界）。
+- **full feature map**（`LinearAttention(feature_map="full")`、Hedgehog/LoLCATs 流）: 4-param 対角アフィン → per-head 全結合行列 W∈[H,d,d]（恒等初期化＝現行 warm start）。L7 で実証した「elu+1 はほぼ一様」への処方（よりspiky な φ を学習可能に）。**4 tests**（恒等初期化一致・学習可能性・形状・不正値拒否）。default は "diag" で非破壊。
+
+**次の実装候補（発見済・未実装）**: chunkwise 並列 Gated DeltaNet 訓練（M §3、CPU 高速化）/ LoRA Step2 + logit KD（K、distill.py）/ NAS allele「層温存{softmax/SWA/linear}」（K、唯一の新規軸）/ multi-head + StateX head-merge。
+
+> 未確認で残った点（honest, doc 全体）: xLSTM 蒸留 α*（→ L で確定: **小さいほど無損失**、コード未公開）、TransMamba（→ L: 400M/1.5B, repo MIT, 重み未公開）、Prover-V2 重み（→ L: **DeepSeek License=商用可だが制限付・Apache 非互換**）、Nemotron-H（→ L: Apache 非互換）、Mamba-2/RWKV-7（→ L: **Apache 確定**）。
