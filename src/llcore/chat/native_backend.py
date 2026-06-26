@@ -67,11 +67,6 @@ class NativeQwenBackend:
         self._model = model
         self._tok = tok
 
-    def _apply_repetition_penalty(self, logits: Any, seen: set[int]) -> None:
-        """HF ``RepetitionPenaltyLogitsProcessor`` と同式: >0 は /penalty、<0 は *penalty。"""
-        # この backend では penalty 適用は in-place。greedy 一致証明時は penalty=1.0 で無効。
-        pass  # 実体は generate 内 (penalty 値を渡す必要があるため)
-
     def _sample_next(self, step_logits: Any, settings: GenerationSettings) -> int:
         """nucleus (top-p) サンプリングで次トークンを選ぶ。"""
         torch = self._torch
