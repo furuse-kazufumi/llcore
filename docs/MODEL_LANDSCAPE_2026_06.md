@@ -142,8 +142,61 @@ llcore 現状: streaming-int8 で Qwen2.5-1.5B を 5.7GB→2.44GB（embed/lm_hea
 
 主要出典: BitNet 2402.17764 / 2504.12285、AWQ 2306.00978、KVQuant 2401.18079、KIVI 2402.02750、QuIP# 2402.04396、llama.cpp quantize README。
 
-## 10. 追記予定（background 調査・2026-06-26 継続中）
-- 線形化/uptraining 先行研究（LoLCATs / SUPRA / Mamba-in-Llama / Liger / Hedgehog）
-- Test-time-training & 長文脈記憶（Titans / TTT / MesaNet / RecurrentGemma）
+## 10. Test-Time Training (TTT) & 長文脈記憶（◎ 追加調査・plateau null の本命）
+
+llcore の最大 null＝「定数状態 recurrent が block_size=128 で有効文脈頭打ち」。本質は**状態容量の限界でなく credit assignment（128 窓を超えて「何を記憶すべきか」の学習信号が届かない）の限界**。
+
+- **TTT**（arXiv 2407.04620, Stanford, **公式コード公開**, 最も再現性高）: **hidden state そのものを ML モデル化**し、更新則＝その state に対する**自己教師あり学習の 1 ステップ**。TTT-Linear（state=線形）/ TTT-MLP（state=2層MLP, I/O 重）。**「Transformer 同様トークン増で perplexity 下がり続ける／Mamba は 16k で改善停止」を 125M-1.3B で同条件実証**＝llcore plateau に最も直接対応する一次研究。
+- **Titans**（2501.00663, Google）: ニューラル長期記憶 MLP を推論時に勾配更新（surprise ベース, momentum + 忘却ゲート）。2M 文脈 NIAH 主張（小規模・検索タスク条件）。公式コード未公開（lucidrains 実装 MIT）。
+- **Atlas**（2505.23735）: Titans 後継。直近1トークンでなくスライド窓で記憶最適化。BABILong 10M で Titans 比 +80%（合成・相対値）。
+- **MesaNet**（2506.05233, von Oswald 他）: in-context loss を共役勾配で**最適点まで解く**locally optimal TTT。**honest（abstract 明記）: 向上は推論時 FLOPs を払う代償**。
+- **Miras**（2504.13173）: TTT 系の設計空間カタログ（記憶アーキ/attentional bias/retention gate/学習則の 4 軸）。Moneta/Yaad/Memora。
+- **Lattice**（2504.05646）: KV を固定スロットに低ランク圧縮、**orthogonal update**（現状態に直交成分のみで干渉最小化）。
+- **RecurrentGemma**（2404.07839, Griffin = 線形再帰 RG-LRU + 局所注意）: **推論時学習はしない**（重み固定）。2B/9B 実重み公開（コード Apache だが**重みは Gemma Terms**=商用注意）。
+
+**llcore 含意（plateau null）**:
+- **StateX（状態を広げる）vs TTT（記憶を学習する）の決定的差**: StateX は容量天井を上げるが更新則は online・線形のままで **BPTT 越えの credit assignment は未解決**（capacity を足しただけ）。TTT は更新則を**内側の自己教師あり損失の勾配ステップ**に置換＝「何を記憶するか」を局所損失が決め、**全ホライズン BPTT を要さない**＝llcore の BPTT=128 ボトルネックそのものを迂回。→ **plateau null には TTT 方向が StateX より本命**。
+- **CPU 実行可能性**: **TTT-Linear が最有力**（線形 inner state + 単一 SGD step + chunk 並列で小型 CPU 現実的）。TTT-MLP / MesaNet（共役勾配）/ Atlas（2次最適化）は推論 FLOPs 増で CPU 不利。
+- **★推奨実験**: llcore に TTT-Linear 層（線形 inner state + 1 GD step + chunk 更新）を試作 → 「inner-loop test-time 学習が block_size=128 plateau を右へ動かすか」を **StateX（state を広げただけ）baseline と対照**し、利得が**容量由来か更新則由来か**を切り分ける（honest ablation）。
+
+## 11. 線形化 / uptraining 先行研究（◎ llcore が居る箱・車輪の再発明リスク）
+
+2 系譜: **(A) 線形 attention 系（feature-map で softmax 近似）** Hedgehog→LoLCATs→SUPRA→Liger / **(B) SSM 蒸留系（重みを Mamba に移す）** MOHAWK, Mamba-in-Llama。**llcore は (A)・特に Hedgehog/LoLCATs の直系**。
+
+| 手法 | 系統 | base 凍結 | feature map | 蒸留損失 | tokens | attn 温存 | 回復（条件） |
+|---|---|---|---|---|---|---|---|
+| **Hedgehog**(2402.04347) | A | 任意 | 学習可能 MLP(spiky/monotonic) | attn 重みマッチ | 小 | 全線形 | >99%（短系列PPL/GLUE）|
+| **LoLCATs**(2410.10254) | A | **凍結** | アフィン+非線形(16.8M) | **出力 MSE**+LoRA | **40M** | 全 or SWA hybrid | 8B ほぼパリティ; 70B/405B gap 78% closing |
+| **SUPRA**(2405.06640) | A | fine-tune | ReLU(Wx+b)+GroupNorm | uptrain(CE) | ~20B | 全線形 | **MMLU 崩壊 28 vs 62; 長文脈 2k で頭打ち** |
+| **Mamba-in-Llama**(2408.15237) | B | 一部再利用 | (SSM) | 段階蒸留 | 中 | **25%温存** | AlpacaEval2 29.6; NIAH 20× 外挿 |
+| **MOHAWK**(2408.10189) | B | 段階凍結 | (SSM) | Frob→L2→KD | 3-5B | 0 or 4/24 | <1%データで OSS 凌駕（短系列）|
+| **Liger**(2503.01496) | A | LoRA のみ | softmax 正規化 | LoRA(CE) | **0.02B** | **SWA intra-layer(64)** | 93%（LM-eval avg, 1-8B）|
+
+**llcore 含意（最重要）**:
+1. **車輪の再発明リスク**: llcore のコア（q,k feature-map → softmax 出力に MSE 蒸留 → base 凍結）は **LoLCATs Step1 とほぼ完全一致**。自前再構築せず **LoLCATs レシピ（→ LoRA 回復）を丸ごと採用**すべき。
+2. **★真に新規な軸 = memetic NAS による層別「線形化 vs 温存」探索**。先行は全て固定ヒューリスティック（MOHAWK 4/24, Mamba-in-Llama 25%, Liger 等間隔 SWA）。**どの層を softmax/SWA のまま残すかを探索する研究は手薄＝llcore の独自貢献**。NAS の allele に「この層は温存」を明示的に含めよ。
+3. **即移植レシピ**: (a) 2段＝出力 MSE attention transfer（base 凍結）→ LoRA 回復（LoLCATs）。(b) **64-token sliding-window hybrid**（LoLCATs-SW と Liger が独立収束＝強い実証）。(c) 回復頭打ちなら **MOHAWK Stage3 = logit KD** 追加。
+4. **「4-param アフィン恒等初期化」への警告**: Hedgehog が「**spiky(低エントロピー)+dot-product monotonic** を満たさない単純 map は softmax を近似しきれない」と明示。llcore の極小アフィンは表現力天井の恐れ → 恒等初期化 MSE 蒸留で spiky 性が出るか **ablation 必須**。
+5. **論争での立ち位置**: 「全層定数状態 vs 局所 attention 温存」は**ファミリー全体が hybrid に決着済**。pure 全層線形（SUPRA, Phi-Mamba 0-attn）は **5-shot MMLU・長文脈で必ず崩壊**。llcore の pure 定数状態全層は**最難・最危険な端**。だからこそ memetic NAS は「**最小限どの層が softmax/SWA を要求するか**」を見つける正しい道具 → **目的関数に MMLU(5-shot) と長文脈を必ず入れる**。
+6. **回復率の honest-disclosure**: 91-101% は**必ずベンチ条件と紐付け**。perplexity/短系列なら literature 整合で妥当。**5-shot MMLU や >8k 長文脈で 91-101% を主張するなら勝った気になる前に内訳を疑う**（[[feedback_benchmark_honest_disclosure]]）。全線形手法はそこで出血する。
+
+---
+
+## 12. ★統合 research leads（優先順・llcore が次に動かす）
+
+| # | lead | 根拠 | CPU 可否 | 期待 |
+|---|---|---|---|---|
+| **L1** | **TTT-Linear 層を試作 → plateau が右に動くか × StateX baseline と対照 ablation** | TTT が「Mamba 16k 停止 / TTT 下がり続ける」を一次実証。BPTT=128 を迂回 | **可**（TTT-Linear） | plateau null を動かす本命。容量 vs 更新則を切り分け |
+| **L2** | **LoLCATs レシピ採用**（出力 MSE transfer → LoRA）+ **memetic NAS の allele に「層温存」追加**、目的関数に 5-shot MMLU + 長文脈 | llcore コア = LoLCATs Step1。NAS 層選択が唯一の新規軸 | 可（蒸留は小 token） | 車輪の再発明回避 + 独自貢献の確立 |
+| **L3** | **CPU 速度（0.7tok/s）改善 = GGUF Q4_K_M + imatrix を CPU ベースライン化** | 律速は「低ビット格納+fp32 計算」のアンチパターン。ネイティブ int カーネルが解 | 可 | 体感速度・実用性 |
+| **L4** | **KIVI 型 KV 2-bit を long-context に追加**（重み非依存・直交） | 無調整 2-bit でピークメモリ 2.6×減 | 可 | 定数状態路線と相乗のメモリ削減 |
+| **L5** | **3B スケールはライセンス切替**（Qwen3-4B / Ministral-3-3B / Gemma 4） | Qwen2.5-3B 非商用 / Gemma 3 derivative | 可（int8≈3-4GB） | 会話品質 + Apache 維持 |
+| **L6** | **数学アシスタント②**: Z3 形式検証 × 長文脈 RAG × on-prem を「検証可能部分の誠実な切り分け」に限定設計 | DeepSeek は LLM 自己検証/Lean=谷間が空く | 可 | 差別化ニッチ（誇張せず） |
+| **L7** | **Hedgehog ablation**: 4-param アフィン恒等初期化で spiky 性が出るか検証 | 表現力天井の警告 | 可 | コア feature-map の妥当性確認 |
+
+> 全 lead に共通の honest 規律: 回復率・ベンチは**条件併記**、pure 全層線形の MMLU/長文脈崩壊を**目的関数に明示**、異常に良い結果は内訳を疑う（[[feedback_benchmark_honest_disclosure]] / [[feedback_llive_measurement_purity]]）。
+
+## 13. 1.5B linearization-tolerance profile（本セッション実走・補遺）
+`out/linearize_tolerance_1.5b/`（28層、aozora 1024tok）。0.5B（24層, `out/linearize_tolerance/`）との比較で「モデルが大きいほど線形化耐性が上がるか（Liger の規模↑で gap↓と整合するか）」を確認するための実測。完走値は同 json 参照。
 
 > 検証レベル ◎=一次確認 / ○=要追検証。未確認で残った点（honest）: xLSTM 蒸留 α* の指標向き・コード公開、TransMamba 規模/ライセンス、Prover-V2 重みライセンス条文。採用前に一次直読で一件ずつ裏取り。
