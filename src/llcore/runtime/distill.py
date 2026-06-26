@@ -128,7 +128,10 @@ def distill_all_layers(
         originals[i] = attn
     students: dict[int, LinearAttention] = {}
     for i in range(n_layer):
-        info = distill_layer(model, i, calib_ids, steps=steps, lr=lr, seed=seed, chunk_size=chunk_size)
+        info = distill_layer(
+            model, i, calib_ids, steps=steps, lr=lr, seed=seed,
+            chunk_size=chunk_size, feature_map=feature_map,
+        )
         student = model.model.layers[i].self_attn
         assert isinstance(student, LinearAttention)
         students[i] = student

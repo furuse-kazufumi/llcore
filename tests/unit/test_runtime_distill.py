@@ -87,3 +87,29 @@ def test_distill_all_layers_rejects_non_softmax_model() -> None:
     ids = torch.randint(0, 48, (1, 24))
     with pytest.raises(ValueError, match="all-softmax"):
         distill_all_layers(model, ids, steps=5)
+
+
+def test_distill_layer_with_full_feature_map_recovers() -> None:
+    """The higher-capacity 'full' feature map (L7/Hedgehog-motivated) also distills: it installs a
+    'full' student and reduces the teacher/student gap."""
+    from llcore.runtime.distill import distill_layer
+    from llcore.runtime.linearize import LinearAttention
+
+    model = _tiny()
+    torch.manual_seed(2)
+    ids = torch.randint(0, 48, (1, 48))
+    result = distill_layer(model, layer=1, calib_ids=ids, steps=60, lr=5e-2, seed=0, feature_map="full")
+    assert result["mse_after"] < result["mse_before"]
+    installed = model.model.layers[1].self_attn
+    assert isinstance(installed, LinearAttention) and installed.feature_map == "full"
+
+
+def test_distill_all_layers_full_feature_map() -> None:
+    from llcore.runtime.distill import distill_all_layers
+
+    model = _tiny()
+    torch.manual_seed(3)
+    ids = torch.randint(0, 48, (1, 40))
+    students = distill_all_layers(model, ids, steps=20, feature_map="full")
+    assert set(students) == set(range(model.params.n_layer))
+    assert all(s.feature_map == "full" for s in students.values())
