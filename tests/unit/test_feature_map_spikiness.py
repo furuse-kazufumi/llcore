@@ -65,6 +65,20 @@ def test_spearman_identical_and_reversed() -> None:
     assert math.isclose(fms._spearman(a, a.flip(0)), -1.0, rel_tol=1e-6)
 
 
+def test_avg_ranks_handles_ties() -> None:
+    # tied values must share their mean rank (1-based): [10,10,20,30] -> ranks [1.5,1.5,3,4]
+    r = fms._avg_ranks(torch.tensor([10.0, 10.0, 20.0, 30.0]))
+    assert torch.allclose(r, torch.tensor([1.5, 1.5, 3.0, 4.0]))
+
+
+def test_spearman_tie_aware_constant_vector() -> None:
+    # an all-equal vector (e.g. a near-uniform row collapsed to ties) has zero rank variance ->
+    # correlation falls back to 0 (no spurious +/-1 from arbitrary argsort tie-breaking)
+    a = torch.tensor([0.25, 0.25, 0.25, 0.25])
+    b = torch.tensor([0.1, 0.2, 0.3, 0.9])
+    assert abs(fms._spearman(a, b)) < 1e-6
+
+
 def test_rank_corr_perfect_when_weights_share_order() -> None:
     # softmax and linear rows that rank keys identically -> rank corr +1
     h, t = 1, 8
