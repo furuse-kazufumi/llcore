@@ -126,7 +126,7 @@ def main(argv: list[str] | None = None) -> int:
     for arch in arches:
         torch.manual_seed(args.seed)
         model = _build(arch, tok.vocab_size, args)
-        n_params = model.num_params()
+        n_params = sum(p.numel() for p in model.parameters())
         cfg = TrainConfig(
             learning_rate=args.lr, max_iters=args.max_iters,
             warmup_iters=min(100, max(1, args.max_iters // 10)),
