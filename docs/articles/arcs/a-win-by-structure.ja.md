@@ -211,6 +211,8 @@ llcore の別アーク(検証付き可塑性)では、frozen な LLM の隠れ�
 
 llcore の進化探索アークでは、recurrent 系アダプタの **capability(賢さ — perplexity / cross-entropy で勾配を上回るか)** を測った結果、地形は **NULL_TIE / NEGATIVE**(進化が baseline に対して有意差なし〜むしろ微害)でした。つまり llcore 自身が「**この特定の実験設定では、recurrent の進化に capability の勝ち筋は確認できなかった**」と認めています(`project_llcore_memory_efficiency_pivot`、北極星を capability から memory へ転換した直接の理由)。
 
+> **パープレキシティ(perplexity, PPL)** — 言語モデルが次の単語をどれだけ言い当てられるかを測る指標で、低いほど賢い(=次に来る語に迷っていない)。「平均して何択で迷っているか」の目安だと思ってください(PPL=10 なら 10 択でうろうろしている感覚)。その対数をとった姉妹指標が cross-entropy(交差エントロピー)損失です。
+
 > **honest disclosure / ソースの境界:** 次に述べる literature 一般傾向と、いま述べた llcore の null 結果は、
 > **出どころが違います**。前者は **SSM 文献で一般に指摘される傾向**=本記事では llcore 実測で直接検証していない
 > 外部知識です。後者(NULL_TIE / NEGATIVE)は **llcore の特定実験設定での自前 null 結果**=ソースは llcore 実測です。
