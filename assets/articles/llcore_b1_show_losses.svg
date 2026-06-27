@@ -73,5 +73,5 @@
 
   <!-- footer -->
   <line x1="34" y1="398" x2="726" y2="398" stroke="#21262d" stroke-width="1"/>
-  <text x="34" y="420" fill="#8b949e" font-size="12.5">勝った瞬間に<tspan fill="#c9d1d9" font-weight="700">「強い相手」を自動でぶつけ直す</tspan>装置を仕込む。差 0.008 の見かけの勝ちは、弱いベースラインの artifact だった。</text>
+  <text x="34" y="420" fill="#8b949e" font-size="11.5">勝った瞬間に<tspan fill="#c9d1d9" font-weight="700">「強い相手」を自動でぶつけ直す</tspan>装置を仕込む。差 0.008 の見かけの勝ちは、弱いベースラインの artifact だった。</text>
 </svg>
