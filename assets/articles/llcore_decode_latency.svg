@@ -63,5 +63,6 @@
 
   <!-- footer -->
   <line x1="34" y1="398" x2="726" y2="398" stroke="#21262d" stroke-width="1"/>
-  <text x="34" y="420" fill="#8b949e" font-size="12.5">honest: <tspan fill="#c9d1d9" font-weight="700">cross-mode の絶対時間は比較不可</tspan>・GPT 絶対 growth は混雑でばらつく。load-bearing は「各モード内の指数」と「GPT は prefill≒decode / recurrent だけ decode 平坦」。</text>
+  <text x="34" y="420" fill="#8b949e" font-size="12.5">honest: <tspan fill="#c9d1d9" font-weight="700">cross-mode の絶対時間は比較不可</tspan>・GPT 絶対 growth は混雑でばらつく。</text>
+  <text x="34" y="440" fill="#8b949e" font-size="12.5">load-bearing は「各モード内の指数」と「GPT は prefill≒decode / recurrent だけ decode 平坦」。</text>
 </svg>
