@@ -442,6 +442,8 @@ b5 章で「賢さ(capability)を追うのは構造的な負け筋だから、�
 
 抑制をかける関門は 5 段です。(1) **paired multi-window bootstrap CI** — proxy 自体に窓ペア再標本の信頼区間を付け、点推定で語らせない。(2) **fresh holdout で winner's curse 除去** — 床を超えたら verdict 抑制。(3) **proxy-vs-judge の Kendall τ** — τ<0.7 なら positive verdict を 'suggestive(示唆的)' へ降格(今回は **τ=1.00** で降格なし)。(4) **HV gain は CI_lo>0 でのみ発火**。(5) **memetic ≈ greedy は honest negative として明示**。先行研究が「proxy は noisy」と認めるところを、本作業は「その noisy さを実際に測って、主張のほうを抑制する」段まで進めた。新しい探索演算子を発明したのではなく、**不確実性を定量化して verdict を律する disclosure 層** を足した点に価値を置いています。
 
+> **ケンドールの順位相関(Kendall τ)** — 2 つの指標(ここでは安い proxy と本気の judge)が「順位の付け方」でどれだけ一致するかを −1〜+1 で表す係数。+1 なら順位が完全一致、0 なら無関係です。安い模試と本番の順位がどれだけ揃うかを 1 つの数字にしたもので、揃っていなければ proxy の勝ち判定を格下げします。
+
 ### 隠さない未検証ギャップ(honest gap)
 
 誠実さは「測った所」だけでなく「測っていない所を申告する」ことでも決まります。
