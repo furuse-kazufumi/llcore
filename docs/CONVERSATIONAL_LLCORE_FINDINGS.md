@@ -35,6 +35,31 @@ Tied embeddings are shared (no duplicate vocab×hidden matrix resident) — a me
 the small-RAM target. This forward is the *instrumentable substrate*; on its own it is a re-derivation,
 **not** the contribution.
 
+### 20-turn endurance: native vs HF reply identity under greedy (corroboration of §1, with caveats)
+
+`scripts/chat_endurance_probe.py --native` drives the same Qwen2.5-0.5B-Instruct through llcore's own
+forward (`NativeQwenBackend`, wired via the shared `build_backend()` factory) over a 20-turn,
+topic-switching script; the same probe **without** `--native` runs HF `transformers.generate`. Under
+**greedy** decoding (`--greedy`, do_sample=False), same seed and same prompts, the two backends produced
+**byte-identical replies on 20/20 turns** (machine-compared), both completing all 20 turns with no
+empty / diverged / truncated output. native is markedly slower (load 35.4 s vs 1.7 s; per-turn
+9.4→13.4 s vs 5.7→11.4 s) — the from-scratch fp32 forward is unoptimised; "equal" here means *output
+correctness*, not speed.
+
+**Honest scope — this corroborates §1, it is NOT independent evidence.** Greedy = per-step argmax, so a
+20-turn greedy match is the *deterministic corollary* of §1's single-shot argmax-100 % identity,
+re-applied along one concrete ~20×≤96-token trajectory. Its added value is narrow but real: no
+equivalence-breaking bug surfaces in the KV-cache / RoPE / long-context path under many generation
+decision points and a growing context. It says **nothing** about sampling (do_sample=True, where the
+two RNG streams diverge), int8, 1.5B, or linearized variants — all out of scope. The "endurance" is
+**turn count, not context length** (the whole script stays in-window; no long-gap memory pressure).
+Context-reference scoring is a substring heuristic: of the 8/8 "ok", only **name ×2 + residence** are
+genuine in-conversation recall — the capitals/arithmetic are parametric world-knowledge recall — and
+turn 13 ("I am Kazufumi, a Japanese person living in Japan", a user/self identity confusion) passed
+only on the `'japan'` substring. Content errors remain (turn 6 "penguin can fly"), consistent with
+§5/§11: robust conversation is the 1.5B tier; 0.5B is easy-prompt-only. The conversational *capability*
+is Qwen's weights; what this probe adds is confidence in the *runtime's* multi-turn numerical fidelity.
+
 ## 2. R&D: internal attention surgery — linearizing Qwen's attention
 
 `src/llcore/runtime/linearize.py` — replace a layer's softmax attention core
@@ -412,6 +437,11 @@ The session goal had two simultaneous parts. Both are now shown in-repo:
   (3+5→8), ~1–2 s/turn after an 11 s load. Honest scope: easy prompts, 0.5B, the greeting answer was
   slightly evasive; robust "まともに会話" is the 1.5B tier. The conversational *capability* is Qwen's
   pretrained weights; llcore's contribution is the verified on-prem runtime that runs them.
+  Extended (§1) to a **20-turn endurance probe** (`chat_endurance_probe.py --native`) where native and
+  HF produce byte-identical greedy replies on 20/20 turns — corroborating the runtime's multi-turn
+  correctness (not an independent axis: greedy ⇒ deterministic corollary of §1's single-shot argmax
+  identity). The conversational *quality* caveats stand (easy/English/0.5B, heuristic recall, content
+  errors like turn 6 "penguin can fly").
 
 * **(2) 進化も可能であることを証明可能なレベル** — proxy-v2 (§10) is the *instrument* that makes the
   evolution claim falsifiable: paired bootstrap CIs, fresh-holdout winner's-curse removal, context sweep,

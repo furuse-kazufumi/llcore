@@ -160,7 +160,8 @@ def main(argv: list[str] | None = None) -> int:
 
     t0 = time.perf_counter()
     hf_tok = AutoTokenizer.from_pretrained(args.model_dir)
-    hf_model = AutoModelForCausalLM.from_pretrained(args.model_dir, dtype=torch.float32).eval()
+    hf_model = AutoModelForCausalLM.from_pretrained(args.model_dir, dtype=torch.float32)
+    hf_model.eval()  # type: ignore[no-untyped-call]
     print(f"[load] HF transformers       ({time.perf_counter() - t0:.1f}s)", flush=True)
     t0 = time.perf_counter()
     nat_model, nat_tok, _ = load_qwen2(args.model_dir)

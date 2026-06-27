@@ -39,7 +39,7 @@ class NativeQwenBackend:
     def __init__(self, model_dir: str, *, seed: int | None = None, int8: bool = False) -> None:
         self.model_dir = model_dir
         self._seed = seed
-        self._int8 = int8
+        self.int8 = int8
         self._torch: Any = None
         self._model: Any = None
         self._tok: Any = None
@@ -59,7 +59,7 @@ class NativeQwenBackend:
                 "(torch / transformers / safetensors がインストールされます)"
             ) from exc
         t0 = time.time()
-        loader = load_qwen2_int8 if self._int8 else load_qwen2
+        loader = load_qwen2_int8 if self.int8 else load_qwen2
         model, tok, _ = loader(self.model_dir)
         model.eval()
         self.load_seconds = time.time() - t0

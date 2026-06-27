@@ -104,6 +104,30 @@ def settings_from_args(args: argparse.Namespace) -> GenerationSettings:
     )
 
 
+def build_backend(
+    *, model: str | None, native: bool, seed: int | None, int8: bool
+) -> tuple[TransformersBackend | NativeQwenBackend, str]:
+    """``--native``/``--model`` から会話バックエンドを構築する (純関数=テスト可能)。
+
+    ``llcore.chat`` CLI と ``scripts/chat_endurance_probe.py`` が同じ規約
+    (native=ローカルディレクトリ) を共有するための単一の選択点。
+
+    Returns:
+        (backend, model_label)。native=True は llcore 自前 forward
+        (:class:`NativeQwenBackend`、``model`` はローカルディレクトリ要)、False は
+        HF transformers ラッパー (:class:`TransformersBackend`)。``model_label`` は
+        :func:`resolve_model_id` 解決後の ID/パス。ロードは lazy で本関数では
+        torch もモデルも読み込まない。
+    """
+    model_id = resolve_model_id(model)
+    backend: TransformersBackend | NativeQwenBackend
+    if native:
+        backend = NativeQwenBackend(model_id, seed=seed, int8=int8)
+    else:
+        backend = TransformersBackend(model_id=model_id, seed=seed)
+    return backend, model_id
+
+
 def run_prompts(
     session: ChatSession, prompts: Sequence[str], show_timing: bool = False
 ) -> list[tuple[str, str]]:
@@ -191,12 +215,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         # 生成パラメータの fail-closed 検証 (temperature=0 等) はロード前に拒否
         print(f"error: {exc}", file=sys.stderr, flush=True)
         return 2
-    model_id = resolve_model_id(args.model)
-    backend: TransformersBackend | NativeQwenBackend
-    if args.native:
-        backend = NativeQwenBackend(model_id, seed=args.seed, int8=args.int8)
-    else:
-        backend = TransformersBackend(model_id=model_id, seed=args.seed)
+    backend, model_id = build_backend(
+        model=args.model, native=args.native, seed=args.seed, int8=args.int8
+    )
     session = ChatSession(backend, system_prompt=args.system, settings=settings)
 
     runtime = "llcore 自前 forward" if args.native else "HF transformers"

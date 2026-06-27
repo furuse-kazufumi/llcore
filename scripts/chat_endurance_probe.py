@@ -26,8 +26,8 @@ _SRC = Path(__file__).resolve().parents[1] / "src"
 if str(_SRC) not in sys.path:
     sys.path.insert(0, str(_SRC))
 
-from llcore.chat import ChatSession, GenerationSettings, TransformersBackend  # noqa: E402
-from llcore.chat.__main__ import _ensure_utf8_stdout  # noqa: E402
+from llcore.chat import ChatSession, GenerationSettings  # noqa: E402
+from llcore.chat.__main__ import _ensure_utf8_stdout, build_backend  # noqa: E402
 
 _ensure_utf8_stdout()
 
@@ -58,9 +58,29 @@ TURNS: list[tuple[str, list[str] | None]] = [
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    parser.add_argument("--model", default=None)
+    parser.add_argument(
+        "--model",
+        default=None,
+        help="HF モデル ID。--native 時はローカルモデルディレクトリのパス",
+    )
     parser.add_argument("--seed", type=int, default=20260610)
     parser.add_argument("--max-new-tokens", type=int, default=96)
+    parser.add_argument(
+        "--native",
+        action="store_true",
+        help="llcore 自前 forward (runtime/qwen2.py) で推論する "
+        "(HF transformers ラッパーでなく。--model はローカルディレクトリ要)",
+    )
+    parser.add_argument(
+        "--int8",
+        action="store_true",
+        help="--native 時に streaming-int8 ロード (RAM 削減・CPU は遅い)",
+    )
+    parser.add_argument(
+        "--greedy",
+        action="store_true",
+        help="決定論的デコード (耐久比較の再現性向上; 小型モデルは反復しやすい)",
+    )
     parser.add_argument(
         "--out",
         type=Path,
@@ -68,10 +88,17 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    backend = TransformersBackend(model_id=args.model, seed=args.seed)
-    session = ChatSession(
-        backend, settings=GenerationSettings(max_new_tokens=args.max_new_tokens)
+    backend, model_id = build_backend(
+        model=args.model, native=args.native, seed=args.seed, int8=args.int8
     )
+    session = ChatSession(
+        backend,
+        settings=GenerationSettings(
+            max_new_tokens=args.max_new_tokens, do_sample=not args.greedy
+        ),
+    )
+    runtime = "llcore 自前 forward" if args.native else "HF transformers"
+    print(f"model: {model_id} (CPU, {runtime})", flush=True)
 
     results: list[dict[str, object]] = []
     elapsed_times: list[float] = []  # typed parallel accumulator (results values are object)
@@ -105,7 +132,13 @@ def main() -> int:
     first_half = elapsed_times[:10]
     second_half = elapsed_times[10:]
     payload = {
-        "model": backend.model_id,
+        "model": model_id,
+        "runtime": "native" if args.native else "transformers",
+        "int8": args.int8,
+        "greedy": args.greedy,
+        "load_seconds": (
+            round(backend.load_seconds, 1) if backend.load_seconds is not None else None
+        ),
         "seed": args.seed,
         "turns_completed": len(results),
         "context_ref_ok": n_ref_ok,
