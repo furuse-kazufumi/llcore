@@ -91,6 +91,8 @@ AI を軽くしようとすると、人はまず「中身を圧縮して薄く�
 
 **核心は recurrent の amortization です。** ここで言う「状態(state)」とは、**これまでの全部を要約した固定サイズの手帳のようなもの**だと思ってください。recurrent は「文脈を作る(prefill, T 個のトークンで状態を T 回更新=O(T))」と「作った状態に 1 手足す(decode, O(1))」を**分けて払える**。長い生成では prefill は最初の一度きりで、その後の毎トークンは O(1) ── これが streaming の体感を決めます。GPT(cache 無)はこの分離ができず、**decode の 1 step が結局 prefill と同じ「全文脈の再 forward」**になる。**同じ 1 ランで測ったので、この「recurrent だけ O(T)→O(1) に落ち、GPT は落ちない」が別ラン比較でなく直接の対比として出ています。**
 
+> **ならし(amortization)** — 一度だけ大きくかかるコストを、その後の多数回に「ならして」薄く割り当てる考え方。recurrent は最初に状態を作る費用(prefill)を一度払えば、以降は 1 トークンごとの追加費用がほぼ一定になります。ジムの入会金は初回だけで、あとは通うたびの料金が一定、というイメージです。
+
 > **honest 留保:** (1) prefill 同様 **cross-mode の絶対 ms は比較不可**(recurrent/RWKV は Python per-step ループ計測)。(2) **この GPT は KV cache を持ちません**。production の LLM serving は KV cache で decode を O(T)/token に落としますが、**cache を入れても GPT の decode は T とともに増え続け、recurrent の O(1) 平坦とは質的に別物**です。(3) GPT の指数が理論上の 2(O(T²))でなく ~1.37 に留まるのは、この小モデル(n_embd=256)では二次項が完全支配に入りきらない regime。
 
 この差を見たとき、私はそれを「新しい発見」だと一瞬思いました。でも違いました。これは **1960 年代の制御工学が「可観測な系を、有界な状態で運ぶ」問題として整理し尽くしていた**ことの再演です。RWKV や Mamba が属する **状態空間モデル(State-Space Model, SSM)** の「S」は、State(状態)の S です。偶然ではありません。
