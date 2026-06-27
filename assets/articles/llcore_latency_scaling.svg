@@ -4,7 +4,7 @@
       <stop offset="0" stop-color="#0d1117"/><stop offset="1" stop-color="#161b22"/>
     </linearGradient>
   </defs>
-  <rect width="760" height="440" fill="url(#bg)"/>
+  <rect width="760" height="465" fill="url(#bg)"/>
 
   <text x="34" y="40" fill="#e6edf3" font-size="22" font-weight="700">時間でも同じ向き — GPT は超線形、recurrent 系は線形</text>
   <text x="34" y="64" fill="#8b949e" font-size="13.5">推論レイテンシのスケーリング(両対数)。各モードを T=128 で正規化=増え方の「形」だけを比較</text>
