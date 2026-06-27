@@ -3,13 +3,15 @@
 > 自動生成: `libexec/raptor-auto-summary` (Stop hook)
 > 次回 ccr 起動時に CLAUDE.md SESSION START で自動的に読み取られる。
 
-- **最終更新**: 2026-06-27 22:58:23
+- **最終更新**: 2026-06-28 01:13:01
 - **プロジェクト**: `D:/projects/llcore`
 - **ブランチ**: `feat/lm-recurrent`
 
 ## 直近の git log
 
 ```
+8535725 auto: next_plan.md 編集前 (2026-06-27 23:06)
+20736e7 auto: next_plan.md 編集前 (2026-06-27 23:02)
 55cb09e feat(chat): native forward in 20-turn endurance probe + honest native==HF result
 e1bb028 auto: prove_native_matches_hf.py 編集前 (2026-06-27 01:28)
 81b1259 auto: prove_native_matches_hf.py 編集前 (2026-06-27 01:28)
@@ -18,21 +20,19 @@ c62661e auto: prove_native_matches_hf.py 編集前 (2026-06-27 01:25)
 785b7d4 auto: __main__.py 編集前 (2026-06-27 01:12)
 e6060ab auto: prove_native_matches_hf.py 編集前 (2026-06-27 01:08)
 40cd719 auto: __main__.py 編集前 (2026-06-27 01:05)
-c395438 auto: __main__.py 編集前 (2026-06-27 01:05)
-e12a4f4 auto: native_backend.py 編集前 (2026-06-27 01:03)
 ```
 
 ## 現在の git status
 
 ```
 M docs/SESSION_SUMMARY.md
-?? docs/SESSION_SUMMARY_2026-06-27.md
+ M docs/next_plan.md
 ```
 
 ## 直近 2 時間に変更されたファイル
 
 ```
-22:49 docs/SESSION_SUMMARY.md
+01:07 docs/SESSION_SUMMARY.md
 ```
 
 ---

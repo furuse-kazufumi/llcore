@@ -30,11 +30,13 @@
 ## 次の一手（優先順・2026-06-23 再編）
 
 ### P0 — human gate（ユーザーのみ実行可・これが真の critical path）
-- **【2026-06-27 訂正・Qiita API 実測】大半公開済み**: authenticated_user/items = **公開 52 / 限定共有 2**。
-  当初 P0 で「未公開」とした記事群（#37–#43、効率アーキ/proxy v2、4 言語アーク、かみくだき版等）は公開済み。
-  **#43「AIは平気で嘘をつく」(public_id `c53c97d9eab745404982`) も 6/26→6/27 で公開フリップ済**。
-  残 private 2 件（`1e7af6b…` llive ビジョン論 / `3b4982…` 5409 テスト緑）は **llive 系で意図的非公開（公開しない）**。
-  → P0 の残作業は「**ローカルドラフトに対し Qiita 側に欠落している記事があれば追加公開**」のみ。
+- **【2026-06-27 完全突合・依然 P0 未達】**: Qiita `authenticated_user/items` = 公開 52 / 限定共有 2。
+  ただし**これらは過去の別系統記事**（FullSense ガイド / llmesh / llive / lldarwin / llcore 検証 arc #37–#43 /
+  harness #43 / proxy v2「AIは平気で嘘をつく」`c53c97d9` 等）で、**P0 の対象ではない**。
+  **P0 の対象 = `docs/articles/{drafts,arcs}` の 48 本（drafts 32 = 技術16+一般16 / arcs 16 = s/a/b/c × ja/en/zh/ko）
+  は public_id 無し = 1 本も未公開**（ローカル frontmatter ⇔ API 突合で確定）。→ 旧 P0「32本 publish-ready・未公開」は
+  **依然正しい**。残 private 2 件（`1e7af6b…` llive ビジョン論 / `3b4982…` 5409 テスト緑）は llive 系で意図的非公開。
+  公開には各記事 preflight（画像 raw 絶対 URL 化 / タグ付与 / 姉妹リンク URL 解決）が前提。
 - （旧記述・参考）32 本 publish-ready。公開順 s1→s2→a 系→b 系→c 系、各 技術版→一般版ペア。
   raw 絶対 URL / imgix 静止化 / 姉妹リンク確認。**Kaggle 結果を待たない**（b2 は L137-138 が honest 留保を
   narrative 化済で実測値なしでも publish-ready）。
