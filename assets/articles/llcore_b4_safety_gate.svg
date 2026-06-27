@@ -63,5 +63,6 @@
 
   <!-- footer -->
   <line x1="34" y1="398" x2="726" y2="398" stroke="#21262d" stroke-width="1"/>
-  <text x="34" y="420" fill="#8b949e" font-size="12.5">安全ゲートが効くのは<tspan fill="#c9d1d9" font-weight="700">目的関数が危険(発散)側を好むとき</tspan>。目的が既に安全を報酬していれば、ゲートは出番が無い(Z3 は健全に稼働・196 中 71 棄却)。</text>
+  <text x="34" y="420" fill="#8b949e" font-size="12.5">安全ゲートが効くのは<tspan fill="#c9d1d9" font-weight="700">目的関数が危険(発散)側を好むとき</tspan>。</text>
+  <text x="34" y="440" fill="#8b949e" font-size="12.5">目的が既に安全を報酬していれば、ゲートは出番が無い(Z3 は健全に稼働・196 中 71 棄却)。</text>
 </svg>
