@@ -6,7 +6,7 @@
   </defs>
   <rect width="760" height="468" fill="url(#bg)"/>
 
-  <text x="34" y="40" fill="#e6edf3" font-size="22" font-weight="700">amortization ── recurrent は decode で O(1) に落ちる、GPT は落ちない</text>
+  <text x="34" y="40" fill="#e6edf3" font-size="20.5" font-weight="700">amortization ── recurrent は decode で O(1) に落ちる、GPT は落ちない</text>
   <text x="34" y="64" fill="#8b949e" font-size="13.5">同一ラン内で prefill(状態構築)と decode(次の 1 トークン)を計測。各線を T=128 で正規化(指数ベースの理想線)</text>
 
   <!-- plot area: x 90..710 (log2 128..2048), y 100..360 (log10 x1..x100) -->
