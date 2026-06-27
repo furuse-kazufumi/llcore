@@ -66,6 +66,8 @@ def passes_capability_gate(
 
 cap-gate を作る直接のきっかけは、量子化のビット幅スイープでした。重みを 8bit → 2bit まで段階的に潰し、PPL と top-1 の両方を測ったものです。
 
+> **量子化(quantization)・fp32 / int8** — 量子化は、モデルの重み(膨大な数値)をより少ないビット数で表してファイルを軽くする圧縮です。fp32 は 1 つの数を 32 ビット(高精度)、int8 は 8 ビット、2bit はわずか 2 ビットで表す。高画質の写真を低画質 JPEG に落とすイメージで、軽くなる代わりに少しずつ情報が削れます。
+
 **multi_smoke(1.36M params、語彙 4358、日本語マルチコーパス。fp32 PPL 24.88 / top1 36.28%)** の per-channel 量子化:
 
 | bits | 削減率 | PPL | ΔPPL% | top1 | Δtop1(pp) | PPL ゲート |
