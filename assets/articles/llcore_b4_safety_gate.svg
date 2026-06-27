@@ -4,7 +4,7 @@
       <stop offset="0" stop-color="#0d1117"/><stop offset="1" stop-color="#161b22"/>
     </linearGradient>
   </defs>
-  <rect width="760" height="440" fill="url(#bg)"/>
+  <rect width="760" height="470" fill="url(#bg)"/>
 
   <text x="34" y="40" fill="#e6edf3" font-size="22" font-weight="700">「6%→100%」のはずが「95%→100%」— ゲートの出番が無かった</text>
   <text x="34" y="64" fill="#8b949e" font-size="13.5">Z3 で発散しない構造だけ通す安全ゲート(自宅 CPU PoC)。目的関数が既に安全側を報酬 → ゲートは冗長に。</text>
