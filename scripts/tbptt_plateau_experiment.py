@@ -107,6 +107,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--carry", choices=["on", "off"], default="on")
     ap.add_argument("--block-size", type=int, default=128)
     ap.add_argument("--seg-len", type=int, default=2048, help="TBPTT segment (state carried this far)")
+    ap.add_argument("--chunk-size", type=int, default=0,
+                    help="TBPTT gradient / credit-assignment window (0 = block_size, the fair-compute "
+                    "default that ties the two). Setting >block_size tests the §13(4) confound: does a "
+                    "wider credit-assignment window (gradients reaching past block_size) move the plateau? "
+                    "Note: compute scales with chunk_size at fixed max-iters — see honest note in summary.")
     ap.add_argument("--n-layer", type=int, default=2)
     ap.add_argument("--n-embd", type=int, default=128)
     ap.add_argument("--state-size", type=int, default=128)
