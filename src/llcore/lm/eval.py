@@ -9,12 +9,14 @@ the unigram baseline by a clear margin (see :func:`passes_gate`).
 from __future__ import annotations
 
 import math
+from collections.abc import Iterator
 from typing import Protocol
 
 import torch
 from torch.nn import functional as F
 
 from llcore.lm.data import get_batch
+from llcore.lm.device import model_device
 
 
 class SupportsForwardLogits(Protocol):
@@ -25,6 +27,8 @@ class SupportsForwardLogits(Protocol):
     def train(self, mode: bool = True) -> SupportsForwardLogits: ...
 
     def forward_logits(self, idx: torch.Tensor) -> torch.Tensor: ...
+
+    def parameters(self) -> Iterator[torch.Tensor]: ...
 
 
 class TrainableLM(SupportsForwardLogits, Protocol):
