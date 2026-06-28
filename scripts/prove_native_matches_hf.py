@@ -153,26 +153,31 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--bulk-tokens", type=int, default=2048, help="定量で比較するトークン数 N")
     ap.add_argument("--chunk", type=int, default=256, help="定量の 1 パスチャンク長")
     ap.add_argument("--bulk-chars", type=int, default=12000, help="コーパス先読み文字数")
+    ap.add_argument("--device", default="auto",
+                    help="比較を走らせる device: auto (cuda if available else cpu) | cpu | cuda | cuda:N")
     args = ap.parse_args(argv)
 
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
+    device = resolve_device(args.device)
     print("=" * 72)
     print("一番正直な証明: 同じ Qwen 重み × {HF transformers, llcore 自前 forward} → 出力一致")
-    print(f"  model: {args.model_dir}")
+    print(f"  model: {args.model_dir}  device: {device}")
     print("=" * 72)
 
     t0 = time.perf_counter()
     hf_tok = AutoTokenizer.from_pretrained(args.model_dir)
     hf_model = AutoModelForCausalLM.from_pretrained(args.model_dir, dtype=torch.float32)
     hf_model.eval()  # type: ignore[no-untyped-call]
+    hf_model.to(device)  # type: ignore[no-untyped-call]
     print(f"[load] HF transformers       ({time.perf_counter() - t0:.1f}s)", flush=True)
     t0 = time.perf_counter()
     nat_model, nat_tok, _ = load_qwen2(args.model_dir)
+    nat_model = nat_model.to(device)
     print(f"[load] llcore native forward ({time.perf_counter() - t0:.1f}s)\n", flush=True)
 
     print("--- 定性 (掴み: 人間が読める 5 問) ---")
-    n_q = qualitative(hf_model, hf_tok, nat_model, nat_tok, args.max_new)
+    n_q = qualitative(hf_model, hf_tok, nat_model, nat_tok, args.max_new, device)
 
     print("--- 定量 (主たる証拠: コーパス全位置の next-token 一致) ---")
     corpus_path = Path(args.corpus)
