@@ -69,9 +69,9 @@ def hf_greedy(model: Any, tok: Any, user: str, max_new: int, device: torch.devic
     return toks
 
 
-def native_greedy(model: Any, tok: Any, user: str, max_new: int) -> list[int]:
+def native_greedy(model: Any, tok: Any, user: str, max_new: int, device: torch.device) -> list[int]:
     text = tok.apply_chat_template(_messages(user), tokenize=False, add_generation_prompt=True)
-    ids = tok(text, return_tensors="pt").input_ids
+    ids = tok(text, return_tensors="pt").input_ids.to(device)
     eos = getattr(tok, "eos_token_id", None)
     toks: list[int] = []
     with torch.no_grad():
@@ -81,7 +81,7 @@ def native_greedy(model: Any, tok: Any, user: str, max_new: int) -> list[int]:
             if eos is not None and nxt == eos:
                 break
             toks.append(nxt)
-            logits, cache = model(torch.tensor([[nxt]]), past=cache, return_cache=True)
+            logits, cache = model(torch.tensor([[nxt]], device=device), past=cache, return_cache=True)
     return toks
 
 
