@@ -122,12 +122,14 @@ class Trainer:
         """Run the training loop; return history + best held-out loss."""
         cfg = self.cfg
         block = self.model.config.block_size
+        dev = model_device(self.model)
         self.model.train()
         for it in range(self.iter_num, cfg.max_iters):
             lr = self.get_lr(it)
             for group in self.optimizer.param_groups:
                 group["lr"] = lr
             x, y = get_batch(train_ids, block, cfg.batch_size, self.batch_gen)
+            x, y = x.to(dev), y.to(dev)
             _, loss = self.model(x, y)
             assert isinstance(loss, torch.Tensor)
             self.optimizer.zero_grad(set_to_none=True)
