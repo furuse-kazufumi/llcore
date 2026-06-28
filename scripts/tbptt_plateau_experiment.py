@@ -144,13 +144,14 @@ def main(argv: list[str] | None = None) -> int:
     ids = encode_corpus(text, tok)
     train_ids, val_ids = train_val_split(ids, val_frac=args.val_frac)
     print(f"[corpus] chars={len(text):,} vocab={tok.vocab_size} train={train_ids.numel():,} "
-          f"val={val_ids.numel():,} carry={args.carry} seg_len={args.seg_len} ctx={context_lens}", flush=True)
+          f"val={val_ids.numel():,} carry={args.carry} seg_len={args.seg_len} ctx={context_lens} "
+          f"device={device}", flush=True)
 
     arches = [a.strip() for a in args.arches.split(",") if a.strip()]
     results: dict[str, Any] = {}
     for arch in arches:
         torch.manual_seed(args.seed)
-        model = _build(arch, tok.vocab_size, args)
+        model = _build(arch, tok.vocab_size, args).to(device)
         n_params = sum(p.numel() for p in model.parameters())
         label = f"{arch}/{args.carry}"
         best_val = _train(model, args.carry, train_ids, val_ids, args, label)
