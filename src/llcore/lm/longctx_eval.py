@@ -84,12 +84,13 @@ def nll_at_positions_with_context(
             )
     was_training = model.training
     model.eval()
+    dev = model_device(model)
     total = 0.0
     count = 0
     for s in range(0, len(pos_list), batch_size):
         batch_pos = pos_list[s : s + batch_size]
-        x = torch.stack([ids[p - context_len : p] for p in batch_pos])
-        y = torch.tensor([int(ids[p]) for p in batch_pos], dtype=torch.long)
+        x = torch.stack([ids[p - context_len : p] for p in batch_pos]).to(dev)
+        y = torch.tensor([int(ids[p]) for p in batch_pos], dtype=torch.long).to(dev)
         logits = run_steps(model, x)
         last = logits[:, -1, :]
         total += float(F.cross_entropy(last, y, reduction="sum").item())
