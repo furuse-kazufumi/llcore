@@ -257,6 +257,9 @@ def streaming_metrics_by_band(
         pred1 = chunk.argmax(dim=-1)
         k = min(5, chunk.size(-1))
         top5_hit = (chunk.topk(k, dim=-1).indices == tgt.unsqueeze(-1)).any(dim=-1)
+        # Bucketing below is CPU position arithmetic; bring the per-chunk vectors back to CPU
+        # (no-op when already on CPU) so device-resident tensors don't mix with CPU index masks.
+        ce, pred1, top5_hit, tgt = ce.cpu(), pred1.cpu(), top5_hit.cpu(), tgt.cpu()
         positions = torch.arange(start + 1, stop + 1)
         bands = torch.bucketize(positions, edges_t, right=True) - 1
         uni = (-unigram_logp[tgt]) if unigram_logp is not None else None
