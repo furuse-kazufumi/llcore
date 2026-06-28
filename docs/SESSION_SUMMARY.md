@@ -3,36 +3,36 @@
 > 自動生成: `libexec/raptor-auto-summary` (Stop hook)
 > 次回 ccr 起動時に CLAUDE.md SESSION START で自動的に読み取られる。
 
-- **最終更新**: 2026-06-28 01:13:01
+- **最終更新**: 2026-06-28 16:10:30
 - **プロジェクト**: `D:/projects/llcore`
 - **ブランチ**: `feat/lm-recurrent`
 
 ## 直近の git log
 
 ```
-8535725 auto: next_plan.md 編集前 (2026-06-27 23:06)
-20736e7 auto: next_plan.md 編集前 (2026-06-27 23:02)
-55cb09e feat(chat): native forward in 20-turn endurance probe + honest native==HF result
-e1bb028 auto: prove_native_matches_hf.py 編集前 (2026-06-27 01:28)
-81b1259 auto: prove_native_matches_hf.py 編集前 (2026-06-27 01:28)
-c62661e auto: prove_native_matches_hf.py 編集前 (2026-06-27 01:25)
-3d6dd72 auto: __main__.py 編集前 (2026-06-27 01:12)
-785b7d4 auto: __main__.py 編集前 (2026-06-27 01:12)
-e6060ab auto: prove_native_matches_hf.py 編集前 (2026-06-27 01:08)
-40cd719 auto: __main__.py 編集前 (2026-06-27 01:05)
+5826f8c auto: b-show-your-losses.ja.md 編集前 (2026-06-28 01:31)
+4283986 auto: b-show-your-losses.ja.md 編集前 (2026-06-28 01:31)
+2bb36c8 auto: b-show-your-losses.ja.md 編集前 (2026-06-28 01:31)
+1507f8c auto: b-show-your-losses.ja.md 編集前 (2026-06-28 01:30)
+8bcfcf7 auto: b-show-your-losses.ja.md 編集前 (2026-06-28 01:30)
+ab650c3 auto: b-show-your-losses.ja.md 編集前 (2026-06-28 01:30)
+d60b4c5 auto: b-show-your-losses.ja.md 編集前 (2026-06-28 01:30)
+89c240d auto: b-show-your-losses.ja.md 編集前 (2026-06-28 01:30)
+db8a82b auto: b-show-your-losses.ja.md 編集前 (2026-06-28 01:30)
+00dd1aa auto: b-show-your-losses.ja.md 編集前 (2026-06-28 01:30)
 ```
 
 ## 現在の git status
 
 ```
 M docs/SESSION_SUMMARY.md
- M docs/next_plan.md
+ M docs/articles/arcs/b-show-your-losses.ja.md
 ```
 
 ## 直近 2 時間に変更されたファイル
 
 ```
-01:07 docs/SESSION_SUMMARY.md
+(直近 2h の変更なし)
 ```
 
 ---
