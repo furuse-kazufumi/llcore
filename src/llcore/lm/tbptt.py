@@ -61,6 +61,7 @@ def reset_state_slots(
     ``[B,S,S]``) — a fixed ``view(-1, 1)`` would mis-broadcast the 3-D case.
     """
     fresh = cast("list[object]", model.init_state(int(mask.size(0))))
+    mask = mask.to(model_device(model))  # align with on-device state for torch.where
 
     def _bcast(ref: torch.Tensor) -> torch.Tensor:
         return mask.view(-1, *([1] * (ref.dim() - 1)))
