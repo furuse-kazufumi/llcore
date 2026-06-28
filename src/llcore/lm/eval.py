@@ -165,7 +165,8 @@ def held_out_report_any(
     model.eval()
     counts = torch.bincount(train_ids, minlength=vocab_size).double()
     probs = (counts + alpha) / (train_ids.numel() + alpha * vocab_size)
-    logp = torch.log(probs)
+    dev = model_device(model)
+    logp = torch.log(probs).to(dev)
     n = val_ids.size(0)
     starts = list(range(0, n - block_size, block_size))
     if not starts:
@@ -175,8 +176,8 @@ def held_out_report_any(
     total_tok = 0
     for s in range(0, len(starts), batch_size):
         idxs = starts[s : s + batch_size]
-        x = torch.stack([val_ids[i : i + block_size] for i in idxs])
-        y = torch.stack([val_ids[i + 1 : i + 1 + block_size] for i in idxs])
+        x = torch.stack([val_ids[i : i + block_size] for i in idxs]).to(dev)
+        y = torch.stack([val_ids[i + 1 : i + 1 + block_size] for i in idxs]).to(dev)
         logits = model.forward_logits(x)
         flat_y = y.reshape(-1)
         total_model += float(
