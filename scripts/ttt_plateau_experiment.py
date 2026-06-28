@@ -31,6 +31,7 @@ from typing import Any, cast
 import torch
 
 from llcore.lm.data import encode_corpus, train_val_split
+from llcore.lm.device import resolve_device
 from llcore.lm.eval import held_out_report_any
 from llcore.lm.longctx_eval import ConstantStateLM, context_length_curve
 from llcore.lm.recurrent import RecurrentConfig, RecurrentLM
