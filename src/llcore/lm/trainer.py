@@ -14,6 +14,7 @@ from typing import Any, Protocol, cast
 import torch
 
 from llcore.lm.data import get_batch
+from llcore.lm.device import model_device
 from llcore.lm.eval import TrainableLM as EvalTrainableLM
 from llcore.lm.eval import estimate_loss
 
