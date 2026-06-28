@@ -219,13 +219,14 @@ def held_out_top1_report(
     starts = list(range(0, n - block_size, block_size))
     if not starts:
         raise ValueError(f"val length {n} too small for block_size {block_size}")
+    dev = model_device(model)
     top1 = 0
     top5 = 0
     total = 0
     for s in range(0, len(starts), batch_size):
         idxs = starts[s : s + batch_size]
-        x = torch.stack([val_ids[i : i + block_size] for i in idxs])
-        y = torch.stack([val_ids[i + 1 : i + 1 + block_size] for i in idxs])
+        x = torch.stack([val_ids[i : i + block_size] for i in idxs]).to(dev)
+        y = torch.stack([val_ids[i + 1 : i + 1 + block_size] for i in idxs]).to(dev)
         logits = model.forward_logits(x)
         flat_logits = logits.view(-1, logits.size(-1))
         flat_y = y.reshape(-1)
