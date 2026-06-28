@@ -24,6 +24,7 @@ from typing import cast
 import torch
 from torch.nn import functional as F
 
+from llcore.lm.device import model_device
 from llcore.lm.eval import estimate_loss
 from llcore.lm.recurrent import RecurrentLM
 from llcore.lm.rwkv import RWKVLM
