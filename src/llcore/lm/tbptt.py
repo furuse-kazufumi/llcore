@@ -163,11 +163,12 @@ class TBPTTTrainer:
         bsz = cfg.batch_size
         vocab = self.model.config.vocab_size
         block = self.model.config.block_size
-        ar = torch.arange(cs)
+        dev = model_device(self.model)
+        ar = torch.arange(cs)  # CPU: indexes the CPU train_ids; gathered batch is moved to dev
 
         seg_starts = self._sample_starts(train_ids, bsz)
         seg_pos = torch.zeros(bsz, dtype=torch.long)
-        state: list[object] = cast("list[object]", self.model.init_state(bsz))
+        state: list[object] = cast("list[object]", self.model.init_state(bsz, device=dev))
         self.model.train()
         for it in range(self.update_num, cfg.max_updates):
             lr = self.get_lr(it)
