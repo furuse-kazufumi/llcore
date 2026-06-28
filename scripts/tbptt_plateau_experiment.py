@@ -127,11 +127,14 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--val-frac", type=float, default=0.1)
     ap.add_argument("--seed", type=int, default=1337)
     ap.add_argument("--threads", type=int, default=0)
+    ap.add_argument("--device", default="auto",
+                    help="compute device: auto (cuda if available else cpu) | cpu | cuda | cuda:N")
     ap.add_argument("--out", default="out/tbptt_plateau")
     args = ap.parse_args(argv)
 
     if args.threads > 0:
         torch.set_num_threads(args.threads)
+    device = resolve_device(args.device)
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     context_lens = [int(c) for c in args.context_lens.split(",")]
