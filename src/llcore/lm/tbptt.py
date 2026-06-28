@@ -175,8 +175,8 @@ class TBPTTTrainer:
             for group in self.optimizer.param_groups:
                 group["lr"] = lr
             base = (seg_starts + seg_pos).unsqueeze(1)  # [B,1]
-            x = train_ids[base + ar]  # [B, cs]
-            y = train_ids[base + ar + 1]  # [B, cs]
+            x = train_ids[base + ar].to(dev)  # [B, cs]
+            y = train_ids[base + ar + 1].to(dev)  # [B, cs]
             logits_steps: list[torch.Tensor] = []
             for t in range(cs):
                 logits, state = self.model.step(x[:, t], state)  # type: ignore[arg-type, assignment]
