@@ -83,7 +83,8 @@ def _train(model: ConstantStateLM, carry: str, train_ids: torch.Tensor, val_ids:
               f"({(time.perf_counter()-t0)/60:.1f} min)", flush=True)
 
     if carry == "on":
-        cfg = TBPTTConfig(seg_len=args.seg_len, chunk_size=args.block_size, batch_size=args.batch_size,
+        chunk = args.chunk_size if args.chunk_size > 0 else args.block_size
+        cfg = TBPTTConfig(seg_len=args.seg_len, chunk_size=chunk, batch_size=args.batch_size,
                           max_updates=args.max_iters, learning_rate=args.lr,
                           eval_interval=max(200, args.max_iters // 4), eval_iters=20, seed=args.seed)
         res = TBPTTTrainer(model, cfg).train(train_ids, val_ids, on_eval=on_eval)
