@@ -122,9 +122,11 @@ def estimate_loss(
     """Mean loss over ``eval_iters`` random batches (training-time monitor)."""
     was_training = model.training
     model.eval()
+    dev = model_device(model)
     losses = torch.zeros(eval_iters)
     for k in range(eval_iters):
         x, y = get_batch(data, block_size, batch_size, generator)
+        x, y = x.to(dev), y.to(dev)
         _, loss = model(x, y)
         assert loss is not None
         losses[k] = loss.item()
