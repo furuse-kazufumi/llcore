@@ -121,7 +121,7 @@ def main(argv: list[str] | None = None) -> int:
     train_ids, val_ids = train_val_split(ids, val_frac=args.val_frac)
     print(
         f"[corpus] chars={len(text):,} vocab={tok.vocab_size} "
-        f"train={train_ids.numel():,} val={val_ids.numel():,} ctx_lens={context_lens}",
+        f"train={train_ids.numel():,} val={val_ids.numel():,} ctx_lens={context_lens} device={device}",
         flush=True,
     )
 
@@ -129,7 +129,7 @@ def main(argv: list[str] | None = None) -> int:
     results: dict[str, Any] = {}
     for arch in arches:
         torch.manual_seed(args.seed)
-        model = _build(arch, tok.vocab_size, args)
+        model = _build(arch, tok.vocab_size, args).to(device)
         n_params = sum(p.numel() for p in model.parameters())
         cfg = TrainConfig(
             learning_rate=args.lr, max_iters=args.max_iters,
