@@ -164,13 +164,21 @@ def main(argv: list[str] | None = None) -> int:
               f"past_block_gain={results[arch]['past_block_gain']} "
               f"ppl_by_ctx={results[arch]['ppl_by_context']}", flush=True)
 
+    chunk_used = args.chunk_size if args.chunk_size > 0 else args.block_size
     summary = {
         "carry": args.carry, "block_size": args.block_size, "seg_len": args.seg_len,
+        "chunk_size": chunk_used,
         "context_lens": context_lens, "n_positions": args.n_positions, "arches": results,
         "note": "Compare against the carry=off run (ttt_plateau / a separate --carry off run). If "
         "past_block_gain only turns positive under carry=on, the plateau was a training-method "
         "artifact, not capacity/cell. Single seed, small CPU model = directional; coarse 2-point "
-        "gain — read the full ppl_by_context curve and re-run >=3 seeds before any claim.",
+        "gain — read the full ppl_by_context curve and re-run >=3 seeds before any claim. "
+        + (f"§13(4) probe: chunk_size={chunk_used} > block_size={args.block_size} widens the "
+           "credit-assignment window, BUT at fixed max-iters this also raises gradient-token compute "
+           f"~{chunk_used / args.block_size:.0f}x vs the chunk=block baseline — a positive signal must "
+           "be re-checked with a compute-matched (more-iters) chunk=block control before any claim."
+           if chunk_used > args.block_size else
+           "chunk_size==block_size (fair-compute baseline)."),
     }
     (out / f"comparison_carry_{args.carry}.json").write_text(
         json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
