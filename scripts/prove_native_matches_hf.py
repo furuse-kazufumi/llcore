@@ -184,7 +184,7 @@ def main(argv: list[str] | None = None) -> int:
     if corpus_path.exists():
         text = corpus_path.read_text(encoding="utf-8")[: args.bulk_chars]
         t0 = time.perf_counter()
-        q = quantitative(hf_model, nat_model, hf_tok, text, args.bulk_tokens, args.chunk)
+        q = quantitative(hf_model, nat_model, hf_tok, text, args.bulk_tokens, args.chunk, device)
         nt = int(q["n_total"])
         nm = int(q["n_match"])
         print(f"  corpus={corpus_path.name}  N={nt} トークン  ({time.perf_counter() - t0:.1f}s)")
