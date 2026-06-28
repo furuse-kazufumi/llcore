@@ -340,6 +340,7 @@ def gpt_sliding_window_nll(gpt: CharGPT, ids: torch.Tensor, stride: int) -> tupl
         raise ValueError(f"stride must be in [1, block_size={block}], got {stride}")
     was_training = gpt.training
     gpt.eval()
+    dev = model_device(gpt)
     total = 0.0
     ntok = 0
     prev_end = 0  # highest target index already scored
@@ -350,9 +351,9 @@ def gpt_sliding_window_nll(gpt: CharGPT, ids: torch.Tensor, stride: int) -> tupl
         new_lo = prev_end + 1
         new_hi = last_target
         if new_hi >= new_lo:
-            logits = gpt.forward_logits(ids[begin:end].unsqueeze(0))[0]  # [L, V]
+            logits = gpt.forward_logits(ids[begin:end].unsqueeze(0).to(dev))[0]  # [L, V]
             sel = logits[new_lo - 1 - begin : new_hi - begin]  # logits[j] predicts ids[begin+j+1]
-            tgt = ids[new_lo : new_hi + 1]
+            tgt = ids[new_lo : new_hi + 1].to(dev)
             total += float(F.cross_entropy(sel, tgt, reduction="sum").item())
             ntok += int(new_hi - new_lo + 1)
             prev_end = new_hi
