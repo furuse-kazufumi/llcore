@@ -30,6 +30,7 @@ from typing import TypeAlias
 import torch
 from torch.nn import functional as F
 
+from llcore.lm.device import model_device
 from llcore.lm.eval import passes_gate
 from llcore.lm.model import CharGPT
 from llcore.lm.recurrent import RecurrentLM
