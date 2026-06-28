@@ -232,7 +232,8 @@ def streaming_metrics_by_band(
     if tail_start is None:
         tail_start = edges[1] if nb > 1 else 0
     edges_t = torch.tensor(edges, dtype=torch.long)
-    inputs, targets = ids[:-1], ids[1:]
+    dev = model_device(model)
+    inputs, targets = ids[:-1].to(dev), ids[1:].to(dev)
     n_pred = n - 1
     sum_nll = [0.0] * nb
     cnt = [0] * nb
