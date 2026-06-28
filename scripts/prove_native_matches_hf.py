@@ -52,10 +52,10 @@ def _messages(user: str) -> list[dict[str, str]]:
 # ---- 定性: 人間が読める greedy 生成の並置 -------------------------------------------------
 
 
-def hf_greedy(model: Any, tok: Any, user: str, max_new: int) -> list[int]:
+def hf_greedy(model: Any, tok: Any, user: str, max_new: int, device: torch.device) -> list[int]:
     inp = tok.apply_chat_template(
         _messages(user), add_generation_prompt=True, return_tensors="pt", return_dict=True
-    )
+    ).to(device)
     with torch.no_grad():
         out = model.generate(
             **inp, max_new_tokens=max_new, do_sample=False, repetition_penalty=1.0
