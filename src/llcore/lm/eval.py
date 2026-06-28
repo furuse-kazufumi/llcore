@@ -83,12 +83,13 @@ def held_out_nll(
     starts = list(range(0, n - block_size, block_size))
     if not starts:
         raise ValueError(f"val length {n} too small for block_size {block_size}")
+    dev = model_device(model)
     total_nll = 0.0
     total_tok = 0
     for s in range(0, len(starts), batch_size):
         idxs = starts[s : s + batch_size]
-        x = torch.stack([val_ids[i : i + block_size] for i in idxs])
-        y = torch.stack([val_ids[i + 1 : i + 1 + block_size] for i in idxs])
+        x = torch.stack([val_ids[i : i + block_size] for i in idxs]).to(dev)
+        y = torch.stack([val_ids[i + 1 : i + 1 + block_size] for i in idxs]).to(dev)
         logits, _ = model(x)
         loss_sum = F.cross_entropy(
             logits.view(-1, logits.size(-1)), y.view(-1), reduction="sum"
