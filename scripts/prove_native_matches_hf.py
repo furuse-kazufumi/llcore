@@ -85,12 +85,14 @@ def native_greedy(model: Any, tok: Any, user: str, max_new: int, device: torch.d
     return toks
 
 
-def qualitative(hf_model: Any, hf_tok: Any, nat_model: Any, nat_tok: Any, max_new: int) -> int:
+def qualitative(
+    hf_model: Any, hf_tok: Any, nat_model: Any, nat_tok: Any, max_new: int, device: torch.device
+) -> int:
     """5 問を目視確認用に並置。一致した問の数を返す (掴みであって主たる証拠ではない)。"""
     n_match = 0
     for user in PROMPTS:
-        hf_toks = hf_greedy(hf_model, hf_tok, user, max_new)
-        nat_toks = native_greedy(nat_model, nat_tok, user, max_new)
+        hf_toks = hf_greedy(hf_model, hf_tok, user, max_new, device)
+        nat_toks = native_greedy(nat_model, nat_tok, user, max_new, device)
         same = hf_toks == nat_toks
         n_match += int(same)
         hf_text = hf_tok.decode(hf_toks, skip_special_tokens=True).strip()
