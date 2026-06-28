@@ -175,7 +175,8 @@ def block_reset_nll(
         raise ValueError(f"chunk_size must be > 0, got {chunk_size}")
     was_training = model.training
     model.eval()
-    inputs, targets = ids[:-1], ids[1:]
+    dev = model_device(model)
+    inputs, targets = ids[:-1].to(dev), ids[1:].to(dev)
     n_pred = n - 1
     total = 0.0
     for w_start in range(0, n_pred, reset_every):
