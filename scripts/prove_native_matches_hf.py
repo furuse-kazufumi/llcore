@@ -108,13 +108,14 @@ def qualitative(
 
 
 def quantitative(
-    hf_model: Any, nat_model: Any, tok: Any, text: str, n_tokens: int, chunk: int
+    hf_model: Any, nat_model: Any, tok: Any, text: str, n_tokens: int, chunk: int,
+    device: torch.device,
 ) -> dict[str, float]:
     """teacher-forcing 1 パスで全 N 位置の next-token argmax 一致率と logits |Δ| を測る。
 
     各 chunk を cold (前文脈なし) で両者に同条件で流す。N が大きいほど「たまたま一致」を排除できる。
     """
-    ids_all = tok(text, return_tensors="pt").input_ids[0]
+    ids_all = tok(text, return_tensors="pt").input_ids[0].to(device)
     n_tokens = min(n_tokens, int(ids_all.numel()))
     n_match = 0
     n_total = 0
