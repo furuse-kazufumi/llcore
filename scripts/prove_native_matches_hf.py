@@ -26,6 +26,7 @@ from typing import Any
 
 import torch
 
+from llcore.lm.device import resolve_device
 from llcore.runtime.loader import load_qwen2
 
 SYSTEM = "あなたは簡潔に答える日本語アシスタントです。"
