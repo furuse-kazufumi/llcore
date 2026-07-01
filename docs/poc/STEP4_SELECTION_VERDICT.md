@@ -103,6 +103,8 @@ behavior descriptor で動く)。手順 2 で fitness 多峰性が出ないと�
 
 ## 7. 手順 6 結果 — 実 substrate proxy は欺瞞的でない (2026-05-30, research/step6_real_proxy/)
 
+> ★**2026-07-01 SUPERSESSION 注記**: 本節 exp7 を「**決定的**」とした n=8/6 の統計は、後続の統計検出力監査 (`research/statistical_power_audit/STATISTICAL_POWER_VERDICT.md` / `VERDICT_power_audit.md`、2026-06-01) で **underpowered と判定 → 撤回・n≥15 で再測必須**とされた (n≤10 は Cliff δ=+1.0・p<0.001 の強効果すら no-effect 化する構造的盲点)。**「決定的」という強い表現は無効。** ただし ③不成立 という *方向* 自体は翌日の `research/step_d_settle/THIRD_AXIS_SETTLE_VERDICT.md` (2026-06-02) が **決定論的測定 (EXP2)** で「landscape は真に滑らか/単峰 → n を増やしても多峰は出ない」と再確認しており、結論方向は維持される。要約: **exp7 の n=8/6 有意性を "決定的" として引用しないこと**。③慎重論の結論は後続で別基盤により支持されている。
+
 §6 の次アクション 1 (実 substrate の欺瞞性測定) を実施。CPU 完結の実 proxy =
 **ESN (固定 reservoir + ridge readout) × 実テキスト (llcore Python source 124K chars) の
 next-char 予測**。gene = reservoir 力学パラメータ。= llcore thesis (dynamics gene 進化) の最近接 CPU 近似。
