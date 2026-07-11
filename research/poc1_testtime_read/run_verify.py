@@ -252,6 +252,8 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--num-pairs", type=int, default=6)
     p.add_argument("--seeds", type=int, nargs="+", default=[0, 1, 2, 3, 4, 5, 6, 7])
     p.add_argument("--eval-batches", type=int, default=12)
+    p.add_argument("--unique-values", action="store_true",
+                   help="MQAR value を非復元 (系列内一意) にし binding-artifact を排除して検証")
     p.add_argument("--pairs-grid", type=int, nargs="+", default=[4, 6, 10],
                    help="headroom モードで振る負荷 (num_pairs)")
     p.add_argument("--out", type=str, default="")

@@ -1,0 +1,244 @@
+{
+ "mode": "headroom",
+ "config": {
+  "mode": "headroom",
+  "train_steps": 400,
+  "lr": 0.005,
+  "batch_size": 64,
+  "num_keys": 16,
+  "num_pairs": 6,
+  "seeds": [
+   0,
+   1,
+   2
+  ],
+  "eval_batches": 12,
+  "pairs_grid": [
+   4,
+   6,
+   10
+  ],
+  "out": ""
+ },
+ "rows": [
+  {
+   "state": "gated_delta",
+   "pairs": 4,
+   "seed": 0,
+   "r0": 0.3434244692325592,
+   "gain": 0.0016276041278615594,
+   "sig": false,
+   "tau": 0.1,
+   "K": 1
+  },
+  {
+   "state": "gated_delta",
+   "pairs": 4,
+   "seed": 1,
+   "r0": 0.3343099057674408,
+   "gain": 0.0052083334885537624,
+   "sig": false,
+   "tau": 0.05,
+   "K": 5
+  },
+  {
+   "state": "gated_delta",
+   "pairs": 4,
+   "seed": 2,
+   "r0": 0.3173828125,
+   "gain": 0.010416666977107525,
+   "sig": false,
+   "tau": 0.01,
+   "K": 5
+  },
+  {
+   "state": "gated_delta",
+   "pairs": 6,
+   "seed": 0,
+   "r0": 0.2701822817325592,
+   "gain": 0.0167100690305233,
+   "sig": true,
+   "tau": 0.0,
+   "K": 5
+  },
+  {
+   "state": "gated_delta",
+   "pairs": 6,
+   "seed": 1,
+   "r0": 0.2662760317325592,
+   "gain": 0.0212673619389534,
+   "sig": true,
+   "tau": 0.0,
+   "K": 3
+  },
+  {
+   "state": "gated_delta",
+   "pairs": 6,
+   "seed": 2,
+   "r0": 0.267578125,
+   "gain": 0.0186631940305233,
+   "sig": true,
+   "tau": 0.01,
+   "K": 1
+  },
+  {
+   "state": "gated_delta",
+   "pairs": 10,
+   "seed": 0,
+   "r0": 0.20690104365348816,
+   "gain": 0.015104166232049465,
+   "sig": true,
+   "tau": 0.0,
+   "K": 5
+  },
+  {
+   "state": "gated_delta",
+   "pairs": 10,
+   "seed": 1,
+   "r0": 0.21302083134651184,
+   "gain": 0.01966145820915699,
+   "sig": true,
+   "tau": 0.05,
+   "K": 5
+  },
+  {
+   "state": "gated_delta",
+   "pairs": 10,
+   "seed": 2,
+   "r0": 0.20195312798023224,
+   "gain": 0.01171875,
+   "sig": true,
+   "tau": 0.3,
+   "K": 1
+  },
+  {
+   "state": "vanilla_additive",
+   "pairs": 4,
+   "seed": 0,
+   "r0": 0.3453775942325592,
+   "gain": 0.0032552082557231188,
+   "sig": false,
+   "tau": 0.05,
+   "K": 1
+  },
+  {
+   "state": "vanilla_additive",
+   "pairs": 4,
+   "seed": 1,
+   "r0": 0.3486328125,
+   "gain": -0.0009765625,
+   "sig": false,
+   "tau": 0.01,
+   "K": 3
+  },
+  {
+   "state": "vanilla_additive",
+   "pairs": 4,
+   "seed": 2,
+   "r0": 0.3434244692325592,
+   "gain": -0.013671875,
+   "sig": false,
+   "tau": 0.0,
+   "K": 5
+  },
+  {
+   "state": "vanilla_additive",
+   "pairs": 6,
+   "seed": 0,
+   "r0": 0.2875434160232544,
+   "gain": 0.0008680555620230734,
+   "sig": false,
+   "tau": 0.1,
+   "K": 3
+  },
+  {
+   "state": "vanilla_additive",
+   "pairs": 6,
+   "seed": 1,
+   "r0": 0.2805989682674408,
+   "gain": -0.0006510416860692203,
+   "sig": false,
+   "tau": 0.3,
+   "K": 1
+  },
+  {
+   "state": "vanilla_additive",
+   "pairs": 6,
+   "seed": 2,
+   "r0": 0.2886284589767456,
+   "gain": 0.004123263992369175,
+   "sig": false,
+   "tau": 0.05,
+   "K": 5
+  },
+  {
+   "state": "vanilla_additive",
+   "pairs": 10,
+   "seed": 0,
+   "r0": 0.2291666716337204,
+   "gain": -0.0010416667209938169,
+   "sig": false,
+   "tau": 0.0,
+   "K": 1
+  },
+  {
+   "state": "vanilla_additive",
+   "pairs": 10,
+   "seed": 1,
+   "r0": 0.23359374701976776,
+   "gain": 0.0003906250058207661,
+   "sig": false,
+   "tau": 0.1,
+   "K": 3
+  },
+  {
+   "state": "vanilla_additive",
+   "pairs": 10,
+   "seed": 2,
+   "r0": 0.22682291269302368,
+   "gain": 0.0013020833721384406,
+   "sig": false,
+   "tau": 0.01,
+   "K": 5
+  }
+ ],
+ "summary": {
+  "gated_delta@4": {
+   "mean_r0": 0.3317057291666667,
+   "mean_gain": 0.005750868197840949,
+   "sig_seeds": 0,
+   "n": 3
+  },
+  "gated_delta@6": {
+   "mean_r0": 0.2680121461550395,
+   "mean_gain": 0.018880208333333332,
+   "sig_seeds": 3,
+   "n": 3
+  },
+  "gated_delta@10": {
+   "mean_r0": 0.20729166766007742,
+   "mean_gain": 0.015494791480402151,
+   "sig_seeds": 3,
+   "n": 3
+  },
+  "vanilla_additive@4": {
+   "mean_r0": 0.3458116253217061,
+   "mean_gain": -0.0037977430814256272,
+   "sig_seeds": 0,
+   "n": 3
+  },
+  "vanilla_additive@6": {
+   "mean_r0": 0.2855902810891469,
+   "mean_gain": 0.0014467592894410093,
+   "sig_seeds": 0,
+   "n": 3
+  },
+  "vanilla_additive@10": {
+   "mean_r0": 0.22986111044883728,
+   "mean_gain": 0.00021701388565512994,
+   "sig_seeds": 0,
+   "n": 3
+  }
+ },
+ "notes": "headroom confound check: if vanilla at higher load (R0 lowered to gated level) still shows no gain, then H3 SUPPORTED reflects state-type dependence, not R0-level headroom. If gain appears once vanilla R0 drops, the H3 conclusion is confounded by headroom."
+}

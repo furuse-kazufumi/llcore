@@ -1,3 +1,5 @@
+> ⚠ **GO 撤回 (2026-07-11)**: 本 findings の GO 判定は敵対的レビュー(39 agents)+ 決定実験で**撤回**。実体は value 重複による metric artifact(unique-value で gain +0.026→0.005/1-8 seed)+ degree-2 spectral read(sparse cleanup でない)。最終 verdict = POC1_VERDICT.md(**NOT GO**)。以下は当時の記録として保持。
+
 # PoC-1 Stage 2 — 凍結 Gated DeltaNet 状態への post-hoc read 変種比較 (2026-07-11, CPU)
 
 > pre-reg: `docs/research/preregistration/prereg_poc1_testtime_read_2026-06-29.md` §3.2/§4/§5。
