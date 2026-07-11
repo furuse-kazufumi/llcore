@@ -61,7 +61,10 @@ def make_batch(cfg: MQARConfig, batch_size: int, generator: torch.Generator
     for b in range(batch_size):
         # N 個の異なる key を選び、各に random value を束縛する
         keys = torch.randperm(D, generator=generator)[:N] + 1              # [1..D]
-        vals = torch.randint(0, D, (N,), generator=generator) + (D + 1)    # [D+1..2D]
+        if cfg.unique_values:
+            vals = torch.randperm(D, generator=generator)[:N] + (D + 1)    # 非復元=系列内 value 一意
+        else:
+            vals = torch.randint(0, D, (N,), generator=generator) + (D + 1)  # 復元 (現行・重複可)
         # KV フェーズ
         for i in range(N):
             inp[b, 2 * i] = keys[i]
