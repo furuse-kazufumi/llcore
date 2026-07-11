@@ -55,3 +55,28 @@
 - **GPU 本走**: Qwen3-1.7B 蒸留 linear-attn 状態 + 長系列(2k/4k/8k)。CPU の +0.018 が長系列で拡大/消失かを見る。
 - honest 注記: cleanup gain の source は「crosstalk 部分除去」(cleanup_prob 図: 正解値の確率が上がる)。
   これは fixed-resolution 状態からの読み出し改善であって **plateau 突破ではない**(P7=2504.14366)。
+
+---
+
+## H3 結果 (状態種 ablation, 2026-07-11, 3 状態種 × 3 seed) — SUPPORTED
+
+faithful セルを変えず instance レベルで step を差し替え、3 状態種で cleanup gain (R-Hopfield vs R0) を測定。
+
+| 状態種 | mean R0 | mean cleanup gain | 有意 seed |
+|---|---|---|---|
+| gated_delta (本命) | 0.268 | +0.019 | 3/3 |
+| delta_rule (忘却なし) | 0.264 | +0.021 | 3/3 |
+| vanilla_additive (純 Hebbian・最弱) | 0.286 | +0.001 | 0/3 |
+
+**H3 SUPPORTED**: cleanup gain は gated-delta/delta-rule で出て **vanilla-additive で消える**。
+しかも vanilla-additive は R0 自体が高い (0.286)=単発読みが既にクリーンで headroom が無い。
+→ gain は「どの線形状態でも効く一般トリック」ではなく **gated/delta 状態の crosstalk 特有**。
+pre-reg の novelty regime (学習・非直交 key の凍結 gated-delta 状態への post-hoc cleanup) を裏付け。
+
+## 総合判定 (H1/H2/H3) — GO(反復 framing のみ訂正)
+
+- H1 (cleanup > R0): 支持 / H2 (> R-CCQ kill-risk): 支持 / H3 (vanilla で消失): 支持。
+- **pre-reg §5 GO 条件を実質すべて満たす**。唯一の訂正 = 「反復 read」ではなく「単発の非 softmax
+  cleanup read」が本体 (R-Hopfield は K でフラット・R-ISTA は不安定)。
+- → **read 側 test-time は状態依存の実シグナルあり**。GPU 本走 (Qwen3-1.7B 蒸留状態・長系列 2k/4k/8k)
+  の価値を確定。honest: 効果小 (+0.02)・CPU tiny・ceiling-relaxation (突破ではない)。
