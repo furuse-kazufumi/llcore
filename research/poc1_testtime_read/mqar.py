@@ -28,6 +28,9 @@ class MQARConfig:
     num_pairs: int = 8       # N: 1 系列あたりの KV ペア数 (<= num_keys)
     num_queries: int = 8     # Q: 1 系列あたりのクエリ数
     seed: int = 0
+    unique_values: bool = False  # True=系列内 value も非復元 (binding 混入なし)。
+    #   既定 False = 復元抽選 (現行動作・byte-identical)。敵対レビュー由来の binding-artifact 検証用:
+    #   value 重複があると「頻出値スナップ」で recall が水増しされうる (2026-07-11)。
 
     def __post_init__(self) -> None:
         if not (0 < self.num_pairs <= self.num_keys):
