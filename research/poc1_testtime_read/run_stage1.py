@@ -78,6 +78,12 @@ def main(argv: list[str] | None = None) -> int:
     model = TTTLinearLM(TTTLinearConfig(
         vocab_size=mcfg.vocab_size, block_size=mcfg.seq_len,
         n_layer=args.n_layer, n_embd=args.n_embd, state_dim=args.state_dim, dropout=0.0))
+    if args.a_log_init is not None:
+        # A_log は学習可能パラメータ (機構ではない)。recall タスク向けに保持寄りへ再初期化する。
+        import math
+        with torch.no_grad():
+            for layer in model.transformer["h"]:
+                layer.A_log.fill_(math.log(args.a_log_init))
     opt = torch.optim.AdamW(model.parameters(), lr=args.lr)
 
     print(f"[stage1] params={model.num_params():,} vocab={mcfg.vocab_size} seq_len={mcfg.seq_len} "
