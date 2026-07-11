@@ -76,7 +76,8 @@ def _build_1layer(mcfg: MQARConfig, seed: int, *, a_log_init: float = 1.0) -> TT
 def _mechanism_seed(args: argparse.Namespace, seed: int) -> dict:
     """1 seed: Stage2 と同一設定で学習 → val で選択 → test で機構診断。"""
     mcfg = MQARConfig(num_keys=args.num_keys, num_pairs=args.num_pairs,
-                      num_queries=args.num_pairs, seed=seed)
+                      num_queries=args.num_pairs, seed=seed,
+                      unique_values=args.unique_values)
     model = _build_1layer(mcfg, seed)
     train(model, mcfg, steps=args.train_steps, lr=args.lr, batch_size=args.batch_size, seed=seed)
 
