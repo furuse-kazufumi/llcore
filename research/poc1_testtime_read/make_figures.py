@@ -152,8 +152,8 @@ def main(argv: list[str] | None = None) -> int:
     Q1 = Qt[idx:idx + 1]
     y1 = int(Yt[idx])
     probs = []
-    for K in Ks:
-        o = R.r0(S1, Q1) if K == 0 else R.r_ista(S1, Q1, K=K, lam=lam, eta=eta)
+    for K in Ks:  # 安定な R-Hopfield を使う (ISTA は K で振動するため単一クエリ可視化に不適)
+        o = R.r0(S1, Q1) if K == 0 else R.r_hopfield(S1, Q1, K=K, tau=tau)
         pr = F.softmax(downstream_logits(model, o, H1), dim=-1)[0, y1].item()
         probs.append(pr)
     data["cleanup_prob"] = {"K": Ks, "prob_correct": probs, "value_token": y1}
