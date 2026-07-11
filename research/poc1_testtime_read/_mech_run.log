@@ -1,0 +1,31 @@
+[verify/mech] seed 0: train 400 steps pairs=6 ...
+  R0=0.270 | CCQ=0.270(+0.000) | Hop-full=0.287(+0.017*,sel=[5, 0.0]) | Hop-pos=0.285(+0.015*) | poly2=0.288(+0.017*)
+[verify/mech] seed 1: train 400 steps pairs=6 ...
+  R0=0.266 | CCQ=0.266(-0.000) | Hop-full=0.288(+0.021*,sel=[3, 0.0]) | Hop-pos=0.285(+0.019*) | poly2=0.282(+0.016*)
+[verify/mech] seed 2: train 400 steps pairs=6 ...
+  R0=0.268 | CCQ=0.267(-0.001) | Hop-full=0.286(+0.019*,sel=[1, 0.01]) | Hop-pos=0.286(+0.019*) | poly2=0.285(+0.017*)
+[verify/mech] seed 3: train 400 steps pairs=6 ...
+  R0=0.243 | CCQ=0.243(-0.000) | Hop-full=0.281(+0.037*,sel=[3, 0.05]) | Hop-pos=0.281(+0.037*) | poly2=0.274(+0.031*)
+[verify/mech] seed 4: train 400 steps pairs=6 ...
+  R0=0.263 | CCQ=0.264(+0.000) | Hop-full=0.301(+0.038*,sel=[5, 0.0]) | Hop-pos=0.300(+0.036*) | poly2=0.292(+0.029*)
+[verify/mech] seed 5: train 400 steps pairs=6 ...
+  R0=0.257 | CCQ=0.257(+0.000) | Hop-full=0.290(+0.033*,sel=[5, 0.05]) | Hop-pos=0.290(+0.033*) | poly2=0.289(+0.032*)
+[verify/mech] seed 6: train 400 steps pairs=6 ...
+  R0=0.262 | CCQ=0.261(-0.000) | Hop-full=0.292(+0.031*,sel=[5, 0.05]) | Hop-pos=0.292(+0.031*) | poly2=0.287(+0.026*)
+[verify/mech] seed 7: train 400 steps pairs=6 ...
+  R0=0.267 | CCQ=0.267(-0.000) | Hop-full=0.283(+0.016*,sel=[5, 0.05]) | Hop-pos=0.283(+0.016*) | poly2=0.281(+0.013*)
+
+variant              matvec  mean rec   d vs R0   sig/n  d vs poly2
+R0                        1     0.262    +0.000    0/8      -0.023
+R-CCQ                     3     0.262    -0.000    0/8      -0.023
+R-Hopfield-full           ?     0.288    +0.026    8/8      +0.004
+R-Hopfield-pos            ?     0.288    +0.026    8/8      +0.003
+r_poly2(S·SᵀS·q̂)         3     0.285    +0.023    8/8      +0.000
+
+[VERDICT NOTES]
+  - tau=0 selection rate=38% (spectral 機構の傍証)
+  - poly2==Hopfield-full match seeds=0/8
+  - => mechanism is SPECTRAL (S·SᵀS·q̂ / degree-2 power-iteration). 'soft-threshold cleanup' label must be corrected; sparsity adds nothing.
+  - FLOP-matched: same 3-matvec, poly2(+SᵀS) wins while R-CCQ(-lam·SᵀS) does not => gain is degree-2 direction, not compute (H2 kill-risk passed from another angle).
+
+[verify] -> D:\projects\llcore\research\poc1_testtime_read\verify_mechanism.json

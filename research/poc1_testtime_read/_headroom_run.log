@@ -1,0 +1,5 @@
+  gated_delta      pairs=4 seed0: R0=0.343 gain=+0.002 (tau=0.1,K=1)
+  gated_delta      pairs=4 seed1: R0=0.334 gain=+0.005 (tau=0.05,K=5)
+  gated_delta      pairs=4 seed2: R0=0.317 gain=+0.010 (tau=0.01,K=5)
+  gated_delta      pairs=6 seed0: R0=0.270 gain=+0.017* (tau=0.0,K=5)
+  gated_delta      pairs=6 seed1: R0=0.266 gain=+0.021* (tau=0.0,K=3)
