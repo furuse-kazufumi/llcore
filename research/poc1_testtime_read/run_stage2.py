@@ -118,59 +118,34 @@ def paired_ci(a: torch.Tensor, b: torch.Tensor, *, n_boot: int = 2000, seed: int
     return float(d.mean()), means[int(0.025 * n_boot)], means[int(0.975 * n_boot)]
 
 
-def main(argv: list[str] | None = None) -> int:
-    p = argparse.ArgumentParser()
-    p.add_argument("--train-steps", type=int, default=400)
-    p.add_argument("--lr", type=float, default=5e-3)
-    p.add_argument("--batch-size", type=int, default=64)
-    p.add_argument("--state-dim", type=int, default=128)
-    p.add_argument("--num-keys", type=int, default=16)
-    p.add_argument("--num-pairs", type=int, default=6)
-    p.add_argument("--num-queries", type=int, default=6)
-    p.add_argument("--a-log-init", type=float, default=1.0)
-    p.add_argument("--seed", type=int, default=0)
-    p.add_argument("--eval-batches", type=int, default=12)
-    args = p.parse_args(argv)
-
-    torch.manual_seed(args.seed)
+def run_once(args: argparse.Namespace, seed: int) -> dict:
+    """1 seed 分: 学習 → val でハイパラ選択 → test で per-instance correct + 効果を返す。"""
+    torch.manual_seed(seed)
     mcfg = MQARConfig(num_keys=args.num_keys, num_pairs=args.num_pairs,
-                      num_queries=args.num_queries, seed=args.seed)
+                      num_queries=args.num_queries, seed=seed)
     model = TTTLinearLM(TTTLinearConfig(
         vocab_size=mcfg.vocab_size, block_size=mcfg.seq_len,
         n_layer=1, n_embd=128, state_dim=args.state_dim, dropout=0.0))
     with torch.no_grad():
         model.transformer["h"][0].A_log.fill_(math.log(args.a_log_init))
-    print(f"[stage2] training 1-layer sd={args.state_dim} pairs={args.num_pairs} "
-          f"chance={1/args.num_keys:.3f} ...")
-    train(model, mcfg, steps=args.train_steps, lr=args.lr,
-          batch_size=args.batch_size, seed=args.seed)
+    train(model, mcfg, steps=args.train_steps, lr=args.lr, batch_size=args.batch_size, seed=seed)
 
-    # val / test で状態を収集 (別 generator = 別系列)
-    val = collect_states(model, mcfg, torch.Generator().manual_seed(args.seed + 1),
+    val = collect_states(model, mcfg, torch.Generator().manual_seed(seed + 1),
                          batches=args.eval_batches, batch_size=args.batch_size)
-    test = collect_states(model, mcfg, torch.Generator().manual_seed(args.seed + 2),
+    test = collect_states(model, mcfg, torch.Generator().manual_seed(seed + 2),
                           batches=args.eval_batches, batch_size=args.batch_size)
     Sv, Hv, Qv, Yv = val
     St, Ht, Qt, Yt = test
-    print(f"[stage2] val N={len(Yv)} test N={len(Yt)}")
-
-    # R0 が native read と一致することを確認 (sanity)
-    r0_native = R.r0(Sv, Qv)
-    assert torch.allclose(r0_native, torch.einsum("bij,bj->bi", Sv, Qv)), "R0 != native"
+    assert torch.allclose(R.r0(Sv, Qv), torch.einsum("bij,bj->bi", Sv, Qv)), "R0 != native"
 
     def val_recall(fn) -> float:
         return float(recall_of(model, Sv, Hv, Qv, Yv, fn).mean())
 
-    def test_correct(fn) -> torch.Tensor:
-        return recall_of(model, St, Ht, Qt, Yt, fn)
-
-    # ── ハイパラを val で選択 ──
     lam_grid = [0.001, 0.003, 0.01, 0.03, 0.1, 0.3]
     tau_grid = [0.0, 0.01, 0.05, 0.1, 0.3]
     K_grid = [3, 5]
     eta_grid = [0.1, 0.3, 1.0]
     beta_grid = [0.5, 1.0, 2.0, 4.0]
-
     best_ccq = max(lam_grid, key=lambda L: val_recall(lambda S, Q: R.r_ccq(S, Q, lam=L)))
     best_hop = max(((K, t) for K in K_grid for t in tau_grid),
                    key=lambda kt: val_recall(lambda S, Q: R.r_hopfield(S, Q, K=kt[0], tau=kt[1])))
@@ -187,35 +162,94 @@ def main(argv: list[str] | None = None) -> int:
         "softmax-Hopfield": lambda S, Q: R.r_softmax_hopfield(S, Q, beta=best_beta),
         "sparse-FY-Hopfield": R.r_fy_hopfield,
     }
-    print(f"[stage2] val-selected: CCQ λ={best_ccq} Hopfield(K,τ)={best_hop} "
-          f"ISTA(K,λ,η)={best_ista} softmax β={best_beta}")
-
-    corr = {name: test_correct(fn) for name, fn in variants.items()}
-    r0c = corr["R0(single)"]
-    ccqc = corr["R-CCQ"]
-    print(f"\n{'variant':<20} {'test recall':>11}   {'Δ vs R0 [95% CI]':>26}   {'Δ vs R-CCQ [95% CI]':>26}")
+    corr = {name: recall_of(model, St, Ht, Qt, Yt, fn) for name, fn in variants.items()}
+    r0c, ccqc, fyc = corr["R0(single)"], corr["R-CCQ"], corr["sparse-FY-Hopfield"]
+    out: dict = {"seed": seed, "n_test": int(len(Yt)),
+                 "hparams": {"ccq_lam": best_ccq, "hop": best_hop, "ista": best_ista, "beta": best_beta},
+                 "variants": {}}
     for name, c in corr.items():
-        rec = float(c.mean())
         d0, lo0, hi0 = paired_ci(c, r0c)
         dq, loq, hiq = paired_ci(c, ccqc)
-        sig0 = "*" if (lo0 > 0 or hi0 < 0) else " "
-        print(f"{name:<20} {rec:>11.3f}   {d0:+.3f} [{lo0:+.3f},{hi0:+.3f}]{sig0}   "
-              f"{dq:+.3f} [{loq:+.3f},{hiq:+.3f}]")
+        di, loi, hii = paired_ci(c, fyc)  # vs sparse-FY (反復が疎性を超えるか)
+        out["variants"][name] = {
+            "recall": float(c.mean()),
+            "d_r0": d0, "ci_r0": [lo0, hi0], "sig_r0": bool(lo0 > 0 or hi0 < 0),
+            "d_ccq": dq, "ci_ccq": [loq, hiq],
+            "d_fy": di, "ci_fy": [loi, hii],
+            "correct": [int(x) for x in c.tolist()],  # 記事/追試用に per-instance を保存
+        }
+    return out
 
-    # ── 判定 (pre-reg §5, H1/H2; H3 は Stage 2b) ──
-    def beats(name: str, ref: torch.Tensor) -> bool:
-        _, lo, hi = paired_ci(corr[name], ref)
-        return lo > 0
-    iter_names = ["R-ISTA", "R-Hopfield"]
-    beats_r0 = any(beats(n, r0c) for n in iter_names)
-    beats_ccq = any(beats(n, ccqc) for n in iter_names)
-    if beats_r0 and beats_ccq:
-        verdict = "GO (H1∧H2 成立: 反復 read が R0 かつ R-CCQ を CI 超で上回る) — H3 で state 依存を確認へ"
-    elif beats_r0:
-        verdict = "PARTIAL (H1 のみ: R0 は超えるが R-CCQ は超えず → gain は『賢い単発』で説明可)"
-    else:
-        verdict = "NULL (いずれも CI 超えなし → read 側 test-time は dead / fork C へ pivot)"
+
+def _verdict(seed_results: list[dict]) -> str:
+    """複数 seed の集約判定 (H1/H2)。反復 read が R0 かつ R-CCQ を CI 超で上回る seed 数で判定。"""
+    iters = ["R-ISTA", "R-Hopfield"]
+    go = par = 0
+    for r in seed_results:
+        v = r["variants"]
+        beats_r0 = any(v[n]["ci_r0"][0] > 0 for n in iters)
+        beats_ccq = any(v[n]["ci_ccq"][0] > 0 for n in iters)
+        if beats_r0 and beats_ccq:
+            go += 1
+        elif beats_r0:
+            par += 1
+    n = len(seed_results)
+    if go == n:
+        return f"GO ({go}/{n} seed で H1∧H2: 反復 read が R0 かつ R-CCQ を CI 超) — 要 H3/大N/長系列で追確認"
+    if go + par == n and go >= 1:
+        return f"GO-leaning ({go}/{n} GO, {par}/{n} PARTIAL) — 効果は小/疎性寄与に注意"
+    if par + go >= 1:
+        return f"MIXED ({go} GO / {par} PARTIAL / {n - go - par} NULL) — 頑健でない"
+    return f"NULL (0/{n} で CI 超えなし) → read 側 test-time は dead / fork C へ pivot"
+
+
+def main(argv: list[str] | None = None) -> int:
+    p = argparse.ArgumentParser()
+    p.add_argument("--train-steps", type=int, default=400)
+    p.add_argument("--lr", type=float, default=5e-3)
+    p.add_argument("--batch-size", type=int, default=64)
+    p.add_argument("--state-dim", type=int, default=128)
+    p.add_argument("--num-keys", type=int, default=16)
+    p.add_argument("--num-pairs", type=int, default=6)
+    p.add_argument("--num-queries", type=int, default=6)
+    p.add_argument("--a-log-init", type=float, default=1.0)
+    p.add_argument("--seeds", type=int, nargs="+", default=[0, 1, 2])
+    p.add_argument("--eval-batches", type=int, default=12)
+    p.add_argument("--out", type=str, default="research/poc1_testtime_read/stage2_results.json")
+    args = p.parse_args(argv)
+
+    results = []
+    for s in args.seeds:
+        print(f"[stage2] seed {s}: train {args.train_steps} steps, pairs={args.num_pairs} ...")
+        r = run_once(args, s)
+        results.append(r)
+        v = r["variants"]
+        print(f"  R0={v['R0(single)']['recall']:.3f} "
+              + " ".join(f"{n.split('(')[0].replace('R-','')}={v[n]['recall']:.3f}"
+                         f"({v[n]['d_r0']:+.3f}{'*' if v[n]['sig_r0'] else ''})"
+                         for n in ["R-ISTA", "R-Hopfield", "R-CCQ", "sparse-FY-Hopfield", "softmax-Hopfield"]))
+
+    # 集約表
+    names = ["R0(single)", "R-CCQ", "softmax-Hopfield", "sparse-FY-Hopfield", "R-Hopfield", "R-ISTA"]
+    print(f"\n{'variant':<20} {'mean recall':>11} {'mean Δ vs R0':>13} {'sig seeds':>10} "
+          f"{'mean Δ vs sparse-FY':>19}")
+    for name in names:
+        recs = [r["variants"][name]["recall"] for r in results]
+        d0s = [r["variants"][name]["d_r0"] for r in results]
+        sig = sum(r["variants"][name]["sig_r0"] and r["variants"][name]["d_r0"] > 0 for r in results)
+        dfy = [r["variants"][name]["d_fy"] for r in results]
+        print(f"{name:<20} {sum(recs)/len(recs):>11.3f} {sum(d0s)/len(d0s):>+13.3f} "
+              f"{sig:>7}/{len(results)} {sum(dfy)/len(dfy):>+19.3f}")
+
+    verdict = _verdict(results)
     print(f"\n[VERDICT/H1H2] {verdict}")
+
+    out_path = _ROOT / args.out
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    import json
+    payload = {"config": vars(args), "verdict": verdict, "seeds": results}
+    out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8")
+    print(f"[stage2] results → {out_path}")
     return 0
 
 
