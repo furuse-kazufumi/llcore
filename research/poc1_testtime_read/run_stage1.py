@@ -63,6 +63,10 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--num-queries", type=int, default=8)
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--eval-every", type=int, default=100)
+    p.add_argument("--a-log-init", type=float, default=None,
+                   help="faithful セルの A_log を log(値) で再初期化 (機構不変=init のみ)。"
+                        "既定 uniform(1,16) は exp(A_log) 巨大→α≈0 で忘却が強く recall に敵対的。"
+                        "例: 1.0 で rate=1→α≈0.95 (保持寄り)。")
     args = p.parse_args(argv)
 
     torch.manual_seed(args.seed)
