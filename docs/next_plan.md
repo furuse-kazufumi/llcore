@@ -1,11 +1,12 @@
 # next_plan (正本) — llcore
 
-> 最終更新: 2026-06-23 ~06:40 JST（ccr セッションでユーザー指示により再構築・肥大化解消）
+> 最終更新: 2026-07-09 22:44 JST
 > SESSION_SUMMARY.md は raptor Stop hook で毎ターン自動上書きされるため、**このファイルが再開の正本**。
 > 旧 EXIT(43)–(87)（Kaggle ポーリングログ約 2100 行・ほぼ全て「v3 RUNNING 待機継続」の重複）は
 > `docs/archive/next_plan_kaggle_polling_through_EXIT87_20260623.md` に全文退避済（可逆）。
+> 2026-06-23 06:40 JST の ccr 再構築で肥大化解消済み、という履歴注記は維持する。
 
-## 現在地（2026-06-23）
+## 現在地
 
 研究（科学）は健全。詳細の正本は `docs/CONVERSATIONAL_LLCORE_FINDINGS.md` §1–11：
 - **会話基盤**: llcore 自前 Qwen2 forward（`runtime/qwen2.py`、HF golden 一致 2e-4）が 0.5B/1.5B で日本語会話成立。
@@ -24,6 +25,12 @@
 - **残フォローアップ**: ①公開時の sibling 相互参照 URL マッピング（記事 slug→Qiita URL）②SVG 図中ラベルの言語別ローカライズ
   （現状 en/zh/ko 記事内も図は日本語ラベル・alt は訳済）③実 Qiita 公開（human gate A）。
 - Kaggle needle offload は **任意 polish**（b2 の 2048 実測値差替のみ）。**2026-06-23 ccr が sweep-only(needle 除去) v5 に切替済**。
+
+## 直近の成果
+
+- `Codex/ccr` セッションで 16 トピック → 4 アーク統合、多言語展開、静的 SVG 33 枚 embed、記事ドラフト 48 本の publish-ready 化まで完了した。
+- 研究面では 0.5B/1.5B 会話成立、linearization-tolerance profile、memetic NSGA-II frontier、proxy-v2 設計、`TTTLinearLM` 実装まで進み、次の本命は plateau 改善の切り分けになっている。
+- 運用面では CPU での full proxy-v2 本走断念、Kaggle sweep-only v5、無限ポーリング禁止などの規律を `next_plan` と memory に反映済み。
 
 ---
 
@@ -119,3 +126,9 @@
 - **L1 実装 DONE / 検証 in-progress**: `src/llcore/lm/ttt.py`=`TTTLinearLM`(delta-rule fast-weight, L2 正規化 key, 学習可能 decay/η, RecurrentLM 互換, +9 tests)。`longctx_eval.ConstantStateLM` union に追加(既存非回帰)。`scripts/ttt_plateau_experiment.py`(+4 tests)=3 arm 対照(recurrent baseline / recurrent-wide=StateX 流容量 / ttt-linear=更新則)を `context_length_curve` で `past_block_gain`(block_size 超で NLL が下がり続けるか)比較。smoke 検証済 → **本走 background 実行中**(`out/ttt_plateau/`, max-iters 1200, params 1.22M/1.38M/1.22M 整合)。完了後: ttt-linear の gain を recurrent / recurrent-wide と対照し「容量 vs 更新則」を切り分け、doc §13 + memory に honest 記録。
 - **1.5B linearization-tolerance profile DONE**: `out/linearize_tolerance_1.5b/`。doc §13(1)。
 - 全規律クリア(mypy strict / ruff / 計 20+ 新 tests green / 保護領域非接触 / no-push)。
+
+## 補足成果メモ
+
+- `Codex/ccr` セッションで 16 トピック → 4 アーク統合、多言語展開、静的 SVG 33 枚 embed、記事ドラフト 48 本の publish-ready 化まで完了した。
+- 研究面では 0.5B/1.5B 会話成立、linearization-tolerance profile、memetic NSGA-II frontier、proxy-v2 設計、`TTTLinearLM` 実装まで進み、次の本命は plateau 改善の切り分けになっている。
+- 運用面では CPU での full proxy-v2 本走断念、Kaggle sweep-only v5、無限ポーリング禁止などの規律を `next_plan` と memory に反映済み。
