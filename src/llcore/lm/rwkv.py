@@ -2,12 +2,17 @@
 """Minimal RWKV-4 style recurrent char LM with stable running-max WKV."""
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import NamedTuple, cast
 
 import torch
 from torch import nn
 from torch.nn import functional as F
+
+from llcore.lm.activations import K3_BETA_GATE, K3_BETA_UP, situ_glu
+
+_FFN_ACTIVATIONS = frozenset({"sq_relu", "situ_glu"})
 
 
 class RWKVLayerState(NamedTuple):
@@ -16,6 +21,81 @@ class RWKVLayerState(NamedTuple):
     a: torch.Tensor
     b: torch.Tensor
     p: torch.Tensor
+
+
+def bounded_log_decay(raw: torch.Tensor, *, log_floor: float) -> torch.Tensor:
+    """Kimi K3 式の下限付き log-decay ``g = log_floor * sigmoid(raw)``.
+
+    ``sigmoid`` は開区間 (0, 1) を返すので ``g ∈ (log_floor, 0)``、したがって保持率
+    ``α = exp(g) ∈ (exp(log_floor), 1)`` となり **1 ステップあたりの忘却速度に床が付く**。
+    従来の ``-exp(raw)`` は下に非有界で ``α → 0`` (チャネル死 = 1 ステップで全忘却) を
+    許してしまう。
+
+    Parameters
+    ----------
+    raw : torch.Tensor
+        生パラメータ (``time_decay``)。値域の制約なし。
+    log_floor : float
+        log 空間の下限。負値のみ (例: K3 の ``g_min = -5``)。
+
+    Returns
+    -------
+    torch.Tensor
+        ``(log_floor, 0)`` に収まる log-decay。
+
+    Raises
+    ------
+    ValueError
+        ``log_floor >= 0`` の場合 (減衰にならない)。
+    """
+    if log_floor >= 0.0:
+        raise ValueError(f"log_floor must be < 0 (decay only), got {log_floor}")
+    return log_floor * torch.sigmoid(raw)
+
+
+def init_raw_for_log_decay(target_log_decay: float, *, log_floor: float | None) -> float:
+    """目標 log-decay を実現する ``time_decay`` の raw 値を返す (逆写像).
+
+    パラメータ化を切り替えると同じ raw 値でも保持率が変わる (zeros 初期化だと
+    ``-exp(0) = -1`` に対し ``-5*sigmoid(0) = -2.5``)。**初期保持率を揃えずに
+    比較すると、測っているのはパラメータ化ではなく初期値の差**になるので、
+    統制実験ではこの逆写像で両者の出発点を合わせる。
+
+    Parameters
+    ----------
+    target_log_decay : float
+        揃えたい log-decay (負値)。保持率は ``exp(target_log_decay)``。
+    log_floor : float | None
+        None = ``-exp(w)`` (従来)、負値 = ``log_floor * sigmoid(w)`` (有界)。
+
+    Returns
+    -------
+    float
+        その parameterization で ``target_log_decay`` を再現する raw 値。
+
+    Raises
+    ------
+    ValueError
+        ``target_log_decay >= 0``、または有界版で床より下を要求した場合
+        (その値は表現できない)。
+    """
+    if target_log_decay >= 0.0:
+        raise ValueError(
+            f"target_log_decay must be < 0 (decay only), got {target_log_decay}"
+        )
+    if log_floor is None:
+        # -exp(w) = target  ->  w = log(-target)
+        return math.log(-target_log_decay)
+    if log_floor >= 0.0:
+        raise ValueError(f"log_floor must be < 0 or None, got {log_floor}")
+    if target_log_decay <= log_floor:
+        raise ValueError(
+            f"target_log_decay {target_log_decay} is not representable above "
+            f"log_floor {log_floor} (有界版は床より下を表現できない)"
+        )
+    # log_floor * sigmoid(w) = target  ->  sigmoid(w) = target/log_floor
+    ratio = target_log_decay / log_floor  # ∈ (0, 1)
+    return math.log(ratio / (1.0 - ratio))
 
 
 @dataclass
@@ -29,6 +109,12 @@ class RWKVConfig:
     dropout: float = 0.0
     bias: bool = True
     model_type: str = "rwkv-4"
+    decay_log_floor: float | None = None
+    """None = 従来の ``-exp(w)`` (下に非有界)。負値を与えると K3 式の有界 log-decay。"""
+    ffn_activation: str = "sq_relu"
+    """``"sq_relu"`` = 従来の squared-ReLU (非有界・二次)。``"situ_glu"`` = K3 の有界 GLU。"""
+    situ_beta_gate: float = K3_BETA_GATE
+    situ_beta_up: float = K3_BETA_UP
 
     def __post_init__(self) -> None:
         if self.vocab_size <= 0:
@@ -39,6 +125,15 @@ class RWKVConfig:
             raise ValueError(f"n_layer must be > 0, got {self.n_layer}")
         if self.n_embd <= 0:
             raise ValueError(f"n_embd must be > 0, got {self.n_embd}")
+        if self.decay_log_floor is not None and self.decay_log_floor >= 0.0:
+            raise ValueError(
+                f"decay_log_floor must be < 0 or None, got {self.decay_log_floor}"
+            )
+        if self.ffn_activation not in _FFN_ACTIVATIONS:
+            raise ValueError(
+                f"ffn_activation must be one of {sorted(_FFN_ACTIVATIONS)}, "
+                f"got {self.ffn_activation!r}"
+            )
 
 
 def _mix(cur: torch.Tensor, prev: torch.Tensor, mix: torch.Tensor) -> torch.Tensor:
@@ -60,6 +155,13 @@ class RWKVTimeMix(nn.Module):
         self.value = nn.Linear(d, d, bias=config.bias)
         self.receptance = nn.Linear(d, d, bias=config.bias)
         self.output = nn.Linear(d, d, bias=config.bias)
+        self.decay_log_floor = config.decay_log_floor
+
+    def log_decay(self) -> torch.Tensor:
+        """1 ステップ分の log-decay を返す (``α = exp(log_decay)`` が保持率)."""
+        if self.decay_log_floor is None:
+            return -torch.exp(self.time_decay)
+        return bounded_log_decay(self.time_decay, log_floor=self.decay_log_floor)
 
     def step(
         self, x: torch.Tensor, prev_x: torch.Tensor, a: torch.Tensor, b: torch.Tensor, p: torch.Tensor
@@ -70,7 +172,7 @@ class RWKVTimeMix(nn.Module):
         k = self.key(xk)
         v = self.value(xv)
         r = torch.sigmoid(self.receptance(xr))
-        decay = -torch.exp(self.time_decay)
+        decay = self.log_decay()
 
         q = torch.maximum(p, self.time_first + k)
         e1 = torch.exp(p - q)
@@ -88,7 +190,13 @@ class RWKVTimeMix(nn.Module):
 
 
 class RWKVChannelMix(nn.Module):
-    """RWKV channel-mix FFN with squared-ReLU activation."""
+    """RWKV channel-mix FFN.
+
+    既定は RWKV-4 本来の squared-ReLU (``value(relu(key(x))**2)``)。これは**非有界かつ
+    二次**なので、低ビット化・形式検証の観点では最も扱いにくい。``ffn_activation``
+    を ``"situ_glu"`` にすると Kimi K3 の有界 GLU に切り替わり、value へ渡る中間活性が
+    ``|a| <= β_gate·β_up`` に有界化される (既定 4.0 × 25.0 = 100)。
+    """
 
     def __init__(self, config: RWKVConfig) -> None:
         super().__init__()
@@ -99,12 +207,29 @@ class RWKVChannelMix(nn.Module):
         self.key = nn.Linear(d, hidden, bias=config.bias)
         self.value = nn.Linear(hidden, d, bias=config.bias)
         self.receptance = nn.Linear(d, d, bias=config.bias)
+        self.ffn_activation = config.ffn_activation
+        self.situ_beta_gate = config.situ_beta_gate
+        self.situ_beta_up = config.situ_beta_up
+        if self.ffn_activation == "situ_glu":
+            # GLU は gate 枝と up 枝の 2 本が要る。key を gate 枝に流用し up を足す。
+            self.up = nn.Linear(d, hidden, bias=config.bias)
+
+    def ffn_hidden(self, x: torch.Tensor, prev_x: torch.Tensor) -> torch.Tensor:
+        """``value`` 射影に渡る直前の中間活性を返す (有界性の検査点)."""
+        xk = _mix(x, prev_x, self.mix_k)
+        if self.ffn_activation == "situ_glu":
+            return situ_glu(
+                self.key(xk),
+                self.up(xk),
+                beta_gate=self.situ_beta_gate,
+                beta_up=self.situ_beta_up,
+            )
+        k = F.relu(self.key(xk))
+        return cast(torch.Tensor, k * k)
 
     def step(self, x: torch.Tensor, prev_x: torch.Tensor) -> torch.Tensor:
-        xk = _mix(x, prev_x, self.mix_k)
         xr = _mix(x, prev_x, self.mix_r)
-        k = F.relu(self.key(xk))
-        kv = self.value(k * k)
+        kv = self.value(self.ffn_hidden(x, prev_x))
         r = torch.sigmoid(self.receptance(xr))
         return cast(torch.Tensor, r * kv)
 

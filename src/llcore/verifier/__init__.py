@@ -8,6 +8,8 @@ llcore の核独自軸:
 
 API (Stage 1a):
 - :func:`verify_state_norm_invariant` — clip 範囲下の有界性を Z3 で検証
+- :func:`verify_retention_floor` — 忘却速度の下限 (保持床) を Z3 で検証
+- :func:`verify_activation_bound` — SiTU-GLU の出力有界性を Z3 で検証
 - :func:`verify_gene_safe` — 単一 gene が安全 (invariant 違反なし) か検査
 - :class:`InvariantResult` — 検査結果
 
@@ -29,6 +31,8 @@ from .invariants import (
     is_z3_available,
     verify_gene_safe,
     verify_lipschitz_contraction,
+    verify_activation_bound,
+    verify_retention_floor,
     verify_state_norm_invariant,
 )
 from .changeop import (
@@ -86,6 +90,8 @@ __all__ = [
     "InvariantResult",
     "is_z3_available",
     "verify_gene_safe",
+    "verify_activation_bound",
+    "verify_retention_floor",
     "verify_state_norm_invariant",
     # Stage 1b — Lipschitz contraction
     "LipschitzResult",

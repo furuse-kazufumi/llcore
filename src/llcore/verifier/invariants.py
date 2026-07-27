@@ -296,6 +296,254 @@ def verify_gene_safe(
 #       ソルバは t 1 変数の線形可行性問題に縮約される。
 
 
+def verify_retention_floor(
+    *,
+    log_floor: float,
+    steps: int = 1,
+    parameterization: str = "bounded_sigmoid",
+    timeout_ms: int = 2000,
+) -> InvariantResult:
+    """**保持床 (retention floor)** — 忘却がある速度より速くならないことを Z3 で検証.
+
+    検査命題 (steps=T, 床 = ``log_floor``):
+        ``∀ raw params. Σ_{i=1..T} g_i > T * log_floor  かつ  ∀i. g_i < 0``
+
+    保持率は ``α_i = exp(g_i)`` で累積保持は ``exp(Σ g_i)`` なので、この命題は
+    「T ステップ経っても保持率が ``exp(T * log_floor)`` を下回らない」と同値
+    (``exp`` は狭義単調増加。**この単調性の一段だけは Z3 の外の数学的議論**で、
+    以降の線形部分を Z3 が厳密に証明する — 下記 honest 留保を参照)。
+
+    Parameters
+    ----------
+    log_floor : float
+        log 空間の床 (負値)。K3 は ``g_min = -5``。
+    steps : int
+        累積を見るステップ数 T (>= 1)。
+    parameterization : str
+        ``"bounded_sigmoid"`` = ``g = log_floor * sigmoid(w)`` (K3 式)。
+        ``"neg_exp"`` = ``g = -exp(w)`` (llcore の従来式、下に非有界)。
+    timeout_ms : int
+        Z3 timeout (ms)。
+
+    Returns
+    -------
+    InvariantResult
+        ok=True (unsat) なら床が破れない証明。ok=False (sat) なら反例あり
+        = その parameterization では床を保証できない。
+
+    Raises
+    ------
+    ValueError
+        ``log_floor >= 0`` / ``steps < 1`` / 未知の ``parameterization``。
+
+    Notes
+    -----
+    Z3 encoding (sound abstraction):
+    - ``sigmoid(w)`` は Z3 で直接表現できないため、**値域そのもの** ``σ ∈ (0, 1)``
+      を持つ自由変数に置き換える。sigmoid が実際に取り得る値の集合は (0,1) と一致
+      するので、この抽象は緩めも狭めもしない (exact range abstraction)。
+    - ``exp(w)`` も同様に ``e > 0`` の自由変数に置き換える。こちらも値域と一致。
+    - よって Z3 が解くのは ``g_i`` に関する**線形実数論**の問題であり厳密。
+
+    honest 留保:
+    - ``α = exp(g)`` への変換は Z3 の外側 (exp の単調性) に依存する。log 空間で
+      床が証明できても、実装が ``exp`` を別の近似で計算していれば話は別。
+    - **実数上の証明であり float の飽和を扱っていない**。Z3 は ``σ ∈ (0,1)`` の
+      開区間を仮定するが、float32 実装では ``sigmoid(1e4) == 1.0`` と飽和して
+      ``g == log_floor`` ちょうどに到達する (``tests/unit/test_poc_k3_bounded_decay.py``
+      の G1c で固定)。**床 ``α >= exp(log_floor)`` 自体は等号成立を含めて保たれる**が、
+      「開区間である」という Z3 の結論を float 実装の記述として引用してはならない。
+    - ``neg_exp`` が sat になるのは「床を保証できない」ことの証明であって、
+      「学習後の実パラメータが実際に床を割る」ことの証明ではない。
+    """
+    if log_floor >= 0.0:
+        raise ValueError(f"log_floor must be < 0, got {log_floor}")
+    if steps < 1:
+        raise ValueError(f"steps must be >= 1, got {steps}")
+    if parameterization not in ("bounded_sigmoid", "neg_exp"):
+        raise ValueError(
+            f"unknown parameterization {parameterization!r} "
+            "(expected 'bounded_sigmoid' or 'neg_exp')"
+        )
+
+    if not _HAS_Z3:
+        return InvariantResult(
+            ok=parameterization == "bounded_sigmoid",
+            used_z3=False,
+            reason=(
+                "z3 not installed; bounded_sigmoid の床は sigmoid の値域 (0,1) から "
+                "解析的に従う (g = log_floor*σ ∈ (log_floor, 0))"
+            ),
+        )
+
+    solver = z3.Solver()
+    solver.set("timeout", timeout_ms)
+
+    log_decays = []
+    for i in range(steps):
+        if parameterization == "bounded_sigmoid":
+            # sigmoid の値域を厳密に写す自由変数 (over/under-approx なし)
+            sigma = z3.Real(f"sigmoid_{i}")
+            solver.add(sigma > 0, sigma < 1)
+            log_decays.append(log_floor * sigma)
+        else:
+            # exp の値域 (0, inf) を厳密に写す自由変数
+            e = z3.Real(f"exp_{i}")
+            solver.add(e > 0)
+            log_decays.append(-e)
+
+    cumulative = z3.Sum(log_decays) if steps > 1 else log_decays[0]
+
+    # 反例探索: 「床を割る」または「減衰していない (g >= 0)」
+    violations = [cumulative <= steps * log_floor]
+    violations.extend(g >= 0 for g in log_decays)
+    solver.add(z3.Or(*violations))
+
+    status = solver.check()
+    if status == z3.unsat:
+        return InvariantResult(
+            ok=True,
+            used_z3=True,
+            reason=(
+                f"unsat: {parameterization} は {steps} step 累積で "
+                f"log-retention > {steps * log_floor} を破れない "
+                f"(= 保持率 > exp({steps * log_floor}))"
+            ),
+            solver_status="unsat",
+        )
+    if status == z3.sat:
+        model = solver.model()
+        counterexample = {
+            str(d): float(model[d].as_fraction()) for d in model.decls()
+        }
+        return InvariantResult(
+            ok=False,
+            used_z3=True,
+            reason=(
+                f"sat: {parameterization} では {steps} step 累積の保持床 "
+                f"{steps * log_floor} を割る割り当てが存在する (床を保証できない)"
+            ),
+            counterexample=counterexample,
+            solver_status="sat",
+        )
+    return InvariantResult(
+        ok=False,
+        used_z3=True,
+        reason=f"z3 returned unknown (timeout {timeout_ms}ms) — fail-closed で reject",
+        solver_status="unknown",
+    )
+
+
+def verify_activation_bound(
+    *,
+    beta_gate: float,
+    beta_up: float,
+    claimed_bound: float | None = None,
+    timeout_ms: int = 2000,
+) -> InvariantResult:
+    """**SiTU-GLU の出力有界性** を Z3 で検証.
+
+    検査命題::
+
+        ∀ gate_pre, up_pre.
+            |[β_g·tanh(g/β_g)·Sigmoid(g)] · [β_u·tanh(u/β_u)]| <= claimed_bound
+
+    ``claimed_bound`` 既定は ``β_gate * β_up`` (解析上界)。
+
+    Parameters
+    ----------
+    beta_gate, beta_up : float
+        gate 枝 / up 枝の softcap 係数 (正)。
+    claimed_bound : float | None
+        主張する上界。None なら ``beta_gate * beta_up``。積より小さい値を渡すと
+        Z3 が反例を返す (soundness のクロスチェックに使える)。
+    timeout_ms : int
+        Z3 timeout (ms)。
+
+    Returns
+    -------
+    InvariantResult
+        ok=True (unsat) なら上界が破れない証明。
+
+    Raises
+    ------
+    ValueError
+        ``beta_gate`` / ``beta_up`` が正でない、または ``claimed_bound <= 0``。
+
+    Notes
+    -----
+    Z3 encoding (sound abstraction):
+    - ``tanh(·)`` を値域と一致する自由変数 ``t ∈ (-1, 1)`` に、``Sigmoid(·)`` を
+      ``s ∈ (0, 1)`` に置き換える。どちらも値域と厳密に一致するので緩めていない。
+    - ただし ``tanh(g/β_g)`` と ``Sigmoid(g)`` は**同じ** ``g`` の関数なので独立ではない。
+      独立変数として扱うのは **over-approximation** (実際に到達できない組合せも許す)
+      であり、unsat ⟹ 真に有界 という含意は保たれる (逆に sat は保守的で偽 reject
+      になりうる = fail-closed 側)。
+    - 結果として Z3 が解くのは 3 変数の非線形実数論。
+
+    honest 留保:
+    - 実数上の証明であり float の丸め・飽和は扱っていない (:func:`verify_retention_floor`
+      と同じ留保)。
+    """
+    if beta_gate <= 0.0:
+        raise ValueError(f"beta_gate must be > 0, got {beta_gate}")
+    if beta_up <= 0.0:
+        raise ValueError(f"beta_up must be > 0, got {beta_up}")
+    bound = beta_gate * beta_up if claimed_bound is None else claimed_bound
+    if bound <= 0.0:
+        raise ValueError(f"claimed_bound must be > 0, got {bound}")
+
+    if not _HAS_Z3:
+        return InvariantResult(
+            ok=bound >= beta_gate * beta_up,
+            used_z3=False,
+            reason=(
+                "z3 not installed; |β_g·tanh|<=β_g, Sigmoid<=1, |β_u·tanh|<=β_u より "
+                f"解析上界 {beta_gate * beta_up} が従う"
+            ),
+        )
+
+    solver = z3.Solver()
+    solver.set("timeout", timeout_ms)
+
+    tanh_gate = z3.Real("tanh_gate")
+    sigmoid_gate = z3.Real("sigmoid_gate")
+    tanh_up = z3.Real("tanh_up")
+    solver.add(tanh_gate > -1, tanh_gate < 1)
+    solver.add(sigmoid_gate > 0, sigmoid_gate < 1)
+    solver.add(tanh_up > -1, tanh_up < 1)
+
+    out = (beta_gate * tanh_gate * sigmoid_gate) * (beta_up * tanh_up)
+    solver.add(z3.Or(out > bound, out < -bound))  # 反例探索
+
+    status = solver.check()
+    if status == z3.unsat:
+        return InvariantResult(
+            ok=True,
+            used_z3=True,
+            reason=f"unsat: |SiTU-GLU| <= {bound} を破る入力は存在しない",
+            solver_status="unsat",
+        )
+    if status == z3.sat:
+        model = solver.model()
+        return InvariantResult(
+            ok=False,
+            used_z3=True,
+            reason=(
+                f"sat: 主張上界 {bound} を超える割り当てが存在する "
+                f"(解析上界は {beta_gate * beta_up})"
+            ),
+            counterexample={str(d): float(model[d].as_fraction()) for d in model.decls()},
+            solver_status="sat",
+        )
+    return InvariantResult(
+        ok=False,
+        used_z3=True,
+        reason=f"z3 returned unknown (timeout {timeout_ms}ms) — fail-closed で reject",
+        solver_status="unknown",
+    )
+
+
 @dataclass(frozen=True)
 class LipschitzResult:
     """状態方向 Lipschitz contraction 検査結果 (Stage 1b).

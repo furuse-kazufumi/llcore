@@ -36,6 +36,7 @@ from llcore.lm.quant import (
     save_int8_checkpoint,
 )
 from llcore.lm.generation import generate_text, is_degenerate
+from llcore.lm.activations import situ_glu, softcap
 from llcore.lm.model import (
     Block,
     CausalSelfAttention,
@@ -58,6 +59,8 @@ __all__ = [
     "GPTConfig",
     "Int8Linear",
     "NewGELU",
+    "situ_glu",
+    "softcap",
     "RecurrentConfig",
     "RecurrentLM",
     "RWKVConfig",
