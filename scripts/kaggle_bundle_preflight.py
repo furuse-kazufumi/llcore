@@ -79,7 +79,12 @@ _PUBLISH_BLOCKLIST_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("openai-api-key-name", re.compile(r"\bOPENAI_API_KEY\b")),
     ("kaggle-key-name", re.compile(r"\bKAGGLE_KEY\b")),
     ("kaggle-api-token-name", re.compile(r"\bKAGGLE_API_TOKEN\b")),
-    ("local-windows-path", re.compile(r"\b[A-Za-z]:(?:\\|/)+(?:Users|projects)\b")),
+    # 絶対 Windows パス全般を fail-closed で弾く。
+    # 旧実装は ``(?:Users|projects)`` を drive letter 直後に固定していたため、
+    # 2026-07-27 の作業実体移設 (``D:\projects\<X>`` → ``C:\dev\projects\<X>``) で
+    # ``dev`` が挟まった時点で主要な漏洩形が素通りしていた。特定フォルダ名に依存せず
+    # 「drive letter + 区切り + 何らかのセグメント」を marker とする。
+    ("local-windows-path", re.compile(r"\b[A-Za-z]:(?:\\|/)+[A-Za-z0-9_.-]")),
 )
 _EMBEDDED_COPIED_FILE_PATHS = {
     "corpus": "input_corpus.txt",

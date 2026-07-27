@@ -284,7 +284,7 @@ def test_preflight_rejects_dataset_payload_with_local_path_marker(tmp_path: Path
     bundle_dir = _build_dataset_bundle(tmp_path)
     config_path = bundle_dir / "dataset_payload" / "config.json"
     config = json.loads(config_path.read_text(encoding="utf-8"))
-    config["note"] = r"D:\projects\secret"
+    config["note"] = r"C:\dev\projects\secret"
     config_path.write_text(json.dumps(config, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
     rc = preflight.main(["--bundle-dir", str(bundle_dir)])
@@ -329,7 +329,7 @@ def test_preflight_rejects_root_report_with_local_path_marker(tmp_path: Path) ->
     preflight = _load_script("kaggle_bundle_preflight.py")
     bundle_dir = _build_dataset_bundle(tmp_path)
     (bundle_dir / "preflight_report.json").write_text(
-        json.dumps({"bundle_dir": r"D:\projects\secret"}, ensure_ascii=False) + "\n",
+        json.dumps({"bundle_dir": r"C:\dev\projects\secret"}, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
 
