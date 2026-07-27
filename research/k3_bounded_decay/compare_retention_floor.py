@@ -54,6 +54,7 @@ def _run_one(
     label: str,
     decay_log_floor: float | None,
     ffn_activation: str,
+    ffn_hidden_mult: float,
     train_ids: torch.Tensor,
     val_ids: torch.Tensor,
     vocab_size: int,
@@ -67,6 +68,7 @@ def _run_one(
         n_embd=args.n_embd,
         decay_log_floor=decay_log_floor,
         ffn_activation=ffn_activation,
+        ffn_hidden_mult=ffn_hidden_mult,
     )
     model = RWKVLM(cfg)
 
@@ -99,6 +101,8 @@ def _run_one(
         "label": label,
         "decay_log_floor": decay_log_floor,
         "ffn_activation": ffn_activation,
+        "ffn_hidden_mult": ffn_hidden_mult,
+        "n_params": sum(p.numel() for p in model.parameters()),
         "best_val_loss": float(result["best_val_loss"]),  # type: ignore[arg-type]
         "init_alpha": init_alpha,
         "elapsed_sec": round(elapsed, 1),
@@ -150,6 +154,12 @@ def main() -> None:
         default=None,
         help="--arms ffn のとき両 arm に共通で使う decay_log_floor (既定 None = 従来 -exp(w))",
     )
+    ap.add_argument("--ffn-hidden-mult", type=float, default=4.0, help="channel-mix の hidden 倍率")
+    ap.add_argument(
+        "--match-ffn-params",
+        action="store_true",
+        help="--arms ffn のとき SiTU-GLU 側の hidden を 2/3 にして FFN パラメータ数を揃える",
+    )
     ap.add_argument("--max-chars", type=int, default=200_000, help="コーパス先頭 N 文字のみ使う")
     args = ap.parse_args()
 
@@ -160,32 +170,38 @@ def main() -> None:
     print(f"corpus={args.corpus_file} chars={len(text)} vocab={tok.vocab_size} "
           f"train={train_ids.numel()} val={val_ids.numel()}")
 
+    mult = args.ffn_hidden_mult
     if args.arms == "decay":
         # 減衰のパラメータ化を比較 (FFN は両 arm 共通)
         arm_specs = [
-            ("baseline_neg_exp", None, args.ffn_activation),
-            ("bounded_sigmoid", args.log_floor, args.ffn_activation),
+            ("baseline_neg_exp", None, args.ffn_activation, mult),
+            ("bounded_sigmoid", args.log_floor, args.ffn_activation, mult),
         ]
     else:
-        # FFN 活性化を比較 (減衰は両 arm 共通)
+        # FFN 活性化を比較 (減衰は両 arm 共通)。
+        # ★統制: SiTU-GLU は up 枝が増えるため同じ hidden 倍率だと FFN パラメータが
+        #   1.5 倍になり、「活性化の差」ではなく「容量の差」を測ってしまう。
+        #   --match-ffn-params で 2/3 則 (hidden を 8/3 倍) を適用して揃える。
+        glu_mult = mult * 2.0 / 3.0 if args.match_ffn_params else mult
         arm_specs = [
-            ("baseline_sq_relu", args.decay_log_floor_both, "sq_relu"),
-            ("situ_glu", args.decay_log_floor_both, "situ_glu"),
+            ("baseline_sq_relu", args.decay_log_floor_both, "sq_relu", mult),
+            ("situ_glu", args.decay_log_floor_both, "situ_glu", glu_mult),
         ]
 
     runs = []
-    for label, floor, ffn in arm_specs:
-        print(f"--- training {label} (decay_log_floor={floor}, ffn={ffn}) ---")
+    for label, floor, ffn, hmult in arm_specs:
+        print(f"--- training {label} (decay_log_floor={floor}, ffn={ffn}, hidden_mult={hmult:.3f}) ---")
         run = _run_one(
             label=label,
             decay_log_floor=floor,
             ffn_activation=ffn,
+            ffn_hidden_mult=hmult,
             train_ids=train_ids,
             val_ids=val_ids,
             vocab_size=tok.vocab_size,
             args=args,
         )
-        print(f"    best_val_loss={run['best_val_loss']:.4f}  ({run['elapsed_sec']}s)")
+        print(f"    best_val_loss={run['best_val_loss']:.4f}  ({run['elapsed_sec']}s, params={run['n_params']:,})")
         print(f"    init_alpha={run['init_alpha']:.4f}  retention={run['retention']}")
         runs.append(run)
 

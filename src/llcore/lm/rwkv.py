@@ -115,6 +115,9 @@ class RWKVConfig:
     """``"sq_relu"`` = 従来の squared-ReLU (非有界・二次)。``"situ_glu"`` = K3 の有界 GLU。"""
     situ_beta_gate: float = K3_BETA_GATE
     situ_beta_up: float = K3_BETA_UP
+    ffn_hidden_mult: float = 4.0
+    """channel-mix の hidden 幅倍率。SiTU-GLU は枝が 1 本増えるので、パラメータ数を
+    sq_relu と揃えて比較したい場合は 8/3 にする (SwiGLU 論文と同じ 2/3 則)。"""
 
     def __post_init__(self) -> None:
         if self.vocab_size <= 0:
@@ -128,6 +131,10 @@ class RWKVConfig:
         if self.decay_log_floor is not None and self.decay_log_floor >= 0.0:
             raise ValueError(
                 f"decay_log_floor must be < 0 or None, got {self.decay_log_floor}"
+            )
+        if self.ffn_hidden_mult <= 0.0:
+            raise ValueError(
+                f"ffn_hidden_mult must be > 0, got {self.ffn_hidden_mult}"
             )
         if self.ffn_activation not in _FFN_ACTIVATIONS:
             raise ValueError(
@@ -201,7 +208,7 @@ class RWKVChannelMix(nn.Module):
     def __init__(self, config: RWKVConfig) -> None:
         super().__init__()
         d = config.n_embd
-        hidden = 4 * d
+        hidden = max(1, round(config.ffn_hidden_mult * d))
         self.mix_k = nn.Parameter(torch.rand(d))
         self.mix_r = nn.Parameter(torch.rand(d))
         self.key = nn.Linear(d, hidden, bias=config.bias)

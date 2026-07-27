@@ -108,3 +108,55 @@ def test_g3_full_lm_forward_works_in_situ_glu_mode() -> None:
     grads = [p.grad for p in model.parameters() if p.grad is not None]
     assert grads, "勾配が流れていない"
     assert all(torch.isfinite(g).all() for g in grads), "非有限の勾配が出た"
+
+
+# ── G4: パラメータ数の統制 (公平比較の前提) ───────────────────────────
+def _ffn_params(mixer: RWKVChannelMix) -> int:
+    return sum(
+        p.numel()
+        for n, p in mixer.named_parameters()
+        if n.split(".")[0] in ("key", "up", "value")
+    )
+
+
+def test_g4_default_hidden_mult_is_four() -> None:
+    """[G4] 既定の hidden 倍率は 4 (RWKV-4 本来の 4x FFN)."""
+    cfg = _cfg()
+    assert cfg.ffn_hidden_mult == 4.0
+    assert RWKVChannelMix(cfg).key.out_features == 4 * cfg.n_embd
+
+
+def test_g4b_situ_glu_has_more_params_at_the_same_hidden_mult() -> None:
+    """[G4b] 同じ hidden 倍率だと SiTU-GLU は 1.5 倍のパラメータを持つ (交絡の実証).
+
+    sq_relu = d*4d + 4d*d = 8d^2 に対し situ_glu は up 射影が増えて 12d^2。
+    倍率を揃えたまま比較すると「活性化の差」ではなく「容量の差」を測ってしまう。
+    """
+    sq = _ffn_params(RWKVChannelMix(_cfg(n_embd=64)))
+    glu = _ffn_params(RWKVChannelMix(_cfg(n_embd=64, ffn_activation="situ_glu")))
+
+    assert glu > sq
+    # 厳密には bias 項が乗るので 1.5 ちょうどにはならない
+    # (d=64, bias=True で 49728/33088 = 1.5029)。
+    assert glu / sq == pytest.approx(1.5, rel=1e-2)
+
+
+def test_g4c_two_thirds_rule_matches_param_count() -> None:
+    """[G4c] hidden を 8/3 倍にすると SiTU-GLU の FFN パラメータ数が sq_relu と一致する.
+
+    SwiGLU 論文と同じ 2/3 則: 3 枝 × d × h = 2 枝 × d × 4d → h = 8d/3。
+    """
+    sq = _ffn_params(RWKVChannelMix(_cfg(n_embd=96)))
+    glu = _ffn_params(
+        RWKVChannelMix(
+            _cfg(n_embd=96, ffn_activation="situ_glu", ffn_hidden_mult=8.0 / 3.0)
+        )
+    )
+
+    assert glu == pytest.approx(sq, rel=0.01), f"sq={sq} glu={glu}"
+
+
+def test_g4d_config_rejects_nonpositive_hidden_mult() -> None:
+    """[G4d] hidden 倍率 <= 0 は拒否する."""
+    with pytest.raises(ValueError, match="ffn_hidden_mult"):
+        _cfg(ffn_hidden_mult=0.0)
