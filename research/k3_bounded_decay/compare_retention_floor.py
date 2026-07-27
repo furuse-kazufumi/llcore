@@ -53,6 +53,7 @@ def _run_one(
     *,
     label: str,
     decay_log_floor: float | None,
+    ffn_activation: str,
     train_ids: torch.Tensor,
     val_ids: torch.Tensor,
     vocab_size: int,
@@ -65,6 +66,7 @@ def _run_one(
         n_layer=args.n_layer,
         n_embd=args.n_embd,
         decay_log_floor=decay_log_floor,
+        ffn_activation=ffn_activation,
     )
     model = RWKVLM(cfg)
 
@@ -96,6 +98,7 @@ def _run_one(
     return {
         "label": label,
         "decay_log_floor": decay_log_floor,
+        "ffn_activation": ffn_activation,
         "best_val_loss": float(result["best_val_loss"]),  # type: ignore[arg-type]
         "init_alpha": init_alpha,
         "elapsed_sec": round(elapsed, 1),
@@ -129,6 +132,24 @@ def main() -> None:
         default=-5.0,
         help="チャネル死の判定に使う床 (baseline 側の集計にも同じ値を使う)",
     )
+    ap.add_argument(
+        "--arms",
+        choices=("decay", "ffn"),
+        default="decay",
+        help="decay = 減衰パラメータ化を比較 / ffn = squared-ReLU vs SiTU-GLU を比較",
+    )
+    ap.add_argument(
+        "--ffn-activation",
+        choices=("sq_relu", "situ_glu"),
+        default="sq_relu",
+        help="--arms decay のとき両 arm に共通で使う FFN 活性化",
+    )
+    ap.add_argument(
+        "--decay-log-floor-both",
+        type=float,
+        default=None,
+        help="--arms ffn のとき両 arm に共通で使う decay_log_floor (既定 None = 従来 -exp(w))",
+    )
     ap.add_argument("--max-chars", type=int, default=200_000, help="コーパス先頭 N 文字のみ使う")
     args = ap.parse_args()
 
@@ -139,12 +160,26 @@ def main() -> None:
     print(f"corpus={args.corpus_file} chars={len(text)} vocab={tok.vocab_size} "
           f"train={train_ids.numel()} val={val_ids.numel()}")
 
+    if args.arms == "decay":
+        # 減衰のパラメータ化を比較 (FFN は両 arm 共通)
+        arm_specs = [
+            ("baseline_neg_exp", None, args.ffn_activation),
+            ("bounded_sigmoid", args.log_floor, args.ffn_activation),
+        ]
+    else:
+        # FFN 活性化を比較 (減衰は両 arm 共通)
+        arm_specs = [
+            ("baseline_sq_relu", args.decay_log_floor_both, "sq_relu"),
+            ("situ_glu", args.decay_log_floor_both, "situ_glu"),
+        ]
+
     runs = []
-    for label, floor in (("baseline_neg_exp", None), ("bounded_sigmoid", args.log_floor)):
-        print(f"--- training {label} (decay_log_floor={floor}) ---")
+    for label, floor, ffn in arm_specs:
+        print(f"--- training {label} (decay_log_floor={floor}, ffn={ffn}) ---")
         run = _run_one(
             label=label,
             decay_log_floor=floor,
+            ffn_activation=ffn,
             train_ids=train_ids,
             val_ids=val_ids,
             vocab_size=tok.vocab_size,
