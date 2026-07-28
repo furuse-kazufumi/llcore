@@ -156,6 +156,15 @@ def main() -> None:
     )
     ap.add_argument("--ffn-hidden-mult", type=float, default=4.0, help="channel-mix の hidden 倍率")
     ap.add_argument(
+        "--ffn-baseline",
+        choices=("sq_relu", "swiglu"),
+        default="sq_relu",
+        help=(
+            "--arms ffn の対照。sq_relu は構造ごと違う (GLU 化 + 有界化が混ざる)。"
+            "swiglu は situ_glu と同一構造・同一パラメータ数なので **有界化だけ**を切り分けられる"
+        ),
+    )
+    ap.add_argument(
         "--match-ffn-params",
         action="store_true",
         help="--arms ffn のとき SiTU-GLU 側の hidden を 2/3 にして FFN パラメータ数を揃える",
@@ -184,7 +193,8 @@ def main() -> None:
         #   --match-ffn-params で 2/3 則 (hidden を 8/3 倍) を適用して揃える。
         glu_mult = mult * 2.0 / 3.0 if args.match_ffn_params else mult
         arm_specs = [
-            ("baseline_sq_relu", args.decay_log_floor_both, "sq_relu", mult),
+            (f"baseline_{args.ffn_baseline}", args.decay_log_floor_both, args.ffn_baseline,
+             mult if args.ffn_baseline == "sq_relu" else glu_mult),
             ("situ_glu", args.decay_log_floor_both, "situ_glu", glu_mult),
         ]
 

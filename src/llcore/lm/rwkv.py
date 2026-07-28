@@ -12,7 +12,7 @@ from torch.nn import functional as F
 
 from llcore.lm.activations import K3_BETA_GATE, K3_BETA_UP, situ_glu
 
-_FFN_ACTIVATIONS = frozenset({"sq_relu", "situ_glu"})
+_FFN_ACTIVATIONS = frozenset({"sq_relu", "swiglu", "situ_glu"})
 
 
 class RWKVLayerState(NamedTuple):
@@ -112,7 +112,8 @@ class RWKVConfig:
     decay_log_floor: float | None = None
     """None = 従来の ``-exp(w)`` (下に非有界)。負値を与えると K3 式の有界 log-decay。"""
     ffn_activation: str = "sq_relu"
-    """``"sq_relu"`` = 従来の squared-ReLU (非有界・二次)。``"situ_glu"`` = K3 の有界 GLU。"""
+    """``"sq_relu"`` = 従来の squared-ReLU (非有界・二次)。``"swiglu"`` = 非有界 GLU
+    (situ_glu と同一構造の対照)。``"situ_glu"`` = K3 の有界 GLU。"""
     situ_beta_gate: float = K3_BETA_GATE
     situ_beta_up: float = K3_BETA_UP
     ffn_hidden_mult: float = 4.0
@@ -217,7 +218,7 @@ class RWKVChannelMix(nn.Module):
         self.ffn_activation = config.ffn_activation
         self.situ_beta_gate = config.situ_beta_gate
         self.situ_beta_up = config.situ_beta_up
-        if self.ffn_activation == "situ_glu":
+        if self.ffn_activation in ("situ_glu", "swiglu"):
             # GLU は gate 枝と up 枝の 2 本が要る。key を gate 枝に流用し up を足す。
             self.up = nn.Linear(d, hidden, bias=config.bias)
 
@@ -231,6 +232,10 @@ class RWKVChannelMix(nn.Module):
                 beta_gate=self.situ_beta_gate,
                 beta_up=self.situ_beta_up,
             )
+        if self.ffn_activation == "swiglu":
+            # situ_glu と同一構造・同一パラメータ数で **有界化だけを外した**対照。
+            # これとの差が「有界化のコスト」を切り分ける。
+            return cast(torch.Tensor, F.silu(self.key(xk)) * self.up(xk))
         k = F.relu(self.key(xk))
         return cast(torch.Tensor, k * k)
 

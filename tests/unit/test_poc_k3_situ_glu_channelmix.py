@@ -88,7 +88,7 @@ def test_g2c_squared_relu_hidden_is_not_bounded() -> None:
 def test_g2d_config_rejects_unknown_ffn_activation() -> None:
     """[G2d] 未知の活性化名は config 段階で弾く (fail-closed)."""
     with pytest.raises(ValueError, match="ffn_activation"):
-        _cfg(ffn_activation="swiglu")
+        _cfg(ffn_activation="geglu")  # 未実装の名前
 
 
 # ── G3: 実経路 (LM 全体) で動く ───────────────────────────────────────
@@ -160,3 +160,33 @@ def test_g4d_config_rejects_nonpositive_hidden_mult() -> None:
     """[G4d] hidden 倍率 <= 0 は拒否する."""
     with pytest.raises(ValueError, match="ffn_hidden_mult"):
         _cfg(ffn_hidden_mult=0.0)
+
+
+# ── G5: swiglu (有界性だけを切り分けるための対照) ─────────────────────
+def test_g5_swiglu_mode_is_available() -> None:
+    """[G5] swiglu を選べる (SiTU-GLU との差が「有界化のみ」になる対照)."""
+    cfg = _cfg(ffn_activation="swiglu")
+    mixer = RWKVChannelMix(cfg)
+
+    assert hasattr(mixer, "up"), "GLU なのに up 射影が無い"
+
+
+def test_g5b_swiglu_has_same_param_count_as_situ_glu() -> None:
+    """[G5b] swiglu と situ_glu はパラメータ数が同一 (差は活性化だけ)."""
+    a = _ffn_params(RWKVChannelMix(_cfg(n_embd=64, ffn_activation="swiglu")))
+    b = _ffn_params(RWKVChannelMix(_cfg(n_embd=64, ffn_activation="situ_glu")))
+
+    assert a == b
+
+
+def test_g5c_swiglu_hidden_is_unbounded_but_situ_glu_is_not() -> None:
+    """[G5c] 同じ GLU 構造でも swiglu は非有界、situ_glu は有界 (対照の成立)."""
+    torch.manual_seed(0)
+    x = torch.randn(4, 8) * 1e3
+    prev = torch.randn(4, 8) * 1e3
+
+    sw = RWKVChannelMix(_cfg(ffn_activation="swiglu")).ffn_hidden(x, prev).detach()
+    si = RWKVChannelMix(_cfg(ffn_activation="situ_glu")).ffn_hidden(x, prev).detach()
+
+    assert float(sw.abs().max()) > K3_BETA_GATE * K3_BETA_UP, "swiglu が有界に見える"
+    assert torch.all(si.abs() <= K3_BETA_GATE * K3_BETA_UP)
