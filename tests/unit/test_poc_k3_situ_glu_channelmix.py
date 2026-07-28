@@ -190,3 +190,44 @@ def test_g5c_swiglu_hidden_is_unbounded_but_situ_glu_is_not() -> None:
 
     assert float(sw.abs().max()) > K3_BETA_GATE * K3_BETA_UP, "swiglu が有界に見える"
     assert torch.all(si.abs() <= K3_BETA_GATE * K3_BETA_UP)
+
+
+# ── G6: 構造を変えずに有界化する (softcap を hidden に直接掛ける) ──────
+def test_g6_default_has_no_ffn_softcap() -> None:
+    """[G6] 既定では softcap を掛けない (additive)."""
+    assert _cfg().ffn_softcap is None
+
+
+def test_g6b_softcap_bounds_squared_relu_without_changing_structure() -> None:
+    """[G6b] sq_relu に softcap を掛けると有界化するが、構造もパラメータ数も不変.
+
+    SiTU-GLU は有界化と引き換えに GLU 構造 (up 射影) を要求するが、こちらは
+    squared-ReLU のまま値域だけ閉じる。llcore にとってはこちらが筋が良い可能性がある。
+    """
+    plain = RWKVChannelMix(_cfg(n_embd=64))
+    capped = RWKVChannelMix(_cfg(n_embd=64, ffn_softcap=100.0))
+
+    assert _ffn_params(plain) == _ffn_params(capped), "パラメータ数が変わってはいけない"
+    assert not hasattr(capped, "up"), "GLU 化してはいけない"
+
+    torch.manual_seed(0)
+    x = torch.randn(4, 64) * 1e3
+    prev = torch.randn(4, 64) * 1e3
+
+    assert float(plain.ffn_hidden(x, prev).detach().abs().max()) > 100.0
+    assert torch.all(capped.ffn_hidden(x, prev).detach().abs() <= 100.0)
+
+
+def test_g6c_softcap_applies_to_glu_modes_too() -> None:
+    """[G6c] softcap は活性化の種類に依らず hidden に効く (直交した knob)."""
+    capped = RWKVChannelMix(_cfg(ffn_activation="swiglu", ffn_softcap=5.0))
+    x = torch.randn(4, 8) * 1e3
+    prev = torch.randn(4, 8) * 1e3
+
+    assert torch.all(capped.ffn_hidden(x, prev).detach().abs() <= 5.0)
+
+
+def test_g6d_config_rejects_nonpositive_softcap() -> None:
+    """[G6d] softcap <= 0 は拒否する."""
+    with pytest.raises(ValueError, match="ffn_softcap"):
+        _cfg(ffn_softcap=0.0)

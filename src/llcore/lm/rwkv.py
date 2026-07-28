@@ -10,7 +10,7 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
-from llcore.lm.activations import K3_BETA_GATE, K3_BETA_UP, situ_glu
+from llcore.lm.activations import K3_BETA_GATE, K3_BETA_UP, situ_glu, softcap
 
 _FFN_ACTIVATIONS = frozenset({"sq_relu", "swiglu", "situ_glu"})
 
@@ -116,6 +116,10 @@ class RWKVConfig:
     (situ_glu と同一構造の対照)。``"situ_glu"`` = K3 の有界 GLU。"""
     situ_beta_gate: float = K3_BETA_GATE
     situ_beta_up: float = K3_BETA_UP
+    ffn_softcap: float | None = None
+    """None = 掛けない。正値を与えると channel-mix の hidden に ``softcap(a, β)`` を
+    適用して ``|a| <= β`` に有界化する。**活性化の種類に依らず効く直交した knob** で、
+    SiTU-GLU と違い GLU 構造 (up 射影) を要求しないためパラメータ数が変わらない。"""
     ffn_hidden_mult: float = 4.0
     """channel-mix の hidden 幅倍率。SiTU-GLU は枝が 1 本増えるので、パラメータ数を
     sq_relu と揃えて比較したい場合は 8/3 にする (SwiGLU 論文と同じ 2/3 則)。"""
@@ -133,6 +137,8 @@ class RWKVConfig:
             raise ValueError(
                 f"decay_log_floor must be < 0 or None, got {self.decay_log_floor}"
             )
+        if self.ffn_softcap is not None and self.ffn_softcap <= 0.0:
+            raise ValueError(f"ffn_softcap must be > 0 or None, got {self.ffn_softcap}")
         if self.ffn_hidden_mult <= 0.0:
             raise ValueError(
                 f"ffn_hidden_mult must be > 0, got {self.ffn_hidden_mult}"
@@ -218,12 +224,19 @@ class RWKVChannelMix(nn.Module):
         self.ffn_activation = config.ffn_activation
         self.situ_beta_gate = config.situ_beta_gate
         self.situ_beta_up = config.situ_beta_up
+        self.ffn_softcap = config.ffn_softcap
         if self.ffn_activation in ("situ_glu", "swiglu"):
             # GLU は gate 枝と up 枝の 2 本が要る。key を gate 枝に流用し up を足す。
             self.up = nn.Linear(d, hidden, bias=config.bias)
 
     def ffn_hidden(self, x: torch.Tensor, prev_x: torch.Tensor) -> torch.Tensor:
         """``value`` 射影に渡る直前の中間活性を返す (有界性の検査点)."""
+        hidden = self._ffn_hidden_raw(x, prev_x)
+        if self.ffn_softcap is not None:
+            hidden = softcap(hidden, beta=self.ffn_softcap)
+        return hidden
+
+    def _ffn_hidden_raw(self, x: torch.Tensor, prev_x: torch.Tensor) -> torch.Tensor:
         xk = _mix(x, prev_x, self.mix_k)
         if self.ffn_activation == "situ_glu":
             return situ_glu(

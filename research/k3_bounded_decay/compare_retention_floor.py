@@ -55,6 +55,7 @@ def _run_one(
     decay_log_floor: float | None,
     ffn_activation: str,
     ffn_hidden_mult: float,
+    ffn_softcap: float | None = None,
     train_ids: torch.Tensor,
     val_ids: torch.Tensor,
     vocab_size: int,
@@ -69,6 +70,7 @@ def _run_one(
         decay_log_floor=decay_log_floor,
         ffn_activation=ffn_activation,
         ffn_hidden_mult=ffn_hidden_mult,
+        ffn_softcap=ffn_softcap,
     )
     model = RWKVLM(cfg)
 
@@ -102,6 +104,7 @@ def _run_one(
         "decay_log_floor": decay_log_floor,
         "ffn_activation": ffn_activation,
         "ffn_hidden_mult": ffn_hidden_mult,
+        "ffn_softcap": ffn_softcap,
         "n_params": sum(p.numel() for p in model.parameters()),
         "best_val_loss": float(result["best_val_loss"]),  # type: ignore[arg-type]
         "init_alpha": init_alpha,
@@ -138,9 +141,12 @@ def main() -> None:
     )
     ap.add_argument(
         "--arms",
-        choices=("decay", "ffn"),
+        choices=("decay", "ffn", "softcap"),
         default="decay",
-        help="decay = 減衰パラメータ化を比較 / ffn = squared-ReLU vs SiTU-GLU を比較",
+        help=(
+            "decay = 減衰パラメータ化 / ffn = 活性化の種類 / "
+            "softcap = 同一構造のまま softcap の有無だけを比較"
+        ),
     )
     ap.add_argument(
         "--ffn-activation",
@@ -155,6 +161,7 @@ def main() -> None:
         help="--arms ffn のとき両 arm に共通で使う decay_log_floor (既定 None = 従来 -exp(w))",
     )
     ap.add_argument("--ffn-hidden-mult", type=float, default=4.0, help="channel-mix の hidden 倍率")
+    ap.add_argument("--ffn-softcap", type=float, default=100.0, help="--arms softcap で掛ける β")
     ap.add_argument(
         "--ffn-baseline",
         choices=("sq_relu", "swiglu"),
@@ -180,11 +187,18 @@ def main() -> None:
           f"train={train_ids.numel()} val={val_ids.numel()}")
 
     mult = args.ffn_hidden_mult
-    if args.arms == "decay":
+    if args.arms == "softcap":
+        # ★構造を変えずに有界化した場合のコストだけを測る。
+        #   両 arm とも同一構造・同一パラメータ数で、違いは softcap の有無だけ。
+        arm_specs = [
+            ("baseline_uncapped", args.decay_log_floor_both, args.ffn_activation, mult, None),
+            ("softcapped", args.decay_log_floor_both, args.ffn_activation, mult, args.ffn_softcap),
+        ]
+    elif args.arms == "decay":
         # 減衰のパラメータ化を比較 (FFN は両 arm 共通)
         arm_specs = [
-            ("baseline_neg_exp", None, args.ffn_activation, mult),
-            ("bounded_sigmoid", args.log_floor, args.ffn_activation, mult),
+            ("baseline_neg_exp", None, args.ffn_activation, mult, None),
+            ("bounded_sigmoid", args.log_floor, args.ffn_activation, mult, None),
         ]
     else:
         # FFN 活性化を比較 (減衰は両 arm 共通)。
@@ -194,18 +208,19 @@ def main() -> None:
         glu_mult = mult * 2.0 / 3.0 if args.match_ffn_params else mult
         arm_specs = [
             (f"baseline_{args.ffn_baseline}", args.decay_log_floor_both, args.ffn_baseline,
-             mult if args.ffn_baseline == "sq_relu" else glu_mult),
-            ("situ_glu", args.decay_log_floor_both, "situ_glu", glu_mult),
+             mult if args.ffn_baseline == "sq_relu" else glu_mult, None),
+            ("situ_glu", args.decay_log_floor_both, "situ_glu", glu_mult, None),
         ]
 
     runs = []
-    for label, floor, ffn, hmult in arm_specs:
-        print(f"--- training {label} (decay_log_floor={floor}, ffn={ffn}, hidden_mult={hmult:.3f}) ---")
+    for label, floor, ffn, hmult, cap in arm_specs:
+        print(f"--- training {label} (decay_log_floor={floor}, ffn={ffn}, hidden_mult={hmult:.3f}, softcap={cap}) ---")
         run = _run_one(
             label=label,
             decay_log_floor=floor,
             ffn_activation=ffn,
             ffn_hidden_mult=hmult,
+            ffn_softcap=cap,
             train_ids=train_ids,
             val_ids=val_ids,
             vocab_size=tok.vocab_size,
